@@ -12,16 +12,16 @@
           span 2
           label LANGUAGE:
           p Source:
-            |&nbsp; {{ sourceSelect }}
+            span.choice &nbsp; {{ sourceSelect }}
           p Target: 
-            |&nbsp; {{ targetSelect }}
+            span.choice &nbsp; {{ targetSelect }}
         .orderInfo__summary-industry
           span 3
           label INDUSTRY: 
           p.choice {{ industrySelect }}
         .orderInfo__summary-deadline
           label SUGGESTED DEADLINE
-          span.choice {{ deadlineSelect }}
+          p.choice {{ deadlineSelect }}
     form.mainForm(@submit.prevent = 'sendForm')
       .number 
         span 1
@@ -29,7 +29,8 @@
       .service-type
         .select(v-on:click='showServices')
           span.inner-text.clarify(:class="{ color: serviceSelect != 'Select' }") {{ serviceSelect }}
-            i.fas.fa-caret-down.icon(:class="{ reverse: serviceDrop == true }")
+            .icon(:class="{ reverse: serviceDrop }")
+              i.fas.fa-caret-down
           .service-type__drop(v-if='serviceDrop')
             .service-type__drop-list(v-for='service of services')
               span.list-item(@click='changeServiceSelect' v-for='curService of service') {{ curService.value }}
@@ -40,20 +41,22 @@
         span Source Language
         .select.source(v-on:click='showSourceLang')
           span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect }}
-            i.fas.fa-caret-down.icon
+            .icon(:class="{ reverse: sourceDrop }")
+              i.fas.fa-caret-down
           .source__drop(v-if='sourceDrop')
             .source__drop-list(v-for='language in languages')
               .pair(@click='changeSourceSelect')
-                img(src="../assets/images/flags/Afrikaans[AF].png")
+                img(:src="language.flag")
                 span.list-item {{ language.lang }}
         span Target Language(s)
         .select.target(v-on:click='showTargetLang')
           span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") {{ targetSelect }}
-            i.fas.fa-caret-down.icon
+            .icon(:class="{ reverse: targetDrop }")
+              i.fas.fa-caret-down
           .target__drop(v-if='targetDrop')
             .target__drop-list(v-for='language in languages')
               .pair(@click='changeTargetSelect')
-                img(src="../assets/images/flags/Bengali(India)[BN-IN].png")
+                img(:src="language.flag")
                 span.list-item {{ language.lang }}  
       .number 
         span 3
@@ -95,8 +98,6 @@
           .image
           .image-white
           p Other
-      //- .datepick
-      //-   datepicker(placeholder="Select Date")
       .number
         span 4
         label PROJECT DETAILS
@@ -114,8 +115,10 @@
           .inner.date-file.deadline
             span Suggested Deadline
             .calendar
-              input#datepicker(type='text' placeholder="dd-mm-yyyy")
-              img(src='../assets/images/calendar.png')
+              //- input#datepicker(type='text' placeholder="dd-mm-yyyy")
+              datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted')
+              .datepick(@click='openPicker')
+                  img(src='../assets/images/calendar.png')
             span.clarify Select     
           .inner.date-file.file-types
             span Supported File Types
@@ -168,12 +171,29 @@
 </template>
 
 <script>
+  let state = {
+    highlighted: {
+      to: new Date(2016, 0, 5), // Highlight all dates up to specific date
+      from: new Date(2016, 0, 26), // Highlight all dates after specific date
+      days: [6, 0]
+    }
+  }
+</script>
+
+<script>
 import ClickOutside from 'vue-click-outside';
 import Datepicker from 'vuejs-datepicker';
+
 export default {
   name: 'form',
   data () {
     return {
+      state: {
+        highlighted: {
+          days: [6, 0],
+          dates: [new Date()]
+        }
+      },
       industryList: {
         legal: {
           text: 'Legal'
@@ -204,6 +224,7 @@ export default {
       targetSelect: 'Select',
       industrySelect: 'Select',
       deadlineSelect: '',
+      format: 'dd-MM-yyyy',
       services:[
         [
           { value: 'Translation' },
@@ -233,51 +254,48 @@ export default {
         'rtf', 'ini', 'Wordfast (txml)'
       ],
       languages: [
-        {flag: '../assets/images/flags/Afrikaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Arabic[AR].png', lang: 'Arabic'},
-        {flag: '../assets/images/flags/Armenian[HY].png', lang: 'Armenian'},
-        {flag: '../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png', lang: 'Azerbaijani'},
-        {flag: '../assets/images/flags/Bengali(India)[BN-IN].png', lang: 'Bengali'},
-        {flag: '../assets/images/flags/Bosnian[BS].png', lang: 'Bosnian'},
-        {flag: '../assets/images/flags/Bulgarian[BG].png', lang: 'Bulgarian'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Chinese(HongKong)[ZH-HK].png', lang: 'Chinese Simpl'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Arabic[AR].png', lang: 'Arabic'},
-        {flag: '../assets/images/flags/Armenian[HY].png', lang: 'Armenian'},
-        {flag: '../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png', lang: 'Azerbaijani'},
-        {flag: '../assets/images/flags/Bengali(India)[BN-IN].png', lang: 'Bengali'},
-        {flag: '../assets/images/flags/Bosnian[BS].png', lang: 'Bosnian'},
-        {flag: '../assets/images/flags/Bulgarian[BG].png', lang: 'Bulgarian'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Chinese(HongKong)[ZH-HK].png', lang: 'Chinese Simpl'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Arabic[AR].png', lang: 'Arabic'},
-        {flag: '../assets/images/flags/Armenian[HY].png', lang: 'Armenian'},
-        {flag: '../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png', lang: 'Azerbaijani'},
-        {flag: '../assets/images/flags/Bengali(India)[BN-IN].png', lang: 'Bengali'},
-        {flag: '../assets/images/flags/Bosnian[BS].png', lang: 'Bosnian'},
-        {flag: '../assets/images/flags/Bulgarian[BG].png', lang: 'Bulgarian'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Chinese(HongKong)[ZH-HK].png', lang: 'Chinese Simpl'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Arabic[AR].png', lang: 'Arabic'},
-        {flag: '../assets/images/flags/Armenian[HY].png', lang: 'Armenian'},
-        {flag: '../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png', lang: 'Azerbaijani'},
-        {flag: '../assets/images/flags/Bengali(India)[BN-IN].png', lang: 'Bengali'},
-        {flag: '../assets/images/flags/Bosnian[BS].png', lang: 'Bosnian'},
-        {flag: '../assets/images/flags/Bulgarian[BG].png', lang: 'Bulgarian'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Chinese(HongKong)[ZH-HK].png', lang: 'Chinese Simpl'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Arabic[AR].png', lang: 'Arabic'},
-        {flag: '../assets/images/flags/Armenian[HY].png', lang: 'Armenian'},
-        {flag: '../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png', lang: 'Azerbaijani'},
-        {flag: '../assets/images/flags/Bengali(India)[BN-IN].png', lang: 'Bengali'},
-        {flag: '../assets/images/flags/Bosnian[BS].png', lang: 'Bosnian'},
-        {flag: '../assets/images/flags/Bulgarian[BG].png', lang: 'Bulgarian'},
-        {flag: '../assets/images/flags/Africaans[AF].png', lang: 'Afrikaans'},
-        {flag: '../assets/images/flags/Chinese(HongKong)[ZH-HK].png', lang: 'Chinese Simpl'},      
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
       ]
     }
   },
@@ -318,8 +336,22 @@ export default {
     },
     changeTargetSelect(event) {
       this.targetSelect = event.target.textContent;
+    },
+    openPicker () {
+      this.$refs.programaticOpen.showCalendar()
     }
   },
+  // computed: {
+  //   deadlineDate() {
+  //     console.log(this.deadlineSelect);
+  //     if(deadlineSelect == null) {
+  //       let string = '';
+  //       return string
+  //     } else {
+  //       return this.deadlineSelect;
+  //     }
+  //   }
+  // },
 
   directives: {
     ClickOutside
@@ -369,10 +401,7 @@ export default {
       &__summary {
         p {
           padding-left: 20px;
-        }
-        .choice {
-          margin-top: 5px;
-        }
+        }        
         span {
           font-size: 30px;
           padding-right: 5px;
@@ -380,7 +409,28 @@ export default {
         label {
           font-size: 18px;
           font-family: MyriadBold;
-        }        
+        }
+        .choice {
+          margin-top: 5px;
+          color: #db9b85;
+        }
+        &-languages {
+          p {
+            .choice {
+              font-size: 16px;
+              color: #db9b85;
+            }
+          }
+        }
+        &-deadline {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          .choice {
+            padding-left: 0;
+            margin-top: 0;
+          }
+        }       
       }
     }
   }
@@ -808,11 +858,18 @@ export default {
     opacity: 1;
   }
 
-  // .icon-reverse {
-  //   transform: rotate(180deg);
-  //   padding-right: 0;
-  //   padding-left: 15px;
-  // }
+  .vdp-datepicker__calendar {
+    border-radius: 10px;
+    div {
+      .day-header {
+        background-color: #ccc;
+      }
+      .blanc, .cell {
+        background-color: #eaeaea;
+      }
+    }
+
+  }
 
   @font-face {
     font-family: MyriadPro;
