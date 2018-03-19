@@ -21,7 +21,7 @@
           p.choice {{ industrySelect }}
         .orderInfo__summary-deadline
           label SUGGESTED DEADLINE
-          p.choice {{ deadlineSelect }}
+          p.choice {{ deadlineDate }}
     form.mainForm(@submit.prevent = 'sendForm')
       .number 
         span 1
@@ -181,8 +181,9 @@
 </script>
 
 <script>
+import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
-import Datepicker from 'vuejs-datepicker';
+import Datepicker from './../components/Datepicker.vue';
 
 export default {
   name: 'form',
@@ -214,6 +215,7 @@ export default {
           text: 'Video Games'
         }
       },
+      deadlineDate: '',
       serviceDrop:  false,
       sourceDrop: false,
       targetDrop: false,
@@ -341,17 +343,12 @@ export default {
       this.$refs.programaticOpen.showCalendar()
     }
   },
-  // computed: {
-  //   deadlineDate() {
-  //     console.log(this.deadlineSelect);
-  //     if(deadlineSelect == null) {
-  //       let string = '';
-  //       return string
-  //     } else {
-  //       return this.deadlineSelect;
-  //     }
-  //   }
-  // },
+  watch: {
+    deadlineSelect() {
+      const date = moment(this.deadlineSelect);
+      this.deadlineDate = date.format('DD-MM-YYYY');
+    }
+  },
 
   directives: {
     ClickOutside
@@ -412,13 +409,13 @@ export default {
         }
         .choice {
           margin-top: 5px;
-          color: #db9b85;
+          color: #FF876C;
         }
         &-languages {
           p {
             .choice {
               font-size: 16px;
-              color: #db9b85;
+              color: #FF876C;
             }
           }
         }
