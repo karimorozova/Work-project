@@ -270,6 +270,7 @@ export default {
           isHighlightStart: this.isHighlightStart(dObj),
           isHighlightEnd: this.isHighlightEnd(dObj),
           isToday: dObj.toDateString() === (new Date()).toDateString(),
+          isBeforeToday: dObj.getDate() < new Date().getDate(),
           isWeekend: dObj.getDay() === 0 || dObj.getDay() === 6,
           isSaturday: dObj.getDay() === 6,
           isSunday: dObj.getDay() === 0
@@ -843,6 +844,7 @@ export default {
         'disabled': day.isDisabled,
         'highlighted': day.isHighlighted,
         'today': day.isToday,
+        'beforeToday': day.isBeforeToday,
         'weekend': day.isWeekend,
         'sat': day.isSaturday,
         'sun': day.isSunday,
@@ -867,6 +869,13 @@ export default {
 </script>
 
 <style>
+.vdp-datepicker__calendar div .cell {
+  font-size: 16px;
+}
+
+.notCurrentMonth {
+  color: rgba(0, 0, 0, 0.2);
+}
 
 .rtl {
 	direction: rtl;
@@ -909,6 +918,11 @@ export default {
 	position: relative;
 }
 
+.vdp-datepicker__calendar header .up {
+  color: #FF876C;
+  font-size: 18px;
+}
+
 .vdp-datepicker__calendar header .prev:after,
 .vdp-datepicker__calendar header .next:after {
 	content: '';
@@ -920,7 +934,7 @@ export default {
 }
 
 .vdp-datepicker__calendar header .prev:after {
-	border-right: 10px solid #000;
+	border-right: 10px solid  #FF876C;
 	margin-left: -5px;
 }
 
@@ -929,7 +943,7 @@ export default {
 }
 
 .vdp-datepicker__calendar header .next:after {
-	border-left: 10px solid #000;
+	border-left: 10px solid #FF876C;
 	margin-left: 5px;
 }
 
@@ -984,7 +998,8 @@ export default {
 }
 
 .vdp-datepicker__calendar .cell.selected {
-	background: #4bd;
+	background: white;
+  font-weight: bold;
 }
 
 .vdp-datepicker__calendar .cell.selected:hover {
@@ -995,8 +1010,20 @@ export default {
 	background: #4bd;
 }
 
-.vdp-datepicker__calendar .cell.highlighted {
-	background: #cae5ed;
+.vdp-datepicker__calendar .cell.highlighted,
+.vdp-datepicker__calendar .cell.disabled.weekend {
+	background: #cde1f7;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.vdp-datepicker__calendar .cell.today {
+  background-color: #FF876C;
+  color: #D50000;
+  font-weight: bold;  
+}
+
+.vdp-datepicker__calendar .cell.beforeToday {
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .vdp-datepicker__calendar .cell.highlighted.disabled {
@@ -1012,9 +1039,11 @@ export default {
 }
 
 .vdp-datepicker__calendar .cell.day-header {
-	font-size: 75%;
+	font-size: 16px;
 	white-space: no-wrap;
 	cursor: inherit;
+  background-color: #d3d3d3;
+  font-weight: bold;
 }
 
 .vdp-datepicker__calendar .cell.day-header:hover {

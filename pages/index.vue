@@ -47,7 +47,12 @@
             .source__drop-list(v-for='language in languages')
               .pair(@click='changeSourceSelect')
                 img(:src="language.flag")
-                span.list-item {{ language.lang }}
+                span.list-item(v-on:hover='showDialects') {{ language.lang }}
+              .source__drop-list.dialect(v-if='language.dialects' v-show="dialectsDrop")
+                template(v-for='dialect in language.dialects')
+                  .pair(@click='changeSourceSelect')
+                    img(:src="dialect.flag")                  
+                    span.list-item {{ dialect.lang }}
         span Target Language(s)
         .select.target(v-on:click='showTargetLang')
           span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") {{ targetSelect }}
@@ -116,7 +121,7 @@
             span Suggested Deadline
             .calendar
               //- input#datepicker(type='text' placeholder="dd-mm-yyyy")
-              datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted')
+              datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
               .datepick(@click='openPicker')
                   img(src='../assets/images/calendar.png')
             span.clarify Select     
@@ -134,8 +139,39 @@
         .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
           .title
             label SUPPORTED FILE TYPES
-          .types 
-            li(v-for='type in fileTypes') &#9679;{{ type }}
+            .crossButton(@click="showFiles")
+              i.fa.fa-times.close
+          .types
+            .textFiles.types__sector
+              .fileTypeTitle Text files
+              .list
+                li(v-for='type in fileTypes.text') 
+                  span.dot &#9679;
+                  span.type-text {{ type }}
+            .designFiles.types__sector
+              .fileTypeTitle Design files
+              .list
+                li(v-for='type in fileTypes.design') 
+                  span.dot &#9679;
+                  span.type-text {{ type }}
+            .webFiles.types__sector
+              .fileTypeTitle Web files
+              .list
+                li(v-for='type in fileTypes.web')
+                  span.dot &#9679;
+                  span.type-text {{ type }}
+            .translationFiles.types__sector
+              .fileTypeTitle Translation files
+              .list
+                li(v-for='type in fileTypes.translation')
+                  span.dot &#9679;
+                  span.type-text {{ type }}
+            .devFiles.types__sector
+              .fileTypeTitle Dev files
+              .list
+                li(v-for='type in fileTypes.dev')
+                  span.dot &#9679;
+                  span.type-text {{ type }}
         .details__brief
           span.details__brief-title Enter a short brief
           textarea(rows='10')
@@ -191,8 +227,11 @@ export default {
     return {
       state: {
         highlighted: {
-          days: [6, 0],
-          dates: [new Date()]
+          days: [6, 0]
+          // dates: [new Date()]
+        },
+        disabled: {
+          to: new Date()
         }
       },
       industryList: {
@@ -224,6 +263,7 @@ export default {
       serviceSelect: 'Select',
       sourceSelect: 'Select',
       targetSelect: 'Select',
+      dialectsDrop: false,
       industrySelect: 'Select',
       deadlineSelect: '',
       format: 'dd-MM-yyyy',
@@ -243,22 +283,62 @@ export default {
           { value: 'SEO Writing' },
         ]
       ],
-      fileTypes: [
-        'Microsoft Office (doc, docx, xls, xlsx, xlsm, ppt, pptx)',
-        'pdf (returns plain text)',
-        'xhtml, xht', 'dita', 'Microsoft Visio (vdx)',
-        'sdf', 'xlf, xliff, sdlxliff', 'asp, aspx',
-        'Open Office (sxw, odt, ods, odp)', 'svg',
-        'Trados (ttx)', 'txt', 'Adobe FrameMaker (mif)',
-        'yml, yaml', 'Java property files', 'tpl',
-        'Adobe InDesign (idml)', 'iPhone apps (strings)', 'html, htm',
-        'resx', 'Adobe Illustrator (fxg & svg)', 'php',
-        'rtf', 'ini', 'Wordfast (txml)'
-      ],
+      fileTypes: {
+        text:
+          [
+            'Microsoft Office (doc, docx, xls, xlsx, xlsm, ppt, pptx)',
+            'Open Office (sxw, odt, ods, odp)', 'Microsoft Visio (vdx)',
+            'pdf (returns plain text)', 'rtf', 'txt'
+          ]
+        ,
+        design:
+          [ 
+            'Adobe Illustrator (fxg & svg)', 'Adobe FrameMaker (mif)',
+            'Adobe InDesign (idml)', 'sdf', 'svg',
+          ]
+        ,
+        web:
+          [
+            'html, htm', 'xhtml, xht', 'asp, aspx', 'php', 'dita', 'tpl'
+          ]
+        ,
+        translation:
+          [
+            'xlf, xliff, sdlxliff', 'Wordfast (txml)', 'Trados (ttx)',
+          ]
+        ,
+        dev:          
+          [
+            'yml, yaml', 'Java property files', 'iPhone apps (strings)',
+            'resx', 'ini'
+          ]    
+      },
       languages: [
         {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', 
+        dialects:
+        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'}
+        ]},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
+        dialects:
+        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'}
+        ]},
+        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
+        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
+        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
+        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
         {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
+        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
+        dialects:
+        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'}
+        ]},
         {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
         {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
         {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
@@ -270,14 +350,12 @@ export default {
         {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
         {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
         {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali'},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian'},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian'},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans',
+        dialects:
+        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'},
+          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans'}
+        ]},
         {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic'},
         {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian'},
         {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani'},
@@ -326,6 +404,12 @@ export default {
     },
     toggleTarget() {
       this.targetDrop = !this.targetDrop
+    },
+    showDialects() {
+      this.toggleDialects()
+    },
+    toggleDialects() {
+      this.dialectsDrop = !this.dialectsDrop
     },
     showFiles() {
       this.toggleFiles()
@@ -453,6 +537,7 @@ export default {
       padding-left:10px;
       display: flex;
       justify-content: space-between;
+      min-height: 24px;
     }
     .icon {
       padding-right: 15px;
@@ -477,11 +562,13 @@ export default {
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
-        margin-top: 15px;
         padding-top: 15px;
         padding-left: 10px;
         padding-right: 10px;
-        border-top: 1px solid rgba(0,0,0,0.3);      
+        border-top: 1px solid rgba(0,0,0,0.3);
+        .dialect {
+          padding-left: 10px;
+        }
         .pair {
           padding: 2px;
           display: flex;
@@ -508,7 +595,6 @@ export default {
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
-        margin-top: 15px;
         padding-top: 15px;
         padding-left: 10px;
         padding-right: 10px;
@@ -628,9 +714,9 @@ export default {
     &__files-list {
       position: absolute;
       top: -23px;
-      right: -6px;;
+      right: -36px;;
       background-color: white;
-      width: 49%;
+      width: 70%;
       display: flex;
       flex-direction: column;
       border-radius: 10px;
@@ -640,17 +726,47 @@ export default {
         display: flex;
         justify-content: center;
         label {
+          font-size: 22px;
           margin-bottom: 0;
           padding-top: 10px;
         }
+        .close {
+          position: absolute;
+          right: 16px;
+          font-size: 22px;
+          cursor: pointer;
+        }
       }
       .types {
-        padding-top: 15px;
         display: flex;
         flex-wrap: wrap;
+        flex-direction: column;
+        &__sector {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: wrap;
+          .fileTypeTitle {
+            margin-top: 0;
+            margin-bottom: 0;
+            padding: 5px 0;
+            font-size: 18px;
+            font-family: MyriadBold;
+          }
+          .list {
+            display: flex;
+            flex-wrap: wrap;
+          }
+        }
         li {
           list-style: none;
-          padding-left: 10px;
+          .dot {
+            padding-bottom: 3px;
+          }
+          .type-text {
+            font-size: 18px;
+            padding-left: 2px;
+            padding-right: 8px;
+          }
         }
       }
     }
@@ -856,12 +972,12 @@ export default {
   }
 
   .vdp-datepicker__calendar {
-    border-radius: 10px;
     div {
       .day-header {
-        background-color: #ccc;
+        font-weight: bold;
+        font-size: 16px;
       }
-      .blanc, .cell {
+      .cell {
         background-color: #eaeaea;
       }
     }
