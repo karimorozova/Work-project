@@ -105,6 +105,7 @@
 <script>
 import DateUtils from '@/utils/DateUtils.js'
 import DateLanguages from '@/utils/DateLanguages.js'
+import moment from 'moment'
 
 export default {
   props: {
@@ -270,7 +271,7 @@ export default {
           isHighlightStart: this.isHighlightStart(dObj),
           isHighlightEnd: this.isHighlightEnd(dObj),
           isToday: dObj.toDateString() === (new Date()).toDateString(),
-          isBeforeToday: dObj.getDate() < new Date().getDate(),
+          isBeforeToday: moment(dObj).isBefore(moment(), 'day'),
           isWeekend: dObj.getDay() === 0 || dObj.getDay() === 6,
           isSaturday: dObj.getDay() === 6,
           isSunday: dObj.getDay() === 0
@@ -873,10 +874,6 @@ export default {
   font-size: 16px;
 }
 
-.notCurrentMonth {
-  color: rgba(0, 0, 0, 0.2);
-}
-
 .rtl {
 	direction: rtl;
 }
@@ -1065,5 +1062,9 @@ export default {
 .vdp-datepicker__calendar-button.disabled {
 	color: #999;
 	cursor: default;
+}
+
+.vdp-datepicker__calendar .cell.notCurrentMonth {
+  color: rgba(0, 0, 0, 0.2);
 }
 </style>
