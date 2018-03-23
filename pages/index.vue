@@ -22,7 +22,7 @@
         .orderInfo__summary-deadline
           label SUGGESTED DEADLINE
           p.choice {{ deadlineDate }}
-    form.mainForm(@submit.prevent = 'sendForm')
+    form.mainForm(@submit.prevent="formControl")
       .number 
         span 1
         label.asterisk SERVICE TYPE      
@@ -117,11 +117,15 @@
         .details__item
           .inner.buttons.upload-file
             span.asterisk Files
-            button Upload File(s)
+            .upload-btn
+              .upload-btn__txt Upload files(s)
+              input(name="files" type="file")
             span.clarify Drag &amp; Drop
           .inner.buttons.upload-reference
             span Upload Reference File
-            button Upload
+            .upload-btn
+              .upload-btn__txt Upload
+              input(name="files" type="file")
             span.clarify Type Text
         .details__item
           .inner.date-file.deadline
@@ -188,10 +192,10 @@
         .contact__col
           .contact__col-item.name
             span.asterisk Name
-            input(type='text' required)
+            input(type='text' name='formContactsName' v-model='form.name')
           .contact__col-item.email
             span.asterisk Email
-            input(type='email' required)
+            input(type='email' name='formContactsMail' v-model='form.email')
           .contact__col-item.phone
             span Phone Number
             input(type='text')
@@ -226,6 +230,7 @@
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
+// import Clock from './../components/Clock.vue';
 
 export default {
   name: 'form',
@@ -278,6 +283,13 @@ export default {
       deadlineSelect: '',
       format: 'dd-MM-yyyy',
       brief: '',
+      errors: [],
+      error: '',
+      show: '',
+      form: {
+        name: '',
+        email: ''
+      },
       services:[
         [
           { value: 'Translation' },
@@ -451,13 +463,19 @@ export default {
     },
     changeTargetSelect($event, { show } = { show: false}, index) {
       let dialect = this.languages[index];
-      if(!dialect.dialects){
-        this.targetSelect = dialect.lang;
-        this.selectLang = '';
-        this.toggleTarget()
-      }
-      else {
-        this.selectLang = dialect;
+
+      if(this.selectLang != dialect) {
+
+        if(!dialect.dialects){
+          this.targetSelect = dialect.lang;
+          this.selectLang = '';
+          this.toggleTarget()
+        }
+        else {
+          this.selectLang = dialect;
+        }
+      } else {
+        this.selectLang = ''
       }
     },
     changeTargetDialect(mainIndex, dialectIndex) {
@@ -468,6 +486,59 @@ export default {
 
     openPicker () {
       this.$refs.programaticOpen.showCalendar()
+    },
+    formControl(){
+      const check = this.checkForm();
+        if(!check){
+          return;
+        }
+        this.sendForm();
+        this.clearForm();
+    },
+    showSuccess(){
+      this.show = true;
+
+      setTimeout(() => {
+          this.show = !this.show
+      }, 4000)
+    },
+    showError(){
+      this.error = true;
+
+      setTimeout(() => {
+          this.error = !this.error
+      }, 4000)
+    },
+    clearForm() {
+      this.form.name = '';
+      this.form.email = '';
+    },
+    sendForm() {
+      $.post( `${API_URL}/form`, this.form )
+        .done(() => {
+            this.showSuccess();
+        })
+        .fail(() => {
+            console.log('Fail');
+            this.showError();
+        })
+    },
+    checkForm(e) {
+      this.errors = [];
+      if(!this.form.name) this.errors.push("Name required");
+      if(!this.form.email) {
+        this.errors.push("Email required");
+      }
+        else if(!this.validEmail(this.form.email)) {
+        this.errors.push("Email should be like address@email.com");
+      }
+      if(!this.errors.length) return true;
+      e.preventDefault();
+      this.sendForm();
+    },
+    validEmail(email) {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     }
   },
   watch: {

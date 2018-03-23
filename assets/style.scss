@@ -169,7 +169,7 @@
               height: 11px;
               top: 0;
             }
-        }          
+          }          
           img {
             width: 23px;
           }
@@ -199,7 +199,7 @@
         padding-right: 10px;
         border-top: 1px solid rgba(0,0,0,0.3);
         .dialect {
-            padding-left: 10px;
+            padding-left: 18px;
             position: absolute;
             opacity: 0;
             transform: translateY(-50px);
@@ -224,6 +224,26 @@
           cursor: pointer;
           transition: all 0.3s;
           position: relative;
+          &_dialect {
+            
+            &:before, &:after {
+                content: "";
+                display: block;
+                position: absolute;
+                background-color: #66563D;
+                left: -8px;
+            }
+            &:before {
+                width: 10px;
+                height: 1px;
+                top: 10px;
+            }
+            &:after {
+              width: 1px;
+              height: 11px;
+              top: 0;
+            }
+          }
           img {
             width: 23px;
           }
@@ -449,13 +469,36 @@
         }
       }
       .buttons {
-        button {
-          background-color: #FF876C;
-          color: white;
-          width: 180px;
+        .upload-btn{
+          overflow: hidden;
+          position: relative;
+          width: 170px;
           padding: 10px;
           border-radius: 10px;
           box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+          background-color: #FF876C;
+          &:hover {
+          box-shadow: 0 0px 15px rgba(0, 0, 0, 0.4);      
+          }
+          .upload-btn__txt {
+              z-index: 1;
+              position: relative;
+              color: #fff;
+              font-size: 14px;
+              font-family: MyriadPro;
+              text-align: center;
+          }
+          input {
+              top: -10px;
+              right: -40px;
+              z-index: 2;
+              position: absolute;
+              cursor: pointer;
+              opacity: 0;
+              filter: alpha(opacity=0);
+              font-size: 50px;
+              font-family: MyriadPro;              
+          }
         }
       }
     }
