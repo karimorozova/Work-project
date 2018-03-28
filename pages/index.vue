@@ -22,7 +22,7 @@
         .orderInfo__summary-deadline
           label SUGGESTED DEADLINE
           p.choice {{ deadlineDate }}
-    form.mainForm(@submit.prevent="formControl")
+    form.mainForm(@submit.prevent="checkForm")
       .number 
         span 1
         label.asterisk SERVICE TYPE      
@@ -192,23 +192,23 @@
         .contact__col
           .contact__col-item.name
             span.asterisk Name
-            input(type='text' name='formContactsName' v-model='form.name')
+            input(type='text' name='formContactsName' v-model='contactName')
           .contact__col-item.email
             span.asterisk Email
-            input(type='email' name='formContactsMail' v-model='form.email')
+            input(type='text' name='formContactsMail' v-model='contactEmail')
           .contact__col-item.phone
             span Phone Number
-            input(type='text')
+            input(type='text' v-model='phone')
         .contact__col
           .contact__col-item.skype
             span Skype Name
-            input(type='text')
+            input(type='text' v-model='contactSkype')
           .contact__col-item.company
             span Company Name
-            input(type='email')
+            input(type='text' v-model='companyName')
           .contact__col-item.website
             span Website
-            input(type='text')
+            input(type='text' v-model='web')
       .captcha
         span.asterisk Enter the message <br> as it shown   
         .captcha__image
@@ -245,6 +245,9 @@ export default {
           to: moment().add(-1, 'day').endOf('day').toDate()
         }
       },
+      request: [
+        {date: "", contactName: "", contactEmail: "", service: "", industry: "", status: "", web: "", skype: "", phone: "", companyName: "", brief: ""}
+      ],
       industryList: {
         legal: {
           text: 'Legal'
@@ -281,15 +284,17 @@ export default {
       dialectsDrop: false,
       industrySelect: 'Select',
       deadlineSelect: '',
+      contactName: '',
+      contactEmail: '',
+      contactSkype: '',
+      phone: '',
+      companyName: '',
+      web: '',
       format: 'dd-MM-yyyy',
       brief: '',
       errors: [],
       error: '',
       show: '',
-      form: {
-        name: '',
-        email: ''
-      },
       services:[
         [
           { value: 'Translation' },
@@ -510,31 +515,58 @@ export default {
       }, 4000)
     },
     clearForm() {
-      this.form.name = '';
-      this.form.email = '';
+      this.request = []
     },
-    sendForm() {
-      $.post( `${API_URL}/form`, this.form )
-        .done(() => {
-            this.showSuccess();
-        })
-        .fail(() => {
-            console.log('Fail');
-            this.showError();
-        })
+    async sendForm() {
+      // this.request = {
+      //     date: this.deadlineSelect, 
+      //     contactName: this.contactName, 
+      //     contactEmail: this.contactEmail,
+      //     service: this.serviceSelect, 
+      //     industry: this.industrySelect, 
+      //     status: 'New', 
+      //     sourceLanguage: this.source, 
+      //     targetLanguages: this.target, 
+      //     web: this.web,
+      //     skype: this.contactSkype, 
+      //     phone: this.phone, 
+      //     companyName: this.companyName        
+      // };
+
+      const result = await this.$axios.$post('http://localhost:3001/request', this.request )
+      console.log(result)
+
+      
     },
-    checkForm(e) {
+    
+    checkForm() {
+      this.request = {
+          date: this.deadlineSelect, 
+          contactName: this.contactName, 
+          contactEmail: this.contactEmail,
+          service: this.serviceSelect, 
+          industry: this.industrySelect, 
+          status: 'New', 
+          sourceLanguage: this.source, 
+          targetLanguages: this.target, 
+          web: this.web,
+          skype: this.contactSkype, 
+          phone: this.phone, 
+          companyName: this.companyName,
+          manager: "None selected"       
+    }
       this.errors = [];
-      if(!this.form.name) this.errors.push("Name required");
-      if(!this.form.email) {
+      if(!this.request.contactName) this.errors.push("Name required");
+      if(!this.request.contactEmail) {
         this.errors.push("Email required");
       }
-        else if(!this.validEmail(this.form.email)) {
+        else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
       }
-      if(!this.errors.length) return true;
-      e.preventDefault();
-      this.sendForm();
+      if(!this.errors.length){
+        this.sendForm();
+      }
+      // 
     },
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

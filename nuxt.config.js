@@ -2,16 +2,23 @@ module.exports = {
   /*
   ** Headers of the page
   */
+  modules: [
+    '@nuxtjs/axios',
+  ],
+  axios: {
+    // proxyHeaders: false
+  },
   head: {
     title: 'translate-poject-nuxt',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'Nuxt.js project' },
-      
+
     ],
     script: [
-      { src: 'https://use.fontawesome.com/releases/v5.0.8/js/all.js'}
+      { src: 'https://use.fontawesome.com/releases/v5.0.8/js/all.js' },
+      // { src: "https://cdn.jsdelivr.net/npm/vue-resource@1.5.0" }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -28,7 +35,7 @@ module.exports = {
     /*
     ** Run ESLint on save
     */
-    extend (config, { isDev, isClient }) {
+    extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
           enforce: 'pre',
