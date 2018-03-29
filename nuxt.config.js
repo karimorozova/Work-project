@@ -18,7 +18,6 @@ module.exports = {
     ],
     script: [
       { src: 'https://use.fontawesome.com/releases/v5.0.8/js/all.js' },
-      // { src: "https://cdn.jsdelivr.net/npm/vue-resource@1.5.0" }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

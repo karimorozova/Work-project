@@ -1,8 +1,13 @@
+@keyframes blink { 
+  50% { border-color: #ff0000; } 
+}
+
 .container {
     position: relative;
     color: #66563D;
     font-family: MyriadPro;
     width: 50%;
+    max-width: 1300px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -10,6 +15,22 @@
     align-items: center;
     padding: 40px 40px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    .successAlert {
+      position: fixed;
+      top: 5px;
+      padding: 20px;
+      width: 400px;
+      background-color: #96f7c2;
+      border-radius: 10px;
+      z-index: 5;
+      text-align: center;
+      font-size: 18px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.7); 
+      p {
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+    }
     .orderInfo {
       padding-bottom: 20px;
       border: 1px solid #66563D;
@@ -617,11 +638,43 @@
           border-radius: 10px;
         }
   }
+
+ table{ /*or other element you want*/
+     animation-name: blink ;
+     animation-duration: .5s ;
+     animation-timing-function: step-end ;
+     animation-iteration-count: infinite ;
+     animation-direction: alternate ;
+ }
+  .warning {
+    width: 300px;
+    font-size: 20px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 2px solid grey;
+    border-radius: 10px;
+    animation-name: blink ;
+    animation-duration: .8s ;
+    animation-timing-function: step-end ;
+    animation-iteration-count: infinite ;
+    animation-direction: alternate ;
+    text-align: center;
+  }
   
   .asterisk {
+    .warning & {
+      font-size: 20px;
+      position: relative;
+      padding-right: 15px;
+    }
     &:after {
       content: '*';
       color: #F00;
+      .warning & {
+        position: absolute;
+        font-size: 30px;
+        right: -1px;
+      }
     }
   }
 
@@ -664,7 +717,9 @@
     }
 
   }
-
+  .targetCheck {
+    margin-bottom: 0 !important;
+  }
   @font-face {
     font-family: MyriadPro;
     src: url('../assets/fonts/MyriadPro-Regular.otf');

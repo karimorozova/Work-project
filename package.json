@@ -15,10 +15,12 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.1.1",
     "moment": "^2.21.0",
+    "normalize.css": "^8.0.0",
     "nuxt": "^1.0.0",
     "pug": "^2.0.1",
     "vue-click-outside": "^1.0.7",
     "vue-resource": "^1.5.0",
+    "vue-transmit": "^8.1.2",
     "vuejs-datepicker": "^0.9.29"
   },
   "devDependencies": {
