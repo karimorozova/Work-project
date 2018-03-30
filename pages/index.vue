@@ -560,7 +560,7 @@ export default {
     clearForm() {
       this.request = [];
       this.deadlineDate = '',
-      this.deadLineSelect = '',
+      this.deadlineSelect = '',
       this.contactName = '',
       this.contactEmail ='',
       this.serviceSelect = 'Select',
@@ -660,7 +660,9 @@ export default {
   watch: {
     deadlineSelect() {
       const date = moment(this.deadlineSelect);
-      this.deadlineDate = date.format('DD-MM-YYYY');
+      if(this.deadlineSelect) {
+        this.deadlineDate = date.format('DD-MM-YYYY');
+      }
     }
   },
 
