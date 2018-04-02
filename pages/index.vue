@@ -11,11 +11,11 @@
         .orderInfo__summary-service
           span 1
           label SERVICE: 
-          p.choice {{ serviceSelect }}
+          p.choice {{ serviceSelect.title }}
         .orderInfo__summary-languages
           span 2
           label LANGUAGE:
-          p Source:
+          p(v-if='serviceSelect.source') Source:
             span.choice &nbsp; {{ sourceSelect }}
           p Target: 
             span.choice &nbsp; {{ targetSelect }}
@@ -32,18 +32,18 @@
         label.asterisk SERVICE TYPE      
       .service-type
         .select(v-on:click='showServices')
-          span.inner-text.clarify(:class="{ color: serviceSelect != 'Select' }") {{ serviceSelect }}
+          span.inner-text.clarify(:class="{ color: serviceSelect != 'Select' }") {{ serviceSelect.title }}
             .icon(:class="{ reverse: serviceDrop }")
               i.fas.fa-caret-down
           .service-type__drop(v-if='serviceDrop')
             .service-type__drop-list(v-for='service of services')
-              span.list-item(@click='changeServiceSelect' v-for='curService of service') {{ curService.value }}
+              span.list-item(@click='changeServiceSelect(curService)' v-for='curService of service') {{ curService.title }}
       .number 
         span 2
         label.asterisk SELECT A LANGUAGE
       .language
-        span Source Language
-        .select.source
+        span(v-if='serviceSelect.source') Source Language
+        .select.source(v-if='serviceSelect.source')
           span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect }}
             .wrapper(v-on:click.self='showSourceLang')
             .icon(:class="{ reverse: sourceDrop }")
@@ -308,7 +308,7 @@ export default {
       targetDrop: false,
       filesDrop: false,
       infoShow: true,
-      serviceSelect: 'Select',
+      serviceSelect: {title : 'Select', source : false},
       sourceSelect: 'Select',
       selectLang: '',
       targetlang: ["Select"],
@@ -329,18 +329,18 @@ export default {
       success: false,
       services:[
         [
-          { value: 'Translation' },
-          { value: 'Localization' },
-          { value: 'Proofing' },
-          { value: 'SEO Translation' },
-          { value: 'QA and Testing' },
+          { title: 'Translation', source: false },
+          { title: 'Localization', source: false },
+          { title: 'Proofing', source: false },
+          { title: 'SEO Translation', source: false },
+          { title: 'QA and Testing', source: false },
         ],
         [
-          { value: 'Official Translation' },
-          { value: 'Graphic Localization' },
-          { value: 'Copywriting' },
-          { value: 'Blogging' },
-          { value: 'SEO Writing' },
+          { title: 'Official Translation', source: true },
+          { title: 'Graphic Localization', source: true },
+          { title: 'Copywriting', source: true },
+          { title: 'Blogging', source: true },
+          { title: 'SEO Writing', source: true },
         ]
       ],
       fileTypes: {
@@ -455,7 +455,8 @@ export default {
       this.serviceDrop = !this.serviceDrop;
     },
     changeServiceSelect(event) {
-      this.serviceSelect = event.target.textContent;
+      console.log(event);
+      this.serviceSelect = event;
     },
     changeIndustry(name) {
       this.industrySelect = this.industryList[name].text;
@@ -563,7 +564,7 @@ export default {
       this.deadlineSelect = '',
       this.contactName = '',
       this.contactEmail ='',
-      this.serviceSelect = 'Select',
+      this.serviceSelect = {title : 'Select', source : false},
       this.industrySelect = 'Select',
       this.sourceSelect = 'Select',
       this.web = '',
