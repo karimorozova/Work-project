@@ -585,6 +585,10 @@ export default {
       const result = await this.$axios.$post('http://localhost:3001/request', this.request )
       console.log(result)   
     },
+    async getServices() {
+      const result = await this.$axios.$get('http://localhost:3001/services')
+      console.log(result)   
+    },
     
     checkForm() {
       this.request = {
@@ -671,6 +675,9 @@ export default {
   },
   components: {
     Datepicker
+  },
+  mounted(){
+    this.getServices();
   }
 }
 </script>
