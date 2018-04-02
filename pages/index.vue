@@ -51,12 +51,12 @@
           .source__drop(v-if='sourceDrop')
             .source__drop-list(v-for='(language, index) in languages')
               .pair(@click='changeSourceSelect($event, { show: true }, index)')
-                img(:src="language.flag")
+                img(:src="'/flags/' + language.symbol + '.png'")
                 span.list-item {{ language.lang }}
               .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
                 template(v-for='(dialect, dialectIndex) in language.dialects')
                   .pair.pair_dialect(@click='changeSourceDialect(index, dialectIndex)')
-                    img(:src="dialect.flag")                  
+                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
                     span.list-item {{ dialect.lang }}
         span Target Language(s)
         .select.target
@@ -67,13 +67,13 @@
           .target__drop(v-if='targetDrop')
             .target__drop-list(v-for='(language, index) in languages')
               .pair(@click='changeTargetSelect($event, { show: true }, index)')
-                img(:src="language.flag")
+                img(:src="'/flags/' + language.symbol  + '.png'")
                 span.list-item {{ language.lang }}
                   input.targetCheck(type="checkbox" v-if="!language.dialects" :checked="language.check")
               .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
                 template(v-for='(dialect, dialectIndex) in language.dialects')
                   .pair.pair_dialect(@click='changeTargetDialect(index, dialectIndex)')
-                    img(:src="dialect.flag")                  
+                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
                     span.list-item {{ dialect.lang }}
                       input.targetCheck(type="checkbox" :checked="dialect.check")
       .number 
@@ -125,13 +125,13 @@
             span.asterisk Files
             .upload-btn
               .upload-btn__txt Upload files(s)
-              input(name="files" type="file")
+              input(name="detailFiles" type="file")
             span.clarify Drag &amp; Drop
           .inner.buttons.upload-reference
             span Upload Reference File
             .upload-btn
               .upload-btn__txt Upload
-              input(name="files" type="file")
+              input(name="refFiles" type="file")
             span.clarify Type Text
         .details__item
           .inner.date-file.deadline
@@ -374,68 +374,7 @@ export default {
           ]    
       },
       languages: [
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', 
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
+      
       ]
     }
   },
@@ -588,7 +527,17 @@ export default {
     },
     async getServices() {
       const result = await this.$axios.$get('http://localhost:3001/services')
-      console.log(result)   
+     // console.log(result)   
+    },
+    async getLanguages() {
+      const result = await this.$axios.$get('http://localhost:3001/languages')
+      .then(response => {
+        this.languages = response;
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
+
     },
     
     checkForm() {
@@ -635,10 +584,11 @@ export default {
   computed: {
     targetSelect() {
       let result = [];
+
       let arrayWithDialects = this.languages.filter(item => {
         if(item.dialects) { return item }
       });
-
+    
       let filterArray = this.languages.filter(item => {
         return item.check == true
       });
@@ -679,6 +629,7 @@ export default {
   },
   mounted(){
     this.getServices();
+    this.getLanguages();
   }
 }
 </script>
