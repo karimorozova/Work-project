@@ -16,9 +16,9 @@
           span 2
           label LANGUAGE:
           p(v-if='serviceSelect.source') Source:
-            span.choice &nbsp; {{ sourceSelect }}
+            span.choice &nbsp; {{ sourceSelect.lang }}
           p Target: 
-            span.choice &nbsp; {{ targetSelect }}
+            span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect ==0">Select</template>
         .orderInfo__summary-industry
           span 3
           label INDUSTRY: 
@@ -44,13 +44,13 @@
       .language
         span(v-if='serviceSelect.source') Source Language
         .select.source(v-if='serviceSelect.source')
-          span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect }}
+          span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect.lang }}
             .wrapper(v-on:click.self='showSourceLang')
             .icon(:class="{ reverse: sourceDrop }")
               i.fas.fa-caret-down
           .source__drop(v-if='sourceDrop')
             .source__drop-list(v-for='(language, index) in languages')
-              .pair(@click='changeSourceSelect($event, { show: true }, index)')
+              .pair(@click='changeSourceSelect(language, { show: true }, index)')
                 img(:src="'/flags/' + language.symbol + '.png'")
                 span.list-item {{ language.lang }}
               .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
@@ -60,13 +60,15 @@
                     span.list-item {{ dialect.lang }}
         span Target Language(s)
         .select.target
-          span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") {{ targetSelect }}
+          span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") 
+            <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
+            <template v-if="targetSelect.length == 0">Select</template>
             .wrapper(v-on:click.self='showTargetLang')
             .icon(:class="{ reverse: targetDrop }")
               i.fas.fa-caret-down
           .target__drop(v-if='targetDrop')
             .target__drop-list(v-for='(language, index) in languages')
-              .pair(@click='changeTargetSelect($event, { show: true }, index)')
+              .pair(@click='changeTargetSelect(language, { show: true }, index)')
                 img(:src="'/flags/' + language.symbol  + '.png'")
                 span.list-item {{ language.lang }}
                   input.targetCheck(type="checkbox" v-if="!language.dialects" :checked="language.check")
@@ -312,7 +314,7 @@ export default {
       sourceSelect: 'Select',
       selectLang: '',
       targetlang: ["Select"],
-      // targetSelect: ['Select'],
+      targetSelect: [],
       dialectsDrop: false,
       industrySelect: 'Select',
       deadlineSelect: '',
@@ -394,7 +396,6 @@ export default {
       this.serviceDrop = !this.serviceDrop;
     },
     changeServiceSelect(event) {
-      console.log(event);
       this.serviceSelect = event;
     },
     changeIndustry(name) {
@@ -424,9 +425,11 @@ export default {
     toggleFiles() {
       this.filesDrop = !this.filesDrop
     },
-    changeSourceSelect($event, { show } = { show: false}, index) {
-      let dialect = this.languages[index];
-
+    changeSourceSelect(event, { show } = { show: false}, index) {
+      this.sourceSelect = event;
+      
+      /*let dialect = this.languages[index];
+      console.log(event);
       if(this.selectLang != dialect) {
 
         if(!dialect.dialects){
@@ -439,15 +442,23 @@ export default {
         }
       } else {
         this.selectLang = ''
-      }
+      }*/
     },
     changeSourceDialect(mainIndex, dialectIndex) {
       this.sourceSelect = this.languages[mainIndex].dialects[dialectIndex].lang
       this.selectLang = '';
       this.toggleSource();
     },
-    changeTargetSelect($event, { show } = { show: false}, index) {
-      let dialect = this.languages[index];
+    changeTargetSelect(event, { show } = { show: false}, index) {
+
+      const pos = this.targetSelect.indexOf(event);
+      if(pos === -1){
+        this.targetSelect.push(event);
+      }
+      else{
+        this.targetSelect.splice(pos,1);
+      }    
+      /*let dialect = this.languages[index];
 
       if(this.selectLang != dialect) {
 
@@ -463,7 +474,7 @@ export default {
         }
       } else {
         this.selectLang = ''
-      }
+      }*/
     },
     changeTargetDialect(mainIndex, dialectIndex) {
       // this.targetSelect.push(this.languages[mainIndex].dialects[dialectIndex].lang)
@@ -582,7 +593,7 @@ export default {
     }
   },
   computed: {
-    targetSelect() {
+    /*targetSelect() {
       let result = [];
 
       let arrayWithDialects = this.languages.filter(item => {
@@ -610,7 +621,7 @@ export default {
       }
       console.log(filterArray.toString())
       return result.join(", ");
-    }
+    }*/
   },
   watch: {
     deadlineSelect() {
