@@ -29,13 +29,13 @@
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
               .source__drop-list(v-for='language in languages')
-                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1' @click='changeSourceSelect(language, { show: true }, index)')
+                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1' @click='changeSourceSelect(language)')
                   img(:src="'/flags/' + language.symbol + '.png'")
                   span.list-item {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
-                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
-                  template(v-for='(dialect, dialectIndex) in language.dialects')
-                    .pair.pair_dialect(@click='changeSourceDialect(index, dialectIndex)')
+                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLang }")
+                  template(v-for='(dialect in language.dialects')
+                    .pair.pair_dialect(@click='changeSourceSelect(dialect)')
                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
                       span.list-item {{ dialect.lang }}
           span Target Language(s)
@@ -48,12 +48,12 @@
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
               .target__drop-list(v-for='language in languages')
-                .pair(v-if='serviceSelect.languages[0].target.indexOf(language.symbol) != -1' @click='changeTargetSelect(language, { show: true }, index)')
+                .pair(v-if='serviceSelect.languages[0].target.indexOf(language.symbol) != -1' @click='changeTargetSelect(language)')
                   img(:src="'/flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
                     //- input.targetCheck(type="checkbox" v-if="!language.dialects" :checked="language.check")
-                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
+                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLang }")
                   template(v-for='dialect in language.dialects')
                     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
@@ -207,19 +207,6 @@
             | Please, fill all the required fields (marked with red 
             span.asterisk asterisk
             | )
-      //- .test
-      //-   vue-transmit.col-12(tag='section', v-bind='options', upload-area-classes='bg-faded', ref='uploader')
-      //-     .d-flex.align-items-center.justify-content-center.w-100(style='height:50vh; border-radius: 1rem;')
-      //-       button.btn.btn-primary(@click='triggerBrowse') Upload Files
-      //-     template(slot='files', slot-scope='props')
-      //-       div(v-for='(file, i) in props.files', :key='file.id', :class="{'mt-5': i === 0}")
-      //-         .media
-      //-           img.img-fluid.d-flex.mr-3(:src='file.dataUrl')
-      //-           .media-body
-      //-             h3 {{ file.name }}
-      //-             .progress(style='width: 50vw;')
-      //-               .progress-bar.bg-success(:style="{width: file.upload.progress + '%'}")
-    //-             pre.
     .orderInfo(v-if='infoShow')
         .orderInfo__title
           h3 YOUR ORDER
@@ -331,22 +318,7 @@ export default {
       errors: [],
       error: '',
       success: false,
-      services:[
-        [
-          // { title: 'Translation', source: false },
-          // { title: 'Localization', source: false },
-          // { title: 'Proofing', source: false },
-          // { title: 'SEO Translation', source: false },
-          // { title: 'QA and Testing', source: false },
-        ],
-        [
-          // { title: 'Official Translation', source: true },
-          // { title: 'Graphic Localization', source: true },
-          // { title: 'Copywriting', source: true },
-          // { title: 'Blogging', source: true },
-          // { title: 'SEO Writing', source: true },
-        ]
-      ],
+      services:[ [],[] ],
       fileTypes: {
         text:
           [
@@ -382,15 +354,7 @@ export default {
       ]
     }
   },
-  // filters: {
-  //   json(value) {
-  //     return JSON.stringify(value, null, 2)
-  //   }
-  // },
   methods: {
-    // triggerBrowse() {
-    //   this.$refs.uploader.triggerBrowseFiles()
-    // },
     showServices() {
       this.toggleServices()
     },
@@ -427,32 +391,16 @@ export default {
     toggleFiles() {
       this.filesDrop = !this.filesDrop
     },
-    changeSourceSelect(event, { show } = { show: false}, index) {
-      if(!event.dialects.length) 
-      this.sourceSelect = event;
-
-      let dialect = this.languages[index];
-      console.log(event);
-      if(this.selectLang != dialect) {
-
-        if(!dialect.dialects){
-          this.sourceSelect = dialect.lang;
-          this.selectLang = '';
-          this.toggleSource()
-        }
-        else {
-          this.selectLang = dialect;
-        }
-      } else {
-        this.selectLang = ''
+    changeSourceSelect(event) {
+      if(event.dialects === undefined){
+        this.sourceSelect = event;
       }
+      if(event.dialects != undefined && !event.dialects.length){
+        this.sourceSelect = event;
+      }
+      this.selectLang = event.lang;
     },
-    changeSourceDialect(mainIndex, dialectIndex) {
-      this.sourceSelect = this.languages[mainIndex].dialects[dialectIndex]
-      this.selectLang = '';
-      this.toggleSource();
-    },
-    changeTargetSelect(event, { show } = { show: false}, index) {
+    changeTargetSelect(event) {
       
       const pos = this.targetSelect.indexOf(event);
       if(pos === -1){
@@ -465,24 +413,7 @@ export default {
         event.check = false;
         this.targetSelect.splice(pos,1);
       }    
-      console.log(event.check);
-      let dialect = this.languages[index];
-
-      if(this.selectLang != dialect) {
-
-        if(!dialect.dialects){
-          // this.targetSelect.push(dialect.lang);
-          dialect.check = !dialect.check;
-          this.selectLang = '';
-          // this.toggleTarget()
-        }
-        else {
-          this.selectLang = dialect;
-          
-        }
-      } else {
-        this.selectLang = ''
-      }
+      this.selectLang = event.lang;
     },
      changeTargetDialect(event) {
        
@@ -495,15 +426,7 @@ export default {
         event.check = false;
         this.targetSelect.splice(pos,1);
       }
-      console.log(event);    
     },
-   /* changeTargetDialect(mainIndex, dialectIndex) {
-      // this.targetSelect.push(this.languages[mainIndex].dialects[dialectIndex].lang)
-      this.languages[mainIndex].dialects[dialectIndex].check = !this.languages[mainIndex].dialects[dialectIndex].check;
-      this.selectLang = '';
-      // this.toggleTarget();
-    },*/
-
     openPicker () {
       this.$refs.programaticOpen.showCalendar()
     },
@@ -651,35 +574,6 @@ export default {
       
       }
     },
-    /*targetSelect() {
-      let result = [];
-
-      let arrayWithDialects = this.languages.filter(item => {
-        if(item.dialects) { return item }
-      });
-    
-      let filterArray = this.languages.filter(item => {
-        return item.check == true
-      });
-
-      arrayWithDialects.map(item => {
-        for(let i = 0; i < item.dialects.length; i++) {
-          if(item.dialects[i].check == true) {
-            filterArray.push(item.dialects[i]);
-          }
-        }
-      });
-
-      if (!filterArray.length) {
-        result.push("Select")
-      } else {
-        filterArray.map(item => {
-          result.push(item.lang)
-        });
-      }
-      console.log(filterArray.toString())
-      return result.join(", ");
-    }*/
   watch: {
     deadlineSelect() {
       const date = moment(this.deadlineSelect);
@@ -698,7 +592,6 @@ export default {
   mounted(){
     this.getServices();
     this.getLanguages();
-    // console.log(this.services[0][0].languages)
   }
 }
 </script>
