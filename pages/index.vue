@@ -17,9 +17,9 @@
             span 2
             label LANGUAGE:
             p(v-if='serviceSelect.source') Source:
-              span.choice &nbsp; {{ sourceSelect }}
+              span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
             p Target: 
-              span.choice &nbsp; {{ targetSelect }}
+              span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect ==0">Select</template>
           .orderInfo__summary-industry
             span 3
             label INDUSTRY: 
@@ -33,7 +33,7 @@
           label.asterisk SERVICE TYPE      
         .service-type
           .select(v-on:click='showServices')
-            span.inner-text.clarify(:class="{ color: serviceSelect.title != 'Select' }") {{ serviceSelect.title }}
+            span.inner-text.clarify(:class="{ color: serviceSelect != 'Select' }") {{ serviceSelect.title }}
               .icon(:class="{ reverse: serviceDrop }")
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
@@ -45,40 +45,41 @@
         .language
           span(v-if='serviceSelect.source') Source Language
           .select.source(v-if='serviceSelect.source')
-            span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect }}
+            span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect.lang }}
               .wrapper(v-on:click.self='showSourceLang')
               .icon(:class="{ reverse: sourceDrop }")
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
               .source__drop-list(v-for='(language, index) in languages')
-                .pair(@click='changeSourceSelect($event, { show: true }, index)')
-                  img(:src="language.flag")
-                  span.list-item {{ language.lang }} 
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language == selectLang}")
+                .pair(@click='changeSourceSelect(language, { show: true }, index)')
+                  img(:src="'/flags/' + language.symbol + '.png'")
+                  span.list-item {{ language.lang }}
+                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
                 .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
                   template(v-for='(dialect, dialectIndex) in language.dialects')
                     .pair.pair_dialect(@click='changeSourceDialect(index, dialectIndex)')
-                      img(:src="dialect.flag")                  
+                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
                       span.list-item {{ dialect.lang }}
           span Target Language(s)
           .select.target
-            span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") {{ targetSelect }}
+            span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") 
+              <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
+              <template v-if="targetSelect.length == 0">Select</template>
               .wrapper(v-on:click.self='showTargetLang')
               .icon(:class="{ reverse: targetDrop }")
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
               .target__drop-list(v-for='(language, index) in languages')
-                .pair(@click='changeTargetSelect($event, { show: true }, index)')
-                  img(:src="language.flag")
+                .pair(@click='changeTargetSelect(language, { show: true }, index)')
+                  img(:src="'/flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language == selectLang}")
+                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
                     //- input.targetCheck(type="checkbox" v-if="!language.dialects" :checked="language.check")
                 .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language == selectLang }")
-                  template(v-for='(dialect, dialectIndex) in language.dialects')
-                    .pair.pair_dialect(@click='changeTargetDialect(index, dialectIndex)')
-                      img(:src="dialect.flag")                  
+                  template(v-for='dialect in language.dialects')
+                    .pair.pair_dialect(@click='changeTargetDialect(dialect)')
+                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-                        //- input.targetCheck(type="checkbox" :checked="dialect.check")
         .number 
           span 3
           label.asterisk CHOOSE AN INDUSTRY
@@ -128,13 +129,13 @@
               span.asterisk Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
-                input(name="files" type="file")
+                input(name="detailFiles" type="file")
               span.clarify Drag &amp; Drop
             .inner.buttons.upload-reference
               span Upload Reference File
               .upload-btn
                 .upload-btn__txt Upload
-                input(name="files" type="file")
+                input(name="refFiles" type="file")
               span.clarify Type Text
           .details__item
             .inner.date-file.deadline
@@ -240,7 +241,7 @@
       //-             h3 {{ file.name }}
       //-             .progress(style='width: 50vw;')
       //-               .progress-bar.bg-success(:style="{width: file.upload.progress + '%'}")
-      //-             pre.
+    //-             pre.
     
 </template>
 
@@ -312,10 +313,10 @@ export default {
       filesDrop: false,
       infoShow: true,
       serviceSelect: {title : 'Select', source : true},
-      sourceSelect: 'Select',
+      sourceSelect: {lang : 'Select'},
       selectLang: '',
       targetlang: ["Select"],
-      // targetSelect: ['Select'],
+      targetSelect: [],
       dialectsDrop: false,
       industrySelect: 'Select',
       deadlineSelect: '',
@@ -377,68 +378,7 @@ export default {
           ]    
       },
       languages: [
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', 
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans',
-        dialects:
-        [ {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-          {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false}
-        ]},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
-        {flag: require('../assets/images/flags/Afrikaans[AF].png'), lang: 'Afrikaans', check: false},
-        {flag: require('../assets/images/flags/Arabic[AR].png'), lang: 'Arabic', check: false},
-        {flag: require('../assets/images/flags/Armenian[HY].png'), lang: 'Armenian', check: false},
-        {flag: require('../assets/images/flags/Azerbaijani(Latin)[AZ-LN].png'), lang: 'Azerbaijani', check: false},
-        {flag: require('../assets/images/flags/Bengali(India)[BN-IN].png'), lang: 'Bengali', check: false},
-        {flag: require('../assets/images/flags/Bosnian[BS].png'), lang: 'Bosnian', check: false},
-        {flag: require('../assets/images/flags/Bulgarian[BG].png'), lang: 'Bulgarian', check: false},
+      
       ]
     }
   },
@@ -458,7 +398,6 @@ export default {
       this.serviceDrop = !this.serviceDrop;
     },
     changeServiceSelect(event) {
-      console.log(event);
       this.serviceSelect = event;
     },
     changeIndustry(name) {
@@ -488,9 +427,11 @@ export default {
     toggleFiles() {
       this.filesDrop = !this.filesDrop
     },
-    changeSourceSelect($event, { show } = { show: false}, index) {
+    changeSourceSelect(event, { show } = { show: false}, index) {
+      this.sourceSelect = event;
+      
       let dialect = this.languages[index];
-
+      console.log(event);
       if(this.selectLang != dialect) {
 
         if(!dialect.dialects){
@@ -506,11 +447,24 @@ export default {
       }
     },
     changeSourceDialect(mainIndex, dialectIndex) {
-      this.sourceSelect = this.languages[mainIndex].dialects[dialectIndex].lang
+      this.sourceSelect = this.languages[mainIndex].dialects[dialectIndex]
       this.selectLang = '';
       this.toggleSource();
     },
-    changeTargetSelect($event, { show } = { show: false}, index) {
+    changeTargetSelect(event, { show } = { show: false}, index) {
+      
+      const pos = this.targetSelect.indexOf(event);
+      if(pos === -1){
+        if(!event.dialects.length) {
+          event.check = true;
+          this.targetSelect.push(event);
+        }
+      }
+      else{
+        event.check = false;
+        this.targetSelect.splice(pos,1);
+      }    
+      console.log(event.check);
       let dialect = this.languages[index];
 
       if(this.selectLang != dialect) {
@@ -529,12 +483,25 @@ export default {
         this.selectLang = ''
       }
     },
-    changeTargetDialect(mainIndex, dialectIndex) {
+     changeTargetDialect(event) {
+       
+     const pos = this.targetSelect.indexOf(event);
+      if(pos === -1){
+        event.check = true;
+        this.targetSelect.push(event);
+      }
+      else{
+        event.check = false;
+        this.targetSelect.splice(pos,1);
+      }
+      console.log(event);    
+    },
+   /* changeTargetDialect(mainIndex, dialectIndex) {
       // this.targetSelect.push(this.languages[mainIndex].dialects[dialectIndex].lang)
       this.languages[mainIndex].dialects[dialectIndex].check = !this.languages[mainIndex].dialects[dialectIndex].check;
       this.selectLang = '';
       // this.toggleTarget();
-    },
+    },*/
 
     openPicker () {
       this.$refs.programaticOpen.showCalendar()
@@ -587,15 +554,25 @@ export default {
     },
     async sendForm() {
       const result = await this.$axios.$post('http://localhost:3001/request', this.request )
-      console.log(result)   
+      
     },
     async getServices() {
       const result = await this.$axios.$get('http://localhost:3001/services')
       for (let i = 0; i < result.length; i++) {
         if (i < result.length/2) this.services[0].push(result[i])
         else this.services[1].push(result[i])  
-        console.log(result); 
+        
       }
+    },
+    async getLanguages() {
+      const result = await this.$axios.$get('http://localhost:3001/languages')
+      .then(response => {
+        this.languages = response;
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
+
     },
     
     checkForm() {
@@ -640,12 +617,13 @@ export default {
     }
   },
   computed: {
-    targetSelect() {
+    /*targetSelect() {
       let result = [];
+
       let arrayWithDialects = this.languages.filter(item => {
         if(item.dialects) { return item }
       });
-
+    
       let filterArray = this.languages.filter(item => {
         return item.check == true
       });
@@ -667,7 +645,7 @@ export default {
       }
       console.log(filterArray.toString())
       return result.join(", ");
-    }
+    }*/
   },
   watch: {
     deadlineSelect() {
@@ -686,6 +664,7 @@ export default {
   },
   mounted(){
     this.getServices();
+    this.getLanguages();
   }
 }
 </script>
