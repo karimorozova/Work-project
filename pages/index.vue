@@ -5,35 +5,13 @@
         .successAlert__message
           p Thanks for your request.
           p We will answer you as soon as possible.
-      .orderInfo(v-if='infoShow')
-        .orderInfo__title
-          h3 YOUR ORDER
-        .orderInfo__summary
-          .orderInfo__summary-service
-            span 1
-            label SERVICE: 
-            p.choice {{ serviceSelect.title }}
-          .orderInfo__summary-languages
-            span 2
-            label LANGUAGE:
-            p(v-if='serviceSelect.source') Source:
-              span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
-            p Target: 
-              span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect ==0">Select</template>
-          .orderInfo__summary-industry
-            span 3
-            label INDUSTRY: 
-            p.choice {{ industrySelect }}
-          .orderInfo__summary-deadline
-            label SUGGESTED DEADLINE
-            p.choice {{ deadlineDate }}
       form.mainForm(@submit.prevent="checkForm")
         .number 
           span 1
           label.asterisk SERVICE TYPE      
         .service-type
           .select(v-on:click='showServices')
-            span.inner-text.clarify(:class="{ color: serviceSelect != 'Select' }") {{ serviceSelect.title }}
+            span.inner-text.clarify(:class="{ color: serviceSelect.title != 'Select' }") {{ serviceSelect.title }}
               .icon(:class="{ reverse: serviceDrop }")
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
@@ -45,13 +23,13 @@
         .language
           span(v-if='serviceSelect.source') Source Language
           .select.source(v-if='serviceSelect.source')
-            span.inner-text.clarify(:class="{ color: sourceSelect != 'Select' }") {{ sourceSelect.lang }}
+            span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
               .wrapper(v-on:click.self='showSourceLang')
               .icon(:class="{ reverse: sourceDrop }")
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
-              .source__drop-list(v-for='(language, index) in languages')
-                .pair(@click='changeSourceSelect(language, { show: true }, index)')
+              .source__drop-list(v-for='language in languages')
+                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1' @click='changeSourceSelect(language, { show: true }, index)')
                   img(:src="'/flags/' + language.symbol + '.png'")
                   span.list-item {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
@@ -62,15 +40,15 @@
                       span.list-item {{ dialect.lang }}
           span Target Language(s)
           .select.target
-            span.inner-text.clarify(:class="{ color: targetSelect != 'Select' }") 
+            span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
               <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
               <template v-if="targetSelect.length == 0">Select</template>
               .wrapper(v-on:click.self='showTargetLang')
               .icon(:class="{ reverse: targetDrop }")
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
-              .target__drop-list(v-for='(language, index) in languages')
-                .pair(@click='changeTargetSelect(language, { show: true }, index)')
+              .target__drop-list(v-for='language in languages')
+                .pair(v-if='serviceSelect.languages[0].target.indexOf(language.symbol) != -1' @click='changeTargetSelect(language, { show: true }, index)')
                   img(:src="'/flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
@@ -242,7 +220,29 @@
       //-             .progress(style='width: 50vw;')
       //-               .progress-bar.bg-success(:style="{width: file.upload.progress + '%'}")
     //-             pre.
-    
+    .orderInfo(v-if='infoShow')
+        .orderInfo__title
+          h3 YOUR ORDER
+        .orderInfo__summary
+          .orderInfo__summary-service
+            span 1
+            label SERVICE: 
+            p.choice {{ serviceSelect.title }}
+          .orderInfo__summary-languages
+            span 2
+            label LANGUAGE:
+            p(v-if='serviceSelect.source') Source:
+              span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
+            p Target: 
+              span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect == 0">Select</template>
+          .orderInfo__summary-industry
+            span 3
+            label INDUSTRY: 
+            p.choice {{ industrySelect }}
+          .orderInfo__summary-deadline
+            label SUGGESTED DEADLINE
+            p.choice {{ deadlineDate }}
+
 </template>
 
 <script>
@@ -428,8 +428,9 @@ export default {
       this.filesDrop = !this.filesDrop
     },
     changeSourceSelect(event, { show } = { show: false}, index) {
+      if(!event.dialects.length) 
       this.sourceSelect = event;
-      
+
       let dialect = this.languages[index];
       console.log(event);
       if(this.selectLang != dialect) {
@@ -617,6 +618,39 @@ export default {
     }
   },
   computed: {
+    languagesForSource() {
+      let filteredLanguages = [];
+      let arrayWithService = [];
+      if(this.serviceSelect.title != 'Select') {
+        arrayWithService = this.services.filter(item => {
+          for(let i = 0; i < item.length; i++) {
+            if(item[i].title == this.serviceSelect.title) return item[i]            
+          }
+        });
+      let currentService = arrayWithService[0];
+      console.log(this.serviceSelect);
+        filteredLanguages = this.languages.filter(item => {
+            // if(!item.dialects) {
+              if(currentService[0].languages[0].source.includes(item.symbol)) 
+                return item
+              // } else {
+              //   for(let j = 0; j < item.dialects.length; j++) {
+              //     if(currentService.languages[0].source.includes(item.dialects[j].symbol)) 
+              //       return item
+              //   }
+            //   }
+            // }
+          // }
+          
+        });
+      return filteredLanguages;        
+      } else {
+        filteredLanguages = this.languages;
+        return filteredLanguages;
+      }
+      
+      }
+    },
     /*targetSelect() {
       let result = [];
 
@@ -646,7 +680,6 @@ export default {
       console.log(filterArray.toString())
       return result.join(", ");
     }*/
-  },
   watch: {
     deadlineSelect() {
       const date = moment(this.deadlineSelect);
@@ -665,6 +698,7 @@ export default {
   mounted(){
     this.getServices();
     this.getLanguages();
+    // console.log(this.services[0][0].languages)
   }
 }
 </script>
