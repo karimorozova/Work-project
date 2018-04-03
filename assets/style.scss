@@ -1,13 +1,18 @@
 @keyframes blink { 
   50% { border-color: #ff0000; } 
 }
-
+.mainWrapper {
+  position: relative;
+  padding: 0;
+  margin: 0 auto;
+  min-width: 1300px;
+  max-width: 1400px;
+}
 .container {
     position: relative;
     color: #66563D;
     font-family: MyriadPro;
     width: 50%;
-    max-width: 1300px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -15,6 +20,10 @@
     align-items: center;
     padding: 40px 40px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    @media (max-width: 1320px) {
+      margin: 0;
+      margin-left: 20px;
+    }
     .successAlert {
       position: fixed;
       top: 5px;
@@ -43,6 +52,9 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      @media (max-width: 1320px) {
+        right: 12%;
+      }
       &__title {
         width: 100%;
         font-size: 22px;
@@ -195,6 +207,15 @@
           img {
             width: 23px;
           }
+          .openIcon {
+            width: 8px;
+            padding-left: 5px;
+          }
+          .reverseOpenIcon {
+            transform: rotate(180deg);
+            padding-left: 0;
+            padding-right: 5px;
+          }
           &:hover {
             box-shadow: 0px 0 15px rgba(102, 86, 61, 0.3);
             border-radius: 5px;
@@ -268,6 +289,15 @@
           }
           img {
             width: 23px;
+          }
+          .openIcon {
+            width: 8px;
+            padding-left: 5px;
+          }
+          .reverseOpenIcon {
+            transform: rotate(180deg);
+            padding-left: 0;
+            padding-right: 5px;
           }
           &:hover {
             box-shadow: 0px 0 15px rgba(102, 86, 61, 0.3);
@@ -619,6 +649,10 @@
     }
   }
 
+  .openIcon {
+    width: 10px;
+  }
+
   .activeIndustry {
     background-color: #66563D;
     color: white;
@@ -721,6 +755,11 @@
   .targetCheck {
     margin-bottom: 0 !important;
   }
+
+  .active {
+    color: #FF876C;
+  }
+
   @font-face {
     font-family: MyriadPro;
     src: url('../assets/fonts/MyriadPro-Regular.otf');
