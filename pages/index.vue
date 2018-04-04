@@ -107,13 +107,13 @@
               span.asterisk Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
-                input(name="detailFiles" type="file")
+                input(name="detailFiles" type="file" @change='changeDetailFiles')
               span.clarify Drag &amp; Drop
             .inner.buttons.upload-reference
               span Upload Reference File
               .upload-btn
                 .upload-btn__txt Upload
-                input(name="refFiles" type="file")
+                input(name="refFiles" type="file" @change='changeRefFiles')
               span.clarify Type Text
           .details__item
             .inner.date-file.deadline
@@ -299,6 +299,7 @@ export default {
       targetDrop: false,
       filesDrop: false,
       infoShow: true,
+      
       serviceSelect: {title : 'Select', source : true},
       sourceSelect: {lang : 'Select'},
       selectLang: '',
@@ -308,7 +309,7 @@ export default {
       industrySelect: 'Select',
       deadlineSelect: '',
       contactName: '',
-      contactEmail: '',
+      contactEmail: 'test@test.com',
       contactSkype: '',
       phone: '',
       companyName: '',
@@ -360,6 +361,12 @@ export default {
     },
     toggleServices() {
       this.serviceDrop = !this.serviceDrop;
+    },
+    changeDetailFiles(event) {
+      this.detailFiles = event.target.files[0];
+    },
+    changeRefFiles(event) {
+      this.refFiles = event.target.files[0];
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
@@ -477,8 +484,28 @@ export default {
       })
     },
     async sendForm() {
-      const result = await this.$axios.$post('http://localhost:3001/request', this.request )
-      
+     
+        var sendForm = new FormData();
+
+        sendForm.append("date", this.request.date);
+        sendForm.append("contactName", this.request.contactName);
+        sendForm.append("contactEmail", this.request.contactEmail);
+        sendForm.append("service", this.request.service);
+        sendForm.append("industry", this.request.industry); 
+        sendForm.append("status", "New");
+        sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
+        sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages)); 
+        sendForm.append("web", this.request.web);
+        sendForm.append("skype", this.request.skype);
+        sendForm.append("phone", this.request.phone);
+        sendForm.append("companyName", this.request.companyName);
+        sendForm.append("accountManager", "None selected");
+        sendForm.append("brief", this.request.brief);
+        sendForm.append("createdAt", this.request.createdAt);
+        sendForm.append("detailFiles", this.detailFiles, this.detailFiles.name);
+        sendForm.append("refFiles", this.refFiles, this.refFiles.name);
+
+        const result = await this.$axios.$post('http://localhost:3001/request', sendForm);
     },
     async getServices() {
       const result = await this.$axios.$get('http://localhost:3001/services')
