@@ -101,67 +101,6 @@
         margin-bottom: 3px;
       }
     }
-    // .orderInfo {
-    //   padding-bottom: 20px;
-    //   border: 1px solid #66563D;
-    //   border-radius: 15px;
-    //   position: fixed;
-    //   top: 7px;
-    //   right: 20px;
-    //   width: 250px;
-    //   display: flex;
-    //   flex-direction: column;
-    //   justify-content: center;
-    //   align-items: center;
-    //   @media (max-width: 1320px) {
-    //     right: 12%;
-    //   }
-    //   &__title {
-    //     width: 100%;
-    //     font-size: 22px;
-    //     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    //     h3 {
-    //       margin-bottom: 5px;
-    //       margin-top: 15px;
-    //       text-align: center;
-    //     }
-    //   }
-    //   &__summary {
-    //     padding: 10px 20px 0 30px; 
-    //     p {
-    //       padding-left: 20px;
-    //     }        
-    //     span {
-    //       font-size: 30px;
-    //       padding-right: 5px;
-    //     }
-    //     label {
-    //       font-size: 18px;
-    //       font-family: MyriadBold;
-    //     }
-    //     .choice {
-    //       margin-top: 5px;
-    //       color: #FF876C;
-    //     }
-    //     &-languages {
-    //       p {
-    //         .choice {
-    //           font-size: 16px;
-    //           color: #FF876C;
-    //         }
-    //       }
-    //     }
-    //     &-deadline {
-    //       display: flex;
-    //       flex-direction: column;
-    //       align-items: center;
-    //       .choice {
-    //         padding-left: 0;
-    //         margin-top: 0;
-    //       }
-    //     }       
-    //   }
-    // }
   }
   form {
     width: 100%;
@@ -284,6 +223,7 @@
             span {
               transition: all 0.4s;
               transform: translateX(3px);
+              color: #AAA39B;
             } 
           }
 
@@ -383,12 +323,18 @@
         width: 45%;
         display: flex;
         flex-direction: column;
-        padding: 20px 5px 10px;     
+        padding: 20px 5px 10px;
+        max-height: 150px;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 15px 10px;   
       }
       .list-item {
         border: 1px solid #66563D;
         border-radius: 5px;
         padding: 5px;
+        margin: 0 6px;
+        width: 46%;
         cursor: pointer;
         &:hover {
           background-color: #66563D;
