@@ -29,11 +29,11 @@
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
               .source__drop-list(v-for='language in languages')
-                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1' @click='changeSourceSelect(language)')
+                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                   img(:src="'/flags/' + language.symbol + '.png'")
                   span.list-item {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
-                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLang }")
+                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLangSource}")
+                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource && dialectsDrop }")
                   template(v-for='(dialect in language.dialects')
                     .pair.pair_dialect(@click='changeSourceSelect(dialect)')
                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
@@ -48,20 +48,24 @@
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
               .target__drop-list(v-for='language in languages')
-                .pair(v-if='serviceSelect.languages[0].target.indexOf(language.symbol) != -1' @click='changeTargetSelect(language)')
+                .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                   img(:src="'/flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
-                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLang }")
+                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLangTarget}")
+                .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1' :class="{ dialect_active : language.lang == selectLangTarget }")
                   template(v-for='dialect in language.dialects')
                     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-                //- .onlyEnglish(v-if='sourceSelect.lang != "Select" && sourceSelect.lang != "English (United Kingdom)" && sourceSelect.lang != "English (United States)"')
-                //-   .pair(@click='changeTargetSelect(language)')
-                //-     img(src="EN.png")
-                //-     span.list-item(:class="{ active: language.check }" v-if='language.symbol == "EN"') English
-                //-       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
+                .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English")' @click='changeTargetSelectEnglish(language)')
+                  img(:src="'/flags/' + language.symbol  + '.png'")
+                  span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLangTargetEnglish}")
+                .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English")' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
+                  template(v-for='dialect in language.dialects')
+                    .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
+                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                      span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
         .number 
           span 3
           label.asterisk CHOOSE AN INDUSTRY
@@ -305,7 +309,9 @@ export default {
       infoShow: true,
       serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
       sourceSelect: {lang : 'Select'},
-      selectLang: '',
+      selectLangSource: '',
+      selectLangTarget: '',
+      selectLangTargetEnglish: '',
       targetlang: ["Select"],
       targetSelect: [],
       dialectsDrop: false,
@@ -367,7 +373,10 @@ export default {
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
-      console.log(this.serviceSelect)
+      this.sourceSelect = {lang : 'Select'};
+      if(!event.source) {
+        this.sourceSelect = {lang: 'English (United Kingdom)'}
+      }
     },
     changeIndustry(name) {
       this.industrySelect = this.industryList[name].text;
@@ -397,15 +406,57 @@ export default {
       this.filesDrop = !this.filesDrop
     },
     changeSourceSelect(event) {
+      console.log("event is down below");
+      console.log(event);
       if(event.dialects === undefined){
         this.sourceSelect = event;
+        this.toggleSource();
       }
+      if(event.dialects.length) {
+        this.showDialects();
+      }
+
       if(event.dialects != undefined && !event.dialects.length){
         this.sourceSelect = event;
+        this.toggleSource();
       }
-      this.selectLang = event.lang;
+      this.selectLangSource = event.lang;
+      this.targetlang = ["Select"],
+      this.targetSelect.forEach(item => {
+        item.check = false
+      })
+      this.targetSelect = [];
+
+
     },
     changeTargetSelect(event) {
+      this.selectLangTarget = '';
+      const pos = this.targetSelect.indexOf(event);
+      if(pos === -1){
+        if(!event.dialects.length) {
+          event.check = true;
+          this.targetSelect.push(event);
+        }
+      }
+      else{
+        event.check = false;
+        this.targetSelect.splice(pos,1);
+      }    
+      this.selectLangTarget = event.lang;
+    },
+    changeTargetDialect(event) {
+      this.selectLangTarget = '';
+     const pos = this.targetSelect.indexOf(event);
+      if(pos === -1){
+        event.check = true;
+        this.targetSelect.push(event);
+      }
+      else{
+        event.check = false;
+        this.targetSelect.splice(pos,1);
+      }
+    },
+    changeTargetSelectEnglish(event) {
       
       const pos = this.targetSelect.indexOf(event);
       if(pos === -1){
@@ -418,9 +469,9 @@ export default {
         event.check = false;
         this.targetSelect.splice(pos,1);
       }    
-      this.selectLang = event.lang;
+      this.selectLangTargetEnglish = event.lang;
     },
-     changeTargetDialect(event) {
+    changeTargetDialectEnglish(event) {
        
      const pos = this.targetSelect.indexOf(event);
       if(pos === -1){
