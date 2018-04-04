@@ -15,8 +15,8 @@
               .icon(:class="{ reverse: serviceDrop }")
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
-              .service-type__drop-list(v-for='service of services')
-                span.list-item(@click='changeServiceSelect(curService)' v-for='curService of service') {{ curService.title }}
+              .service-type__drop-list
+                span.list-item(@click='changeServiceSelect(service)' v-for='service of services') {{ service.title }}
         .number 
           span 2
           label.asterisk SELECT A LANGUAGE
@@ -52,12 +52,16 @@
                   img(:src="'/flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
-                    //- input.targetCheck(type="checkbox" v-if="!language.dialects" :checked="language.check")
                 .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLang }")
                   template(v-for='dialect in language.dialects')
                     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                //- .onlyEnglish(v-if='sourceSelect.lang != "Select" && sourceSelect.lang != "English (United Kingdom)" && sourceSelect.lang != "English (United States)"')
+                //-   .pair(@click='changeTargetSelect(language)')
+                //-     img(src="EN.png")
+                //-     span.list-item(:class="{ active: language.check }" v-if='language.symbol == "EN"') English
+                //-       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language == selectLang}")
         .number 
           span 3
           label.asterisk CHOOSE AN INDUSTRY
@@ -299,7 +303,7 @@ export default {
       targetDrop: false,
       filesDrop: false,
       infoShow: true,
-      serviceSelect: {title : 'Select', source : true},
+      serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
       sourceSelect: {lang : 'Select'},
       selectLang: '',
       targetlang: ["Select"],
@@ -318,7 +322,7 @@ export default {
       errors: [],
       error: '',
       success: false,
-      services:[ [],[] ],
+      services:[],
       fileTypes: {
         text:
           [
@@ -363,6 +367,7 @@ export default {
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
+      console.log(this.serviceSelect)
     },
     changeIndustry(name) {
       this.industrySelect = this.industryList[name].text;
@@ -458,9 +463,11 @@ export default {
       this.deadlineSelect = '',
       this.contactName = '',
       this.contactEmail ='',
-      this.serviceSelect = {title : 'Select', source : false},
+      this.serviceSelect = {title : 'Select', source : true, languages: [{source: [], target: []}]},
       this.industrySelect = 'Select',
-      this.sourceSelect = 'Select',
+      this.sourceSelect = {lang: 'Select'},
+      this.targetlang = ["Select"],
+      this.targetSelect = [],
       this.web = '',
       this.contactSkype = '',
       this.phone = '',
@@ -483,10 +490,11 @@ export default {
     async getServices() {
       const result = await this.$axios.$get('http://localhost:3001/services')
       for (let i = 0; i < result.length; i++) {
-        if (i < result.length/2) this.services[0].push(result[i])
-        else this.services[1].push(result[i])  
-        
+        this.services.push(result[i])
       }
+      //   else this.services[1].push(result[i])  
+        
+      // }
     },
     async getLanguages() {
       const result = await this.$axios.$get('http://localhost:3001/languages')
@@ -541,38 +549,6 @@ export default {
     }
   },
   computed: {
-    languagesForSource() {
-      let filteredLanguages = [];
-      let arrayWithService = [];
-      if(this.serviceSelect.title != 'Select') {
-        arrayWithService = this.services.filter(item => {
-          for(let i = 0; i < item.length; i++) {
-            if(item[i].title == this.serviceSelect.title) return item[i]            
-          }
-        });
-      let currentService = arrayWithService[0];
-      console.log(this.serviceSelect);
-        filteredLanguages = this.languages.filter(item => {
-            // if(!item.dialects) {
-              if(currentService[0].languages[0].source.includes(item.symbol)) 
-                return item
-              // } else {
-              //   for(let j = 0; j < item.dialects.length; j++) {
-              //     if(currentService.languages[0].source.includes(item.dialects[j].symbol)) 
-              //       return item
-              //   }
-            //   }
-            // }
-          // }
-          
-        });
-      return filteredLanguages;        
-      } else {
-        filteredLanguages = this.languages;
-        return filteredLanguages;
-      }
-      
-      }
     },
   watch: {
     deadlineSelect() {
