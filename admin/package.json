@@ -1,8 +1,8 @@
 {
-  "name": "pangea",
+  "name": "pangea-api",
   "version": "1.0.0",
-  "description": "A Vue.js project",
-  "author": "Daniyal <da-lu@lenta.ru>",
+  "description": "pangea api/admin",
+  "author": "wellyes",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
