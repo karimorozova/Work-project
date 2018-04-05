@@ -208,7 +208,11 @@
         .captcha
           span.asterisk Enter the message <br> as it shown   
           .captcha__image
-            img(src='#')
+            vue-recaptcha(sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
+              ref="recaptcha"
+              @verify="onVerify"
+              @expired="onExpired"
+              :callback="checkForm")
           input.buttons(type='submit' value='Submit')
         .warning(v-if="errors.length")
           p.message
@@ -236,7 +240,7 @@
             p.choice {{ industrySelect }}
           .orderInfo__summary-deadline
             span 4
-            label PROJECT DETAILS 
+            label PROJECT DETAILS: 
             p Files: 
               span.choice {{ detailFiles.name }}
             p Reference File: 
@@ -260,6 +264,7 @@
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
+import VueRecaptcha from 'vue-recaptcha';
 // import Clock from './../components/Clock.vue';
 
 export default {
@@ -337,6 +342,7 @@ export default {
       error: '',
       success: false,
       services:[],
+      captchaValid : false,
       fileTypes: {
         text:
           [
@@ -493,6 +499,13 @@ export default {
     openPicker () {
       this.$refs.programaticOpen.showCalendar()
     },
+    onVerify: function (response) {
+      this.captchaValid = true;
+      console.log('Verify: ' + response)
+    },
+    onExpired: function () {
+      console.log('Expired')
+    },
     formControl(){
       const check = this.checkForm();
         if(!check){
@@ -542,7 +555,7 @@ export default {
       })
     },
     async sendForm() {
-     
+
         var sendForm = new FormData();
 
         sendForm.append("date", this.request.date);
@@ -604,7 +617,9 @@ export default {
           files: this.files,
           createdAt: Date.now    
     }
+
       this.errors = [];
+      
       if(!this.request.contactName) this.errors.push("Name required");
       if(!this.request.contactEmail) {
         this.errors.push("Email required");
@@ -615,6 +630,7 @@ export default {
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
       }
+      if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
         this.clearForm();
@@ -641,7 +657,8 @@ export default {
     ClickOutside
   },
   components: {
-    Datepicker
+    Datepicker,
+    VueRecaptcha
   },
   mounted(){
     this.getServices();
