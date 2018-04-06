@@ -115,7 +115,7 @@
               span.asterisk Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
-                input(name="detailFiles" type="file" @change='changeDetailFiles')
+                input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
               span.clarify Drag &amp; Drop
             .inner.buttons.upload-reference
               span Upload Reference File
@@ -241,8 +241,8 @@
           .orderInfo__summary-deadline
             span 4
             label PROJECT DETAILS: 
-            p Files: 
-              span.choice {{ detailFiles.name }}
+            p Files:
+              span.choice <template v-for="detFile of detailFiles" >{{ detFile.name }} </template>
             p Reference File: 
               span.choice {{ refFiles.name }}
             label SUGGESTED DEADLINE
@@ -386,7 +386,10 @@ export default {
       this.serviceDrop = !this.serviceDrop;
     },
     changeDetailFiles(event) {
-      this.detailFiles = event.target.files[0];
+      for(var i = 0; i < event.target.files.length; i++){
+        this.detailFiles.push(event.target.files[i]);
+      }      
+      console.log(this.detailFiles);
     },
     changeRefFiles(event) {
       this.refFiles = event.target.files[0];
@@ -573,7 +576,10 @@ export default {
         sendForm.append("accountManager", "None selected");
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
-        sendForm.append("detailFiles", this.detailFiles, this.detailFiles.name);
+        for(var i = 0; i < this.detailFiles.length; i++){
+          console.log(this.detailFiles[i]);
+          sendForm.append("detailFiles", this.detailFiles[i]);
+        }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
 
         const result = await this.$axios.$post('http://localhost:8081/request', sendForm);
