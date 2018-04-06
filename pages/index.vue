@@ -118,14 +118,9 @@
                 .upload-btn__txt Upload files(s)
                 input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
               span.clarify Drag &amp; Drop
-              //- .loadedList(v-for="file in detailFiles")
-              //-   li.loadedList__item {{ file.name }}
-            .inner.buttons.upload-reference_mobileView
-              span Upload Reference File
-              .upload-btn
-                .upload-btn__txt Upload
-                input(name="refFiles" type="file" @change='changeRefFiles')
-              span.clarify Type Text
+              .loadedList(v-if="detailFiles.length")
+                li.loadedList__item(v-for="file in detailFiles" @click="detailRemove(file)") {{ file.name }}
+                  i.fa.fa-times.deleteIcon
             .inner.date-file.deadline
               span Suggested Deadline
               .calendar
@@ -140,6 +135,16 @@
                 .upload-btn__txt Upload
                 input(name="refFiles" type="file" @change='changeRefFiles')
               span.clarify Type Text
+              .loadedList
+                li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                  i.fa.fa-times.deleteIcon
+            .inner.date-file_mobileView.deadline
+              span Suggested Deadline
+              .calendar
+                datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                .datepick(@click='openPicker')
+                    img(src='../assets/images/calendar.png')
+              span.clarify Select
             .inner.date-file.file-types
               span Supported File Types
               .supported
@@ -271,7 +276,7 @@ import VueRecaptcha from 'vue-recaptcha';
 // import Clock from './../components/Clock.vue';
 
 export default {
-  name: 'form',
+  name: 'pang-form',
   data () {
     return {
       // options: {
@@ -335,7 +340,7 @@ export default {
       industrySelect: 'Select',
       deadlineSelect: '',
       contactName: '',
-      contactEmail: 'test@test.com',
+      contactEmail: '',
       contactSkype: '',
       phone: '',
       companyName: '',
@@ -398,8 +403,15 @@ export default {
       }      
       console.log(this.detailFiles);
     },
+    detailRemove(event) {   
+      this.detailFiles.splice(this.detailFiles.indexOf(event),1)
+    },
+    refRemove(event) {   
+      this.refFiles = [];
+    },
     changeRefFiles(event) {
       this.refFiles = event.target.files[0];
+      console.log(this.refFiles);
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
@@ -539,6 +551,8 @@ export default {
       }, 4000)
     },
     clearForm() {
+      this.refFiles = [];
+      this.detailFiles = [];
       this.request = [];
       this.deadlineDate = '',
       this.deadlineSelect = '',

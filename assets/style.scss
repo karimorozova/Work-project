@@ -21,6 +21,7 @@
     }
     @media (max-width: 1023px) {
       transform: translateX(350px);
+      display: none;
     }
     margin-left: 30px;
     padding-bottom: 20px;
@@ -81,6 +82,8 @@
   }
   .slideToShow {
     @media (max-width: 1023px) {
+      transition: all 1s;
+      display: flex;
       transform: translateX(0);
       background-color: white;
       position: fixed;
@@ -580,9 +583,9 @@
     }
     &__item {
       display: flex;     
-      padding: 20px 40px;
+      padding: 0 40px;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 77%;
       @media (max-width: 655px) {
         width: 100%;
@@ -590,6 +593,7 @@
       }
       @media (max-width: 550px) {
         flex-direction: column;
+        align-items: center;
       }
       .inner {
         display: flex;
@@ -630,17 +634,6 @@
           }
         }
       }
-      .upload-reference {
-        @media (max-width: 550px) {
-          display: none;
-        }
-        &_mobileView {
-          display: none;
-          @media (max-width: 550px) {
-            display: flex;
-          }
-        }
-      }
       .deadline {
         // padding-top: 3px;
         // padding-bottom: 38px;
@@ -663,6 +656,17 @@
             width: 150px;
             margin-left: 20px;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);            
+          }
+        }
+        @media (max-width: 550px) {
+          display: none;
+        }
+      }
+      .date-file {
+        &_mobileView {
+          display: none;
+          @media (max-width: 550px) {
+            display: flex;
           }
         }
       }
@@ -698,6 +702,22 @@
               font-family: MyriadPro;              
           }
         }
+      }
+    }
+    .loadedList {
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 40px;
+      padding-top: 0;
+      list-style: none;
+      &__item {
+        .deleteIcon {
+          padding-left: 5px;
+          cursor: pointer;
+        }
+      }
+      @media (max-width: 550px) {
+        padding-bottom: 10px;
       }
     }
     .details__brief {
