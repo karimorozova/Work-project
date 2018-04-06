@@ -1,6 +1,7 @@
 <template lang='pug'>
   .mainWrapper
     .container
+      .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your order
       .successAlert(v-if="success")
         .successAlert__message
           p Thanks for your request.
@@ -227,7 +228,7 @@
             | Please, fill all the required fields (marked with red 
             span.asterisk asterisk
             | )
-    .orderInfo(v-if='infoShow')
+    .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
         .orderInfo__title
           h3 YOUR ORDER
         .orderInfo__summary
@@ -314,6 +315,7 @@ export default {
           text: 'Other'
         }
       },
+      infoSlide: false,
       deadlineDate: '',
       detailFiles: [],
       refFiles: [],
@@ -381,6 +383,9 @@ export default {
     }
   },
   methods: {
+    orderSlide() {
+      this.infoSlide = !this.infoSlide
+    },
     showServices() {
       this.toggleServices()
     },

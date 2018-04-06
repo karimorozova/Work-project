@@ -15,11 +15,12 @@
     min-width: 100%;
   }
   .orderInfo {
+    transition: all 0.7s;
     @media (max-width: 1024px) {
       margin-left: 0;
     }
     @media (max-width: 1023px) {
-      display: none;
+      transform: translateX(350px);
     }
     margin-left: 30px;
     padding-bottom: 20px;
@@ -78,8 +79,39 @@
       }       
     }
   }
+  .slideToShow {
+    @media (max-width: 1023px) {
+      transform: translateX(0);
+      background-color: white;
+      position: fixed;
+      right: 3px;
+      top: 68px;
+      z-index: 5;
+    }
+  }
 }
 .container {
+    .slideInInfo {
+      display: none;
+      @media (max-width: 1023px) {
+        display: block;
+      }
+      transition: all 1s;
+      position: fixed;;
+      top: 38px;
+      right: -27px;
+      border: 1px solid black;
+      padding: 5px;
+      transform: rotate(-90deg);
+      z-index: 10;
+      background: yellowgreen;
+      color: blue;
+      cursor: pointer;
+    }
+    .positionChange {
+      transform: rotate(0);
+      transform: translateX(-26px);
+    }
     position: relative;
     color: #66563D;
     font-family: MyriadPro;
