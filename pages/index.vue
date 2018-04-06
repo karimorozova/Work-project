@@ -115,7 +115,7 @@
               span.asterisk Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
-                input(name="detailFiles" type="file" @change='changeDetailFiles')
+                input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
               span.clarify Drag &amp; Drop
               //- .loadedList(v-for="file in detailFiles")
               //-   li.loadedList__item {{ file.name }}
@@ -388,7 +388,10 @@ export default {
       this.serviceDrop = !this.serviceDrop;
     },
     changeDetailFiles(event) {
-      this.detailFiles = event.target.files[0];
+      for(var i = 0; i < event.target.files.length; i++){
+        this.detailFiles.push(event.target.files[i]);
+      }      
+      console.log(this.detailFiles);
     },
     changeRefFiles(event) {
       this.refFiles = event.target.files[0];
@@ -575,13 +578,16 @@ export default {
         sendForm.append("accountManager", "None selected");
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
-        sendForm.append("detailFiles", this.detailFiles, this.detailFiles.name);
+        for(var i = 0; i < this.detailFiles.length; i++){
+          console.log(this.detailFiles[i]);
+          sendForm.append("detailFiles", this.detailFiles[i]);
+        }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
 
-        const result = await this.$axios.$post('http://localhost:3001/request', sendForm);
+        const result = await this.$axios.$post('http://localhost:8081/request', sendForm);
     },
     async getServices() {
-      const result = await this.$axios.$get('http://localhost:3001/services')
+      const result = await this.$axios.$get('http://localhost:8081/services')
       for (let i = 0; i < result.length; i++) {
         this.services.push(result[i])
       }
@@ -590,7 +596,7 @@ export default {
       // }
     },
     async getLanguages() {
-      const result = await this.$axios.$get('http://localhost:3001/languages')
+      const result = await this.$axios.$get('http://localhost:8081/languages')
       .then(response => {
         this.languages = response;
       })
