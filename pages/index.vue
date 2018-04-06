@@ -117,20 +117,28 @@
                 .upload-btn__txt Upload files(s)
                 input(name="detailFiles" type="file" @change='changeDetailFiles')
               span.clarify Drag &amp; Drop
-            .inner.buttons.upload-reference
+              //- .loadedList(v-for="file in detailFiles")
+              //-   li.loadedList__item {{ file.name }}
+            .inner.buttons.upload-reference_mobileView
               span Upload Reference File
               .upload-btn
                 .upload-btn__txt Upload
                 input(name="refFiles" type="file" @change='changeRefFiles')
               span.clarify Type Text
-          .details__item
             .inner.date-file.deadline
               span Suggested Deadline
               .calendar
                 datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
                 .datepick(@click='openPicker')
                     img(src='../assets/images/calendar.png')
-              span.clarify Select     
+              span.clarify Select
+          .details__item
+            .inner.buttons.upload-reference
+              span Upload Reference File
+              .upload-btn
+                .upload-btn__txt Upload
+                input(name="refFiles" type="file" @change='changeRefFiles')
+              span.clarify Type Text
             .inner.date-file.file-types
               span Supported File Types
               .supported
@@ -206,9 +214,9 @@
               span Website
               input(type='text' v-model='web')
         .captcha
-          span.asterisk Enter the message <br> as it shown   
-          .captcha__image
-            vue-recaptcha(sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
+          span.asterisk Please, confirm that you are not a robot   
+          .captcha__google
+            vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
               ref="recaptcha"
               @verify="onVerify"
               @expired="onExpired"
@@ -239,12 +247,6 @@
             label INDUSTRY: 
             p.choice {{ industrySelect }}
           .orderInfo__summary-deadline
-            span 4
-            label PROJECT DETAILS: 
-            p Files: 
-              span.choice {{ detailFiles.name }}
-            p Reference File: 
-              span.choice {{ refFiles.name }}
             label SUGGESTED DEADLINE
             p.choice {{ deadlineDate }}
 
