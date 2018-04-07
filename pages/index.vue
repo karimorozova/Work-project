@@ -228,11 +228,14 @@
               @expired="onExpired"
               :callback="checkForm")
           input.buttons(type='submit' value='Submit')
-        .warning(v-if="errors.length")
-          p.message
-            | Please, fill all the required fields (marked with red 
-            span.asterisk asterisk
-            | )
+        .warning(v-if="error")
+          .message
+            .closeWarning(@click="closeWarning")
+              i.fa.fa-times
+            p
+              | Please, fill all the required fields (marked with red 
+              span.asterisk asterisk
+              | )
     .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
         .orderInfo__title
           h3 YOUR ORDER
@@ -348,7 +351,7 @@ export default {
       format: 'dd-MM-yyyy',
       brief: '',
       errors: [],
-      error: '',
+      error: false,
       success: false,
       services:[],
       captchaValid : false,
@@ -548,7 +551,10 @@ export default {
 
       setTimeout(() => {
           this.error = !this.error
-      }, 4000)
+      }, 5000)
+    },
+    closeWarning() {
+      this.error = false;
     },
     clearForm() {
       this.refFiles = [];
@@ -662,6 +668,8 @@ export default {
         this.sendForm();
         this.clearForm();
         this.showSuccess()
+      } else {
+        this.showError()
       }
     },
     validEmail(email) {
