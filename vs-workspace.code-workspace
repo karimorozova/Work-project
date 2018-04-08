@@ -7,5 +7,7 @@
 			"path": "client"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"eslint.enable": true
+	}
 }

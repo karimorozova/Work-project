@@ -1,15 +1,15 @@
 {
-  "name": "pangea-client",
+  "name": "translate-poject-nuxt",
   "version": "1.0.0",
-  "description": "pangea frontend",
-  "author": "wellyes",
+  "description": "Nuxt.js project",
+  "author": "Daniyal <da-lu@lenta.ru>",
   "private": true,
   "config": {
     "nuxt": {
       "host": "0.0.0.0",
       "port": "3000"
     }
-   },
+  },
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -26,6 +26,7 @@
     "nuxt": "^1.0.0",
     "pug": "^2.0.1",
     "vue-click-outside": "^1.0.7",
+    "vue-recaptcha": "^1.1.0",
     "vue-resource": "^1.5.0",
     "vue-transmit": "^8.1.2",
     "vuejs-datepicker": "^0.9.29"
