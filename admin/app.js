@@ -10,7 +10,7 @@ const db = mongoose.connection;
 const checkCollections = require('./helpers/dbSetDefault');
 const { LanguagesModel, RequestSchema } = require('./models');
 
-// TODO : make origins from current hostname only
+// TODO : check origins from localhost only
 const allowedOrigins = [
     '*'
 ];
@@ -27,24 +27,19 @@ app.use(session({
 }));
 
 app.use(express.static('dist'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser());
 
 
 app.use((req, res, next) => {
 
-    const origin = req.headers.origin;
-    
+    //const origin = req.headers.origin;
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', true);
 
-    var index = allowedOrigins.indexOf(origin);
-    if (index > -1) {
-        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[index]);
-    }
+    /*var index = allowedOrigins.indexOf(origin);
+    if (index > -1) {}*/
+    res.setHeader('Access-Control-Allow-Origin', '*');
     
     return next();
 });

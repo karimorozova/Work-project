@@ -76,12 +76,13 @@ const RequestSchema = new mongoose.Schema({
         default: ''
     },
     detailFiles: {
-        type: String,
-        default: ''
+        type: Array,
+        default: [],
+        trim : true
     },
     refFiles: {
-        type: String,
-        default: ''
+        type: Array,
+        default: []
     },
     createdAt: {
         type: Date,

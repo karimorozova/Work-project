@@ -23,7 +23,3 @@ mongo
 *.ntvs*
 *.njsproj
 *.sln
-/admin/config/dev.env.js
-/admin/config/prod.env.js
-/server/transactions-attachments
-/server/backup

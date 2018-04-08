@@ -6,10 +6,11 @@ module.exports = {
     '@nuxtjs/axios',
   ],
   axios: {
-    // proxyHeaders: false
+    // API url
+    baseURL: 'http://localhost:8081'
   },
   head: {
-    title: 'translate-poject-nuxt',
+    title: 'Translate request',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, , height=device-height, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0 ' },

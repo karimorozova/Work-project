@@ -609,10 +609,10 @@ export default {
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
 
-        const result = await this.$axios.$post('http://localhost:8081/request', sendForm);
+        const result = await this.$axios.$post('request', sendForm);
     },
     async getServices() {
-      const result = await this.$axios.$get('http://localhost:8081/services')
+      const result = await this.$axios.$get('services')
       for (let i = 0; i < result.length; i++) {
         this.services.push(result[i])
       }
@@ -621,7 +621,7 @@ export default {
       // }
     },
     async getLanguages() {
-      const result = await this.$axios.$get('http://localhost:8081/languages')
+      const result = await this.$axios.$get('languages')
       .then(response => {
         this.languages = response;
       })

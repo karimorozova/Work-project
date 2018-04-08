@@ -8,10 +8,10 @@ const { requiresLogin } = require('../utils/middleware');
 const { sendMail } = require('../utils/mailhandler');
 const multer = require('multer');
 
-// define configuration of upload files
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './dist/uploads/')
+        cb(null, './dist/uploads/tmp/')
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
@@ -119,7 +119,7 @@ router.get('/requests', requiresLogin, (req, res) => {
 // Update
 router.put('/request', requiresLogin, (req, res) => {
     if (!req.body._id) {
-        let error = new Error('Something wrong with db');
+        //let error = new Error('Something wrong with db');
 
         res.statusCode = 400;
         res.statusMessage = 'The id field was not sent';
@@ -156,7 +156,7 @@ router.post('/profile', function (req, res) {
     upload(req, res, function (err, file) {
         if (err) {
             // An error occurred when uploading
-            res.send('Erro')
+            res.send('Error in profile')
             return
         }
 
@@ -185,39 +185,13 @@ router.post('/request', upload.fields([{ name : 'detailFiles'}, {name : 'refFile
         companyName: req.body.companyName,
         sourceLanguage: JSON.parse(req.body.sourceLanguage),
         targetLanguages:   JSON.parse(req.body.targetLanguages),
-        detailFiles : req.files["detailFiles"][0].filename,
-        refFiles : req.files["refFiles"][0].filename,
+        detailFiles : req.files["detailFiles"],
+        refFiles : req.files["refFiles"] ? req.files["refFiles"] : '',
         brief: req.body.brief
     })
         .then(request => {
-            var msg = "<b>" + 
-            "Suggested Deadline : " + request.date +"<br/>" + 
-            "Contact Name : " + request.contactName + "<br/>" + 
-            "Contact Email : " + request.contactEmail + "<br/>" + 
-            "Web : " + request.web + "<br/>" + 
-            "Skype : " + request.skype + "<br/>" +
-            "Phone : " + request.phone + "<br/>" + 
-            "Service : " + request.service.title + "<br/>" + 
-            "Industry : " + request.industry + "<br/>" + 
-            "Status : " + request.status + "<br/>" + 
-            "Account manager : " + request.accountManager + "<br/>" + 
-            "Company name : " + request.companyName + "<br/>" +
-            "Detail File : <a href='http://admin.pangea.global:81/uploads/" + request.detailFiles + "' download target='_self'>"+ request.detailFiles +"</a><br/>" +
-            "Ref File : <a href='http://admin.pangea.global:81/uploads/" + request.refFiles + "' download target='_self'>"+ request.refFiles +"</a><br/>" +
-            "Source languages : " + request.sourceLanguage.lang + "<br/>"; 
-            
-            // Add targetLanguages
-            msg +="Target Languages : ";
-            request.targetLanguages.forEach(element => {
-                msg += element.lang + ",";
-            });
-            msg +="<br/>";
-            msg += "Brief : " + request.brief + "<br/>";
-            sendMail(msg);
-
+            sendMail(request);
             res.send({ message: "request was added" });
-            
-
         })
         .catch(err => {
             console.log(err);
