@@ -159,13 +159,10 @@ router.post('/profile', function (req, res) {
             res.send('Error in profile')
             return
         }
-
-        console.log(req.file)
         res.send('Ok')
 
         // Everything went fine
     })
-    // const file = `uploads/${}`
 })
 
 // Add
