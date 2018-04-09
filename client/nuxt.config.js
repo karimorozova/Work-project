@@ -7,7 +7,7 @@ module.exports = {
   ],
   axios: {
     // API url
-    baseURL: 'http://localhost:8081'
+    baseURL: 'http://localhost:3001'
   },
   head: {
     title: 'Translate request',
