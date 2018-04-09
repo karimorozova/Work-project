@@ -684,6 +684,7 @@
         }
       }
       .buttons {
+        position: relative;
         .upload-btn{
           overflow: hidden;
           position: relative;
@@ -714,6 +715,13 @@
               font-size: 50px;
               font-family: MyriadPro;              
           }
+        }
+        .drop {
+          position: absolute;
+          border: none;
+          padding: 50px 120px 40px;
+          top: 0;
+          background: transparent;
         }
       }
     }
