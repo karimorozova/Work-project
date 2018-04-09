@@ -568,6 +568,7 @@ export default {
       this.industrySelect = 'Select',
       this.sourceSelect = {lang: 'Select'},
       this.targetlang = ["Select"],
+      this.targetDrop = false,
       this.targetSelect = [],
       this.web = '',
       this.contactSkype = '',
