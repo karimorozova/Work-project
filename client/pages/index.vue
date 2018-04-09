@@ -113,6 +113,7 @@
         .details
           .details__item
             .inner.buttons.upload-file
+              drop.drop(@drop="handleDrop")
               span.asterisk Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
@@ -141,8 +142,8 @@
             .inner.date-file_mobileView.deadline
               span Suggested Deadline
               .calendar
-                datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
-                .datepick(@click='openPicker')
+                datepicker(ref="programaticOpen1" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                .datepick(@click='openPicker1')
                     img(src='../assets/images/calendar.png')
               span.clarify Select
             .inner.date-file.file-types
@@ -276,6 +277,8 @@ import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
 import VueRecaptcha from 'vue-recaptcha';
+import { Drag, Drop } from 'vue-drag-drop';
+
 // import Clock from './../components/Clock.vue';
 
 export default {
@@ -391,6 +394,15 @@ export default {
     }
   },
   methods: {
+    handleDrop(data, event) {
+      event.preventDefault();
+      const files = event.dataTransfer.files;
+      const filenames = [];
+      for (let i = 0; i < files.length; i++) {
+        filenames.push(files.item(i).name);
+        this.detailFiles.push(files[i]);
+      }
+    },
     orderSlide() {
       this.infoSlide = !this.infoSlide
     },
@@ -523,6 +535,9 @@ export default {
     },
     openPicker () {
       this.$refs.programaticOpen.showCalendar()
+    },
+    openPicker1 () {
+      this.$refs.programaticOpen1.showCalendar()
     },
     onVerify: function (response) {
       this.captchaValid = true;
@@ -694,7 +709,8 @@ export default {
   },
   components: {
     Datepicker,
-    VueRecaptcha
+    VueRecaptcha,
+    Drop
   },
   mounted(){
     this.getServices();
