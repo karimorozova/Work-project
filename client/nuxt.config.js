@@ -10,7 +10,8 @@ module.exports = {
   },
   axios: {
     // API url
-    baseURL: 'http://admin.pangea.global'
+    //baseURL: 'https://admin.pangea.global'
+    baseURL: 'http://localhost:3001'
   },
   head: {
     title: 'Translate request',
@@ -36,10 +37,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    /*
-    ** Run ESLint on save
-    */
-    publicPath: '/dist/',
+    publicPath: '/request-quote/',
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
