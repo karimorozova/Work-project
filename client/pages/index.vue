@@ -32,7 +32,7 @@
               .source__drop-list(v-for='language in languages')
                 .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                   img(:src="'/flags/' + language.symbol + '.png'")
-                  span.list-item(:class="{ active: language.lang == sourceSelect.lang || language.lang == activeLanguage }") {{ language.lang }}
+                  span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
                 .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
                   template(v-for='(dialect in language.dialects')
@@ -473,10 +473,11 @@ export default {
         if(!event.dialects.length) {
           this.sourceSelect = event;
           this.toggleSource();
-        } else {
-          this.sourceSelect = event.dialects[0];
+        } 
+        else {
+          // this.sourceSelect = event.dialects;
           this.selectLangSource = event.lang;
-          this.activeLanguage = event.lang
+          // this.activeLanguage = event.lang
         }
       }
       this.targetlang = ["Select"];
@@ -496,7 +497,6 @@ export default {
       this.targetSelect = [];
     },
     changeTargetSelect(event) {
-      console.log(event);
       if(event.lang == this.selectLangTarget) {
         this.selectLangTarget = ''        
       } else {
@@ -508,21 +508,20 @@ export default {
             this.targetSelect.push(event);
           } else {
               this.selectLangTarget = event.lang;            
-              let firstLang = event.dialects[0];
-              firstLang.check = true;
-              if(!this.targetSelect.includes(firstLang)) {
-                this.targetSelect.push(firstLang);
-              }
-              let checkForActiveDialect = false;
-              for(let i = 0; i < event.dialects.length; i++) {
-                if(event.dialects[i].check) {
-                  checkForActiveDialect = true
-                  break
-                }
-              } if(checkForActiveDialect) {
-                event.check = true;
-              }
-            }
+              // let firstLang = event.dialects[0];
+              // firstLang.check = true;
+              // if(!this.targetSelect.includes(firstLang)) {
+              //   this.targetSelect.push(firstLang);
+              // }
+            //   let checkForActiveDialect = false;
+            //   for(let i = 0; i < event.dialects.length; i++) {
+            //     if(event.dialects[i].check) {
+            //       checkForActiveDialect = true
+            //       break
+            //     }          
+            // } 
+            // event.check = checkForActiveDialect;
+          }
         }
         else{
           event.check = false;
