@@ -496,8 +496,9 @@ export default {
       this.targetSelect = [];
     },
     changeTargetSelect(event) {
+      console.log(event);
       if(event.lang == this.selectLangTarget) {
-        this.selectLangTarget = ''           
+        this.selectLangTarget = ''        
       } else {
         this.selectLangTarget = '';
         const pos = this.targetSelect.indexOf(event);
@@ -506,6 +507,12 @@ export default {
             event.check = true;
             this.targetSelect.push(event);
           } else {
+              this.selectLangTarget = event.lang;            
+              let firstLang = event.dialects[0];
+              firstLang.check = true;
+              if(!this.targetSelect.includes(firstLang)) {
+                this.targetSelect.push(firstLang);
+              }
               let checkForActiveDialect = false;
               for(let i = 0; i < event.dialects.length; i++) {
                 if(event.dialects[i].check) {
@@ -515,21 +522,12 @@ export default {
               } if(checkForActiveDialect) {
                 event.check = true;
               }
-                else { 
-                  event.check = false
-                }
-              this.selectLangTarget = event.lang;            
-              let firstLang = event.dialects[0];
-              firstLang.check = true;
-              if(!this.targetSelect.includes(firstLang)) {
-                this.targetSelect.push(firstLang);
-              }
             }
         }
         else{
           event.check = false;
           this.targetSelect.splice(pos,1);
-        }    
+        }   
       }
     },
     changeTargetDialect(event) {
