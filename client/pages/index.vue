@@ -513,24 +513,21 @@ export default {
               if(!this.targetSelect.includes(firstLang)) {
                 this.targetSelect.push(firstLang);
               }
+              let checkForActiveDialect = false;
+              for(let i = 0; i < event.dialects.length; i++) {
+                if(event.dialects[i].check) {
+                  checkForActiveDialect = true
+                  break
+                }
+              } if(checkForActiveDialect) {
+                event.check = true;
+              }
             }
         }
         else{
           event.check = false;
           this.targetSelect.splice(pos,1);
-        }
-        let checkForActiveDialect = false;
-        for(let i = 0; i < event.dialects.length; i++) {
-          if(event.dialects[i].check) {
-            checkForActiveDialect = true
-            break
-          }
-        } if(checkForActiveDialect) {
-          event.check = true;
-        }
-          else { 
-            event.check = false
-          }    
+        }   
       }
     },
     changeTargetDialect(event) {
