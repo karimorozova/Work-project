@@ -28,9 +28,9 @@ const mailhandler = {
     if (request.detailFiles.length > 0) {
       msg += "Detail File : ";
       for (var i = 0; i < request.detailFiles.length; i++) {
-        msg += "<a href='http://admin.pangea.global:81/uploads/";
-        msg += request.detailFiles[i].filename;
-        msg += "' download target='_self'>" + request.detailFiles[i].filename + "</a><br/>";
+        msg += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
+        msg += request.detailFiles[i];
+        msg += "' download target='_self'>" + request.detailFiles[i] + "</a><br/>";
       }
     }
     if (request.refFiles.length > 0) {

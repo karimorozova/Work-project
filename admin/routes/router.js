@@ -7,6 +7,7 @@ const { User, Languages, Requests, Services } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { sendMail } = require('../utils/mailhandler');
 const multer = require('multer');
+const mv = require('mv');
 
 
 var storage = multer.diskStorage({
@@ -187,6 +188,18 @@ router.post('/request', upload.fields([{ name : 'detailFiles'}, {name : 'refFile
         brief: req.body.brief
     })
         .then(request => {
+            var newDetail = [];
+            for(var i=0; i < request.detailFiles.length; i+=1)
+            {
+                var oldFile = request.detailFiles[i];
+                var newFile = './dist/reqfiles/' + request.id + '/' + oldFile.filename;
+                
+                mv(oldFile.path, newFile, {mkdirp: true}, function(err) {
+                    console.log("New file " + request.detailFiles[i]);
+                });
+                request.detailFiles[i] = oldFile.filename;
+                newDetail.push(oldFile.filename);
+            }
             sendMail(request);
             res.send({ message: "request was added" });
         })
