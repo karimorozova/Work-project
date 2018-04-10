@@ -20,6 +20,7 @@
   }
   .orderInfo {
     font-family: MyriadPro;
+    color: #66563D;
     transition: all 0.7s;
     @media (max-width: 1024px) {
       margin-left: 0;
@@ -51,13 +52,14 @@
       }
     }
     &__summary {
-      padding: 10px 20px 0 30px; 
+      padding: 10px 20px 0; 
       p {
         padding-left: 20px;
       }        
       span {
         font-size: 30px;
         padding-right: 5px;
+        font-family: MyriadBold;
       }
       label {
         font-size: 18px;
@@ -66,6 +68,7 @@
       .choice {
         margin-top: 5px;
         color: #FF876C;
+        font-family: MyriadPro;
       }
       &-languages {
         p {
