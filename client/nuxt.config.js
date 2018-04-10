@@ -5,9 +5,12 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
   ],
+  router: {
+    base: '/request-quote/'
+  },
   axios: {
     // API url
-    baseURL: 'http://localhost:3001'
+    baseURL: 'http://admin.pangea.global'
   },
   head: {
     title: 'Translate request',
@@ -36,6 +39,7 @@ module.exports = {
     /*
     ** Run ESLint on save
     */
+    publicPath: '/dist/',
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
