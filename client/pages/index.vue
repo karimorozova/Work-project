@@ -31,13 +31,13 @@
             .source__drop(v-if='sourceDrop')
               .source__drop-list(v-for='language in languages')
                 .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
-                  img(:src="'/flags/' + language.symbol + '.png'")
+                  img(:src="'flags/' + language.symbol + '.png'")
                   span.list-item(:class="{ active: language.lang == sourceSelect.lang || language.lang == activeLanguage }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
                 .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
                   template(v-for='(dialect in language.dialects')
                     .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                      img(:src="'flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
           span Target Language(s)
           .select.target
@@ -50,22 +50,22 @@
             .target__drop(v-if='targetDrop')
               .target__drop-list(v-for='language in languages')
                 .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
-                  img(:src="'/flags/' + language.symbol  + '.png'")
+                  img(:src="'flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
                 .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
                   template(v-for='dialect in language.dialects')
                     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                      img(:src="'flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
-                  img(:src="'/flags/' + language.symbol  + '.png'")
+                  img(:src="'flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
                     img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
                 .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
                   template(v-for='dialect in language.dialects')
                     .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
-                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                      img(:src="'flags/' + dialect.symbol + '.png'")                  
                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
         .number 
           span 3
