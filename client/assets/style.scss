@@ -201,7 +201,7 @@
     flex-direction: column;
     width: 100%;
     margin-bottom: 30px;
-    border-radius: 8px;
+    border-radius: 12px;
     background: transparent;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     cursor: default;
@@ -234,8 +234,11 @@
     display: flex;
     flex-direction: column;
     padding-top: 20px;
+    span {
+      padding-bottom: 5px;
+    }
     .source {
-      max-height: 387px;
+      max-height: 430px;
       @media (max-width: 710px) {
         max-height: 250px;
       }
@@ -327,7 +330,7 @@
       }
     }
     .target {
-      max-height: 387px;
+      max-height: 430px;
         @media (max-width: 710px) {
           max-height: 250px;
         }
@@ -338,9 +341,7 @@
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
-        padding-top: 15px;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 15px 10px 0;
         border-top: 1px solid rgba(0,0,0,0.3);
         @media (max-width: 710px) {
           flex-wrap: nowrap;
@@ -477,7 +478,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      border: 1px solid black;
+      border: 1px solid #66563D;
       border-radius: 10px;
       width: 29%;
       padding: 2px;
@@ -538,6 +539,9 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    span {
+      padding: 5px 0;
+    }
     &__files-list {
       position: absolute;
       top: -23px;
@@ -633,7 +637,7 @@
         padding-bottom: 20px;
         span {
           font-size: 12px;
-          padding-top: 5px;
+          padding-top: 9px;
         }
         .supported {
           display: flex;
@@ -680,10 +684,11 @@
             text-align: center;
             opacity: 0.7;
             border-radius: 10px;
-            padding: 5px;
+            border: none;
+            padding: 8px;
             width: 150px;
             margin-left: 20px;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);            
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);            
           }
         }
         @media (max-width: 550px) {
@@ -765,6 +770,7 @@
         border-radius: 10px;
         padding: 5px;
         outline: none;
+        font-family: MyriadPro;
         &:focus {
           box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
@@ -781,6 +787,9 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    span {
+      padding-bottom: 3px;
+    }
     @media (max-width: 550px) {
       display: block;
     }
@@ -803,8 +812,10 @@
         flex-direction: column;
         padding: 10px;
         input {
+          border: 1px solid #66563D;
           border-radius: 10px;
           padding: 10px 5px;
+          font-family: MyriadPro;
         }
       }
     }

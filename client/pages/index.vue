@@ -17,7 +17,7 @@
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
               .service-type__drop-list
-                span.list-item(@click='changeServiceSelect(service)' v-for='service of services.sort((a, b) => a.sortIndex - b.sortIndex)') {{ service.title }}
+                span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
         .number 
           span 2
           label.asterisk SELECT A LANGUAGE
@@ -211,15 +211,15 @@
               span Phone Number
               input(type='text' v-model='phone')
           .contact__col
-            .contact__col-item.skype
-              span Skype Name
-              input(type='text' v-model='contactSkype')
             .contact__col-item.company
-              span Company Name
+              span.asterisk Company Name
               input(type='text' v-model='companyName')
             .contact__col-item.website
               span Website
               input(type='text' v-model='web')
+            .contact__col-item.skype
+              span Skype Name
+              input(type='text' v-model='contactSkype')
         .captcha
           span.asterisk Please, confirm that you are not a robot   
           .captcha__google
@@ -672,12 +672,10 @@ export default {
     },
     async getServices() {
       const result = await this.$axios.$get('services')
+      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
       for (let i = 0; i < result.length; i++) {
         this.services.push(result[i])
       }
-      //   else this.services[1].push(result[i])  
-        
-      // }
     },
     async getLanguages() {
       const result = await this.$axios.$get('languages')
@@ -713,21 +711,21 @@ export default {
       this.errors = [];
       
       if(!this.request.contactName) this.errors.push("Name required");
-      if(!this.request.contactEmail) {
-        this.errors.push("Email required");
-      };
+      if(!this.request.contactEmail) this.errors.push("Email required");
+      if(!this.request.companyName) this.errors.push("Company Name required");
       if(this.serviceSelect == 'Select' || this.industrySelect == 'Select' || (this.source == 'Select' && this.target == 'Select')) {
         this.errors.push("Please, fill the required fields (with red asterisk).")
       }
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
-      }
+      } 
       if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.detailFiles) this.error.push("Upload files please!");
       if(!this.errors.length){
         this.sendForm();
-        this.clearForm();
-        this.showSuccess()
+        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        // this.clearForm();
+        // this.showSuccess()
       } else {
         this.showError()
       }
@@ -747,7 +745,15 @@ export default {
         }
       }
       return this.languages;
-    }
+    },
+    // sortedServices() {
+    //   console.log('Called ' + this.services);
+    //   return this.services.sort((a, b) => {
+    //     a.sortIndex - b.sortIndex;
+    //     console.log(a.sortIndex + " " + b.sortIndex)
+    //   });
+      
+    // }
   },
   watch: {
     deadlineSelect() {
