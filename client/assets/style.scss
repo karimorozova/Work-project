@@ -914,12 +914,14 @@
  }
   .warning {
     position: fixed;
-    bottom: 0px;
+    top: 50%;
+    left: 50%;
+    margin-left: -150px;
+    margin-top: -60px;
     background-color: white;
     z-index: 10;
     width: 300px;
     font-size: 20px;
-    margin: 20px auto;
     padding: 20px;
     border: 2px solid grey;
     border-radius: 10px;
@@ -929,7 +931,6 @@
     animation-iteration-count: infinite ;
     animation-direction: alternate ;
     text-align: center;
-    transform: translateX(45%);
     .message {
       position: relative;
       .closeWarning {
@@ -941,9 +942,13 @@
     @media (max-width: 767px) {
       transform: translateX(0);
     }
+    @media (max-width: 450px) {
+      margin-left: -170px;
+    }
     @media (max-width: 380px) {
       width: 250px;
       padding: 5px;
+      margin-left: -125px;
     } 
   }
   

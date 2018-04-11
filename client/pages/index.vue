@@ -17,7 +17,7 @@
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
               .service-type__drop-list
-                span.list-item(@click='changeServiceSelect(service)' v-for='service of services') {{ service.title }}
+                span.list-item(@click='changeServiceSelect(service)' v-for='service of services.sort((a, b) => a.sortIndex - b.sortIndex)') {{ service.title }}
         .number 
           span 2
           label.asterisk SELECT A LANGUAGE
@@ -29,7 +29,7 @@
               .icon(:class="{ reverse: sourceDrop }")
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
-              .source__drop-list(v-for='language in languages')
+              .source__drop-list(v-for='language in sortedLanguages')
                 .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                   img(:src="'flags/' + language.symbol + '.png'")
                   span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
@@ -48,7 +48,7 @@
               .icon(:class="{ reverse: targetDrop }")
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
-              .target__drop-list(v-for='language in languages')
+              .target__drop-list(v-for='language in sortedLanguages')
                 .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                   img(:src="'flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
@@ -723,6 +723,7 @@ export default {
         this.errors.push("Email should be like address@email.com");
       }
       if(!this.captchaValid) this.errors.push("captcha required");
+      if(!this.detailFiles) this.error.push("Upload files please!");
       if(!this.errors.length){
         this.sendForm();
         this.clearForm();
@@ -737,7 +738,17 @@ export default {
     }
   },
   computed: {
-    },
+    sortedLanguages() {
+      let moveToStart;
+      for(let i = 0; i < this.languages.length; i++) {
+        if(this.languages[i].lang == 'English') {
+          moveToStart = this.languages.splice(i, 1);
+          this.languages.unshift(moveToStart[0]);
+        }
+      }
+      return this.languages;
+    }
+  },
   watch: {
     deadlineSelect() {
       const date = moment(this.deadlineSelect);
