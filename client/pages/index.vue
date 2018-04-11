@@ -71,16 +71,12 @@
           span 3
           label.asterisk CHOOSE AN INDUSTRY
         .industry
-          .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+          .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
             .image
             .image-white
-            p Legal
-          .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
-            .image
-            .image-white
-            p Hotel &amp;
-              br 
-              | Real Estates 
+            p Casino, Poker
+              br
+              | &amp; IGaming
           .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
             .image
             .image-white
@@ -93,16 +89,20 @@
             p ICOs &amp; Crypto-
               br
               | Currency
-          .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
-            .image
-            .image-white
-            p Casino, Poker
-              br
-              | &amp; IGaming
           .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
             .image
             .image-white
             p Video Games
+          .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
+            .image
+            .image-white
+            p Hotel &amp;
+              br 
+              | Real Estates
+          .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+            .image
+            .image-white
+            p Legal 
           .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
             .image
             .image-white
@@ -114,7 +114,7 @@
           .details__item
             .inner.buttons.upload-file
               drop.drop(@drop="handleDrop")
-              span.asterisk Files
+              span Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
                 input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
@@ -720,7 +720,6 @@ export default {
         this.errors.push("Email should be like address@email.com");
       } 
       if(!this.captchaValid) this.errors.push("captcha required");
-      if(!this.detailFiles) this.error.push("Upload files please!");
       if(!this.errors.length){
         this.sendForm();
         window.top.location.href = "https://www.pangea.global/thank-you"; 
