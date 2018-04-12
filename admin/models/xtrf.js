@@ -2,7 +2,6 @@ const axios = require('axios');
 
 var instance = axios.create({
   baseURL: 'https://pangea.s.xtrf.eu/home-api/',
-  timeout: 1000,
   headers: {
     'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj'
   }
@@ -74,8 +73,8 @@ const Xtrf = async (request) => {
     console.log("Looking for existing customer");
     customerId = await (findCustomer(request.companyName));
   }
-
   var personId = await (createPerson(request, customerId))
+   
 
   return new Promise(resolve => {
     instance.post("v2/quotes", {

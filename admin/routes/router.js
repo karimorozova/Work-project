@@ -257,7 +257,7 @@ router.get('/qtest', (req, res) => {
       industry: "industryparam",
       status: "statusparam",
       accountManager: "accounmanagerparam",
-      companyName: "companyparam1",
+      companyName: "company-test",
       sourceLanguage: {
         symbol: "BG"
       },

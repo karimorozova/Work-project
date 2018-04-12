@@ -15,6 +15,10 @@ const LanguageSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
+    xtrf:{
+        type: String,
+        default: '',
+    },
     direction:{
         type: String,
         default: 'both',
