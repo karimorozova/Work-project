@@ -150,12 +150,12 @@
               span Supported File Types
               .supported
                 .supported__icons
-                  img(src='../assets/images/file-types/supported-files.jpg')
-                  //- img(src='../assets/images/file-types/excel.png')
-                  //- img(src='../assets/images/file-types/word.png')
-                  //- img(src='../assets/images/file-types/Artboard1copy3.png')
-                  //- img(src='../assets/images/file-types/powerpoint.png')
-                  //- img(src='../assets/images/file-types/photoshop.png')
+                  img(src='../assets/images/file-types/in.png')
+                  img(src='../assets/images/file-types/excel1.png')
+                  img(src='../assets/images/file-types/word1.png')
+                  img(src='../assets/images/file-types/ini.png')
+                  img(src='../assets/images/file-types/powerpoint1.png')
+                  img(src='../assets/images/file-types/photoshop1.png')
                   span.filesLink(v-on:click='showFiles') Full List
           .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
             .title
