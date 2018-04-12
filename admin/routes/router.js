@@ -3,17 +3,21 @@ const app = express();
 const router = express.Router();
 const session = require('express-session');
 const path = require('path');
-const { User, Languages, Requests, Services } = require('../models');
-const { requiresLogin } = require('../utils/middleware');
-const { sendMail } = require('../utils/mailhandler');
+const {
+  User,
+  Languages,
+  Requests,
+  Services,
+  Xtrf
+} = require('../models');
+const {
+  requiresLogin
+} = require('../utils/middleware');
+const {
+  sendMail
+} = require('../utils/mailhandler');
 const multer = require('multer');
 const mv = require('mv');
-
-const Client = require('node-rest-client').Client;
-const restClient = new Client();
-
-
-
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -213,9 +217,12 @@ router.post('/request', upload.fields([{
         request.detailFiles[i] = oldFile.filename;
       }
       sendMail(request);
+      
       res.send({
         message: "request was added"
       });
+
+      
     })
     .catch(err => {
       console.log(err);
@@ -239,21 +246,37 @@ router.get('/services', (req, res) => {
 });
 
 router.get('/qtest', (req, res) => {
-  var args = {
-    data: { 
-        "name": "form-test", 
-        "clientId": "140" ,
-        "serviceId" :"45",
-        "opportunityOfferId": "",
-    },
-    headers: {
-      "X-AUTH-ACCESS-TOKEN": "U0mLa6os4DIBAsXErcSUvxU0cj"
-    }
-  };
-  restClient.post("https://pangea.s.xtrf.eu/home-api/v2/quotes", args, (data, response) => {
-    res.send("test completed with" + data);
-  });
-
+  Requests.create({
+      date: "",
+      contactName: "testme2",
+      contactEmail: "test@test.com",
+      web: "webparam",
+      skype: "skypeparam",
+      phone: "phoneparam",
+      service: "41",
+      industry: "industryparam",
+      status: "statusparam",
+      accountManager: "accounmanagerparam",
+      companyName: "companyparam1",
+      sourceLanguage: {
+        symbol: "BG"
+      },
+      targetLanguages: [{
+        symbol: "EN-GB"
+      }],
+      brief: req.body.brief
+    })
+    .then(request => {
+      Xtrf(request).then(results => {
+        res.send("" + results);
+      }).catch(err => {
+        console.log(err)
+      })
+    }).catch(err => {
+      console.log(err)
+      //res.statusCode(500);
+      //res.send('Something wrond with DB')
+    })
 });
 
 router.get('/languages', (req, res) => {
