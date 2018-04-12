@@ -17,7 +17,7 @@
                 i.fas.fa-caret-down
             .service-type__drop(v-if='serviceDrop')
               .service-type__drop-list
-                span.list-item(@click='changeServiceSelect(service)' v-for='service of services') {{ service.title }}
+                span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
         .number 
           span 2
           label.asterisk SELECT A LANGUAGE
@@ -29,7 +29,7 @@
               .icon(:class="{ reverse: sourceDrop }")
                 i.fas.fa-caret-down
             .source__drop(v-if='sourceDrop')
-              .source__drop-list(v-for='language in languages')
+              .source__drop-list(v-for='language in sortedLanguages')
                 .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                   img(:src="'flags/' + language.symbol + '.png'")
                   span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
@@ -48,7 +48,7 @@
               .icon(:class="{ reverse: targetDrop }")
                 i.fas.fa-caret-down
             .target__drop(v-if='targetDrop')
-              .target__drop-list(v-for='language in languages')
+              .target__drop-list(v-for='language in sortedLanguages')
                 .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                   img(:src="'flags/' + language.symbol  + '.png'")
                   span.list-item(:class="{ active: language.check }") {{ language.lang }}
@@ -71,16 +71,12 @@
           span 3
           label.asterisk CHOOSE AN INDUSTRY
         .industry
-          .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+          .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
             .image
             .image-white
-            p Legal
-          .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
-            .image
-            .image-white
-            p Hotel &amp;
-              br 
-              | Real Estates 
+            p Casino, Poker
+              br
+              | &amp; IGaming
           .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
             .image
             .image-white
@@ -93,16 +89,20 @@
             p ICOs &amp; Crypto-
               br
               | Currency
-          .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
-            .image
-            .image-white
-            p Casino, Poker
-              br
-              | &amp; IGaming
           .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
             .image
             .image-white
             p Video Games
+          .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
+            .image
+            .image-white
+            p Hotel &amp;
+              br 
+              | Real Estates
+          .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+            .image
+            .image-white
+            p Legal 
           .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
             .image
             .image-white
@@ -114,7 +114,7 @@
           .details__item
             .inner.buttons.upload-file
               drop.drop(@drop="handleDrop")
-              span.asterisk Files
+              span Files
               .upload-btn
                 .upload-btn__txt Upload files(s)
                 input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
@@ -150,12 +150,12 @@
               span Supported File Types
               .supported
                 .supported__icons
-                  img(src='../assets/images/file-types/Artboard1.png')
-                  img(src='../assets/images/file-types/Artboard1copy.png')
-                  img(src='../assets/images/file-types/Artboard1copy2.png')
-                  img(src='../assets/images/file-types/Artboard1copy3.png')
-                  img(src='../assets/images/file-types/Artboard1copy4.png')
-                  img(src='../assets/images/file-types/Artboard1copy5.png')
+                  img(src='../assets/images/file-types/in.png')
+                  img(src='../assets/images/file-types/excel1.png')
+                  img(src='../assets/images/file-types/word1.png')
+                  img(src='../assets/images/file-types/ini.png')
+                  img(src='../assets/images/file-types/powerpoint1.png')
+                  img(src='../assets/images/file-types/photoshop1.png')
                   span.filesLink(v-on:click='showFiles') Full List
           .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
             .title
@@ -211,15 +211,15 @@
               span Phone Number
               input(type='text' v-model='phone')
           .contact__col
-            .contact__col-item.skype
-              span Skype Name
-              input(type='text' v-model='contactSkype')
             .contact__col-item.company
-              span Company Name
+              span.asterisk Company Name
               input(type='text' v-model='companyName')
             .contact__col-item.website
               span Website
               input(type='text' v-model='web')
+            .contact__col-item.skype
+              span Skype Name
+              input(type='text' v-model='contactSkype')
         .captcha
           span.asterisk Please, confirm that you are not a robot   
           .captcha__google
@@ -672,12 +672,10 @@ export default {
     },
     async getServices() {
       const result = await this.$axios.$get('services')
+      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
       for (let i = 0; i < result.length; i++) {
         this.services.push(result[i])
       }
-      //   else this.services[1].push(result[i])  
-        
-      // }
     },
     async getLanguages() {
       const result = await this.$axios.$get('languages')
@@ -713,20 +711,20 @@ export default {
       this.errors = [];
       
       if(!this.request.contactName) this.errors.push("Name required");
-      if(!this.request.contactEmail) {
-        this.errors.push("Email required");
-      };
+      if(!this.request.contactEmail) this.errors.push("Email required");
+      if(!this.request.companyName) this.errors.push("Company Name required");
       if(this.serviceSelect == 'Select' || this.industrySelect == 'Select' || (this.source == 'Select' && this.target == 'Select')) {
         this.errors.push("Please, fill the required fields (with red asterisk).")
       }
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
-      }
+      } 
       if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
-        this.clearForm();
-        this.showSuccess()
+        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        // this.clearForm();
+        // this.showSuccess()
       } else {
         this.showError()
       }
@@ -737,7 +735,25 @@ export default {
     }
   },
   computed: {
+    sortedLanguages() {
+      let moveToStart;
+      for(let i = 0; i < this.languages.length; i++) {
+        if(this.languages[i].lang == 'English') {
+          moveToStart = this.languages.splice(i, 1);
+          this.languages.unshift(moveToStart[0]);
+        }
+      }
+      return this.languages;
     },
+    // sortedServices() {
+    //   console.log('Called ' + this.services);
+    //   return this.services.sort((a, b) => {
+    //     a.sortIndex - b.sortIndex;
+    //     console.log(a.sortIndex + " " + b.sortIndex)
+    //   });
+      
+    // }
+  },
   watch: {
     deadlineSelect() {
       const date = moment(this.deadlineSelect);
