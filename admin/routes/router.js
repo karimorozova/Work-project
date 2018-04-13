@@ -193,7 +193,7 @@ router.post('/request', upload.fields([{
       web: req.body.web,
       skype: req.body.skype,
       phone: req.body.phone,
-      service: req.body.service,
+      service: JSON.parse(req.body.service),
       industry: req.body.industry,
       status: req.body.status,
       accountManager: req.body.accountManager,
@@ -217,7 +217,13 @@ router.post('/request', upload.fields([{
         request.detailFiles[i] = oldFile.filename;
       }
       sendMail(request);
-      
+      /* sending request via API */
+      Xtrf(request).then(results => {
+        console.log("request added via api");
+      }).catch(err => {
+        console.log(err)
+      })
+
       res.send({
         message: "request was added"
       });
@@ -248,8 +254,8 @@ router.get('/services', (req, res) => {
 router.get('/qtest', (req, res) => {
   Requests.create({
       date: "",
-      contactName: "testme2",
-      contactEmail: "test@test.com",
+      contactName: "testme3",
+      contactEmail: "test3@test.com",
       web: "webparam",
       skype: "skypeparam",
       phone: "phoneparam",
@@ -257,12 +263,12 @@ router.get('/qtest', (req, res) => {
       industry: "industryparam",
       status: "statusparam",
       accountManager: "accounmanagerparam",
-      companyName: "company-test",
+      companyName: "company-test1",
       sourceLanguage: {
-        symbol: "BG"
+        symbol: "AF", xtrf:3
       },
       targetLanguages: [{
-        symbol: "EN-GB"
+        symbol: "BG", xtrf : 40
       }],
       brief: req.body.brief
     })

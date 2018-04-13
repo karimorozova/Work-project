@@ -19,6 +19,14 @@ const ServicesSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    xtrf:{
+        type: String,
+        default: '',
+    },
+    projectType: {
+        type: String,
+        default: "regular",
+    },
     createdAt : { 
         type : Date, 
         default : Date.now 

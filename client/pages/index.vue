@@ -434,6 +434,7 @@ export default {
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
+      
       this.sourceSelect = {lang : 'Select'};
       if(!event.source) {
         this.sourceSelect = {lang: 'English (United Kingdom)'}
@@ -508,19 +509,6 @@ export default {
             this.targetSelect.push(event);
           } else {
               this.selectLangTarget = event.lang;            
-              // let firstLang = event.dialects[0];
-              // firstLang.check = true;
-              // if(!this.targetSelect.includes(firstLang)) {
-              //   this.targetSelect.push(firstLang);
-              // }
-            //   let checkForActiveDialect = false;
-            //   for(let i = 0; i < event.dialects.length; i++) {
-            //     if(event.dialects[i].check) {
-            //       checkForActiveDialect = true
-            //       break
-            //     }          
-            // } 
-            // event.check = checkForActiveDialect;
           }
         }
         else{
@@ -650,7 +638,7 @@ export default {
         sendForm.append("date", this.request.date);
         sendForm.append("contactName", this.request.contactName);
         sendForm.append("contactEmail", this.request.contactEmail);
-        sendForm.append("service", this.request.service);
+        sendForm.append("service", JSON.stringify(this.serviceSelect));
         sendForm.append("industry", this.request.industry); 
         sendForm.append("status", "New");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));

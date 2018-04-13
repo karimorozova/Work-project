@@ -10,8 +10,8 @@ module.exports = {
   },
   axios: {
     // API url
-    baseURL: 'https://admin.pangea.global'
-    // baseURL: 'http://localhost:3001'
+    //baseURL: 'https://admin.pangea.global'
+    baseURL: 'http://localhost:3001'
   },
   head: {
     title: 'Translate request',

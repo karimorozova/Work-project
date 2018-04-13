@@ -41,11 +41,6 @@ const RequestSchema = new mongoose.Schema({
         default: null,
         trim: true
     },
-    industry: {
-        type: String,
-        default: '',
-        trim: true
-    },
     status: {
         type: String,
         default: '',
@@ -88,7 +83,18 @@ const RequestSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+    
 });
+
+RequestSchema.methods.targetArray = function targetArray (){
+    var res = [];
+    for(var i=0; i < this.targetLanguages.length; i+=1 )
+    {
+        res.push(this.targetLanguages[i].xtrf);
+    }
+    console.log("length is " + res.length);
+    return res;
+}
 
 const Requests = mongoose.model('Requests', RequestSchema);
 
