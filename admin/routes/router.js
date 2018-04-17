@@ -255,20 +255,20 @@ router.get('/qtest', (req, res) => {
   Requests.create({
       date: "",
       contactName: "testme3",
-      contactEmail: "11111@test.com",
+      contactEmail: "m.s.ignat@gmail.com",
       web: "webparam",
       skype: "skypeparam",
       phone: "phoneparam",
-      service: "41",
-      industry: "industryparam",
+      service: { xtrf: 11, projectType: "regular", title: "Translation", source: true },
+      industry: "Video Games",
       status: "statusparam",
       accountManager: "accounmanagerparam",
       companyName: "company-test1",
       sourceLanguage: {
-        symbol: "AF", xtrf:3
+        lang:"Bengali (Indida)",symbol:"BN-IN"
       },
       targetLanguages: [{
-        symbol: "BG", xtrf : 40
+        lang:"Czech",symbol:"CS"
       }],
       brief: req.body.brief
     })

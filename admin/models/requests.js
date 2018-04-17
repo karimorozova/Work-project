@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 // const Schema = mongoose.Schema;
-
+const querystring = require('querystring');
 const RequestSchema = new mongoose.Schema({
     date: {
         type: Date,
@@ -90,9 +90,8 @@ RequestSchema.methods.targetArray = function targetArray (){
     var res = [];
     for(var i=0; i < this.targetLanguages.length; i+=1 )
     {
-        res.push(this.targetLanguages[i].xtrf);
+        res.push({"name" : this.targetLanguages[i].lang});
     }
-    console.log("length is " + res.length);
     return res;
 }
 

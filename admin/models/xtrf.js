@@ -34,7 +34,6 @@ function findCustomer(name) {
     homeApi.get("customers").then(function (response) {
       resolve(response.data.find(x => x.name == name).id);
     }).catch(function (error) {
-      console.log("errord adding customer, status " + error.response.status + "\n Message :" + error.response.data.errorMessage);
       resolve(error);
     });
   })
@@ -69,16 +68,28 @@ function createPerson(person, clientId) {
 }
 
 const Xtrf = async (request) => {
-  
-  var customerToken = await (generateToken(request.contactEmail))
-  if (customerToken) {
-    var sessionId = await (Customer.login(customerToken));
+  console.log("Begin creating quote"); 
+
+  const classic = request.service.projectType === "regular";
+  console.log(`Project is regular : ${classic}`);
+
+  if(classic)
+  {
+    var customerId = await(findCustomer(request.companyName));    
+    var accessToken = await(generateToken(request.contactEmail));
+    var sessionId = await(Customer.login(accessToken));
+    console.log(`Customer id : ${customerId} \nAcess Token is : ${accessToken} \nSessionId is : ${sessionId}`);
+
     var customer = new Customer(request,sessionId);
-    await (customer.createQuote());
-    //await (customer.workflows());
+    
+    var quoteId = await (customer.createQuote());
+    
   }
+  console.log("End of creation quote");
 
 }
+
+
 
 /* help debug function */
 function getServiceList() {
