@@ -227,7 +227,11 @@
               ref="recaptcha"
               @verify="onVerify"
               @expired="onExpired"
-              :callback="checkForm")
+              :callback="checkForm"
+              :style= {"transform": "scale(0.77)",
+                "-webkit-transform": "scale(0.77)",
+                "transform-origin": "150px 0",
+                "-webkit-transform-origin": "150px 0" })
           input.buttons(type='submit' value='Submit')
         .warning(v-if="error")
           .message
