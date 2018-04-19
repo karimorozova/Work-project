@@ -71,10 +71,8 @@ var Customer = class Customer {
         "specialization": {
           "name": "General"
         },
-        "sourceLanguage": {
-          "name": this.request.sourceLanguage
-        },
-        "targetLanguages": this.request.targetArray(),
+        "sourceLanguage": this.request.sourceLangName(),
+        "targetLanguages": this.request.targetLangName(),
         "notes": "Coming from website",
         "autoAccept": false
       };
