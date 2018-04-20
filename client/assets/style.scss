@@ -1115,3 +1115,81 @@
     font-family: MyriadBold;
     src: url('../assets/fonts/MyriadPro-Bold.otf')
   }
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-grow: 1;
+    &__image {
+      width: 38%;
+      img {
+        padding: 6px 0 12px 0;
+        width: 240px;
+        height: 67px;
+      }
+    }
+    
+  }
+
+  .header {
+      max-height: 273px;
+      background-image: url('./../assets/images/header-back.png.jpg');
+      background-size: cover;
+      padding: 113px 0 99px 780px;
+      margin-bottom: 45px;
+      span {
+        color: #fff;
+        font-size: 56px;
+        font-weight: bold;
+        font-family: 'Open Sans', sans-serif;
+        
+      }
+  }
+
+  .linkList {
+    display: flex;
+    justify-content: center;
+  }
+
+  .list {
+    list-style: none;
+  }
+
+  .list li {
+    display: inline;
+    padding: 4px;
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
+  }
+
+  .legalInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  p.linfo {
+    color: #fff;
+    font-size: 12px;
+    margin-top: 0.5px;
+    margin-bottom: 0.5px;
+  }
+
+  .socialLinks {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+  }
+  
+  .socialsImage {
+    margin: 5px;
+  }
+
+  .footer {
+    background-color: #665741;
+    height: 218px;
+    }

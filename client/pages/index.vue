@@ -1,279 +1,297 @@
 <template lang='pug'>
-  .mainWrapper
-    .container
-      .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
-      .successAlert(v-if="success")
-        .successAlert__message
-          p Thanks for your request.
-          p We will answer you as soon as possible.
-      form.mainForm(@submit.prevent="checkForm")
-        .number 
-          span 1
-          label.asterisk SERVICE TYPE      
-        .service-type
-          .select(v-on:click='showServices')
-            span.inner-text.clarify(:class="{ color: serviceSelect.title != 'Select' }") {{ serviceSelect.title }}
-              .icon(:class="{ reverse: serviceDrop }")
-                i.fas.fa-caret-down
-            .service-type__drop(v-if='serviceDrop')
-              .service-type__drop-list
-                span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
-        .number 
-          span 2
-          label.asterisk SELECT A LANGUAGE
-        .language
-          span(v-if='serviceSelect.source') Source Language
-          .select.source(v-if='serviceSelect.source')
-            span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
-              .wrapper(v-on:click.self='showSourceLang')
-              .icon(:class="{ reverse: sourceDrop }")
-                i.fas.fa-caret-down
-            .source__drop(v-if='sourceDrop')
-              .source__drop-list(v-for='language in sortedLanguages')
-                .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
-                  img(:src="'flags/' + language.symbol + '.png'")
-                  span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
-                .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
-                  template(v-for='(dialect in language.dialects')
-                    .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                      img(:src="'flags/' + dialect.symbol + '.png'")                  
-                      span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
-          span Target Language(s)
-          .select.target
-            span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-              <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
-              <template v-if="targetSelect.length == 0">Select</template>
-              .wrapper(v-on:click.self='showTargetLang')
-              .icon(:class="{ reverse: targetDrop }")
-                i.fas.fa-caret-down
-            .target__drop(v-if='targetDrop')
-              .target__drop-list(v-for='language in sortedLanguages')
-                .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
-                  img(:src="'flags/' + language.symbol  + '.png'")
-                  span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
-                .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
-                  template(v-for='dialect in language.dialects')
-                    .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                      img(:src="'flags/' + dialect.symbol + '.png'")                  
-                      span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-                .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
-                  img(:src="'flags/' + language.symbol  + '.png'")
-                  span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                    img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
-                .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
-                  template(v-for='dialect in language.dialects')
-                    .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
-                      img(:src="'flags/' + dialect.symbol + '.png'")                  
-                      span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-        .number 
-          span 3
-          label.asterisk CHOOSE AN INDUSTRY
-        .industry
-          .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
-            .image
-            .image-white
-            p Casino, Poker
-              br
-              | &amp; IGaming
-          .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
-            .image
-            .image-white
-            p CFDs &amp; Online
-              br
-              | Trading
-          .industry__item.crypto(:class="{activeIndustry: industrySelect == industryList.crypto.text}" @click='() => changeIndustry("crypto")')
-            .image
-            .image-white
-            p ICOs &amp; Crypto-
-              br
-              | Currency
-          .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
-            .image
-            .image-white
-            p Video Games
-          .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
-            .image
-            .image-white
-            p Hotel &amp;
-              br 
-              | Real Estates
-          .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
-            .image
-            .image-white
-            p Legal 
-          .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
-            .image
-            .image-white
-            p Other
-        .number
-          span 4
-          label PROJECT DETAILS
-        .details
-          .details__item
-            .inner.buttons.upload-file
-              drop.drop(@drop="handleDrop")
-              span Files
-              .upload-btn
-                .upload-btn__txt Upload files(s)
-                input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
-              span.clarify Drag &amp; Drop
-              .loadedList(v-if="detailFiles.length")
-                li.loadedList__item(v-for="file in detailFiles" @click="detailRemove(file)") {{ file.name }}
-                  i.fa.fa-times.deleteIcon
-            .inner.buttons.btn-mobileview
-              span Upload Reference File
-              .upload-btn
-                .upload-btn__txt Upload
-                input(name="refFiles" type="file" @change='changeRefFiles')
-              span.clarify Type Text
-              .loadedList
-                li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
-                  i.fa.fa-times.deleteIcon
-            .inner.date-file.deadline
-              span Suggested Deadline
-              .calendar
-                datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
-                .datepick(@click='openPicker')
-                    img(src='../assets/images/calendar.png')
-              span.clarify Select
-          .details__item
-            .inner.buttons.upload-reference
-              span Upload Reference File
-              .upload-btn
-                .upload-btn__txt Upload
-                input(name="refFiles" type="file" @change='changeRefFiles')
-              span.clarify Type Text
-              .loadedList
-                li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
-                  i.fa.fa-times.deleteIcon
-            .inner.date-file_mobileView.deadline
-              span Suggested Deadline
-              .calendar
-                datepicker(ref="programaticOpen1" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
-                .datepick(@click='openPicker1')
-                    img(src='../assets/images/calendar.png')
-              span.clarify Select
-            .inner.date-file.file-types
-              span Supported File Types
-              .supported
-                .supported__icons
-                  .supported__icons_images
-                    img(src='../assets/images/file-types/in.png')
-                    img(src='../assets/images/file-types/excel1.png')
-                    img(src='../assets/images/file-types/word1.png')
-                    img(src='../assets/images/file-types/ini.png')
-                    img(src='../assets/images/file-types/powerpoint1.png')
-                    img(src='../assets/images/file-types/photoshop1.png')
-                  span.filesLink(v-on:click='showFiles') Full List
-          .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
-            .title
-              label SUPPORTED FILE TYPES
-              .crossButton(@click="showFiles")
-                i.fa.fa-times.close
-            .types
-              .textFiles.types__sector
-                .fileTypeTitle Text files
-                .list
-                  li(v-for='type in fileTypes.text') 
-                    span.dot &#9679;
-                    span.type-text {{ type }}
-              .designFiles.types__sector
-                .fileTypeTitle Design files
-                .list
-                  li(v-for='type in fileTypes.design') 
-                    span.dot &#9679;
-                    span.type-text {{ type }}
-              .webFiles.types__sector
-                .fileTypeTitle Web files
-                .list
-                  li(v-for='type in fileTypes.web')
-                    span.dot &#9679;
-                    span.type-text {{ type }}
-              .translationFiles.types__sector
-                .fileTypeTitle Translation files
-                .list
-                  li(v-for='type in fileTypes.translation')
-                    span.dot &#9679;
-                    span.type-text {{ type }}
-              .devFiles.types__sector
-                .fileTypeTitle Dev files
-                .list
-                  li(v-for='type in fileTypes.dev')
-                    span.dot &#9679;
-                    span.type-text {{ type }}
-          .details__brief
-            span.details__brief-title Enter a short brief
-            textarea(rows='10' v-model='brief')
-        .number
-          span 5
-          label CONTACT DETAILS
-        .contact
-          .contact__col
-            .contact__col-item.name
-              span.asterisk Name
-              input(type='text' name='formContactsName' v-model='contactName')
-            .contact__col-item.email
-              span.asterisk Email
-              input(type='text' name='formContactsMail' v-model='contactEmail')
-            .contact__col-item.phone
-              span Phone Number
-              input(type='text' v-model='phone')
-          .contact__col
-            .contact__col-item.company
-              span.asterisk Company Name
-              input(type='text' v-model='companyName')
-            .contact__col-item.website
-              span Website
-              input(type='text' v-model='web')
-            .contact__col-item.skype
-              span Skype Name
-              input(type='text' v-model='contactSkype')
-        .captcha
-          span.asterisk Please, confirm that you are not a robot   
-          .captcha__google
-            vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
-              ref="recaptcha"
-              @verify="onVerify"
-              @expired="onExpired"
-              :callback="checkForm"
-              :style= {"transform": "scale(0.77)",
-                "-webkit-transform": "scale(0.77)",
-                "transform-origin": "150px 0",
-                "-webkit-transform-origin": "150px 0" })
-          input.buttons(type='submit' value='Submit')
-        .warning(v-if="error")
-          .message
-            .closeWarning(@click="closeWarning")
-              i.fa.fa-times
-            p
-              | Please, fill all the required fields (marked with red 
-              span.asterisk asterisk
-              | )
-    .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
-        .orderInfo__title
-          h3 YOUR ORDER
-        .orderInfo__summary
-          .orderInfo__summary-service
+  .externalWrap
+    .logo
+      .logo__image
+        img(src='./../assets/images/logo.png')
+    .header
+      span Request a Quote
+    .mainWrapper  
+      .container
+        .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
+        .successAlert(v-if="success")
+          .successAlert__message
+            p Thanks for your request.
+            p We will answer you as soon as possible.
+        form.mainForm(@submit.prevent="checkForm")
+          .number 
             span 1
-            label SERVICE: 
-            p.choice {{ serviceSelect.title }}
-          .orderInfo__summary-languages
+            label.asterisk SERVICE TYPE      
+          .service-type
+            .select(v-on:click='showServices')
+              span.inner-text.clarify(:class="{ color: serviceSelect.title != 'Select' }") {{ serviceSelect.title }}
+                .icon(:class="{ reverse: serviceDrop }")
+                  i.fas.fa-caret-down
+              .service-type__drop(v-if='serviceDrop')
+                .service-type__drop-list
+                  span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
+          .number 
             span 2
-            label LANGUAGE:
-            p(v-if='serviceSelect.source') Source:
-              span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
-            p Target: 
-              span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect == 0">Select</template>
-          .orderInfo__summary-industry
+            label.asterisk SELECT A LANGUAGE
+          .language
+            span(v-if='serviceSelect.source') Source Language
+            .select.source(v-if='serviceSelect.source')
+              span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
+                .wrapper(v-on:click.self='showSourceLang')
+                .icon(:class="{ reverse: sourceDrop }")
+                  i.fas.fa-caret-down
+              .source__drop(v-if='sourceDrop')
+                .source__drop-list(v-for='language in sortedLanguages')
+                  .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
+                    img(:src="'flags/' + language.symbol + '.png'")
+                    span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
+                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
+                  .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
+                    template(v-for='(dialect in language.dialects')
+                      .pair.pair_dialect(@click='changeSourceDialect(dialect)')
+                        img(:src="'flags/' + dialect.symbol + '.png'")                  
+                        span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
+            span Target Language(s)
+            .select.target
+              span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
+                <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
+                <template v-if="targetSelect.length == 0">Select</template>
+                .wrapper(v-on:click.self='showTargetLang')
+                .icon(:class="{ reverse: targetDrop }")
+                  i.fas.fa-caret-down
+              .target__drop(v-if='targetDrop')
+                .target__drop-list(v-for='language in sortedLanguages')
+                  .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
+                    img(:src="'flags/' + language.symbol  + '.png'")
+                    span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
+                  .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
+                    template(v-for='dialect in language.dialects')
+                      .pair.pair_dialect(@click='changeTargetDialect(dialect)')
+                        img(:src="'flags/' + dialect.symbol + '.png'")                  
+                        span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                  .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
+                    img(:src="'flags/' + language.symbol  + '.png'")
+                    span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
+                  .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
+                    template(v-for='dialect in language.dialects')
+                      .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
+                        img(:src="'flags/' + dialect.symbol + '.png'")                  
+                        span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+          .number 
             span 3
-            label INDUSTRY: 
-            p.choice {{ industrySelect }}
-          .orderInfo__summary-deadline
-            label SUGGESTED DEADLINE
-            p.choice {{ deadlineDate }}
-
+            label.asterisk CHOOSE AN INDUSTRY
+          .industry
+            .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
+              .image
+              .image-white
+              p Casino, Poker
+                br
+                | &amp; IGaming
+            .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
+              .image
+              .image-white
+              p CFDs &amp; Online
+                br
+                | Trading
+            .industry__item.crypto(:class="{activeIndustry: industrySelect == industryList.crypto.text}" @click='() => changeIndustry("crypto")')
+              .image
+              .image-white
+              p ICOs &amp; Crypto-
+                br
+                | Currency
+            .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
+              .image
+              .image-white
+              p Video Games
+            .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
+              .image
+              .image-white
+              p Hotel &amp;
+                br 
+                | Real Estates
+            .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+              .image
+              .image-white
+              p Legal 
+            .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
+              .image
+              .image-white
+              p Other
+          .number
+            span 4
+            label PROJECT DETAILS
+          .details
+            .details__item
+              .inner.buttons.upload-file
+                drop.drop(@drop="handleDrop")
+                span Files
+                .upload-btn
+                  .upload-btn__txt Upload files(s)
+                  input(name="detailFiles" type="file" @change='changeDetailFiles' multiple)
+                span.clarify Drag &amp; Drop
+                .loadedList(v-if="detailFiles.length")
+                  li.loadedList__item(v-for="file in detailFiles" @click="detailRemove(file)") {{ file.name }}
+                    i.fa.fa-times.deleteIcon
+              .inner.buttons.btn-mobileview
+                span Upload Reference File
+                .upload-btn
+                  .upload-btn__txt Upload
+                  input(name="refFiles" type="file" @change='changeRefFiles')
+                span.clarify Type Text
+                .loadedList
+                  li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                    i.fa.fa-times.deleteIcon
+              .inner.date-file.deadline
+                span Suggested Deadline
+                .calendar
+                  datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                  .datepick(@click='openPicker')
+                      img(src='../assets/images/calendar.png')
+                span.clarify Select
+            .details__item
+              .inner.buttons.upload-reference
+                span Upload Reference File
+                .upload-btn
+                  .upload-btn__txt Upload
+                  input(name="refFiles" type="file" @change='changeRefFiles')
+                span.clarify Type Text
+                .loadedList
+                  li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                    i.fa.fa-times.deleteIcon
+              .inner.date-file_mobileView.deadline
+                span Suggested Deadline
+                .calendar
+                  datepicker(ref="programaticOpen1" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                  .datepick(@click='openPicker1')
+                      img(src='../assets/images/calendar.png')
+                span.clarify Select
+              .inner.date-file.file-types
+                span Supported File Types
+                .supported
+                  .supported__icons
+                    .supported__icons_images
+                      img(src='../assets/images/file-types/in.png')
+                      img(src='../assets/images/file-types/excel1.png')
+                      img(src='../assets/images/file-types/word1.png')
+                      img(src='../assets/images/file-types/ini.png')
+                      img(src='../assets/images/file-types/powerpoint1.png')
+                      img(src='../assets/images/file-types/photoshop1.png')
+                    span.filesLink(v-on:click='showFiles') Full List
+            .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
+              .title
+                label SUPPORTED FILE TYPES
+                .crossButton(@click="showFiles")
+                  i.fa.fa-times.close
+              .types
+                .textFiles.types__sector
+                  .fileTypeTitle Text files
+                  .list
+                    li(v-for='type in fileTypes.text') 
+                      span.dot &#9679;
+                      span.type-text {{ type }}
+                .designFiles.types__sector
+                  .fileTypeTitle Design files
+                  .list
+                    li(v-for='type in fileTypes.design') 
+                      span.dot &#9679;
+                      span.type-text {{ type }}
+                .webFiles.types__sector
+                  .fileTypeTitle Web files
+                  .list
+                    li(v-for='type in fileTypes.web')
+                      span.dot &#9679;
+                      span.type-text {{ type }}
+                .translationFiles.types__sector
+                  .fileTypeTitle Translation files
+                  .list
+                    li(v-for='type in fileTypes.translation')
+                      span.dot &#9679;
+                      span.type-text {{ type }}
+                .devFiles.types__sector
+                  .fileTypeTitle Dev files
+                  .list
+                    li(v-for='type in fileTypes.dev')
+                      span.dot &#9679;
+                      span.type-text {{ type }}
+            .details__brief
+              span.details__brief-title Enter a short brief
+              textarea(rows='10' v-model='brief')
+          .number
+            span 5
+            label CONTACT DETAILS
+          .contact
+            .contact__col
+              .contact__col-item.name
+                span.asterisk Name
+                input(type='text' name='formContactsName' v-model='contactName')
+              .contact__col-item.email
+                span.asterisk Email
+                input(type='text' name='formContactsMail' v-model='contactEmail')
+              .contact__col-item.phone
+                span Phone Number
+                input(type='text' v-model='phone')
+            .contact__col
+              .contact__col-item.company
+                span.asterisk Company Name
+                input(type='text' v-model='companyName')
+              .contact__col-item.website
+                span Website
+                input(type='text' v-model='web')
+              .contact__col-item.skype
+                span Skype Name
+                input(type='text' v-model='contactSkype')
+          .captcha
+            span.asterisk Please, confirm that you are not a robot   
+            .captcha__google
+              vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
+                ref="recaptcha"
+                @verify="onVerify"
+                @expired="onExpired"
+                :callback="checkForm"
+                :style= {"transform": "scale(0.77)",
+                  "-webkit-transform": "scale(0.77)",
+                  "transform-origin": "150px 0",
+                  "-webkit-transform-origin": "150px 0" })
+            input.buttons(type='submit' value='Submit')
+          .warning(v-if="error")
+            .message
+              .closeWarning(@click="closeWarning")
+                i.fa.fa-times
+              p
+                | Please, fill all the required fields (marked with red 
+                span.asterisk asterisk
+                | )
+      .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
+          .orderInfo__title
+            h3 YOUR ORDER
+          .orderInfo__summary
+            .orderInfo__summary-service
+              span 1
+              label SERVICE: 
+              p.choice {{ serviceSelect.title }}
+            .orderInfo__summary-languages
+              span 2
+              label LANGUAGE:
+              p(v-if='serviceSelect.source') Source:
+                span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
+              p Target: 
+                span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect == 0">Select</template>
+            .orderInfo__summary-industry
+              span 3
+              label INDUSTRY: 
+              p.choice {{ industrySelect }}
+            .orderInfo__summary-deadline
+              label SUGGESTED DEADLINE
+              p.choice {{ deadlineDate }}
+    .footer
+      .linkList
+        ul.list
+          li(v-for="link in linksArray")
+            a(:href='link.link') {{ link.title }} |
+      .legalInfo
+        p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
+        p.linfo office : +35725252150
+        p.linfo Reg. No. HE362046  VAT. No. 10362046H
+        p.linfo © 2016 Pangea Translation Services (Cyprus) LTD
+      .socialLinks
+        ul.socials
+          img.socialsImage(v-for='social in socialsArray' :src="social.image")
 </template>
 
 <script>
@@ -408,6 +426,52 @@ export default {
       },
       languages: [
       
+      ],
+      linksArray: [
+        {
+        link: 'https://www.pangea.global', title: 'Home'
+        },
+        {
+        link: 'https://www.pangea.global/career', title: 'Careers'
+        },
+        {
+        link: 'https://www.pangea.global/faq', title: 'FAQ'
+        },
+        {
+        link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'
+        },
+        {
+        link: 'https://www.pangea.global/contact', title: 'Contact Us'
+        },
+        {
+        link: 'https://www.pangea.global/blog', title: 'Blog'
+        },
+        {
+        link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'
+        }
+      ],
+      socialsArray: [
+        {
+          image: require('../assets/images/social/facebook.png')
+        },
+        {
+          image: require('../assets/images/social/linkedin.png')
+        },
+        {
+          image: require('../assets/images/social/twitter.png')
+        },
+        {
+          image: require('../assets/images/social/google +.png')
+        },
+        {
+          image: require('../assets/images/social/youtube.png')
+        },
+        {
+          image: require('../assets/images/social/instagram.png')
+        },
+        {
+          image: require('../assets/images/social/pinterest.png')
+        }
       ]
     }
   },

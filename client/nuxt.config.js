@@ -26,7 +26,8 @@ module.exports = {
       { src: 'https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit'}
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { href: "https://fonts.googleapis.com/css?family=Open+Sans:400,700", rel: "stylesheet" }
     ]
   },
   /*
