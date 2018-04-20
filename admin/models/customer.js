@@ -1,6 +1,10 @@
 const axios = require('axios');
 const querystring = require('querystring');
 
+var FormData = require('form-data');
+var fs = require('fs');
+var httpRequest = require("request");
+
 var Customer = class Customer {
   constructor(request, sessionId) {
     this.request = request;
@@ -12,7 +16,6 @@ var Customer = class Customer {
         'Content-Type': 'application/json',
       }
     });
-    //this.sessionId = ;
   }
 
   static login(customerToken) {
@@ -61,10 +64,36 @@ var Customer = class Customer {
     })
   }
 
+  uploadFiles(sessionId) {
+    for (let i = 0; i < this.request.detailFiles.length; i += 1) {
+
+      let filePath = `./dist/reqfiles/${this.request.id}/${this.request.detailFiles[i]}`;
+      var formData = {
+        'file': fs.createReadStream(filePath)
+      };
+  
+      var options = {
+        uri: `https://pangea.s.xtrf.eu/customer-api/system/session/files`,
+        method: 'POST',
+        headers: {
+          'Cookie': 'JSESSIONID=' + sessionId,
+          'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj',
+          'Content-Type': 'multipart/form-data'
+        },
+        formData: formData,
+      };
+      httpRequest(options, (error, response, body) => {
+        if (!error && response.statusCode == 200) {
+          console.log("File send, new file id " + body);
+        }
+      });
+    }
+  }
+  
   createQuote() {
     return new Promise(resolve => {
       var jsonData = {
-        'name': `${this.request.companyName}`,        
+        'name': `${this.request.companyName}`,
         "workflow": {
           "name": "Translation [General]"
         },

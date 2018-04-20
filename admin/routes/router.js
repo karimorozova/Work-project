@@ -218,17 +218,19 @@ router.post('/request', upload.fields([{
       }
       sendMail(request);
       /* sending request via API */
-      Xtrf(request).then(results => {
-        console.log("request added via api");
-      }).catch(err => {
-        console.log(err)
-      })
+      if (request.detailFiles.length > 0) {
+        Xtrf(request).then(results => {
+          console.log("request added via api");
+        }).catch(err => {
+          console.log(err)
+        })
+      }
 
       res.send({
         message: "request was added"
       });
 
-      
+
     })
     .catch(err => {
       console.log(err);
@@ -263,7 +265,11 @@ router.get('/qtest', (req, res) => {
       web: "webparam",
       skype: "skypeparam",
       phone: "phoneparam",
-      service: { xtrf: 35, projectType: "smart", title: "Proofing" },
+      service: {
+        xtrf: 35,
+        projectType: "smart",
+        title: "Proofing"
+      },
       industry: "Video Games",
       status: "statusparam",
       accountManager: "accounmanagerparam",
@@ -272,7 +278,7 @@ router.get('/qtest', (req, res) => {
         xtrf: "3"
       },
       targetLanguages: [{
-        xtrf : "40"
+        xtrf: "40"
       }],
       brief: req.body.brief
     })
@@ -295,7 +301,12 @@ router.get('/qtest-classic', (req, res) => {
       web: "webparam",
       skype: "skypeparam",
       phone: "phoneparam",
-      service: { xtrf: 11, projectType: "regular", title: "Translation", source: true },
+      service: {
+        xtrf: 11,
+        projectType: "regular",
+        title: "Translation",
+        source: true
+      },
       industry: "Video Games",
       status: "statusparam",
       accountManager: "accounmanagerparam",
@@ -304,7 +315,8 @@ router.get('/qtest-classic', (req, res) => {
         lang: "German (Germany)"
       },
       targetLanguages: [{
-        lang:"Czech",symbol:"CS"
+        lang: "Czech",
+        symbol: "CS"
       }],
       brief: req.body.brief
     })
