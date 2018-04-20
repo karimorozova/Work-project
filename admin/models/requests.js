@@ -85,7 +85,7 @@ const RequestSchema = new mongoose.Schema({
 
 });
 
-RequestSchema.methods.targetArray = function targetLangName() {
+RequestSchema.methods.targetLangName = function targetLangName() {
   var res = [];
   for (var i = 0; i < this.targetLanguages.length; i += 1) {
     res.push({

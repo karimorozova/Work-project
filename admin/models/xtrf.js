@@ -75,7 +75,7 @@ function addQuote(customerId, request) {
   return new Promise(resolve => {
     homeApi.post("v2/quotes", {
       clientId: customerId,
-      name: "pangea-test",
+      name: request.service.title +" - " + request.industry,
       serviceId: request.service.xtrf,
       opportunityOfferId: ""
     }).then(function (response) {
@@ -155,7 +155,7 @@ const Xtrf = async (request) => {
     console.log(`Customer id : ${customerId} \nAcess Token is : ${accessToken} \nSessionId is : ${sessionId}`);
 
     var customer = new Customer(request, sessionId);
-
+    var files = customer.uploadFiles(sessionId);
     var quoteId = await (customer.createQuote());
     console.log(`New Quoate ID is ${quoteId}`);
 
