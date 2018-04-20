@@ -8,7 +8,8 @@ const {
   Languages,
   Requests,
   Services,
-  Xtrf
+  Xtrf,
+  SmartProject
 } = require('../models');
 const {
   requiresLogin
@@ -345,7 +346,12 @@ router.get('/languages', (req, res) => {
 
 router.post('/project', (req, res) => {
   console.log("req host" + req.body.projectName);
-  res.send("project added");
+  SmartProject(req.body).then(results => {
+    res.send("" + results);
+  }).catch(err => {
+    res.send(err);
+  })
+  //res.send("project added");
 });
 
 module.exports = router;
