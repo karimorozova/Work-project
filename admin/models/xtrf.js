@@ -111,42 +111,31 @@ function setTargetLanguage(url, trgLanguage) {
 }
 
 function uploadFiles(quote, request) {
+
   for (let i = 0; i < request.detailFiles.length; i += 1) {
+
     let filePath = `./dist/reqfiles/${request.id}/${request.detailFiles[i]}`;
-
-
-    var data = new FormData();
-    data.append('file', fs.readFileSync(filePath));
+    var formData = {
+      'file': fs.createReadStream(filePath)
+    };
 
     var options = {
+      uri: `https://pangea.s.xtrf.eu/home-api/v2/quotes/${quote}/files/upload`,
+      method: 'POST',
       headers: {
         'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj',
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      formData: formData,
     };
 
-    httpRequest.post(`http://localhost:3000/incoming`,{options,data, 
-    function (error, response, body) {
-      if (error) {
-        return console.error('upload failed:', error);
+    function callback(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log("File send, new file id " + body);
       }
-      console.log('Upload successful!  Server responded with:', body);
-    }});
+    }
 
-    /*axios({
-      method: 'POST',
-      url: `https://pangea.s.xtrf.eu/home-api/v2/quotes/${quote}/files/upload`,
-      headers: {
-        'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj',
-        'Content-Type':'multipart/form-data'
-      },
-      file: data
-    }).then(function (response) {
-      console.log(`file uploaded, fileId: ${response.fileId}`);
-    }).catch(function (error) {
-      console.log(`error uploading file`);
-    });*/
-
+    httpRequest(options, callback);
   }
 }
 
@@ -172,11 +161,11 @@ const Xtrf = async (request) => {
 
   } else {
     //adding smart quote
-    //var quote = await (addQuote(customerId, request));
-    //var srclang = await (setSrcLanguage("/v2/quotes/" + quote.id + "/sourceLanguage", request.sourceLanguage.xtrf));
-    //var trgLang = await (setTargetLanguage("/v2/quotes/" + quote.id + "/targetLanguages", request.targetArray()));
-    //uploadFiles(quote.id, request);
-    uploadFiles("3B4F6AWC4ZDTPOJAEY4Z7RY5GU", request);
+    var quote = await (addQuote(customerId, request));
+    var srclang = await (setSrcLanguage("/v2/quotes/" + quote.id + "/sourceLanguage", request.sourceLanguage.xtrf));
+    var trgLang = await (setTargetLanguage("/v2/quotes/" + quote.id + "/targetLanguages", request.targetArray()));
+    uploadFiles(quote.id, request);
+    //uploadFiles("3B4F6AWC4ZDTPOJAEY4Z7RY5GU", request);
   }
   console.log("End of creation quote");
 
