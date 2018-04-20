@@ -251,7 +251,43 @@ router.get('/services', (req, res) => {
     })
 });
 
+router.post('/incoming', (req) => {
+  console.log(`req is ${req}`)
+});
+
 router.get('/qtest', (req, res) => {
+  Requests.create({
+      date: "",
+      contactName: "testme3",
+      contactEmail: "m.s.ignat@gmail.com",
+      web: "webparam",
+      skype: "skypeparam",
+      phone: "phoneparam",
+      service: { xtrf: 35, projectType: "smart", title: "Proofing" },
+      industry: "Video Games",
+      status: "statusparam",
+      accountManager: "accounmanagerparam",
+      companyName: "company-test1",
+      sourceLanguage: {
+        xtrf: "3"
+      },
+      targetLanguages: [{
+        xtrf : "40"
+      }],
+      brief: req.body.brief
+    })
+    .then(request => {
+      Xtrf(request).then(results => {
+        res.send("" + results);
+      }).catch(err => {
+        console.log(err)
+      })
+    }).catch(err => {
+      console.log(err)
+    })
+});
+
+router.get('/qtest-classic', (req, res) => {
   Requests.create({
       date: "",
       contactName: "testme3",
@@ -265,7 +301,7 @@ router.get('/qtest', (req, res) => {
       accountManager: "accounmanagerparam",
       companyName: "company-test1",
       sourceLanguage: {
-        lang:"Bengali (Indida)",symbol:"BN-IN"
+        lang: "German (Germany)"
       },
       targetLanguages: [{
         lang:"Czech",symbol:"CS"
@@ -280,8 +316,6 @@ router.get('/qtest', (req, res) => {
       })
     }).catch(err => {
       console.log(err)
-      //res.statusCode(500);
-      //res.send('Something wrond with DB')
     })
 });
 
