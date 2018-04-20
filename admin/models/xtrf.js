@@ -75,8 +75,23 @@ function addQuote(customerId, request) {
   return new Promise(resolve => {
     homeApi.post("v2/quotes", {
       clientId: customerId,
-      name: request.service.title +" - " + request.industry,
+      name: request.service.title + " - " + request.industry,
       serviceId: request.service.xtrf,
+      opportunityOfferId: ""
+    }).then(function (response) {
+      resolve(response.data);
+    }).catch(function (error) {
+      resolve(error);
+    });
+  })
+}
+
+function createSmartQuote(request) {
+  return new Promise(resolve => {
+    homeApi.post("v2/quotes", {
+      clientId: request.clientId,
+      name: request.name,
+      serviceId: request.serviceId,
       opportunityOfferId: ""
     }).then(function (response) {
       resolve(response.data);
@@ -165,10 +180,21 @@ const Xtrf = async (request) => {
     var srclang = await (setSrcLanguage("/v2/quotes/" + quote.id + "/sourceLanguage", request.sourceLanguage.xtrf));
     var trgLang = await (setTargetLanguage("/v2/quotes/" + quote.id + "/targetLanguages", request.targetArray()));
     uploadFiles(quote.id, request);
-    //uploadFiles("3B4F6AWC4ZDTPOJAEY4Z7RY5GU", request);
   }
   console.log("End of creation quote");
 
+}
+
+const SmartProject = async (request) => {
+
+    console.log("Begin create project");
+    var quote = await (createSmartQuote(request));
+    var langIds = [];
+    for(let i = 0; i < request.jobs.length; i++) {
+      langIds.push(`${request.jobs[i].targetLang.xtrf}`)
+    };
+    var trgLang = await (setTargetLanguage("/v2/quotes/" + quote.id + "/targetLanguages", langIds));
+    console.log("trgLang : " + trgLang);
 }
 
 
@@ -186,4 +212,4 @@ function getServiceList() {
 
 
 
-module.exports = Xtrf;
+module.exports = { Xtrf, SmartProject };

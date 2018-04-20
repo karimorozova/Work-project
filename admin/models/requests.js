@@ -101,7 +101,6 @@ RequestSchema.methods.targetArray = function targetArray() {
   {
       res.push(this.targetLanguages[i].xtrf);
   }
-  console.log("length is " + res.length);
   return res;
 }
 
