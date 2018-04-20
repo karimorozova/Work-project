@@ -892,7 +892,12 @@ export default {
 	z-index: 100;
 	background: #fff;
 	width: 300px;
-	border: 1px solid #ccc;
+  border: 1px solid #ccc;  
+}
+@media (max-width: 350px) {
+  .vdp-datepicker__calendar {
+    left: -25px;
+  }
 }
 
 .vdp-datepicker__calendar header {

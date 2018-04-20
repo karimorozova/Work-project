@@ -1,7 +1,7 @@
 <template lang='pug'>
   .mainWrapper
     .container
-      .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your order
+      .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
       .successAlert(v-if="success")
         .successAlert__message
           p Thanks for your request.
@@ -122,6 +122,15 @@
               .loadedList(v-if="detailFiles.length")
                 li.loadedList__item(v-for="file in detailFiles" @click="detailRemove(file)") {{ file.name }}
                   i.fa.fa-times.deleteIcon
+            .inner.buttons.btn-mobileview
+              span Upload Reference File
+              .upload-btn
+                .upload-btn__txt Upload
+                input(name="refFiles" type="file" @change='changeRefFiles')
+              span.clarify Type Text
+              .loadedList
+                li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                  i.fa.fa-times.deleteIcon
             .inner.date-file.deadline
               span Suggested Deadline
               .calendar
@@ -150,12 +159,13 @@
               span Supported File Types
               .supported
                 .supported__icons
-                  img(src='../assets/images/file-types/in.png')
-                  img(src='../assets/images/file-types/excel1.png')
-                  img(src='../assets/images/file-types/word1.png')
-                  img(src='../assets/images/file-types/ini.png')
-                  img(src='../assets/images/file-types/powerpoint1.png')
-                  img(src='../assets/images/file-types/photoshop1.png')
+                  .supported__icons_images
+                    img(src='../assets/images/file-types/in.png')
+                    img(src='../assets/images/file-types/excel1.png')
+                    img(src='../assets/images/file-types/word1.png')
+                    img(src='../assets/images/file-types/ini.png')
+                    img(src='../assets/images/file-types/powerpoint1.png')
+                    img(src='../assets/images/file-types/photoshop1.png')
                   span.filesLink(v-on:click='showFiles') Full List
           .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
             .title
