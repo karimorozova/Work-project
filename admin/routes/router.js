@@ -331,4 +331,9 @@ router.get('/languages', (req, res) => {
     })
 });
 
+router.post('/project', (req, res) => {
+  console.log("req host" + req.body.projectName);
+  res.send("project added");
+});
+
 module.exports = router;
