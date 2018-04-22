@@ -5,9 +5,6 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
   ],
-  router: {
-    base: '/request-quote/'
-  },
   axios: {
     // API url
     //baseURL: 'https://admin.pangea.global'
@@ -38,7 +35,6 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    publicPath: '/request-quote/',
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
