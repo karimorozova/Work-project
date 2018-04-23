@@ -2,7 +2,7 @@
     .company
         label Company: 
         .select
-            .select__selected 
+            .select__selected(:class="classes('company')")
                 span {{ companySelected.name }}
                 .icon(@click="showCompanies")
                     i.fa.fa-caret-down
@@ -17,7 +17,9 @@ import axios from 'axios';
 
 export default {
     props: {
-        
+        errors: {
+            type: Array
+        }
     },
     data () {
         return {
@@ -28,6 +30,13 @@ export default {
         }
     },
     methods: {
+        classes(err) {
+            for(let i = 0; i < this.errors.length; i++ ) {
+                if(this.errors[i].title == err) {
+                    return 'errorActive'
+                }
+            }
+        },
         showCompanies() {
             this.droppedCompanies = !this.droppedCompanies
         },

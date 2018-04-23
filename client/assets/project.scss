@@ -92,6 +92,9 @@
                             width: 100%;
                         }
                     }
+                    .errorActive {
+                        background-color: #FEB4B0;
+                    }
                     .drop {
                         position: absolute;
                         width: 100%;
@@ -157,6 +160,9 @@
                             border-bottom-right-radius: 5px;
                             cursor: pointer;
                         }
+                    }
+                    .errorActive {
+                        background-color: #FEB4B0;
                     }
                     .drop {
                         position: absolute;
