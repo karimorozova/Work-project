@@ -1139,6 +1139,8 @@ body {
       justify-content: left;
       &__image {
         width: 28%;
+        padding-left: 15px;
+        padding-top: 12px;
         img {
           padding: 6px 0 12px 0;
           width: 240px;
@@ -1153,9 +1155,9 @@ body {
         img {
           padding: 6px 0 12px 0;
           width: 220px;
-          height: 57px;
-          margin-top: 15px;
-          margin-left: 20px;
+          height: 65px;
+          // margin-top: 15px;
+          // margin-left: 20px;
         }
       }
     }
@@ -1167,7 +1169,7 @@ body {
           padding: 6px 0 12px 0;
           width: 200px;
           height: 55px;
-          margin-left: 10px;
+          // margin-left: 10px;
         }
       }
     }

@@ -1,8 +1,11 @@
 <template lang='pug'>
   .externalWrap
+    noscript
+      iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-KM2S59F" height="0" width="0" style="display:none;visibility:hidden")
     .logo
       .logo__image
-        img(src='./../assets/images/logo.png')
+        a(href="https://www.pangea.global/")
+          img(src='./../assets/images/logo.png')
     .header
       span Request a Quote
     .mainWrapper  
@@ -257,6 +260,7 @@
                 | Please, fill all the required fields (marked with red 
                 span.asterisk asterisk
                 | )
+          input(id="00N1r00000Fie4G" name="00N1r00000Fie4G" type="hidden")
       .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
           .orderInfo__title
             h3 YOUR ORDER
@@ -315,6 +319,7 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 </script>
 
 <script>
+
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
@@ -810,6 +815,37 @@ export default {
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
+    },
+    salesForce() {
+      function setCookie(name, value, days){
+          var date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000)); 
+          var expires = "; expires=" + date.toGMTString();
+          document.cookie = name + "=" + value + expires;
+      }
+      function getParam(p){
+          var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
+          return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+      }
+      var gclid = getParam('gclid');
+      if(gclid){
+          var gclsrc = getParam('gclsrc');
+          if(!gclsrc || gclsrc.indexOf('aw') !== -1){
+              setCookie('gclid', gclid, 90);
+          }
+      }
+    },
+    gclid() {
+      window.onload = function getGclid() {        
+      document.getElementById("00N1r00000Fie4G").value = (name = new     RegExp('(?:^|;\\s*)gclid=([^;]*)').exec(document.cookie)) ? 
+      name.split(",")[1] : ""; }
+    },
+    google() {
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-KM2S59F');
     }
   },
   computed: {
@@ -852,8 +888,12 @@ export default {
   mounted(){
     this.getServices();
     this.getLanguages();
+    this.salesForce();
+    this.gclid();
+    this.google();
   }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
