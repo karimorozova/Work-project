@@ -3,22 +3,13 @@ const app = express();
 const router = express.Router();
 const session = require('express-session');
 const path = require('path');
-const {
-  User,
-  Languages,
-  Requests,
-  Services,
-  Xtrf,
-  SmartProject
-} = require('../models');
-const {
-  requiresLogin
-} = require('../utils/middleware');
-const {
-  sendMail
-} = require('../utils/mailhandler');
+const { User, Languages, Requests, Services, Xtrf, SmartProject, ParseHTML } = require('../models');
+const { requiresLogin } = require('../utils/middleware');
+const { sendMail } = require('../utils/mailhandler');
 const multer = require('multer');
 const mv = require('mv');
+
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -254,84 +245,6 @@ router.get('/services', (req, res) => {
     })
 });
 
-router.post('/incoming', (req) => {
-  console.log(`req is ${req}`)
-});
-
-router.get('/qtest', (req, res) => {
-  Requests.create({
-      date: "",
-      contactName: "testme3",
-      contactEmail: "m.s.ignat@gmail.com",
-      web: "webparam",
-      skype: "skypeparam",
-      phone: "phoneparam",
-      service: {
-        xtrf: 35,
-        projectType: "smart",
-        title: "Proofing"
-      },
-      industry: "Video Games",
-      status: "statusparam",
-      accountManager: "accounmanagerparam",
-      companyName: "company-test1",
-      sourceLanguage: {
-        xtrf: "3"
-      },
-      targetLanguages: [{
-        xtrf: "40"
-      }],
-      brief: req.body.brief
-    })
-    .then(request => {
-      Xtrf(request).then(results => {
-        res.send("" + results);
-      }).catch(err => {
-        console.log(err)
-      })
-    }).catch(err => {
-      console.log(err)
-    })
-});
-
-router.get('/qtest-classic', (req, res) => {
-  Requests.create({
-      date: "",
-      contactName: "testme3",
-      contactEmail: "m.s.ignat@gmail.com",
-      web: "webparam",
-      skype: "skypeparam",
-      phone: "phoneparam",
-      service: {
-        xtrf: 11,
-        projectType: "regular",
-        title: "Translation",
-        source: true
-      },
-      industry: "Video Games",
-      status: "statusparam",
-      accountManager: "accounmanagerparam",
-      companyName: "company-test1",
-      sourceLanguage: {
-        lang: "German (Germany)"
-      },
-      targetLanguages: [{
-        lang: "Czech",
-        symbol: "CS"
-      }],
-      brief: req.body.brief
-    })
-    .then(request => {
-      Xtrf(request).then(results => {
-        res.send("" + results);
-      }).catch(err => {
-        console.log(err)
-      })
-    }).catch(err => {
-      console.log(err)
-    })
-});
-
 router.get('/languages', (req, res) => {
   Languages.find()
     .then(results => {
@@ -352,6 +265,15 @@ router.post('/project', (req, res) => {
     res.send(err);
   })
   //res.send("project added");
+});
+
+
+
+
+router.post("/request-qa", async (req, res) => {
+  let html = await ParseHTML(req.body.site);
+  const word = wordCount(html);
+  res.status(200).send({ word })
 });
 
 module.exports = router;
