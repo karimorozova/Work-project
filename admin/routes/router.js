@@ -10,6 +10,18 @@ const multer = require('multer');
 const mv = require('mv');
 
 
+/* wordcount section */ 
+
+
+const puppeteer = require("puppeteer");
+const wordCount = require("html-word-count");
+const bodyParser = require("body-parser");
+const Entities = require('html-entities').XmlEntities;
+const entities = new Entities();
+const translate = require('translate');
+
+/* end wordcount section */
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -271,9 +283,29 @@ router.post('/project', (req, res) => {
 
 
 router.post("/request-qa", async (req, res) => {
-  let html = await ParseHTML(req.body.site);
+  const site = req.body.site;
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(site);
+
+  if(site.indexOf('dropbox') >= 0) {
+      const frames = await page.frames();
+      const frame = frames.filter(f => {
+          if (f.name() === 'preview-content') {
+              return f
+          }
+      })
+      await page.goto(frame[0]._url);
+  };
+  
+  const bodyHTML = await page.evaluate(() => document.body.innerHTML);
+  await browser.close();
+
+  const html = entities.decode(bodyHTML);
+
   const word = wordCount(html);
   res.status(200).send({ word })
+  
 });
 
 module.exports = router;

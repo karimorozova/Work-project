@@ -4,24 +4,31 @@
             .newProject__row
                 .name
                     label Project Name: 
-                    input(type="text" placeholder="Project Name" v-model="projectName")
+                    input(:class="classes('projectName')" type="text" placeholder="Project Name" v-model="projectName")
             .newProject__row
                 .deadline
                     label Deadline: 
-                    .date
-                        datepicker(ref="programaticOpen" v-model="deadline" placeholder='dd/mm/yyyy' :format='format' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                    .date(:class="classes('deadline')")
+                        datepicker1(ref="programaticOpen" v-model="deadline" placeholder='dd/mm/yyyy' 
+                          :format='format' 
+                          monday-first=true 
+                          :highlighted='state.highlighted' 
+                          :disabled='state.disabled'
+                          :errors='errors'
+                        )
                     .icon(@click="openPicker")
                         .icon__picker
                             i.far.fa-calendar-alt.datePicker 
                         .icon__arrow 
                             i.fas.fa-caret-down
                 company(
+                    :errors="errors"
                     @companyChanged="companySelect"
                 )
                 .contact-person
                     label Contact person: 
                     .select
-                        .select__selected 
+                        .select__selected(:class="classes('personSelected')")
                             span {{ personSelected.name }} {{ personSelected.lastName }}
                             .icon(@click="showPersons")
                                 i.fa.fa-caret-down
@@ -53,7 +60,7 @@
 <script>
 import axios from "axios";
 import querystring from "querystring";
-import Datepicker from "./../components/Datepicker.vue";
+import Datepicker1 from "./../components/Datepicker1.vue";
 import moment from "moment";
 import Multiselect from "vue-multiselect";
 import VueLodash from "vue-lodash";
@@ -61,7 +68,7 @@ import Company from "./../components/Company.vue";
 import NewProject from "./../components/NewProject.vue";
 
 export default {
-  name: "request-qa",
+  name: "project",
   data() {
     return {
       languages: [],
@@ -112,6 +119,13 @@ export default {
     };
   },
   methods: {
+    classes(err) {
+      for(let i = 0; i < this.errors.length; i++ ) {
+        if(this.errors[i].title == err) {
+          return 'errorActive'
+        }
+      }
+    },
     openPicker() {
       this.$refs.programaticOpen.showCalendar();
     },
@@ -229,22 +243,23 @@ export default {
       }
     },
     async newProject() {
-      // if(!this.projectName) {
-      //   this.errors.unshift('Fill the "Project Name" field.')
-      // }
-      // if(!this.deadline) {
-      //   this.errors.unshift('Choose deadline date.')
-      // }
-      // if(!this.company) {
-      //   this.errors.unshift('Choose company.')
-      // }
-      // if(!this.personSelected) {
-      //   this.errors.unshift('Choose person.')
-      // }
-
-      // if(this.errors.length) {
-      //   this.showErrors = true
-      // } else {
+      this.errors = [];
+      if(!this.projectName) {
+        this.errors.push({error: 'Fill the "Project Name" field.', title: 'projectName'})
+      }
+      if(!this.deadline) {
+        this.errors.push({error: 'Choose deadline date.', title: 'deadline'})
+      }
+      if(!this.company) {
+        this.errors.push({error: 'Choose company.', title: 'company'})
+      }
+      if(this.personSelected.name == 'Options' && this.company) {
+        this.errors.push({error: 'Choose person.', title: 'personSelected'})
+      }
+      console.log(this.errors);
+      if(this.errors.length) {
+          this.showErrors = true
+      } else {
           const result = await this.$axios.$post('project',{
           "name" : this.projectName,
           "serviceId" : 13,
@@ -258,15 +273,16 @@ export default {
                   console.error('Error: ', err)
                 })
       }
+    }
   },
   computed: {},
   mounted() {},
   components: {
-    Datepicker,
+    Datepicker1,
     Multiselect,
     VueLodash,
-    company: Company,
-    newproject: NewProject
+    "company": Company,
+    "newproject": NewProject
   }
 };
 </script>
