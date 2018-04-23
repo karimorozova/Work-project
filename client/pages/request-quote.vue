@@ -281,17 +281,25 @@
               p.choice {{ deadlineDate }}
     .footer
       .linkList
-        ul.list
-          li(v-for="link in linksArray")
-            a(:href='link.link') {{ link.title }} |
+        .linkList__item.first
+          ul.list
+            li(v-for="link in linksArray[0]")
+              a(:href='link.link') {{ link.title }}
+        .linkList__item.second
+          ul.list
+            li(v-for="link in linksArray[1]")
+              a(:href='link.link') {{ link.title }}
       .legalInfo
         p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
         p.linfo office : +35725252150
         p.linfo Reg. No. HE362046  VAT. No. 10362046H
-        p.linfo © 2016 Pangea Translation Services (Cyprus) LTD
+        p.linfo © 2016 
+          span.pangeaFooterSpan Pangea Translation Services (Cyprus) LTD
       .socialLinks
         ul.socials
-          img.socialsImage(v-for='social in socialsArray' :src="social.image")
+          li(v-for="social in socialsArray")
+            a(:href="social.socialLink")
+              img.socialsImage(:src="social.image")
 </template>
 
 <script>
@@ -428,49 +436,53 @@ export default {
       
       ],
       linksArray: [
-        {
-        link: 'https://www.pangea.global', title: 'Home'
-        },
-        {
-        link: 'https://www.pangea.global/career', title: 'Careers'
-        },
-        {
-        link: 'https://www.pangea.global/faq', title: 'FAQ'
-        },
-        {
-        link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'
-        },
-        {
-        link: 'https://www.pangea.global/contact', title: 'Contact Us'
-        },
-        {
-        link: 'https://www.pangea.global/blog', title: 'Blog'
-        },
-        {
-        link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'
-        }
+        [
+          {
+          link: 'https://www.pangea.global', title: 'Home'
+          },
+          {
+          link: 'https://www.pangea.global/career', title: 'Careers'
+          },
+          {
+          link: 'https://www.pangea.global/faq', title: 'FAQ'
+          },
+          {
+          link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'
+          }
+        ],
+        [
+          {
+          link: 'https://www.pangea.global/contact', title: 'Contact Us'
+          },
+          {
+          link: 'https://www.pangea.global/blog', title: 'Blog'
+          },
+          {
+          link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'
+          }
+        ]
       ],
       socialsArray: [
         {
-          image: require('../assets/images/social/facebook.png')
+          socialLink: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')
         },
         {
-          image: require('../assets/images/social/linkedin.png')
+          socialLink: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')
         },
         {
-          image: require('../assets/images/social/twitter.png')
+          socialLink: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')
         },
         {
-          image: require('../assets/images/social/google +.png')
+          socialLink: 'https://plus.google.com/116520029165216678356', image: require('../assets/images/social/google +.png')
         },
         {
-          image: require('../assets/images/social/youtube.png')
+          socialLink: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')
         },
         {
-          image: require('../assets/images/social/instagram.png')
+          socialLink: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')
         },
         {
-          image: require('../assets/images/social/pinterest.png')
+          socialLink: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')
         }
       ]
     }
