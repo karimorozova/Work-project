@@ -163,7 +163,7 @@ export default {
           this.showErrors = true;
           this.$emit("showWarning", {show: this.showErrors, index: index});
         } else {
-          const url = "http://localhost:3005/request-qa";
+          const url = "http://localhost:3001/request-qa";
           let value = this.projects[index].source.text;
 
           if (value.indexOf("http") == -1) {
