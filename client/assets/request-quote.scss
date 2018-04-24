@@ -1213,6 +1213,11 @@ body {
         font-size: 56px;
         font-weight: bold;
         font-family: 'Open Sans', sans-serif;
+        text-shadow:
+          -2px -2px 0 #fff,
+          2px -2px 0 #fff,
+          -2px 2px 0 #fff,
+          2px 2px 0 #fff;
         @media (max-width: 680px) {
           font-size: 46px;
         }
