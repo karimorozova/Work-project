@@ -51,7 +51,7 @@ router.get('/login', (req, res) => {
   res.sendFile(path.resolve() + '/dist/index.html');
 });
 
-router.get('/report', (req, res) => {
+router.get('/tasks-report', (req, res) => {
   res.sendFile(path.resolve() + '/dist/index.html');
 });
 
@@ -141,7 +141,6 @@ router.get('/requests', requiresLogin, (req, res) => {
 // Update
 router.put('/request', requiresLogin, (req, res) => {
   if (!req.body._id) {
-    //let error = new Error('Something wrong with db');
 
     res.statusCode = 400;
     res.statusMessage = 'The id field was not sent';
@@ -275,20 +274,7 @@ router.get('/languages', (req, res) => {
     })
 });
 
-router.get('/quotes', (req, res) => {
-  Quotes.find()
-    .then(results => {
-      res.send(results)
-    })
-    .catch(err => {
-      console.log(err)
-      res.statusCode(500);
-      res.send('Something wrond with DB')
-    })
-});
-
 router.post('/project', (req, res) => {
-  console.log("req host" + req.body.projectName);
   SmartProject(req.body).then(results => {
     res.send("" + results);
   }).catch(err => {
@@ -296,14 +282,6 @@ router.post('/project', (req, res) => {
   })
   //res.send("project added");
 });
-
-router.get('/report-parse', (req, res) => {
-  console.log("report called");
-  parseQuotes("","");
-  
-});
-
-
 
 
 router.post("/request-qa", async (req, res) => {

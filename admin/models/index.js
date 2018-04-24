@@ -1,6 +1,6 @@
 const Languages = require('./languages');
 const Requests = require('./requests');
-const Quotes = require('./quotes');
+const TasksReport = require('./tasks');
 const User = require('./user');
 const Services = require('./services');
 const { Xtrf, SmartProject } = require("./xtrf");
@@ -14,7 +14,7 @@ const Models = {
     Xtrf,
     SmartProject,
     ParseHTML,
-    Quotes,
+    TasksReport,
 };
 
 module.exports = Models;
