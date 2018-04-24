@@ -1203,6 +1203,11 @@ body {
       background-size: cover;
       padding: 6.3% 0 5.6% 31%;
       margin-bottom: 45px;
+
+      @media (max-width: 768px) {
+        margin-bottom: 5px;
+      }
+
       span {
         color: #665741;
         font-size: 56px;
