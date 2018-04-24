@@ -49,8 +49,8 @@ const mailhandler = {
 
     let mailOptions = {
       from: 'pangea@wellyes.ru', // sender address
-      to: 'm.s.ignat@gmail.com', // list of receivers
-      subject: 'Pangea test', // Subject line
+      to: 'sales@pangea.global', // list of receivers
+      subject: `A new lead from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body
     };

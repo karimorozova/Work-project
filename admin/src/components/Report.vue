@@ -1,22 +1,32 @@
 <template lang="pug">
   .container
-    h2 Email
-    input(v-model='form.logemail')
-    h2 Password
-    input(v-model='form.logpassword')
-    button(@click='sendForm') Log In
-    h2(v-if='isLogin') You are logged in!
-
+    .summaryTable
+      h1 Summary
+      table.table.reportTable(border='bordered')
+        tr
+          th(v-for="title in titles") {{ title }}
+        tr(v-for="res in summary")
+          td {{ res.client }}        
+          td {{ res.project }}        
+          td {{ res.service }}        
+          td {{ res.deadline }}        
+          td {{ res.sourceLang }}        
+          td {{ res.targetLang }}        
+          td {{ res.words }}        
+          td {{ res.cost }}        
+          td {{ res.amount }}        
+          td {{ res.month }}        
+        
 </template>
 <script>
 export default {
   data() {
     return {
-      form: {
-        logemail: "",
-        logpassword: ""
-      },
-      isLogin: false,      
+      summary: [
+        {client: 'Johnson', project: '11111', service: 'translation', deadline: new Date(), sourceLang: 'EN-GB',
+        targetLang: 'RU', words: 199, cost: 0.15, amount: 29.85, month: new Date().getMonth()}
+      ],
+      titles: ['col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10']      
     };
   },
   methods: {
@@ -26,7 +36,10 @@ export default {
   components: {}
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss">
 
+
+<style lang="scss">
+  .reportTable {
+    margin-top: 20px;
+  }
 </style>

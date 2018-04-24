@@ -50,6 +50,10 @@ router.get('/login', (req, res) => {
   res.sendFile(path.resolve() + '/dist/index.html');
 });
 
+router.get('/report', (req, res) => {
+  res.sendFile(path.resolve() + '/dist/index.html');
+});
+
 //authentication
 router.post('/register', (req, res, next) => {
   // confirm that user typed same password twice
