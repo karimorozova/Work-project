@@ -3,11 +3,13 @@
     noscript
       iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-KM2S59F" height="0" width="0" style="display:none;visibility:hidden")
     .logo
-      .logo__image
-        a(href="https://www.pangea.global/")
-          img(src='./../assets/images/logo.png')
+      .mainWrapper
+        .logo__image
+          a(href="https://www.pangea.global/")
+            img(src='./../assets/images/logo.png')
     .header
-      span Request a Quote
+      .mainWrapper
+        span Request a Quote
     .mainWrapper  
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
