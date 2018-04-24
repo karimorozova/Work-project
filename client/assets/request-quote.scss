@@ -1137,7 +1137,13 @@ body {
     }
     @media (max-width: 1600px) {
       &__image {
-        width: 56%;
+        width: 65%;
+      }
+    }
+
+    @media (max-width: 1320px) {
+      &__image {
+        width: 98%;
       }
     }
 
@@ -1146,7 +1152,7 @@ body {
       &__image {
         width: 28%;
         img {
-          padding: 6px 0 12px 0;
+          padding: 6px 0 12px 12px;
           width: 240px;
           height: 67px;
         }
@@ -1193,7 +1199,7 @@ body {
 
   .header {
       max-height: 273px;
-      background-image: url('./../assets/images/header-back.png.jpg');
+      background-image: url('./../assets/images/header-back1.jpg');
       background-size: cover;
       padding: 6.3% 0 5.6% 31%;
       margin-bottom: 45px;
@@ -1213,7 +1219,10 @@ body {
         }
       }
       @media (max-width: 1600px) {
-        padding: 6.3% 0 5.6% 22%;
+        padding: 6.3% 0 5.6% 17%;
+      }
+      @media (max-width: 1320px) {
+        padding: 6.3% 0 5.6% 1%;
       }
       @media (max-width: 1024px) {
         padding: 6.3% 0 5.6% 2%;
