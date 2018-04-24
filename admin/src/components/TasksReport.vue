@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     getQuotes() {
-      this.$http.get("/quotes").then(
+      this.$http.get("/reps").then(
         response => {
           console.log(JSON.parse(response.bodyText)[0]._id)
           //this.orders = JSON.parse(response.bodyText);

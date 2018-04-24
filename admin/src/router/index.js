@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
 import Requests from '@/components/Requests'
-import Report from '@/components/Report'
+import TasksReport from '@/components/TasksReport'
 
 Vue.use(Router)
 
@@ -26,9 +26,9 @@ export default new Router({
       component: Login
     },
     {
-      path: '/report',
-      name: 'report',
-      component: Report
+      path: '/tasks-report',
+      name: 'tasks-report',
+      component: TasksReport
     }
   ]
 })
