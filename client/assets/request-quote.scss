@@ -6,6 +6,11 @@ body {
   margin: 0;
 }
 
+.top {
+  display: flex;
+  flex-direction: column;
+}
+
 .mainWrapper {
   position: relative;
   padding: 0;
@@ -1123,6 +1128,8 @@ body {
   }
 
   .logo {
+    box-shadow: 0 5px 30px rgba(92, 46, 26, 0.4);
+    z-index: 5;
     &__image {
       margin-left: 20%;
       img {
@@ -1172,6 +1179,7 @@ body {
     @media (max-width: 450px) {
       justify-content: left;
       &__image {
+        margin-left: 22%;
         width: 28%;
         img {
           padding: 6px 0 12px 0;
@@ -1226,7 +1234,7 @@ body {
           font-size: 46px;
         }
         @media (max-width: 450px) {
-          font-size: 36px;
+          font-size: 30px;
         }
         @media (max-width: 330px) {
           font-size: 26px;
@@ -1236,7 +1244,10 @@ body {
         background-position-x: -96px;
       }
       @media (max-width: 450px) {
-        background-position-x: -88px;
+        background-position-x: -52px;
+      }
+      @media (max-width: 380px) {
+        background-position-x: -69px;
       }
       @media (max-width: 350px) {
         background-position-x: -62px;
