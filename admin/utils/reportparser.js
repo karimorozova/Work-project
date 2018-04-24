@@ -12,7 +12,7 @@ const reportparser = {
 
     var data = instance.get().then(function (response) {
         console.log("Data getting finished, begin to parse");
-        for(var i=0; i < 5; i++){
+        for(var i=0; i < 50; i++){
             var row = response.data.rows[i].columns;
             Quotes.create({
                 id :  row[0],
