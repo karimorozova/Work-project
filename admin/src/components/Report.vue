@@ -6,33 +6,38 @@
         tr
           th(v-for="title in titles") {{ title }}
         tr(v-for="res in summary")
-          td {{ res.client }}        
-          td {{ res.project }}        
-          td {{ res.service }}        
-          td {{ res.deadline }}        
-          td {{ res.sourceLang }}        
-          td {{ res.targetLang }}        
-          td {{ res.words }}        
-          td {{ res.cost }}        
-          td {{ res.amount }}        
-          td {{ res.month }}        
+          td {{ res.id }}        
+          td {{ res.companyName }}        
+          td {{ res.beginDate }}         
         
 </template>
 <script>
 export default {
   data() {
     return {
-      summary: [
-        {client: 'Johnson', project: '11111', service: 'translation', deadline: new Date(), sourceLang: 'EN-GB',
-        targetLang: 'RU', words: 199, cost: 0.15, amount: 29.85, month: new Date().getMonth()}
-      ],
-      titles: ['col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10']      
+      summary : [],
+      titles: ['id', 'Company Name', 'Begin Date']      
     };
   },
   methods: {
+    getQuotes() {
+      this.$http.get("/quotes").then(
+        response => {
+          console.log(JSON.parse(response.bodyText)[0]._id)
+          //this.orders = JSON.parse(response.bodyText);
+          this.summary = JSON.parse(response.bodyText);
+        },
+        err => {
+          console.log(`You have to log in ${err}`);
+          this.$router.push('/login')
+        }
+      );
+    }
   },
   computed: {},
-  mounted() {},
+  mounted() {
+    this.getQuotes();
+  },
   components: {}
 };
 </script>
