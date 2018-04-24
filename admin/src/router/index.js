@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
 import Requests from '@/components/Requests'
+import Report from '@/components/Report'
 
 Vue.use(Router)
 
