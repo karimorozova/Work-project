@@ -6,6 +6,7 @@ const path = require('path');
 const { User, Languages, Requests, Services, Xtrf, SmartProject, ParseHTML } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { sendMail } = require('../utils/mailhandler');
+const { parseQuotes } = require('../utils/reportparser');
 const multer = require('multer');
 const mv = require('mv');
 
@@ -277,6 +278,12 @@ router.post('/project', (req, res) => {
     res.send(err);
   })
   //res.send("project added");
+});
+
+router.get('/report-parse', (req, res) => {
+  console.log("report called");
+  parseQuotes("","");
+  
 });
 
 
