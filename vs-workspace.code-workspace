@@ -4,7 +4,10 @@
 			"path": "admin"
 		},
 		{
-			"path": "client"
+			"path": "portal"
+		},
+		{
+			"path": "vendor"
 		}
 	],
 	"settings": {
