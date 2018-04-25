@@ -28,13 +28,14 @@ export default {
     sendForm() {
       this.$axios.post("/auth", this.form).then(
         response => {
-          document.cookie =  "ses=" + response.data;
-          document.cookie = "ses1=" +response.data ;
+          let date = new Date();
+          date.setDate(date.getSeconds() + 30)
+          document.cookie =  "ses=" + response.data; + `;expires=${date}`;
           console.log(response);
           this.isLogin = true;
 
           setTimeout(() => {
-            this.$router.push("/project");
+            this.$router.push("/clients");
           }, 1500);
         },
         err => {
