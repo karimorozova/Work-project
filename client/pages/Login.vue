@@ -54,7 +54,13 @@ export default {
   .loginWrapper {
     background-color: #bfb3b3;
     margin: 20% auto;
-    width: 350px;
+    width: 603px;
+    @media (max-width: 625px) {
+      width: 450px;
+    }
+    @media (max-width: 560px) {
+      width: 350px;
+    }
     @media (max-width: 374px) {
       width: 300px;
     }
@@ -86,6 +92,7 @@ export default {
           width: 37%;
           height: 38px;
           border-radius: 8px;
+          font-size: 15px;
         }
     }
   }
