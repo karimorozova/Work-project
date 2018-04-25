@@ -1,0 +1,251 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-width: 1220px;
+    max-width: 1600px;
+    font-family: MyriadPro;
+  }
+  
+  .header {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+    align-items: center;
+    .export {
+      padding-top: 20px;
+      width: 100%;
+      text-align: right;
+      input {
+        cursor: pointer;
+        padding: 3px 17px; 
+        border: 1px solid black;
+        background: #9ADD8C;
+        font-size: 14px;
+        font-weight: bolder;
+      }
+    }
+    .view {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 10px;
+        padding-right: 20px;
+        font-weight: bold;
+        width: 100%;
+        text-align: right;
+        .fa {
+            font-size: 24px;
+            padding:0 18px 0 8px;
+        }
+    }
+  }
+  
+  .filter {
+    width: 100%;
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .dates {
+      display: flex;
+      flex-direction: column;
+      .dates-picker {
+        display: flex;
+        align-items: center;
+        img {
+          width: 23px;
+          height: 23px;
+          margin-left: 5px;
+          cursor: pointer;
+        }
+        span {
+          padding: 3px 15px 3px 9px;
+        }
+        .vdp-datepicker {
+          input {
+            border: 2px solid black;
+            padding: 8px 4px;
+            width: 105px;
+          }
+          &__clear-button {
+            position: absolute;
+            top: 3px;
+            right: -23px;
+          }
+        }
+        .date-from, .date-to {
+          position: relative;
+        }
+      }
+      
+    }
+    
+    .name {
+      display: flex;
+      flex-direction: column;
+      select {
+        border: 2px solid black;
+        background-color: transparent;
+        padding: 7px;
+        width: 168px;
+      }
+      input {
+        border: 2px solid black;
+        padding: 8px 4px;
+        width: 168px;
+      }
+    }
+    label {
+      margin-bottom: 0;
+    }
+  }
+  
+  .table-bordered td, .table-bordered th {
+    border: 2px solid black;
+  }
+  
+  .table {
+    th {
+        border: 2px solid black;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        text-align: center;
+    }
+    .dateColumn {
+      min-width: 115px;
+      width: 130px;
+    }
+    .statusCol {
+      min-width: 100px;
+    }
+    .iconCol {
+      min-width: 50px;
+    }
+    .nameCol, .emailCol, .serviceCol, .industryCol, .managerCol {
+      min-width: 150px;
+      max-width: 200px;      
+    }
+    td {
+      border: 2px solid black;
+      height: 85px;
+      .fa {
+        display: flex;
+        justify-content: center;
+        opacity: 0.5;
+        font-size: 24px;
+        cursor: pointer;
+        &:hover {
+            opacity: 1;
+        }
+      }
+      &:last-child {
+        padding-top: 31px;;
+      }
+    }
+  }
+
+  .select {
+    border: 2px solid black;
+    position: relative;
+    width: 168px;
+    .services__drop, .industries__drop, .status__drop, .manager__drop {
+      position: absolute;
+      max-height: 200px;
+      width: 100%;
+      border-top: 1px solid black;
+      outline: 1px solid black;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 1); 
+      padding: 4px;
+      z-index: 1;
+      background-color: white;
+      transition: all 0.5s;
+      &-list {
+        .list-item {
+          position: relative;
+          cursor: pointer;
+          display: flex;
+          padding-top: 3px;
+          padding-bottom: 3px;
+          font-size: 14px;
+          transition: all 0.5s;
+          border-bottom: 1px solid black;
+          input {
+              position: absolute;
+              right: 0;
+              top: 8px;
+          }
+          &:hover {
+            padding-left:3px;
+            background-color: #e5e5e5;
+          }
+        }
+        &:last-child{
+          .list-item {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+    .select__text {
+      position: relative;
+      padding: 6px;
+      display: flex;
+      justify-content: space-between;
+      max-height: 35px;
+      overflow: overlay;
+      .text {
+        opacity: 0.7;
+      }
+      .text_opacity {
+        opacity: 1;
+      }
+      .reverse {
+        transform: rotate(180deg);
+      }
+    }
+      .text-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        .full-order & {
+            z-index: 0;
+        }
+        color: rgba(0, 0, 0, 0);
+        &:focus{
+          border: 1px solid blue;
+        }
+      }
+  }
+  
+  th {
+    background: #DEDEDE;
+    color: black;
+  }
+  h1, h2 {
+    font-weight: normal;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  
+  a {
+    color: #42b983;
+  }
+
+  @font-face {
+    font-family: MyriadPro;
+    src: url('../fonts/MyriadPro-Regular.otf');
+  }
+  @font-face {
+    font-family: MyriadBold;
+    src: url('../fonts/MyriadPro-Bold.otf')
+  }

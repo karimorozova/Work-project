@@ -1,11 +1,24 @@
-# dependencies
+logs
+*.log
+pids
+*.pid
+*.seed
+lib-cov
+coverage
+.grunt
+build/Release
 node_modules
+.env
+.DS_Store
+dump
+package-lock.json
+.nyc_output
+mongo
 
-# logs
-npm-debug.log
-
-# Nuxt build
-.nuxt
-
-# Nuxt generate
-dist
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

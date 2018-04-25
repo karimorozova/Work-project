@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "admin"
+		},
+		{
+			"path": "portal"
+		},
+		{
+			"path": "vendor"
+		}
+	],
+	"settings": {
+		"eslint.enable": true
+	}
+}
