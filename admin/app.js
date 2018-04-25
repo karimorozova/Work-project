@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
 const config = require('./server-config.json');
@@ -29,6 +30,7 @@ app.use(session({
 
 app.use(express.static('dist'));
 app.use(bodyParser());
+app.use(cookieParser());
 
 
 app.use((req, res, next) => {

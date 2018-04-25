@@ -118,6 +118,7 @@ router.post('/auth', async (req, res, next) => {
   if (req.body.logemail && req.body.logpassword) {
     var jsessionId = await (Customer.authUser(req.body.logemail, req.body.logpassword))
     var customer = new Customer("", jsessionId);
+    var userInfo = await (customer.userInfo());
     var userdata = await (customer.getName());
     res.statusCode = 200;
     req.session.name = userdata.data.name;
@@ -127,6 +128,11 @@ router.post('/auth', async (req, res, next) => {
     err.status = 400;
     return next(err);
   }
+});
+router.get('/clientsinfo', (req, res) => {
+    console.log(" cookie val : " + req.cookies.ses);
+    console.log("gettt");
+    res.send("OK");
 });
 
 // GET /logout
