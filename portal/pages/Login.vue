@@ -5,13 +5,15 @@
       input(v-model='form.logemail')
     .h2Wrapper
       h2 Password
-      input(v-model='form.logpassword')
+      input(type="password" v-model='form.logpassword')
     .buttonWrapper
       button(@click='sendForm') Log In
       h2(v-if='isLogin') You are logged in!
 
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -24,15 +26,19 @@ export default {
   },
   methods: {
     sendForm() {
-      this.$http.post("/login", this.form).then(
+      this.$axios.post("/auth", this.form).then(
         response => {
+          document.cookie =  "ses=" + response.data;
+          document.cookie = "ses1=" +response.data ;
+          console.log(response);
           this.isLogin = true;
 
           setTimeout(() => {
-            this.$router.push("/");
+            this.$router.push("/project");
           }, 1500);
         },
         err => {
+          alert("Bad credentials");
           console.log("Errored : ");
           console.log(err);
         }

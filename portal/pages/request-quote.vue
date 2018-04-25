@@ -862,14 +862,6 @@ export default {
       }
       return this.languages;
     },
-    // sortedServices() {
-    //   console.log('Called ' + this.services);
-    //   return this.services.sort((a, b) => {
-    //     a.sortIndex - b.sortIndex;
-    //     console.log(a.sortIndex + " " + b.sortIndex)
-    //   });
-      
-    // }
   },
   watch: {
     deadlineSelect() {
