@@ -1,9 +1,10 @@
 const express = require('express');
+const cookieSession = require('cookie-session');
 const app = express();
 const router = express.Router();
 const session = require('express-session');
 const path = require('path');
-const { User, Languages, Requests, Services, Quotes } = require('../models');
+const { User, Languages, Requests, Services, Quotes, Customer } = require('../models');
 const { Xtrf, SmartProject, ParseHTML } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { sendMail } = require('../utils/mailhandler');
@@ -106,6 +107,21 @@ router.post('/login', (req, res, next) => {
         // return res.redirect('/test');
       }
     });
+  } else {
+    let err = new Error('All fields required.');
+    err.status = 400;
+    return next(err);
+  }
+});
+
+router.post('/auth', async (req, res, next) => {
+  if (req.body.logemail && req.body.logpassword) {
+    var jsessionId = await (Customer.authUser(req.body.logemail, req.body.logpassword))
+    var customer = new Customer("", jsessionId);
+    var userdata = await (customer.getName());
+    res.statusCode = 200;
+    req.session.name = userdata.data.name;
+    res.send(jsessionId);
   } else {
     let err = new Error('All fields required.');
     err.status = 400;
