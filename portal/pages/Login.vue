@@ -20,7 +20,7 @@
 
 </template>
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
@@ -29,14 +29,14 @@ export default {
         logemail: "",
         logpassword: ""
       },
-      isLogin: false,      
+      isLogin: false
     };
   },
   methods: {
     sendForm() {
       this.$axios.post("/auth", this.form).then(
         response => {
-          document.cookie =  "ses=" + response.data + `;max-age=36000`;
+          document.cookie = "ses=" + response.data + `;max-age=36000`;
           console.log(response);
           this.isLogin = true;
 
@@ -50,7 +50,7 @@ export default {
           console.log(err);
         }
       );
-    },  
+    }
   },
   computed: {},
   mounted() {},
@@ -59,12 +59,12 @@ export default {
 </script>
 
 <style lang="scss">
-  body {
-    margin: 0;
-    background-image: url('/assets/images/image-background.jpg');
-  }
+body {
+  // margin: 0;
+  background-image: url("/assets/images/image-background.jpg");
+}
 
-  .loginWrapper {
+.loginWrapper {
     position: absolute;
     margin-left: -250px;
     left: 50%;
@@ -92,24 +92,25 @@ export default {
     border-radius: 26px;
 
     .imageWrapper {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2%;
+  display: flex;
+  justify-content: center;
+    margin-bottom: 2%;
       img {
         width: 269px;
         height: 76px;
       }
     }
 
+  .formWrapper {
+    margin: 0 auto;
+    width: 436px;
+    height: 266px;
+    background-color: #fff;
+
     .h2Wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-
-    h2 {
-      color: #fff;
-      margin: 3%;
     }
 
     input {
@@ -120,7 +121,7 @@ export default {
       padding-left: 3%;
       opacity: 0.38;
       border-radius: 8px;
-      border: 2px solid #DEDEDE;
+      border: 2px solid #dedede;
     }
 
     .email {
@@ -154,14 +155,14 @@ export default {
       justify-content: center;
       margin: 2% 0 0.2% 0;
       padding-bottom: 3%;
-        button {
-          width: 142px;
-          height: 35px;
-          border-radius: 8px;
-          font-size: 20px;
-          background-color: #84ca8e;
-          color: #fff;
-        }
+      button {
+        width: 142px;
+        height: 35px;
+        border-radius: 8px;
+        font-size: 20px;
+        background-color: #84ca8e;
+        color: #fff;
+      }
     }
 
     .formFooter {
@@ -180,4 +181,17 @@ export default {
       }
     }
   }
+
+  @media (max-width: 625px) {
+    width: 450px;
+  }
+  @media (max-width: 560px) {
+    width: 350px;
+  }
+  @media (max-width: 374px) {
+    width: 300px;
+  }
+
+  border-radius: 26px;
+}
 </style>
