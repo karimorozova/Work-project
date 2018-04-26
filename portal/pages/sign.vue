@@ -36,13 +36,10 @@ export default {
     sendForm() {
       this.$axios.post("/auth", this.form).then(
         response => {
-          document.cookie =  "ses=" + response.data + `;max-age=36000`;
+          document.cookie =  "ses=" + response.data + `;max-age=60`;
           console.log(response);
           this.isLogin = true;
-
-          setTimeout(() => {
-            this.$router.push("/clients");
-          }, 1500);
+          window.location.replace("http://localhost:3000/");
         },
         err => {
           alert("Bad credentials");
