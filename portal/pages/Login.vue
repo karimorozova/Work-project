@@ -1,16 +1,22 @@
 <template lang="pug">
-  .loginWrapper
-    .imageWrapper
-      img(src="../assets/images/login_logo.png")
-    .h2Wrapper
-      h2 Email
-      input(v-model='form.logemail' placeholder='Email')
-    .h2Wrapper
-      h2 Password
-      input(type="password" v-model='form.logpassword' placeholder='Password')
-    .buttonWrapper
-      button(@click='sendForm') Log In
-      h2(v-if='isLogin') You are logged in!
+  .wrapper
+    .loginWrapper
+      .imageWrapper
+        img(src="../assets/images/login_logo.png")
+      .formWrapper
+        .h2Wrapper
+          input.email(v-model='form.logemail' placeholder='Email')
+        .h2Wrapper
+          input.password(type="password" v-model='form.logpassword' placeholder='Password')
+        .checkboxWrapper
+          input.checkboxWrapper__input(type="checkbox")
+          label.checkboxWrapper__label Remember me
+        .buttonWrapper
+          button(@click='sendForm') Sign In
+          h2(v-if='isLogin') You are logged in!
+        .formFooter
+          label.firstLabel Forgot Your Password?
+          label.secondLabel Register
 
 </template>
 <script>
@@ -57,14 +63,32 @@ export default {
 <style lang="scss">
   body {
     margin: 0;
-    overflow-y: hidden;
     background-image: url('/assets/images/image-background.jpg');
   }
 
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
   .loginWrapper {
-    background-color: #fff;
-    margin: 20% auto;
-    width: 603px;
+    // position: absolute;
+    // top: 0;
+    // right: 0;
+    // bottom: 0;
+    // left: 0;
+
+    .formWrapper {
+      background-color: #fff;
+    }
+    
+    // margin: auto;
+    width: 436px;
+    height: 266px;
+
     @media (max-width: 625px) {
       width: 450px;
     }
@@ -78,9 +102,9 @@ export default {
     border-radius: 26px;
 
     .imageWrapper {
-      position: absolute;
-      top: 24%;
-      left: 43%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2%;
       img {
         width: 269px;
         height: 76px;
@@ -100,20 +124,70 @@ export default {
 
     input {
       height: 41px;
-      width: 378px;
+      width: 356px;
+      font-size: 20px;
+      color: #66563d;
+      padding-left: 3%;
+      opacity: 0.38;
+      border-radius: 8px;
+      border: 2px solid #DEDEDE;
+    }
+
+    .email {
+      margin-top: 3.5%;
+      margin-bottom: 5.5%;
+    }
+
+    .password {
+      margin-top: 0;
+      margin-bottom: 2.5%;
+    }
+
+    .checkboxWrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      .checkboxWrapper__input {
+        width: 13px;
+        height: 13px;
+        margin-left: 7%;
+      }
+      .checkboxWrapper__label {
+        font-size: 15px;
+        color: #2d2d2d;
+        margin-left: 2%;
+      }
     }
 
     .buttonWrapper {
       display: flex;
       justify-content: center;
-      margin: 7% 0 1.2% 0;
-      padding-bottom: 5%;
+      margin: 2% 0 0.2% 0;
+      padding-bottom: 3%;
         button {
           width: 142px;
           height: 35px;
           border-radius: 8px;
-          font-size: 15px;
+          font-size: 20px;
+          background-color: #84ca8e;
+          color: #fff;
         }
+    }
+
+    .formFooter {
+      display: flex;
+      justify-content: space-between;
+      font-size: 20px;
+      .firstLabel {
+        color: #4280d3;
+        padding-left: 6%;
+        margin-bottom: 4%;
+      }
+      .secondLabel {
+        color: #66563d;
+        padding-right: 8%;
+        margin-bottom: 4%;
+      }
     }
   }
 </style>
