@@ -129,10 +129,13 @@ router.post('/auth', async (req, res, next) => {
     return next(err);
   }
 });
-router.get('/clientsinfo', (req, res) => {
+router.get('/clientsinfo', async (req, res) => {
     console.log(" cookie val : " + req.cookies.ses);
     console.log("gettt");
-    res.send("OK");
+    var customer = new Customer("", req.cookies.ses);
+    const userId = await (customer.userInfo());
+    const fullInfo = await (customer.companyInfo(userId.data.parentId));
+    res.send(fullInfo.data);
 });
 
 // GET /logout
