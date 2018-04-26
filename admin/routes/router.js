@@ -130,8 +130,6 @@ router.post('/auth', async (req, res, next) => {
   }
 });
 router.get('/clientsinfo', async (req, res) => {
-    console.log(" cookie val : " + req.cookies.ses);
-    console.log("gettt");
     var customer = new Customer("", req.cookies.ses);
     const userId = await (customer.userInfo());
     const fullInfo = await (customer.companyInfo(userId.data.parentId));
