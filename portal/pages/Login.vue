@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper
+  .loginMain
     .loginWrapper
       .imageWrapper
         img(src="../assets/images/login_logo.png")
@@ -64,20 +64,12 @@ export default {
     background-image: url('/assets/images/image-background.jpg');
   }
 
-  .wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  }
-
   .loginWrapper {
-    // position: absolute;
-    // top: 0;
-    // right: 0;
-    // bottom: 0;
-    // left: 0;
+    position: absolute;
+    margin-left: -250px;
+    left: 50%;
+    top: 50%;
+    margin-top: -266px;
 
     .formWrapper {
       background-color: #fff;
