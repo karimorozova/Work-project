@@ -35,15 +35,29 @@ function reports() {
           endDate: Date.parse(lastDay)
         })
       }
+
     }
   });
 
 
   TasksReport.find()
     .then(reports => {
-      for (var i = 0; i < reports.length; i++) {
-        //console.log(`Begin date of ${reports[i].monthName} is ${reports[i].beginDate}`);
-      } 
+
+      for (const report of reports) {
+
+        instance.get(`/browser/?viewId=787&q.startDate=fromTo(${report.beginDate},${report.endDate})`)
+          .then(function (response) {
+            if (Object.keys(response.data.rows).length > 0) {
+              report.set("columns", response.data.header.columns);
+              report.set("tasks", Object.values(response.data.rows));
+              report.save();
+            }
+            //report.set()
+          }).catch(function (error) {
+            console.log("Error updating report");
+          })
+
+      }
     })
     .catch(err => {
       console.log(err)
