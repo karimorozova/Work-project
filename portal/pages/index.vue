@@ -20,11 +20,10 @@ export default {
             }
             else {
                 console.log('Redirected to login page');
-                this.$router.push('/login')
+                window.location.replace("http://localhost:3000/sign");
             } 
         },
         async clientInfo() {
-            //const result = await this.$axios.get("/clientsinfo");
             const result = await( this.$axios.request({
                 method: "get",
                 url: "/clientsinfo",
