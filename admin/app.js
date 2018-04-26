@@ -14,7 +14,7 @@ const { LanguagesModel, RequestSchema } = require('./models');
 
 // TODO : check origins from localhost only
 const allowedOrigins = [
-    '*'
+    'localhost'
 ];
 
 mongoose.connect(config.mongoDB.url);
@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 
     /*var index = allowedOrigins.indexOf(origin);
     if (index > -1) {}*/
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     
     return next();
 });

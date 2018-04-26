@@ -30,9 +30,7 @@ export default {
     sendForm() {
       this.$axios.post("/auth", this.form).then(
         response => {
-          let date = new Date();
-          date.setDate(date.getSeconds() + 30)
-          document.cookie =  "ses=" + response.data; + `;expires=${date}`;
+          document.cookie =  "ses=" + response.data + `;max-age=36000`;
           console.log(response);
           this.isLogin = true;
 
