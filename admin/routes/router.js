@@ -4,7 +4,7 @@ const app = express();
 const router = express.Router();
 const session = require('express-session');
 const path = require('path');
-const { User, Languages, Requests, Services, Quotes, Customer } = require('../models');
+const { User, Languages, Requests, Services, Quotes, Customer, TasksReport } = require('../models');
 const { Xtrf, SmartProject, ParseHTML } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { sendMail } = require('../utils/mailhandler');
@@ -297,6 +297,23 @@ router.get('/languages', (req, res) => {
       res.statusCode(500);
       res.send('Something wrond with DB')
     })
+});
+
+router.get('/reps', (req, res) => {
+  TasksReport.find().then(results=>{
+    res.send(results)
+  }).catch(err=>{
+    console.log(err)
+  });
+  /*Languages.find()
+    .then(results => {
+      res.send(results)
+    })
+    .catch(err => {
+      console.log(err)
+      res.statusCode(500);
+      res.send('Something wrond with DB')
+    })*/
 });
 
 router.post('/project', (req, res) => {
