@@ -56,6 +56,28 @@ var Customer = class Customer {
     })
   }
 
+  userInfo() {
+    return new Promise(resolve => {
+      this.clientApi.get("/system/session")
+        .then(function (response) {
+          resolve(response);
+        }).catch(function (error) {
+          resolve(error);
+        })
+    })
+  }
+
+  companyInfo(id) {
+    return new Promise(resolve => {
+      this.clientApi.get(`/customers/${id}`)
+        .then(function (response) {
+          resolve(response);
+        }).catch(function (error) {
+          resolve(error);
+        })
+    })
+  }
+
   workflows() {
     return new Promise(resolve => {
       this.clientApi.get("system/values/workflows")

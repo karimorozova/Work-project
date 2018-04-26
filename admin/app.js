@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
 const config = require('./server-config.json');
@@ -13,7 +14,7 @@ const { LanguagesModel, RequestSchema } = require('./models');
 
 // TODO : check origins from localhost only
 const allowedOrigins = [
-    '*'
+    'localhost'
 ];
 
 mongoose.connect(config.mongoDB.url);
@@ -29,6 +30,7 @@ app.use(session({
 
 app.use(express.static('dist'));
 app.use(bodyParser());
+app.use(cookieParser());
 
 
 app.use((req, res, next) => {
@@ -40,7 +42,7 @@ app.use((req, res, next) => {
 
     /*var index = allowedOrigins.indexOf(origin);
     if (index > -1) {}*/
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     
     return next();
 });
