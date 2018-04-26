@@ -1,11 +1,13 @@
 <template lang="pug">
   .loginMain
+    .loginButton
+        button.registerButton Sign In
     .loginWrapper
       .imageWrapper
         img(src="../assets/images/login_logo.png")
-      .formWrapper
+      .loginForm(v-if="isShowLoginForm")
         .labelWrapper
-          label.warningMessage(v-if="isWarning") Check your email or password
+          label.warningMessage(v-if="isLoginWarning") Check your email or password
         .h2Wrapper
           input.email(v-model='form.logemail' placeholder='Email' :class="{addShadow: form.logemail}")
         .h2Wrapper
@@ -19,10 +21,11 @@
         .formFooter
           label.firstLabel Forgot Your Password?
           label.secondLabel Register
-
+    register
 </template>
 <script>
 import axios from "axios";
+import Register from "../components/Register"
 
 export default {
   data() {
@@ -32,8 +35,10 @@ export default {
         logpassword: ""
       },
       isLogin: false,
-      isWarning: false
-      // isWarning: true
+      // isLoginWarning: false
+      isLoginWarning: true,
+      isShowLoginForm: false
+      // isShowLoginForm: true
     };
   },
   methods: {
@@ -58,7 +63,9 @@ export default {
   },
   computed: {},
   mounted() {},
-  components: {}
+  components: {
+    "register": Register
+  }
 };
 </script>
 
@@ -66,6 +73,21 @@ export default {
 body {
   background-image: url("/assets/images/image-background.jpg");
 }
+
+.loginButton {
+    display: flex;
+    justify-content: flex-end;
+
+    .registerButton {
+      width: 142px;
+      height: 35px;
+      border-radius: 8px;
+      font-size: 20px;
+      background-color: #84ca8e;
+      color: #66563d;
+      opacity: 0.22;
+    }
+  }
 
 .loginWrapper {
     position: absolute;
@@ -89,16 +111,16 @@ body {
     border-radius: 26px;
 
     .imageWrapper {
-  display: flex;
-  justify-content: center;
-    margin-bottom: 2%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2%;
       img {
         width: 269px;
         height: 76px;
       }
     }
 
-  .formWrapper {
+  .loginForm {
     padding: 1%;
     margin: 0 auto;
     width: 436px;
@@ -146,10 +168,7 @@ body {
       box-shadow: 0 0 10px #66563d;
     }
 
-
-
     .email {
-      // margin-top: 3.5%;
       margin-top: 5.5%;
       margin-bottom: 5.5%;
     }
