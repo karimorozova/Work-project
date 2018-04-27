@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 });
 
 // include routes
-const routes = require('./routes/router');
+const routes = require('./routes');
 app.use('/', routes);
 
 
