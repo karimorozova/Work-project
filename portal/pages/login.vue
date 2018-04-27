@@ -1,11 +1,9 @@
 <template lang="pug">
   .loginMain
-    .loginButton
-        button.signinButton(@click="hideUnhideSungInButton" :class="{addOpacity: !isShowRegisterForm}") Sign In
-    .loginWrapper
+    .loginWrapper(v-if="forgotLink")
       .imageWrapper
         img(src="../assets/images/login_logo.png")
-      .loginForm(v-if="isShowLoginForm")
+      .loginForm
         .labelWrapper
           label.warningMessage(v-if="isLoginWarning") Check your email or password
         .h2Wrapper
@@ -19,14 +17,12 @@
           button(@click='sendForm' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
           h2(v-if='isLogin') You are logged in!
         .formFooter
-          label.firstLabel Forgot Your Password?
-          label.secondLabel Register
-    register(v-if="isShowRegisterForm")
+          span.firstLabel(@click="forget") Forgot Your Password?
+    passwordrestore(v-else)
 </template>
 <script>
 import axios from "axios";
-import Register from "../components/Register"
-
+import PasswordRestore from '../components/PasswordRestore';
 export default {
   data() {
     return {
@@ -36,9 +32,8 @@ export default {
       },
       isLogin: false,
       isLoginWarning: false,
-      // isLoginWarning: true,
-      isShowLoginForm: false,
-      isShowRegisterForm: true
+      // isLoginWarning: true
+      forgotLink: true
       };
   },
   methods: {
@@ -57,15 +52,14 @@ export default {
         }
       );
     },
-    hideUnhideSungInButton(){
-      this.isShowLoginForm = true;
-      this.isShowRegisterForm = false;
+    forget(){
+      this.forgotLink = !this.forgotLink;
     }
   },
   computed: {},
   mounted() {},
   components: {
-    "register": Register
+    "passwordrestore": PasswordRestore
   }
 };
 </script>
@@ -75,25 +69,6 @@ body {
   background-image: url("/assets/images/image-background.jpg");
 }
 
-.loginButton {
-    display: flex;
-    justify-content: flex-end;
-
-  .signinButton {
-    width: 142px;
-    height: 35px;
-    border-radius: 8px;
-    font-size: 20px;
-    background-color: #84ca8e;
-    color: #fff;
-  }
-
-  .addOpacity {
-    color: #66563d;
-    opacity: 0.22;
-    }
-}
-
 .loginWrapper {
     position: absolute;
     margin-left: -250px;
@@ -101,17 +76,6 @@ body {
     top: 50%;
     margin-top: -266px;
     width: 436px;
-    height: 266px;
-
-    @media (max-width: 625px) {
-      width: 450px;
-    }
-    @media (max-width: 560px) {
-      width: 350px;
-    }
-    @media (max-width: 374px) {
-      width: 300px;
-    }
 
     border-radius: 26px;
 
@@ -227,11 +191,7 @@ body {
         color: #4280d3;
         padding-left: 6%;
         margin-bottom: 4%;
-      }
-      .secondLabel {
-        color: #66563d;
-        padding-right: 8%;
-        margin-bottom: 4%;
+        cursor: pointer;
       }
     }
   }
