@@ -1,7 +1,7 @@
 <template lang="pug">
   .loginMain
     .loginButton
-        button.registerButton Sign In
+        button.signinButton(@click="hideUnhideSungInButton" :class="{addOpacity: !isShowRegisterForm}") Sign In
     .loginWrapper
       .imageWrapper
         img(src="../assets/images/login_logo.png")
@@ -21,7 +21,7 @@
         .formFooter
           label.firstLabel Forgot Your Password?
           label.secondLabel Register
-    register
+    register(v-if="isShowRegisterForm")
 </template>
 <script>
 import axios from "axios";
@@ -35,11 +35,11 @@ export default {
         logpassword: ""
       },
       isLogin: false,
-      // isLoginWarning: false
-      isLoginWarning: true,
-      isShowLoginForm: false
-      // isShowLoginForm: true
-    };
+      isLoginWarning: false,
+      // isLoginWarning: true,
+      isShowLoginForm: false,
+      isShowRegisterForm: true
+      };
   },
   methods: {
     sendForm() {
@@ -56,6 +56,10 @@ export default {
           console.log(err);
         }
       );
+    },
+    hideUnhideSungInButton(){
+      this.isShowLoginForm = true;
+      this.isShowRegisterForm = false;
     }
   },
   computed: {},
@@ -75,16 +79,20 @@ body {
     display: flex;
     justify-content: flex-end;
 
-    .registerButton {
-      width: 142px;
-      height: 35px;
-      border-radius: 8px;
-      font-size: 20px;
-      background-color: #84ca8e;
-      color: #66563d;
-      opacity: 0.22;
-    }
+  .signinButton {
+    width: 142px;
+    height: 35px;
+    border-radius: 8px;
+    font-size: 20px;
+    background-color: #84ca8e;
+    color: #fff;
   }
+
+  .addOpacity {
+    color: #66563d;
+    opacity: 0.22;
+    }
+}
 
 .loginWrapper {
     position: absolute;
