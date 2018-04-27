@@ -41,6 +41,14 @@ function findCustomer(name) {
   })
 }
 
+function providerJobs(email) {
+
+  return new Promise(resolve => {
+    
+  })
+}
+
+
 function generateToken(contactEmail) {
   return new Promise(resolve => {
     homeApi.post("customers/persons/accessToken", {

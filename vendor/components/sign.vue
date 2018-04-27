@@ -26,13 +26,9 @@ export default {
   },
   methods: {
     sendForm() {
-      this.$axios.post("/auth", this.form).then(
+      this.$axios.get("/vendorJobs", this.form).then(
         response => {
-          document.cookie =  "ses=" + response.data;
-          document.cookie = "ses1=" +response.data ;
-          console.log(response);
-          this.isLogin = true;
-
+          
           setTimeout(() => {
             this.$router.push("/project");
           }, 1500);

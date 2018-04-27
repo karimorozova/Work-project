@@ -1,6 +1,5 @@
 const Languages = require('./languages');
 const Requests = require('./requests');
-const TasksReport = require('./tasks');
 const User = require('./user');
 const Services = require('./services');
 const Customer = require('./customer');
@@ -16,7 +15,6 @@ const Models = {
     Xtrf,
     SmartProject,
     ParseHTML,
-    TasksReport,
     Customer
 };
 

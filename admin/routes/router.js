@@ -12,8 +12,10 @@ const { parseQuotes } = require('../utils/reportparser');
 const multer = require('multer');
 const mv = require('mv');
 
+const axios = require('axios');
 
-/* wordcount section */ 
+
+/* wordcount section */
 
 
 const puppeteer = require("puppeteer");
@@ -130,10 +132,10 @@ router.post('/auth', async (req, res, next) => {
   }
 });
 router.get('/clientsinfo', async (req, res) => {
-    var customer = new Customer("", req.cookies.ses);
-    const userId = await (customer.userInfo());
-    const fullInfo = await (customer.companyInfo(userId.data.parentId));
-    res.send(fullInfo.data);
+  var customer = new Customer("", req.cookies.ses);
+  const userId = await (customer.userInfo());
+  const fullInfo = await (customer.companyInfo(userId.data.parentId));
+  res.send(fullInfo.data);
 });
 
 // GET /logout
@@ -172,8 +174,8 @@ router.put('/request', requiresLogin, (req, res) => {
   }
 
   Requests.update({
-      _id: req.body._id
-    }, {
+    _id: req.body._id
+  }, {
       $set: {
         date: req.body.date,
         contactName: req.body.contactName,
@@ -219,23 +221,23 @@ router.post('/request', upload.fields([{
 }]), (req, res) => {
   //req.files[0]
   Requests.create({
-      date: req.body.date,
-      contactName: req.body.contactName,
-      contactEmail: req.body.contactEmail,
-      web: req.body.web,
-      skype: req.body.skype,
-      phone: req.body.phone,
-      service: JSON.parse(req.body.service),
-      industry: req.body.industry,
-      status: req.body.status,
-      accountManager: req.body.accountManager,
-      companyName: req.body.companyName,
-      sourceLanguage: JSON.parse(req.body.sourceLanguage),
-      targetLanguages: JSON.parse(req.body.targetLanguages),
-      detailFiles: req.files["detailFiles"],
-      refFiles: req.files["refFiles"] ? req.files["refFiles"] : '',
-      brief: req.body.brief
-    })
+    date: req.body.date,
+    contactName: req.body.contactName,
+    contactEmail: req.body.contactEmail,
+    web: req.body.web,
+    skype: req.body.skype,
+    phone: req.body.phone,
+    service: JSON.parse(req.body.service),
+    industry: req.body.industry,
+    status: req.body.status,
+    accountManager: req.body.accountManager,
+    companyName: req.body.companyName,
+    sourceLanguage: JSON.parse(req.body.sourceLanguage),
+    targetLanguages: JSON.parse(req.body.targetLanguages),
+    detailFiles: req.files["detailFiles"],
+    refFiles: req.files["refFiles"] ? req.files["refFiles"] : '',
+    brief: req.body.brief
+  })
     .then(request => {
       for (var i = 0; i < request.detailFiles.length; i += 1) {
         var oldFile = request.detailFiles[i];
@@ -285,6 +287,23 @@ router.get('/services', (req, res) => {
     })
 });
 
+router.get('/vendorJobs', async (req, res) => {
+  const email = req.query.email;
+  axios({
+    url: `https://pangea.s.xtrf.eu/home-api/browser/?viewId=880&q.provider.emailAddress=eq(${email})`,
+    method: 'GET',
+    headers: {
+      'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj',
+    }
+  }).then(function (response) {
+    res.send(response.data);
+  }).catch(function (err) {
+    res.send(err);
+  }); 
+
+});
+
+
 router.get('/languages', (req, res) => {
   Languages.find()
     .then(results => {
@@ -298,9 +317,9 @@ router.get('/languages', (req, res) => {
 });
 
 router.get('/reps', (req, res) => {
-  TasksReport.find().then(results=>{
+  TasksReport.find().then(results => {
     res.send(results)
-  }).catch(err=>{
+  }).catch(err => {
     console.log(err)
   });
   /*Languages.find()
@@ -330,16 +349,16 @@ router.post("/request-qa", async (req, res) => {
   const page = await browser.newPage();
   await page.goto(site);
 
-  if(site.indexOf('dropbox') >= 0) {
-      const frames = await page.frames();
-      const frame = frames.filter(f => {
-          if (f.name() === 'preview-content') {
-              return f
-          }
-      })
-      await page.goto(frame[0]._url);
+  if (site.indexOf('dropbox') >= 0) {
+    const frames = await page.frames();
+    const frame = frames.filter(f => {
+      if (f.name() === 'preview-content') {
+        return f
+      }
+    })
+    await page.goto(frame[0]._url);
   };
-  
+
   const bodyHTML = await page.evaluate(() => document.body.innerHTML);
   await browser.close();
 
@@ -347,7 +366,7 @@ router.post("/request-qa", async (req, res) => {
 
   const word = wordCount(html);
   res.status(200).send({ word })
-  
+
 });
 
 module.exports = router;
