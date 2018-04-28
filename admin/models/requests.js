@@ -76,13 +76,9 @@ const RequestSchema = new mongoose.Schema({
   },
   refFiles: {
     type: Array,
-    default: []
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    default: [],
+    trim: true
   }
-
 });
 
 RequestSchema.methods.targetLangName = function targetLangName() {

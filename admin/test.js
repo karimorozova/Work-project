@@ -1,5 +1,12 @@
-const  { findCustomer }  = require("./models/xtrf/");
+const  { HomeApi }  = require("./models/xtrf/");
 
-//const customerInfo = await ( findCustomer() );
-console.log(customerInfo);
+
+async function runTest() {
+    console.log("Begin test");
+    const customerInfo = await ( HomeApi.findCustomer("11111"));
+    console.log("customer info " + customerInfo);
+}
+//
+
+runTest();
 

@@ -33,9 +33,20 @@ const mailhandler = {
         msg += "' download target='_self'>" + request.detailFiles[i] + "</a><br/>";
       }
     }
+
+
     if (request.refFiles.length > 0) {
-      msg += "Ref File : <a href='http://admin.pangea.global:81/uploads/" + request.refFiles[0].filename + "' download target='_self'>" + request.refFiles[0].filename + "</a><br/>";
+      msg += "Reference File : ";
+      for (var i = 0; i < request.refFiles.length; i++) {
+        msg += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
+        msg += request.refFiles[i];
+        msg += "' download target='_self'>" + request.refFiles[i] + "</a><br/>";
+      }
     }
+
+    /*if (request.refFiles.length > 0) {
+      msg += "Ref File : <a href='http://admin.pangea.global:81/uploads/" + request.refFiles[0].filename + "' download target='_self'>" + request.refFiles[0].filename + "</a><br/>";
+    }*/
 
 
     // Add targetLanguages
@@ -49,7 +60,7 @@ const mailhandler = {
 
     let mailOptions = {
       from: 'pangea@wellyes.ru', // sender address
-      to: 'sales@pangea.global', // list of receivers
+      to: 'sales@pangea.global', // sales@pangea.global list of receivers
       subject: `A new lead from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body

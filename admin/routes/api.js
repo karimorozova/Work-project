@@ -2,8 +2,8 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
-const { Requests } = require('../models');
-const { Xtrf, SmartProject, ParseHTML } = require('../models');
+const { Requests, Languages, Services } = require('../models');
+const { quote } = require('../models/xtrf');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -18,71 +18,54 @@ var upload = multer({
   storage: storage
 });
 
+function moveFile(oldFile, requestId){
 
-router.get('/', (req, res) => {
-  res.send("vendor");
-});
+  var newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
 
+  mv(oldFile.path, newFile, {
+    mkdirp: true
+  }, function (err) {
+  });
 
-// Add
-router.post('/request', upload.fields([{
-  name: 'detailFiles'
-}, {
-  name: 'refFiles'
-}]), (req, res) => {
-  Requests.create({
-    date: req.body.date,
-    contactName: req.body.contactName,
-    contactEmail: req.body.contactEmail,
-    web: req.body.web,
-    skype: req.body.skype,
-    phone: req.body.phone,
-    service: JSON.parse(req.body.service),
-    industry: req.body.industry,
-    status: req.body.status,
-    accountManager: req.body.accountManager,
-    companyName: req.body.companyName,
-    sourceLanguage: JSON.parse(req.body.sourceLanguage),
-    targetLanguages: JSON.parse(req.body.targetLanguages),
-    detailFiles: req.files["detailFiles"],
-    refFiles: req.files["refFiles"] ? req.files["refFiles"] : '',
-    brief: req.body.brief
-  })
-    .then(request => {
-      for (var i = 0; i < request.detailFiles.length; i += 1) {
-        var oldFile = request.detailFiles[i];
-        var newFile = './dist/reqfiles/' + request.id + '/' + oldFile.filename;
+  return oldFile.filename;
+}
 
-        mv(oldFile.path, newFile, {
-          mkdirp: true
-        }, function (err) {
-          console.log("New file " + request.detailFiles[i]);
-        });
-        request.detailFiles[i] = oldFile.filename;
+router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
+
+  const request = new Requests(req.body);
+
+  const detailFiles = req.files["detailFiles"];
+  const refFiles = req.files["refFiles"];
+
+  request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
+  request.targetLanguages = JSON.parse(req.body.targetLanguages);
+  request.service = JSON.parse(req.body.service)
+  try {
+    await request.save();
+
+    for (var i = 0; i < detailFiles.length; i += 1) {
+      request.detailFiles.push(moveFile(detailFiles[i], request.id));
+    }
+    if (refFiles) {
+      for (var i = 0; i < refFiles.length; i += 1) {
+        request.refFiles.push(moveFile(refFiles[i], request.id))
       }
-      sendMail(request);
-      /* sending request via API */
-      if (request.detailFiles.length > 0) {
-        Xtrf(request).then(results => {
-          console.log("request added via api");
-        }).catch(err => {
-          console.log(err)
-        })
-      }
+    }
+    
+    await request.save();
+    //sendMail(request);
+    quote(request);
 
-      res.send({
-        message: "request was added"
-      });
+    console.log("Saved");
 
+  } catch (err) {
+    console.log(err);
+  }
 
-    })
-    .catch(err => {
-      console.log(err);
-      let error = new Error('Something wrong with DB');
-      error.status = 504;
+  res.send({
+    message: "request was added"
+  });
 
-      return res.send(error);
-    })
 });
 
 router.get('/languages', (req, res) => {

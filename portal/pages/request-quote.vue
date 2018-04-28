@@ -535,7 +535,7 @@ export default {
       
       this.sourceSelect = {lang : 'Select'};
       if(!event.source) {
-        this.sourceSelect = {lang: 'English (United Kingdom)'}
+        this.sourceSelect = {lang: 'English (United Kingdom)', xtrf : 61}
       }
     },
     changeIndustry(name) {
@@ -808,7 +808,7 @@ export default {
       if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
-        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        //window.top.location.href = "https://www.pangea.global/thank-you"; 
         // this.clearForm();
         // this.showSuccess()
       } else {
