@@ -754,17 +754,17 @@ export default {
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
 
-        const result = await this.$axios.$post('request', sendForm);
+        const result = await this.$axios.$post('api/request', sendForm);
     },
     async getServices() {
-      const result = await this.$axios.$get('services')
+      const result = await this.$axios.$get('api/services')
       result.sort((a, b) => {return a.sortIndex - b.sortIndex});
       for (let i = 0; i < result.length; i++) {
         this.services.push(result[i])
       }
     },
     async getLanguages() {
-      const result = await this.$axios.$get('languages')
+      const result = await this.$axios.$get('api/languages')
       .then(response => {
         this.languages = response;
       })

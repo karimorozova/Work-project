@@ -1,4 +1,4 @@
-
+const { ClientApi } = require('../models/xtrf');
 const router = require('express').Router();
 
 router.get('/', (req, res) => {
@@ -7,8 +7,8 @@ router.get('/', (req, res) => {
 
 router.post('/auth', async (req, res, next) => {
     if (req.body.logemail && req.body.logpassword) {
-        var jsessionId = await (Customer.authUser(req.body.logemail, req.body.logpassword))
-        var customer = new Customer("", jsessionId);
+        var jsessionId = await (ClientApi.authUser(req.body.logemail, req.body.logpassword));
+        var customer = new ClientApi("",jsessionId);
         var userInfo = await (customer.userInfo());
         var userdata = await (customer.getName());
         res.statusCode = 200;

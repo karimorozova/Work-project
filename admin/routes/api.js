@@ -53,7 +53,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
     }
     
     await request.save();
-    //sendMail(request);
+    sendMail(request);
     quote(request);
 
     console.log("Saved");

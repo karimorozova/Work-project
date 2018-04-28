@@ -36,10 +36,15 @@ async function quote(request) {
 
 }
 
+async function authClient(login, pass) {
+   const jsessionId = await (ClientApi.authUser(login, pass));
+}
+
 const Models = {
     ClientApi,
     HomeApi,
     quote,
+    authClient
 };
 
 module.exports = Models;

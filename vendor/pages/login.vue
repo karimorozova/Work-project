@@ -38,19 +38,19 @@ export default {
   },
   methods: {
     sendForm() {
-      this.$axios.post("portal/auth", this.form).then(
-        response => {
-          document.cookie = "ses=" + response.data + `;max-age=36000`;
-          console.log(response);
-          this.isLogin = true;
-          window.location.replace("http://localhost:3000/");
-        },
+      // this.$axios.post("portal/auth", this.form).then(
+      //   response => {
+      //     document.cookie = "ses=" + response.data + `;max-age=36000`;
+      //     console.log(response);
+      //     this.isLogin = true;
+      //     window.location.replace("http://localhost:3000/");
+      /*  },
         err => {
           alert("Bad credentials");
           console.log("Errored : ");
           console.log(err);
         }
-      );
+      );*/
     },
     forget(){
       this.forgotLink = !this.forgotLink;

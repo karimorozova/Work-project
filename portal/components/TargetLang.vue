@@ -77,7 +77,7 @@ export default {
       this.$emit("addLanguage", {index, lang: this.targetLanguages[langIndex]})
     },
     async getLanguages() {
-        const result = await this.$axios.$get('languages')
+        const result = await this.$axios.$get('api/languages')
         .then(response => {
             this.languages = response;
         })

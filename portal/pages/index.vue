@@ -63,7 +63,7 @@ export default {
         return true;
       } else {
         console.log("Redirected to login page");
-        window.location.replace("http://localhost:3000/sign");
+        window.location.replace("http://localhost:3000/login");
       }
     },
     async clientInfo() {
