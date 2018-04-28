@@ -1,113 +1,232 @@
 <template lang="pug">
-   .container
-    .summaryTable(v-if="gotData")
-      h1 Summary
-      table.table.reportTable(border='bordered')
-        tr
-          th(v-for="datas in fromApi.header.columns") {{ datas.header }}
-        tr(v-for="row in fromApi.rows")           
-            td(v-for="rowVal in row.columns") {{ rowVal }}
-    .loginWrapper(v-else)
-      .h2Wrapper
-        h2 Email
-        input(v-model='form.logemail')
-      .h2Wrapper
-        h2 Password
-        input(type="password" v-model='form.logpassword')
-      .buttonWrapper
-        button(@click='sendForm') Log In
-        h2(v-if='isLogin') You are logged in!
-
+    .clientsportalWrapper
+        .clientsTop
+            .clientsTop__clientName
+                h2.clientsPortal {{ clientPortal }}
+            .clientsTop__searchBlock
+                .searchWrapper
+                    img.search(src="../assets/images/search.png")
+                .womanWrapper
+        .clientsMainWrapper
+            .clientsNavbar
+                ul.navbar__ulist
+                  li(v-for="note in navbarList") 
+                    img.intothelist(:src="note.img")
+                    br
+                    span(v-if="false") {{ note.describe }}
+                .logoImage(v-if="false")
+                .balloons(v-else)
+            .clientsAll
+                .buttonPanel
+                    button.quote {{ newQuote }}
+                    button.project {{ newProject }}
+                .openQuotes {{ openQuotes }}
+                    img(src="../assets/images/open-close-arrow-brown.png")
+                .openProjects {{ openProjects }}
+                    img(src="../assets/images/open-close-arrow-brown.png")
 </template>
-<script>
-import axios from 'axios';
 
+<script>
 export default {
   data() {
     return {
-      form: {
-        logemail: "",
-        logpassword: ""
-      },
-      gotData: false,
-      isLogin: false,
-      fromApi: [] 
+      companyName: "",
+      clientPortal: "CLIENT PORTAL",
+      navbarList: [
+        {
+          describe: "DASHBOARD",
+          img: require("../assets/images/dashboard.png")
+        },
+        {
+          describe: "PROJECTS",
+          img: require("../assets/images/projects.png")
+        },
+        {
+          describe: "INVOICES",
+          img: require("../assets/images/invoices.png")
+        },
+        {
+          describe: "DOCUMENTS",
+          img: require("../assets/images/documents.png")
+        }
+      ],
+      newQuote: "New Quote",
+      newProject: "New Project",
+      openQuotes: "Open Quotes",
+      openProjects: "Open Projects"
     };
   },
   methods: {
-    sendForm() {
-      this.$axios.get(`/vendorJobs?email=${this.form.logemail}`).then(
-        response => {
-          this.fromApi = response.data;
-          console.log(this.fromApi);
-          this.gotData = true;
-          // setTimeout(() => {
-          //   this.$router.push("/project");
-          // }, 1500);
-        },
-        err => {
-          alert("Bad credentials");
-          console.log("Errored : ");
-          console.log(err);
-        }
-      );
-    },  
+    getCookie() {
+      let sessionCookie = document.cookie.split("=")[1];
+      if (sessionCookie) {
+        return true;
+      } else {
+        console.log("Redirected to login page");
+        window.location.replace("login");
+      }
+    },
+    async clientInfo() {
+      const result = await this.$axios.request({
+        method: "get",
+        url: "/clientsinfo",
+        withCredentials: true
+      });
+      console.log(result);
+      this.companyName = result.data.name;
+    }
   },
-  computed: {},
-  mounted() {},
-  components: {}
+  mounted() {
+    this.getCookie();
+    this.clientInfo();
+  }
 };
 </script>
 
 <style lang="scss">
-  body {
-    margin: 0;
-    overflow-y: hidden;
+body {
+  margin: 0;
+}
+
+.clientsportalWrapper {
+  max-width: 1190px;
+  margin: 0 auto;
+}
+
+.clientsTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #67573e;
+  .company {
+    span {
+      font-weight: 600;
+      font-size: 24px;
+      font-weight: bold;
+      color: darkslategray;
+      font-style: italic;
+    }
   }
 
-  .loginWrapper {
-    background-color: #bfb3b3;
-    margin: 20% auto;
-    width: 603px;
-    @media (max-width: 625px) {
-      width: 450px;
-    }
-    @media (max-width: 560px) {
-      width: 350px;
-    }
-    @media (max-width: 374px) {
-      width: 300px;
-    }
-
-    border-radius: 26px;
-
-    .h2Wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h2 {
+  .clientsTop__clientName {
+    .clientsPortal {
       color: #fff;
-      margin: 3%;
+      margin-left: 7%;
+      width: 100%;
+    }
+  }
+
+  .clientsTop__searchBlock {
+    margin-right: 1%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .searchWrapper {
+      margin-left: -55%;
+    }
+    .womanWrapper {
+      margin-right: 20%;
+      border: 2px solid #fff;
+      border-radius: 30px;
+      width: 33px;
+      height: 33px;
+    }
+  }
+}
+
+.clientsMainWrapper {
+  display: flex;
+  justify-content: center;
+
+  .clientsNavbar {
+    background-color: #67573e;
+    height: 100%;
+    width: 12%;
+    opacity: 0.67;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .navbar__ulist {
+      list-style: none;
+      font-size: 15px;
+      font-weight: bold;
+      padding: 0;
+
+      li {
+        // margin-top: 40%;
+        margin-bottom: 40%;
+
+        .intothelist {
+          margin-bottom: 78%;
+        }
+      }
+
+      span {
+        margin-left: -13%;
+        color: #fff;
+      }
     }
 
-    input {
-      height: 26px;
-      width: 70%;
-    }
-
-    .buttonWrapper {
+    .logoImage {
       display: flex;
       justify-content: center;
-      margin: 7% 0 1.2% 0;
-      padding-bottom: 5%;
-        button {
-          width: 37%;
-          height: 38px;
-          border-radius: 8px;
-          font-size: 15px;
+      align-items: center;
+      background-image: url("../assets/images/logo.png");
+      background-size: cover;
+      background-position: no-repeat;
+      margin-left: 8%;
+      width: 175px;
+      height: 59px;
+    }
+
+    .balloons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url("../assets/images/balloons.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 80px;
+      height: 100px;
+    }
+  }
+
+  .clientsAll {
+    width: 88%;
+
+    .buttonPanel {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 7%;
+
+      button {
+        color: #fff;
+        font-size: 15px;
+        box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
+        background-color: #f5876e;
+        border-radius: 18px;
+        border: none;
+        width: 200px;
+        height: 50px;
+        margin: 2% 1% 0 1%;
+      }
+    }
+
+    .openQuotes, .openProjects {
+        border: 0.4px solid #67573e;
+        border-radius: 12px;
+        box-shadow: 0 3px 13px rgba(0, 0, 0, .3);
+        margin-left: 6%;
+        margin-right: 4%;
+        margin-bottom: 13%;
+        padding: 1.5%;
+        color: #67573e;
+        img {
+            margin-left: 87%;
         }
     }
   }
+}
 </style>
