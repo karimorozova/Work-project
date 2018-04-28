@@ -9,7 +9,6 @@ const mongoose = require('mongoose');
 const port = config.server.port;
 const db = mongoose.connection;
 const checkCollections = require('./helpers/dbSetDefault');
-const initReports = require('./helpers/dbReportInit');
 const { LanguagesModel, RequestSchema } = require('./models');
 
 // TODO : check origins from localhost only
@@ -48,7 +47,7 @@ app.use((req, res, next) => {
 });
 
 // include routes
-const routes = require('./routes/router');
+const routes = require('./routes');
 app.use('/', routes);
 
 
