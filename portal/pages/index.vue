@@ -9,20 +9,26 @@
                 .womanWrapper
         .clientsMainWrapper
             .clientsNavbar
+              .clientsNavbar__sideBar(:class="{testExpander: expander}")
                 ul.navbar__ulist
-                  li(v-for="note in navbarList") 
-                    img.intothelist(:src="note.img")
-                    br
-                    span(v-if="false") {{ note.describe }}
-                .logoImage(v-if="false")
+                  li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList")
+                    .image
+                      img(:src="note.img")
+                    .title(:class="{showTitle: expander}")
+                      span {{ note.title }}
+                .logoImage(v-if="expander")
                 .balloons(v-else)
+              .clientsNavbar__openHide
+                .icon(@click="expandBar" :class="{openReverse: expander}")
+                  span.icon__arrow >
+                .pointer(:class='"position-" + activeIndex')
             .clientsAll
                 .buttonPanel
-                    button.quote {{ newQuote }}
-                    button.project {{ newProject }}
-                .openQuotes {{ openQuotes }}
+                    button.quote New Quote
+                    button.project New Project
+                .clientsAll__dropMenu.openQuotes(:class="{shorten: expander}") {{ openQuotes }}
                     img(src="../assets/images/open-close-arrow-brown.png")
-                .openProjects {{ openProjects }}
+                .clientsAll__dropMenu.openProjects(:class="{shorten: expander}") {{ openProjects }}
                     img(src="../assets/images/open-close-arrow-brown.png")
 </template>
 
@@ -34,26 +40,26 @@ export default {
       clientPortal: "CLIENT PORTAL",
       navbarList: [
         {
-          describe: "DASHBOARD",
+          title: "DASHBOARD",
           img: require("../assets/images/dashboard.png")
         },
         {
-          describe: "PROJECTS",
+          title: "PROJECTS",
           img: require("../assets/images/projects.png")
         },
         {
-          describe: "INVOICES",
+          title: "INVOICES",
           img: require("../assets/images/invoices.png")
         },
         {
-          describe: "DOCUMENTS",
+          title: "DOCUMENTS",
           img: require("../assets/images/documents.png")
         }
       ],
-      newQuote: "New Quote",
-      newProject: "New Project",
       openQuotes: "Open Quotes",
-      openProjects: "Open Projects"
+      openProjects: "Open Projects",
+      expander: false,
+      activeIndex: 0
     };
   },
   methods: {
@@ -74,8 +80,15 @@ export default {
       });
       console.log(result);
       this.companyName = result.data.name;
+    },
+    expandBar() {
+      this.expander = !this.expander
+    },
+    switchInfo(index) {
+      this.activeIndex = index;
     }
   },
+  
   mounted() {
     this.getCookie();
     this.clientInfo();
@@ -137,51 +150,109 @@ body {
 .clientsMainWrapper {
   display: flex;
   justify-content: center;
-
   .clientsNavbar {
-    background-color: #67573e;
-    height: 100%;
-    width: 12%;
-    opacity: 0.67;
+    position: relative;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    &__sideBar {
+      padding-top: 15px;
+      background-color: #998e7e;
+      height: 100%;
+      width: 121px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
+      transition: all 0.5s;
+      z-index: 1;
+    }
+    .testExpander {
+      width: 200px
+    }
 
+    &__openHide {
+      background: rgb(245, 135, 110);
+      color: white;
+      width: 27px;
+      height: 38px;
+      top: 0;
+      right: 0px;
+      text-align: center;
+      cursor: pointer;
+      .icon {
+        font-size: 32px;
+      }
+      .openReverse {
+        transform: rotate(180deg);
+      }
+      .pointer {
+        position: absolute;
+        width: 160px;
+        height: 85px;
+        background-color: rgba(103, 87, 62, 0.66);
+        top: 36px;
+        right: -20px;
+        border-right: none;
+        border-radius: 50%;
+        z-index: -1;
+        transition: all 0.4s;
+      }
+      .position-1 {
+        top: 23%;        
+      }
+      .position-2 {
+        top: 42%;        
+      }
+      .position-3 {
+        top: 60%;        
+      }
+    }
     .navbar__ulist {
       list-style: none;
       font-size: 15px;
       font-weight: bold;
       padding: 0;
 
-      li {
-        // margin-top: 40%;
-        margin-bottom: 40%;
+      &_item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 60px;
+        cursor: pointer;
+        &:last-child {
+          margin-bottom: 120px;
+        }
 
         .intothelist {
           margin-bottom: 78%;
         }
-      }
-
-      span {
-        margin-left: -13%;
-        color: #fff;
+        .title {
+          transition: all 0.4s;
+          opacity: 0;
+          color: #fff;
+        }
+        .showTitle {
+          opacity: 1;
+        }
       }
     }
 
     .logoImage {
+      transition: all 0.4s;
       display: flex;
       justify-content: center;
       align-items: center;
       background-image: url("../assets/images/logo.png");
-      background-size: cover;
-      background-position: no-repeat;
-      margin-left: 8%;
+      background-size: contain;
+      background-repeat: no-repeat;
       width: 175px;
       height: 59px;
+      padding-bottom: 41px;
     }
 
     .balloons {
+      transition: all 0.4s;      
       display: flex;
       justify-content: center;
       align-items: center;
@@ -199,7 +270,7 @@ body {
     .buttonPanel {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 7%;
+      margin-bottom: 5%;
 
       button {
         color: #fff;
@@ -208,17 +279,18 @@ body {
         background-color: #f5876e;
         border-radius: 18px;
         border: none;
-        width: 200px;
-        height: 50px;
-        margin: 2% 1% 0 1%;
+        width: 180px;
+        height: 43px;
+        margin: 15px 18px 0;
       }
     }
 
-    .openQuotes, .openProjects {
+    &__dropMenu {
+        width: 900px;
         border: 0.4px solid #67573e;
-        border-radius: 12px;
+        border-radius: 18px;
         box-shadow: 0 3px 13px rgba(0, 0, 0, .3);
-        margin-left: 6%;
+        margin-left: 46px;
         margin-right: 4%;
         margin-bottom: 13%;
         padding: 1.5%;
@@ -227,6 +299,10 @@ body {
             margin-left: 87%;
         }
     }
+    .shorten {
+      margin-left: 15px;
+    }
   }
 }
+
 </style>

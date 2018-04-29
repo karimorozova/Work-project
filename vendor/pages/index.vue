@@ -2,7 +2,7 @@
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
-                h2.clientsPortal {{ clientPortal }}
+                h2.clientsPortal {{ vendortPortal }}
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
@@ -31,7 +31,7 @@ export default {
   data() {
     return {
       companyName: "",
-      clientPortal: "CLIENT PORTAL",
+      vendorPortal: "VENDOR PORTAL",
       navbarList: [
         {
           describe: "DASHBOARD",
