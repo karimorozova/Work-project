@@ -42,16 +42,17 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
   request.service = JSON.parse(req.body.service)
   try {
     await request.save();
-
-    for (var i = 0; i < detailFiles.length; i += 1) {
-      request.detailFiles.push(moveFile(detailFiles[i], request.id));
+    if(detailFiles){
+      for (var i = 0; i < detailFiles.length; i += 1) {
+        request.detailFiles.push(moveFile(detailFiles[i], request.id));
+      }
     }
     if (refFiles) {
       for (var i = 0; i < refFiles.length; i += 1) {
         request.refFiles.push(moveFile(refFiles[i], request.id))
       }
     }
-    
+  
     await request.save();
     sendMail(request);
     quote(request);
