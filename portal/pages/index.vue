@@ -118,6 +118,7 @@ export default {
 <style lang="scss">
 body {
   margin: 0;
+  height: 100vh;
 }
 
 .clientsportalWrapper {
@@ -140,7 +141,7 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #67573e;
-  height: 6%;
+  // height: 6%;
   .company {
     span {
       font-weight: 600;
@@ -179,8 +180,8 @@ body {
 
 .clientsMainWrapper {
   display: flex;
-  justify-content: flex-start;
-  height: 94%;
+  // justify-content: flex-start;
+  height: 95%;
   .mainInfo {
     display: flex;
     flex-direction: column;
@@ -208,10 +209,10 @@ body {
   .clientsNavbar {
     position: relative;
     display: flex;
+    height: 100%;
     &__sideBar {
       padding: 25px 0;
       background-color: #998e7e;
-      height: 100%;
       width: 121px;
       display: flex;
       flex-direction: column;
@@ -277,6 +278,9 @@ body {
         cursor: pointer;
         &:last-child {
           margin-bottom: 120px;
+          @media (max-width: 768px) {
+            margin-bottom: 57px;
+          }
         }
 
         .intothelist {
