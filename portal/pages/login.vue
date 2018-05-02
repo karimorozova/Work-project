@@ -43,7 +43,7 @@ export default {
           document.cookie = "ses=" + response.data + `;max-age=36000`;
           console.log(response);
           this.isLogin = true;
-          window.location.replace("http://localhost:3000/");
+          window.location.href = "https://portal.pangea.global";
         },
         err => {
           alert("Bad credentials");
