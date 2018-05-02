@@ -1,8 +1,5 @@
 const axios = require('axios');
 const querystring = require('querystring');
-const FormData = require('form-data');
-const fs = require('fs');
-const httpRequest = require("request");
 
 
 var ClientApi = class ClientApi {
