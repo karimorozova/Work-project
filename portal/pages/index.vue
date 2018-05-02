@@ -278,7 +278,7 @@ body {
         cursor: pointer;
         &:last-child {
           margin-bottom: 120px;
-          @media (max-width: 768px) {
+          @media (max-height: 768px) {
             margin-bottom: 57px;
           }
         }
