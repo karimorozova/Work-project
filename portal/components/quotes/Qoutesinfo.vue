@@ -1,43 +1,45 @@
 <template lang="pug">
     .qoutesWrap 
         .row
-            .row__icon
-            .row__columns
-                .col
-                    .col__title 
-                        span Request On
-                        img(src="../../assets/images/white-arrow.png")
-                .col
-                    .col__title 
-                        span Project ID
-                        img(src="../../assets/images/white-arrow.png")                        
-                .col.col-5
-                    .col__title 
-                        span Project Name
-                        img(src="../../assets/images/white-arrow.png")                        
-                .col.col-4
-                    .col__title 
-                        span Status
-                        img(src="../../assets/images/white-arrow.png")                        
-                .col
-                    .col__title 
-                        span Deadline
-                        img(src="../../assets/images/white-arrow.png")                        
-                .col.col-5
-                    .col__title 
-                        span Total Cost
-        .row(v-for="quote in clientQuotes")
-            .row__icon
-                img(src="../../assets/images/open.png")
-            .row__columns_info
-                .col {{ quote.requestOn }}
-                .col {{ quote.projectId }}
-                .col.col-5 {{ quote.projectName }}
-                .col.col-4 {{ quote.status }}
-                .col {{ quote.deadline }}
-                .col.col-5
-                    span(v-for="cost in quote.totalCost") {{ cost }}
-                    
+            .shortInfo
+                .row__icon
+                .row__columns
+                    .col
+                        .col__title 
+                            span Request On
+                            img(src="../../assets/images/white-arrow.png")
+                    .col
+                        .col__title 
+                            span Project ID
+                            img(src="../../assets/images/white-arrow.png")                        
+                    .col.col-5
+                        .col__title 
+                            span Project Name
+                            img(src="../../assets/images/white-arrow.png")                        
+                    .col.col-4
+                        .col__title 
+                            span Status
+                            img(src="../../assets/images/white-arrow.png")                        
+                    .col
+                        .col__title 
+                            span Deadline
+                            img(src="../../assets/images/white-arrow.png")                        
+                    .col.col-5
+                        .col__title 
+                            span Total Cost
+        .row(v-for="(quote,index) in clientQuotes")
+            .shortInfo
+                .row__icon(@click="showFullInfo(index)")
+                    img(src="../../assets/images/open.png" :class="{rotateImage: quote.fullInfoAppear}")
+                .row__columns_info
+                    .col {{ quote.requestOn }}
+                    .col {{ quote.projectId }}
+                    .col.col-5 {{ quote.projectName }}
+                    .col.col-4 {{ quote.status }}
+                    .col {{ quote.deadline }}
+                    .col.col-5
+                        span(v-for="cost in quote.totalCost") {{ cost }}
+            .fullInfo(v-if="quote.fullInfoAppear")      
 </template>
 
 <script>
@@ -47,10 +49,16 @@ export default {
     data() {
         return {
             clientQuotes: [
-                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"]},
-                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"]},
-                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"]},      
-            ]
+                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"], fullInfoAppear: false},
+                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"], fullInfoAppear: false},
+                {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"], fullInfoAppear: false},
+            ],
+            
+        }
+    },
+    methods: {
+        showFullInfo(index) {
+            this.clientQuotes[index].fullInfoAppear = !this.clientQuotes[index].fullInfoAppear
         }
     }
 }
@@ -62,10 +70,22 @@ export default {
         display: flex;
         justify-content: center;
         margin-bottom: 5px;
+        flex-direction: column;
+        .shortInfo {
+            display: flex;
+        }
         &__icon {
             width: 4%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             img {
                 cursor: pointer;
+            }
+            .rotateImage {
+                transform: rotate(180deg);
+                padding-right: 5px;
+                padding-bottom: 3px;
             }
         }
         &__columns {
@@ -135,6 +155,14 @@ export default {
                     }
                 }
             }
+        }
+        .fullInfo {
+            margin-top: 2px;
+            align-self: flex-end;
+            border-radius: 20px; 
+            width: 95%;
+            min-height: 66px;
+            border: 1px solid #998e7e;
         }
     }
 }
