@@ -39,7 +39,17 @@
                     .col {{ quote.deadline }}
                     .col.col-5
                         span(v-for="cost in quote.totalCost") {{ cost }}
-            .fullInfo(v-if="quote.fullInfoAppear")      
+            .fullInfo(v-if="quote.fullInfoAppear")
+                .languagePair 
+                    .languagePair__title {{ languagePair }}
+                        img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
+                    ul.languagePair_ul
+                        li.languagePair_li Whatever
+                .cost
+                    .cost__title {{ cost }}
+                        img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
+                    ul.cost__ul
+                        li.cost__li Whatever2
 </template>
 
 <script>
@@ -53,7 +63,9 @@ export default {
                 {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"], fullInfoAppear: false},
                 {requestOn: moment(new Date()).format("DD-MM-YYYY"), projectId: "111 [33]", projectName: "1Market Resources", status: "Open", deadline: moment(new Date()).format("DD-MM-YYYY"), totalCost: ["€1000", "APPROVE", "REJECT"], fullInfoAppear: false},
             ],
-            
+            languagePair: 'Language Pair',
+            cost: 'Cost',
+
         }
     },
     methods: {
@@ -163,7 +175,45 @@ export default {
             width: 95%;
             min-height: 66px;
             border: 1px solid #998e7e;
+            display: flex;
+            justify-content: flex-start;
+
+            .languagePair {
+                width: 17%;
+
+                &__title {
+                    background-color: rgba(243,226,199,1);
+                    border-right: 1px solid #998e7e;
+                    border-radius: 20px 0 0 0;
+                    padding: 5px 0 5px 20px;
+                    border-bottom: 2px solid #67573e;
+                }
+                &__image {
+                    margin-left: 7%;
+                }
+
+                &__li {
+                    border-top: 1px solid rgba(243,226,199,1);
+                }
+            }
+
+            .cost {
+                width: 83%;
+                &__title {
+                    background-color: rgba(243,226,199,1);
+                    border-radius: 0 20px 0 0;
+                    padding: 5px 0 5px 20px;
+                    border-bottom: 2px solid #67573e;
+                }
+                &__image {
+                    margin-left: 4%;
+                }
+            }
         }
+    }
+
+    li {
+        list-style: none;
     }
 }
     
