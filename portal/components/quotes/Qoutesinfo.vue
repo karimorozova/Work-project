@@ -40,16 +40,16 @@
                     .col.col-5
                         span(v-for="cost in quote.totalCost") {{ cost }}
             .fullInfo(v-if="quote.fullInfoAppear")
-                .languagePair 
+                .languagePair
                     .languagePair__title {{ languagePair }}
                         img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                    ul.languagePair_ul
-                        li.languagePair_li Whatever
+                    ul.languagePair__ul
+                        li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
                 .cost
                     .cost__title {{ cost }}
                         img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
                     ul.cost__ul
-                        li.cost__li Whatever2
+                        li.cost__li(v-for="language in languagesFromTo" v-html="language.price")
 </template>
 
 <script>
@@ -65,7 +65,17 @@ export default {
             ],
             languagePair: 'Language Pair',
             cost: 'Cost',
-
+            languagesFromTo: [
+                {
+                    description: 'EN-GB >> PL', price: '32.43 &#8364;'
+                },
+                {
+                    description: 'EN-GB >> HU', price: '32.43 &#8364;'
+                },
+                {
+                    description: 'EN-GB >> CZ', price: '32.43 &#8364;'
+                }
+            ]
         }
     },
     methods: {
@@ -180,10 +190,10 @@ export default {
 
             .languagePair {
                 width: 17%;
+                border-right: 1px solid #998e7e;
 
                 &__title {
                     background-color: rgba(243,226,199,1);
-                    border-right: 1px solid #998e7e;
                     border-radius: 20px 0 0 0;
                     padding: 5px 0 5px 20px;
                     border-bottom: 2px solid #67573e;
@@ -191,9 +201,17 @@ export default {
                 &__image {
                     margin-left: 7%;
                 }
+                
+                &__ul {
+                    padding-left: 0;
+                }
 
                 &__li {
-                    border-top: 1px solid rgba(243,226,199,1);
+                    border-bottom: 1px solid rgba(243,226,199,1);
+                    padding: 5px 0 5px 20px;
+                    &:last-child {
+                        border-bottom: none;
+                    }
                 }
             }
 
@@ -208,8 +226,25 @@ export default {
                 &__image {
                     margin-left: 4%;
                 }
+
+                &__ul {
+                    padding-left: 0;
+                }
+                
+                &__li {
+                    border-bottom: 1px solid rgba(243,226,199,1);
+                    padding: 5px 0 5px 20px;
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
             }
         }
+    }
+
+    ul {
+        padding: 5px 0 5px 20px;
+        margin: 0;
     }
 
     li {
