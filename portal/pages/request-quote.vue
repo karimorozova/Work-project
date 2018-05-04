@@ -326,7 +326,7 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
-import VueRecaptcha from 'vue-recaptcha';
+
 import { Drag, Drop } from 'vue-drag-drop';
 
 // import Clock from './../components/Clock.vue';
@@ -824,11 +824,11 @@ export default {
       return re.test(email);
     },
     salesForce() {
-      function setCookie(name, value, days){
+      function setCookie(name, value, days, dom){
           var date = new Date();
           date.setTime(date.getTime() + (days*24*60*60*1000)); 
           var expires = "; expires=" + date.toGMTString();
-          document.cookie = name + "=" + value + expires;
+          document.cookie = name + "=" + value + expires + "; domain=" + dom;
       }
       function getParam(p){
           var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
@@ -838,7 +838,7 @@ export default {
       if(gclid){
           var gclsrc = getParam('gclsrc');
           if(!gclsrc || gclsrc.indexOf('aw') !== -1){
-              setCookie('gclid', gclid, 90);
+              setCookie('gclid', gclid, 90, '.pangea.global');
           }
       }
     },
@@ -892,7 +892,7 @@ export default {
     this.google();
   }
 }
-
+import VueRecaptcha from 'vue-recaptcha';
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

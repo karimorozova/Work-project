@@ -20,7 +20,7 @@ module.exports = {
     ],
     script: [
       { src: 'https://use.fontawesome.com/releases/v5.0.8/js/all.js' },
-      { src: 'https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit'}
+      { src: 'https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit', defer: true}
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -35,6 +35,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
