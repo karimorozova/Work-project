@@ -243,17 +243,18 @@
                 span Skype Name
                 input(type='text' v-model='contactSkype')
           .captcha
-            span.asterisk Please, confirm that you are not a robot   
-            .captcha__google
-              vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
-                ref="recaptcha"
-                @verify="onVerify"
-                @expired="onExpired"
-                :callback="checkForm"
-                :style= {"transform": "scale(0.77)",
-                  "-webkit-transform": "scale(0.77)",
-                  "transform-origin": "150px 0",
-                  "-webkit-transform-origin": "150px 0" })
+            //- span.asterisk Please, confirm that you are not a robot   
+            //- .captcha__google
+              //- vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
+              //-   ref="recaptcha"
+              //-   @verify="onVerify"
+              //-   @expired="onExpired"
+              //-   :callback="checkForm"
+              //-   :style= {"transform": "scale(0.77)",
+              //-     "-webkit-transform": "scale(0.77)",
+              //-     "transform-origin": "150px 0",
+              //-     "-webkit-transform-origin": "150px 0" })
+            input(id="00N1r00000Fie4G" name="00N1r00000Fie4G" type="hidden")
             input.buttons(type='submit' value='Submit')
           .warning(v-if="error")
             .message
@@ -263,7 +264,6 @@
                 | Please, fill all the required fields (marked with red 
                 span.asterisk asterisk
                 | )
-          input(id="00N1r00000Fie4G" name="00N1r00000Fie4G" type="hidden")
       .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
           .orderInfo__title
             h3 YOUR ORDER
@@ -307,6 +307,8 @@
           li(v-for="social in socialsArray")
             a(:href="social.socialLink")
               img.socialsImage(:src="social.image")
+    script(src='/salesforce.js')          
+    //- script(src='https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit', defer=true, async=true)
 </template>
 
 <script>
@@ -326,13 +328,16 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
-
+// import VueRecaptcha from 'vue-recaptcha';
 import { Drag, Drop } from 'vue-drag-drop';
 
 // import Clock from './../components/Clock.vue';
+var sbjs = require('sourcebuster');
 
 export default {
   name: 'pang-form',
+  head: {
+  },
   data () {
     return {
       // options: {
@@ -668,13 +673,13 @@ export default {
     openPicker1 () {
       this.$refs.programaticOpen1.showCalendar()
     },
-    onVerify: function (response) {
-      this.captchaValid = true;
-      console.log('Verify: ' + response)
-    },
-    onExpired: function () {
-      console.log('Expired')
-    },
+    // onVerify: function (response) {
+    //   this.captchaValid = true;
+    //   console.log('Verify: ' + response)
+    // },
+    // onExpired: function () {
+    //   console.log('Expired')
+    // },
     formControl(){
       const check = this.checkForm();
         if(!check){
@@ -809,7 +814,7 @@ export default {
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
       } 
-      if(!this.captchaValid) this.errors.push("captcha required");
+      // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
         window.top.location.href = "https://www.pangea.global/thank-you"; 
@@ -853,6 +858,9 @@ export default {
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
       })(window,document,'script','dataLayer','GTM-KM2S59F');
+    },
+    go(sb) {
+      console.log('Cookies are set! Your current source is: ' + sb.current.src);
     }
   },
   computed: {
@@ -881,7 +889,7 @@ export default {
   },
   components: {
     Datepicker,
-    VueRecaptcha,
+    // VueRecaptcha,
     Drop
   },
   mounted(){
@@ -890,9 +898,11 @@ export default {
     this.salesForce();
     this.gclid();
     this.google();
+    sbjs.init({ callback: this.go });
+    console.log(sbjs.get.current.src);
   }
 }
-import VueRecaptcha from 'vue-recaptcha';
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
