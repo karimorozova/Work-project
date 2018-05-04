@@ -1,20 +1,32 @@
 <template lang="pug">
 .restoreMain
     .restoreWrapper
-        .restoreForm
+        .restoreForm(v-if="formVisible")
             .emailWrapper
                 label Enter your email to get the link for reset your password:
                 input.notice(v-model='notice' placeholder='Enter your email' )
             .buttonWrapper
+                span.buttonWrapper__backLabel(@click="backEvent") Back
                 button(@click='sendForm' v-model='notice' ) Send Link
 </template>
 
 <script>
+
 export default {
   data() {
     return {
-      notice: ""
+      notice: "",
+      formVisible: true
     };
+  },
+  methods: {
+    backEvent(){
+      this.formVisible = false;
+      this.$emit('loginVisible', {forgotLink: true})
+    }
+  },
+  computed: {
+
   }
 };
 </script>
@@ -77,7 +89,7 @@ body {
 
     .buttonWrapper {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         margin-bottom: 4%;
 
@@ -88,7 +100,16 @@ body {
             font-size: 20px;
             background-color: #84ca8e;
             color: #66563d;
+            margin-right: 5%;
         }
+
+        &__backLabel {
+        color: #0000ff;
+        font-size: 20px;
+        margin-left: 9%;
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
   }
 }
