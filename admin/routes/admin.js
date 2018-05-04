@@ -1,12 +1,15 @@
 const router = require('express').Router();
 const path = require('path');
-const { User, Requests } = require('../models');
+const { User, Requests, Reports } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 
 router.get('/', (req, res) => {
     res.sendFile(path.resolve() + '/dist/index.html');
 });
 
+router.get('/tasks-report', (req, res) => {
+    res.sendFile(path.resolve() + '/dist/index.html');
+});
 router.get('/register', (req, res) => {
     res.sendFile(path.resolve() + '/dist/index.html');
 });
@@ -31,6 +34,16 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/requests', requiresLogin, (req, res) => {
     Requests.find()
+        .then(requests => {
+            res.send(requests)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+});
+
+router.get('/reps', (req, res) => {
+    Reports.find()
         .then(requests => {
             res.send(requests)
         })

@@ -21,14 +21,14 @@ export default new Router({
       component: Register
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login
-    },
-    {
       path: '/tasks-report',
       name: 'tasks-report',
       component: TasksReport
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     }
   ]
 })

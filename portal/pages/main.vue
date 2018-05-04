@@ -21,7 +21,7 @@
               .clientsNavbar__openHide
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
-                .pointer(:class='"position-" + activeIndex')
+                //- .pointer(:class='"position-" + activeIndex')
             .mainInfo  
               .buttonPanel
                 button.quote New Quote
@@ -36,10 +36,12 @@
                     .clientsAll__dropMenu.openProjects(@click="showProjects" :class="{shorten: expander}") Open Projects
                       img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                     .clientsAll__dropMenu_item.projectsTable(v-if="openProjects" :class="{shorten: expander}")
+                      projectsInfo
 </template>
 
 <script>
 import Quotesinfo from "../components/quotes/Qoutesinfo";
+import ProjectsInfo from "../components/projects/ProjectsInfo";
 
 export default {
   data() {
@@ -110,7 +112,8 @@ export default {
     this.clientInfo();
   },
   components: {
-    Quotesinfo
+    Quotesinfo,
+    "projectsInfo": ProjectsInfo
   }
 };
 </script>
@@ -241,27 +244,6 @@ body {
       .openReverse {
         transform: rotate(180deg);
       }
-      .pointer {
-        position: absolute;
-        width: 160px;
-        height: 85px;
-        background-color: rgba(103, 87, 62, 0.66);
-        top: 36px;
-        right: -20px;
-        border-right: none;
-        border-radius: 50%;
-        z-index: -1;
-        transition: all 0.4s;
-      }
-      .position-1 {
-        top: 180px;        
-      }
-      .position-2 {
-        top: 325px;        
-      }
-      .position-3 {
-        top: 465px;        
-      }
     }
     .navbar__ulist {
       list-style: none;
@@ -302,7 +284,7 @@ body {
       display: flex;
       justify-content: center;
       align-items: center;
-      background-image: url("../assets/images/logo.png");
+      background-image: url("../assets/images/logo_white.png");
       background-size: contain;
       background-repeat: no-repeat;
       width: 175px;
@@ -327,12 +309,13 @@ body {
   .clientsAll {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
+    margin-left: 1%;
     &__dropMenu {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 100%;
+        width: 111%;
         border: 0.4px solid #67573e;
         border-radius: 18px;
         box-shadow: 0 3px 13px rgba(0, 0, 0, .3);
@@ -343,15 +326,17 @@ body {
         color: #67573e;
         transition: all 0.4s;
         cursor: pointer;
+        margin-left: 5%;
         &_item {
-          width: 100%;
+          width: 111%;
           min-height: 190px;
-          border-radius: 15px;
+          // border-radius: 15px;
           // margin-left: 46px;
           padding: 1.5%;
           box-shadow: 0 5px 20px rgba(103, 87, 62, 0.5);
           transition: all 0.4s; 
-          // overflow-y: scroll;         
+          // overflow-y: scroll;
+          margin-left: 5%;       
         }
         .reverseImage {
           transform: rotate(180deg);
