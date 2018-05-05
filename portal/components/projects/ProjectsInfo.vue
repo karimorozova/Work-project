@@ -10,10 +10,25 @@
                 img.projectid(src="../../assets/images/white-arrow.png")
             .project-table__col-3.col_bleach
                 span Project Name
+                .double_arrow
+                  .up
+                    img.arrow_up(src="../../assets/images/white-arrow.png")
+                  .down
+                    img.arrow_down(src="../../assets/images/white-arrow.png")
             .project-table__col-4.col_bleach
                 span Status
+                .double_arrow
+                  .up
+                    img.arrow_up(src="../../assets/images/white-arrow.png")
+                  .down
+                    img.arrow_down(src="../../assets/images/white-arrow.png")
             .project-table__col-5.col_bleach
                 span Deadline
+                .double_arrow
+                  .up
+                    img.arrow_up(src="../../assets/images/white-arrow.png")
+                  .down
+                    img.arrow_down(src="../../assets/images/white-arrow.png")
             .project-table__col-6.col_bleach
                 span Total Cost
             .project-table__col-7
@@ -47,6 +62,26 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+
+        .double_arrow {
+
+          .up {
+            margin-left: -10%;
+            margin-bottom: -33%;
+            .arrow_up {
+              height: 10px;
+              cursor: pointer;
+            }
+          }
+
+          .down {
+            .arrow_down {
+            height: 10px;
+            cursor: pointer;
+            transform: rotate(180deg);
+            }
+          }
+        }
     }
   }
 
@@ -90,12 +125,14 @@
       padding: 5px;
     }
     &-6 {
-      flex-basis: 9%;
+      flex-basis: 10%;
       border: 1px solid #978D7E;
       padding: 5px;
+      display: flex;
+      justify-content: center;
     }
     &-7 {
-      flex-basis: 17%;
+      flex-basis: 16%;
       border: 1px solid #978D7E;
       padding: 5px;
     }
@@ -114,6 +151,11 @@
         height: 10px;
         cursor: pointer;
     }
+  }
+
+  &__col-7 {
+    display: flex;
+    justify-content: center;
   }
 
   &__col-7 {

@@ -14,15 +14,30 @@
                     .col.col-5
                         .col__title 
                             span Project Name
-                            img(src="../../assets/images/white-arrow.png")                        
+                            //- img(src="../../assets/images/white-arrow.png")
+                            .double_arrow
+                              .up
+                                img.arrow_up(src="../../assets/images/white-arrow.png")
+                              .down
+                                img.arrow_down(src="../../assets/images/white-arrow.png")                       
                     .col.col-4
                         .col__title 
                             span Status
-                            img(src="../../assets/images/white-arrow.png")                      
+                            //- img(src="../../assets/images/white-arrow.png")
+                            .double_arrow
+                              .up
+                                img.arrow_up(src="../../assets/images/white-arrow.png")
+                              .down
+                                img.arrow_down(src="../../assets/images/white-arrow.png")                
                     .col
                         .col__title 
                             span Deadline
-                            img(src="../../assets/images/white-arrow.png")                        
+                            //- img(src="../../assets/images/white-arrow.png")
+                            .double_arrow
+                              .up
+                                img.arrow_up(src="../../assets/images/white-arrow.png")
+                              .down
+                                img.arrow_down(src="../../assets/images/white-arrow.png")                  
                     .col.col-5.colSplit
                         .col__title 
                             span Total Cost
@@ -165,6 +180,26 @@ export default {
             cursor: pointer;
           }
 
+            .double_arrow {
+
+            .up {
+              margin-left: -19%;
+              margin-bottom: -33%;
+              .arrow_up {
+                height: 10px;
+                cursor: pointer;
+              }
+            }
+
+            .down {
+              .arrow_down {
+              height: 10px;
+              cursor: pointer;
+              transform: rotate(180deg);
+              }
+            }
+          }
+
           .req_img {
             transform: rotate(180deg);
           }
@@ -188,7 +223,7 @@ export default {
         }
         .col__title {
           border-right: 1px solid white;
-          width: 36%;
+          width: 36%;  
         }
       }
       &_info {
