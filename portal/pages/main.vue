@@ -11,7 +11,7 @@
             .clientsNavbar
               .clientsNavbar__sideBar(:class="{testExpander: expander}")
                 ul.navbar__ulist
-                  li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList")
+                  li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
                       img(:src="note.img")
                     .title(:class="{showTitle: expander}")
@@ -28,15 +28,17 @@
                 button.project New Project
               .clientsAll
                   .quotesComponent
-                    .clientsAll__dropMenu.openQuotes(@click="showQuotes" :class="{shorten: expander}") Open Quotes
-                      img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
-                    .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes" :class="{shorten: expander}")
-                      Quotesinfo
+                    .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                      .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
+                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
+                      .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                        Quotesinfo
                   .projectsComponent
-                    .clientsAll__dropMenu.openProjects(@click="showProjects" :class="{shorten: expander}") Open Projects
-                      img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
-                    .clientsAll__dropMenu_item.projectsTable(v-if="openProjects" :class="{shorten: expander}")
-                      projectsInfo
+                    .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
+                      .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
+                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
+                      .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
+                        projectsInfo
 </template>
 
 <script>
@@ -51,25 +53,28 @@ export default {
       navbarList: [
         {
           title: "DASHBOARD",
-          img: require("../assets/images/dashboard.png")
+          img: require("../assets/images/dashboard.png"),
+          active: true
         },
         {
           title: "PROJECTS",
-          img: require("../assets/images/projects.png")
+          img: require("../assets/images/projects.png"),
+          active: false
         },
         {
           title: "INVOICES",
-          img: require("../assets/images/invoices.png")
+          img: require("../assets/images/invoices.png"),
+          active: false          
         },
         {
           title: "DOCUMENTS",
-          img: require("../assets/images/documents.png")
+          img: require("../assets/images/documents.png"),
+          active: false          
         }
       ],
       openQuotes: false,
       openProjects: false,
       expander: false,
-      activeIndex: 0
     };
   },
   methods: {
@@ -97,7 +102,13 @@ export default {
       this.expander = !this.expander
     },
     switchInfo(index) {
-      this.activeIndex = index;
+      this.navbarList.forEach( (item, i) => {
+        if(i == index) {
+          item.active = true
+        } else {
+          item.active = false
+        }
+      })
     },
     showQuotes() {
       this.openQuotes = !this.openQuotes;
@@ -144,7 +155,6 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #67573e;
-  // height: 6%;
   .company {
     span {
       font-weight: 600;
@@ -250,6 +260,7 @@ body {
       font-size: 15px;
       font-weight: bold;
       padding: 0;
+      width: 100%;
 
       &_item {
         display: flex;
@@ -258,6 +269,7 @@ body {
         align-items: center;
         margin-bottom: 60px;
         cursor: pointer;
+        transition: all 0.4s;
         &:last-child {
           margin-bottom: 120px;
           @media (max-height: 768px) {
@@ -275,6 +287,12 @@ body {
         }
         .showTitle {
           opacity: 1;
+        }
+      }
+      .active {
+        background-color: white;
+        .title {
+          color: #978D7E;
         }
       }
     }
@@ -309,43 +327,49 @@ body {
   .clientsAll {
     display: flex;
     flex-direction: column;
-    align-items: left;
-    margin-left: 1%;
+    align-items: center;
     &__dropMenu {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        width: 111%;
+        width: 100%;
         border: 0.4px solid #67573e;
         border-radius: 18px;
         box-shadow: 0 3px 13px rgba(0, 0, 0, .3);
-        // margin-left: 46px;
         margin-right: 4%;
         margin-bottom: 10px;
-        padding: 1.5%;
+        padding: 0 14px;
         color: #67573e;
-        transition: all 0.4s;
-        cursor: pointer;
-        margin-left: 5%;
-        &_item {
-          width: 111%;
-          min-height: 190px;
-          // border-radius: 15px;
-          // margin-left: 46px;
+        transition: all 0.2s;
+        &_select {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
           padding: 1.5%;
-          box-shadow: 0 5px 20px rgba(103, 87, 62, 0.5);
+          cursor: pointer;          
+        }
+        &_item {
+          width: 100%;
+          padding: 1.5%;
           transition: all 0.4s; 
-          // overflow-y: scroll;
-          margin-left: 5%;       
+          // overflow-y: scroll;      
         }
         .reverseImage {
           transform: rotate(180deg);
         }
     }
-    .shorten {
-      margin-left: 15px;
+    .bottomLine {
+      border-bottom: 0.2px solid #C5BFB7;
     }
   }
+  .borderAngle {
+    border-radius: 0;
+    border: none;
+    margin-bottom: 0;
+  }
 }
+
 
 </style>

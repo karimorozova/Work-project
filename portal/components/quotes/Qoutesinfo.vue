@@ -174,7 +174,7 @@ export default {
         width: 14%;
       }
       .col-5 {
-        width: 22%;
+        width: 23%;
       }
       .colSplit {
         display: flex;
@@ -207,7 +207,7 @@ export default {
           width: 14%;
         }
         .col-5 {
-          width: 22%;
+          width: 23%;
           span {
             border-right: 1px solid #998e7e;
             padding: 0 3px;
