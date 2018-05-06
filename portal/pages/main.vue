@@ -3,6 +3,7 @@
         .clientsTop
             .clientsTop__clientName
                 h2.clientsPortal {{ clientPortal }}
+                span {{ companyName }}
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
@@ -106,7 +107,6 @@ export default {
     getCookie() {
       // let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
-        alert("You've already logged in!");
         return true;
       } else {
         console.log("login failed");
@@ -117,7 +117,7 @@ export default {
     async clientInfo() {
       const result = await this.$axios.request({
         method: "get",
-        url: "/clientsinfo",
+        url: "portal/clientsinfo",
         withCredentials: true
       });
       console.log(result);

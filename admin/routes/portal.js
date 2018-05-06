@@ -22,10 +22,10 @@ router.post('/auth', async (req, res, next) => {
 });
 
 router.get('/clientsinfo', async (req, res) => {
-    var customer = new Customer("", req.cookies.ses);
+    var customer = new ClientApi("", req.cookies.ses);
     const userId = await (customer.userInfo());
-    const fullInfo = await (customer.companyInfo(userId.data.parentId));
-    res.send(fullInfo.data);
+    // const fullInfo = await (customer.companyInfo(userId.data.parentId));
+    res.send(userId.data);
 });
 
 module.exports = router;
