@@ -13,7 +13,8 @@
                 ul.navbar__ulist
                   li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
-                      img(:src="note.img")
+                      img(v-if="!note.active" :src="note.imgWhite") 
+                      img(v-else :src="note.imgBrown")
                     .title(:class="{showTitle: expander}")
                       span {{ note.title }}
                 .logoImage(v-if="expander")
@@ -53,22 +54,26 @@ export default {
       navbarList: [
         {
           title: "DASHBOARD",
-          img: require("../assets/images/dashboard.png"),
+          imgWhite: require("../assets/images/dashboard.png"),
+          imgBrown: require("../assets/images/dashboard-brown.png"),
           active: true
         },
         {
           title: "PROJECTS",
-          img: require("../assets/images/projects.png"),
+          imgWhite: require("../assets/images/projects.png"),
+          imgBrown: require("../assets/images/projects-brown.png"),          
           active: false
         },
         {
           title: "INVOICES",
-          img: require("../assets/images/invoices.png"),
+          imgWhite: require("../assets/images/invoices.png"),
+          imgBrown: require("../assets/images/invoices-brown.png"),
           active: false          
         },
         {
           title: "DOCUMENTS",
-          img: require("../assets/images/documents.png"),
+          imgWhite: require("../assets/images/documents.png"),
+          imgBrown: require("../assets/images/documents-brown.png"),
           active: false          
         }
       ],
@@ -370,6 +375,5 @@ body {
     margin-bottom: 0;
   }
 }
-
 
 </style>
