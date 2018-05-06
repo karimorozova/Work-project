@@ -6,7 +6,23 @@
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
-                .womanWrapper
+                .womanWrapper(@click="showAccountMenu")
+                  .accountMenuWrapper(v-if="accountMenuVisible")
+                    .accountBlock
+                      .accountBlock__info(@mouseover="changeBackgroundColorInfo" :class="{changedBackgroundColorInfo: backgroundColorMenuInfo}")
+                        .icon
+                          img(src="../assets/images/woman.png")
+                        .personal_data
+                          .name Mary Jones
+                          .email mary.j@gmail.com
+                      .accountBlock__myaccount(@mouseover="changeBackgroundColorAccount" :class="{changedBackgroundColorAccount: backgroundColorMenuAccount}")
+                        .human_icon
+                          img(src="../assets/images/man.png")
+                        .my_account My Account
+                      .accountBlock__exit(@mouseover="changeBackgroundColorExit" :class="{changedBackgroundColorExit: backgroundColorMenuExit}")
+                        .icon_exit
+                          img(src="../assets/images/sign-out.png")
+                        .sign_out Sign Out
         .clientsMainWrapper
             .clientsNavbar
               .clientsNavbar__sideBar(:class="{testExpander: expander}")
@@ -80,13 +96,17 @@ export default {
       openQuotes: false,
       openProjects: false,
       expander: false,
+      accountMenuVisible: false,
+      backgroundColorMenuInfo: false,
+      backgroundColorMenuAccount: false,
+      backgroundColorMenuExit: false
     };
   },
   methods: {
     getCookie() {
       // let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
-        alert("You've already logged in!")
+        alert("You've already logged in!");
         return true;
       } else {
         console.log("login failed");
@@ -104,32 +124,44 @@ export default {
       this.companyName = result.data.name;
     },
     expandBar() {
-      this.expander = !this.expander
+      this.expander = !this.expander;
     },
     switchInfo(index) {
-      this.navbarList.forEach( (item, i) => {
-        if(i == index) {
-          item.active = true
+      this.navbarList.forEach((item, i) => {
+        if (i == index) {
+          item.active = true;
         } else {
-          item.active = false
+          item.active = false;
         }
-      })
+      });
     },
     showQuotes() {
       this.openQuotes = !this.openQuotes;
     },
     showProjects() {
       this.openProjects = !this.openProjects;
+    },
+    showAccountMenu() {
+      this.accountMenuVisible = !this.accountMenuVisible;
+    },
+    changeBackgroundColorInfo(){
+      this.backgroundColorMenuInfo = !this.backgroundColorMenuInfo;
+    },
+    changeBackgroundColorAccount(){
+      this.backgroundColorMenuAccount = !this.backgroundColorMenuAccount;
+    },
+    changeBackgroundColorExit(){
+      this.backgroundColorMenuExit = !this.backgroundColorMenuExit;
     }
   },
-  
+
   mounted() {
     this.getCookie();
     this.clientInfo();
   },
   components: {
     Quotesinfo,
-    "projectsInfo": ProjectsInfo
+    projectsInfo: ProjectsInfo
   }
 };
 </script>
@@ -145,7 +177,8 @@ body {
   margin: 0 auto;
   overflow: auto;
 }
-.projectsComponent, .quotesComponent {
+.projectsComponent,
+.quotesComponent {
   width: 80%;
   max-width: 900px;
   display: flex;
@@ -192,8 +225,104 @@ body {
       border-radius: 30px;
       width: 33px;
       height: 33px;
+
+      .accountMenuWrapper {
+        .accountBlock {
+          width: 192px;
+          height: 119px;
+          background-color: #fff;
+          box-shadow: 1px 1px 11px black;
+          position: absolute;
+          top: 4%;
+          left: 87%;
+          border-radius: 6px;
+          &__info {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid #998e7e;
+            padding-top: 3%;
+            padding-bottom: 3%;
+
+            .icon {
+              margin-left: 20%;
+              img {
+                height: 32px;
+              }
+            }
+
+            .personal_data {
+              color: #67573e;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              padding-top: 2%;
+              margin-right: 14%;
+
+              .name {
+                font-size: 12px;
+              }
+
+              .email {
+                font-size: 11px;
+              }
+            }
+          }
+
+          &__myaccount {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            border-bottom: 1px solid #998e7e;
+
+            .human_icon {
+              margin-left: 8%;
+              img {
+                height: 32px;
+              }
+            }
+
+            .my_account {
+              font-size: 12px;
+              color: #67573e;
+              margin-left: 8%;
+            }
+          }
+
+          &__exit {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+
+            .icon_exit {
+              margin-left: 9%;
+              img {
+                height: 32px;
+              }
+            }
+
+            .sign_out {
+              font-size: 12px;
+              color: #67573e;
+              margin-left: 7%;
+            }
+          }
+        }
+      }
     }
   }
+}
+
+.changedBackgroundColorInfo {
+  background-color: #ddd3c8;
+}
+
+.changedBackgroundColorAccount {
+  background-color: #ddd3c8;
+}
+
+.changedBackgroundColorExit {
+  background-color: #ddd3c8;
 }
 
 .clientsMainWrapper {
@@ -241,7 +370,7 @@ body {
       z-index: 1;
     }
     .testExpander {
-      width: 200px
+      width: 200px;
     }
 
     &__openHide {
@@ -297,7 +426,7 @@ body {
       .active {
         background-color: white;
         .title {
-          color: #978D7E;
+          color: #978d7e;
         }
       }
     }
@@ -316,7 +445,7 @@ body {
     }
 
     .balloons {
-      transition: all 0.4s;      
+      transition: all 0.4s;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -325,7 +454,7 @@ body {
       background-repeat: no-repeat;
       width: 80px;
       height: 100px;
-      padding-bottom: 41px;      
+      padding-bottom: 41px;
     }
   }
 
@@ -334,39 +463,39 @@ body {
     flex-direction: column;
     align-items: center;
     &__dropMenu {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      border: 0.4px solid #67573e;
+      border-radius: 18px;
+      box-shadow: 0 3px 13px rgba(0, 0, 0, 0.3);
+      margin-right: 4%;
+      margin-bottom: 10px;
+      padding: 0 14px;
+      color: #67573e;
+      transition: all 0.2s;
+      &_select {
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         width: 100%;
-        border: 0.4px solid #67573e;
-        border-radius: 18px;
-        box-shadow: 0 3px 13px rgba(0, 0, 0, .3);
-        margin-right: 4%;
-        margin-bottom: 10px;
-        padding: 0 14px;
-        color: #67573e;
-        transition: all 0.2s;
-        &_select {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          padding: 1.5%;
-          cursor: pointer;          
-        }
-        &_item {
-          width: 100%;
-          padding: 1.5%;
-          transition: all 0.4s; 
-          // overflow-y: scroll;      
-        }
-        .reverseImage {
-          transform: rotate(180deg);
-        }
+        padding: 1.5%;
+        cursor: pointer;
+      }
+      &_item {
+        width: 100%;
+        padding: 1.5%;
+        transition: all 0.4s;
+        // overflow-y: scroll;
+      }
+      .reverseImage {
+        transform: rotate(180deg);
+      }
     }
     .bottomLine {
-      border-bottom: 0.2px solid #C5BFB7;
+      border-bottom: 0.2px solid #c5bfb7;
     }
   }
   .borderAngle {
@@ -375,5 +504,4 @@ body {
     margin-bottom: 0;
   }
 }
-
 </style>
