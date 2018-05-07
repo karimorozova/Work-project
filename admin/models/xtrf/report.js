@@ -30,8 +30,12 @@ function projectJobs(projectId) {
             for(key in response.data.rows)
             {
                 let data = response.data.rows[key].columns;
-                if(!data[8].includes("Automatic"))
-                    res.push(response.data.rows[key].columns);
+                if(!data[8].includes("Automatic")){
+                    if(data[8].includes("Nguyen")){
+                        res.push(response.data.rows[key].columns);
+                    }                        
+                }
+                    
             }
             resolve(res);
         }).catch(function (error) {

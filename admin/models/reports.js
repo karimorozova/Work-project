@@ -112,7 +112,7 @@ const ReportSchema = new mongoose.Schema({
         default: '',
         trim: true
     },
-    porfitPerc: {
+    profitPerc: {
         type: String,
         default: '',
         trim: true
