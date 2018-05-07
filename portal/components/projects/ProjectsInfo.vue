@@ -35,13 +35,13 @@
                 span Download
         .project-table__body
             .project-table__row(v-for="(quote, index) in clientQuotes")
-                .project-table__col-1 {{ quote.requestOn }}
-                .project-table__col-2 {{ quote.projectId }}
-                .project-table__col-3 {{ quote.projectName }}
-                .project-table__col-4 {{ quote.status }}
-                .project-table__col-5 {{ quote.deadline }}
-                .project-table__col-6 {{ quote.totalCost }}   
-                .project-table__col-7
+                .project-table__col-1(@click="changeBgCol1" :class="{lightbrown: changeBrown}") {{ quote.requestOn }}
+                .project-table__col-2(@click="changeBgCol2" :class="{lightbrown: changeBrown}") {{ quote.projectId }}
+                .project-table__col-3(@click="changeBgCol3" :class="{lightbrown: changeBrown}") {{ quote.projectName }}
+                .project-table__col-4(@click="changeBgCol4" :class="{lightbrown: changeBrown}") {{ quote.status }}
+                .project-table__col-5(@click="changeBgCol5" :class="{lightbrown: changeBrown}") {{ quote.deadline }}
+                .project-table__col-6(@click="changeBgCol6" :class="{lightbrown: changeBrown}") {{ quote.totalCost }}   
+                .project-table__col-7(@click="changeBgCol7" :class="{lightbrown: changeBrown}")
                     img(src="../../assets/images/download.png")
 </template>
 
@@ -56,6 +56,7 @@
     background-color: #998e7e;
     color: white;
     margin-bottom: 5px;
+    align-items: center;
 
     .col_bleach {
         border-right: 1px solid #fff;
@@ -66,7 +67,7 @@
         .double_arrow {
 
           .up {
-            margin-left: -10%;
+            margin-left: -13%;
             margin-bottom: -33%;
             .arrow_up {
               height: 10px;
@@ -93,6 +94,9 @@
   &__row {
     display: flex;
     margin-bottom: 5px;
+    &:hover {
+        background-color: #ddd3c8;
+      }
     &:last-child {
       margin-bottom: 0;
     }
@@ -102,27 +106,40 @@
     &-1 {
       flex-basis: 14.2857%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      line-height: 32px;
     }
     &-2 {
       flex-basis: 14.2857%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      line-height: 32px;
+      cursor: pointer;
     }
     &-3 {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       flex-basis: 28%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      cursor: pointer;
     }
     &-4 {
       flex-basis: 17%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
     }
     &-5 {
       flex-basis: 15%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
     }
     &-6 {
       flex-basis: 10%;
@@ -130,11 +147,13 @@
       padding: 5px;
       display: flex;
       justify-content: center;
+      padding: 0 5px;
+      line-height: 32px;
     }
     &-7 {
       flex-basis: 16%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
     }
   }
 
@@ -161,11 +180,16 @@
   &__col-7 {
     display: flex;
     justify-content: center;
+    align-items: center;
 
     img {
       width: 19px;
       cursor: pointer;
     }
+  }
+
+  .lightbrown {
+    background-color: #f4f0ee;
   }
 }
 </style>
@@ -204,8 +228,33 @@ export default {
           totalCost: "€1000",
           fullInfoAppear: false
         }
-      ]
-    };
+      ],
+      changeBrown: false
+    }
+    ;
+  },
+  methods:{
+    changeBgCol1(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol2(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol3(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol4(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol5(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol6(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol7(){
+      this.changeBrown = !this.changeBrown;
+    }
   }
 };
 </script>

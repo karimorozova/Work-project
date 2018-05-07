@@ -8,13 +8,12 @@
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow.png")
                     .col
-                        .col__title 
+                        .col__title
                             span Project ID
                             img(src="../../assets/images/white-arrow.png")                        
                     .col.col-5
                         .col__title 
                             span Project Name
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -23,7 +22,6 @@
                     .col.col-4
                         .col__title 
                             span Status
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -32,7 +30,6 @@
                     .col
                         .col__title 
                             span Deadline
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -47,7 +44,7 @@
             .shortInfo
                 .row__columns_info
                     .col {{ quote.requestOn }}
-                    .col {{ quote.projectId }}
+                    .col.proj {{ quote.projectId }}
                     .col.col-5 {{ quote.projectName }}
                     .col.col-4 {{ quote.status }}
                     .col {{ quote.deadline }}
@@ -143,6 +140,9 @@ export default {
     flex-direction: column;
     .shortInfo {
       display: flex;
+      &:hover {
+        background-color: #ddd3c8;
+      }
     }
     &__icon {
       width: 4%;
@@ -162,6 +162,7 @@ export default {
       width: 100%;
       display: flex;
       background-color: #998e7e;
+      align-items: center;
       .col {
         display: flex;
         align-items: center;
@@ -244,11 +245,15 @@ export default {
             border-right: none;
           }
         }
+        .proj {
+            cursor: pointer;
+          }
         .col-4 {
           width: 14%;
         }
         .col-5 {
           width: 23%;
+          cursor: pointer;
           span {
             border-right: 1px solid #998e7e;
             padding: 0 3px;
