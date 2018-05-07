@@ -140,6 +140,9 @@ export default {
     flex-direction: column;
     .shortInfo {
       display: flex;
+      &:hover {
+        background-color: #ddd3c8;
+      }
     }
     &__icon {
       width: 4%;

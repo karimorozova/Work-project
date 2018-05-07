@@ -40,23 +40,24 @@
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
                 //- .pointer(:class='"position-" + activeIndex')
-            .mainInfo  
-              .buttonPanel
-                button.quote New Quote
-                button.project New Project
-              .clientsAll
-                  .quotesComponent
-                    .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                      .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
-                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
-                      .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                        Quotesinfo
-                  .projectsComponent
-                    .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
-                      .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
-                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
-                      .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                        projectsInfo
+            .maininfoWrapper
+              .mainInfo  
+                .buttonPanel
+                  button.quote New Quote
+                  button.project New Project
+                .clientsAll
+                    .quotesComponent
+                      .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                        .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
+                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
+                        .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                          Quotesinfo
+                    .projectsComponent
+                      .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
+                        .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
+                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
+                        .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
+                          projectsInfo
 </template>
 
 <script>
@@ -326,6 +327,14 @@ body {
   display: flex;
   // justify-content: flex-start;
   height: 95%;
+
+  .maininfoWrapper {
+    width: 88%;
+    position: absolute;
+    top: 6%;
+    left: 9%;
+  }
+
   .mainInfo {
     display: flex;
     flex-direction: column;
@@ -334,6 +343,7 @@ body {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 5%;
+      margin-right: -15%;
 
       button {
         color: #fff;

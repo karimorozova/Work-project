@@ -35,13 +35,13 @@
                 span Download
         .project-table__body
             .project-table__row(v-for="(quote, index) in clientQuotes")
-                .project-table__col-1 {{ quote.requestOn }}
-                .project-table__col-2 {{ quote.projectId }}
-                .project-table__col-3 {{ quote.projectName }}
-                .project-table__col-4 {{ quote.status }}
-                .project-table__col-5 {{ quote.deadline }}
-                .project-table__col-6 {{ quote.totalCost }}   
-                .project-table__col-7
+                .project-table__col-1(@click="changeBgCol1" :class="{lightbrown: changeBrown}") {{ quote.requestOn }}
+                .project-table__col-2(@click="changeBgCol2" :class="{lightbrown: changeBrown}") {{ quote.projectId }}
+                .project-table__col-3(@click="changeBgCol3" :class="{lightbrown: changeBrown}") {{ quote.projectName }}
+                .project-table__col-4(@click="changeBgCol4" :class="{lightbrown: changeBrown}") {{ quote.status }}
+                .project-table__col-5(@click="changeBgCol5" :class="{lightbrown: changeBrown}") {{ quote.deadline }}
+                .project-table__col-6(@click="changeBgCol6" :class="{lightbrown: changeBrown}") {{ quote.totalCost }}   
+                .project-table__col-7(@click="changeBgCol7" :class="{lightbrown: changeBrown}")
                     img(src="../../assets/images/download.png")
 </template>
 
@@ -94,6 +94,9 @@
   &__row {
     display: flex;
     margin-bottom: 5px;
+    &:hover {
+        background-color: #ddd3c8;
+      }
     &:last-child {
       margin-bottom: 0;
     }
@@ -184,6 +187,10 @@
       cursor: pointer;
     }
   }
+
+  .lightbrown {
+    background-color: #f4f0ee;
+  }
 }
 </style>
 
@@ -221,8 +228,33 @@ export default {
           totalCost: "€1000",
           fullInfoAppear: false
         }
-      ]
-    };
+      ],
+      changeBrown: false
+    }
+    ;
+  },
+  methods:{
+    changeBgCol1(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol2(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol3(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol4(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol5(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol6(){
+      this.changeBrown = !this.changeBrown;
+    },
+    changeBgCol7(){
+      this.changeBrown = !this.changeBrown;
+    }
   }
 };
 </script>
