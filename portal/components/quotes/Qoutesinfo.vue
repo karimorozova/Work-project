@@ -8,13 +8,12 @@
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow.png")
                     .col
-                        .col__title 
+                        .col__title
                             span Project ID
                             img(src="../../assets/images/white-arrow.png")                        
                     .col.col-5
                         .col__title 
                             span Project Name
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -23,7 +22,6 @@
                     .col.col-4
                         .col__title 
                             span Status
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -32,7 +30,6 @@
                     .col
                         .col__title 
                             span Deadline
-                            //- img(src="../../assets/images/white-arrow.png")
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
@@ -250,6 +247,7 @@ export default {
         }
         .col-5 {
           width: 23%;
+          cursor: pointer;
           span {
             border-right: 1px solid #998e7e;
             padding: 0 3px;
