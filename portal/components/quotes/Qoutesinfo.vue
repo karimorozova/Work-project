@@ -162,6 +162,7 @@ export default {
       width: 100%;
       display: flex;
       background-color: #998e7e;
+      align-items: center;
       .col {
         border-right: 1px solid white;
         color: white;

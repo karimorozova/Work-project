@@ -10,17 +10,17 @@
                 .womanWrapper(@click="showAccountMenu")
                   .accountMenuWrapper(v-if="accountMenuVisible")
                     .accountBlock
-                      .accountBlock__info(@mouseover="changeBackgroundColorInfo" :class="{changedBackgroundColorInfo: backgroundColorMenuInfo}")
+                      .accountBlock__info
                         .icon
                           img(src="../assets/images/woman.png")
                         .personal_data
                           .name Mary Jones
                           .email mary.j@gmail.com
-                      .accountBlock__myaccount(@mouseover="changeBackgroundColorAccount" :class="{changedBackgroundColorAccount: backgroundColorMenuAccount}")
+                      .accountBlock__myaccount
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
-                      .accountBlock__exit(@mouseover="changeBackgroundColorExit" :class="{changedBackgroundColorExit: backgroundColorMenuExit}")
+                      .accountBlock__exit
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
@@ -97,10 +97,7 @@ export default {
       openQuotes: false,
       openProjects: false,
       expander: false,
-      accountMenuVisible: false,
-      backgroundColorMenuInfo: false,
-      backgroundColorMenuAccount: false,
-      backgroundColorMenuExit: false
+      accountMenuVisible: false
     };
   },
   methods: {
@@ -143,15 +140,6 @@ export default {
     },
     showAccountMenu() {
       this.accountMenuVisible = !this.accountMenuVisible;
-    },
-    changeBackgroundColorInfo(){
-      this.backgroundColorMenuInfo = !this.backgroundColorMenuInfo;
-    },
-    changeBackgroundColorAccount(){
-      this.backgroundColorMenuAccount = !this.backgroundColorMenuAccount;
-    },
-    changeBackgroundColorExit(){
-      this.backgroundColorMenuExit = !this.backgroundColorMenuExit;
     }
   },
 
@@ -267,6 +255,9 @@ body {
                 font-size: 11px;
               }
             }
+            &:hover{
+              background-color: #ddd3c8;
+            }
           }
 
           &__myaccount {
@@ -287,6 +278,9 @@ body {
               color: #67573e;
               margin-left: 8%;
             }
+            &:hover{
+              background-color: #ddd3c8;
+            }
           }
 
           &__exit {
@@ -305,6 +299,9 @@ body {
               font-size: 12px;
               color: #67573e;
               margin-left: 7%;
+            }
+            &:hover{
+              background-color: #ddd3c8;
             }
           }
         }

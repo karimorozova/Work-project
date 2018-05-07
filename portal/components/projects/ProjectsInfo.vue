@@ -56,6 +56,7 @@
     background-color: #998e7e;
     color: white;
     margin-bottom: 5px;
+    align-items: center;
 
     .col_bleach {
         border-right: 1px solid #fff;
@@ -66,7 +67,7 @@
         .double_arrow {
 
           .up {
-            margin-left: -10%;
+            margin-left: -13%;
             margin-bottom: -33%;
             .arrow_up {
               height: 10px;
@@ -102,27 +103,38 @@
     &-1 {
       flex-basis: 14.2857%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      line-height: 32px;
     }
     &-2 {
       flex-basis: 14.2857%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      line-height: 32px;
     }
     &-3 {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       flex-basis: 28%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
     }
     &-4 {
       flex-basis: 17%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
     }
     &-5 {
       flex-basis: 15%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
     }
     &-6 {
       flex-basis: 10%;
@@ -130,11 +142,13 @@
       padding: 5px;
       display: flex;
       justify-content: center;
+      padding: 0 5px;
+      line-height: 32px;
     }
     &-7 {
       flex-basis: 16%;
       border: 1px solid #978D7E;
-      padding: 5px;
+      padding: 0 5px;
     }
   }
 
@@ -161,6 +175,7 @@
   &__col-7 {
     display: flex;
     justify-content: center;
+    align-items: center;
 
     img {
       width: 19px;
