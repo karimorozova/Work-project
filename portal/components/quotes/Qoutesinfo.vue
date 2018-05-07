@@ -163,9 +163,12 @@ export default {
       display: flex;
       background-color: #998e7e;
       .col {
-        border-right: 1px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-right: 0.5px solid white;
         color: white;
-        padding: 5px;
+        padding: 0 5px;
         width: 12%;
         &:last-child {
           border-right: none;
@@ -175,6 +178,7 @@ export default {
           align-items: center;
           justify-content: space-between;
           padding: 0 5px;
+          width: 100%;
           img {
             height: 10px;
             cursor: pointer;
@@ -220,10 +224,12 @@ export default {
           display: flex;
           justify-content: center;
           align-items: center;
+          height: 100%;
         }
         .col__title {
           border-right: 1px solid white;
-          width: 36%;  
+          width: 35%;
+          height: 100%;
         }
       }
       &_info {
