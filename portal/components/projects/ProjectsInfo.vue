@@ -111,6 +111,7 @@
       border: 1px solid #978D7E;
       padding: 0 5px;
       line-height: 32px;
+      cursor: pointer;
     }
     &-3 {
       display: flex;
@@ -119,6 +120,7 @@
       flex-basis: 28%;
       border: 1px solid #978D7E;
       padding: 0 5px;
+      cursor: pointer;
     }
     &-4 {
       flex-basis: 17%;

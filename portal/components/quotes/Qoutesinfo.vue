@@ -44,7 +44,7 @@
             .shortInfo
                 .row__columns_info
                     .col {{ quote.requestOn }}
-                    .col {{ quote.projectId }}
+                    .col.proj {{ quote.projectId }}
                     .col.col-5 {{ quote.projectName }}
                     .col.col-4 {{ quote.status }}
                     .col {{ quote.deadline }}
@@ -242,6 +242,9 @@ export default {
             border-right: none;
           }
         }
+        .proj {
+            cursor: pointer;
+          }
         .col-4 {
           width: 14%;
         }
