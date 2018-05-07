@@ -18,7 +18,9 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
-        form.mainForm(@submit.prevent="checkForm")
+        form.mainForm(@submit="checkForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" )
+          input(type="hidden" name="oid" value="00D1r000001nlsn")
+          input(type="hidden" name="retURL" value="http://www.pangea.global/thank-you")
           .number 
             span 1
             label.asterisk SERVICE TYPE      
@@ -30,6 +32,7 @@
               .service-type__drop(v-if='serviceDrop')
                 .service-type__drop-list
                   span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
+                  input#00N1r00000HRi9E(maxlength="255" name="00N1r00000HRi9E" size="20" type="hidden" :value="serviceSelect.title")
           .number 
             span 2
             label.asterisk SELECT A LANGUAGE
@@ -51,6 +54,7 @@
                       .pair.pair_dialect(@click='changeSourceDialect(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
+              input#00N1r00000HRi9J(maxlength="255" name="00N1r00000HRi9J" size="20" type="hidden" :value="sourceSelect.lang")
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
@@ -79,6 +83,7 @@
                       .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+              input#00N1r00000HRiDb(name="00N1r00000HRiDb" maxlength="255" size="20" type="hidden" :value="targetLangForSales")
           .number 
             span 3
             label.asterisk CHOOSE AN INDUSTRY
@@ -119,6 +124,7 @@
               .image
               .image-white
               p Other
+            input#00N1r00000HRiDg(maxlength="255" name="00N1r00000HRiDg" size="20" type="hidden" :value="industrySelect")
           .number
             span 4
             label PROJECT DETAILS
@@ -218,6 +224,7 @@
             .details__brief
               span.details__brief-title Enter a short brief
               textarea(rows='10' v-model='brief')
+            input#00N1r00000HRiDv(name="00N1r00000HRiDv" size="12" type="hidden" :value="deadlineDate")
           .number
             span 5
             label CONTACT DETAILS
@@ -226,22 +233,29 @@
               .contact__col-item.name
                 span.asterisk Name
                 input(type='text' name='formContactsName' v-model='contactName')
-              .contact__col-item.email
+                input#first_name(maxlength="255" name="first_name" size="20" type="hidden" :value="first_name")
+                input#last_name(maxlength="255" name="last_name" size="20" type="hidden" :value="last_name")
+              .contact__col-item.e-mail
                 span.asterisk Email
                 input(type='text' name='formContactsMail' v-model='contactEmail')
-              .contact__col-item.phone
+                input#email(maxlength="80" name="email" size="20" type="hidden" :value="contactEmail")
+              .contact__col-item.phones
                 span Phone Number
                 input(type='text' v-model='phone')
+                input#phone(maxlength="40" name="phone" size="20" type="hidden" :value="phone")
             .contact__col
-              .contact__col-item.company
+              .contact__col-item.company-name
                 span.asterisk Company Name
                 input(type='text' v-model='companyName')
+                input#company(maxlength="40" name="company" size="20" type="hidden" :value="companyName")
               .contact__col-item.website
                 span Website
                 input(type='text' v-model='web')
+                input#URL(maxlength="80" name="URL" size="20" type="hidden" :value="web")
               .contact__col-item.skype
                 span Skype Name
                 input(type='text' v-model='contactSkype')
+                input#00N1r00000HRiEF(maxlength="255" name="00N1r00000HRiEF" size="20" type="hidden" :value="contactSkype")
           .captcha
             //- span.asterisk Please, confirm that you are not a robot   
             //- .captcha__google
@@ -254,8 +268,8 @@
               //-     "-webkit-transform": "scale(0.77)",
               //-     "transform-origin": "150px 0",
               //-     "-webkit-transform-origin": "150px 0" })
-            input(id="00N1r00000Fie4G" name="00N1r00000Fie4G" type="hidden")
-            input.buttons(type='submit' value='Submit')
+            input#00N1r00000Fie4G(name="00N1r00000Fie4G" type="hidden" maxlength="255" size="20")
+            input.buttons(type='submit' value='Submit' name="submit")
           .warning(v-if="error")
             .message
               .closeWarning(@click="closeWarning")
@@ -501,6 +515,10 @@ export default {
     }
   },
   methods: {
+    testForm(){
+      console.log("ALRAMAAA");
+      return false;
+    },
     handleDrop(data, event) {
       event.preventDefault();
       const files = event.dataTransfer.files;
@@ -734,6 +752,32 @@ export default {
         }
       })
     },
+    // salesForm() {
+    //   var send = {
+    //     "oid": "00D1r000001nlsn",
+    //     "00N1r00000HRi9E": this.serviceSelect.title,
+    //     "00N1r00000HRi9J": this.sourceSelect.lang,
+    //     "00N1r00000HRiDb": this.targetLangForSales,
+    //     "00N1r00000HRiDg": this.industrySelect,
+    //     "00N1r00000HRiDv": this.deadlineDate,
+    //     "00N1r00000HRiE5": this.contactName,
+    //     "email": this.contactEmail,
+    //     "phone": this.phone,
+    //     "company": this.companyName,
+    //     "URL": this.web,
+    //     "00N1r00000HRiEF": this.contactSkype,
+    //     "00N1r00000Fie4G": ''
+    //   }
+     
+    //   try {
+    //     this.$axios.post('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', send);
+    //     console.log('SalesForse has been sent');
+    //     console.log(send)
+    //   } catch(err) {
+    //     console.log("Failed to send a post-request: " + err)
+    //   }
+      
+    // },
     async sendForm() {
 
         var sendForm = new FormData();
@@ -816,6 +860,7 @@ export default {
       } 
       // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
+        // this.salesForm();
         this.sendForm();
         window.top.location.href = "https://www.pangea.global/thank-you"; 
         // this.clearForm();
@@ -823,6 +868,7 @@ export default {
       } else {
         this.showError()
       }
+      return true;
     },
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -864,6 +910,16 @@ export default {
     }
   },
   computed: {
+    first_name() {
+      return this.contactName.split(" ")[0]
+    },
+    last_name() {
+      let result = "";
+      if(this.contactName.split(" ").length > 1) {
+        result = this.contactName.split(" ")[1]
+      }
+      return result
+    },
     sortedLanguages() {
       let moveToStart;
       for(let i = 0; i < this.languages.length; i++) {
@@ -874,6 +930,13 @@ export default {
       }
       return this.languages;
     },
+    targetLangForSales() {
+      let result = '';
+      this.targetSelect.forEach(item => {
+        result += item.lang + ', '
+      })
+      return result;
+    }
   },
   watch: {
     deadlineSelect() {
