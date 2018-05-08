@@ -752,32 +752,6 @@ export default {
         }
       })
     },
-    // salesForm() {
-    //   var send = {
-    //     "oid": "00D1r000001nlsn",
-    //     "00N1r00000HRi9E": this.serviceSelect.title,
-    //     "00N1r00000HRi9J": this.sourceSelect.lang,
-    //     "00N1r00000HRiDb": this.targetLangForSales,
-    //     "00N1r00000HRiDg": this.industrySelect,
-    //     "00N1r00000HRiDv": this.deadlineDate,
-    //     "00N1r00000HRiE5": this.contactName,
-    //     "email": this.contactEmail,
-    //     "phone": this.phone,
-    //     "company": this.companyName,
-    //     "URL": this.web,
-    //     "00N1r00000HRiEF": this.contactSkype,
-    //     "00N1r00000Fie4G": ''
-    //   }
-     
-    //   try {
-    //     this.$axios.post('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', send);
-    //     console.log('SalesForse has been sent');
-    //     console.log(send)
-    //   } catch(err) {
-    //     console.log("Failed to send a post-request: " + err)
-    //   }
-      
-    // },
     async sendForm() {
 
         var sendForm = new FormData();
@@ -860,7 +834,6 @@ export default {
       } 
       // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
-        // this.salesForm();
         this.sendForm();
         window.top.location.href = "https://www.pangea.global/thank-you"; 
         // this.clearForm();
@@ -895,7 +868,7 @@ export default {
     },
     gclid() {
       window.onload = function getGclid() {        
-      document.getElementById("00N1r00000Fie4G").value = (name = new     RegExp('(?:^|;\\s*)gclid=([^;]*)').exec(document.cookie)) ? 
+      document.getElementById("00N1r00000Fie4G").value = (name = new RegExp('(?:^|;\\s*)gclid=([^;]*)').exec(document.cookie)) ? 
       name.split(",")[1] : ""; }
     },
     google() {
@@ -956,11 +929,11 @@ export default {
     Drop
   },
   mounted(){
+    this.gclid();
+    this.google();
     this.getServices();
     this.getLanguages();
     this.salesForce();
-    this.gclid();
-    this.google();
     sbjs.init({ callback: this.go });
     console.log(sbjs.get.current.src);
   }

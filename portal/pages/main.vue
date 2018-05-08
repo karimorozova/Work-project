@@ -2,8 +2,8 @@
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
-                h2.clientsPortal {{ clientPortal }}
-                span {{ companyName }}
+                h2.clientsPortal {{ clientPortal }}  
+                  span(v-if="companyName") >> {{ companyName }}
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
@@ -143,10 +143,9 @@ export default {
       this.accountMenuVisible = !this.accountMenuVisible;
     }
   },
-
   mounted() {
     this.getCookie();
-    this.clientInfo();
+    this.clientInfo()
   },
   components: {
     Quotesinfo,
@@ -325,14 +324,13 @@ body {
 
 .clientsMainWrapper {
   display: flex;
-  // justify-content: flex-start;
   height: 95%;
-
+  position: relative;
   .maininfoWrapper {
-    width: 88%;
+    width: 100%;
     position: absolute;
-    top: 6%;
-    left: 9%;
+    top: 2%;
+    left: 11%;
   }
 
   .mainInfo {
@@ -343,7 +341,6 @@ body {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 5%;
-      margin-right: -15%;
 
       button {
         color: #fff;
@@ -374,7 +371,7 @@ body {
       align-items: center;
       box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
       transition: all 0.5s;
-      z-index: 1;
+      z-index: 2;
     }
     .testExpander {
       width: 200px;
@@ -389,6 +386,7 @@ body {
       right: 0px;
       text-align: center;
       cursor: pointer;
+      z-index: 1;
       .icon {
         font-size: 32px;
       }
