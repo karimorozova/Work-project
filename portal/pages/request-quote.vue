@@ -18,7 +18,7 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
-        form.mainForm(@submit="checkForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" )
+        form.mainForm(ref="myForm" @submit="checkForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" )
           input(type="hidden" name="oid" value="00D1r000001nlsn")
           input(type="hidden" name="retURL" value="http://www.pangea.global/thank-you")
           .number 
@@ -223,8 +223,8 @@
                       span.type-text {{ type }}
             .details__brief
               span.details__brief-title Enter a short brief
-              textarea(rows='10' v-model='brief')
-            input#00N1r00000HRiDv(name="00N1r00000HRiDv" size="12" type="hidden" :value="deadlineDate")
+              textarea#00N1r00000HRiE0(name="00N1r00000HRiE0" rows='10' v-model='brief')
+            input#00N1r00000HRiDv(name="00N1r00000HRiDv" size="12" type="hidden" :value="deadlineSelect")
           .number
             span 5
             label CONTACT DETAILS
@@ -233,8 +233,9 @@
               .contact__col-item.name
                 span.asterisk Name
                 input(type='text' name='formContactsName' v-model='contactName')
-                input#first_name(maxlength="255" name="first_name" size="20" type="hidden" :value="first_name")
-                input#last_name(maxlength="255" name="last_name" size="20" type="hidden" :value="last_name")
+                input#first_name(maxlength="255" name="first_name" size="20" type="hidden" :value="contactName")
+                input#last_name(maxlength="255" name="last_name" size="20" type="hidden" value="_")
+                input#00N1r00000HRiE5(maxlength="255" name="00N1r00000HRiE5" size="20" type="hidden" :value="contactName")
               .contact__col-item.e-mail
                 span.asterisk Email
                 input(type='text' name='formContactsMail' v-model='contactEmail')
@@ -268,7 +269,7 @@
               //-     "-webkit-transform": "scale(0.77)",
               //-     "transform-origin": "150px 0",
               //-     "-webkit-transform-origin": "150px 0" })
-            input#00N1r00000Fie4G(name="00N1r00000Fie4G" type="hidden" maxlength="255" size="20")
+            input#00N1r00000Fie4G(maxlength="255" name="00N1r00000Fie4G" size="20" type="hidden")
             input.buttons(type='submit' value='Submit' name="submit")
           .warning(v-if="error")
             .message
@@ -345,7 +346,6 @@ import Datepicker from './../components/Datepicker.vue';
 // import VueRecaptcha from 'vue-recaptcha';
 import { Drag, Drop } from 'vue-drag-drop';
 
-// import Clock from './../components/Clock.vue';
 var sbjs = require('sourcebuster');
 
 export default {
@@ -354,18 +354,9 @@ export default {
   },
   data () {
     return {
-      // options: {
-      //   acceptedFileTypes: ['image/*', 'text/*'],
-      //   clickable: false,
-      //   adapterOptions: {
-      //     url: './',
-      //   },
-      // },
-      // files: [],
       state: {
         highlighted: {
           days: [6, 0]
-          // dates: [new Date()]
         },
         disabled: {
           to: moment().add(-1, 'day').endOf('day').toDate()
@@ -515,10 +506,6 @@ export default {
     }
   },
   methods: {
-    testForm(){
-      console.log("ALRAMAAA");
-      return false;
-    },
     handleDrop(data, event) {
       event.preventDefault();
       const files = event.dataTransfer.files;
@@ -698,14 +685,6 @@ export default {
     // onExpired: function () {
     //   console.log('Expired')
     // },
-    formControl(){
-      const check = this.checkForm();
-        if(!check){
-          return;
-        }
-        this.sendForm();
-        this.clearForm();
-    },
     showSuccess(){
       this.success = true;
 
@@ -752,32 +731,6 @@ export default {
         }
       })
     },
-    // salesForm() {
-    //   var send = {
-    //     "oid": "00D1r000001nlsn",
-    //     "00N1r00000HRi9E": this.serviceSelect.title,
-    //     "00N1r00000HRi9J": this.sourceSelect.lang,
-    //     "00N1r00000HRiDb": this.targetLangForSales,
-    //     "00N1r00000HRiDg": this.industrySelect,
-    //     "00N1r00000HRiDv": this.deadlineDate,
-    //     "00N1r00000HRiE5": this.contactName,
-    //     "email": this.contactEmail,
-    //     "phone": this.phone,
-    //     "company": this.companyName,
-    //     "URL": this.web,
-    //     "00N1r00000HRiEF": this.contactSkype,
-    //     "00N1r00000Fie4G": ''
-    //   }
-     
-    //   try {
-    //     this.$axios.post('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', send);
-    //     console.log('SalesForse has been sent');
-    //     console.log(send)
-    //   } catch(err) {
-    //     console.log("Failed to send a post-request: " + err)
-    //   }
-      
-    // },
     async sendForm() {
 
         var sendForm = new FormData();
@@ -827,7 +780,8 @@ export default {
 
     },
     
-    checkForm() {
+    checkForm(event) {
+      console.log("in check form");
       this.request = {
           date: this.deadlineSelect, 
           contactName: this.contactName, 
@@ -860,43 +814,22 @@ export default {
       } 
       // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
-        // this.salesForm();
         this.sendForm();
-        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        
+        // window.top.location.href = "https://www.pangea.global/thank-you"; 
         // this.clearForm();
         // this.showSuccess()
       } else {
-        this.showError()
+        this.showError();
+        
+        event.preventDefault();
       }
-      return true;
+      //this.$refs.myForm.submit();
+      
     },
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
-    },
-    salesForce() {
-      function setCookie(name, value, days, dom){
-          var date = new Date();
-          date.setTime(date.getTime() + (days*24*60*60*1000)); 
-          var expires = "; expires=" + date.toGMTString();
-          document.cookie = name + "=" + value + expires + "; domain=" + dom;
-      }
-      function getParam(p){
-          var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
-          return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-      }
-      var gclid = getParam('gclid');
-      if(gclid){
-          var gclsrc = getParam('gclsrc');
-          if(!gclsrc || gclsrc.indexOf('aw') !== -1){
-              setCookie('gclid', gclid, 90, '.pangea.global');
-          }
-      }
-    },
-    gclid() {
-      window.onload = function getGclid() {        
-      document.getElementById("00N1r00000Fie4G").value = (name = new     RegExp('(?:^|;\\s*)gclid=([^;]*)').exec(document.cookie)) ? 
-      name.split(",")[1] : ""; }
     },
     google() {
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -910,16 +843,6 @@ export default {
     }
   },
   computed: {
-    first_name() {
-      return this.contactName.split(" ")[0]
-    },
-    last_name() {
-      let result = "";
-      if(this.contactName.split(" ").length > 1) {
-        result = this.contactName.split(" ")[1]
-      }
-      return result
-    },
     sortedLanguages() {
       let moveToStart;
       for(let i = 0; i < this.languages.length; i++) {
@@ -956,11 +879,10 @@ export default {
     Drop
   },
   mounted(){
+    // this.gclid();
+    this.google();
     this.getServices();
     this.getLanguages();
-    this.salesForce();
-    this.gclid();
-    this.google();
     sbjs.init({ callback: this.go });
     console.log(sbjs.get.current.src);
   }
