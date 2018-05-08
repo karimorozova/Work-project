@@ -340,10 +340,12 @@ body {
   }
 
   .detailedInfoWrapper {
-    width: 54%;
+    width: 34%;
     position: absolute;
-    top: 29%;
-    left: 31%;
+    top: 31%;
+    left: 30%;
+    max-width: 919px;
+    width: 100%;
   }
   
   .mainInfo {
