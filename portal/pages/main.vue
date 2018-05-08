@@ -58,11 +58,14 @@
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                           projectsInfo
+            .detailedInfoWrapper
+              quotesInfoDetailed
 </template>
 
 <script>
 import Quotesinfo from "../components/quotes/Qoutesinfo";
 import ProjectsInfo from "../components/projects/ProjectsInfo";
+import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed"
 
 export default {
   data() {
@@ -150,7 +153,8 @@ export default {
   },
   components: {
     Quotesinfo,
-    projectsInfo: ProjectsInfo
+    projectsInfo: ProjectsInfo,
+    quotesInfoDetailed: QuotesInfoDetailed
   }
 };
 </script>
@@ -335,6 +339,13 @@ body {
     left: 9%;
   }
 
+  .detailedInfoWrapper {
+    width: 54%;
+    position: absolute;
+    top: 29%;
+    left: 31%;
+  }
+  
   .mainInfo {
     display: flex;
     flex-direction: column;
