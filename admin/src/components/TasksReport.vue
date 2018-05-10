@@ -13,12 +13,14 @@
           td {{ res.sourceLanguage }}
           td {{ res.targetLanguage }}
           td {{ res.projectService }}
-          td {{ res.providerName }}
-          td {{ res.jobService }}
-          td {{ res.providerRate }}
-          td {{ res.wordcount }}
-          td {{ res.wordcountRelative }}
-          td {{ res.totalCost }}
+          td 
+            tr(v-for="vendor in res.vendors")
+              td {{ vendor.providerName }}
+              td {{ vendor.jobService }}
+              td {{ vendor.providerRate }}
+              td {{ vendor.wordcount }}
+              td {{ vendor.wordcountRelative }}
+              td {{ vendor.totalCost }}
           td {{ res.clientName }}
           td {{ res.clientRate }}
           td {{ res.wordcountReceivable }}
@@ -40,7 +42,7 @@ export default {
     return {
       summary : [],
       titles: ["Project ID", "Project Name", "Start Date and Time", "Project Deadline", "Source Language", "Target Language", "Project Service", 
-      "Provider Name", "Service", "Rate [Provider]", "Wordcount", "Relative Wordcount", "Total Cost", 
+      "Provider Name", "Service", "Rate [Provider]", "Wordcount", "Relative Wordcount", "Total Cost", "Provider Name", "Service", "Rate [Provider]", "Wordcount", "Relative Wordcount", "Total Cost",
       "Client Name", "Rate [Client]", "Wordcount [Receivable]", "Sum [Step1]", "Sum [Step2]", "Sum [Receivable]", "Total Agreed", 
       "Profit", "Profit in %", "Internal Special Instructions", "Invoiced"
       ]      

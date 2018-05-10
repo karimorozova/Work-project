@@ -16,7 +16,7 @@
                         .personal_data
                           .name Mary Jones
                           .email mary.j@gmail.com
-                      .accountBlock__myaccount
+                      .accountBlock__myaccount(@click="showAccountInfo")
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
@@ -39,8 +39,8 @@
               .clientsNavbar__openHide
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
-            .maininfoWrapper(v-if="!detailedInfoVisible")
-              .mainInfo  
+            .maininfoWrapper
+              .mainInfo(v-if="mainShow")
                 .buttonPanel
                   button.quote New Quote
                   button.project New Project
@@ -58,20 +58,23 @@
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                           projectsInfo
-            .detailedInfoWrapper(v-if="detailedInfoVisible")
-              quotesInfoDetailed
+            .detailedInfoWrapper
+              quotesInfoDetailed(v-if="false")
+            Accountinfo(v-if="accountInfo")
 </template>
 
 <script>
 import Quotesinfo from "../components/quotes/Qoutesinfo";
 import ProjectsInfo from "../components/projects/ProjectsInfo";
-import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed"
+import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
+import Accountinfo from "../components/account/Accountinfo";
 
 export default {
   data() {
     return {
       companyName: "",
       clientPortal: "CLIENT PORTAL",
+      mainShow: true,
       navbarList: [
         {
           title: "DASHBOARD",
@@ -102,7 +105,7 @@ export default {
       openProjects: false,
       expander: false,
       accountMenuVisible: false,
-      detailedInfoVisible: false
+      accountInfo: false
     };
   },
   methods: {
@@ -148,6 +151,10 @@ export default {
     },
     showAccountMenu() {
       this.accountMenuVisible = !this.accountMenuVisible;
+    },
+    showAccountInfo() {
+      this.accountInfo = true;
+      this.mainShow = false;
     }
   },
   mounted() {
@@ -157,7 +164,8 @@ export default {
   components: {
     Quotesinfo,
     projectsInfo: ProjectsInfo,
-    quotesInfoDetailed: QuotesInfoDetailed
+    quotesInfoDetailed: QuotesInfoDetailed,
+    Accountinfo
   }
 };
 </script>
@@ -221,6 +229,7 @@ body {
       border-radius: 30px;
       width: 33px;
       height: 33px;
+      position: relative;
 
       .accountMenuWrapper {
         .accountBlock {
@@ -229,9 +238,10 @@ body {
           background-color: #fff;
           box-shadow: 1px 1px 11px black;
           position: absolute;
-          top: 4%;
-          left: 87%;
+          top: 50px;
+          right: -15px;
           border-radius: 6px;
+          z-index: 5;
           &__info {
             display: flex;
             justify-content: space-around;
@@ -263,9 +273,6 @@ body {
                 font-size: 11px;
               }
             }
-            &:hover{
-              background-color: #ddd3c8;
-            }
           }
 
           &__myaccount {
@@ -273,7 +280,7 @@ body {
             justify-content: flex-start;
             align-items: center;
             border-bottom: 1px solid #998e7e;
-
+            cursor: pointer;
             .human_icon {
               margin-left: 8%;
               img {
@@ -295,7 +302,7 @@ body {
             display: flex;
             justify-content: flex-start;
             align-items: center;
-
+            cursor: default;
             .icon_exit {
               margin-left: 9%;
               img {

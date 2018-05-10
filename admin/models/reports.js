@@ -37,41 +37,48 @@ const ReportSchema = new mongoose.Schema({
         default: '',
         trim: true
     },
-    jobId: {
+    commonJobId:{
         type: String,
         default: '',
-        trim: true
+        trim: true,
     },
-    providerName: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    jobService: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    providerRate: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    wordcount: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    wordcountRelative: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    totalCost: {
-        type: String,
-        default: '',
-        trim: true
-    },
+    vendors:[{
+        jobId: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        providerName: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        jobService: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        providerRate: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        wordcount: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        wordcountRelative: {
+            type: String,
+            default: '',
+            trim: true
+        },
+        totalCost: {
+            type: String,
+            default: '',
+            trim: true
+        }
+    }],    
     clientName: {
         type: String,
         default: '',
