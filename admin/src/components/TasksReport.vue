@@ -13,14 +13,13 @@
           td {{ res.sourceLanguage }}
           td {{ res.targetLanguage }}
           td {{ res.projectService }}
-          td 
-            tr(v-for="vendor in res.vendors")
-              td {{ vendor.providerName }}
-              td {{ vendor.jobService }}
-              td {{ vendor.providerRate }}
-              td {{ vendor.wordcount }}
-              td {{ vendor.wordcountRelative }}
-              td {{ vendor.totalCost }}
+          template(v-for="vendor in res.vendors")
+            td {{ vendor.providerName }}  
+            td {{ vendor.jobService }}
+            td {{ vendor.providerRate }}
+            td {{ vendor.wordcount }}
+            td {{ vendor.wordcountRelative }}
+            td {{ vendor.totalCost }}
           td {{ res.clientName }}
           td {{ res.clientRate }}
           td {{ res.wordcountReceivable }}
