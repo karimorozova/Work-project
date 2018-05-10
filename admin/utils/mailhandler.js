@@ -4,12 +4,12 @@ const mailhandler = {
   sendMail(request) {
 
     let transporter = nodemailer.createTransport({
-      host: 'email-smtp.us-east-1.amazonaws.com',
-      port: 465,
-      secure: true, // upgrade later with STARTTLS
+      host: 'in-v3.mailjet.com',
+      port: 587,
+      secure: false, // upgrade later with STARTTLS
       auth: {
-        user: 'AKIAJICV5JCK4NXBDCLQ',
-        pass: 'AuetzT/oBNpG3GtBrHRBFqO7sBHrcVfr3zNOMGFaF40P'
+        user: '2a629a8646758c2140a8aced91f03dcb',
+        pass: 'fc72170d536b40480711bfad6ff1a8c1'
       }
     });
 

@@ -817,8 +817,6 @@ export default {
         this.sendForm();
         
         // window.top.location.href = "https://www.pangea.global/thank-you"; 
-        // this.clearForm();
-        // this.showSuccess()
       } else {
         this.showError();
         
