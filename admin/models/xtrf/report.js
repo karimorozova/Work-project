@@ -31,9 +31,9 @@ function projectJobs(projectId) {
             {
                 let data = response.data.rows[key].columns;
                 if(!data[8].includes("Automatic")){
-                    if(data[8].includes("Nguyen")){
+                    //if(data[8].includes("Nguyen")){
                         res.push(response.data.rows[key].columns);
-                    }                        
+                    //}                        
                 }
                     
             }
