@@ -3,79 +3,78 @@
         .container
             .container__label
                 .container__label-title Quote Details
-            .container__info
-              .container__info-first
-                  .projid
-                      .projid-name {{ quotesInfoDetailed.title }}
-                      .projid-value {{ quotesInfoDetailed.createdDate }}
-                  .requsted
-                      .requsted-name {{ quotesInfoDetailed.requested }}
-                      .requsted-value {{ quotesInfoDetailed.requstedDate }}
-                  .deadline
-                      .deadline-name {{ quotesInfoDetailed.deadline }}
-                      .deadline-value {{ quotesInfoDetailed.deadlineDate }}
-              .container__info-second
-                  .projectName
-                      .projectName-name {{ quotesInfoDetailed.projectName }}
-                      .projectName-value {{ quotesInfoDetailed.projectNameValue }}
-                  .status
-                      .status-name {{ quotesInfoDetailed.status }}
-                      .status-value {{ quotesInfoDetailed.statusDescription }}
-                  .totalcost
-                      .totalcost-name {{ quotesInfoDetailed.totalCost }}
-                      .totalcost-value(v-html="quotesInfoDetailed.totalCostValue")
-              .container-table
-                .container-table__header
-                    .container-table__col-1
-                      .firstPart ID
-                      .secondPart
+            .container__infoWrapper
+              .container__info
+                .container-project
+                  .container-project__first-block
+                    .container-project__first-block-one
+                      .name {{ quotesInfoDetailed.projectName }}
+                      .value {{ quotesInfoDetailed.projectNameValue }}
+                    .container-project__first-block-two
+                      .name {{ quotesInfoDetailed.title }}
+                      .value {{ quotesInfoDetailed.createdDate }}
+                  .container-project__second-block
+                    .container-project__second-block-one
+                      .name {{ quotesInfoDetailed.status }}
+                      .value {{ quotesInfoDetailed.statusDescription }}
+                    .container-project__second-block-two
+                      .name {{ quotesInfoDetailed.totalCost }}
+                      span(v-html="quotesInfoDetailed.totalCostValue")
+                  .container-project__third-block
+                    .container-project__third-block-one(@click="downloadAsPDF")
+                      img(src="../../assets/images/pdf-icon.png")
+                    span Download Fill Report
+                .tableWrapper
+                  table
+                    tr.row
+                      td Language Pair
                         img(src="../../assets/images/open-close-arrow-brown.png")
-                    .container-table__col-2
-                      .firstPart Language Pair
-                      .secondPart
+                      td Wordcount
                         img(src="../../assets/images/open-close-arrow-brown.png")
-                    .container-table__col-3
-                      .firstPart Wordcount
-                      .secondPart
-                        img(src="../../assets/images/open-close-arrow-brown.png")
-                    .container-table__col-4.addition Cost
-                .container-table__inner-ceils
-                    .container-table__row
-                        .container-table__col-1 1
-                        .container-table__col-2 2
-                        .container-table__col-3 3
-                        .container-table__col-4 4
-                    .container-table__row
-                        .container-table__col-1 1
-                        .container-table__col-2 2
-                        .container-table__col-3 3
-                        .container-table__col-4 4
-                    .container-table__row
-                        .container-table__col-1
-                        .container-table__col-2
-                        .container-table__col-3 TOTAL COST:
-                        .container-table__col-4 4
-              .container__buttons
-                  button.approve APPROVE QUOTE
-                  button.reject REJECT QUOTE
-            .project-manager
-              .project-manager__detailed_info Project Manager
-              .project-manager__detailed_description Services
+                      td Cost
+                    tr.row
+                      td Language Pair
+                      td Wordcount
+                      td Cost
+                    tr.row
+                      td Language Pair
+                      td Wordcount
+                      td Cost
+                .container__buttons
+                    button.approve APPROVE QUOTE
+                    button.reject REJECT QUOTE
+              .project-manager
+                .project-manager__detailed_info
+                  .manager-icon
+                    img(src="../../assets/images/man.png")
+                  .manager-title  Project Manager
+                  .manager-person {{ managerPerson }}
+                .project-manager__detailed_description
+                  .project-manager__detailed_description-firstblock
+                    .services1 {{ services.servicesTitle }}
+                    .services2 {{ services.servicesTitleValue }}
+                  .project-manager__detailed_description-secondblock
+                    .services1 {{ services.industryTitle }}
+                    .services2 {{ services.industryTitleValue }}
+                  .project-manager__detailed_description-thirdblock
+                    .services1 {{ services.requestedOn }}
+                    .services2 {{ services.requestedOnDate }}
+                  .project-manager__detailed_description-fourthblock
+                    .services1 {{ services.deadline }}
+                    .services2 {{ services.deadlineDate }}
 </template>
 
 <style lang="scss" scoped>
 .qoutesInfoDetailedWrapper {
-  height: 32vh;
   max-width: 919px;
   box-shadow: 0 0 6px #000;
 }
 
 .container {
   display: flex;
-  // flex-direction: column;
-  width: 100%;
+  flex-direction: column;
 
-  &__label {
+  .container__label {
     display: flex;
     justify-content: flex-start;
 
@@ -88,180 +87,246 @@
     }
   }
 
-  &__info {
-    flex-direction: column;
+  &__infoWrapper {
+    display: flex;
 
-    &-first {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 3%;
-      margin-bottom: 3%;
-
-      .projid,
-      .requsted,
-      .deadline {
-        display: flex;
-        justify-content: space-around;
-
-        &-name {
-          color: #978d7e;
-          padding-right: 2%;
-        }
-        &-value {
-          color: #67573e;
-        }
-      }
-    }
-
-    &-second {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 3%;
-      margin-bottom: 3%;
-
-      .projectName,
-      .status,
-      .totalcost {
-        display: flex;
-        justify-content: space-around;
-
-        &-name {
-          color: #978d7e;
-          padding-right: 2%;
-        }
-        &-value {
-          color: #67573e;
-        }
-      }
-    }
-
-    .container-table {
-      display: flex;
-      width: 100%;
+    .container__info {
       flex-direction: column;
-      margin-left: 2%;
-      margin-top: 2%;
-      color: #978d7e;
+      width: 100%;
 
-      &__header {
+      .container-project {
         display: flex;
-        flex-direction: columns;
+        justify-content: space-around;
+        padding-top: 2%;
+        padding-bottom: 9%;
         color: #67573e;
-      }
+        border-bottom: 1px solid #c5bfb7;
+        margin-left: 3%;
+        margin-right: 3%;
 
-      &__inner-ceils {
-        display: flex;
-        flex-direction: column;
-      }
+        &__first-block {
+          display: flex;
+          flex-direction: column;
+          align-content: stretch;
 
-      &__row {
-        display: flex;
-        &:last-child {
-          .container-table__col-1 {
-            border: none;
+          &-one {
+            margin-bottom: 9%;
+            display: flex;
+
+            .name {
+              opacity: 0.67;
+              margin-right: 8px;
+            }
           }
 
-          .container-table__col-2 {
-            border: none;
+          &-two {
+            display: flex;
+
+            .name {
+              opacity: 0.67;
+              margin-right: 8px;
+            }
+          }
+        }
+        &__second-block {
+          display: flex;
+          flex-direction: column;
+
+          &-one {
+            margin-bottom: 14%;
+            display: flex;
+
+            .name {
+              opacity: 0.67;
+              margin-right: 8px;
+            }
           }
 
-          .container-table__col-3 {
-            border: none;
-            margin-right: 0.5%;
+          &-two {
+            display: flex;
+
+            .name {
+              opacity: 0.67;
+              margin-right: 8px;
+            }
+          }
+        }
+
+        &__third-block {
+          display: flex;
+          flex-direction: column;
+          cursor: pointer;
+
+          &-one {
+            justify-content: center;
+            img {
+              height: 33px;
+            }
+          }
+          span {
+            visibility: hidden;
+            font-size: 10px;
+          }
+          &:hover {
+            span {
+              visibility: visible;
+            }
           }
         }
       }
 
-      &__col-1 {
-        flex-basis: 25%;
-        border: 1px solid #978d7e;
-        padding: 5px 5px;
-        justify-content: flex-start;
+      .tableWrapper {
+        margin: 3%;
+        table {
+          border: 1px solid #c5bfb7;
+          width: 100%;
+          border-collapse: collapse;
+
+          tr,
+          td {
+            border: 2px solid #c5bfb7;
+          }
+
+          td {
+            padding: 2% 2% 2% 5%;
+          }
+        }
+      }
+
+      .container__buttons {
         display: flex;
+        justify-content: flex-end;
 
-        .firstPart {
-          margin-left: 7%;
-        }
-
-        .secondPart {
-          margin-left: 6%;
-        }
-        &:last-child {
+        button {
+          width: 164px;
+          height: 40px;
+          color: #fff;
+          box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
+          border-radius: 18px;
           border: none;
-        }
-      }
-
-      &__col-2 {
-        flex-basis: 25%;
-        border: 1px solid #978d7e;
-        padding: 5px 5px;
-        justify-content: flex-start;
-        display: flex;
-
-        .firstPart {
-          margin-left: 7%;
+          margin-right: 2%;
+          margin-left: 2%;
+          font-size: 15px;
         }
 
-        .secondPart {
-          margin-left: 6%;
-        }
-      }
-
-      &__col-3 {
-        flex-basis: 25%;
-        border: 1px solid #978d7e;
-        padding: 5px 5px;
-        justify-content: flex-start;
-        display: flex;
-
-        .firstPart {
-          margin-left: 7%;
+        .approve {
+          background-color: #84ca8e;
         }
 
-        .secondPart {
-          margin-left: 6%;
+        .reject {
+          background-color: #f5876e;
         }
-      }
-
-      &__col-4 {
-        flex-basis: 16%;
-        border: 1px solid #978d7e;
-        padding: 5px 5px;
-
-        .addition {
-          margin-left: 7%;
-        }
-      }
-    }
-
-    &__buttons {
-      display: flex;
-      justify-content: flex-end;
-
-      button {
-        width: 164px;
-        height: 40px;
-        color: #fff;
-        box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
-        border-radius: 18px;
-        border: none;
-        margin-right: 2%;
-        margin-left: 2%;
-        font-size: 15px;
-      }
-
-      .approve {
-        background-color: #84ca8e;
-      }
-
-      .reject {
-        background-color: #f5876e;
       }
     }
   }
 
   .project-manager {
     background-color: #f4f0ee;
+    border: 1px solid #c5bfb7;
+    width: 37%;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+
+    &__detailed_info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-top: 6%;
+      padding-bottom: 6%;
+      border-bottom: 1px solid #c5bfb7;
+      margin: 3% 7% 0 7%;
+
+      .manager-icon {
+        border: 1px solid #67573e;
+        border-radius: 23px;
+        width: 45px;
+        height: 45px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 2%;
+        img {
+          padding-left: 5px;
+          padding-top: 3px;
+          height: 37px;
+        }
+      }
+
+      .manager-title {
+        margin-top: 3%;
+        margin-bottom: 3%;
+        color: #67573e;
+        opacity: 0.67;
+      }
+
+      .manager-person {
+        color: #67573e;
+      }
+    }
+
+    &__detailed_description {
+      display: flex;
+      flex-direction: column;
+
+      &-firstblock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 7%;
+        margin-top: 3%;
+        .services1 {
+          margin-bottom: 3%;
+          color: #67573e;
+          opacity: 0.67;
+        }
+        .services2 {
+          color: #67573e;
+        }
+      }
+      &-secondblock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 7%;
+        .services1 {
+          margin-bottom: 3%;
+          color: #67573e;
+          opacity: 0.67;
+        }
+        .services2 {
+          color: #67573e;
+        }
+      }
+      &-thirdblock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 7%;
+        .services1 {
+          margin-bottom: 3%;
+          color: #67573e;
+          opacity: 0.67;
+        }
+        .services2 {
+          color: #67573e;
+        }
+      }
+      &-fourthblock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 7%;
+        .services1 {
+          margin-bottom: 3%;
+          color: #67573e;
+          opacity: 0.67;
+        }
+        .services2 {
+          color: #67573e;
+        }
+      }
+    }
   }
 }
 </style>
@@ -273,15 +338,11 @@ export default {
       quotesInfoDetailed: {
         title: "Project ID:",
         createdDate: "2018 04 11 [27]",
-        requested: "Requested On:",
-        requstedDate: "01-Apr-2018",
-        deadline: "Deadline:",
-        deadlineDate: "11-Apr-2018",
-        projectName: "Pproject Name",
+        projectName: "Project Name:",
         projectNameValue: "1Market Resources(Updated)",
-        status: "Status",
+        status: "Status:",
         statusDescription: "Wating for approval",
-        totalCost: "Total Cost",
+        totalCost: "Total Cost:",
         totalCostValue: "1000&#8364;"
       },
       projectInformation: [
@@ -297,8 +358,29 @@ export default {
           wordcount: "200",
           cost: "32.32&#8364;"
         }
-      ]
+      ],
+      managerPerson: "Sakis Koulos",
+      services: {
+        servicesTitle: "Services:",
+        servicesTitleValue: "Marketing & Copyrighting",
+        industryTitle: "Industry:",
+        industryTitleValue: "ICO & Cryptocurrencies",
+        requestedOn: "Requested On:",
+        requestedOnDate: "01-Apr-2018",
+        deadline: "Suggested Dedline",
+        deadlineDate: "11-Apr-2018"
+      },
+      spanVisible: false
     };
+  },
+  methods: {
+    hideSpan() {
+      this.spanVisible = !this.spanVisible;
+    },
+    downloadAsPDF() {
+      //stub
+      console.log("Implement this method");
+    }
   }
 };
 </script>

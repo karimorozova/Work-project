@@ -39,26 +39,27 @@
               .clientsNavbar__openHide
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
-            .maininfoWrapper
+            .maininfoWrapper(v-if="!detailedInfoVisible")
               .mainInfo  
                 .buttonPanel
                   button.quote New Quote
                   button.project New Project
-                .clientsAll
+                .clientsAll(v-if="true")
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
                         .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Quotesinfo
+                          //- Quotesinfo(@quoteDetails="getDataFromQuotesinfo")
+                          Quotesinfo(@quoteDetails="detailedInfoVisible = $event")
                     .projectsComponent
                       .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                           projectsInfo
-            .detailedInfoWrapper
-              quotesInfoDetailed(v-if="false")
+            .detailedInfoWrapper(v-if="detailedInfoVisible")
+              quotesInfoDetailed
 </template>
 
 <script>
@@ -100,10 +101,14 @@ export default {
       openQuotes: false,
       openProjects: false,
       expander: false,
-      accountMenuVisible: false
+      accountMenuVisible: false,
+      detailedInfoVisible: false
     };
   },
   methods: {
+    // getDataFromQuotesinfo(data) {
+    //    this.detailedInfoVisible = data;
+    // },
     getCookie() {
       // let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {

@@ -44,8 +44,8 @@
             .shortInfo
                 .row__columns_info
                     .col {{ quote.requestOn }}
-                    .col.proj {{ quote.projectId }}
-                    .col.col-5 {{ quote.projectName }}
+                    .col.proj(@click="openQuotesInfoDetailed") {{ quote.projectId }}
+                    .col.col-5(@click="openQuotesInfoDetailed") {{ quote.projectName }}
                     .col.col-4 {{ quote.status }}
                     .col {{ quote.deadline }}
                     .col.col-5.colSplit
@@ -119,13 +119,18 @@ export default {
           description: "EN-GB >> CZ",
           price: "32.43 &#8364;"
         }
-      ]
+      ],
+      detailedInfoVisible: false
     };
   },
   methods: {
     showFullInfo(index) {
       this.clientQuotes[index].fullInfoAppear = !this.clientQuotes[index]
         .fullInfoAppear;
+    },
+    openQuotesInfoDetailed() {
+      this.detailedInfoVisible = true;
+      this.$emit("quoteDetails", this.detailedInfoVisible);
     }
   }
 };
@@ -186,8 +191,7 @@ export default {
             cursor: pointer;
           }
 
-            .double_arrow {
-
+          .double_arrow {
             .up {
               margin-left: -19%;
               margin-bottom: -33%;
@@ -199,9 +203,9 @@ export default {
 
             .down {
               .arrow_down {
-              height: 10px;
-              cursor: pointer;
-              transform: rotate(180deg);
+                height: 10px;
+                cursor: pointer;
+                transform: rotate(180deg);
               }
             }
           }
@@ -247,8 +251,8 @@ export default {
           }
         }
         .proj {
-            cursor: pointer;
-          }
+          cursor: pointer;
+        }
         .col-4 {
           width: 14%;
         }
@@ -267,7 +271,7 @@ export default {
             }
             &:last-child {
               border-right: none;
-            //   color: rgb(245, 135, 110);
+              //   color: rgb(245, 135, 110);
             }
           }
         }
