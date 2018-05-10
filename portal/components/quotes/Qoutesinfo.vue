@@ -171,6 +171,7 @@ export default {
         color: white;
         padding: 0 5px;
         width: 12%;
+        height: 100%;
         &:last-child {
           border-right: none;
         }
@@ -289,6 +290,9 @@ export default {
           }
         }
       }
+    }
+    &:nth-of-type(odd) {
+      background-color: #f4f0ee;
     }
     .fullInfo {
       margin-top: 2px;

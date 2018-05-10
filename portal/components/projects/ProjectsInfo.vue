@@ -100,6 +100,9 @@
     &:last-child {
       margin-bottom: 0;
     }
+    &:nth-of-type(even) {
+      background-color: #f4f0ee;
+    }
   }
 
   &__col {

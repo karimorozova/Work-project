@@ -39,7 +39,6 @@
               .clientsNavbar__openHide
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
-                //- .pointer(:class='"position-" + activeIndex')
             .maininfoWrapper
               .mainInfo  
                 .buttonPanel
@@ -59,7 +58,7 @@
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                           projectsInfo
             .detailedInfoWrapper
-              quotesInfoDetailed
+              quotesInfoDetailed(v-if="false")
 </template>
 
 <script>
