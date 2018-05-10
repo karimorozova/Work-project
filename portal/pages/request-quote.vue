@@ -18,7 +18,9 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
-        form.mainForm(@submit.prevent="checkForm")
+        form.mainForm(ref="myForm" @submit="checkForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" )
+          input(type="hidden" name="oid" value="00D1r000001nlsn")
+          input(type="hidden" name="retURL" value="http://www.pangea.global/thank-you")
           .number 
             span 1
             label.asterisk SERVICE TYPE      
@@ -30,6 +32,7 @@
               .service-type__drop(v-if='serviceDrop')
                 .service-type__drop-list
                   span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
+                  input#00N1r00000HRi9E(maxlength="255" name="00N1r00000HRi9E" size="20" type="hidden" :value="serviceSelect.title")
           .number 
             span 2
             label.asterisk SELECT A LANGUAGE
@@ -51,6 +54,7 @@
                       .pair.pair_dialect(@click='changeSourceDialect(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
+              input#00N1r00000HRi9J(maxlength="255" name="00N1r00000HRi9J" size="20" type="hidden" :value="sourceSelect.lang")
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
@@ -79,6 +83,7 @@
                       .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+              input#00N1r00000HRiDb(name="00N1r00000HRiDb" maxlength="255" size="20" type="hidden" :value="targetLangForSales")
           .number 
             span 3
             label.asterisk CHOOSE AN INDUSTRY
@@ -119,6 +124,7 @@
               .image
               .image-white
               p Other
+            input#00N1r00000HRiDg(maxlength="255" name="00N1r00000HRiDg" size="20" type="hidden" :value="industrySelect")
           .number
             span 4
             label PROJECT DETAILS
@@ -217,7 +223,8 @@
                       span.type-text {{ type }}
             .details__brief
               span.details__brief-title Enter a short brief
-              textarea(rows='10' v-model='brief')
+              textarea#00N1r00000HRiE0(name="00N1r00000HRiE0" rows='10' v-model='brief')
+            input#00N1r00000HRiDv(name="00N1r00000HRiDv" size="12" type="hidden" :value="deadlineSelect")
           .number
             span 5
             label CONTACT DETAILS
@@ -226,22 +233,30 @@
               .contact__col-item.name
                 span.asterisk Name
                 input(type='text' name='formContactsName' v-model='contactName')
-              .contact__col-item.email
+                input#first_name(maxlength="255" name="first_name" size="20" type="hidden" :value="contactName")
+                input#last_name(maxlength="255" name="last_name" size="20" type="hidden" value="_")
+                input#00N1r00000HRiE5(maxlength="255" name="00N1r00000HRiE5" size="20" type="hidden" :value="contactName")
+              .contact__col-item.e-mail
                 span.asterisk Email
                 input(type='text' name='formContactsMail' v-model='contactEmail')
-              .contact__col-item.phone
+                input#email(maxlength="80" name="email" size="20" type="hidden" :value="contactEmail")
+              .contact__col-item.phones
                 span Phone Number
                 input(type='text' v-model='phone')
+                input#phone(maxlength="40" name="phone" size="20" type="hidden" :value="phone")
             .contact__col
-              .contact__col-item.company
+              .contact__col-item.company-name
                 span.asterisk Company Name
                 input(type='text' v-model='companyName')
+                input#company(maxlength="40" name="company" size="20" type="hidden" :value="companyName")
               .contact__col-item.website
                 span Website
                 input(type='text' v-model='web')
+                input#URL(maxlength="80" name="URL" size="20" type="hidden" :value="web")
               .contact__col-item.skype
                 span Skype Name
                 input(type='text' v-model='contactSkype')
+                input#00N1r00000HRiEF(maxlength="255" name="00N1r00000HRiEF" size="20" type="hidden" :value="contactSkype")
           .captcha
             //- span.asterisk Please, confirm that you are not a robot   
             //- .captcha__google
@@ -254,8 +269,8 @@
               //-     "-webkit-transform": "scale(0.77)",
               //-     "transform-origin": "150px 0",
               //-     "-webkit-transform-origin": "150px 0" })
-            input(id="00N1r00000Fie4G" name="00N1r00000Fie4G" type="hidden")
-            input.buttons(type='submit' value='Submit')
+            input#00N1r00000Fie4G(maxlength="255" name="00N1r00000Fie4G" size="20" type="hidden")
+            input.buttons(type='submit' value='Submit' name="submit")
           .warning(v-if="error")
             .message
               .closeWarning(@click="closeWarning")
@@ -331,7 +346,6 @@ import Datepicker from './../components/Datepicker.vue';
 // import VueRecaptcha from 'vue-recaptcha';
 import { Drag, Drop } from 'vue-drag-drop';
 
-// import Clock from './../components/Clock.vue';
 var sbjs = require('sourcebuster');
 
 export default {
@@ -340,18 +354,9 @@ export default {
   },
   data () {
     return {
-      // options: {
-      //   acceptedFileTypes: ['image/*', 'text/*'],
-      //   clickable: false,
-      //   adapterOptions: {
-      //     url: './',
-      //   },
-      // },
-      // files: [],
       state: {
         highlighted: {
           days: [6, 0]
-          // dates: [new Date()]
         },
         disabled: {
           to: moment().add(-1, 'day').endOf('day').toDate()
@@ -680,14 +685,6 @@ export default {
     // onExpired: function () {
     //   console.log('Expired')
     // },
-    formControl(){
-      const check = this.checkForm();
-        if(!check){
-          return;
-        }
-        this.sendForm();
-        this.clearForm();
-    },
     showSuccess(){
       this.success = true;
 
@@ -783,7 +780,8 @@ export default {
 
     },
     
-    checkForm() {
+    checkForm(event) {
+      console.log("in check form");
       this.request = {
           date: this.deadlineSelect, 
           contactName: this.contactName, 
@@ -817,40 +815,21 @@ export default {
       // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
-        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        
+        // window.top.location.href = "https://www.pangea.global/thank-you"; 
         // this.clearForm();
         // this.showSuccess()
       } else {
-        this.showError()
+        this.showError();
+        
+        event.preventDefault();
       }
+      //this.$refs.myForm.submit();
+      
     },
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
-    },
-    salesForce() {
-      function setCookie(name, value, days, dom){
-          var date = new Date();
-          date.setTime(date.getTime() + (days*24*60*60*1000)); 
-          var expires = "; expires=" + date.toGMTString();
-          document.cookie = name + "=" + value + expires + "; domain=" + dom;
-      }
-      function getParam(p){
-          var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
-          return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-      }
-      var gclid = getParam('gclid');
-      if(gclid){
-          var gclsrc = getParam('gclsrc');
-          if(!gclsrc || gclsrc.indexOf('aw') !== -1){
-              setCookie('gclid', gclid, 90, '.pangea.global');
-          }
-      }
-    },
-    gclid() {
-      window.onload = function getGclid() {        
-      document.getElementById("00N1r00000Fie4G").value = (name = new     RegExp('(?:^|;\\s*)gclid=([^;]*)').exec(document.cookie)) ? 
-      name.split(",")[1] : ""; }
     },
     google() {
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -874,6 +853,13 @@ export default {
       }
       return this.languages;
     },
+    targetLangForSales() {
+      let result = '';
+      this.targetSelect.forEach(item => {
+        result += item.lang + ', '
+      })
+      return result;
+    }
   },
   watch: {
     deadlineSelect() {
@@ -893,11 +879,10 @@ export default {
     Drop
   },
   mounted(){
+    // this.gclid();
+    this.google();
     this.getServices();
     this.getLanguages();
-    this.salesForce();
-    this.gclid();
-    this.google();
     sbjs.init({ callback: this.go });
     console.log(sbjs.get.current.src);
   }

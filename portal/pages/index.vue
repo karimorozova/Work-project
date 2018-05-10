@@ -41,7 +41,6 @@ export default {
       this.$axios.post("portal/auth", this.form).then(
         response => {
           document.cookie = "ses=" + response.data + `;max-age=36000`;
-          console.log(response);
           this.isLogin = true;
           window.location.href = "/main";
         },

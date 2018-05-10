@@ -8,42 +8,6 @@ mongoose.connect('mongodb://localhost/pangea');
 async function runTest() {
     console.log("Begin test");
 
-    /* var rows = [];
-     const pageCount = await beginProject();
-     // pageCount == 1 due to debug speed 
-     for (let i = 1; i <= 1; i++) {
-         var pageRows = await beginProject(i);
-         
-         for (row in pageRows) {
-             rows.push(pageRows[row]);
-         }
-         break;
-     }
-     //const customerInfo = await ( HomeApi.findCustomer("11111"));
-     //console.log("customer info " + customerInfo);
-     for (key in rows) {
-         try {
-             const val = rows[key].columns;
-             const newRow = new Projects({
-                 id: val[0],
-                 idVisible : val[1],
-                 name : val[2],
-                 beginDate : val[3],
-                 deadline : val[4],
-                 languages: val[5],
-                 service : val[6],
-                 clientId : val[7]
-             });
-             newRow.save();
-         }
-         catch (err) {
-             console.log(err);
-         }
-     }*/
-
-    // 0 Project id
-    // 1 Project name
-    // 2 Project name
     const projectIds = [2473];
     projectIds.forEach(async (id) => {
 

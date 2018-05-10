@@ -2,25 +2,25 @@
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
-                h2.clientsPortal {{ clientPortal }}
-                span {{ companyName }}
+                h2.clientsPortal {{ clientPortal }}  
+                  span(v-if="companyName") >> {{ companyName }}
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
                 .womanWrapper(@click="showAccountMenu")
                   .accountMenuWrapper(v-if="accountMenuVisible")
                     .accountBlock
-                      .accountBlock__info(@mouseover="changeBackgroundColorInfo" :class="{changedBackgroundColorInfo: backgroundColorMenuInfo}")
+                      .accountBlock__info
                         .icon
                           img(src="../assets/images/woman.png")
                         .personal_data
                           .name Mary Jones
                           .email mary.j@gmail.com
-                      .accountBlock__myaccount(@mouseover="changeBackgroundColorAccount" :class="{changedBackgroundColorAccount: backgroundColorMenuAccount}")
+                      .accountBlock__myaccount
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
-                      .accountBlock__exit(@mouseover="changeBackgroundColorExit" :class="{changedBackgroundColorExit: backgroundColorMenuExit}")
+                      .accountBlock__exit
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
@@ -39,29 +39,32 @@
               .clientsNavbar__openHide
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
-                //- .pointer(:class='"position-" + activeIndex')
-            .mainInfo  
-              .buttonPanel
-                button.quote New Quote
-                button.project New Project
-              .clientsAll
-                  .quotesComponent
-                    .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                      .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
-                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
-                      .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                        Quotesinfo
-                  .projectsComponent
-                    .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
-                      .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
-                        img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
-                      .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                        projectsInfo
+            .maininfoWrapper
+              .mainInfo  
+                .buttonPanel
+                  button.quote New Quote
+                  button.project New Project
+                .clientsAll
+                    .quotesComponent
+                      .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                        .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
+                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
+                        .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                          Quotesinfo
+                    .projectsComponent
+                      .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
+                        .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
+                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
+                        .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
+                          projectsInfo
+            .detailedInfoWrapper
+              quotesInfoDetailed(v-if="false")
 </template>
 
 <script>
 import Quotesinfo from "../components/quotes/Qoutesinfo";
 import ProjectsInfo from "../components/projects/ProjectsInfo";
+import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed"
 
 export default {
   data() {
@@ -97,10 +100,7 @@ export default {
       openQuotes: false,
       openProjects: false,
       expander: false,
-      accountMenuVisible: false,
-      backgroundColorMenuInfo: false,
-      backgroundColorMenuAccount: false,
-      backgroundColorMenuExit: false
+      accountMenuVisible: false
     };
   },
   methods: {
@@ -143,25 +143,16 @@ export default {
     },
     showAccountMenu() {
       this.accountMenuVisible = !this.accountMenuVisible;
-    },
-    changeBackgroundColorInfo(){
-      this.backgroundColorMenuInfo = !this.backgroundColorMenuInfo;
-    },
-    changeBackgroundColorAccount(){
-      this.backgroundColorMenuAccount = !this.backgroundColorMenuAccount;
-    },
-    changeBackgroundColorExit(){
-      this.backgroundColorMenuExit = !this.backgroundColorMenuExit;
     }
   },
-
   mounted() {
     this.getCookie();
-    this.clientInfo();
+    this.clientInfo()
   },
   components: {
     Quotesinfo,
-    projectsInfo: ProjectsInfo
+    projectsInfo: ProjectsInfo,
+    quotesInfoDetailed: QuotesInfoDetailed
   }
 };
 </script>
@@ -267,6 +258,9 @@ body {
                 font-size: 11px;
               }
             }
+            &:hover{
+              background-color: #ddd3c8;
+            }
           }
 
           &__myaccount {
@@ -287,6 +281,9 @@ body {
               color: #67573e;
               margin-left: 8%;
             }
+            &:hover{
+              background-color: #ddd3c8;
+            }
           }
 
           &__exit {
@@ -305,6 +302,9 @@ body {
               font-size: 12px;
               color: #67573e;
               margin-left: 7%;
+            }
+            &:hover{
+              background-color: #ddd3c8;
             }
           }
         }
@@ -327,8 +327,24 @@ body {
 
 .clientsMainWrapper {
   display: flex;
-  // justify-content: flex-start;
   height: 95%;
+  position: relative;
+  .maininfoWrapper {
+    width: 100%;
+    position: absolute;
+    top: 2%;
+    left: 11%;
+  }
+
+  .detailedInfoWrapper {
+    width: 34%;
+    position: absolute;
+    top: 31%;
+    left: 30%;
+    max-width: 919px;
+    width: 100%;
+  }
+  
   .mainInfo {
     display: flex;
     flex-direction: column;
@@ -367,7 +383,7 @@ body {
       align-items: center;
       box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
       transition: all 0.5s;
-      z-index: 1;
+      z-index: 2;
     }
     .testExpander {
       width: 200px;
@@ -382,6 +398,7 @@ body {
       right: 0px;
       text-align: center;
       cursor: pointer;
+      z-index: 1;
       .icon {
         font-size: 32px;
       }
