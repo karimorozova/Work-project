@@ -44,7 +44,7 @@
                 .buttonPanel
                   button.quote New Quote
                   button.project New Project
-                .clientsAll(v-if="true")
+                .clientsAll(v-if="!detailedInfoVisible")
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
@@ -59,7 +59,7 @@
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                           projectsInfo
             .detailedInfoWrapper
-              quotesInfoDetailed(v-if="false")
+              quotesInfoDetailed(v-if="detailedInfoVisible")
             Accountinfo(v-if="accountInfo")
 </template>
 
@@ -105,7 +105,8 @@ export default {
       openProjects: false,
       expander: false,
       accountMenuVisible: false,
-      accountInfo: false
+      accountInfo: false,
+      detailedInfoVisible: false
     };
   },
   methods: {

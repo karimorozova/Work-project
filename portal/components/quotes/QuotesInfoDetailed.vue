@@ -25,21 +25,17 @@
                       img(src="../../assets/images/pdf-icon.png")
                     span Download Fill Report
                 .tableWrapper
-                  table
+                  table.container-table
                     tr.row
                       td Language Pair
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Wordcount
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Cost
-                    tr.row
-                      td Language Pair
-                      td Wordcount
-                      td Cost
-                    tr.row
-                      td Language Pair
-                      td Wordcount
-                      td Cost
+                    tr.row(v-for="projectInformation in projectInformations")
+                      td.first-ceil {{ projectInformation.languaagePair }}
+                      td.second-ceil {{ projectInformation.wordcount }}
+                      td.third-ceil(v-html="projectInformation.cost")
                 .container__buttons
                     button.approve APPROVE QUOTE
                     button.reject REJECT QUOTE
@@ -177,7 +173,7 @@
 
       .tableWrapper {
         margin: 3%;
-        table {
+        .container-table {
           border: 1px solid #c5bfb7;
           width: 100%;
           border-collapse: collapse;
@@ -188,7 +184,22 @@
           }
 
           td {
-            padding: 2% 2% 2% 5%;
+            padding: 2% 2% 2% 6%;
+              img {
+                  margin-left: 5px;
+                }
+          }
+        }
+
+        .row {
+          .first-ceil {
+            width: 60%;
+          }
+          .second-ceil {
+            width: 23%;
+          }
+          .third-ceil {
+            width: 17%;
           }
         }
       }
@@ -207,6 +218,9 @@
           margin-right: 2%;
           margin-left: 2%;
           font-size: 15px;
+          &:hover {
+            color: #67573e;
+          }
         }
 
         .approve {
@@ -345,7 +359,7 @@ export default {
         totalCost: "Total Cost:",
         totalCostValue: "1000&#8364;"
       },
-      projectInformation: [
+      projectInformations: [
         {
           projectID: "2018 04 11 [27]/EN-GB*ES-ES/1",
           languaagePair: "English(United Kingdom)>>Spanish(Spain)",
