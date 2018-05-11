@@ -155,9 +155,7 @@ export default {
                                     outline: none;
                                 }
                                 .focus {
-                                    &:focus {
-                                        border: 2px solid rgba(153, 142, 126, 0.8);
-                                    }
+                                    border: 2px solid rgba(153, 142, 126, 0.8);
                                 }
                             }   
                         }
