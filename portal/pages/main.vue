@@ -44,7 +44,7 @@
                 .buttonPanel
                   button.quote New Quote
                   button.project New Project
-                .clientsAll(v-if="!detailedInfoVisible")
+                .clientsAll(v-if="visibleChecker == false")
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
@@ -57,9 +57,11 @@
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                          projectsInfo
+                          projectsInfo(@projectDetails="detailedProjectVisible = $event")
             .detailedInfoWrapper
               quotesInfoDetailed(v-if="detailedInfoVisible")
+            .detailedProjectWrapper
+              projectInfoDetailed(v-if="detailedProjectVisible")
             Accountinfo(v-if="accountInfo")
 </template>
 
@@ -68,6 +70,7 @@ import Quotesinfo from "../components/quotes/Qoutesinfo";
 import ProjectsInfo from "../components/projects/ProjectsInfo";
 import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
+import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
 
 export default {
   data() {
@@ -106,7 +109,8 @@ export default {
       expander: false,
       accountMenuVisible: false,
       accountInfo: false,
-      detailedInfoVisible: false
+      detailedInfoVisible: false,
+      detailedProjectVisible: false
     };
   },
   methods: {
@@ -166,7 +170,13 @@ export default {
     Quotesinfo,
     projectsInfo: ProjectsInfo,
     quotesInfoDetailed: QuotesInfoDetailed,
-    Accountinfo
+    Accountinfo,
+    projectInfoDetailed: ProjectInfoDetailed
+  },
+  computed: {
+    visibleChecker() {
+      return this.detailedInfoVisible || this.detailedProjectVisible;
+    }
   }
 };
 </script>
@@ -350,6 +360,15 @@ body {
   }
 
   .detailedInfoWrapper {
+    width: 34%;
+    position: absolute;
+    top: 31%;
+    left: 30%;
+    max-width: 919px;
+    width: 100%;
+  }
+
+  .detailedProjectWrapper {
     width: 34%;
     position: absolute;
     top: 31%;

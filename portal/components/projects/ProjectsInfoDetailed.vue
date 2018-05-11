@@ -1,8 +1,8 @@
 <template lang="pug">
-    .qoutesInfoDetailedWrapper
+    .projectsInfoDetailedWrapper
         .container
             .container__label
-                .container__label-title Quote Details
+                .container__label-title Projects Details
             .container__infoWrapper
               .container__info
                 .container-project
@@ -29,16 +29,19 @@
                     tr.row
                       td Language Pair
                         img(src="../../assets/images/open-close-arrow-brown.png")
+                      td Status
+                        img(src="../../assets/images/open-close-arrow-brown.png")
                       td Wordcount
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Cost
+                      td
                     tr.row(v-for="projectInformation in projectInformations")
                       td.first-ceil {{ projectInformation.languaagePair }}
-                      td.second-ceil {{ projectInformation.wordcount }}
-                      td.third-ceil(v-html="projectInformation.cost")
-                .container__buttons
-                    button.approve APPROVE QUOTE
-                    button.reject REJECT QUOTE
+                      td.second-ceil {{ projectInformation.status }}
+                      td.third-ceil {{ projectInformation.wordcount }}
+                      td.fourth-ceil(v-html="projectInformation.cost")
+                      td.fifth-ceil(@click="downloadDetail")
+                        img(src="../../assets/images/download.png")
               .project-manager
                 .project-manager__detailed_info
                   .manager-icon
@@ -61,7 +64,7 @@
 </template>
 
 <style lang="scss" scoped>
-.qoutesInfoDetailedWrapper {
+.projectsInfoDetailedWrapper {
   max-width: 919px;
   box-shadow: 0 0 6px #000;
 }
@@ -185,51 +188,30 @@
           }
 
           td {
-            padding: 2% 2% 2% 6%;
-              img {
-                  margin-left: 5px;
-                }
+            padding: 2% 2% 2% 2%;
+            img {
+              margin-left: 5px;
+            }
           }
         }
 
         .row {
           .first-ceil {
-            width: 60%;
+            width: 50%;
           }
           .second-ceil {
-            width: 23%;
+            width: 13%;
           }
           .third-ceil {
             width: 17%;
           }
-        }
-      }
-
-      .container__buttons {
-        display: flex;
-        justify-content: flex-end;
-
-        button {
-          width: 164px;
-          height: 40px;
-          color: #fff;
-          box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
-          border-radius: 18px;
-          border: none;
-          margin-right: 2%;
-          margin-left: 2%;
-          font-size: 15px;
-          &:hover {
-            color: #67573e;
+          .fourth-ceil {
+            width: 11%;
           }
-        }
-
-        .approve {
-          background-color: #84ca8e;
-        }
-
-        .reject {
-          background-color: #f5876e;
+          .fifth-ceil {
+            width: 9%;
+            cursor: pointer;
+          }
         }
       }
     }
@@ -362,14 +344,14 @@ export default {
       },
       projectInformations: [
         {
-          projectID: "2018 04 11 [27]/EN-GB*ES-ES/1",
           languaagePair: "English(United Kingdom)>>Spanish(Spain)",
+          status: "Open",
           wordcount: "100",
           cost: "32.32&#8364;"
         },
         {
-          projectID: "2018 04 11 [27]/EN-GB*KO/1",
           languaagePair: "English(United Kingdom)>>Korean",
+          status: "Open",
           wordcount: "200",
           cost: "32.32&#8364;"
         }
@@ -393,6 +375,10 @@ export default {
       this.spanVisible = !this.spanVisible;
     },
     downloadAsPDF() {
+      //stub
+      console.log("Implement this method");
+    },
+    downloadDetail() {
       //stub
       console.log("Implement this method");
     }
