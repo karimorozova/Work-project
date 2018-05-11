@@ -40,24 +40,23 @@
                 .icon(@click="expandBar" :class="{openReverse: expander}")
                   span.icon__arrow >
             .maininfoWrapper
-              .mainInfo(v-if="mainShow")
+              .mainInfo(v-if="visibleChecker == false")
                 .buttonPanel
                   button.quote New Quote
                   button.project New Project
-                .clientsAll(v-if="visibleChecker == false")
+                .clientsAll
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
                         .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          //- Quotesinfo(@quoteDetails="getDataFromQuotesinfo")
-                          Quotesinfo(@quoteDetails="detailedInfoVisible = $event")
+                          Quotesinfo(@quoteDetails="quoteDetails")
                     .projectsComponent
                       .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                          projectsInfo(@projectDetails="detailedProjectVisible = $event")
+                          projectsInfo(@projectDetails="projectDetails")
             .detailedInfoWrapper
               quotesInfoDetailed(v-if="detailedInfoVisible")
             .detailedProjectWrapper
@@ -77,7 +76,6 @@ export default {
     return {
       companyName: "",
       clientPortal: "CLIENT PORTAL",
-      mainShow: true,
       navbarList: [
         {
           title: "DASHBOARD",
@@ -88,20 +86,20 @@ export default {
         {
           title: "PROJECTS",
           imgWhite: require("../assets/images/projects.png"),
-          imgBrown: require("../assets/images/projects-brown.png"),          
+          imgBrown: require("../assets/images/projects-brown.png"),
           active: false
         },
         {
           title: "INVOICES",
           imgWhite: require("../assets/images/invoices.png"),
           imgBrown: require("../assets/images/invoices-brown.png"),
-          active: false          
+          active: false
         },
         {
           title: "DOCUMENTS",
           imgWhite: require("../assets/images/documents.png"),
           imgBrown: require("../assets/images/documents-brown.png"),
-          active: false          
+          active: false
         }
       ],
       openQuotes: false,
@@ -114,9 +112,6 @@ export default {
     };
   },
   methods: {
-    // getDataFromQuotesinfo(data) {
-    //    this.detailedInfoVisible = data;
-    // },
     getCookie() {
       // let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -143,6 +138,14 @@ export default {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
           item.active = true;
+          if(this.detailedInfoVisible && !this.detailedProjectVisible) {
+            this.detailedInfoVisible = !this.detailedInfoVisible;
+            this.openQuotes = !this.openQuotes;
+          }
+          if(!this.detailedInfoVisible && this.detailedProjectVisible) {
+            this.detailedProjectVisible = !this.detailedProjectVisible;
+            this.openProjects = !this.openProjects;
+          }
         } else {
           item.active = false;
         }
@@ -160,11 +163,25 @@ export default {
     showAccountInfo() {
       this.accountInfo = true;
       this.mainShow = false;
+    },
+    quoteDetails(data) {
+      this.detailedInfoVisible = data;
+      for (let i = 0; i < this.navbarList.length; i++) {
+        if (i == 1) this.navbarList[i].active = true;
+        else this.navbarList[i].active = false;
+      }
+    },
+    projectDetails(data) {
+      this.detailedProjectVisible = data;
+      for (let i = 0; i < this.navbarList.length; i++) {
+        if (i == 1) this.navbarList[i].active = true;
+        else this.navbarList[i].active = false;
+      }
     }
   },
   mounted() {
     this.getCookie();
-    this.clientInfo()
+    this.clientInfo();
   },
   components: {
     Quotesinfo,
@@ -304,7 +321,7 @@ body {
               color: #67573e;
               margin-left: 8%;
             }
-            &:hover{
+            &:hover {
               background-color: #ddd3c8;
             }
           }
@@ -326,7 +343,7 @@ body {
               color: #67573e;
               margin-left: 7%;
             }
-            &:hover{
+            &:hover {
               background-color: #ddd3c8;
             }
           }
@@ -376,7 +393,7 @@ body {
     max-width: 919px;
     width: 100%;
   }
-  
+
   .mainInfo {
     display: flex;
     flex-direction: column;
@@ -476,6 +493,17 @@ body {
         background-color: white;
         .title {
           color: #978d7e;
+        }
+      }
+
+      .activeSecondLi {
+        li {
+          &:nth-child(2) {
+            background-color: white;
+            .title {
+              color: #978d7e;
+            }
+          }
         }
       }
     }

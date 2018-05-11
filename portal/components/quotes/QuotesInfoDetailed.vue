@@ -219,6 +219,7 @@
           margin-right: 2%;
           margin-left: 2%;
           font-size: 15px;
+          outline-style: none;
           &:hover {
             color: #67573e;
           }
