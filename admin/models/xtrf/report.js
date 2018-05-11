@@ -22,10 +22,20 @@ function beginProject(pageNum = -1) {
         });
     })
 }
-
-function projectJobs(projectId) {
+function projectJobsPagesCount() {
     return new Promise(resolve => {
-        homeXtrf.get(`browser/?viewId=880&q.task_project.projectId=eq(${projectId})`).then(function (response) {
+        homeXtrf.get(`browser/?viewId=880`).then(function (response) {
+            const num = response.data.header.pagination.pagesCount;
+            resolve(num);
+        }).catch(function (error) {
+            console.log("errord adding customer, status " + error.response.status + "\n Message :" + error.response.data.errorMessage);
+            resolve(error);
+        });
+    })
+}
+function projectJobs(pageNum) {
+    return new Promise(resolve => {
+        homeXtrf.get(`browser/?viewId=880&page=${pageNum}`).then(function (response) {
             const res = [];
             for(key in response.data.rows)
             {
@@ -47,4 +57,4 @@ function projectJobs(projectId) {
 
 
 
-module.exports = { beginProject , projectJobs  }
+module.exports = { beginProject , projectJobs, projectJobsPagesCount }

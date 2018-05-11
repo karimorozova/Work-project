@@ -162,7 +162,6 @@ export default {
     },
     showAccountInfo() {
       this.accountInfo = true;
-      this.mainShow = false;
     },
     quoteDetails(data) {
       this.detailedInfoVisible = data;
@@ -192,7 +191,7 @@ export default {
   },
   computed: {
     visibleChecker() {
-      return this.detailedInfoVisible || this.detailedProjectVisible;
+      return this.detailedInfoVisible || this.detailedProjectVisible || this.accountInfo;
     }
   }
 };
