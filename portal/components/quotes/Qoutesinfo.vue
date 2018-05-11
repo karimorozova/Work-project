@@ -43,14 +43,14 @@
         .row(v-for="(quote,index) in clientQuotes")
             .shortInfo
                 .row__columns_info
-                    .col {{ quote.requestOn }}
+                    .col(@click="openQuotesInfoDetailed") {{ quote.requestOn }}
                     .col.proj(@click="openQuotesInfoDetailed") {{ quote.projectId }}
                     .col.col-5(@click="openQuotesInfoDetailed") {{ quote.projectName }}
-                    .col.col-4 {{ quote.status }}
-                    .col {{ quote.deadline }}
+                    .col.col-4(@click="openQuotesInfoDetailed") {{ quote.status }}
+                    .col(@click="openQuotesInfoDetailed") {{ quote.deadline }}
                     .col.col-5.colSplit
                         .col
-                            span {{ quote.totalCost }}
+                            span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                         .col
                             img(src="../../assets/images/Approve-icon.png")                            
                         .col
@@ -246,6 +246,7 @@ export default {
           border-right: 1px solid #998e7e;
           padding: 5px;
           width: 12%;
+          cursor: pointer;
           &:last-child {
             border-right: none;
           }

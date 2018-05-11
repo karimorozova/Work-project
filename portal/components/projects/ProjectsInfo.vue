@@ -35,12 +35,12 @@
                 span Download
         .project-table__body
             .project-table__row(v-for="(quote, index) in clientQuotes")
-                .project-table__col-1 {{ quote.requestOn }}
+                .project-table__col-1(@click="openProjectsInfoDetailed") {{ quote.requestOn }}
                 .project-table__col-2(@click="openProjectsInfoDetailed") {{ quote.projectId }}
                 .project-table__col-3(@click="openProjectsInfoDetailed") {{ quote.projectName }}
-                .project-table__col-4 {{ quote.status }}
-                .project-table__col-5 {{ quote.deadline }}
-                .project-table__col-6 {{ quote.totalCost }}   
+                .project-table__col-4(@click="openProjectsInfoDetailed") {{ quote.status }}
+                .project-table__col-5(@click="openProjectsInfoDetailed") {{ quote.deadline }}
+                .project-table__col-6(@click="openProjectsInfoDetailed") {{ quote.totalCost }}   
                 .project-table__col-7
                     img(src="../../assets/images/download.png")
 </template>
@@ -110,6 +110,7 @@
       border: 1px solid #978d7e;
       padding: 0 5px;
       line-height: 32px;
+      cursor: pointer;
     }
     &-2 {
       flex-basis: 14.2857%;
@@ -134,6 +135,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      cursor: pointer;
     }
     &-5 {
       flex-basis: 15%;
@@ -142,6 +144,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      cursor: pointer;
     }
     &-6 {
       flex-basis: 10%;
@@ -151,6 +154,7 @@
       justify-content: center;
       padding: 0 5px;
       line-height: 32px;
+      cursor: pointer;
     }
     &-7 {
       flex-basis: 16%;
