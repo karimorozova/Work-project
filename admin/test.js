@@ -21,7 +21,7 @@ async function runTest() {
             var commonJobId = jobId.substring(0, jobId.length - 1);
             var jobService = element[9];
             var wordcount = element[11];
-    
+            var totalAgreed = element[17].split(' ')[0];
     
             var wordcountRelative = wordcount;
     
@@ -47,7 +47,44 @@ async function runTest() {
                     wordcountRelative: wordcountRelative,
                     totalCost: element[12],
                 });
+
+            var sum = 0;
+            for(let i = 0; i < job.vendors.length; i++) {
+                sum = sum + +job.vendors[i].totalCost.split(' ')[0];
+            }
+            
+            job.profit = (job.totalAgreed - sum).toFixed(2);
+            job.profitPerc = ((job.profit / job.totalAgreed) * 100).toFixed(2);
+
+            job.sumStep1 = job.sum;
+            job.sumStep2 = 0;
+
+            if (job.projectService.toLowerCase() == 'translation and editing') {
+                job.sumStep1 = ((+job.sum * 66.6)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 33.3)/100).toFixed(2); 
+            }
+            if (job.projectService.toLowerCase() == 'translation and proofreading') {
+                job.sumStep1 = ((+job.sum * 80)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 20)/100).toFixed(2);
+            }
+            if (job.projectService.toLowerCase() == 'copywriting and proofreading') {
+                job.sumStep1 = ((+job.sum * 80)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 20)/100).toFixed(2);
+            }
+            if (job.projectService.toLowerCase() == 'blogging') {
+                job.sumStep1 = ((+job.sum * 80)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 20)/100).toFixed(2);
+            }
+            if (job.projectService.toLowerCase() == 'copywriting') {
+                job.sumStep1 = ((+job.sum * 80)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 20)/100).toFixed(2);
+            }
+            if (job.projectService.toLowerCase() == 'copywriting: orm/seo articles') {
+                job.sumStep1 = ((+job.sum * 80)/100).toFixed(2);
+                job.sumStep2 = ((+job.sum * 20)/100).toFixed(2);
+            }
                 await job.save();
+            
             } else {
                 const report = new Reports({
                     projectId: element[0],
@@ -73,9 +110,9 @@ async function runTest() {
                     sumStep1: 0,
                     sumStep2: 0,
                     sum: element[16],
-                    totalAgreed: element[17],
-                    profit: "profit",
-                    profitPerc: "profitPerc",
+                    totalAgreed: totalAgreed,
+                    profit: 0,
+                    profitPerc: 0,
                     instruction: element[18],
                     invoiced: element[19],
                 });
@@ -84,8 +121,6 @@ async function runTest() {
         } 
     });
  
-
-
     console.log("Test Ended");
 }
 //
