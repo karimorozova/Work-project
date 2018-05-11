@@ -1,11 +1,30 @@
 <template lang="pug">
-  .container
+  .reportWrapper
     .summaryTable
       h1 Summary
+      .tableFilters
+        .tableFilters__project
+          label Project ID: 
+          input(type="text" v-model="projectIdFilter" :value="projectIdFilter")
+        .tableFilters__dateFrom
+          label From: 
+          input(type="date" v-model="projectDeadlineStart" :value="projectDeadlineStart")
+        .tableFilters__dateTo
+          label To: 
+          input(type="date" v-model="projectDeadlineEnd" :value="projectDeadlineEnd")
+        .tableFilters__sourceLang
+          label Surce Language: 
+          input(type="text" v-model="sourceLang" :value="sourceLang")
+        .tableFilters__targetLang
+          label Target Language: 
+          input(type="text" v-model="targetLang" :value="targetLang")
+        .tableFilters__clientName
+          label Client Name: 
+          input(type="text" v-model="clientNameFilter" :value="clientNameFilter")
       table.table.reportTable(border='bordered')
         tr
           th(v-for="title in titles") {{ title }}
-        tr(v-for="res in summary")
+        tr(v-for="res in filteredSummary")
           td {{ res.projectId }}
           td {{ res.projectName }}
           td {{ res.beginDate }}
@@ -27,8 +46,8 @@
           td {{ res.sumStep2 }}          
           td {{ res.sum }}
           td {{ res.totalAgreed }}
-          td {{ res.porfit }}
-          td {{ res.porfitPerc }}
+          td {{ res.profit }}
+          td {{ res.profitPerc }}
           td {{ res.instructions }}
           td {{ res.invoiced }}
           td {{ res.jobId }}
@@ -44,7 +63,13 @@ export default {
       "Provider Name", "Service", "Rate [Provider]", "Wordcount", "Relative Wordcount", "Total Cost", "Provider Name", "Service", "Rate [Provider]", "Wordcount", "Relative Wordcount", "Total Cost",
       "Client Name", "Rate [Client]", "Wordcount [Receivable]", "Sum [Step1]", "Sum [Step2]", "Sum [Receivable]", "Total Agreed", 
       "Profit", "Profit in %", "Internal Special Instructions", "Invoiced"
-      ]      
+      ],
+      projectIdFilter: "",
+      projectDeadlineStart: "",
+      projectDeadlineEnd: "",
+      sourceLang: "",
+      targetLang: "",
+      clientNameFilter: ""
     };
   },
   methods: {
@@ -65,7 +90,62 @@ export default {
       );
     }
   },
-  computed: {},
+  computed: {
+    filteredSummary() {
+      let result = [];
+      if(this.projectIdFilter) {
+        result = this.summary.filter(item => {
+          if(item.projectId.includes(this.projectIdFilter)) {
+            return item;
+          }
+        })
+      } else {
+        result = this.summary;
+      }
+
+      if(this.sourceLang) {
+        result = this.summary.filter(item => {
+          if(item.sourceLanguage.includes(this.sourceLang)) {
+            return item;
+          }
+        })
+      } else {
+        result = this.summary;
+      }
+
+      if(this.targetLang) {
+        result = this.summary.filter(item => {
+          if(item.targetLanguage.includes(this.targetLang)) {
+            return item;
+          }
+        })
+      } else {
+        result = this.summary;
+      }
+
+      if(this.targetLang) {
+        result = this.summary.filter(item => {
+          if(item.targetLanguage.includes(this.targetLang)) {
+            return item;
+          }
+        })
+      } else {
+        result = this.summary;
+      }
+
+      if(this.clientNameFilter) {
+        result = this.summary.filter(item => {
+          if(item.clientName.includes(this.clientNameFilter)) {
+            return item;
+          }
+        })
+      } else {
+        result = this.summary;
+      }
+
+    return result;
+    }
+  },
   created() {
     this.getReports();
   },
