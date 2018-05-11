@@ -35,13 +35,13 @@
                 span Download
         .project-table__body
             .project-table__row(v-for="(quote, index) in clientQuotes")
-                .project-table__col-1(@click="changeBgCol1" :class="{lightbrown: changeBrown}") {{ quote.requestOn }}
-                .project-table__col-2(@click="changeBgCol2" :class="{lightbrown: changeBrown}") {{ quote.projectId }}
-                .project-table__col-3(@click="changeBgCol3" :class="{lightbrown: changeBrown}") {{ quote.projectName }}
-                .project-table__col-4(@click="changeBgCol4" :class="{lightbrown: changeBrown}") {{ quote.status }}
-                .project-table__col-5(@click="changeBgCol5" :class="{lightbrown: changeBrown}") {{ quote.deadline }}
-                .project-table__col-6(@click="changeBgCol6" :class="{lightbrown: changeBrown}") {{ quote.totalCost }}   
-                .project-table__col-7(@click="changeBgCol7" :class="{lightbrown: changeBrown}")
+                .project-table__col-1(@click="openProjectsInfoDetailed") {{ quote.requestOn }}
+                .project-table__col-2(@click="openProjectsInfoDetailed") {{ quote.projectId }}
+                .project-table__col-3(@click="openProjectsInfoDetailed") {{ quote.projectName }}
+                .project-table__col-4(@click="openProjectsInfoDetailed") {{ quote.status }}
+                .project-table__col-5(@click="openProjectsInfoDetailed") {{ quote.deadline }}
+                .project-table__col-6(@click="openProjectsInfoDetailed") {{ quote.totalCost }}   
+                .project-table__col-7
                     img(src="../../assets/images/download.png")
 </template>
 
@@ -59,30 +59,29 @@
     align-items: center;
 
     .col_bleach {
-        border-right: 1px solid #fff;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+      border-right: 1px solid #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-        .double_arrow {
-
-          .up {
-            margin-left: -13%;
-            margin-bottom: -33%;
-            .arrow_up {
-              height: 10px;
-              cursor: pointer;
-            }
+      .double_arrow {
+        .up {
+          margin-left: -13%;
+          margin-bottom: -33%;
+          .arrow_up {
+            height: 10px;
+            cursor: pointer;
           }
+        }
 
-          .down {
-            .arrow_down {
+        .down {
+          .arrow_down {
             height: 10px;
             cursor: pointer;
             transform: rotate(180deg);
-            }
           }
         }
+      }
     }
   }
 
@@ -94,27 +93,28 @@
   &__row {
     display: flex;
     margin-bottom: 5px;
-    &:hover {
-        background-color: #ddd3c8;
-      }
     &:last-child {
       margin-bottom: 0;
     }
     &:nth-of-type(even) {
       background-color: #f4f0ee;
     }
+    &:hover {
+      background-color: #ddd3c8;
+    }
   }
 
   &__col {
     &-1 {
       flex-basis: 14.2857%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
       line-height: 32px;
+      cursor: pointer;
     }
     &-2 {
       flex-basis: 14.2857%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
       line-height: 32px;
       cursor: pointer;
@@ -124,38 +124,41 @@
       justify-content: flex-start;
       align-items: center;
       flex-basis: 28%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
       cursor: pointer;
     }
     &-4 {
       flex-basis: 17%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      cursor: pointer;
     }
     &-5 {
       flex-basis: 15%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      cursor: pointer;
     }
     &-6 {
       flex-basis: 10%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 5px;
       display: flex;
       justify-content: center;
       padding: 0 5px;
       line-height: 32px;
+      cursor: pointer;
     }
     &-7 {
       flex-basis: 16%;
-      border: 1px solid #978D7E;
+      border: 1px solid #978d7e;
       padding: 0 5px;
     }
   }
@@ -170,8 +173,8 @@
 
   &__col-2 {
     .projectid {
-        height: 10px;
-        cursor: pointer;
+      height: 10px;
+      cursor: pointer;
     }
   }
 
@@ -232,31 +235,13 @@ export default {
           fullInfoAppear: false
         }
       ],
-      changeBrown: false
-    }
-    ;
+      projectInfoDetailed: false
+    };
   },
-  methods:{
-    changeBgCol1(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol2(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol3(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol4(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol5(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol6(){
-      this.changeBrown = !this.changeBrown;
-    },
-    changeBgCol7(){
-      this.changeBrown = !this.changeBrown;
+  methods: {
+    openProjectsInfoDetailed() {
+      this.projectInfoDetailed = !this.projectInfoDetailed;
+      this.$emit("projectDetails", this.projectInfoDetailed);
     }
   }
 };
