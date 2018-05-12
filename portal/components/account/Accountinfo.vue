@@ -1,6 +1,9 @@
 <template lang="pug">
     .account
-        form.account__form
+        .successModal(v-if="successShow")
+            p.successModal__message Your information has been saved
+        .account__header My account
+        form.account__form(@submit.prevent="saveInfo")
             .companyDetails
                 .companyDetails__title.blockTitle
                     span Company Details
@@ -28,6 +31,7 @@
                             .pass.item
                                 label Password
                                 input(type="password" value="12345678" :readonly="readonly" :class="{focus: !readonly}")
+                                span Change your password
                             .confirm.item
                                 label Confirm your Password
                                 input(type="password" value="12345678" :readonly="readonly" :class="{focus: !readonly}")
@@ -41,7 +45,7 @@
                             .skype.item
                                 label Skype Name
                                 input(type="text" value="mary.j" :readonly="readonly" :class="{focus: !readonly}")
-                .contactDetails__buttons
+                .contactDetails__buttons(v-if="!readonly")
                     input.button(type="submit" value="SAVE")
                     input.button(type="button" value="CANCEL" @click="cancelEdit")
 </template>
@@ -51,6 +55,7 @@ export default {
     data() {
         return {
             readonly: true,
+            successShow: false, 
         }
     },
     methods: {
@@ -59,6 +64,13 @@ export default {
         },
         cancelEdit() {
             this.readonly = true;
+        },
+        saveInfo() {
+            this.readonly = true;
+            this.successShow = true;
+            setTimeout(() => {
+                this.successShow = false;
+            }, 3000)
         }
     }
 }
@@ -66,10 +78,30 @@ export default {
 
 <style lang="scss">
     .account {
+        position: relative;
         width: 80%;
+        color: #67573e;
+        .successModal {
+            position: absolute;
+            width: 320px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 0;
+            left: 50%;
+            margin-left: -130px;
+            background-color: #DEEFD8;
+            color: #7CA47B;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        &__header {
+            padding: 20px 40px 0;
+            font-size: 26px;
+        }
         &__form {
-            color: #67573e;
-            padding: 20px;
+            padding: 20px 40px;
             display: flex;
             flex-direction: column;
             .button {
@@ -137,18 +169,20 @@ export default {
                         width: 100%;
                         max-height: 250px;
                         display: flex;
-                        justify-content: space-between;
+                        justify-content: space-around;
                         .credBlock {
-                            width: 47%;
+                            width: 270px;
                             .item {
                             display: flex;
                             flex-direction: column;
-                            margin-bottom: 40px;
+                            margin-bottom: 50px;
                             margin-right: 20px;
                                 label {
                                     margin-bottom: 10px;
+                                    font-size: 12px;
                                 }
                                 input {
+                                    width: 253px;
                                     padding: 10px;
                                     border-radius: 18px;
                                     border: none;
@@ -157,12 +191,23 @@ export default {
                                 .focus {
                                     border: 2px solid rgba(153, 142, 126, 0.8);
                                 }
+                            }
+                            .pass {
+                                position: relative;
+                                span {
+                                    position: absolute;
+                                    bottom: -16px;
+                                    left: 9px;
+                                    font-size: 12px;
+                                    color: rgba(103, 87, 62, 0.38);
+                                }
                             }   
                         }
                     }
                 }
                 &__buttons {
                     text-align: center;
+                    margin-top: 20px;
                     .button {
                         &:first-child {
                             margin-right: 30px;

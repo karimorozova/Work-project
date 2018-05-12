@@ -61,6 +61,7 @@
               quotesInfoDetailed(v-if="detailedInfoVisible")
             .detailedProjectWrapper
               projectInfoDetailed(v-if="detailedProjectVisible")
+            Allprojects(v-if="allProjectsShow")
             Accountinfo(v-if="accountInfo")
 </template>
 
@@ -70,6 +71,7 @@ import ProjectsInfo from "../components/projects/ProjectsInfo";
 import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
 import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
+import Allprojects from "../components/projects/Allprojects";
 
 export default {
   data() {
@@ -108,7 +110,8 @@ export default {
       accountMenuVisible: false,
       accountInfo: false,
       detailedInfoVisible: false,
-      detailedProjectVisible: false
+      detailedProjectVisible: false,
+      allProjectsShow: false
     };
   },
   methods: {
@@ -149,6 +152,19 @@ export default {
         } else {
           item.active = false;
         }
+
+        if (index == 0) {
+          this.allProjectsShow = false;
+          this.detailedInfoVisible = false;
+          this.detailedProjectVisible = false;
+        }
+
+        if (index == 1) {
+          this.allProjectsShow = true;
+          this.detailedInfoVisible = false;
+          this.detailedProjectVisible = false;
+        }
+        this.accountInfo = false;
       });
     },
     showQuotes() {
@@ -162,6 +178,10 @@ export default {
     },
     showAccountInfo() {
       this.accountInfo = true;
+      this.allProjectsShow = false;
+      this.detailedInfoVisible = false;
+      this.detailedProjectVisible = false;
+      this.navbarList.forEach(item => {item.active = false})
     },
     quoteDetails(data) {
       this.detailedInfoVisible = data;
@@ -187,11 +207,12 @@ export default {
     projectsInfo: ProjectsInfo,
     quotesInfoDetailed: QuotesInfoDetailed,
     Accountinfo,
-    projectInfoDetailed: ProjectInfoDetailed
+    projectInfoDetailed: ProjectInfoDetailed,
+    Allprojects    
   },
   computed: {
     visibleChecker() {
-      return this.detailedInfoVisible || this.detailedProjectVisible || this.accountInfo;
+      return this.detailedInfoVisible || this.detailedProjectVisible || this.accountInfo || this.allProjectsShow;
     }
   }
 };
@@ -379,8 +400,9 @@ body {
     width: 34%;
     position: absolute;
     top: 31%;
-    left: 30%;
+    left: 50%;
     max-width: 919px;
+    margin-left: -400px;
     width: 100%;
   }
 
@@ -388,8 +410,9 @@ body {
     width: 34%;
     position: absolute;
     top: 31%;
-    left: 30%;
+    left: 50%;
     max-width: 919px;
+    margin-left: -400px;    
     width: 100%;
   }
 
