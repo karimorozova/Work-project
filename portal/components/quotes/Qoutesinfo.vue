@@ -1,5 +1,6 @@
 <template lang="pug">
-    .qoutesWrap 
+    .qoutesWrap
+        QuotesCalendars
         .row
             .shortInfo
                 .row__columns
@@ -71,6 +72,7 @@
 
 <script>
 import moment from "moment";
+import QuotesCalendars from "./QuotesCalendars";
 
 export default {
   data() {
@@ -132,6 +134,9 @@ export default {
       this.detailedInfoVisible = true;
       this.$emit("quoteDetails", this.detailedInfoVisible);
     }
+  },
+  components: {
+    QuotesCalendars
   }
 };
 </script>
