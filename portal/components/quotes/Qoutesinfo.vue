@@ -102,9 +102,11 @@
                         .col
                             span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                         .col
-                            img(src="../../assets/images/Approve-icon.png")                            
+                            img(src="../../assets/images/Approve-icon.png")
+                            span.appr APPROVE QUOTE                         
                         .col
                             img(src="../../assets/images/Reject-icon.png")
+                            span.rej REJECT QUOTE
             .fullInfo(v-if="quote.fullInfoAppear")
                 .languagePair
                     .languagePair__title {{ languagePair }}
@@ -284,8 +286,8 @@ export default {
           }
           .src_lang {
             position: absolute;
-            top: 52.21%;
-            left: 24.91%;
+            top: 88.21%;
+            left: 11.81%;
             width: 200px;
             border-left: 2px solid #998e7e;
             border-right: 2px solid #998e7e;
@@ -542,6 +544,33 @@ export default {
           padding: 5px;
           width: 12%;
           cursor: pointer;
+          position: relative;
+          .appr {
+            position: absolute;
+            top: 97%;
+            left: -49%;
+            opacity: 0.5;
+            color: green;
+            z-index: 10;
+            font-size: 14px;
+            white-space: nowrap;
+            visibility: hidden;
+            &:hover {
+              visibility: visible;
+            }
+          }
+          .rej {
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            z-index: -1;
+            opacity: 0.5;
+            color: #f5876e;
+            visibility: hidden;
+            &:hover {
+              visibility: visible;
+            }
+          }
           &:last-child {
             border-right: none;
           }
