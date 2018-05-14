@@ -2,7 +2,8 @@
     .qoutesWrap
         .calendarWrapper
           .calenadr-container
-            quotesCalendarDetailed
+            quotesCalendarDetailed(v-if="currentFormVisible")
+            quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
             .calenadr-container__requestes
                 .calenadr-container__requestes-left
                     .first Request On
@@ -11,7 +12,7 @@
                 .calenadr-container__requestes-right
                     .first
                         .first-text {{ quotesCalendar.requeteOn }}
-                        .first-image
+                        .first-image(@click="showDetailedCalendar")
                             img(src="../../assets/images/calendar.png")
                     .second {{ quotesCalendar.projectName }}
                     .third(@click="showSrcLangs")
@@ -28,7 +29,7 @@
                 .calenadr-container__deadlines-right
                     .first
                         .first-text {{ quotesCalendar.requeteOn }}
-                        .first-image
+                        .first-image(@click="showDetailedCalendarOther")
                             img(src="../../assets/images/calendar.png")
                     .second {{ quotesCalendar.projectId }}
                     .third(@click="showTargLangs")
@@ -181,7 +182,9 @@ export default {
       },
       statusesBar: false,
       srcLangs: false,
-      targLangs: false
+      targLangs: false,
+      currentFormVisible: false,
+      currentFormVisibleOther: false
     };
   },
   methods: {
@@ -199,8 +202,14 @@ export default {
     showSrcLangs() {
       this.srcLangs = !this.srcLangs;
     },
-    showTargLangs(){
-       this.targLangs = !this.targLangs; 
+    showTargLangs() {
+      this.targLangs = !this.targLangs;
+    },
+    showDetailedCalendar() {
+      this.currentFormVisible = !this.currentFormVisible;
+    },
+    showDetailedCalendarOther() {
+      this.currentFormVisibleOther = !this.currentFormVisibleOther;
     }
   },
   components: {
@@ -252,6 +261,7 @@ export default {
             padding: 5px;
             .first-image {
               display: flex;
+              cursor: pointer;
               img {
                 height: 20px;
               }
@@ -327,6 +337,7 @@ export default {
             align-items: center;
             padding: 5px;
             .first-image {
+              cursor: pointer;
               display: flex;
               img {
                 height: 20px;
@@ -412,6 +423,13 @@ export default {
           }
         }
       }
+    }
+
+    .switcher {
+      position: absolute;
+      top: 28%;
+      left: 40%;
+      z-index: 5;
     }
   }
 
