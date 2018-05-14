@@ -390,7 +390,7 @@ body {
   height: 95%;
   position: relative;
   .maininfoWrapper {
-    width: 100%;
+    width: 89%;
     position: absolute;
     top: 2%;
     left: 11%;

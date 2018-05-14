@@ -45,6 +45,13 @@ import Projectstable from "./Projectstable";
 export default {
     data() {
         return {
+            requestDateFilter: '',
+            projectNameFilter: '',
+            deadlineFilter: '',
+            pojectIdFilter: '',
+            sourceLangsFilter: '',
+            tergetLangsFilter: '',
+            statusFilter: '',
             openAll: false,
             openSourceLangs: false,
             openTargetLangs: false,
@@ -73,7 +80,7 @@ export default {
 
 <style lang="scss">
     .allProjects {
-        width: 95%;
+        width: 89%;
         display: flex;
         justify-content: center;
         align-items: flex-start;
