@@ -593,9 +593,9 @@ body {
         transform: rotate(180deg);
       }
     }
-    .bottomLine {
-      border-bottom: 0.2px solid #c5bfb7;
-    }
+    // .bottomLine {
+    //   border-bottom: 0.2px solid #c5bfb7;
+    // }
   }
   .borderAngle {
     border-radius: 0;
