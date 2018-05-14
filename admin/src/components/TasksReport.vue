@@ -2,7 +2,7 @@
   .reportWrapper
     .summaryTable
       h1 Summary
-        a(href="/reports-update") Load Report to DB
+        //- a(href="/reports-update") Load Report to DB
       .tableFilters
         .tableFilters__project
           label Project ID: 

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
+const { sendMailClient } = require('../utils/mailhandlerclient');
 const { Requests, Languages, Services } = require('../models');
 const { quote } = require('../models/xtrf');
 
@@ -55,6 +56,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
   
     await request.save();
     sendMail(request);
+    sendMailClient(request);
     quote(request);
 
     console.log("Saved");

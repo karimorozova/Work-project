@@ -754,11 +754,12 @@ export default {
           console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
         }
-        for(var i = 0; i < this.detailFiles.length; i++){
+        sendForm.append("refFiles", this.refFiles, this.refFiles.name);
+        /*`for(var i = 0; i < this.refFiles.length; i++){
           console.log(this.refFiles[i]);
           sendForm.append("refFiles", this.refFiles[i]);
-        }
-        // sendForm.append("refFiles", this.refFiles, this.refFiles.name);
+        }*/
+        
 
         const result = await this.$axios.$post('api/request', sendForm);
     },
@@ -781,7 +782,6 @@ export default {
     },
     
     checkForm(event) {
-      console.log("in check form");
       this.request = {
           date: this.deadlineSelect, 
           contactName: this.contactName, 
@@ -815,7 +815,7 @@ export default {
       // if(!this.captchaValid) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
-        
+        console.log("sent")
         // window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
         this.showError();

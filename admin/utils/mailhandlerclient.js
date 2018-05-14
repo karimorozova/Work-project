@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
-const mailhandler = {
-  sendMail(request) {
+const mailhandlerclient = {
+  sendMailClient(request) {
     var detailFile = "";
     if (request.detailFiles.length > 0) {
       for (var i = 0; i < request.detailFiles.length; i++) {
@@ -34,7 +34,13 @@ const mailhandler = {
         pass: 'fc72170d536b40480711bfad6ff1a8c1'
       }
     });
-    var msg = `<table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
+    var msg = `<p style="color: #66563D;font-size: 12px">
+    Hi ${request.contactName}, <br/>
+    Thank you for your interest in Pangea Localization Services. <br/>
+    I have received your information and will get in touch with you at the earliest opportunity. <br/>
+    Please find a summary of your details below:
+</p>
+    <table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
     <thead>
       <td colspan="2" class="header" style="border: 2px solid #66563D;background-color: #F8D260;font-size: 15px;font-weight: bold;text-align: center;padding: 8px;width: 50%">CONTACT DETAILS</td>
     </thead>
@@ -119,11 +125,21 @@ const mailhandler = {
         <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">${request.date}</td>
       </tr>
     </tbody>
-</table>`;
+</table>
+<p style="color: #66563D;font-size: 12px">Looking forward to working together.</p>
+    <p style="color: #66563D;font-size: 12px">
+        Illy Dimitrova <br/>
+        Business Development Manager <br/>
+        T: +375 25252150 <br/>
+        M: +375 96130494 <br/>
+        S: illy.pangea <br/>
+        E: illy@pangea.global <br/>
+        W: pangea.global <br/>
+    </p>`;
 
     let mailOptions = {
       from: 'pangea@wellyes.ru', // sender address
-      to: 'sales@pangea.global', // sales@pangea.global list of receivers
+      to: `${request.contactEmail}`, // sales@pangea.global list of receivers
       subject: `A new lead from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body
@@ -144,4 +160,4 @@ const mailhandler = {
 
 
 
-module.exports = mailhandler;
+module.exports = mailhandlerclient;

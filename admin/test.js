@@ -1,6 +1,6 @@
 const { beginProject, projectJobs, projectJobsPagesCount } = require("./models/xtrf/report");
 const { Reports } = require("./models")
-
+const { sendMail } = require('./utils/mailhandler');
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/pangea');
@@ -9,7 +9,7 @@ mongoose.connection.collections['reports'].drop( function(err) {
     console.log('collection dropped');
 });
 
-async function runTest() {
+/*async function runTest() {
     console.log("Begin test");
         const pagesCount = await projectJobsPagesCount();
         
@@ -126,8 +126,12 @@ async function runTest() {
       
  
     console.log("Test Ended");
-}
+}*/
 //
 
-const res = runTest();
+//const res = runTest();
+var resp = {
+
+}
+const res = sendMail(resp);
 
