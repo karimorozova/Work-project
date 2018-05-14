@@ -231,8 +231,9 @@ body {
 }
 .projectsComponent,
 .quotesComponent {
-  width: 80%;
-  max-width: 900px;
+  // width: 80%;
+  // max-width: 900px;
+  width: 919px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -394,6 +395,9 @@ body {
     position: absolute;
     top: 2%;
     left: 11%;
+    @media(max-width: 1280px) {
+      left: 18%;
+    }
   }
 
   .detailedInfoWrapper {
