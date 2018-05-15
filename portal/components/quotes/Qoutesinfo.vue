@@ -294,6 +294,7 @@ export default {
             border-right: 2px solid #998e7e;
             border-bottom: 2px solid #998e7e;
             border-top: 2px solid #998e7e;
+            z-index: 5;
             .lang {
               border-bottom: 0.2px solid #c5bfb7;
               padding: 5px;
@@ -363,13 +364,14 @@ export default {
           }
           .targ_lang {
             position: absolute;
-            top: 52.21%;
-            left: 43.1%;
+            top: 88.21%;
+            left: 46.5%;
             width: 200px;
             border-left: 2px solid #998e7e;
             border-right: 2px solid #998e7e;
             border-bottom: 2px solid #998e7e;
             border-top: 2px solid #998e7e;
+            z-index: 5;
             .lang {
               border-bottom: 0.2px solid #c5bfb7;
               padding: 5px;
@@ -555,8 +557,8 @@ export default {
             height: 32px;
             visibility: hidden;
             &:hover {
-                visibility: visible;
-              }
+              visibility: visible;
+            }
 
             .appr {
               opacity: 0.5;
