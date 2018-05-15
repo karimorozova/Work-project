@@ -101,13 +101,14 @@
                     .col.col-5.colSplit
                         .col
                             span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
-                        .col
+                        .col.approve
                             img(src="../../assets/images/Approve-icon.png")
                             .sp-wrapper
                               span.appr APPROVE QUOTE                         
-                        .col
+                        .col.reject
                             img(src="../../assets/images/Reject-icon.png")
-                            span.rej REJECT QUOTE
+                            .sp-wrapper
+                              span.rej REJECT QUOTE
             .fullInfo(v-if="quote.fullInfoAppear")
                 .languagePair
                     .languagePair__title {{ languagePair }}
@@ -448,6 +449,41 @@ export default {
       &:hover {
         background-color: #ddd3c8;
       }
+
+      .row__columns_info {
+        .col.col-5.colSplit {
+          .col {
+            // .sp-wrapper {
+            //   position: absolute;
+            //   top: 21%;
+            //   left: -66%;
+            //   width: 112px;
+            //   height: 32px;
+            //   visibility: hidden;
+            //   z-index: 1;
+
+            //   .appr {
+            //     opacity: 0.5;
+            //     color: green;
+            //     z-index: -1;
+            //     font-size: 14px;
+            //     white-space: nowrap;
+            //     font-size: 12px;
+            //   }
+            // }
+
+            // .rej {
+            //   position: absolute;
+            //   top: 1%;
+            //   left: 1%;
+            //   z-index: -1;
+            //   opacity: 0.5;
+            //   color: #f5876e;
+            //   visibility: hidden;
+            // }
+          }
+        }
+      }
     }
     &__icon {
       width: 4%;
@@ -548,40 +584,6 @@ export default {
           width: 12%;
           cursor: pointer;
           position: relative;
-
-          .sp-wrapper {
-            position: absolute;
-            top: 65%;
-            left: -63%;
-            width: 112px;
-            height: 32px;
-            visibility: hidden;
-            &:hover {
-              visibility: visible;
-            }
-
-            .appr {
-              opacity: 0.5;
-              color: green;
-              z-index: -1;
-              font-size: 14px;
-              white-space: nowrap;
-              font-size: 12px;
-            }
-          }
-
-          .rej {
-            position: absolute;
-            top: 1%;
-            left: 1%;
-            z-index: -1;
-            opacity: 0.5;
-            color: #f5876e;
-            visibility: hidden;
-            &:hover {
-              visibility: visible;
-            }
-          }
           &:last-child {
             border-right: none;
           }
@@ -615,6 +617,7 @@ export default {
           display: flex;
           padding: 0;
           .col {
+            z-index: 2;
             width: 33%;
             padding: 0;
             display: flex;
@@ -628,12 +631,70 @@ export default {
               width: 22px;
             }
           }
+          .approve {
+            .sp-wrapper {
+              position: absolute;
+              top: 73%;
+              left: -37%;
+              width: 112px;
+              height: 32px;
+              visibility: hidden;
+              z-index: 1;
+
+              .appr {
+                opacity: 0.5;
+                color: green;
+                z-index: -1;
+                font-size: 14px;
+                white-space: nowrap;
+                font-size: 12px;
+              }
+            }
+
+            &:hover {
+              .sp-wrapper {
+                span {
+                  visibility: visible;
+                }
+              }
+            }
+          }
+
+          .reject {
+            .sp-wrapper {
+              position: absolute;
+              top: 73%;
+              left: -20%;
+              width: 112px;
+              height: 32px;
+              visibility: hidden;
+              z-index: 1;
+
+              .rej {
+                z-index: -1;
+                font-size: 14px;
+                white-space: nowrap;
+                font-size: 12px;
+                opacity: 0.5;
+                color: #f5876e;
+              }
+            }
+
+            &:hover {
+              .sp-wrapper {
+                span {
+                  visibility: visible;
+                }
+              }
+            }
+          }
         }
       }
     }
     &:nth-of-type(odd) {
       background-color: #f4f0ee;
     }
+
     .fullInfo {
       margin-top: 2px;
       align-self: flex-end;
