@@ -18,9 +18,7 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
-        form.mainForm(ref="myForm" @submit="checkForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" )
-          input(type="hidden" name="oid" value="00D1r000001nlsn")
-          input(type="hidden" name="retURL" value="http://www.pangea.global/thank-you")
+        form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number 
             span 1
             label.asterisk SERVICE TYPE      
@@ -32,7 +30,6 @@
               .service-type__drop(v-if='serviceDrop')
                 .service-type__drop-list
                   span.list-item(@click='changeServiceSelect(service)' v-for='service of services' ) {{ service.title }}
-                  input#00N1r00000HRi9E(maxlength="255" name="00N1r00000HRi9E" size="20" type="hidden" :value="serviceSelect.title")
           .number 
             span 2
             label.asterisk SELECT A LANGUAGE
@@ -54,7 +51,6 @@
                       .pair.pair_dialect(@click='changeSourceDialect(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
-              input#00N1r00000HRi9J(maxlength="255" name="00N1r00000HRi9J" size="20" type="hidden" :value="sourceSelect.lang")
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
@@ -83,7 +79,6 @@
                       .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-              input#00N1r00000HRiDb(name="00N1r00000HRiDb" maxlength="255" size="20" type="hidden" :value="targetLangForSales")
           .number 
             span 3
             label.asterisk CHOOSE AN INDUSTRY
@@ -124,7 +119,6 @@
               .image
               .image-white
               p Other
-            input#00N1r00000HRiDg(maxlength="255" name="00N1r00000HRiDg" size="20" type="hidden" :value="industrySelect")
           .number
             span 4
             label PROJECT DETAILS
@@ -223,8 +217,7 @@
                       span.type-text {{ type }}
             .details__brief
               span.details__brief-title Enter a short brief
-              textarea#00N1r00000HRiE0(name="00N1r00000HRiE0" rows='10' v-model='brief')
-            input#00N1r00000HRiDv(name="00N1r00000HRiDv" size="12" type="hidden" :value="deadlineSelect")
+              textarea(rows='10' v-model='brief')
           .number
             span 5
             label CONTACT DETAILS
@@ -233,43 +226,30 @@
               .contact__col-item.name
                 span.asterisk Name
                 input(type='text' name='formContactsName' v-model='contactName')
-                input#first_name(maxlength="255" name="first_name" size="20" type="hidden" :value="contactName")
-                input#last_name(maxlength="255" name="last_name" size="20" type="hidden" value="_")
-                input#00N1r00000HRiE5(maxlength="255" name="00N1r00000HRiE5" size="20" type="hidden" :value="contactName")
               .contact__col-item.e-mail
                 span.asterisk Email
                 input(type='text' name='formContactsMail' v-model='contactEmail')
-                input#email(maxlength="80" name="email" size="20" type="hidden" :value="contactEmail")
               .contact__col-item.phones
                 span Phone Number
                 input(type='text' v-model='phone')
-                input#phone(maxlength="40" name="phone" size="20" type="hidden" :value="phone")
             .contact__col
               .contact__col-item.company-name
                 span.asterisk Company Name
                 input(type='text' v-model='companyName')
-                input#company(maxlength="40" name="company" size="20" type="hidden" :value="companyName")
               .contact__col-item.website
                 span Website
                 input(type='text' v-model='web')
-                input#URL(maxlength="80" name="URL" size="20" type="hidden" :value="web")
               .contact__col-item.skype
                 span Skype Name
                 input(type='text' v-model='contactSkype')
-                input#00N1r00000HRiEF(maxlength="255" name="00N1r00000HRiEF" size="20" type="hidden" :value="contactSkype")
           .captcha
-            //- span.asterisk Please, confirm that you are not a robot   
-            //- .captcha__google
-              //- vue-recaptcha( sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ" 
-              //-   ref="recaptcha"
-              //-   @verify="onVerify"
-              //-   @expired="onExpired"
-              //-   :callback="checkForm"
-              //-   :style= {"transform": "scale(0.77)",
-              //-     "-webkit-transform": "scale(0.77)",
-              //-     "transform-origin": "150px 0",
-              //-     "-webkit-transform-origin": "150px 0" })
-            input#00N1r00000Fie4G(maxlength="255" name="00N1r00000Fie4G" size="20" type="hidden")
+            span.asterisk Please, confirm that you are not a robot   
+            .captcha__google
+              .g-recaptcha(data-sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ"
+                style= {"transform": "scale(0.77)",
+                  "-webkit-transform": "scale(0.77)",
+                  "transform-origin": "150px 0",
+                  "-webkit-transform-origin": "150px 0" })
             input.buttons(type='submit' value='Submit' name="submit")
           .warning(v-if="error")
             .message
@@ -323,7 +303,7 @@
             a(:href="social.socialLink")
               img.socialsImage(:src="social.image")
     script(src='/salesforce.js')          
-    //- script(src='https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit', defer=true, async=true)
+    script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
 <script>
@@ -343,7 +323,6 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
-// import VueRecaptcha from 'vue-recaptcha';
 import { Drag, Drop } from 'vue-drag-drop';
 
 var sbjs = require('sourcebuster');
@@ -419,7 +398,6 @@ export default {
       error: false,
       success: false,
       services:[],
-      captchaValid : false,
       fileTypes: {
         text:
           [
@@ -678,26 +656,19 @@ export default {
     openPicker1 () {
       this.$refs.programaticOpen1.showCalendar()
     },
-    // onVerify: function (response) {
-    //   this.captchaValid = true;
-    //   console.log('Verify: ' + response)
-    // },
-    // onExpired: function () {
-    //   console.log('Expired')
-    // },
     showSuccess(){
       this.success = true;
 
       setTimeout(() => {
-          this.success = !this.success
+          this.success = false
       }, 4000)
     },
     showError(){
       this.error = true;
 
       setTimeout(() => {
-          this.error = !this.error
-      }, 5000)
+          this.error = false
+      }, 4000)
     },
     closeWarning() {
       this.error = false;
@@ -781,7 +752,7 @@ export default {
 
     },
     
-    checkForm(event) {
+    async checkForm(event) {
       this.request = {
           date: this.deadlineSelect, 
           contactName: this.contactName, 
@@ -811,12 +782,13 @@ export default {
       }
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
-      } 
-      // if(!this.captchaValid) this.errors.push("captcha required");
+      }
+      let captchaValidation = await grecaptcha.getResponse();
+      if(captchaValidation.length === 0) this.errors.push("captcha required");
       if(!this.errors.length){
         this.sendForm();
         console.log("sent")
-        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+        window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
         this.showError();
         
@@ -873,11 +845,9 @@ export default {
   },
   components: {
     Datepicker,
-    // VueRecaptcha,
     Drop
   },
   mounted(){
-    // this.gclid();
     this.google();
     this.getServices();
     this.getLanguages();

@@ -26,15 +26,18 @@ const mailhandlerclient = {
     });
 
     let transporter = nodemailer.createTransport({
-      host: 'in-v3.mailjet.com',
+      host: 'smtp.gmail.com', //in-v3.mailjet.com
       port: 587,
       secure: false, // upgrade later with STARTTLS
       auth: {
-        user: '2a629a8646758c2140a8aced91f03dcb',
-        pass: 'fc72170d536b40480711bfad6ff1a8c1'
+        user: 'translation@pangea.global', //2a629a8646758c2140a8aced91f03dcb
+        pass: 'LetMeInNow!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
-    var msg = `<p style="color: #66563D;font-size: 12px">
+    var msg = `<div class="emailWrapper" style="width: 600px; padding:10px;">
+    <a href="https://www.pangea.global/">
+    <img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
+    <p style="color: #66563D;font-size: 12px; line-height: 1.5em;">
     Hi ${request.contactName}, <br/>
     Thank you for your interest in Pangea Localization Services. <br/>
     I have received your information and will get in touch with you at the earliest opportunity. <br/>
@@ -135,14 +138,60 @@ const mailhandlerclient = {
         S: illy.pangea <br/>
         E: illy@pangea.global <br/>
         W: pangea.global <br/>
-    </p>`;
+    </p>
+    <div style="margin-left: 170px; margin-top: 20px">
+      <a href="https://plus.google.com/116520029165216678356"><img src="cid:Artboard2@pan" alt="" class="social-image"></a>
+      <a href="https://www.facebook.com/PangeaLocalizationServices/"><img src="cid:Artboard3@pan" alt="" class="social-image"></a>
+      <a href="https://twitter.com/Pangea_Local"><img src="cid:Artboard4@pan" alt="" class="social-image"></a>
+      <a href="https://www.pinterest.com/pangealocalizat/"><img src="cid:Artboard5@pan" alt="" class="social-image"></a>
+      <a href="https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw"><img src="cid:Artboard6@pan" alt="" class="social-image"></a>
+      <a href="https://www.linkedin.com/company/pangea-language-service"><img src="cid:Artboard7@pan" alt="" class="social-image"></a>
+      <a href="https://www.instagram.com/pangea_local/"><img src="cid:Artboard8@pan" alt="" class="social-image"></a>
+    </div>
+    </div>`;
 
     let mailOptions = {
-      from: 'pangea@wellyes.ru', // sender address
+      from: 'translation@pangea.global', // sender address
       to: `${request.contactEmail}`, // sales@pangea.global list of receivers
-      subject: `A new lead from ${request.companyName}`, // Subject line
+      subject: 'Inquiry confirmation from Pangea Localization Services', // Subject line
       text: "plain text", // plain text body
-      html: "<b>" + msg + "</b>" // html body
+      html: "<b>" + msg + "</b>", // html body
+      attachments: [{
+        filename: 'logo.png',
+        path: './static/logo.png',
+        cid: 'logo@pan' //same cid value as in the html img src
+        },
+        {
+          filename: 'Artboard2.jpg',
+          path: './static/Artboard2.jpg',
+          cid: 'Artboard2@pan' //same cid value as in the html img src
+        },
+        {
+          filename: 'Artboard3.jpg',
+          path: './static/Artboard3.jpg',
+          cid: 'Artboard3@pan' //same cid value as in the html img src
+        },{
+          filename: 'Artboard4.jpg',
+          path: './static/Artboard4.jpg',
+          cid: 'Artboard4@pan' //same cid value as in the html img src
+        },{
+          filename: 'Artboard5.jpg',
+          path: './static/Artboard5.jpg',
+          cid: 'Artboard5@pan' //same cid value as in the html img src
+        },{
+          filename: 'Artboard6.jpg',
+          path: './static/Artboard6.jpg',
+          cid: 'Artboard6@pan' //same cid value as in the html img src
+        },{
+          filename: 'Artboard7.jpg',
+          path: './static/Artboard8.jpg',
+          cid: 'Artboard7@pan' //same cid value as in the html img src
+        },{
+          filename: 'Artboard8.jpg',
+          path: './static/Artboard8.jpg',
+          cid: 'Artboard8@pan' //same cid value as in the html img src
+        },
+      ]
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

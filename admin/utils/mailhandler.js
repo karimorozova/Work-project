@@ -26,12 +26,12 @@ const mailhandler = {
     });
 
     let transporter = nodemailer.createTransport({
-      host: 'in-v3.mailjet.com',
+      host: 'smtp.gmail.com', //in-v3.mailjet.com
       port: 587,
       secure: false, // upgrade later with STARTTLS
       auth: {
-        user: '2a629a8646758c2140a8aced91f03dcb',
-        pass: 'fc72170d536b40480711bfad6ff1a8c1'
+        user: 'translation@pangea.global', //2a629a8646758c2140a8aced91f03dcb
+        pass: 'LetMeInNow!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
     var msg = `<table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
@@ -122,7 +122,7 @@ const mailhandler = {
 </table>`;
 
     let mailOptions = {
-      from: 'pangea@wellyes.ru', // sender address
+      from: 'translation@pangea.global', // sender address
       to: 'sales@pangea.global', // sales@pangea.global list of receivers
       subject: `A new lead from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
