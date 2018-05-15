@@ -103,7 +103,8 @@
                             span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                         .col
                             img(src="../../assets/images/Approve-icon.png")
-                            span.appr APPROVE QUOTE                         
+                            .sp-wrapper
+                              span.appr APPROVE QUOTE                         
                         .col
                             img(src="../../assets/images/Reject-icon.png")
                             span.rej REJECT QUOTE
@@ -293,6 +294,7 @@ export default {
             border-right: 2px solid #998e7e;
             border-bottom: 2px solid #998e7e;
             border-top: 2px solid #998e7e;
+            z-index: 5;
             .lang {
               border-bottom: 0.2px solid #c5bfb7;
               padding: 5px;
@@ -362,13 +364,14 @@ export default {
           }
           .targ_lang {
             position: absolute;
-            top: 52.21%;
-            left: 43.1%;
+            top: 88.21%;
+            left: 46.5%;
             width: 200px;
             border-left: 2px solid #998e7e;
             border-right: 2px solid #998e7e;
             border-bottom: 2px solid #998e7e;
             border-top: 2px solid #998e7e;
+            z-index: 5;
             .lang {
               border-bottom: 0.2px solid #c5bfb7;
               padding: 5px;
@@ -545,20 +548,28 @@ export default {
           width: 12%;
           cursor: pointer;
           position: relative;
-          .appr {
+
+          .sp-wrapper {
             position: absolute;
-            top: 97%;
-            left: -49%;
-            opacity: 0.5;
-            color: green;
-            z-index: 10;
-            font-size: 14px;
-            white-space: nowrap;
+            top: 65%;
+            left: -63%;
+            width: 112px;
+            height: 32px;
             visibility: hidden;
             &:hover {
               visibility: visible;
             }
+
+            .appr {
+              opacity: 0.5;
+              color: green;
+              z-index: -1;
+              font-size: 14px;
+              white-space: nowrap;
+              font-size: 12px;
+            }
           }
+
           .rej {
             position: absolute;
             top: 1%;
