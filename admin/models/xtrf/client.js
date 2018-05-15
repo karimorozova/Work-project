@@ -53,6 +53,17 @@ var ClientApi = class ClientApi {
         })
     }
 
+    clientInfo() {
+        return new Promise(resolve => {
+            this.clientApi.get("/projects")
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
     getName() {
         return new Promise(resolve => {
             this.clientApi.get("system/account")

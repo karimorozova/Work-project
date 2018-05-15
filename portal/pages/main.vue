@@ -147,7 +147,7 @@ export default {
     async clientInfo() {
       const result = await this.$axios.request({
         method: "get",
-        url: "portal/clientsinfo",
+        url: "portal/clientinfo",
         withCredentials: true
       });
       console.log(result);
