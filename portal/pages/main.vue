@@ -6,6 +6,17 @@
                   h2.clientsPortal {{ clientPortal }}  
                   span(v-if="companyName") >> {{ companyName }}
             .clientsTop__searchBlock
+                .sel_project_block
+                  .sel_project_block__proj
+                    span New Project
+                  .sel_project_block__additional
+                    .first {{ newProject.trans }}
+                    .second {{ newProject.copyw }}
+                    .third {{ newProject.market }}
+                    .fourth {{ newProject.proof }}
+                    .fifth {{ newProject.graph }}
+                  .sel_project_block__imgWrapper
+                    img(src="../assets/images/white-arrow.png")
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
                 .womanWrapper(@click="showAccountMenu")
@@ -112,7 +123,14 @@ export default {
       accountInfo: false,
       detailedInfoVisible: false,
       detailedProjectVisible: false,
-      allProjectsShow: false
+      allProjectsShow: false,
+      newProject: {
+        trans: "Translation",
+        copyw: "Copywrighting",
+        market: "Marketing",
+        proof: "Proofing/QA",
+        graph: "Graphic Localization"
+      }
     };
   },
   methods: {
@@ -280,12 +298,65 @@ body {
   }
 
   .clientsTop__searchBlock {
-    margin-right: 1%;
+    margin-right: -3%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .sel_project_block {
+      background-color: #f5876e;
+      border-radius: 14px;
+      margin-right: 150px;
+      width: 212px;
+      height: 34px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      &__proj {
+        border-right: 1px solid #fff;
+        line-height: 100%;
+        color: #fff;
+        margin-right: 16px;
+        padding-right: 14px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        span {
+          padding-right: 38%;
+          white-space: nowrap;
+        }
+      }
+
+      &__additional {
+        position: absolute;
+        border: 2px solid #978d7e;
+        top: 1.2%;
+        right: 16%;
+        color: #67573e;
+        background-color: #fff;
+        font-size: 16px;
+        z-index: 20;
+
+          .first, .second, .third, .fourth, .fifth {
+            padding: 15px;
+            border-bottom: 0.2px solid #978d7e;
+          }
+      }
+
+      &__imgWrapper {
+        display: flex;
+        img {
+          height: 14px;
+          transform: rotate(180deg);
+          margin-right: 20px;
+        }
+      }
+    }
+
     .searchWrapper {
-      margin-left: -55%;
+      margin-left: -32%;
     }
     .womanWrapper {
       margin-right: 20%;
