@@ -7,7 +7,7 @@
                 .dropItem__filters
                     .filterBlock
                         .filterBlock__item.request
-                            label Request on
+                            label Request On
                             input(type="text" v-model="requestDateFilter")
                             img(src="../../assets/images/calendar.png")
                         .filterBlock__item.projectName
