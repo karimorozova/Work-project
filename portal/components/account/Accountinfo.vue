@@ -22,7 +22,7 @@
                 .contactDetails__details
                     .contactDetails__details_image
                         .photo
-                        input.button(type="button" value="Change Image")
+                        input.button(v-if="!readonly" type="button" value="Change Image")
                     .contactDetails__details_credentials
                         .authData.credBlock
                             .name.item
