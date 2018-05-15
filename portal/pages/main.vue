@@ -2,7 +2,8 @@
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
-                h2.clientsPortal {{ clientPortal }}  
+                a(href="/main") 
+                  h2.clientsPortal {{ clientPortal }}  
                   span(v-if="companyName") >> {{ companyName }}
             .clientsTop__searchBlock
                 .searchWrapper
@@ -141,11 +142,11 @@ export default {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
           item.active = true;
-          if(this.detailedInfoVisible && !this.detailedProjectVisible) {
+          if (this.detailedInfoVisible && !this.detailedProjectVisible) {
             this.detailedInfoVisible = !this.detailedInfoVisible;
             this.openQuotes = !this.openQuotes;
           }
-          if(!this.detailedInfoVisible && this.detailedProjectVisible) {
+          if (!this.detailedInfoVisible && this.detailedProjectVisible) {
             this.detailedProjectVisible = !this.detailedProjectVisible;
             this.openProjects = !this.openProjects;
           }
@@ -181,7 +182,9 @@ export default {
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
       this.detailedProjectVisible = false;
-      this.navbarList.forEach(item => {item.active = false})
+      this.navbarList.forEach(item => {
+        item.active = false;
+      });
     },
     quoteDetails(data) {
       this.detailedInfoVisible = data;
@@ -196,6 +199,10 @@ export default {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
       }
+    },
+    backToMain() {
+      this.$refs.againMain.baseURI;
+      console.log(this.$refs);
     }
   },
   mounted() {
@@ -208,11 +215,16 @@ export default {
     quotesInfoDetailed: QuotesInfoDetailed,
     Accountinfo,
     projectInfoDetailed: ProjectInfoDetailed,
-    Allprojects    
+    Allprojects
   },
   computed: {
     visibleChecker() {
-      return this.detailedInfoVisible || this.detailedProjectVisible || this.accountInfo || this.allProjectsShow;
+      return (
+        this.detailedInfoVisible ||
+        this.detailedProjectVisible ||
+        this.accountInfo ||
+        this.allProjectsShow
+      );
     }
   }
 };
@@ -257,6 +269,9 @@ body {
   }
 
   .clientsTop__clientName {
+    a {
+      text-decoration: none;
+    }
     .clientsPortal {
       color: #fff;
       margin-left: 7%;
@@ -395,7 +410,7 @@ body {
     position: absolute;
     top: 2%;
     left: 11%;
-    @media(max-width: 1280px) {
+    @media (max-width: 1280px) {
       left: 18%;
     }
   }
@@ -416,7 +431,7 @@ body {
     top: 31%;
     left: 50%;
     max-width: 919px;
-    margin-left: -400px;    
+    margin-left: -400px;
     width: 100%;
   }
 

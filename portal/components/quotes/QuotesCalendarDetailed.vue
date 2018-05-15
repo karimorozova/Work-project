@@ -8,20 +8,7 @@
                     .col2-text1
                     .col2-text2 Anytime
             .container__left-level4
-                datepicker(monday-first=true :highlighted='state.highlighted' :disabled='state.disabled' v-if="true")
-            .container__left-level5
-                .col1
-                    .col1-text Current
-                    .col1-image
-                        img(src="../../assets/images/open-close-arrow-brown.png")
-                .col2
-                    .col2-text Last
-                    .col2-image
-                        img(src="../../assets/images/open-close-arrow-brown.png")
-                .col3
-                    .col3-text Next
-                    .col3-image
-                        img(src="../../assets/images/open-close-arrow-brown.png")
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' :disabled='state.disabled')
         .container__right
             .container__right-level1
                 .col1 From
@@ -29,7 +16,7 @@
                     .col2-text1
                     .col2-text2 Anytime
             .container__right-level4
-                datepicker(monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' :disabled='state.disabled')
             .container__right-level5
                 .col1
                     .col1-text 15 days selected

@@ -103,7 +103,8 @@
                             span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                         .col
                             img(src="../../assets/images/Approve-icon.png")
-                            span.appr APPROVE QUOTE                         
+                            .sp-wrapper
+                              span.appr APPROVE QUOTE                         
                         .col
                             img(src="../../assets/images/Reject-icon.png")
                             span.rej REJECT QUOTE
@@ -545,20 +546,28 @@ export default {
           width: 12%;
           cursor: pointer;
           position: relative;
-          .appr {
+
+          .sp-wrapper {
             position: absolute;
-            top: 97%;
-            left: -49%;
-            opacity: 0.5;
-            color: green;
-            z-index: 10;
-            font-size: 14px;
-            white-space: nowrap;
+            top: 65%;
+            left: -63%;
+            width: 112px;
+            height: 32px;
             visibility: hidden;
             &:hover {
-              visibility: visible;
+                visibility: visible;
+              }
+
+            .appr {
+              opacity: 0.5;
+              color: green;
+              z-index: -1;
+              font-size: 14px;
+              white-space: nowrap;
+              font-size: 12px;
             }
           }
+
           .rej {
             position: absolute;
             top: 1%;
