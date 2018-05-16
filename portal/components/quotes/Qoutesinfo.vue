@@ -94,33 +94,22 @@
           .row(v-for="(quote,index) in clientQuotes")
               .shortInfo
                   .row__columns_info
-                      .col(@click="openQuotesInfoDetailed") {{ quote.requestOn }}
-                      .col.proj(@click="openQuotesInfoDetailed") {{ quote.projectId }}
-                      .col.col-5(@click="openQuotesInfoDetailed") {{ quote.projectName }}
-                      .col.col-4(@click="openQuotesInfoDetailed") {{ quote.status }}
-                      .col(@click="openQuotesInfoDetailed") {{ quote.deadline }}
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.requestOn }}
+                      .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.projectId }}
+                      .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.projectName }}
+                      .col.col-4(@click="openQuotesInfoDetailed(index)") {{ quote.status }}
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.deadline }}
                       .col.col-5.colSplit
                           .col
                               span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                           .col.approve
-                              img(src="../../assets/images/Approve-icon.png")
-                              .sp-wrapper
-                                span.appr APPROVE QUOTE                         
+                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'")
+                              //- .sp-wrapper
+                              //-   span.appr APPROVE QUOTE                         
                           .col.reject
-                              img(src="../../assets/images/Reject-icon.png")
-                              .sp-wrapper
-                                span.rej REJECT QUOTE
-              .fullInfo(v-if="quote.fullInfoAppear")
-                  .languagePair
-                      .languagePair__title {{ languagePair }}
-                          img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                      ul.languagePair__ul
-                          li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
-                  .cost
-                      .cost__title {{ cost }}
-                          img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
-                      ul.cost__ul
-                          li.cost__li(v-for="language in languagesFromTo" v-html="language.price")
+                              img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'")
+                              //- .sp-wrapper
+                              //-   span.rej REJECT QUOTE
                                          
 </template>
 
@@ -174,22 +163,7 @@ export default {
       //     fullInfoAppear: false
       //   }
       // ],
-      languagePair: "Language Pair",
-      cost: "Cost",
-      languagesFromTo: [
-        {
-          description: "EN-GB >> PL",
-          price: "32.43 &#8364;"
-        },
-        {
-          description: "EN-GB >> HU",
-          price: "32.43 &#8364;"
-        },
-        {
-          description: "EN-GB >> CZ",
-          price: "32.43 &#8364;"
-        }
-      ],
+
       detailedInfoVisible: false,
       quotesCalendar: {
         requeteOn: "01-Apr-2018-15-Apr-2018",
@@ -211,9 +185,9 @@ export default {
       this.clientQuotes[index].fullInfoAppear = !this.clientQuotes[index]
         .fullInfoAppear;
     },
-    openQuotesInfoDetailed() {
+    openQuotesInfoDetailed(index) {
       this.detailedInfoVisible = true;
-      this.$emit("quoteDetails", this.detailedInfoVisible);
+      this.$emit("quoteDetails", {open: this.detailedInfoVisible, index: index} );
     },
     showStatuses() {
       this.statusesBar = !this.statusesBar;
@@ -249,7 +223,7 @@ export default {
             projectName: array[i].name,
             status: array[i].status,
             deadline: finalDeadline, //moment(new Date()).format("DD-MM-YYYY"),
-            totalCost: "€1000",
+            totalCost: array[i].totalAgreed.formattedAmount,
             fullInfoAppear: false
           })
         }
@@ -264,10 +238,10 @@ export default {
 </script>
 
 <style lang="scss">
-.qoutesWrap {
+.qoutesWrap, .projectWrapper {
   .scrollingArea {
-    max-height: 113px;
-    overflow-y: scroll;
+    height: 150px;
+    overflow-y: auto;
     overflow-x: hidden;
   }
   .calendarWrapper {

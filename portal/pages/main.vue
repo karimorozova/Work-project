@@ -54,9 +54,9 @@
                   span.icon__arrow >
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
-                .buttonPanel
-                  button.quote New Quote
-                  button.project New Project
+                //- .buttonPanel
+                //-   button.quote New Quote
+                //-   button.project New Project
                 .clientsAll
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
@@ -69,9 +69,9 @@
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                          projectsInfo(@projectDetails="projectDetails")
+                          projectsInfo(@projectDetails="projectDetails" :projects="projects")
             .detailedInfoWrapper
-              quotesInfoDetailed(v-if="detailedInfoVisible")
+              QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
               projectInfoDetailed(v-if="detailedProjectVisible")
             Allprojects(v-if="allProjectsShow")
@@ -117,8 +117,8 @@ export default {
           active: false
         }
       ],
-      openQuotes: false,
-      openProjects: false,
+      openQuotes: true,
+      openProjects: true,
       expander: false,
       accountMenuVisible: false,
       accountInfo: false,
@@ -130,6 +130,8 @@ export default {
       user: {},
       projects: [],
       quotes: [],
+      quoteIndex: 0,
+      projectIndex: 0,
       newProject: {
         trans: "Translation",
         copyw: "Copywrighting",
@@ -216,7 +218,9 @@ export default {
       });
     },
     quoteDetails(data) {
-      this.detailedInfoVisible = data;
+      this.detailedInfoVisible = data.open;
+      this.quoteIndex = data.index;
+      console.log(this.quoteIndex);
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
@@ -244,7 +248,7 @@ export default {
   components: {
     Quotesinfo,
     projectsInfo: ProjectsInfo,
-    quotesInfoDetailed: QuotesInfoDetailed,
+    QuotesInfoDetailed,
     Accountinfo,
     projectInfoDetailed: ProjectInfoDetailed,
     Allprojects
@@ -614,6 +618,8 @@ body {
       width: 100%;
 
       &_item {
+        padding-top: 20px;
+        padding-bottom: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;
