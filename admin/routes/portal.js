@@ -23,9 +23,16 @@ router.post('/auth', async (req, res, next) => {
 
 router.get('/clientinfo', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
-    const userId = await (customer.userInfo());
-    const fullInfo = await (customer.clientInfo(userId.data.parentId));
-    res.send(fullInfo.data);
+    const userId = await (customer.userInfo());   
+    const userInfo = await (customer.fullUserInfo(userId.data.parentId, userId.data.id));
+    const fullInfo = await (customer.projectsInfo());
+    const quotesInfo = await (customer.quotesInfo());
+    const companyInfo = await (customer.companyInfo(userId.data.parentId));
+    const projects = fullInfo.data;
+    const quotes = quotesInfo.data;
+    const client = companyInfo.data;
+    const user = userInfo.data;
+    res.send({user, client, projects, quotes});
 });
 
 module.exports = router;

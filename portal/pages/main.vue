@@ -1,10 +1,10 @@
 <template lang="pug">
-    .clientsportalWrapper
+    .clientsportalWrapper(v-if="cookies")
         .clientsTop
             .clientsTop__clientName
                 a(href="/main") 
-                  h2.clientsPortal {{ clientPortal }}  
-                  span(v-if="companyName") >> {{ companyName }}
+                  h2.clientsPortal CLIENT PORTAL
+                    span(v-if="accountInfo") >> {{ user.name }} (My Account)
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
@@ -51,7 +51,7 @@
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
                         .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Quotesinfo(@quoteDetails="quoteDetails")
+                          Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")
                     .projectsComponent
                       .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
@@ -63,7 +63,7 @@
             .detailedProjectWrapper
               projectInfoDetailed(v-if="detailedProjectVisible")
             Allprojects(v-if="allProjectsShow")
-            Accountinfo(v-if="accountInfo")
+            Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
 <script>
@@ -112,18 +112,24 @@ export default {
       accountInfo: false,
       detailedInfoVisible: false,
       detailedProjectVisible: false,
-      allProjectsShow: false
+      allProjectsShow: false,
+      cookies: false,
+      client: {},
+      user: {},
+      projects: [],
+      quotes: []
     };
   },
   methods: {
     getCookie() {
-      // let sessionCookie = document.cookie.split("=")[1];
+      let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
+        this.cookies = true;
         return true;
       } else {
         console.log("login failed");
         // alert("Please, Log in!")
-        // window.location.replace("/");
+        window.location.replace("/");
       }
     },
     async clientInfo() {
@@ -133,7 +139,10 @@ export default {
         withCredentials: true
       });
       console.log(result);
-      this.companyName = result.data.name;
+      this.client = result.data.client;
+      this.user = result.data.user;
+      this.projects = result.data.projects;
+      this.quotes = result.data.quotes
     },
     expandBar() {
       this.expander = !this.expander;
@@ -276,6 +285,10 @@ body {
       color: #fff;
       margin-left: 7%;
       width: 100%;
+      span {
+        margin-left: 20px;
+        font-weight: 400;
+      }
     }
   }
 
