@@ -335,7 +335,7 @@ export default {
           .src_lang {
             position: absolute;
             top: 88.21%;
-            left: 11.81%;
+            left: 11.71%;
             width: 200px;
             border-left: 2px solid #998e7e;
             border-right: 2px solid #998e7e;

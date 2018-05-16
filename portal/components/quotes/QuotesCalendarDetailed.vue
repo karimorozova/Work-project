@@ -11,7 +11,7 @@
                 datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' :disabled='state.disabled')
         .container__right
             .container__right-level1
-                .col1 From
+                .col1 To
                 .col2
                     .col2-text1
                     .col2-text2 Anytime
@@ -111,7 +111,7 @@
           color: #67573e;
           font-size: 16px;
           font-weight: bold;
-          margin-right: 57%;
+          margin-right: 65%;
         }
         .col2 {
           display: flex;
