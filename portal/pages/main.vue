@@ -5,17 +5,18 @@
                 a(href="/main") 
                   h2.clientsPortal {{ clientPortal }}  
                   span(v-if="companyName") >> {{ companyName }}
+            .clientsTop__dropdown
+              .additional(v-if="dropdownVisible")
+                .first {{ newProject.trans }}
+                .second {{ newProject.copyw }}
+                .third {{ newProject.market }}
+                .fourth {{ newProject.proof }}
+                .fifth {{ newProject.graph }}
             .clientsTop__searchBlock
                 .sel_project_block
                   .sel_project_block__proj
                     span New Project
-                  .sel_project_block__additional
-                    .first {{ newProject.trans }}
-                    .second {{ newProject.copyw }}
-                    .third {{ newProject.market }}
-                    .fourth {{ newProject.proof }}
-                    .fifth {{ newProject.graph }}
-                  .sel_project_block__imgWrapper
+                  .sel_project_block__imgWrapper(@click="showDropdown")
                     img(src="../assets/images/white-arrow.png")
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
@@ -130,7 +131,8 @@ export default {
         market: "Marketing",
         proof: "Proofing/QA",
         graph: "Graphic Localization"
-      }
+      },
+      dropdownVisible: false
     };
   },
   methods: {
@@ -221,6 +223,9 @@ export default {
     backToMain() {
       this.$refs.againMain.baseURI;
       console.log(this.$refs);
+    },
+    showDropdown(){
+      this.dropdownVisible = !this.dropdownVisible;
     }
   },
   mounted() {
@@ -276,6 +281,7 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #67573e;
+  position: relative;
   .company {
     span {
       font-weight: 600;
@@ -297,6 +303,42 @@ body {
     }
   }
 
+  &__dropdown {
+    .additional {
+      position: absolute;
+      border: 2px solid #978d7e;
+      top: 62.2%;
+      right: 12.3%;
+      color: #67573e;
+      background-color: #fff;
+      font-size: 16px;
+      z-index: 50;
+      width: 185px;
+
+      .first,
+      .second,
+      .third,
+      .fourth,
+      .fifth {
+        padding: 15px;
+        border-bottom: 0.2px solid #978d7e;
+        &:hover {
+          background-color: #ddd3c8;
+        }
+      }
+
+      .fifth {
+        border-bottom: none;
+      }
+
+      .first {
+        &:hover {
+          background-color: #ddd3c8;
+        }
+      }
+    }
+  }
+
   .clientsTop__searchBlock {
     margin-right: -3%;
     display: flex;
@@ -307,42 +349,26 @@ body {
       background-color: #f5876e;
       border-radius: 14px;
       margin-right: 150px;
-      width: 212px;
+      width: 239px;
       height: 34px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      z-index: 50;
 
       &__proj {
         border-right: 1px solid #fff;
         line-height: 100%;
         color: #fff;
         margin-right: 16px;
-        padding-right: 14px;
+        padding-right: 24%;
         height: 100%;
         display: flex;
         align-items: center;
-        position: relative;
         span {
           padding-right: 38%;
           white-space: nowrap;
         }
-      }
-
-      &__additional {
-        position: absolute;
-        border: 2px solid #978d7e;
-        top: 1.2%;
-        right: 16%;
-        color: #67573e;
-        background-color: #fff;
-        font-size: 16px;
-        z-index: 20;
-
-          .first, .second, .third, .fourth, .fifth {
-            padding: 15px;
-            border-bottom: 0.2px solid #978d7e;
-          }
       }
 
       &__imgWrapper {

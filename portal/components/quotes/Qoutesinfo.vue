@@ -449,41 +449,6 @@ export default {
       &:hover {
         background-color: #ddd3c8;
       }
-
-      .row__columns_info {
-        .col.col-5.colSplit {
-          .col {
-            // .sp-wrapper {
-            //   position: absolute;
-            //   top: 21%;
-            //   left: -66%;
-            //   width: 112px;
-            //   height: 32px;
-            //   visibility: hidden;
-            //   z-index: 1;
-
-            //   .appr {
-            //     opacity: 0.5;
-            //     color: green;
-            //     z-index: -1;
-            //     font-size: 14px;
-            //     white-space: nowrap;
-            //     font-size: 12px;
-            //   }
-            // }
-
-            // .rej {
-            //   position: absolute;
-            //   top: 1%;
-            //   left: 1%;
-            //   z-index: -1;
-            //   opacity: 0.5;
-            //   color: #f5876e;
-            //   visibility: hidden;
-            // }
-          }
-        }
-      }
     }
     &__icon {
       width: 4%;
