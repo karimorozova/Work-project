@@ -6,28 +6,23 @@
                 a(href="/main") 
                   h2.clientsPortal CLIENT PORTAL
                     span(v-if="accountInfo") >> {{ user.name }} (My Account)
-            .clientsTop__dropdown
-              .additional(v-if="dropdownVisible")
-                .first {{ newProject.trans }}
-                .second {{ newProject.copyw }}
-                .third {{ newProject.market }}
-                .fourth {{ newProject.proof }}
-                .fifth {{ newProject.graph }}
             .clientsTop__searchBlock
-                .sel_project_block
-                  .sel_project_block__proj
-                    span New Project
+                .dropdownWrapper
+                  .sel_project_block
+                    .sel_project_block__proj
+                      span New Project
+                    .sel_project_block__imgWrapper(@click="showDropdown")
+                      img(src="../assets/images/white-arrow.png")
+                  .clientsTop__dropdown
                     .additional(v-if="dropdownVisible")
                       .first {{ newProject.trans }}
                       .second {{ newProject.copyw }}
                       .third {{ newProject.market }}
                       .fourth {{ newProject.proof }}
                       .fifth {{ newProject.graph }}
-                  .sel_project_block__imgWrapper(@click="showDropdown")
-                    img(src="../assets/images/white-arrow.png")
                 .searchWrapper
                     img.search(src="../assets/images/search.png")
-                .womanWrapper(@click="showAccountMenu")
+                .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
                   .accountMenuWrapper(v-if="accountMenuVisible")
                     .accountBlock
@@ -45,6 +40,8 @@
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
+                .chevronWrapper
+                  .chevron(@click="showAccountMenu")
         .clientsMainWrapper
             .clientsNavbar
               .clientsNavbar__sideBar(:class="{testExpander: expander}")
@@ -178,7 +175,7 @@ export default {
       this.client = result.data.client;
       this.user = result.data.user;
       this.projects = result.data.projects;
-      this.quotes = result.data.quotes
+      this.quotes = result.data.quotes;
     },
     expandBar() {
       this.expander = !this.expander;
@@ -308,5 +305,4 @@ export default {
 
 <style lang="scss">
 @import "../assets/styles/main.scss";
-
 </style>
