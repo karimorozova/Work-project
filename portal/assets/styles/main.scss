@@ -22,7 +22,6 @@ body {
   }
   .clientsTop {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background-color: #67573e;
     position: relative;
@@ -36,7 +35,8 @@ body {
       }
     }
   
-    .clientsTop__clientName {
+    &__clientName {
+      width: 60%;
       a {
         text-decoration: none;
       }
@@ -87,20 +87,21 @@ body {
       }
     }
   
-    .clientsTop__searchBlock {
+    &__searchBlock {
+      width: 40%;
       margin-right: -3%;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
   
       .sel_project_block {
+        width: 33%;
         background-color: #f5876e;
         border-radius: 14px;
         margin-right: 150px;
         width: 239px;
         height: 34px;
         display: flex;
-        justify-content: flex-end;
         align-items: center;
         z-index: 50;
   
@@ -130,10 +131,10 @@ body {
       }
   
       .searchWrapper {
-        margin-left: -32%;
+        // margin-left: -32%;
       }
       .womanWrapper {
-        margin-right: 20%;
+        margin: 0 50px 0 15px;
         border: 2px solid #fff;
         border-radius: 30px;
         width: 33px;
@@ -142,9 +143,6 @@ body {
         &__photo {
           border-radius: 50%;
           background-color: white;
-          position: absolute;
-          top: -3px;
-          left: -2px;
         }
   
         .accountMenuWrapper {
