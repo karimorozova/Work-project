@@ -35,7 +35,7 @@
                             span(v-model="statusFilter" @click="statusOpen")
                                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openStatus}")                                
                 .dropItem__table
-                    Projectstable
+                    Projectstable(:projects="projects")
 
 </template>
 
@@ -43,6 +43,20 @@
 import Projectstable from "./Projectstable";
 
 export default {
+    props: {
+        client: {
+            type: Object
+        },
+        user: {
+            type: Object
+        },
+        projects : {
+            type: Array
+        },
+        quotes: {
+            type: Array
+        }
+    },
     data() {
         return {
             requestDateFilter: '',

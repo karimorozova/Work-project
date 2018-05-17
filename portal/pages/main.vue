@@ -81,8 +81,8 @@
             .detailedInfoWrapper
               QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible")
-            Allprojects(v-if="allProjectsShow")
+              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :projectIndex="projectIndex")
+            Allprojects(v-if="allProjectsShow" :projects="projects" :user="user")
             Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
@@ -228,14 +228,15 @@ export default {
     quoteDetails(data) {
       this.detailedInfoVisible = data.open;
       this.quoteIndex = data.index;
-      console.log(this.quoteIndex);
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
       }
     },
     projectDetails(data) {
-      this.detailedProjectVisible = data;
+      this.detailedProjectVisible = data.open;
+      this.projectIndex = data.index;
+      console.log(this.projectIndex);
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
