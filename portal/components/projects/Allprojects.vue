@@ -37,7 +37,7 @@
                             span(v-model="statusFilter" @click="statusOpen")
                                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openStatus}")                                
                 .dropItem__table
-                    Projectstable
+                    Projectstable(:projects="projects")
 
 </template>
 
@@ -46,26 +46,40 @@ import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
 
 export default {
-  data() {
-    return {
-      requestDateFilter: "",
-      projectNameFilter: "",
-      deadlineFilter: "",
-      pojectIdFilter: "",
-      sourceLangsFilter: "",
-      tergetLangsFilter: "",
-      statusFilter: "",
-      openAll: false,
-      openSourceLangs: false,
-      openTargetLangs: false,
-      openStatus: false,
-      currentFormVisible: false,
-      currentFormVisibleOther: false
-    };
-  },
-  methods: {
+    props: {
+        client: {
+            type: Object
+        },
+        user: {
+            type: Object
+        },
+        projects : {
+            type: Array
+        },
+        quotes: {
+            type: Array
+        }
+    },
+    data() {
+        return {
+            requestDateFilter: '',
+            projectNameFilter: '',
+            deadlineFilter: '',
+            pojectIdFilter: '',
+            sourceLangsFilter: '',
+            tergetLangsFilter: '',
+            statusFilter: '',
+            openAll: false,
+            openSourceLangs: false,
+            openTargetLangs: false,
+            openStatus: false,
+            currentFormVisible: false,
+            currentFormVisibleOther: false        
+        }
+    },
+    methods: {
     showAllProjects() {
-      this.openAll = !this.openAll;
+        this.openAll = !this.openAll
     },
     sourceLangOpen() {
       this.openSourceLangs = !this.openSourceLangs;

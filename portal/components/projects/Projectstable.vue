@@ -40,40 +40,51 @@
                             span Total Cost
                         .col
                         .col
-        .row(v-for="(quote,index) in clientQuotes")
-            .shortInfo
-                .row__columns_info
-                    .col(@click="openQuotesInfoDetailed") {{ quote.requestOn }}
-                    .col.proj(@click="openQuotesInfoDetailed") {{ quote.projectId }}
-                    .col.col-5(@click="openQuotesInfoDetailed") {{ quote.projectName }}
-                    .col.col-4(@click="openQuotesInfoDetailed") {{ quote.status }}
-                    .col(@click="openQuotesInfoDetailed") {{ quote.deadline }}
-                    .col.col-5.colSplit
-                        .col
-                            span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
-                        .col
-                            img(src="../../assets/images/Approve-icon.png")
-                            .sp-wrapper
-                              span.appr APPROVE QUOTE                         
-                        .col
-                            img(src="../../assets/images/Reject-icon.png")
-                            span.rej REJECT QUOTE
-            .fullInfo(v-if="quote.fullInfoAppear")
-                .languagePair
-                    .languagePair__title {{ languagePair }}
-                        img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                    ul.languagePair__ul
-                        li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
-                .cost
-                    .cost__title {{ cost }}
-                        img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
-                    ul.cost__ul
-                        li.cos
+        .scrollArea
+            .row(v-for="(project, index) in clientProjects")
+                .shortInfo
+                    .row__columns_info
+                        .col {{ project.requestOn }}
+                        .col.proj {{ project.projectId }}
+                        .col.col-5 {{ project.projectName }}
+                        .col.col-4 {{ project.status }}
+                        .col {{ project.deadline }}
+                        .col.col-5.colSplit
+                            .col
+                                span {{ project.totalCost }}
+                            .col                        
+                            .col                                
+                //- .fullInfo(v-if="project.fullInfoAppear")
+                //-     .languagePair
+                //-         .languagePair__title {{ languagePair }}
+                //-             img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
+                //-         ul.languagePair__ul
+                //-             li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
+                //-     .cost
+                //-         .cost__title {{ cost }}
+                //-             img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
+                //-         ul.cost__ul
+                //-             li.cos
   
 </template>
 
 <script>
+import moment from "moment";
 export default {
+    props: {
+        client: {
+            type: Object
+        },
+        user: {
+            type: Object
+        },
+        projects : {
+            type: Array
+        },
+        quotes: {
+            type: Array
+        }
+    },
     data() {
         return {
             clientQuotes: []
@@ -98,6 +109,34 @@ export default {
             });
             console.log(result);
             this.companyName = result.data.name;
+        }
+    },
+    computed: {
+        clientProjects() {
+            let result = [];
+            if(this.projects.length) {
+                let array = this.projects;
+                let finalDeadline = '';
+                for(let i = 0; i < array.length; i++) {
+                    if(array[i].deadline) {
+                     finalDeadline = moment(new Date(array[i].deadline.millisGMT)).format("DD-MM-YYYY");
+                    } else {
+                        finalDeadline = ''
+                }
+                if(array[i].status == "CLOSED") {
+                        result.push({
+                        requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
+                        projectId: array[i].idNumber,
+                        projectName: array[i].name,
+                        status: array[i].status,
+                        deadline: finalDeadline, //moment(new Date()).format("DD-MM-YYYY"),
+                        totalCost: array[i].totalAgreed.formattedAmount,
+                        fullInfoAppear: false
+                        })
+                    }         
+                }
+            }
+            return result;
         }
     },
     mounted() {

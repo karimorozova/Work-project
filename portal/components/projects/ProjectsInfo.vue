@@ -43,14 +43,14 @@
       .row(v-for="(project,index) in clientProjects")
           .shortInfo
               .row__columns_info
-                  .col(@click="openProjectsInfoDetailed") {{ project.requestOn }}
-                  .col.proj(@click="openProjectsInfoDetailed") {{ project.projectId }}
-                  .col.col-5(@click="openProjectsInfoDetailed") {{ project.projectName }}
-                  .col.col-4(@click="openProjectsInfoDetailed") {{ project.status }}
-                  .col(@click="openProjectsInfoDetailed") {{ project.deadline }}
+                  .col(@click="openProjectsInfoDetailed(index)") {{ project.requestOn }}
+                  .col.proj(@click="openProjectsInfoDetailed(index)") {{ project.projectId }}
+                  .col.col-5(@click="openProjectsInfoDetailed(index)") {{ project.projectName }}
+                  .col.col-4(@click="openProjectsInfoDetailed(index)") {{ project.status }}
+                  .col(@click="openProjectsInfoDetailed(index)") {{ project.deadline }}
                   .col.col-5.colSplit
                       .col
-                        span(@click="openProjectsInfoDetailed") {{ project.totalCost }}
+                        span(@click="openProjectsInfoDetailed(index)") {{ project.totalCost }}
                       .col.download
                         img(src="../../assets/images/download.png")
 
@@ -124,9 +124,9 @@ export default {
     };
   },
   methods: {
-    openProjectsInfoDetailed() {
+    openProjectsInfoDetailed(index) {
       this.projectInfoDetailed = !this.projectInfoDetailed;
-      this.$emit("projectDetails", this.projectInfoDetailed);
+      this.$emit("projectDetails", {open: this.projectInfoDetailed, index: index});
     }
   },
   computed: {
