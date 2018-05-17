@@ -5,17 +5,16 @@
                 a(href="/main") 
                   h2.clientsPortal {{ clientPortal }}  
                   span(v-if="companyName") >> {{ companyName }}
-            .clientsTop__dropdown
-              .additional(v-if="dropdownVisible")
-                .first {{ newProject.trans }}
-                .second {{ newProject.copyw }}
-                .third {{ newProject.market }}
-                .fourth {{ newProject.proof }}
-                .fifth {{ newProject.graph }}
             .clientsTop__searchBlock
                 .sel_project_block
                   .sel_project_block__proj
                     span New Project
+                    .additional(v-if="dropdownVisible")
+                      .first {{ newProject.trans }}
+                      .second {{ newProject.copyw }}
+                      .third {{ newProject.market }}
+                      .fourth {{ newProject.proof }}
+                      .fifth {{ newProject.graph }}
                   .sel_project_block__imgWrapper(@click="showDropdown")
                     img(src="../assets/images/white-arrow.png")
                 .searchWrapper
@@ -54,9 +53,9 @@
                   span.icon__arrow >
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
-                .buttonPanel
-                  button.quote New Quote
-                  button.project New Project
+                //- .buttonPanel
+                //-   button.quote New Quote
+                //-   button.project New Project
                 .clientsAll
                     .quotesComponent
                       .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
@@ -127,7 +126,7 @@ export default {
       allProjectsShow: false,
       newProject: {
         trans: "Translation",
-        copyw: "Copywrighting",
+        copyw: "Copywriting",
         market: "Marketing",
         proof: "Proofing/QA",
         graph: "Graphic Localization"
@@ -224,7 +223,7 @@ export default {
       this.$refs.againMain.baseURI;
       console.log(this.$refs);
     },
-    showDropdown(){
+    showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     }
   },
@@ -281,7 +280,6 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #67573e;
-  position: relative;
   .company {
     span {
       font-weight: 600;
@@ -303,42 +301,6 @@ body {
     }
   }
 
-  &__dropdown {
-    .additional {
-      position: absolute;
-      border: 2px solid #978d7e;
-      top: 62.2%;
-      right: 12.3%;
-      color: #67573e;
-      background-color: #fff;
-      font-size: 16px;
-      z-index: 50;
-      width: 185px;
-
-      .first,
-      .second,
-      .third,
-      .fourth,
-      .fifth {
-        padding: 15px;
-        border-bottom: 0.2px solid #978d7e;
-        &:hover {
-          background-color: #ddd3c8;
-        }
-      }
-
-      .fifth {
-        border-bottom: none;
-      }
-
-      .first {
-        &:hover {
-          background-color: #ddd3c8;
-        }
-      }
-    }
-  }
-
   .clientsTop__searchBlock {
     margin-right: -3%;
     display: flex;
@@ -354,25 +316,62 @@ body {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      z-index: 50;
+      position: relative;
+      box-shadow: 1px 3px 7px #000;
 
       &__proj {
         border-right: 1px solid #fff;
         line-height: 100%;
         color: #fff;
         margin-right: 16px;
-        padding-right: 24%;
+        padding-right: 23%;
         height: 100%;
         display: flex;
         align-items: center;
         span {
-          padding-right: 38%;
+          padding-right: 36%;
           white-space: nowrap;
+        }
+      }
+
+      .additional {
+        max-width: 185px;
+        position: absolute;
+        top: 76.2%;
+        right: 22.05%;
+        z-index: -1;
+        color: #67573e;
+        background-color: #fff;
+        border: 1px solid #978d7e;
+        font-size: 16px;
+        width: 185px;
+
+        .first,
+        .second,
+        .third,
+        .fourth,
+        .fifth {
+          padding: 15px 15px 15px 20px;
+          border-bottom: 0.2px solid #ddd3c8;
+          &:hover {
+            background-color: #ddd3c8;
+          }
+        }
+
+        .fifth {
+          border-bottom: none;
+        }
+
+        .first {
+          &:hover {
+            background-color: #ddd3c8;
+          }
         }
       }
 
       &__imgWrapper {
         display: flex;
+        cursor: pointer;
         img {
           height: 14px;
           transform: rotate(180deg);

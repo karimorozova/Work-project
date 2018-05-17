@@ -11,7 +11,7 @@
                     .third Source Langs
                 .calenadr-container__requestes-right
                     .first
-                        .first-text {{ quotesCalendar.requeteOn }}
+                        .first-text {{ quotesCalendar.requestOn }}
                         .first-image(@click="showDetailedCalendar")
                             img(src="../../assets/images/calendar.png")
                     .second {{ quotesCalendar.projectName }}
@@ -28,7 +28,7 @@
                     .third Target Langs
                 .calenadr-container__deadlines-right
                     .first
-                        .first-text {{ quotesCalendar.requeteOn }}
+                        .first-text {{ quotesCalendar.requestOn }}
                         .first-image(@click="showDetailedCalendarOther")
                             img(src="../../assets/images/calendar.png")
                     .second {{ quotesCalendar.projectId }}
@@ -177,7 +177,7 @@ export default {
       ],
       detailedInfoVisible: false,
       quotesCalendar: {
-        requeteOn: "01-Apr-2018-15-Apr-2018",
+        requestOn: "01-Apr-2018-15-Apr-2018",
         deadline: "01-Apr-2018-15-Apr-2018",
         projectName: "1Market Resources(Updated)",
         projectId: "2018 04 11 [27]",
