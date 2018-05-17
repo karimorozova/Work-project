@@ -99,4 +99,15 @@
         margin-bottom: 0;
     }
     
+    .quotesCalendarWrapper {
+        top: 64%;
+        left: 12%;
+    }
+
+    .switcher {
+        position: absolute;
+        top: 64%;
+        left: 41%;
+        z-index: 5;
+      }
 }
