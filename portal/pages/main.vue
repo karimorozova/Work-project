@@ -1,5 +1,6 @@
 <template lang="pug">
-    .clientsportalWrapper(v-if="cookies")
+    //- .clientsportalWrapper(v-if="cookies")
+    .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
                 a(href="/main") 
@@ -16,6 +17,12 @@
                 .sel_project_block
                   .sel_project_block__proj
                     span New Project
+                    .additional(v-if="dropdownVisible")
+                      .first {{ newProject.trans }}
+                      .second {{ newProject.copyw }}
+                      .third {{ newProject.market }}
+                      .fourth {{ newProject.proof }}
+                      .fifth {{ newProject.graph }}
                   .sel_project_block__imgWrapper(@click="showDropdown")
                     img(src="../assets/images/white-arrow.png")
                 .searchWrapper
@@ -135,7 +142,7 @@ export default {
       projectIndex: 0,
       newProject: {
         trans: "Translation",
-        copyw: "Copywrighting",
+        copyw: "Copywriting",
         market: "Marketing",
         proof: "Proofing/QA",
         graph: "Graphic Localization"
@@ -152,7 +159,7 @@ export default {
       } else {
         console.log("login failed");
         // alert("Please, Log in!")
-        window.location.replace("/");
+        // window.location.replace("/");
       }
     },
     async clientInfo() {
@@ -238,7 +245,7 @@ export default {
       this.$refs.againMain.baseURI;
       console.log(this.$refs);
     },
-    showDropdown(){
+    showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     }
   },
