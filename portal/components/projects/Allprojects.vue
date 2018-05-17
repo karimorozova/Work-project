@@ -1,5 +1,7 @@
 <template lang="pug">
     .allProjects
+        quotesCalendarDetailed(v-if="currentFormVisible")
+        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
         .allProjects__dropMenu(:class="{opened: openAll}")
             .dropSelect(@click="showAllProjects") All Projects
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
@@ -9,7 +11,7 @@
                         .filterBlock__item.request
                             label Request On
                             input(type="text" v-model="requestDateFilter")
-                            img(src="../../assets/images/calendar.png")
+                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
@@ -21,7 +23,7 @@
                         .filterBlock__item.deadline
                             label Deadline
                             input(type="text" v-model="deadlineFilter")
-                            img(src="../../assets/images/calendar.png")                            
+                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")                            
                         .filterBlock__item.projectId
                             label Project ID
                             input(type="text" v-model="pojectIdFilter")
@@ -41,6 +43,7 @@
 
 <script>
 import Projectstable from "./Projectstable";
+import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
 
 export default {
     props: {
@@ -69,27 +72,33 @@ export default {
             openAll: false,
             openSourceLangs: false,
             openTargetLangs: false,
-            openStatus: false           
+            openStatus: false,
+            currentFormVisible: false,
+            currentFormVisibleOther: false        
         }
     },
     methods: {
-        showAllProjects() {
-            this.openAll = !this.openAll
-        },
-        sourceLangOpen() {
-            this.openSourceLangs = !this.openSourceLangs
-        },
-        targetLangOpen() {
-            this.openTargetLangs = !this.openTargetLangs
-        },
-        statusOpen() {
-            this.openStatus = !this.openStatus
-        }
+    sourceLangOpen() {
+      this.openSourceLangs = !this.openSourceLangs;
     },
-    components: {
-        Projectstable
+    targetLangOpen() {
+      this.openTargetLangs = !this.openTargetLangs;
+    },
+    statusOpen() {
+      this.openStatus = !this.openStatus;
+    },
+    showDetailedCalendar() {
+      this.currentFormVisible = !this.currentFormVisible;
+    },
+    showDetailedCalendarOther() {
+      this.currentFormVisibleOther = !this.currentFormVisibleOther;
     }
-}
+  },
+  components: {
+    Projectstable,
+    quotesCalendarDetailed: QuotesCalendarDetailed
+  }
+};
 </script>
 
 <style lang="scss">
