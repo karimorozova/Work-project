@@ -83,6 +83,8 @@
             .detailedProjectWrapper
               projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :projectIndex="projectIndex")
             Allprojects(v-if="allProjectsShow" :projects="projects" :user="user")
+            invoices(v-if="invoicesShow")
+            documents(v-if="documentsShow")
             Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
@@ -93,6 +95,8 @@ import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
 import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
 import Allprojects from "../components/projects/Allprojects";
+import invoices from "../components/invoices/invoices";
+import documents from "../components/documents/documents";
 
 export default {
   data() {
@@ -133,6 +137,8 @@ export default {
       detailedInfoVisible: false,
       detailedProjectVisible: false,
       allProjectsShow: false,
+      invoicesShow: false,
+      documentsShow: false,
       cookies: false,
       client: {},
       user: {},
@@ -197,13 +203,34 @@ export default {
           this.allProjectsShow = false;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
+          this.invoicesShow = false
+          this.documentsShow = false
         }
 
         if (index == 1) {
           this.allProjectsShow = true;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
+          this.invoicesShow = false
+          this.documentsShow = false
         }
+
+        if (index == 2) {
+          this.invoicesShow = true;
+          this.allProjectsShow = false;
+          this.detailedInfoVisible = false;
+          this.detailedProjectVisible = false;
+          this.documentsShow = false
+        }
+
+        if (index == 3) {
+          this.documentsShow = true;
+          this.allProjectsShow = false;
+          this.detailedInfoVisible = false;
+          this.detailedProjectVisible = false;
+          this.invoicesShow = false
+        }
+
         this.accountInfo = false;
       });
     },
@@ -260,7 +287,9 @@ export default {
     QuotesInfoDetailed,
     Accountinfo,
     projectInfoDetailed: ProjectInfoDetailed,
-    Allprojects
+    Allprojects,
+    invoices,
+    documents
   },
   computed: {
     visibleChecker() {
@@ -268,7 +297,9 @@ export default {
         this.detailedInfoVisible ||
         this.detailedProjectVisible ||
         this.accountInfo ||
-        this.allProjectsShow
+        this.allProjectsShow ||
+        this.invoicesShow ||
+        this.documentsShow
       );
     }
   }

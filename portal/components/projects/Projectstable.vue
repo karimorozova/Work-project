@@ -44,8 +44,8 @@
             .row(v-for="(project, index) in clientProjects")
                 .shortInfo
                     .row__columns_info
-                        .col {{ project.requestOn }}
-                        .col.proj {{ project.projectId }}
+                        .col(@click="projectDetails(index)") {{ project.requestOn }}
+                        .col.proj(@click="projectDetails(index)") {{ project.projectId }}
                         .col.col-5 {{ project.projectName }}
                         .col.col-4 {{ project.status }}
                         .col {{ project.deadline }}
@@ -83,11 +83,33 @@ export default {
         },
         quotes: {
             type: Array
-        }
+        },
+        requestDateFilter: {
+            type: Date
+        },
+        projectNameFilter: {
+            type: String
+        },
+        deadlineFilter: {
+            type: Date
+        },
+        projectIdFilter: {
+            type: String
+        },
+        sourceLangsFilter: {
+            type: String
+        },
+        targetLangsFilter: {
+            type: String
+        },
+        statusFilter: {
+            type: String
+        },
     },
     data() {
         return {
-            clientQuotes: []
+            clientQuotes: [],
+            allProjectsFiltered: []
         }
     },
     methods: {
@@ -137,7 +159,57 @@ export default {
                 }
             }
             return result;
-        }
+        },
+        // filteredProjects() {
+        //     if (this.projects.length) {
+        //         if (this.projectNameFilter.length) {
+        //             this.projects.map(item => {
+        //                 if (item.name.toLowerCase().indexOf(this.projectNameFilter.toLowerCase()) != -1)
+        //                     this.allProjectsFiltered.push(item)
+        //             });
+        //         }
+
+        //         if (this.projectIdFilter.length) {
+        //             this.projects.map(item => {
+        //                 if (item.idNumber.indexOf(this.projectIdFilter) != -1)
+        //                     this.allProjectsFiltered.push(item)
+        //             });
+        //         }
+
+        //         if (this.sourceLangsFilter.length) {
+        //             this.projects.map(item => {
+        //                 if (item.languageCombinations.length) {
+        //                     for(let i = 0; i < item.languageCombinations.length; i++) {
+        //                         if (item.item.languageCombinations[i].sourceLanguage.name.indexOf(this.sourceLangsFilter) != -1) {
+        //                             this.allProjectsFiltered.push(item)        
+        //                         }
+        //                     }
+        //                 }
+        //             });
+        //         }
+
+        //         if (this.targetLangsFilter.length) {
+        //             this.projects.map(item => {
+        //                 if (item.languageCombinations.length) {
+        //                     for(let i = 0; i < item.languageCombinations.length; i++) {
+        //                         if (item.item.languageCombinations[i].targetLanguage.name.indexOf(this.tergetLangsFilter) != -1) {
+        //                             this.allProjectsFiltered.push(item)        
+        //                         }
+        //                     }
+        //                 }
+        //             });
+        //         }
+
+        //         if (this.statusFilter.length) {
+        //             this.projects.map(item => {
+        //                 if (item.status.indexOf(this.statusFilter) != -1)
+        //                     this.allProjectsFiltered.push(item)
+        //             });
+        //         }
+
+        //         return this.allProjectsFiltered;
+        //     }
+        // }
     },
     mounted() {
         this.getCookie(),
