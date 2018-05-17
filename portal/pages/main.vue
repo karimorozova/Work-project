@@ -1,10 +1,18 @@
 <template lang="pug">
+    //- .clientsportalWrapper(v-if="cookies")
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
                 a(href="/main") 
-                  h2.clientsPortal {{ clientPortal }}  
-                  span(v-if="companyName") >> {{ companyName }}
+                  h2.clientsPortal CLIENT PORTAL
+                    span(v-if="accountInfo") >> {{ user.name }} (My Account)
+            .clientsTop__dropdown
+              .additional(v-if="dropdownVisible")
+                .first {{ newProject.trans }}
+                .second {{ newProject.copyw }}
+                .third {{ newProject.market }}
+                .fourth {{ newProject.proof }}
+                .fifth {{ newProject.graph }}
             .clientsTop__searchBlock
                 .sel_project_block
                   .sel_project_block__proj
@@ -62,19 +70,19 @@
                         .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
                         .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Quotesinfo(@quoteDetails="quoteDetails")
+                          Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")
                     .projectsComponent
                       .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
                         .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                           img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
                         .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                          projectsInfo(@projectDetails="projectDetails")
+                          projectsInfo(@projectDetails="projectDetails" :projects="projects")
             .detailedInfoWrapper
-              quotesInfoDetailed(v-if="detailedInfoVisible")
+              QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
               projectInfoDetailed(v-if="detailedProjectVisible")
             Allprojects(v-if="allProjectsShow")
-            Accountinfo(v-if="accountInfo")
+            Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
 <script>
@@ -116,14 +124,21 @@ export default {
           active: false
         }
       ],
-      openQuotes: false,
-      openProjects: false,
+      openQuotes: true,
+      openProjects: true,
       expander: false,
       accountMenuVisible: false,
       accountInfo: false,
       detailedInfoVisible: false,
       detailedProjectVisible: false,
       allProjectsShow: false,
+      cookies: false,
+      client: {},
+      user: {},
+      projects: [],
+      quotes: [],
+      quoteIndex: 0,
+      projectIndex: 0,
       newProject: {
         trans: "Translation",
         copyw: "Copywriting",
@@ -136,8 +151,9 @@ export default {
   },
   methods: {
     getCookie() {
-      // let sessionCookie = document.cookie.split("=")[1];
+      let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
+        this.cookies = true;
         return true;
       } else {
         console.log("login failed");
@@ -152,7 +168,10 @@ export default {
         withCredentials: true
       });
       console.log(result);
-      this.companyName = result.data.name;
+      this.client = result.data.client;
+      this.user = result.data.user;
+      this.projects = result.data.projects;
+      this.quotes = result.data.quotes
     },
     expandBar() {
       this.expander = !this.expander;
@@ -206,7 +225,9 @@ export default {
       });
     },
     quoteDetails(data) {
-      this.detailedInfoVisible = data;
+      this.detailedInfoVisible = data.open;
+      this.quoteIndex = data.index;
+      console.log(this.quoteIndex);
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
@@ -234,7 +255,7 @@ export default {
   components: {
     Quotesinfo,
     projectsInfo: ProjectsInfo,
-    quotesInfoDetailed: QuotesInfoDetailed,
+    QuotesInfoDetailed,
     Accountinfo,
     projectInfoDetailed: ProjectInfoDetailed,
     Allprojects
@@ -298,6 +319,10 @@ body {
       color: #fff;
       margin-left: 7%;
       width: 100%;
+      span {
+        margin-left: 20px;
+        font-weight: 400;
+      }
     }
   }
 
@@ -600,6 +625,8 @@ body {
       width: 100%;
 
       &_item {
+        padding-top: 20px;
+        padding-bottom: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;

@@ -90,36 +90,26 @@
                             span Total Cost
                         .col
                         .col
-        .row(v-for="(quote,index) in clientQuotes")
-            .shortInfo
-                .row__columns_info
-                    .col(@click="openQuotesInfoDetailed") {{ quote.requestOn }}
-                    .col.proj(@click="openQuotesInfoDetailed") {{ quote.projectId }}
-                    .col.col-5(@click="openQuotesInfoDetailed") {{ quote.projectName }}
-                    .col.col-4(@click="openQuotesInfoDetailed") {{ quote.status }}
-                    .col(@click="openQuotesInfoDetailed") {{ quote.deadline }}
-                    .col.col-5.colSplit
-                        .col
-                            span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
-                        .col.approve
-                            img(src="../../assets/images/Approve-icon.png")
-                            .sp-wrapper
-                              span.appr APPROVE QUOTE                         
-                        .col.reject
-                            img(src="../../assets/images/Reject-icon.png")
-                            .sp-wrapper
-                              span.rej REJECT QUOTE
-            .fullInfo(v-if="quote.fullInfoAppear")
-                .languagePair
-                    .languagePair__title {{ languagePair }}
-                        img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                    ul.languagePair__ul
-                        li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
-                .cost
-                    .cost__title {{ cost }}
-                        img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
-                    ul.cost__ul
-                        li.cost__li(v-for="language in languagesFromTo" v-html="language.price")
+        .scrollingArea
+          .row(v-for="(quote,index) in clientQuotes")
+              .shortInfo
+                  .row__columns_info
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.requestOn }}
+                      .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.projectId }}
+                      .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.projectName }}
+                      .col.col-4(@click="openQuotesInfoDetailed(index)") {{ quote.status }}
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.deadline }}
+                      .col.col-5.colSplit
+                          .col
+                              span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
+                          .col.approve
+                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'")
+                              //- .sp-wrapper
+                              //-   span.appr APPROVE QUOTE                         
+                          .col.reject
+                              img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'")
+                              //- .sp-wrapper
+                              //-   span.rej REJECT QUOTE
                                          
 </template>
 
@@ -128,53 +118,52 @@ import moment from "moment";
 import QuotesCalendarDetailed from "./QuotesCalendarDetailed";
 
 export default {
+  props: {
+        client: {
+            type: Object
+        },
+        user: {
+            type: Object
+        },
+        projects : {
+            type: Array
+        },
+        quotes: {
+            type: Array
+        }
+  },
   data() {
     return {
-      clientQuotes: [
-        {
-          requestOn: moment(new Date()).format("DD-MM-YYYY"),
-          projectId: "111 [33]",
-          projectName: "1Market Resources",
-          status: "Open",
-          deadline: moment(new Date()).format("DD-MM-YYYY"),
-          totalCost: "€1000",
-          fullInfoAppear: false
-        },
-        {
-          requestOn: moment(new Date()).format("DD-MM-YYYY"),
-          projectId: "111 [33]",
-          projectName: "1Market Resources",
-          status: "Open",
-          deadline: moment(new Date()).format("DD-MM-YYYY"),
-          totalCost: "€1000",
-          fullInfoAppear: false
-        },
-        {
-          requestOn: moment(new Date()).format("DD-MM-YYYY"),
-          projectId: "111 [33]",
-          projectName: "1Market Resources",
-          status: "Open",
-          deadline: moment(new Date()).format("DD-MM-YYYY"),
-          totalCost: "€1000",
-          fullInfoAppear: false
-        }
-      ],
-      languagePair: "Language Pair",
-      cost: "Cost",
-      languagesFromTo: [
-        {
-          description: "EN-GB >> PL",
-          price: "32.43 &#8364;"
-        },
-        {
-          description: "EN-GB >> HU",
-          price: "32.43 &#8364;"
-        },
-        {
-          description: "EN-GB >> CZ",
-          price: "32.43 &#8364;"
-        }
-      ],
+      // clientQuotes: [
+      //   {
+      //     requestOn: moment(new Date()).format("DD-MM-YYYY"),
+      //     projectId: "111 [33]",
+      //     projectName: "1Market Resources",
+      //     status: "Open",
+      //     deadline: moment(new Date()).format("DD-MM-YYYY"),
+      //     totalCost: "€1000",
+      //     fullInfoAppear: false
+      //   },
+      //   {
+      //     requestOn: moment(new Date()).format("DD-MM-YYYY"),
+      //     projectId: "111 [33]",
+      //     projectName: "1Market Resources",
+      //     status: "Open",
+      //     deadline: moment(new Date()).format("DD-MM-YYYY"),
+      //     totalCost: "€1000",
+      //     fullInfoAppear: false
+      //   },
+      //   {
+      //     requestOn: moment(new Date()).format("DD-MM-YYYY"),
+      //     projectId: "111 [33]",
+      //     projectName: "1Market Resources",
+      //     status: "Open",
+      //     deadline: moment(new Date()).format("DD-MM-YYYY"),
+      //     totalCost: "€1000",
+      //     fullInfoAppear: false
+      //   }
+      // ],
+
       detailedInfoVisible: false,
       quotesCalendar: {
         requestOn: "01-Apr-2018-15-Apr-2018",
@@ -196,9 +185,9 @@ export default {
       this.clientQuotes[index].fullInfoAppear = !this.clientQuotes[index]
         .fullInfoAppear;
     },
-    openQuotesInfoDetailed() {
+    openQuotesInfoDetailed(index) {
       this.detailedInfoVisible = true;
-      this.$emit("quoteDetails", this.detailedInfoVisible);
+      this.$emit("quoteDetails", {open: this.detailedInfoVisible, index: index} );
     },
     showStatuses() {
       this.statusesBar = !this.statusesBar;
@@ -216,6 +205,32 @@ export default {
       this.currentFormVisibleOther = !this.currentFormVisibleOther;
     }
   },
+  computed: {
+    clientQuotes() {
+      let result = [];
+      if(this.quotes.length) {
+        let array = this.quotes;
+        let finalDeadline = '';
+        for(let i = 0; i < array.length; i++) {
+          if(array[i].deadline) {
+             finalDeadline = moment(new Date(array[i].deadline.millisGMT)).format("DD-MM-YYYY");
+          } else {
+            finalDeadline = ''
+          }
+          result.push({
+            requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
+            projectId: array[i].idNumber,
+            projectName: array[i].name,
+            status: array[i].status,
+            deadline: finalDeadline, //moment(new Date()).format("DD-MM-YYYY"),
+            totalCost: array[i].totalAgreed.formattedAmount,
+            fullInfoAppear: false
+          })
+        }
+      }
+      return result;
+    }
+  },
   components: {
     quotesCalendarDetailed: QuotesCalendarDetailed
   }
@@ -223,7 +238,12 @@ export default {
 </script>
 
 <style lang="scss">
-.qoutesWrap {
+.qoutesWrap, .projectWrapper {
+  .scrollingArea {
+    height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .calendarWrapper {
     position: relative;
     .calenadr-container {
@@ -465,7 +485,7 @@ export default {
       }
     }
     &__columns {
-      width: 100%;
+      width: 98.5%;
       display: flex;
       background-color: #998e7e;
       align-items: center;

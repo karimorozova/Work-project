@@ -23,7 +23,7 @@
                   .container-project__third-block
                     .container-project__third-block-one(@click="downloadAsPDF")
                       img(src="../../assets/images/pdf-icon.png")
-                    span Download Fill Report
+                    span Download Full Report
                 .tableWrapper
                   table.container-table
                     tr.row
@@ -330,6 +330,20 @@
 
 <script>
 export default {
+  props: {
+        client: {
+            type: Object
+        },
+        user: {
+            type: Object
+        },
+        projects : {
+            type: Array
+        },
+        quotes: {
+            type: Array
+        }
+  },
   data() {
     return {
       quotesInfoDetailed: {

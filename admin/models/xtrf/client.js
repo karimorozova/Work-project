@@ -52,10 +52,43 @@ var ClientApi = class ClientApi {
                 })
         })
     }
+    
+    fullUserInfo(customerId, personId) {
+        return new Promise(resolve => {
+            this.clientApi.get(`/customers/${customerId}/persons/${personId}`)
+                .then(function (response) {
+                    resolve(response);
+                }).catch(function (error) {
+                    resolve(error);
+                })
+        })
+    }
 
-    clientInfo() {
+    companyInfo(customerId) {
+        return new Promise(resolve => {
+            this.clientApi.get(`/customers/${customerId}`)
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
+    projectsInfo() {
         return new Promise(resolve => {
             this.clientApi.get("/projects")
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
+    quotesInfo() {
+        return new Promise(resolve => {
+            this.clientApi.get("/quotes")
                 .then(function(response) {
                     resolve(response)
                 }).catch(function(error) {
