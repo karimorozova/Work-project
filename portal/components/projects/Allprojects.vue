@@ -78,6 +78,9 @@ export default {
         }
     },
     methods: {
+    showAllProjects() {
+        this.openAll = !this.openAll
+    },
     sourceLangOpen() {
       this.openSourceLangs = !this.openSourceLangs;
     },
