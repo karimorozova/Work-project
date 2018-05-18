@@ -28,10 +28,10 @@
                         quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")                          
                         .filterBlock__item.projectId
                             label Project ID
-                            input(type="text" v-model="pojectIdFilter")
+                            input(type="text" v-model="projectIdFilter")
                         .filterBlock__item.sourceLangs
                             label Target Langs
-                            span(v-model="tergetLangsFilter" @click="targetLangOpen")
+                            span(v-model="targetLangsFilter" @click="targetLangOpen")
                                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")                                
                     .filterBlock
                         .filterBlock__item.status
@@ -39,7 +39,16 @@
                             span(v-model="statusFilter" @click="statusOpen")
                                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openStatus}")                                
                 .dropItem__table
-                    Projectstable(:projects="projects")
+                    Projectstable(
+                        :projects="projects"
+                        :requestDateFilter="requestDateFilter"
+                        :projectNameFilter="projectNameFilter"
+                        :projectIdFilter="projectIdFilter"
+                        :deadlineFilter="deadlineFilter"
+                        :sourceLangsFilter="sourceLangsFilter"
+                        :targetLangsFilter="targetLangsFilter"
+                        :statusFilter="statusFilter"
+                    )
 
 </template>
 
@@ -64,12 +73,12 @@ export default {
     },
     data() {
         return {
-            requestDateFilter: '',
+            requestDateFilter: new Date("01-01-2015"),
             projectNameFilter: '',
-            deadlineFilter: '',
-            pojectIdFilter: '',
+            deadlineFilter: new Date(),
+            projectIdFilter: '',
             sourceLangsFilter: '',
-            tergetLangsFilter: '',
+            targetLangsFilter: '',
             statusFilter: '',
             openAll: false,
             openSourceLangs: false,
@@ -80,29 +89,31 @@ export default {
         }
     },
     methods: {
-    showAllProjects() {
-        this.openAll = !this.openAll
+        showAllProjects() {
+            this.openAll = !this.openAll
+        },
+        sourceLangOpen() {
+        this.openSourceLangs = !this.openSourceLangs;
+        },
+        targetLangOpen() {
+        this.openTargetLangs = !this.openTargetLangs;
+        },
+        statusOpen() {
+        this.openStatus = !this.openStatus;
+        },
+        showDetailedCalendar() {
+        this.currentFormVisible = !this.currentFormVisible;
+        },
+        showDetailedCalendarOther() {
+        this.currentFormVisibleOther = !this.currentFormVisibleOther;
+        }
     },
-    sourceLangOpen() {
-      this.openSourceLangs = !this.openSourceLangs;
+    computed: {
     },
-    targetLangOpen() {
-      this.openTargetLangs = !this.openTargetLangs;
-    },
-    statusOpen() {
-      this.openStatus = !this.openStatus;
-    },
-    showDetailedCalendar() {
-      this.currentFormVisible = !this.currentFormVisible;
-    },
-    showDetailedCalendarOther() {
-      this.currentFormVisibleOther = !this.currentFormVisibleOther;
+    components: {
+        Projectstable,
+        quotesCalendarDetailed: QuotesCalendarDetailed
     }
-  },
-  components: {
-    Projectstable,
-    quotesCalendarDetailed: QuotesCalendarDetailed
-  }
 };
 </script>
 
