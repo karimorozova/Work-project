@@ -7,6 +7,9 @@
     position: absolute;
     left: 50%;
     margin-left: -40%;
+    @media screen and (max-width: 1550px) {
+    width: 79%;
+    }
     &__dropMenu {
         max-width: 919px;
         width: 100%;
@@ -97,17 +100,50 @@
         border-radius: 0;
         border: none;
         margin-bottom: 0;
+        @media screen and (max-width: 1550px) {
+            margin-left: 130px;
+        }
     }
     
     .quotesCalendarWrapper {
-        top: 64%;
-        left: 12%;
+        top: 265px;
+        left: 295px;
+        @media screen and (max-width: 1800px) {
+        left: 65px;
+        }
+        @media screen and (max-width: 1550px) {
+        left: 60px;
+        }
     }
 
     .switcher {
         position: absolute;
-        top: 64%;
-        left: 41%;
+        top: 264px;
+        left: 945px;
         z-index: 5;
+        @media screen and (max-width: 1800px) {
+        left: 705px;
+        }
       }
+
+      .vdp-datepicker__calendar .cell.beforeToday {
+        color: #67573e;
+      }
+
+      .vdp-datepicker__calendar .cell.notCurrentMonth {
+        color: rgba(0, 0, 0, 0.2);
+      }
+
+
+      .vdp-datepicker__calendar .cell {
+        @media screen and (max-width: 1550px) {
+            font-size: 14px;
+            }
+        }
+
+        .vdp-datepicker__calendar {
+            @media screen and (max-width: 1550px) {
+            width: 230px;
+          }
+        }
 }
