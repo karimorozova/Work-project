@@ -55,6 +55,6 @@ app.use('/', routes);
 
 
 app.listen(port, () => {
-    console.log(`Server in working on: ${port}`)
+    console.log(`Server is working on: ${port}`)
 });
 

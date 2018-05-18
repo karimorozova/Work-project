@@ -16,10 +16,13 @@
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
-                        .filterBlock__item.sourceLangs
+                        .filterBlock__item.sourceLangs    
                             label Source Langs
-                            span(v-model="sourceLangsFilter" @click="sourceLangOpen")
-                                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
+                            .sourceLangs__select
+                                span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
+                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
+                                .sourceLangs__drop(v-if="openSourceLangs")
+                                    select-lang(@chooseLang="chooseLang")
                     .filterBlock
                         .filterBlock__item.deadline
                             label Deadline
@@ -56,6 +59,7 @@
 <script>
 import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
+import LanguagesSelect from "../../components/LanguagesSelect";
 
 export default {
     props: {
@@ -110,13 +114,17 @@ export default {
         },
         projectDetails(data) {
             this.$emit('projectDetails', data)
+        },
+        chooseLang(data) {
+            this.sourceLangsFilter = data;
         }
     },
     computed: {
     },
     components: {
         Projectstable,
-        quotesCalendarDetailed: QuotesCalendarDetailed
+        quotesCalendarDetailed: QuotesCalendarDetailed,
+        "select-lang": LanguagesSelect
     }
 };
 </script>

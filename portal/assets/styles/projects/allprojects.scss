@@ -88,6 +88,24 @@
                             margin-right: 10px;
                         }
                     }
+                    .sourceLangs {
+                        &__select {
+                            display: flex;
+                            position: relative;                       
+                        }
+                        &__drop {
+                            position: absolute;
+                            background-color: white;
+                            max-height: 150px;
+                            overflow: auto;
+                            right: 0;
+                            top: 32px;
+                            width: 99%;
+                            z-index: 2;
+                            border: 1px solid #67573e;
+                            padding-bottom: 5px;
+                        }
+                    }
                 }
             }
             &__table {
