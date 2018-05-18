@@ -35,16 +35,28 @@ body {
   
     &__clientName {
       width: 60%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       a {
         text-decoration: none;
       }
       .clientsPortal {
         color: #fff;
-        margin-left: 15px;
         width: 100%;
+        margin-left: 284px;
+        margin-right: 20px;
         span {
           margin-left: 20px;
           font-weight: 400;
+        }
+      }
+      .searchWrapper {
+        display: flex;
+        justify-content: flex-start;
+        border: 2px solid #fff;
+        img {
+          padding-right: 514px;
         }
       }
     }
@@ -259,6 +271,7 @@ body {
             margin-bottom: 6px;
             height: 16px;
             width: 16px;
+            margin-right: 123px;
           }
           
           .chevron:before {
