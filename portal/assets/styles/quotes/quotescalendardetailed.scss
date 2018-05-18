@@ -5,27 +5,40 @@
     z-index: 5;
     width: 582px;
   
-    .container {
+    .calendarContainer {
       display: flex;
       border: 2px solid #67573e;
       padding: 20px 20px 20px 20px;
       font-size: 16px;
       background-color: #fff;
       width: 100%;
+      @media screen and (max-width: 1550px) {
+        padding: 10px;
+      }
   
       &__left {
         flex-direction: column;
         margin-right: 8%;
         width: 50%;
+        @media screen and (max-width: 1550px) {
+          margin-right: -3px;
+        }
         &-level1 {
           display: flex;
           justify-content: space-around;
           margin-bottom: 3%;
+          @media screen and (max-width: 1550px) {
+            justify-content: flex-start;
+          }
+          
           .col1 {
             color: #67573e;
             font-size: 16px;
             font-weight: bold;
-            margin-right: 57%;
+            margin-right: 167px;
+            @media screen and (max-width: 1550px) {
+              margin-right: 145px;
+            }
           }
           .col2 {
             display: flex;
@@ -80,11 +93,17 @@
           display: flex;
           justify-content: space-around;
           margin-bottom: 3%;
+          @media screen and (max-width: 1550px) {
+            justify-content: flex-start;
+          }
           .col1 {
             color: #67573e;
             font-size: 16px;
             font-weight: bold;
             margin-right: 65%;
+            @media screen and (max-width: 1550px) {
+              margin-right: 167px;
+            }
           }
           .col2 {
             display: flex;

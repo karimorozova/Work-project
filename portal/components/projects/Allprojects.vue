@@ -1,7 +1,7 @@
 <template lang="pug">
     .allProjects
-        quotesCalendarDetailed(v-if="currentFormVisible")
-        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
+        //- quotesCalendarDetailed(v-if="currentFormVisible")
+        //- quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
         .allProjects__dropMenu(:class="{opened: openAll}")
             .dropSelect(@click="showAllProjects") All Projects
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
@@ -12,6 +12,7 @@
                             label Request On
                             input(type="text" v-model="requestDateFilter")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
+                        quotesCalendarDetailed(v-if="currentFormVisible")
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
@@ -23,7 +24,8 @@
                         .filterBlock__item.deadline
                             label Deadline
                             input(type="text" v-model="deadlineFilter")
-                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")                            
+                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
+                        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")                          
                         .filterBlock__item.projectId
                             label Project ID
                             input(type="text" v-model="projectIdFilter")
