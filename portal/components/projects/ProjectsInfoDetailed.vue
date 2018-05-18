@@ -37,9 +37,9 @@
                       td
                     tr.row(v-for="lanCombination in project.languageCombinations")
                       td.first-ceil {{ lanCombination.sourceLanguage.name }} >> {{ lanCombination.targetLanguage.name }}
-                      td.second-ceil {{ project.workflow }}
-                      td.third-ceil {{ project.totalAgreed.formattedAmount }}
-                      td.fourth-ceil
+                      td.second-ceil {{ project.status }}
+                      td.third-ceil 
+                      td.fourth-ceil {{ project.totalAgreed.formattedAmount }}
                       td.fifth-ceil(@click="downloadDetail")
                         img(src="../../assets/images/download.png")
               .project-manager
@@ -57,10 +57,10 @@
                     .services2 {{ project.specialization }}
                   .project-manager__detailed_description-thirdblock
                     .services1 Requested On
-                    .services2 {{ project.startDate.formatted }}
+                    .services2 {{ project.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
                   .project-manager__detailed_description-fourthblock
                     .services1 Suggested Deadline
-                    .services2(v-if="project.deadline") {{ project.deadline.formatted }}
+                    .services2(v-if="project.deadline") {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
 </template>
 
 
@@ -79,47 +79,47 @@ export default {
         quotes: {
             type: Array
         },
-        projectIndex: {
-            type: Number
+        project: {
+            type: Object
         }
   },
   data() {
     return {
-      quotesInfoDetailed: {
-        title: "Project ID:",
-        createdDate: "2018 04 11 [27]",
-        projectName: "Project Name:",
-        projectNameValue: "1Market Resources(Updated)",
-        status: "Status:",
-        statusDescription: "Wating for approval",
-        totalCost: "Total Cost:",
-        totalCostValue: "1000&#8364;"
-      },
-      projectInformations: [
-        {
-          languaagePair: "English(United Kingdom)>>Spanish(Spain)",
-          status: "Open",
-          wordcount: "100",
-          cost: "32.32&#8364;"
-        },
-        {
-          languaagePair: "English(United Kingdom)>>Korean",
-          status: "Open",
-          wordcount: "200",
-          cost: "32.32&#8364;"
-        }
-      ],
-      managerPerson: "Sakis Koulos",
-      services: {
-        servicesTitle: "Services:",
-        servicesTitleValue: "Marketing & Copyrighting",
-        industryTitle: "Industry:",
-        industryTitleValue: "ICO & Cryptocurrencies",
-        requestedOn: "Requested On:",
-        requestedOnDate: "01-Apr-2018",
-        deadline: "Suggested Dedline",
-        deadlineDate: "11-Apr-2018"
-      },
+      // quotesInfoDetailed: {
+      //   title: "Project ID:",
+      //   createdDate: "2018 04 11 [27]",
+      //   projectName: "Project Name:",
+      //   projectNameValue: "1Market Resources(Updated)",
+      //   status: "Status:",
+      //   statusDescription: "Wating for approval",
+      //   totalCost: "Total Cost:",
+      //   totalCostValue: "1000&#8364;"
+      // },
+      // projectInformations: [
+      //   {
+      //     languaagePair: "English(United Kingdom)>>Spanish(Spain)",
+      //     status: "Open",
+      //     wordcount: "100",
+      //     cost: "32.32&#8364;"
+      //   },
+      //   {
+      //     languaagePair: "English(United Kingdom)>>Korean",
+      //     status: "Open",
+      //     wordcount: "200",
+      //     cost: "32.32&#8364;"
+      //   }
+      // ],
+      // managerPerson: "Sakis Koulos",
+      // services: {
+      //   servicesTitle: "Services:",
+      //   servicesTitleValue: "Marketing & Copyrighting",
+      //   industryTitle: "Industry:",
+      //   industryTitleValue: "ICO & Cryptocurrencies",
+      //   requestedOn: "Requested On:",
+      //   requestedOnDate: "01-Apr-2018",
+      //   deadline: "Suggested Dedline",
+      //   deadlineDate: "11-Apr-2018"
+      // },
       spanVisible: false
     };
   },
@@ -137,15 +137,12 @@ export default {
     }
   },
   computed: {
-    project() {
-      return this.projects[this.projectIndex]
-    }
   }
 };
 </script>
 
 
-<style lang="scss" scoped>
-@import "../../assets/styles/projects/projectsinfodetailed.scss";
+<style lang="scss" src="../../assets/styles/projects/projectsinfodetailed.scss" scoped>
+// @import "../../assets/styles/projects/projectsinfodetailed.scss";
 
 </style>

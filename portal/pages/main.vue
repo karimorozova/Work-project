@@ -1,6 +1,5 @@
 <template lang="pug">
-    //- .clientsportalWrapper(v-if="cookies")
-    .clientsportalWrapper
+    .clientsportalWrapper(v-if="cookies")
         .clientsTop
             .clientsTop__clientName
                 a(href="/main") 
@@ -78,8 +77,8 @@
             .detailedInfoWrapper
               QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :projectIndex="projectIndex")
-            Allprojects(v-if="allProjectsShow" :projects="projects" :user="user")
+              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project")
+            Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
             invoices(v-if="invoicesShow")
             documents(v-if="documentsShow")
             Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
@@ -141,6 +140,7 @@ export default {
       user: {},
       projects: [],
       quotes: [],
+      project: {},
       quoteIndex: 0,
       projectIndex: 0,
       newProject: {
@@ -162,7 +162,7 @@ export default {
       } else {
         console.log("login failed");
         // alert("Please, Log in!")
-        // window.location.replace("/");
+        window.location.replace("/");
       }
     },
     async clientInfo() {
@@ -252,15 +252,18 @@ export default {
     quoteDetails(data) {
       this.detailedInfoVisible = data.open;
       this.quoteIndex = data.index;
+      this.detailedProjectVisible = false;
+      this.allProjectsShow = false;
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
       }
     },
     projectDetails(data) {
-      this.detailedProjectVisible = data.open;
-      this.projectIndex = data.index;
-      console.log(this.projectIndex);
+      this.detailedProjectVisible = true;
+      this.allProjectsShow = false;
+      this.detailedInfoVisible = false;
+      this.project = data;
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;

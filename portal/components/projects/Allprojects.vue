@@ -38,6 +38,7 @@
                                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openStatus}")                                
                 .dropItem__table
                     Projectstable(
+                        @projectDetails="projectDetails"
                         :projects="projects"
                         :requestDateFilter="requestDateFilter"
                         :projectNameFilter="projectNameFilter"
@@ -104,6 +105,9 @@ export default {
         },
         showDetailedCalendarOther() {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
+        },
+        projectDetails(data) {
+            this.$emit('projectDetails', data)
         }
     },
     computed: {
@@ -115,6 +119,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import "../../assets/styles/projects/allprojects.scss";
+<style lang="scss" src="../../assets/styles/projects/allprojects.scss" scoped>
+// @import "../../assets/styles/projects/allprojects.scss";
 </style>

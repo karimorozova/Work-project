@@ -108,7 +108,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import "../../assets/styles/account/accountinfo.scss";
+<style lang="scss" src="../../assets/styles/account/accountinfo.scss" scoped>
+// @import "../../assets/styles/account/accountinfo.scss";
 
 </style>

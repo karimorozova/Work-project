@@ -126,7 +126,7 @@ export default {
   methods: {
     openProjectsInfoDetailed(index) {
       this.projectInfoDetailed = !this.projectInfoDetailed;
-      this.$emit("projectDetails", {open: this.projectInfoDetailed, index: index});
+      this.$emit("projectDetails", this.projects[index]);
     }
   },
   computed: {
@@ -160,6 +160,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import "../../assets/styles/projects/projectsinfo.scss";
+<style lang="scss" src="../../assets/styles/projects/projectsinfo.scss" scoped>
+// @import "../../assets/styles/projects/projectsinfo.scss";
 </style>

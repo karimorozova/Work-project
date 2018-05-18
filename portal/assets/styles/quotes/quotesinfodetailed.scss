@@ -145,8 +145,10 @@
         .container__buttons {
           display: flex;
           justify-content: flex-end;
+          padding-bottom: 20px;
   
           button {
+            cursor: pointer;
             width: 164px;
             height: 40px;
             color: #fff;
