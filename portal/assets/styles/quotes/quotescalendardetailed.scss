@@ -8,24 +8,24 @@
     .calendarContainer {
       display: flex;
       border: 2px solid #67573e;
-      padding: 20px 20px 20px 20px;
+      padding: 10px;
       font-size: 16px;
       background-color: #fff;
-      width: 100%;
+      width: 82%;
       @media screen and (max-width: 1550px) {
         padding: 10px;
       }
   
       &__left {
         flex-direction: column;
-        margin-right: 8%;
+        margin-right: 18px;
         width: 50%;
         @media screen and (max-width: 1550px) {
-          margin-right: -3px;
+          margin-right: 9px;
         }
         &-level1 {
           display: flex;
-          justify-content: space-around;
+          justify-content: flex-start;
           margin-bottom: 3%;
           @media screen and (max-width: 1550px) {
             justify-content: flex-start;
@@ -35,9 +35,9 @@
             color: #67573e;
             font-size: 16px;
             font-weight: bold;
-            margin-right: 167px;
+            margin-right: 117px;
             @media screen and (max-width: 1550px) {
-              margin-right: 145px;
+              margin-right: 116px;
             }
           }
           .col2 {
@@ -91,7 +91,7 @@
         width: 50%;
         &-level1 {
           display: flex;
-          justify-content: space-around;
+          justify-content: flex-start;
           margin-bottom: 3%;
           @media screen and (max-width: 1550px) {
             justify-content: flex-start;
@@ -100,9 +100,9 @@
             color: #67573e;
             font-size: 16px;
             font-weight: bold;
-            margin-right: 65%;
+            margin-right: 137px;
             @media screen and (max-width: 1550px) {
-              margin-right: 167px;
+              margin-right: 137px;
             }
           }
           .col2 {
@@ -127,6 +127,7 @@
         &-level5 {
           display: flex;
           justify-content: space-evenly;
+          margin-right: -8px;
   
           .col1 {
             font-size: 14px;
@@ -151,7 +152,7 @@
       }
   
       .vdp-datepicker__calendar {
-        width: 260px;
+        width: 230px;
         div {
           .day-header {
             font-weight: bold;
@@ -159,7 +160,9 @@
           }
           .cell {
             background-color: #eaeaea;
-            height: 30px;
+            height: 25px;
+            font-size: 14px;
+            line-height: 29px;
           }
         }
       }

@@ -9,6 +9,13 @@
     margin-left: -40%;
     @media screen and (max-width: 1550px) {
     width: 79%;
+    margin-left: -39%;
+    }
+    @media screen and (max-width: 1380px) {
+    margin-left: -37%;
+    }
+    @media screen and (max-width: 1300px) {
+    margin-left: -38%;
     }
     &__dropMenu {
         max-width: 919px;
@@ -44,6 +51,7 @@
                 justify-content: space-between;
                 .filterBlock {
                     width: 30%;
+                    position: relative;
                     &__item {
                         display: flex;
                         justify-content: space-between;
@@ -106,23 +114,26 @@
     }
     
     .quotesCalendarWrapper {
-        top: 265px;
-        left: 295px;
-        @media screen and (max-width: 1800px) {
-        left: 65px;
+        top: 37px;
+        left: -140px;
+        @media screen and (max-width: 1580px) {
+        left: -94px;
         }
-        @media screen and (max-width: 1550px) {
-        left: 60px;
+        @media screen and (max-width: 1515px) {
+        left: -64px;
         }
     }
 
     .switcher {
         position: absolute;
-        top: 264px;
-        left: 945px;
+        top: 37px;
+        left: 100px;
         z-index: 5;
-        @media screen and (max-width: 1800px) {
-        left: 705px;
+        @media screen and (max-width: 1580px) {
+        left: 139px;
+        }
+        @media screen and (max-width: 1515px) {
+        left: 169px;
         }
       }
 
@@ -133,17 +144,4 @@
       .vdp-datepicker__calendar .cell.notCurrentMonth {
         color: rgba(0, 0, 0, 0.2);
       }
-
-
-      .vdp-datepicker__calendar .cell {
-        @media screen and (max-width: 1550px) {
-            font-size: 14px;
-            }
-        }
-
-        .vdp-datepicker__calendar {
-            @media screen and (max-width: 1550px) {
-            width: 230px;
-          }
-        }
 }
