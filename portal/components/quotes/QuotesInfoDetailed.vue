@@ -139,7 +139,5 @@ export default {
 
 <style lang="scss" src="../../assets/styles/quotes/quotesinfodetailed.scss">
 // @import "../../assets/styles/quotes/quotesinfodetailed.scss";
-.manager-title{
-  color: red;
-}
+
 </style>
