@@ -57,7 +57,7 @@ function projectJobs(pageNum) {
 
 function jobInfo(projectId) {
     return new Promise(resolve => {
-        homeXtrf.get(`browser/?viewId=880&projectId=${projectId}`).then(function (response) {
+        homeXtrf.get(`browser/?viewId=880&q.task_project.projectId=eq(${projectId})`).then(function (response) {
             const res = [];
             for(key in response.data.rows)
             {

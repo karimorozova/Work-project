@@ -35,11 +35,11 @@
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Cost
                       td
-                    tr.row(v-for="lanCombination in project.languageCombinations")
-                      td.first-ceil {{ lanCombination.sourceLanguage.name }} >> {{ lanCombination.targetLanguage.name }}
-                      td.second-ceil {{ project.status }}
-                      td.third-ceil 
-                      td.fourth-ceil {{ project.totalAgreed.formattedAmount }}
+                    tr.row(v-for="job in jobsById")
+                      td.first-ceil {{ job[21] }} >> {{ job[22] }}
+                      td.second-ceil {{ job[20] }}
+                      td.third-ceil {{ job[11] }}
+                      td.fourth-ceil {{ job[12] }}
                       td.fifth-ceil(@click="downloadDetail")
                         img(src="../../assets/images/download.png")
               .project-manager
@@ -81,6 +81,9 @@ export default {
         },
         project: {
             type: Object
+        },
+        jobsById: {
+          type: Array
         }
   },
   data() {
@@ -109,7 +112,5 @@ export default {
 
 <style lang="scss" src="../../assets/styles/projects/projectsinfodetailed.scss" scoped>
 // @import "../../assets/styles/projects/projectsinfodetailed.scss";
-.manager-title{
-  color: red;
-}
+
 </style>

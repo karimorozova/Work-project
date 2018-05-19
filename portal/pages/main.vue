@@ -77,7 +77,7 @@
             .detailedInfoWrapper
               QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project")
+              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById")
             Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
             invoices(v-if="invoicesShow")
             documents(v-if="documentsShow")
@@ -141,6 +141,7 @@ export default {
       projects: [],
       quotes: [],
       project: {},
+      jobsById: [],
       quoteIndex: 0,
       projectIndex: 0,
       newProject: {
@@ -242,6 +243,7 @@ export default {
     },
     showAccountInfo() {
       this.accountInfo = true;
+      this.accountMenuVisible = !this.accountMenuVisible;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
       this.detailedProjectVisible = false;
@@ -260,10 +262,12 @@ export default {
       }
     },
     projectDetails(data) {
+      console.log(data);
       this.detailedProjectVisible = true;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
-      this.project = data;
+      this.project = data.project;
+      this.jobsById = data.jobs;
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;

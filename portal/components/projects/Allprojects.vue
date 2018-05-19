@@ -56,7 +56,7 @@
                         :targetLangsFilter="targetLangsFilter"
                         :statusFilter="statusFilter"
                     )
-        button(@click="getRepos") Click
+        //- button(@click="getRepos") Click
 </template>
 
 <script>
@@ -115,9 +115,14 @@ export default {
         showDetailedCalendarOther() {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
         },
-        projectDetails(data) {
-            this.$emit('projectDetails', data);
-            this.getRepos(data.id);
+        // projectDetails(data) {
+        //     this.$emit('projectDetails', data);
+        //     this.getRepos(data.id);
+        // },
+        async projectDetails(data) {
+            this.$axios.get(`portal/job?projectId=${data.id}`)
+            .then(res => this.$emit('projectDetails', {project: data, jobs: res.data.jobById}))
+            .catch(err => {console.log(err)})
         },
         chooseSourceLang(data) {
             this.sourceLangsFilter = data;
@@ -127,11 +132,11 @@ export default {
             this.targetLangsFilter = data;
             this.openTargetLangs = false;
         },
-        async getRepos(id) {
-            this.$axios.get(`portal/job?projectId=${id}`)
-            .then(res => {console.log(res.data)})
-            .catch(err => {console.log(err)})
-        }
+        // async getRepos(id) {
+        //     this.$axios.get(`portal/job?projectId=${id}`)
+        //     .then(res => this.$emit('jobsById', res.data))
+        //     .catch(err => {console.log(err)})
+        // }
     },
     computed: {
     },

@@ -277,6 +277,10 @@
     margin-left: 2%;
     font-size: 15px;
     outline-style: none;
+    cursor: pointer;
+    &:hover {
+      color: #67573e;
+    }
   }
   .approve {
     background-color: #84ca8e;
