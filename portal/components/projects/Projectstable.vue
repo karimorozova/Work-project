@@ -54,17 +54,6 @@
                                 span {{ project.totalAgreed.formattedAmount }}
                             .col                        
                             .col                                
-                //- .fullInfo(v-if="project.fullInfoAppear")
-                //-     .languagePair
-                //-         .languagePair__title {{ languagePair }}
-                //-             img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                //-         ul.languagePair__ul
-                //-             li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
-                //-     .cost
-                //-         .cost__title {{ cost }}
-                //-             img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
-                //-         ul.cost__ul
-                //-             li.cos
   
 </template>
 
@@ -151,6 +140,7 @@ export default {
                 if(array[i].status == "CLOSED") {
                         result.push({
                         requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
+                        id: array[i].id,
                         startDate: array[i].startDate, 
                         idNumber: array[i].idNumber,
                         name: array[i].name,

@@ -137,7 +137,9 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
-@import "../../assets/styles/quotes/quotesinfodetailed.scss";
-
+<style lang="scss" src="../../assets/styles/quotes/quotesinfodetailed.scss">
+// @import "../../assets/styles/quotes/quotesinfodetailed.scss";
+.manager-title{
+  color: red;
+}
 </style>

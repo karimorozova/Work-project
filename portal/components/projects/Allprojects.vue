@@ -18,11 +18,11 @@
                             input(type="text" v-model="projectNameFilter")
                         .filterBlock__item.sourceLangs    
                             label Source Langs
-                            .sourceLangs__select
+                            .sourceLangs__select.selector
                                 span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
-                                .sourceLangs__drop(v-if="openSourceLangs")
-                                    select-lang(@chooseLang="chooseLang")
+                                .selector__drop(v-if="openSourceLangs")
+                                    select-lang(@chooseLang="chooseSourceLang")
                     .filterBlock
                         .filterBlock__item.deadline
                             label Deadline
@@ -32,10 +32,13 @@
                         .filterBlock__item.projectId
                             label Project ID
                             input(type="text" v-model="projectIdFilter")
-                        .filterBlock__item.sourceLangs
-                            label Target Langs
-                            span(v-model="targetLangsFilter" @click="targetLangOpen")
-                                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")                                
+                        .filterBlock__item.targetLangs
+                            label Target Langs                            
+                            .targetLangs__select.selector
+                                span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
+                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
+                                .selector__drop(v-if="openTargetLangs")
+                                    select-lang(@chooseLang="chooseTargetLang")                                                                
                     .filterBlock
                         .filterBlock__item.status
                             label Status
@@ -53,7 +56,7 @@
                         :targetLangsFilter="targetLangsFilter"
                         :statusFilter="statusFilter"
                     )
-
+        button(@click="getRepos") Click
 </template>
 
 <script>
@@ -90,7 +93,7 @@ export default {
             openTargetLangs: false,
             openStatus: false,
             currentFormVisible: false,
-            currentFormVisibleOther: false        
+            currentFormVisibleOther: false,  
         }
     },
     methods: {
@@ -113,10 +116,21 @@ export default {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
         },
         projectDetails(data) {
-            this.$emit('projectDetails', data)
+            this.$emit('projectDetails', data);
+            this.getRepos(data.id);
         },
-        chooseLang(data) {
+        chooseSourceLang(data) {
             this.sourceLangsFilter = data;
+            this.openSourceLangs = false;
+        },
+        chooseTargetLang(data) {
+            this.targetLangsFilter = data;
+            this.openTargetLangs = false;
+        },
+        async getRepos(id) {
+            this.$axios.get(`portal/job?projectId=${id}`)
+            .then(res => {console.log(res.data)})
+            .catch(err => {console.log(err)})
         }
     },
     computed: {

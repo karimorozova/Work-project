@@ -1,4 +1,5 @@
 const { ClientApi } = require('../models/xtrf');
+const { jobInfo } = require('../models/xtrf/report')
 const router = require('express').Router();
 
 router.get('/', (req, res) => {
@@ -33,6 +34,12 @@ router.get('/clientinfo', async (req, res) => {
     const client = companyInfo.data;
     const user = userInfo.data;
     res.send({user, client, projects, quotes});
+});
+
+router.get('/job',async (req, res) => {
+    var id = req.query.projectId;
+    const jobById = await jobInfo(id);
+    res.send({jobById});
 });
 
 module.exports = router;

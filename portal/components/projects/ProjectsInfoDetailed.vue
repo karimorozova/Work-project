@@ -85,41 +85,6 @@ export default {
   },
   data() {
     return {
-      // quotesInfoDetailed: {
-      //   title: "Project ID:",
-      //   createdDate: "2018 04 11 [27]",
-      //   projectName: "Project Name:",
-      //   projectNameValue: "1Market Resources(Updated)",
-      //   status: "Status:",
-      //   statusDescription: "Wating for approval",
-      //   totalCost: "Total Cost:",
-      //   totalCostValue: "1000&#8364;"
-      // },
-      // projectInformations: [
-      //   {
-      //     languaagePair: "English(United Kingdom)>>Spanish(Spain)",
-      //     status: "Open",
-      //     wordcount: "100",
-      //     cost: "32.32&#8364;"
-      //   },
-      //   {
-      //     languaagePair: "English(United Kingdom)>>Korean",
-      //     status: "Open",
-      //     wordcount: "200",
-      //     cost: "32.32&#8364;"
-      //   }
-      // ],
-      // managerPerson: "Sakis Koulos",
-      // services: {
-      //   servicesTitle: "Services:",
-      //   servicesTitleValue: "Marketing & Copyrighting",
-      //   industryTitle: "Industry:",
-      //   industryTitleValue: "ICO & Cryptocurrencies",
-      //   requestedOn: "Requested On:",
-      //   requestedOnDate: "01-Apr-2018",
-      //   deadline: "Suggested Dedline",
-      //   deadlineDate: "11-Apr-2018"
-      // },
       spanVisible: false
     };
   },
@@ -144,5 +109,7 @@ export default {
 
 <style lang="scss" src="../../assets/styles/projects/projectsinfodetailed.scss" scoped>
 // @import "../../assets/styles/projects/projectsinfodetailed.scss";
-
+.manager-title{
+  color: red;
+}
 </style>
