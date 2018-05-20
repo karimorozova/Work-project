@@ -18,8 +18,13 @@
         font-size: 20px;
     }
     &__header {
-        padding: 20px 40px 0;
-        font-size: 26px;
+        padding: 20px 0 0 80px;
+        font-size: 21px;
+        .arrows {
+            font-size: 18px;
+            padding: 0 5px;
+            opacity: 0.5;
+        }
     }
     &__form {
         padding: 20px 40px;
@@ -52,8 +57,17 @@
                 padding-top: 35px;
                 display: flex;
                 padding-left: 20px;
+                display: flex;
+                justify-content: space-around;
+                
                 .name {
-                    width: 50%;
+                    width: 270px;
+                    &__title {
+                        font-size: 12px;
+                    }
+                }
+                .web {
+                    width: 270px;
                 }
             }
         }

@@ -2,17 +2,20 @@
     .account
         .successModal(v-if="successShow")
             p.successModal__message Your information has been saved
-        .account__header My account
+        .account__header 
+            span(v-if="user.name") {{ user.name }} 
+                span.arrows >> 
+            span My account
         form.account__form(@submit.prevent="saveInfo")
             .companyDetails
                 .companyDetails__title.blockTitle
                     span Company Details
                 .companyDetails__details
                     .name
-                        p Company Name
+                        p.name__title Company Name
                         p {{ client.name }}
                     .web
-                        p Website
+                        p.name__title Website
                         p {{ client.contact.www }}
             .contactDetails
                 .contactDetails__title.blockTitle

@@ -4,14 +4,13 @@
             .clientsTop__clientName
                 a(href="/main") 
                   h2.clientsPortal CLIENT PORTAL
-                    span(v-if="accountInfo") >> {{ user.name }} (My Account)
             .clientsTop__searchBlock
                 .dropdownWrapper
                   .sel_project_block
                     .sel_project_block__proj
                       span New Project
                     .sel_project_block__imgWrapper(@click="showDropdown")
-                      img(src="../assets/images/white-arrow.png")
+                      img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
                   .clientsTop__dropdown
                     .additional(v-if="dropdownVisible")
                       .first {{ newProject.trans }}
@@ -27,15 +26,15 @@
                     .accountBlock
                       .accountBlock__info
                         .icon
-                          img(src="../assets/images/woman.png")
+                          img(src="../assets/images/man.png")
                         .personal_data
-                          .name Mary Jones
-                          .email mary.j@gmail.com
+                          .name {{ user.name }}
+                          .email {{ user.email }}
                       .accountBlock__myaccount(@click="showAccountInfo")
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
-                      .accountBlock__exit
+                      .accountBlock__exit(@click="signOut")
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
@@ -165,6 +164,10 @@ export default {
         // alert("Please, Log in!")
         window.location.replace("/");
       }
+    },
+    signOut() {
+      document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      window.location.replace("/");
     },
     async clientInfo() {
       const result = await this.$axios.request({

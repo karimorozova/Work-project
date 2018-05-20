@@ -7,8 +7,8 @@
     position: absolute;
     left: 50%;
     margin-left: -40%;
-    @media screen and (max-width: 1550px) {
-    width: 79%;
+    @media (max-width: 1550px) {
+        width: 87%;
     }
     &__dropMenu {
         max-width: 919px;
@@ -116,7 +116,7 @@
         border-radius: 0;
         border: none;
         margin-bottom: 0;
-        @media screen and (max-width: 1550px) {
+        @media (max-width: 1550px) {
             margin-left: 130px;
         }
     }
