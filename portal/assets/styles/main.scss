@@ -124,17 +124,15 @@ body {
           top: 22px;
 
           .additional {
+            padding-top: 10px;
             border: 2px solid #978d7e;
             color: #67573e;
             background-color: #fff;
             font-size: 16px;
             width: 185px;
       
-            .first,
-            .second,
-            .third,
-            .fourth,
-            .fifth {
+            &__listItem,
+            {
               padding: 15px;
               border-bottom: 0.2px solid #978d7e;
               cursor: pointer;
@@ -142,15 +140,7 @@ body {
                 background-color: #ddd3c8;
               }
             }
-
-            .first {
-              padding-top: 14%;
-            }
-      
-            .fifth {
-              border-bottom: none;
-            }
-      
+    
             .first {
               &:hover {
                 background-color: #ddd3c8;

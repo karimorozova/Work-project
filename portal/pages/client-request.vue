@@ -59,7 +59,6 @@
                       .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
                         img(:src="'/flags/' + dialect.symbol + '.png'")                  
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-          
           .number
             label PROJECT DETAILS
           .details
@@ -183,7 +182,7 @@
             .orderInfo__summary-service
               span 1
               label SERVICE: 
-              p.choice {{ serviceSelect.title }}
+              p.choice {{ service }}
             .orderInfo__summary-languages
               span 2
               label LANGUAGE:
@@ -194,7 +193,7 @@
             .orderInfo__summary-industry
               span 3
               label INDUSTRY: 
-              p.choice {{ industrySelect }}
+              p.choice {{ industry }}
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
@@ -746,6 +745,12 @@ export default {
         result += item.lang + ', '
       })
       return result;
+    },
+    service() {
+      return this.$store.state.clientInfo.service
+    },
+    industry() {
+      return this.$store.state.clientInfo.industry
     }
   },
   watch: {
@@ -783,7 +788,7 @@ export default {
   flex-direction: column;
   &__title {
     margin-left: 3%;
-    width: 55%;
+    width: 100%;
     text-align: center;
     margin: 20px 0 10px;
     span {

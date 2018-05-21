@@ -1,7 +1,5 @@
 <template lang="pug">
     .allProjects
-        //- quotesCalendarDetailed(v-if="currentFormVisible")
-        //- quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
         .allProjects__dropMenu(:class="{opened: openAll}")
             .dropSelect(@click="showAllProjects") All Projects
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
@@ -115,10 +113,6 @@ export default {
         showDetailedCalendarOther() {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
         },
-        // projectDetails(data) {
-        //     this.$emit('projectDetails', data);
-        //     this.getRepos(data.id);
-        // },
         async projectDetails(data) {
             this.$axios.get(`portal/job?projectId=${data.id}`)
             .then(res => this.$emit('projectDetails', {project: data, jobs: res.data.jobById}))

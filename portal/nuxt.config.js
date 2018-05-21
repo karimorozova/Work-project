@@ -5,9 +5,7 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
   ],
-  plugins: [
-    { src: '~/plugins/vue-data-table.js', ssr: false }
-  ],
+
   axios: {
     // API url
     // baseURL: 'https://admin.pangea.global'
