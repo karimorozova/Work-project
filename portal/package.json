@@ -52,7 +52,7 @@
     "eslint-plugin-vue": "^4.0.0",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.7",
-    "vue-style-loader": "^4.0.2"
+    "vue-style-loader": "^4.1.0"
   },
   "main": ".eslintrc.js",
   "keywords": [],

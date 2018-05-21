@@ -4,6 +4,9 @@
             .clientsTop__clientName
                 a(href="/main") 
                   h2.clientsPortal CLIENT PORTAL
+                    span(v-if="accountInfo") >> {{ user.name }} (My Account)
+                .searchWrapper
+                  img.search(src="../assets/images/search.png")
             .clientsTop__searchBlock
                 .dropdownWrapper
                   .sel_project_block
@@ -18,8 +21,8 @@
                       .third {{ newProject.market }}
                       .fourth {{ newProject.proof }}
                       .fifth {{ newProject.graph }}
-                .searchWrapper
-                    img.search(src="../assets/images/search.png")
+                //- .searchWrapper
+                //-     img.search(src="../assets/images/search.png")
                 .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
                   .accountMenuWrapper(v-if="accountMenuVisible")
