@@ -4,7 +4,6 @@
             .clientsTop__clientName
                 a(href="/main") 
                   h2.clientsPortal CLIENT PORTAL
-                    span(v-if="accountInfo") >> {{ user.name }} (My Account)
             .searchWrapper
               img.search(src="../assets/images/search.png")
             .clientsTop__searchBlock
@@ -16,13 +15,7 @@
                       img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
                   .clientsTop__dropdown
                     .additional(v-if="dropdownVisible")
-                      .first {{ newProject.trans }}
-                      .second {{ newProject.copyw }}
-                      .third {{ newProject.market }}
-                      .fourth {{ newProject.proof }}
-                      .fifth {{ newProject.graph }}
-                //- .searchWrapper
-                //-     img.search(src="../assets/images/search.png")
+                      .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
                 .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
                   .accountMenuWrapper(v-if="accountMenuVisible")
@@ -79,7 +72,7 @@
             .detailedInfoWrapper
               QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById")
+              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById" :user="user")
             Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
             invoices(v-if="invoicesShow")
             documents(v-if="documentsShow")
@@ -146,13 +139,13 @@ export default {
       jobsById: [],
       quoteIndex: 0,
       projectIndex: 0,
-      newProject: {
-        trans: "Translation",
-        copyw: "Copywriting",
-        market: "Marketing",
-        proof: "Proofing/QA",
-        graph: "Graphic Localization"
-      },
+      newProject: [
+        {title: "Translation"},
+        {title: "Copywriting"},
+        {title: "Marketing"},
+        {title: "Proofing/QA"},
+        {title: "Graphic Localization"}
+      ],
       dropdownVisible: false
     };
   },
@@ -268,7 +261,6 @@ export default {
       }
     },
     projectDetails(data) {
-      console.log(data);
       this.detailedProjectVisible = true;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
@@ -281,10 +273,26 @@ export default {
     },
     backToMain() {
       this.$refs.againMain.baseURI;
-      console.log(this.$refs);
     },
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
+    },
+    dataForRequest(ind) {      
+      if(this.projects.length && this.user) {        
+        let formData = {
+          name: this.user.name,
+          email: this.user.email,
+          companyName: this.projects[0].office.name,
+          www: this.user.contact.www,
+          phone: this.user.contact.mobile,
+          skype: "",
+          service: this.newProject[ind].title,
+          industry: this.projects[0].specialization
+        }
+        this.$store.dispatch('requestInfo', formData);
+        this.$router.push("/client-request")
+      }
+
     }
   },
   mounted() {
