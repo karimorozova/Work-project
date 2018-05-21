@@ -36,26 +36,14 @@ body {
     &__clientName {
       width: 35%;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-around;
       align-items: center;
-      // @media screen and (max-width: 1710px) {
-      //   margin-right: 106px;
-      // }
-      // @media screen and (max-width: 1380px) {
-      //   margin-left: -31px;
-      // }
       a {
         text-decoration: none;
       }
       .clientsPortal {
         color: #fff;
         width: 100%;
-        margin-left: 284px;
-        margin-right: 20px;
-        span {
-          margin-left: 20px;
-          font-weight: 400;
-        }
       }
       .searchWrapper {
         display: flex;
@@ -72,32 +60,20 @@ body {
         justify-content: flex-start;
         border: 2px solid #fff;
         width: 30%;
-        // @media screen and (max-width: 1900px) {
-        //   margin-right: 170px;
-        // }
-        // @media screen and (max-width: 1800px) {
-        //   margin-right: 140px;
-        // }
-        // @media screen and (max-width: 1710px) {
-        //   margin-right: 106px;
-        // }
-        // @media screen and (max-width: 1580px) {
-        //   margin-right: 69px;
-        // }
-        // @media screen and (max-width: 1460px) {
-        //   margin-right: 20px;
-        // }
+        @media screen and (max-width: 1520px) {
+          margin-right: 20px;
+        }
+        @media screen and (max-width: 1430px) {
+          margin-right: 40px;
+        }
+        @media screen and (max-width: 1380px) {
+          margin-right: 55px;
+        }
+        @media screen and (max-width: 1330px) {
+          margin-right: 85px;
+        }
         img {
           padding-right: 514px;
-          // @media screen and (max-width: 1710px) {
-          //   padding-right: 450px;
-          // }
-          // @media screen and (max-width: 1380px) {
-          //   padding-right: 400px;
-          // }
-          // @media screen and (max-width: 1280px) {
-          //   padding-right: 370px;
-          // }
         }
       }
 
@@ -107,21 +83,6 @@ body {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      // @media screen and (max-width: 1650px) {
-      //   margin-right: -75px;
-      // }
-      // @media screen and (max-width: 1580px) {
-      //   margin-right: -75px;
-      // }
-      // @media screen and (max-width: 1460px) {
-      //   margin-right: -91px;
-      // }
-      // @media screen and (max-width: 1380px) {
-      //   margin-right: -91px;
-      // }
-      // @media screen and (max-width: 1280px) {
-      //   margin-right: -125px;
-      // }
 
       .dropdownWrapper {
         height: 34px;
@@ -129,15 +90,6 @@ body {
         margin-right: 50px;
         z-index: 3;
         position: relative;
-        // @media screen and (max-width: 1650px) {
-        //   margin-right: 25px;
-        // }
-        // @media screen and (max-width: 1460px) {
-        //   margin-right: 32px;
-        // }
-        // @media screen and (max-width: 1380px) {
-        //   margin-right: 30px;
-        // }
 
         .sel_project_block {
           margin-right: 150px;
