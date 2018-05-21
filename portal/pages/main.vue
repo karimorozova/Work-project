@@ -5,8 +5,8 @@
                 a(href="/main") 
                   h2.clientsPortal CLIENT PORTAL
                     span(v-if="accountInfo") >> {{ user.name }} (My Account)
-                .searchWrapper
-                  img.search(src="../assets/images/search.png")
+            .searchWrapper
+              img.search(src="../assets/images/search.png")
             .clientsTop__searchBlock
                 .dropdownWrapper
                   .sel_project_block
