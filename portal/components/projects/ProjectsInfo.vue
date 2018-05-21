@@ -124,9 +124,14 @@ export default {
     };
   },
   methods: {
-    openProjectsInfoDetailed(index) {
+    async openProjectsInfoDetailed(index) {
+      console.log(this.projects[index])
+      var id = this.projects[index].id;
+      this.$axios.get(`portal/job?projectId=${id}`)
+      .then(res => {
+        this.$emit("projectDetails", {project: this.projects[index], jobs: res.data.jobById})
+      }).catch(err => {console.log(err)})
       this.projectInfoDetailed = !this.projectInfoDetailed;
-      this.$emit("projectDetails", this.projects[index]);
     }
   },
   computed: {

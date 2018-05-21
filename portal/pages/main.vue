@@ -13,7 +13,7 @@
                     .sel_project_block__proj
                       span New Project
                     .sel_project_block__imgWrapper(@click="showDropdown")
-                      img(src="../assets/images/white-arrow.png")
+                      img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
                   .clientsTop__dropdown
                     .additional(v-if="dropdownVisible")
                       .first {{ newProject.trans }}
@@ -29,15 +29,15 @@
                     .accountBlock
                       .accountBlock__info
                         .icon
-                          img(src="../assets/images/woman.png")
+                          img(src="../assets/images/man.png")
                         .personal_data
-                          .name Mary Jones
-                          .email mary.j@gmail.com
+                          .name {{ user.name }}
+                          .email {{ user.email }}
                       .accountBlock__myaccount(@click="showAccountInfo")
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
-                      .accountBlock__exit
+                      .accountBlock__exit(@click="signOut")
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
@@ -79,7 +79,7 @@
             .detailedInfoWrapper
               QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
             .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project")
+              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById")
             Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
             invoices(v-if="invoicesShow")
             documents(v-if="documentsShow")
@@ -143,6 +143,7 @@ export default {
       projects: [],
       quotes: [],
       project: {},
+      jobsById: [],
       quoteIndex: 0,
       projectIndex: 0,
       newProject: {
@@ -166,6 +167,10 @@ export default {
         // alert("Please, Log in!")
         window.location.replace("/");
       }
+    },
+    signOut() {
+      document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      window.location.replace("/");
     },
     async clientInfo() {
       const result = await this.$axios.request({
@@ -244,6 +249,7 @@ export default {
     },
     showAccountInfo() {
       this.accountInfo = true;
+      this.accountMenuVisible = !this.accountMenuVisible;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
       this.detailedProjectVisible = false;
@@ -262,10 +268,12 @@ export default {
       }
     },
     projectDetails(data) {
+      console.log(data);
       this.detailedProjectVisible = true;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
-      this.project = data;
+      this.project = data.project;
+      this.jobsById = data.jobs;
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;

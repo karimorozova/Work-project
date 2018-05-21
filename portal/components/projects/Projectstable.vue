@@ -54,17 +54,6 @@
                                 span {{ project.totalAgreed.formattedAmount }}
                             .col                        
                             .col                                
-                //- .fullInfo(v-if="project.fullInfoAppear")
-                //-     .languagePair
-                //-         .languagePair__title {{ languagePair }}
-                //-             img.languagePair__image(src="../../assets/images/open-close-arrow-brown.png")
-                //-         ul.languagePair__ul
-                //-             li.languagePair__li(v-for="language in languagesFromTo") {{ language.description }}
-                //-     .cost
-                //-         .cost__title {{ cost }}
-                //-             img.cost__image(src="../../assets/images/open-close-arrow-brown.png")
-                //-         ul.cost__ul
-                //-             li.cos
   
 </template>
 
@@ -151,6 +140,7 @@ export default {
                 if(array[i].status == "CLOSED") {
                         result.push({
                         requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
+                        id: array[i].id,
                         startDate: array[i].startDate, 
                         idNumber: array[i].idNumber,
                         name: array[i].name,
@@ -223,56 +213,6 @@ export default {
             }
             return filtered;
         },
-        // filteredProjects() {
-        //     if (this.projects.length) {
-        //         if (this.projectNameFilter.length) {
-        //             this.projects.map(item => {
-        //                 if (item.name.toLowerCase().indexOf(this.projectNameFilter.toLowerCase()) != -1)
-        //                     this.allProjectsFiltered.push(item)
-        //             });
-        //         }
-
-        //         if (this.projectIdFilter.length) {
-        //             this.projects.map(item => {
-        //                 if (item.idNumber.indexOf(this.projectIdFilter) != -1)
-        //                     this.allProjectsFiltered.push(item)
-        //             });
-        //         }
-
-        //         if (this.sourceLangsFilter.length) {
-        //             this.projects.map(item => {
-        //                 if (item.languageCombinations.length) {
-        //                     for(let i = 0; i < item.languageCombinations.length; i++) {
-        //                         if (item.item.languageCombinations[i].sourceLanguage.name.indexOf(this.sourceLangsFilter) != -1) {
-        //                             this.allProjectsFiltered.push(item)        
-        //                         }
-        //                     }
-        //                 }
-        //             });
-        //         }
-
-        //         if (this.targetLangsFilter.length) {
-        //             this.projects.map(item => {
-        //                 if (item.languageCombinations.length) {
-        //                     for(let i = 0; i < item.languageCombinations.length; i++) {
-        //                         if (item.item.languageCombinations[i].targetLanguage.name.indexOf(this.tergetLangsFilter) != -1) {
-        //                             this.allProjectsFiltered.push(item)        
-        //                         }
-        //                     }
-        //                 }
-        //             });
-        //         }
-
-        //         if (this.statusFilter.length) {
-        //             this.projects.map(item => {
-        //                 if (item.status.indexOf(this.statusFilter) != -1)
-        //                     this.allProjectsFiltered.push(item)
-        //             });
-        //         }
-
-        //         return this.allProjectsFiltered;
-        //     }
-        // }
     },
     mounted() {
         this.getCookie(),

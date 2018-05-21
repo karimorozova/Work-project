@@ -16,10 +16,13 @@
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
-                        .filterBlock__item.sourceLangs
+                        .filterBlock__item.sourceLangs    
                             label Source Langs
-                            span(v-model="sourceLangsFilter" @click="sourceLangOpen")
-                                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
+                            .sourceLangs__select.selector
+                                span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
+                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
+                                .selector__drop(v-if="openSourceLangs")
+                                    select-lang(@chooseLang="chooseSourceLang")
                     .filterBlock
                         .filterBlock__item.deadline
                             label Deadline
@@ -29,10 +32,13 @@
                         .filterBlock__item.projectId
                             label Project ID
                             input(type="text" v-model="projectIdFilter")
-                        .filterBlock__item.sourceLangs
-                            label Target Langs
-                            span(v-model="targetLangsFilter" @click="targetLangOpen")
-                                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")                                
+                        .filterBlock__item.targetLangs
+                            label Target Langs                            
+                            .targetLangs__select.selector
+                                span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
+                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
+                                .selector__drop(v-if="openTargetLangs")
+                                    select-lang(@chooseLang="chooseTargetLang")                                                                
                     .filterBlock
                         .filterBlock__item.status
                             label Status
@@ -50,12 +56,13 @@
                         :targetLangsFilter="targetLangsFilter"
                         :statusFilter="statusFilter"
                     )
-
+        //- button(@click="getRepos") Click
 </template>
 
 <script>
 import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
+import LanguagesSelect from "../../components/LanguagesSelect";
 
 export default {
     props: {
@@ -86,7 +93,7 @@ export default {
             openTargetLangs: false,
             openStatus: false,
             currentFormVisible: false,
-            currentFormVisibleOther: false        
+            currentFormVisibleOther: false,  
         }
     },
     methods: {
@@ -108,15 +115,35 @@ export default {
         showDetailedCalendarOther() {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
         },
-        projectDetails(data) {
-            this.$emit('projectDetails', data)
-        }
+        // projectDetails(data) {
+        //     this.$emit('projectDetails', data);
+        //     this.getRepos(data.id);
+        // },
+        async projectDetails(data) {
+            this.$axios.get(`portal/job?projectId=${data.id}`)
+            .then(res => this.$emit('projectDetails', {project: data, jobs: res.data.jobById}))
+            .catch(err => {console.log(err)})
+        },
+        chooseSourceLang(data) {
+            this.sourceLangsFilter = data;
+            this.openSourceLangs = false;
+        },
+        chooseTargetLang(data) {
+            this.targetLangsFilter = data;
+            this.openTargetLangs = false;
+        },
+        // async getRepos(id) {
+        //     this.$axios.get(`portal/job?projectId=${id}`)
+        //     .then(res => this.$emit('jobsById', res.data))
+        //     .catch(err => {console.log(err)})
+        // }
     },
     computed: {
     },
     components: {
         Projectstable,
-        quotesCalendarDetailed: QuotesCalendarDetailed
+        quotesCalendarDetailed: QuotesCalendarDetailed,
+        "select-lang": LanguagesSelect
     }
 };
 </script>

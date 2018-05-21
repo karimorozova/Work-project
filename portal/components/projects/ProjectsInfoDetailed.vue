@@ -35,11 +35,11 @@
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Cost
                       td
-                    tr.row(v-for="lanCombination in project.languageCombinations")
-                      td.first-ceil {{ lanCombination.sourceLanguage.name }} >> {{ lanCombination.targetLanguage.name }}
-                      td.second-ceil {{ project.status }}
-                      td.third-ceil 
-                      td.fourth-ceil {{ project.totalAgreed.formattedAmount }}
+                    tr.row(v-for="job in jobsById")
+                      td.first-ceil {{ job[21] }} >> {{ job[22] }}
+                      td.second-ceil {{ job[20] }}
+                      td.third-ceil {{ job[11] }}
+                      td.fourth-ceil {{ job[12] }}
                       td.fifth-ceil(@click="downloadDetail")
                         img(src="../../assets/images/download.png")
               .project-manager
@@ -81,45 +81,13 @@ export default {
         },
         project: {
             type: Object
+        },
+        jobsById: {
+          type: Array
         }
   },
   data() {
     return {
-      // quotesInfoDetailed: {
-      //   title: "Project ID:",
-      //   createdDate: "2018 04 11 [27]",
-      //   projectName: "Project Name:",
-      //   projectNameValue: "1Market Resources(Updated)",
-      //   status: "Status:",
-      //   statusDescription: "Wating for approval",
-      //   totalCost: "Total Cost:",
-      //   totalCostValue: "1000&#8364;"
-      // },
-      // projectInformations: [
-      //   {
-      //     languaagePair: "English(United Kingdom)>>Spanish(Spain)",
-      //     status: "Open",
-      //     wordcount: "100",
-      //     cost: "32.32&#8364;"
-      //   },
-      //   {
-      //     languaagePair: "English(United Kingdom)>>Korean",
-      //     status: "Open",
-      //     wordcount: "200",
-      //     cost: "32.32&#8364;"
-      //   }
-      // ],
-      // managerPerson: "Sakis Koulos",
-      // services: {
-      //   servicesTitle: "Services:",
-      //   servicesTitleValue: "Marketing & Copyrighting",
-      //   industryTitle: "Industry:",
-      //   industryTitleValue: "ICO & Cryptocurrencies",
-      //   requestedOn: "Requested On:",
-      //   requestedOnDate: "01-Apr-2018",
-      //   deadline: "Suggested Dedline",
-      //   deadlineDate: "11-Apr-2018"
-      // },
       spanVisible: false
     };
   },

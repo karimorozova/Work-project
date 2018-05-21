@@ -55,6 +55,28 @@ function projectJobs(pageNum) {
     })
 }
 
+function jobInfo(projectId) {
+    return new Promise(resolve => {
+        homeXtrf.get(`browser/?viewId=880&q.task_project.projectId=eq(${projectId})`).then(function (response) {
+            const res = [];
+            for(key in response.data.rows)
+            {
+                let data = response.data.rows[key].columns;
+                if(!data[8].includes("Automatic")){
+                    //if(data[8].includes("Nguyen")){
+                        res.push(response.data.rows[key].columns);
+                    //}                        
+                }
+                    
+            }
+            resolve(res);
+        }).catch(function (error) {
+            console.log("errord adding customer, status " + error.response.status + "\n Message :" + error.response.data.errorMessage);
+            resolve(error);
+        });
+    })
+}
 
 
-module.exports = { beginProject , projectJobs, projectJobsPagesCount }
+
+module.exports = { beginProject , projectJobs, projectJobsPagesCount, jobInfo }

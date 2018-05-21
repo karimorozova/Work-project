@@ -92,7 +92,6 @@ body {
             border-right: 1px solid #fff;
             line-height: 100%;
             color: #fff;
-            margin-right: 16px;
             padding-right: 60px;
             height: 100%;
             display: flex;
@@ -109,7 +108,11 @@ body {
             img {
               height: 14px;
               transform: rotate(180deg);
-              margin-right: 20px;
+              padding: 10px 17px;
+              cursor: pointer;
+            }
+            .rotate {
+              transform: rotate(0deg);
             }
           }
         }
@@ -117,9 +120,7 @@ body {
         .clientsTop__dropdown {
           z-index: -1;
           position: absolute;
-          top: 59.2%;
-          right: 13.8%;
-          right: 52px;
+          right: 50px;
           top: 22px;
 
           .additional {
@@ -136,6 +137,7 @@ body {
             .fifth {
               padding: 15px;
               border-bottom: 0.2px solid #978d7e;
+              cursor: pointer;
               &:hover {
                 background-color: #ddd3c8;
               }
@@ -242,7 +244,7 @@ body {
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              cursor: default;
+              cursor: pointer;
               .icon_exit {
                 margin-left: 9%;
                 img {
@@ -272,6 +274,7 @@ body {
             height: 16px;
             width: 16px;
             margin-right: 123px;
+            cursor: pointer;
           }
           
           .chevron:before {
