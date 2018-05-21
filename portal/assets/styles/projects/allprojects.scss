@@ -156,11 +156,11 @@
         }
       }
 
-      .vdp-datepicker__calendar .cell.beforeToday {
-        color: rgba(0, 0, 0, 1);
-      }
-
       .vdp-datepicker__calendar .cell.notCurrentMonth {
         color: rgba(0, 0, 0, 0.2);
+      }
+
+      .vdp-datepicker__calendar .cell.beforeToday {
+        color: rgba(0, 0, 0, 1);
       }
 }

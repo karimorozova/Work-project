@@ -8,6 +8,7 @@
                     .col2-text1
                     .col2-text2 Anytime
             .calendarContainer__left-level4
+                input(type="text" readonly)
                 datepicker(monday-first=true :inline="true" :highlighted='state.highlighted')
         .calendarContainer__right
             .calendarContainer__right-level1
@@ -16,6 +17,7 @@
                     .col2-text1
                     .col2-text2 Anytime
             .calendarContainer__right-level4
+                input(type="text" readonly)
                 datepicker(monday-first=true :inline="true" :highlighted='state.highlighted')
             .calendarContainer__right-level5
                 .col1
