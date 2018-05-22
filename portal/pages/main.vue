@@ -137,6 +137,7 @@ export default {
       quotes: [],
       project: {},
       jobsById: [],
+      languageCombinations: [],
       quoteIndex: 0,
       projectIndex: 0,
       newProject: [
@@ -176,6 +177,7 @@ export default {
       this.user = result.data.user;
       this.projects = result.data.projects;
       this.quotes = result.data.quotes;
+      this.languageCombinations = result.data.languageCombinations;
     },
     expandBar() {
       this.expander = !this.expander;
@@ -290,6 +292,7 @@ export default {
           industry: this.projects[0].specialization
         }
         this.$store.dispatch('requestInfo', formData);
+        this.$store.dispatch('loadLangs', this.languageCombinations);
         this.$router.push("/client-request")
       }
 

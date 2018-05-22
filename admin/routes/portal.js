@@ -1,5 +1,5 @@
 const { ClientApi } = require('../models/xtrf');
-const { jobInfo } = require('../models/xtrf/report')
+const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report')
 const router = require('express').Router();
 
 router.get('/', (req, res) => {
@@ -29,11 +29,13 @@ router.get('/clientinfo', async (req, res) => {
     const fullInfo = await (customer.projectsInfo());
     const quotesInfo = await (customer.quotesInfo());
     const companyInfo = await (customer.companyInfo(userId.data.parentId));
+    const clientLanguages = await (customer.languageComb(userId.data.parentId));
     const projects = fullInfo.data;
     const quotes = quotesInfo.data;
     const client = companyInfo.data;
     const user = userInfo.data;
-    res.send({user, client, projects, quotes});
+    const languageCombinations = clientLanguages.data;
+    res.send({user, client, projects, quotes, languageCombinations});
 });
 
 router.get('/job',async (req, res) => {
@@ -41,5 +43,25 @@ router.get('/job',async (req, res) => {
     const jobById = await jobInfo(id);
     res.send({jobById});
 });
+
+router.get('/tasksInfo', async (req,res) => {
+    var id = req.query.quoteId;
+    const tasksOfQuote = await quoteTasksInfo(id);
+    res.send({tasksOfQuote});
+});
+
+router.post('/approve', async (req, res) => {
+    var customer = new ClientApi("", req.cookies.ses);
+    var id = req.query.quoteId;
+    const result = await customer.quoteApprove(id);
+    res.send({result});
+});
+
+router.get('/reject', async (req, res) => {
+    var customer = new ClientApi("", req.cookies.ses);
+    var id = req.query.quoteId;
+    const result = await customer.quoteReject(id);
+    res.send({result});
+})
 
 module.exports = router;

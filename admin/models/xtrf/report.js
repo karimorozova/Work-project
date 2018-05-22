@@ -77,6 +77,23 @@ function jobInfo(projectId) {
     })
 }
 
+function quoteTasksInfo(quoteId) {
+    return new Promise(resolve => {
+        homeXtrf.get(`browser/?viewId=798&q.quote.quoteId=eq(${quoteId})`).then(function (response) {
+            const res = [];
+            for(key in response.data.rows)
+            {
+                let data = response.data.rows[key].columns;
+                res.push(response.data.rows[key].columns);
+            }
+            resolve(res);
+        }).catch(function (error) {
+            console.log("error, status " + error.response.status + "\n Message :" + error.response.data.errorMessage);
+            resolve(error);
+        });
+    })
+}
 
 
-module.exports = { beginProject , projectJobs, projectJobsPagesCount, jobInfo }
+
+module.exports = { beginProject , projectJobs, projectJobsPagesCount, jobInfo, quoteTasksInfo }

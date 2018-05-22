@@ -74,7 +74,7 @@ export default {
             type: Array
         },
         requestDateFilter: {
-            type: Date
+            type: Object
         },
         projectNameFilter: {
             type: String

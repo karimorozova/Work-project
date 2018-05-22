@@ -32,13 +32,13 @@
                       td Wordcount
                         img(src="../../assets/images/open-close-arrow-brown.png")
                       td Cost
-                    tr.row(v-for="lanCombination in quote.languageCombinations")
-                      td.first-ceil {{ lanCombination.sourceLanguage.name }} >> {{ lanCombination.targetLanguage.name }}
-                      td.second-ceil {{ quote.workflow }}
-                      td.third-ceil(v-html="quote.totalAgreed.formattedAmount")
+                    tr.row(v-for="task in tasks")
+                      td.first-ceil {{ task.sourceLang }} >> {{ task.targetLang }}
+                      td.second-ceil {{ task.wordcount }}
+                      td.third-ceil {{ task.totalCost }}
                 .container__buttons
-                    button.approve APPROVE QUOTE
-                    button.reject REJECT QUOTE
+                    button.approve(@click="approveQuote") APPROVE QUOTE
+                    button.reject(@click="rejectQuote") REJECT QUOTE
               .project-manager
                 .project-manager__detailed_info
                   .manager-icon
@@ -81,41 +81,7 @@ export default {
   },
   data() {
     return {
-      quotesInfoDetailed: {
-        title: "Project ID:",
-        createdDate: "2018 04 11 [27]",
-        projectName: "Project Name:",
-        projectNameValue: "1Market Resources(Updated)",
-        status: "Status:",
-        statusDescription: "Wating for approval",
-        totalCost: "Total Cost:",
-        totalCostValue: "1000&#8364;"
-      },
-      projectInformations: [
-        {
-          projectID: "2018 04 11 [27]/EN-GB*ES-ES/1",
-          languaagePair: "English(United Kingdom)>>Spanish(Spain)",
-          wordcount: "100",
-          cost: "32.32&#8364;"
-        },
-        {
-          projectID: "2018 04 11 [27]/EN-GB*KO/1",
-          languaagePair: "English(United Kingdom)>>Korean",
-          wordcount: "200",
-          cost: "32.32&#8364;"
-        }
-      ],
-      managerPerson: "Sakis Koulos",
-      services: {
-        servicesTitle: "Services:",
-        servicesTitleValue: "Marketing & Copyrighting",
-        industryTitle: "Industry:",
-        industryTitleValue: "ICO & Cryptocurrencies",
-        requestedOn: "Requested On:",
-        requestedOnDate: "01-Apr-2018",
-        deadline: "Suggested Dedline",
-        deadlineDate: "11-Apr-2018"
-      },
+      tasks: [],
       spanVisible: false
     };
   },
@@ -126,12 +92,40 @@ export default {
     downloadAsPDF() {
       //stub
       console.log("Implement this method");
+    },
+    async getTasksOfQuote() {
+      this.$axios.get(`portal/tasksInfo?quoteId=${this.quotes[this.quoteIndex].id}`)
+        .then(res => {
+          var tasksInfo = res.data.tasksOfQuote;
+          for(let i = 0; i < tasksInfo.length; i++) {
+            this.tasks.push({
+              sourceLang: tasksInfo[i][19],
+              targetLang: tasksInfo[i][20],
+              wordcount: tasksInfo[i][10],
+              totalCost: tasksInfo[i][11]
+            })
+          }
+        })
+        .catch(err => console.log(err))
+    },
+    async approveQuote() {
+      this.$axios.get(`portal/approve?quoteId=${this.quotes[this.quoteIndex].id}`)
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
+    },
+    async rejectQuote() {
+      this.$axios.get(`portal/reject?quoteId=${this.quotes[this.quoteIndex].id}`, {withCredentials: true})      
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
     }
   },
   computed: {
     quote() {
       return this.quotes[this.quoteIndex]
     }
+  },
+  mounted() {
+    this.getTasksOfQuote()
   }
 };
 </script>
