@@ -55,9 +55,11 @@
           }
         }
         &-level4 {
-          display: flex;
-          justify-content: flex-start;
           margin-bottom: 3%;
+            input {
+              padding: 4px;
+              margin-bottom: 10px;
+            }
         }
         &-level5 {
           display: flex;
@@ -120,9 +122,11 @@
           }
         }
         &-level4 {
-          display: flex;
-          justify-content: flex-start;
           margin-bottom: 3%;
+          input {
+            padding: 4px;
+            margin-bottom: 10px;
+          }
         }
         &-level5 {
           display: flex;
