@@ -6,14 +6,9 @@
             .dropItem(v-if="openAll")
                 .dropItem__filters
                     .filterBlock
-                        .filterBlock__item.request
-                            label Request On
-                            input(type="text")
-                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-                        quotesCalendarDetailed(v-if="currentFormVisible" @requestOnFilter='requestOnFilter')
-                        .filterBlock__item.projectName
-                            label Project Name
-                            input(type="text" v-model="projectNameFilter")
+                        .filterBlock__item.projectId
+                            label Project ID
+                            input(type="text" v-model="projectIdFilter")
                         .filterBlock__item.sourceLangs    
                             label Source Langs
                             .sourceLangs__select.selector
@@ -22,26 +17,27 @@
                                 .selector__drop(v-if="openSourceLangs")
                                     select-lang(@chooseLang="chooseSourceLang")
                     .filterBlock
-                        .filterBlock__item.deadline
-                            label Deadline
-                            input(type="text" v-model="deadlineFilter")
-                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-                        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")                          
-                        .filterBlock__item.projectId
-                            label Project ID
-                            input(type="text" v-model="projectIdFilter")
                         .filterBlock__item.targetLangs
                             label Target Langs                            
                             .targetLangs__select.selector
                                 span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
                                 .selector__drop(v-if="openTargetLangs")
-                                    select-lang(@chooseLang="chooseTargetLang")                                                                
+                                    select-lang(@chooseLang="chooseTargetLang")
+                        .filterBlock__item.projectName
+                            label Project Name
+                            input(type="text" v-model="projectNameFilter")                                                               
                     .filterBlock
-                        .filterBlock__item.status
-                            label Status
-                            span(v-model="statusFilter" @click="statusOpen")
-                                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openStatus}")                                
+                        .filterBlock__item.request
+                            label Request On
+                            input(type="text")
+                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
+                        quotesCalendarDetailed(v-if="currentFormVisible" @requestOnFilter='requestOnFilter')
+                        .filterBlock__item.deadline
+                            label Deadline
+                            input(type="text" v-model="deadlineFilter")
+                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
+                        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}") 
                 .dropItem__table
                     Projectstable(
                         @projectDetails="projectDetails"

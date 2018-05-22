@@ -38,19 +38,21 @@
                   .chevron(@click="showAccountMenu")
         .clientsMainWrapper
             .clientsNavbar
-              .clientsNavbar__sideBar(:class="{testExpander: expander}")
+              //- .clientsNavbar__sideBar(:class="{testExpander: expander}")
+              .clientsNavbar__sideBar
                 ul.navbar__ulist
                   li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
                       img(v-if="!note.active" :src="note.imgWhite") 
                       img(v-else :src="note.imgBrown")
-                    .title(:class="{showTitle: expander}")
+                    //- .title(:class="{showTitle: expander}")
+                    .title(:class="{showTitle: true}")
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              .clientsNavbar__openHide
-                .icon(@click="expandBar" :class="{openReverse: expander}")
-                  span.icon__arrow >
+              //- .clientsNavbar__openHide
+              //-   .icon(@click="expandBar" :class="{openReverse: expander}")
+              //-     span.icon__arrow >
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
                 //- .buttonPanel

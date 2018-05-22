@@ -8,14 +8,14 @@
     left: 50%;
     margin-left: -40%;
     @media screen and (max-width: 1550px) {
-    width: 79%;
+    width: 94%;
     margin-left: -39%;
     }
     @media screen and (max-width: 1380px) {
     margin-left: -37%;
     }
     @media screen and (max-width: 1300px) {
-    margin-left: -38%;
+    margin-left: -41%;
     }
     &__dropMenu {
         max-width: 919px;
@@ -33,7 +33,7 @@
         color: #67573e;
         transition: all 0.2s;
         @media (max-width: 1550px) {
-            margin-left: 130px;
+            margin-left: 58px;
         }       
         .dropSelect {
             width: 100%;
@@ -53,7 +53,7 @@
                 display: flex;
                 justify-content: space-between;
                 .filterBlock {
-                    width: 30%;
+                    width: 32%;
                     position: relative;
                     &__item {
                         display: flex;
@@ -117,10 +117,6 @@
                     }
                 }
             }
-            &__table {
-                // max-height: 500px;
-                // overflow: scroll;
-            }
         }
     }
     .opened {
@@ -128,7 +124,7 @@
         border: none;
         margin-bottom: 0;
         @media (max-width: 1550px) {
-            margin-left: 130px;
+            margin-left: 58px;
         }
     }
     
