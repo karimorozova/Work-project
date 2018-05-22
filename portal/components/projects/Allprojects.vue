@@ -8,9 +8,9 @@
                     .filterBlock
                         .filterBlock__item.request
                             label Request On
-                            input(type="text")
+                            input(type="text" :value="requestFilter")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-                        quotesCalendarDetailed(v-if="currentFormVisible" @requestOnFilter='requestOnFilter')
+                        quotesCalendarDetailed(v-if="currentFormVisible" @dateFilter='requestOnFilter')
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
@@ -24,9 +24,9 @@
                     .filterBlock
                         .filterBlock__item.deadline
                             label Deadline
-                            input(type="text" v-model="deadlineFilter")
+                            input(type="text" :value="deadFilter")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-                        quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")                          
+                        quotesCalendarDetailed(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")                          
                         .filterBlock__item.projectId
                             label Project ID
                             input(type="text" v-model="projectIdFilter")
@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
 import LanguagesSelect from "../../components/LanguagesSelect";
@@ -81,7 +82,7 @@ export default {
         return {
             requestDateFilter: {from: "", to: ""},
             projectNameFilter: '',
-            deadlineFilter: new Date(),
+            deadlineFilter: {from: "", to: ""},
             projectIdFilter: '',
             sourceLangsFilter: '',
             targetLangsFilter: '',
@@ -127,15 +128,29 @@ export default {
             this.openTargetLangs = false;
         },
         requestOnFilter(data) {
-            console.log(data);
+            this.requestDateFilter = {from: data.from, to: data.to};
+            console.log(this.requestDateFilter);
+        },
+        dealineFiltered(data) {
+            this.deadlineFilter = {from: data.from, to: data.to};
+            console.log(this.deadlineFilter);
         }
-        // async getRepos(id) {
-        //     this.$axios.get(`portal/job?projectId=${id}`)
-        //     .then(res => this.$emit('jobsById', res.data))
-        //     .catch(err => {console.log(err)})
-        // }
     },
     computed: {
+        requestFilter() {
+            let result = "";
+            if(this.requestDateFilter.from) {
+                result = moment(this.requestDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.requestDateFilter.to).format('DD-MM-YYYY')
+            }
+            return result
+        },
+        deadFilter() {
+            let result = "";
+            if(this.deadlineFilter.from) {
+                result = moment(this.deadlineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadlineFilter.to).format('DD-MM-YYYY')
+            }
+            return result
+        }
     },
     components: {
         Projectstable,

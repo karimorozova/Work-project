@@ -77,6 +77,7 @@
             invoices(v-if="invoicesShow")
             documents(v-if="documentsShow")
             Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
+            Clientrequest(v-if="clientRequestShow")
 </template>
 
 <script>
@@ -88,6 +89,8 @@ import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
 import Allprojects from "../components/projects/Allprojects";
 import invoices from "../components/invoices/invoices";
 import documents from "../components/documents/documents";
+import Clientrequest from "../components/Clientrequest";
+
 
 export default {
   data() {
@@ -147,7 +150,8 @@ export default {
         {title: "Proofing/QA"},
         {title: "Graphic Localization"}
       ],
-      dropdownVisible: false
+      dropdownVisible: false,
+      clientRequestShow: false
     };
   },
   methods: {
@@ -202,8 +206,9 @@ export default {
           this.allProjectsShow = false;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false
-          this.documentsShow = false
+          this.invoicesShow = false;
+          this.documentsShow = false;
+          this.clientRequestShow = false;
         }
 
         if (index == 1) {
@@ -211,7 +216,8 @@ export default {
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
           this.invoicesShow = false
-          this.documentsShow = false
+          this.documentsShow = false;
+          this.clientRequestShow = false;
         }
 
         if (index == 2) {
@@ -219,7 +225,8 @@ export default {
           this.allProjectsShow = false;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.documentsShow = false
+          this.documentsShow = false;
+          this.clientRequestShow = false;
         }
 
         if (index == 3) {
@@ -227,7 +234,8 @@ export default {
           this.allProjectsShow = false;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false
+          this.invoicesShow = false;
+          this.clientRequestShow = false;
         }
 
         this.accountInfo = false;
@@ -248,6 +256,7 @@ export default {
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
       this.detailedProjectVisible = false;
+      this.clientRequestShow = false;
       this.navbarList.forEach(item => {
         item.active = false;
       });
@@ -257,6 +266,7 @@ export default {
       this.quoteIndex = data.index;
       this.detailedProjectVisible = false;
       this.allProjectsShow = false;
+      this.clientRequestShow = false;
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
@@ -266,6 +276,7 @@ export default {
       this.detailedProjectVisible = true;
       this.allProjectsShow = false;
       this.detailedInfoVisible = false;
+      this.clientRequestShow = false;
       this.project = data.project;
       this.jobsById = data.jobs;
       for (let i = 0; i < this.navbarList.length; i++) {
@@ -279,7 +290,7 @@ export default {
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    dataForRequest(ind) {      
+    dataForRequest(ind) {     
       if(this.projects.length && this.user) {        
         let formData = {
           name: this.user.name,
@@ -293,7 +304,14 @@ export default {
         }
         this.$store.dispatch('requestInfo', formData);
         this.$store.dispatch('loadLangs', this.languageCombinations);
-        this.$router.push("/client-request")
+        this.clientRequestShow = true;
+        this.accountInfo = false;
+        this.allProjectsShow = false;
+        this.detailedInfoVisible = false;
+        this.detailedProjectVisible = false;
+        this.documentsShow = false;
+        this.invoicesShow = false;
+        this.dropdownVisible = false
       }
 
     }
@@ -310,7 +328,8 @@ export default {
     projectInfoDetailed: ProjectInfoDetailed,
     Allprojects,
     invoices,
-    documents
+    documents,
+    Clientrequest
   },
   computed: {
     visibleChecker() {
@@ -320,7 +339,8 @@ export default {
         this.accountInfo ||
         this.allProjectsShow ||
         this.invoicesShow ||
-        this.documentsShow
+        this.documentsShow ||
+        this.clientRequestShow
       );
     }
   }

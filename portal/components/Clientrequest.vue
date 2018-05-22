@@ -14,51 +14,51 @@
           .number 
             label.asterisk SELECT A LANGUAGE
           .language
-            span(v-if='serviceSelect.source') Source Language
-            .select.source(v-if='serviceSelect.source')
+            span(v-if='serviceSelected') Source Language
+            .select.source(v-if='serviceSelected')
               span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
                 .wrapper(v-on:click.self='showSourceLang')
                 .icon(:class="{ reverse: sourceDrop }")
                   i.fas.fa-caret-down
               .source__drop(v-if='sourceDrop')
-                .source__drop-list(v-for='language in sortedLanguages')
+                .source__drop-list(v-for='language in sourceLanguages')
                   .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                     img(:src="'/flags/' + language.symbol + '.png'")
-                    span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
-                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
-                  .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
-                    template(v-for='(dialect in language.dialects')
-                      .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                        img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                        span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
+                    span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.name }}
+                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
+                  //- .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
+                  //-   template(v-for='(dialect in language.dialects')
+                  //-     .pair.pair_dialect(@click='changeSourceDialect(dialect)')
+                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                  //-       span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
+                <template v-if="targetSelect.length > 0" v-for="language in targetLanguages"> {{ language.name }} </template> 
                 <template v-if="targetSelect.length == 0">Select</template>
                 .wrapper(v-on:click.self='showTargetLang')
                 .icon(:class="{ reverse: targetDrop }")
                   i.fas.fa-caret-down
               .target__drop(v-if='targetDrop')
-                .target__drop-list(v-for='language in sortedLanguages')
+                .target__drop-list(v-for='language in targetLanguages')
                   .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                     img(:src="'/flags/' + language.symbol  + '.png'")
-                    span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
-                  .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
-                    template(v-for='dialect in language.dialects')
-                      .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                        img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                        span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-                  .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
-                    img(:src="'/flags/' + language.symbol  + '.png'")
-                    span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                      img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
-                  .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
-                    template(v-for='dialect in language.dialects')
-                      .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
-                        img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                        span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                    span.list-item(:class="{ active: language.check }") {{ language.name }}
+                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
+                  //- .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
+                  //-   template(v-for='dialect in language.dialects')
+                  //-     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
+                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                  //-       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                  //- .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
+                  //-   img(:src="'/flags/' + language.symbol  + '.png'")
+                    //- span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
+                  //- .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
+                  //-   template(v-for='dialect in language.dialects')
+                  //-     .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
+                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                  //-       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
           .number
             label PROJECT DETAILS
           .details
@@ -197,29 +197,6 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
-    //- .footer
-    //-   .linkList
-    //-     .linkList__item.first
-    //-       ul.list
-    //-         li(v-for="link in linksArray[0]")
-    //-           a(:href='link.link') {{ link.title }}
-    //-     .linkList__item.second
-    //-       ul.list
-    //-         li(v-for="link in linksArray[1]")
-    //-           a(:href='link.link') {{ link.title }}
-    //-   .legalInfo
-    //-     p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
-    //-     p.linfo office : +35725252150
-    //-     p.linfo Reg. No. HE362046  VAT. No. 10362046H
-    //-     p.linfo © 2016 
-    //-       span.pangeaFooterSpan Pangea Translation Services (Cyprus) LTD
-    //-   .socialLinks
-    //-     ul.socials
-    //-       li(v-for="social in socialsArray")
-    //-         a(:href="social.socialLink")
-    //-           img.socialsImage(:src="social.image")
-    //- script(src='/salesforce.js')          
-    //- script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
 <script>
@@ -238,13 +215,12 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
-import Datepicker from './../components/Datepicker.vue';
+import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
 
-var sbjs = require('sourcebuster');
 
 export default {
-  name: 'pang-form',
+  name: 'client-form',
   head: {
   },
   data () {
@@ -258,29 +234,6 @@ export default {
         }
       },
       request: [],
-      industryList: {
-        legal: {
-          text: 'Legal'
-        },
-        hotel: {
-          text: 'Hotel & Real Estates'
-        },
-        trading: {
-          text: 'CFDs & Online Trading'
-        },
-        crypto: {
-          text: 'ICOs & Crypto-Currency'
-        },
-        casino: {
-          text: 'Casino, Poker & IGaming'
-        },
-        games: {
-          text: 'Video Games'
-        },
-        other: {
-          text: 'Other'
-        }
-      },
       activeLanguage: '',
       hasTargetChosen: [],
       infoSlide: false,
@@ -347,56 +300,6 @@ export default {
       languages: [
       
       ],
-      linksArray: [
-        [
-          {
-          link: 'https://www.pangea.global', title: 'Home'
-          },
-          {
-          link: 'https://www.pangea.global/career', title: 'Careers'
-          },
-          {
-          link: 'https://www.pangea.global/faq', title: 'FAQ'
-          },
-          {
-          link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'
-          }
-        ],
-        [
-          {
-          link: 'https://www.pangea.global/contact', title: 'Contact Us'
-          },
-          {
-          link: 'https://www.pangea.global/blog', title: 'Blog'
-          },
-          {
-          link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'
-          }
-        ]
-      ],
-      socialsArray: [
-        {
-          socialLink: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')
-        },
-        {
-          socialLink: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')
-        },
-        {
-          socialLink: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')
-        },
-        {
-          socialLink: 'https://plus.google.com/116520029165216678356', image: require('../assets/images/social/google +.png')
-        },
-        {
-          socialLink: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')
-        },
-        {
-          socialLink: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')
-        },
-        {
-          socialLink: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')
-        }
-      ]
     }
   },
   methods: {
@@ -709,28 +612,38 @@ export default {
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
-    },
-    google() {
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-KM2S59F');
-    },
-    go(sb) {
-      console.log('Cookies are set! Your current source is: ' + sb.current.src);
-    }
+    },    
   },
   computed: {
-    sortedLanguages() {
-      let moveToStart;
-      for(let i = 0; i < this.languages.length; i++) {
-        if(this.languages[i].lang == 'English') {
-          moveToStart = this.languages.splice(i, 1);
-          this.languages.unshift(moveToStart[0]);
+    serviceSelected() {
+      if(this.service == "Copywriting") {
+        return false
+      }
+      return true
+    },
+    sourceLanguages() {
+      let result = [];
+      if(this.languages.length) {
+        for(let i = 0; i < this.languages.length; i++) {
+          result.push({name: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol})   
         }
       }
-      return this.languages;
+      result = result.filter((obj, pos, arr) => {
+        return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+      });
+      return result;
+    },
+    targetLanguages() {
+      let result = [];
+      if(this.languages.length) {
+        for(let i = 0; i < this.languages.length; i++) {
+          result.push({name: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol})   
+        }
+      }
+      result = result.filter((obj, pos, arr) => {
+        return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+      });
+      return result;
     },
     targetLangForSales() {
       let result = '';
@@ -763,20 +676,18 @@ export default {
     Drop
   },
   mounted(){
-    this.google();
     this.getServices();
     this.getLanguages();
-    sbjs.init({ callback: this.go });
-    console.log(sbjs.get.current.src);
+    
   }
 }
 
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss'>
-@import '../assets/request-quote.scss';
+@import '../assets/styles/clientrequest/clientrequest.scss';
 .externalWrap {
+  width: 85%;
   display: flex;
   flex-direction: column;
   &__title {

@@ -5,20 +5,22 @@
             .calendarContainer__left-level1
                 .col1 From
                 .col2
-                    .col2-text1
+                    .col2-text1(@click="fromAny")
+                      .innerCheck(:class="{checkedBox: checked.from}")
                     .col2-text2 Anytime
             .calendarContainer__left-level4
-                input(type="text" :value="requestDateFilter.from" readonly)
-                datepicker(@click="requestOnFilter" monday-first=true :inline="true" :highlighted='state.highlighted' v-model="requestDateFilter.from")
+                input(type="text" :value="datesFilter.from" readonly)
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.from")
         .calendarContainer__right
             .calendarContainer__right-level1
                 .col1 To
                 .col2
-                    .col2-text1
+                    .col2-text1(@click="toAny")
+                      .innerCheck(:class="{checkedBox: checked.to}")
                     .col2-text2 Anytime
             .calendarContainer__right-level4
-                input(type="text" :value="requestDateFilter.to" readonly)
-                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="requestDateFilter.to")
+                input(type="text" :value="datesFilter.to" readonly)
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.to")
             .calendarContainer__right-level5
                 .col1
                     .col1-text 15 days selected
@@ -43,15 +45,29 @@ export default {
           to: moment().add(-1, 'day').endOf('day').toDate()
         }
       },
-      requestDateFilter: {from: new Date(), to: new Date()}
+      datesFilter: {from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), to: new Date()},
+      checked: {from: false, to: false},
+      currentTo: ''
     }
   },
   methods: {
     closeWindow() {
       this.formVisible = !this.formVisible;
+      this.$emit('dateFilter', this.datesFilter)
     },
-    requestOnFilter() {
-      this.$emit('requestOnFilter', this.requestDateFilter)
+    fromAny() {
+      this.checked.from = !this.checked.from;
+      if(!this.checked.from) {
+        this.datesFilter.from = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      } else {
+        this.datesFilter.from = new Date(1970, 1, 1);
+      }
+      this.$emit('fromAny', this.datesFilter);
+    },
+    toAny() {
+      this.checked.to = !this.checked.to;
+      this.datesFilter.to = new Date();        
+      this.$emit('toAny', this.datesFilter);
     }
   },
   components: {

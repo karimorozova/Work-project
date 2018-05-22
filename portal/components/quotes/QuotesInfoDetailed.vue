@@ -36,7 +36,7 @@
                       td.first-ceil {{ task.sourceLang }} >> {{ task.targetLang }}
                       td.second-ceil {{ task.wordcount }}
                       td.third-ceil {{ task.totalCost }}
-                .container__buttons
+                .container__buttons(v-if='quote.status == "SENT"')
                     button.approve(@click="approveQuote") APPROVE QUOTE
                     button.reject(@click="rejectQuote") REJECT QUOTE
               .project-manager
@@ -102,21 +102,23 @@ export default {
               sourceLang: tasksInfo[i][19],
               targetLang: tasksInfo[i][20],
               wordcount: tasksInfo[i][10],
-              totalCost: tasksInfo[i][11]
+              totalCost: tasksInfo[i][13]
             })
           }
         })
         .catch(err => console.log(err))
     },
     async approveQuote() {
-      this.$axios.get(`portal/approve?quoteId=${this.quotes[this.quoteIndex].id}`)
+      this.$axios.get(`portal/approve?quoteId=${this.quotes[this.quoteIndex].id}`, {withCredentials: true})
       .then(res => console.log(res))
-      .catch(err => console.log(err))
+      .catch(err => console.log(err));
+      this.quotes[this.quoteIndex].status = "ACCEPTED"
     },
     async rejectQuote() {
       this.$axios.get(`portal/reject?quoteId=${this.quotes[this.quoteIndex].id}`, {withCredentials: true})      
       .then(res => console.log(res))
-      .catch(err => console.log(err))
+      .catch(err => console.log(err));
+      this.quotes[this.quoteIndex].status = "REJECTED";
     }
   },
   computed: {

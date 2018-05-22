@@ -80,7 +80,7 @@ export default {
             type: String
         },
         deadlineFilter: {
-            type: Date
+            type: Object
         },
         projectIdFilter: {
             type: String
@@ -157,6 +157,42 @@ export default {
                 }
 
                 var filtered = result;
+                if(this.requestDateFilter.from) {
+                    filtered = filtered.filter(item => {
+                        if (item.startDate.millisGMT >= this.requestDateFilter.from) {
+                            return true
+                        }
+                        return false
+                    })
+                }
+
+                if(this.requestDateFilter.to) {
+                    filtered = filtered.filter(item => {
+                        if (item.startDate.millisGMT <= this.requestDateFilter.to) {
+                            return true
+                        }
+                        return false
+                    })
+                }
+
+                if(this.deadlineFilter.from) {
+                    filtered = filtered.filter(item => {
+                        if (item.deadline.millisGMT >= this.deadlineFilter.from) {
+                            return true
+                        }
+                        return false
+                    })
+                }
+
+                if(this.deadlineFilter.to) {
+                    filtered = filtered.filter(item => {
+                        if (item.deadline.millisGMT <= this.deadlineFilter.to) {
+                            return true
+                        }
+                        return false
+                    })
+                }
+
                 if (this.projectNameFilter.length) {
                     filtered = filtered.filter(item => {
                         if (item.name.toLowerCase().indexOf(this.projectNameFilter.toLowerCase()) != -1) {

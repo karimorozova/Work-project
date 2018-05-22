@@ -39,7 +39,7 @@
                       td.first-ceil {{ job[21] }} >> {{ job[22] }}
                       td.second-ceil {{ job[20] }}
                       td.third-ceil {{ job[11] }}
-                      td.fourth-ceil {{ job[12] }}
+                      td.fourth-ceil {{ job[17] }}
                       td.fifth-ceil(@click="downloadDetail")
                         img(src="../../assets/images/download.png")
               .project-manager

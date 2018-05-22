@@ -50,18 +50,18 @@ router.get('/tasksInfo', async (req,res) => {
     res.send({tasksOfQuote});
 });
 
-router.post('/approve', async (req, res) => {
+router.get('/approve', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
     var id = req.query.quoteId;
     const result = await customer.quoteApprove(id);
-    res.send({result});
+    res.send("approved");
 });
 
 router.get('/reject', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
     var id = req.query.quoteId;
     const result = await customer.quoteReject(id);
-    res.send({result});
+    res.send("rejected");
 })
 
 module.exports = router;

@@ -137,7 +137,7 @@ export default {
           } else {
             finalDeadline = ''
           }
-          if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status != "ACCEPTED") {
+          if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status.indexOf("ACCEPTED") == -1) {
               result.push({
               requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
               projectId: array[i].idNumber,
