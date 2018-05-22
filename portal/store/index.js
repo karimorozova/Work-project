@@ -5,20 +5,20 @@ Vue.use(Vuex)
 
 const store = () => new Vuex.Store({
     state: {
-        products: [],
+        clientLanguages: [],
         clientInfo: {},
     },
     actions: {
-        loadProducts(context, payload) {
-            context.commit('load', payload)
+        loadLangs(context, payload) {
+            context.commit('langs', payload)
         },
         requestInfo(context, obj) {
             context.commit('clientForRequest', obj)
         }
     },
     mutations: {
-        load(state, payload) {
-            state.products = payload
+        langs(state, payload) {
+            state.clientLanguages = payload
         },
         clientForRequest(state, payload) {
             state.clientInfo = payload

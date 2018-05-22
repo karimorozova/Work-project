@@ -1,55 +1,5 @@
 <template lang="pug">
     .qoutesWrap
-        //- .calendarWrapper
-        //-   .calenadr-container
-        //-     quotesCalendarDetailed(v-if="currentFormVisible")
-        //-     quotesCalendarDetailed(v-if="currentFormVisibleOther" :class="{switcher: currentFormVisibleOther}")
-        //-     .calenadr-container__requestes
-        //-         .calenadr-container__requestes-left
-        //-             .first Request On
-        //-             .second Project Name
-        //-             .third Source Langs
-        //-         .calenadr-container__requestes-right
-        //-             .first
-        //-                 .first-text {{ quotesCalendar.requestOn }}
-        //-                 .first-image(@click="showDetailedCalendar")
-        //-                     img(src="../../assets/images/calendar.png")
-        //-             .second {{ quotesCalendar.projectName }}
-        //-             .third(@click="showSrcLangs")
-        //-                 img(src="../../assets/images/open-close-arrow-brown.png")
-        //-             .src_lang(v-if="srcLangs")
-        //-                 .lang
-        //-                 .lang
-        //-                 .lang
-        //-     .calenadr-container__deadlines
-        //-         .calenadr-container__deadlines-left
-        //-             .first Deadline
-        //-             .second Project ID
-        //-             .third Target Langs
-        //-         .calenadr-container__deadlines-right
-        //-             .first
-        //-                 .first-text {{ quotesCalendar.requestOn }}
-        //-                 .first-image(@click="showDetailedCalendarOther")
-        //-                     img(src="../../assets/images/calendar.png")
-        //-             .second {{ quotesCalendar.projectId }}
-        //-             .third(@click="showTargLangs")
-        //-                 img(src="../../assets/images/open-close-arrow-brown.png")
-        //-             .targ_lang(v-if="targLangs")
-        //-                 .lang
-        //-                 .lang
-        //-                 .lang
-        //-     .calenadr-container__statuses
-        //-         .calenadr-container__statuses-left
-        //-             .first Status
-        //-             .second
-        //-             .third
-        //-         .calenadr-container__statuses-right
-        //-             .first(@click="showStatuses")
-        //-                 img(src="../../assets/images/open-close-arrow-brown.png")
-        //-             .second(v-if="statusesBar")
-        //-                 .status {{ quotesCalendar.statusW }}
-        //-                 .status {{ quotesCalendar.statusR }}
-        //-                 .status
         .row
             .shortInfo
                 .row__columns
@@ -187,7 +137,7 @@ export default {
           } else {
             finalDeadline = ''
           }
-          if(array[i].status != "APPROVED" && array[i].status != "REJECTED") {
+          if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status != "ACCEPTED") {
               result.push({
               requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
               projectId: array[i].idNumber,

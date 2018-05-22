@@ -8,9 +8,9 @@
                     .filterBlock
                         .filterBlock__item.request
                             label Request On
-                            input(type="text" v-model="requestDateFilter")
+                            input(type="text")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-                        quotesCalendarDetailed(v-if="currentFormVisible")
+                        quotesCalendarDetailed(v-if="currentFormVisible" @requestOnFilter='requestOnFilter')
                         .filterBlock__item.projectName
                             label Project Name
                             input(type="text" v-model="projectNameFilter")
@@ -79,7 +79,7 @@ export default {
     },
     data() {
         return {
-            requestDateFilter: new Date("01-01-2015"),
+            requestDateFilter: {from: "", to: ""},
             projectNameFilter: '',
             deadlineFilter: new Date(),
             projectIdFilter: '',
@@ -126,6 +126,9 @@ export default {
             this.targetLangsFilter = data;
             this.openTargetLangs = false;
         },
+        requestOnFilter(data) {
+            console.log(data);
+        }
         // async getRepos(id) {
         //     this.$axios.get(`portal/job?projectId=${id}`)
         //     .then(res => this.$emit('jobsById', res.data))

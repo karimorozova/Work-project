@@ -75,6 +75,17 @@ var ClientApi = class ClientApi {
         })
     }
 
+    languageComb(customerId) {
+        return new Promise(resolve => {
+            this.clientApi.get(`/customers/${customerId}/sales/languageCombinations`)
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
     projectsInfo() {
         return new Promise(resolve => {
             this.clientApi.get("/projects")
@@ -89,6 +100,28 @@ var ClientApi = class ClientApi {
     quotesInfo() {
         return new Promise(resolve => {
             this.clientApi.get("/quotes")
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
+    quoteApprove(id) {
+        return new Promise(resolve => {
+            this.clientApi.put(`/quotes/${id}/acceptance`)
+                .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
+    quoteReject(id) {
+        return new Promise(resolve => {
+            this.clientApi.delete(`/quotes/${id}/acceptance`)
                 .then(function(response) {
                     resolve(response)
                 }).catch(function(error) {

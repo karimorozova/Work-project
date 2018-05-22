@@ -657,15 +657,8 @@ export default {
         this.services.push(result[i])
       }
     },
-    async getLanguages() {
-      const result = await this.$axios.$get('api/languages')
-      .then(response => {
-        this.languages = response;
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
-
+    getLanguages() {
+      this.languages = this.$store.state.clientLanguages;
     },
     
     async checkForm(event) {
