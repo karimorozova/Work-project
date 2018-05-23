@@ -106,9 +106,15 @@ export default {
         },
         showDetailedCalendar() {
         this.currentFormVisible = !this.currentFormVisible;
+            if(this.currentFormVisible) {
+                this.currentFormVisibleOther = false;
+            }
         },
         showDetailedCalendarOther() {
         this.currentFormVisibleOther = !this.currentFormVisibleOther;
+            if(this.currentFormVisibleOther) {
+                this.currentFormVisible = false;
+            }
         },
         async projectDetails(data) {
             this.$axios.get(`portal/job?projectId=${data.id}`)
