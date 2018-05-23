@@ -353,6 +353,9 @@ body {
       display: flex;
       flex-direction: column;
       width: 88%;
+      @media screen and (max-width: 1400px){
+        width: 98%;
+      }
       .buttonPanel {
         display: flex;
         justify-content: flex-end;
