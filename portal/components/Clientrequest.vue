@@ -21,7 +21,7 @@
                 .source__drop-list(v-for='language in sourceLanguages')
                   .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
                     img(:src="'/flags/' + language.symbol + '.png'")
-                    span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.name }}
+                    span.list-item(:class="{ active: language.name == sourceSelect.lang }") {{ language.name }}
                       //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
                   //- .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
                   //-   template(v-for='(dialect in language.dialects')
@@ -31,7 +31,7 @@
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                <template v-if="targetSelect.length > 0" v-for="language in targetLanguages"> {{ language.name }} </template> 
+                <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }},  </template> 
                 <template v-if="targetSelect.length == 0">Select</template>
                 .wrapper(v-on:click.self='showTargetLang')
                 .icon(:class="{ reverse: targetDrop }")
@@ -41,21 +41,6 @@
                   .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                     img(:src="'/flags/' + language.symbol  + '.png'")
                     span.list-item(:class="{ active: language.check }") {{ language.name }}
-                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
-                  //- .source__drop-list.dialect(v-if='language.dialects && sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1 || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' :class="{ dialect_active : language.lang == selectLangTarget }")
-                  //-   template(v-for='dialect in language.dialects')
-                  //-     .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                  //-       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-                  //- .pair(v-if='!sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' @click='changeTargetSelectEnglish(language)')
-                  //-   img(:src="'/flags/' + language.symbol  + '.png'")
-                    //- span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangTargetEnglish}")
-                  //- .source__drop-list.dialect(v-if='language.dialects && !sourceSelect.lang.includes("English") && language.lang.includes("English") && serviceSelect.title != "Select" && sourceSelect.lang != "Select"' :class="{ dialect_active : language.lang == selectLangTargetEnglish }")
-                  //-   template(v-for='dialect in language.dialects')
-                  //-     .pair.pair_dialect(@click='changeTargetDialectEnglish(dialect)')
-                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                  //-       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
           .number
             label PROJECT DETAILS
           .details
@@ -156,12 +141,17 @@
               textarea(rows='4' v-model='brief')
             .details__quote
               .send
-                .send__check.checker
-                  .checker__checked
-                .send__
+                .send__check
+                  .checker(:class="{checkerChecked: true}")
+                .send__text
+                  p.head Send a Quote
+                  p.insideText i approve for the project to begin immediately and I'll review the quote later.
               .start
-                .start__check.checker
-                  .checker__checked
+                .start__check
+                  .checker
+                .start__text
+                  p.head Start Immediately
+                  p.insideText i approve for the project to begin immediately and to receive the quote just for reference.                
             .captcha
               input.buttons(type='submit' value='Submit' name="submit")          
           .warning(v-if="error")
@@ -186,7 +176,7 @@
               p(v-if='serviceSelect.source') Source:
                 span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
               p Target: 
-                span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect == 0">Select</template>
+                span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.name }},  </template> <template v-if="targetSelect == 0">Select</template>
             .orderInfo__summary-industry
               span 3
               label INDUSTRY: 
@@ -243,7 +233,7 @@ export default {
       filesDrop: false,
       infoShow: true,
       serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
-      sourceSelect: {lang : 'Select'},
+      sourceSelect: {lang : 'English (United Kingdom)'},
       selectLangSource: '',
       selectLangTarget: '',
       selectLangTargetEnglish: '',
@@ -312,12 +302,6 @@ export default {
     orderSlide() {
       this.infoSlide = !this.infoSlide
     },
-    showServices() {
-      this.toggleServices()
-    },
-    toggleServices() {
-      this.serviceDrop = !this.serviceDrop;
-    },
     changeDetailFiles(event) {
       for(var i = 0; i < event.target.files.length; i++){
         this.detailFiles.push(event.target.files[i]);
@@ -334,17 +318,6 @@ export default {
       this.refFiles = event.target.files[0];
       console.log(this.refFiles);
     },
-    changeServiceSelect(event) {
-      this.serviceSelect = event;
-      
-      this.sourceSelect = {lang : 'Select'};
-      if(!event.source) {
-        this.sourceSelect = {lang: 'English (United Kingdom)', xtrf : 61}
-      }
-    },
-    changeIndustry(name) {
-      this.industrySelect = this.industryList[name].text;
-    },
     showSourceLang() {
       this.toggleSource()
     },
@@ -357,12 +330,6 @@ export default {
     toggleTarget() {
       this.targetDrop = !this.targetDrop
     },
-    showDialects(event) {
-      this.toggleDialects()
-    },
-    toggleDialects() {
-      this.dialectsDrop = !this.dialectsDrop
-    },
     showFiles() {
       this.toggleFiles()
     },
@@ -370,29 +337,8 @@ export default {
       this.filesDrop = !this.filesDrop
     },
     changeSourceSelect(event) {
-      if(event.lang == this.selectLangSource) {
-        this.selectLangSource = '';
-      } else {
-        if(!event.dialects.length) {
-          this.sourceSelect = event;
-          this.toggleSource();
-        } 
-        else {
-          // this.sourceSelect = event.dialects;
-          this.selectLangSource = event.lang;
-          // this.activeLanguage = event.lang
-        }
-      }
-      this.targetlang = ["Select"];
-      this.targetSelect.forEach(item => {
-        item.check = false
-      })
-      this.targetSelect = [];
-    },
-    changeSourceDialect(event) {
-      this.sourceSelect = event;
-      this.selectLangSource = '';
       this.toggleSource();
+      this.sourceSelect.lang = event.name;
       this.targetlang = ["Select"];
       this.targetSelect.forEach(item => {
         item.check = false
@@ -400,24 +346,22 @@ export default {
       this.targetSelect = [];
     },
     changeTargetSelect(event) {
-      if(event.lang == this.selectLangTarget) {
+      console.log(event);
+      if(event == this.selectLangTarget) {
         this.selectLangTarget = ''        
       } else {
         this.selectLangTarget = '';
         const pos = this.targetSelect.indexOf(event);
         if(pos === -1) {
-          if(!event.dialects.length) {
-            event.check = true;
-            this.targetSelect.push(event);
-          } else {
-              this.selectLangTarget = event.lang;            
-          }
+          event.check = true;
+          this.targetSelect.push(event);
         }
-        else{
-          event.check = false;
-          this.targetSelect.splice(pos,1);
-        }   
+          else {
+            event.check = false;
+            this.targetSelect.splice(pos,1);
+          }    
       }
+      console.log(this.targetSelect);
     },
     changeTargetDialect(event) {
      const pos = this.targetSelect.indexOf(event);
@@ -499,7 +443,7 @@ export default {
       this.contactEmail ='',
       this.serviceSelect = {title : 'Select', source : true, languages: [{source: [], target: []}]},
       this.industrySelect = 'Select',
-      this.sourceSelect = {lang: 'Select'},
+      this.sourceSelect = {lang: 'English (United Kingdom)'},
       this.targetlang = ["Select"],
       this.targetDrop = false,
       this.targetSelect = [],
@@ -622,25 +566,31 @@ export default {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol})   
+          result.push({name: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
-      return result;
+      return result.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+      });
     },
     targetLanguages() {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol})   
+          result.push({name: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
-      return result;
+      return result.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+      });
     },
     targetLangForSales() {
       let result = '';
@@ -712,6 +662,48 @@ export default {
   }
   .details {
     padding-bottom: 0;
+    flex-direction: column;
+    &__quote {
+      margin-top: 30px;
+      width: 100%;
+      .send, .start {
+        display: flex;
+        align-items: center;
+        border: 1px solid #66563D;        
+        padding: 10px;
+        margin-top: 10px;
+        margin-left: 10px;
+        &__check {
+          width: 18px;
+          height: 18px;
+          margin-right: 20px;
+          border: 1px solid #66563D;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .checker {
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+          }
+          .checkerChecked {
+            background-color: #66563D;
+          }
+        }
+        &__text {
+          width: 88%;
+          .head {
+            margin-bottom: 5px;
+          }
+          .insideText {
+            font-size: 12px;
+            margin-top: 0;
+          }
+        }
+      }
+
+    }
   }
 }
 </style>

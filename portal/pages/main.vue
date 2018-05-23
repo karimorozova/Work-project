@@ -58,7 +58,7 @@
               span.arrows(v-if="user.name") >> 
               span {{ path }}
               span.arrows(v-if="clientRequestShow") >>
-              span {{ serviceType }}
+              span(v-if="clientRequestShow") {{ serviceType }}
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
                 //- .buttonPanel
@@ -329,7 +329,11 @@ export default {
         this.dropdownVisible = false
       }
       this.path = "New Project";
-      this.serviceType = this.newProject[ind].title
+      this.serviceType = this.newProject[ind].title;
+      this.navbarList.forEach( (item, i) => {
+        if (i == 0) item.active = true;
+        else item.active = false;
+      })
     }
   },
   mounted() {
