@@ -53,6 +53,8 @@
               //- .clientsNavbar__openHide
               //-   .icon(@click="expandBar" :class="{openReverse: expander}")
               //-     span.icon__arrow >
+            .breadCrumbs 
+              span {{ user.name }}
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
                 //- .buttonPanel
@@ -351,4 +353,8 @@ export default {
 
 <style lang="scss">
 @import "../assets/styles/main.scss";
+
+.breadCrumbs {
+  margin: 20px;
+}
 </style>

@@ -17,6 +17,9 @@
                                 .selector__drop(v-if="openSourceLangs")
                                     select-lang(@chooseLang="chooseSourceLang")
                     .filterBlock
+                        .filterBlock__item.projectName
+                            label Project Name
+                            input(type="text" v-model="projectNameFilter")
                         .filterBlock__item.targetLangs
                             label Target Langs                            
                             .targetLangs__select.selector
@@ -24,9 +27,6 @@
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
                                 .selector__drop(v-if="openTargetLangs")
                                     select-lang(@chooseLang="chooseTargetLang")
-                        .filterBlock__item.projectName
-                            label Project Name
-                            input(type="text" v-model="projectNameFilter")                                                               
                     .filterBlock
                         .filterBlock__item.request
                             label Request On
@@ -126,10 +126,13 @@ export default {
         requestOnFilter(data) {
             this.requestDateFilter = {from: data.from, to: data.to};
             console.log(this.requestDateFilter);
+            this.currentFormVisible = false;
         },
         dealineFiltered(data) {
             this.deadlineFilter = {from: data.from, to: data.to};
             console.log(this.deadlineFilter);
+            this.currentFormVisibleOther = false;
+            
         }
     },
     computed: {
