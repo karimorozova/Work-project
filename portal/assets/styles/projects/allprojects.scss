@@ -1,13 +1,10 @@
 .allProjects {
-    width: 89%;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     padding-top: 80px;
     margin: 0 auto;
-    @media screen and (max-width: 1550px) {
-    width: 90%;
-    }
     &__dropMenu {
         max-width: 919px;
         width: 100%;
