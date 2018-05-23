@@ -34,7 +34,7 @@
         justify-content: space-between;
         border-right: 0.5px solid white;
         color: white;
-        padding: 0 5px;
+        padding: 5px 5px;
         width: 12%;
         height: 100%;
         &:last-child {
@@ -43,9 +43,12 @@
         &__title {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: space-around;
           padding: 0 5px;
           width: 100%;
+          span {
+            margin-left: -10px;
+          }
           img {
             height: 10px;
             cursor: pointer;
@@ -75,28 +78,33 @@
           }
         }
       }
-      .col-4 {
-        width: 14%;
+      .col-lg {
+        width: 18%;
+          span {
+            margin-left: 26px;
+            margin-right: 45px;
+          }
       }
-      .col-5 {
-        width: 23%;
+      .col-xlg {
+        width: 29%;
+          span {
+            margin-left: 12px;
+            margin-right: 111px;
+          }
       }
-      .colSplit {
-        display: flex;
-        padding: 0;
-        .col {
-          width: 33%;
-          padding: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100%;
+      .col-md {
+        width: 20%;
+        span {
+          margin-left: 8px;
+          margin-right: 43px;
         }
-        .col__title {
-          border-right: 1px solid white;
-          width: 35%;
-          height: 100%;
-        }
+      }
+      .col-end {
+        width: 12%;
+          span {
+            margin-left: 26px;
+            margin-right: 17px;
+          }
       }
       &_info {
         width: 100%;
@@ -108,7 +116,7 @@
           width: 12%;
           cursor: pointer;
           position: relative;
-
+            
           .sp-wrapper {
             position: absolute;
             top: 65%;
@@ -148,40 +156,42 @@
         }
         .proj {
           cursor: pointer;
+          padding-right: 29px;
+          padding-left: 35px;
         }
-        .col-4 {
-          width: 14%;
+        .col-xlg {
+          width: 29%;
+            span {
+              margin-left: 26px;
+              margin-right: 45px;
+            }
         }
-        .col-5 {
-          width: 23%;
+        .col-md {
+          width: 20%;
+          span {
+            margin-left: 26px;
+            margin-right: 45px;
+          }
+        }
+        .col-end {
+          width: 12%;
           cursor: pointer;
           span {
-            border-right: 1px solid #998e7e;
-            padding: 0 3px;
-            font-size: 14px;
-            color: green;
-            &:first-child {
-              font-size: 16px;
-              color: black;
-              padding-right: 10px;
-            }
-            &:last-child {
-              border-right: none;
-              //   color: rgb(245, 135, 110);
-            }
+            margin-left: 26px;
+            margin-right: 19px;
           }
         }
         .colSplit {
           display: flex;
           padding: 0;
           .col {
-            width: 33%;
+            width: 37%;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             &:first-child {
-              padding: 7px;
+              padding: 7px 7px 7px 35px;
             }
             img {
               cursor: pointer;

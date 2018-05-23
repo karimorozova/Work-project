@@ -7,53 +7,36 @@
                         .col__title 
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow.png")
-                    .col
+                    .col.col-lg
                         .col__title
                             span Project ID
                             img(src="../../assets/images/white-arrow.png")                        
-                    .col.col-5
+                    .col.col-xlg
                         .col__title 
                             span Project Name
                             .double_arrow
-                              .up
-                                img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                       
-                    .col.col-4
-                        .col__title 
-                            span Status
-                            .double_arrow
-                              .up
-                                img.arrow_up(src="../../assets/images/white-arrow.png")
-                              .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                
-                    .col
+                                img.arrow_down(src="../../assets/images/white-arrow.png")                                     
+                    .col.col-md
                         .col__title 
                             span Deadline
                             .double_arrow
-                              .up
-                                img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
                                 img.arrow_down(src="../../assets/images/white-arrow.png")                  
-                    .col.col-5.colSplit
-                        .col__title 
-                            span Total Cost
-                        .col
-                        .col
+                    .col.col-end
+                        span Total Cost
         .scrollArea
             .row(v-for="(project, index) in clientProjects")
                 .shortInfo
                     .row__columns_info
                         .col(@click="projectDetails(index)") {{ project.requestOn }}
                         .col.proj(@click="projectDetails(index)") {{ project.idNumber }}
-                        .col.col-5(@click="projectDetails(index)") {{ project.name }}
-                        .col.col-4(@click="projectDetails(index)") {{ project.status }}
-                        .col(v-if="project.deadline" @click="projectDetails(index)") {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
-                        .col.col-5.colSplit
-                            .col(@click="projectDetails(index)")
-                                span {{ project.totalAgreed.formattedAmount }}
-                            .col                        
-                            .col                                
+                        .col.col-xlg(@click="projectDetails(index)")
+                            span {{ project.name }}
+                        .col.col-md(v-if="project.deadline" @click="projectDetails(index)")
+                            span {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                        .col.col-end(@click="projectDetails(index)")
+                            span {{ project.totalAgreed.formattedAmount }}                              
   
 </template>
 

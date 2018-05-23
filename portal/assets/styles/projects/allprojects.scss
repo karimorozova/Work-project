@@ -9,13 +9,12 @@
     margin-left: -40%;
     @media screen and (max-width: 1550px) {
     width: 90%;
-    margin-left: -39%;
     }
-    @media screen and (max-width: 1380px) {
-    margin-left: -37%;
-    }
+    // @media screen and (max-width: 1380px) {
+    //     width: 90%;
+    // }
     @media screen and (max-width: 1300px) {
-    margin-left: -41%;
+    margin-left: -522px;
     }
     &__dropMenu {
         max-width: 919px;

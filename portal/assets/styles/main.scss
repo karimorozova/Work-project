@@ -36,9 +36,9 @@ body {
     &__clientName {
       width: 35%;
       display: flex;
-      justify-content: space-around;
+      justify-content: flex-start;
       align-items: center;
-      margin-left: 140px;
+      margin-left: 150px;
       a {
         text-decoration: none;
       }
