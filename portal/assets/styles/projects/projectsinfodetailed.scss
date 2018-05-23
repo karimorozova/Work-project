@@ -3,11 +3,11 @@
     box-shadow: 0 0 6px #000;
   }
   
-  .container {
+  .projContainer {
     display: flex;
     flex-direction: column;
   
-    .container__label {
+    .projContainer__label {
       display: flex;
       justify-content: flex-start;
   
@@ -23,11 +23,11 @@
     &__infoWrapper {
       display: flex;
   
-      .container__info {
+      .projContainer__info {
         flex-direction: column;
         width: 100%;
   
-        .container-project {
+        .projContainer-project {
           display: flex;
           justify-content: space-around;
           padding-top: 2%;
@@ -110,7 +110,7 @@
   
         .tableWrapper {
           margin: 3%;
-          .container-table {
+          .projContainer-table {
             border: 1px solid #c5bfb7;
             width: 100%;
             border-collapse: collapse;

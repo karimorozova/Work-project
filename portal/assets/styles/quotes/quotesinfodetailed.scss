@@ -3,11 +3,11 @@
   box-shadow: 0 0 6px #000;
 }
   
-.container {
+.quoteContainer {
   display: flex;
   flex-direction: column;
 
-  .container__label {
+  .quoteContainer__label {
     display: flex;
     justify-content: flex-start;
 
@@ -23,11 +23,11 @@
   &__infoWrapper {
     display: flex;
 
-    .container__info {
+    .quoteContainer__info {
       flex-direction: column;
       width: 100%;
 
-      .container-project {
+      .quoteContainer-project {
         display: flex;
         justify-content: space-around;
         padding-top: 2%;
@@ -110,7 +110,7 @@
 
       .tableWrapper {
         margin: 3%;
-        .container-table {
+        .quoteContainer-table {
           border: 1px solid #c5bfb7;
           width: 100%;
           border-collapse: collapse;
@@ -261,7 +261,7 @@
   }
 }
 
-.container__buttons {
+.quoteContainer__buttons {
   display: flex;
   justify-content: flex-end;
   padding-bottom: 20px;

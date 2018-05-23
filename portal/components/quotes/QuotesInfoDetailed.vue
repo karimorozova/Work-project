@@ -1,31 +1,31 @@
 <template lang="pug">
     .qoutesInfoDetailedWrapper
-        .container
-            .container__label
-                .container__label-title Quote Details
-            .container__infoWrapper
-              .container__info
-                .container-project
-                  .container-project__first-block
-                    .container-project__first-block-one
+        .quoteContainer
+            .quoteContainer__label
+                .quoteContainer__label-title Quote Details
+            .quoteContainer__infoWrapper
+              .quoteContainer__info
+                .quoteContainer-project
+                  .quoteContainer-project__first-block
+                    .quoteContainer-project__first-block-one
                       .name Project Name:
                       .value {{ quote.name }}
-                    .container-project__first-block-two
+                    .quoteContainer-project__first-block-two
                       .name Project ID:
                       .value {{ quote.idNumber }}
-                  .container-project__second-block
-                    .container-project__second-block-one
+                  .quoteContainer-project__second-block
+                    .quoteContainer-project__second-block-one
                       .name Status:
                       .value {{ quote.status }}
-                    .container-project__second-block-two
+                    .quoteContainer-project__second-block-two
                       .name Total Cost:
                       .value {{ quote.totalAgreed.formattedAmount }}
-                  .container-project__third-block
-                    .container-project__third-block-one(@click="downloadAsPDF")
+                  .quoteContainer-project__third-block
+                    .quoteContainer-project__third-block-one(@click="downloadAsPDF")
                       img(src="../../assets/images/pdf-icon.png")
                     span Download Full Report
                 .tableWrapper
-                  table.container-table
+                  table.quoteContainer-table
                     tr.row
                       td Language Pair
                         img(src="../../assets/images/open-close-arrow-brown.png")
@@ -36,7 +36,7 @@
                       td.first-ceil {{ task.sourceLang }} >> {{ task.targetLang }}
                       td.second-ceil {{ task.wordcount }}
                       td.third-ceil {{ task.totalCost }}
-                .container__buttons(v-if='quote.status == "SENT"')
+                .quoteContainer__buttons(v-if='quote.status == "SENT"')
                     button.approve(@click="approveQuote") APPROVE QUOTE
                     button.reject(@click="rejectQuote") REJECT QUOTE
               .project-manager

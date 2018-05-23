@@ -1,31 +1,31 @@
 <template lang="pug">
     .projectsInfoDetailedWrapper
-        .container
-            .container__label
-                .container__label-title Projects Details
-            .container__infoWrapper
-              .container__info
-                .container-project
-                  .container-project__first-block
-                    .container-project__first-block-one
+        .projContainer
+            .projContainer__label
+                .projContainer__label-title Projects Details
+            .projContainer__infoWrapper
+              .projContainer__info
+                .projContainer-project
+                  .projContainer-project__first-block
+                    .projContainer-project__first-block-one
                       .name Project Name:
                       .value {{ project.name }}
-                    .container-project__first-block-two
+                    .projContainer-project__first-block-two
                       .name Project ID:
                       .value {{ project.idNumber }}
-                  .container-project__second-block
-                    .container-project__second-block-one
+                  .projContainer-project__second-block
+                    .projContainer-project__second-block-one
                       .name Status:
                       .value {{ project.status }}
-                    .container-project__second-block-two
+                    .projContainer-project__second-block-two
                       .name Total Cost:
                       .value {{ project.totalAgreed.formattedAmount }}
-                  .container-project__third-block
-                    .container-project__third-block-one(@click="downloadAsPDF")
+                  .projContainer-project__third-block
+                    .projContainer-project__third-block-one(@click="downloadAsPDF")
                       img(src="../../assets/images/pdf-icon.png")
                     span Download Full Report
                 .tableWrapper
-                  table.container-table
+                  table.projContainer-table
                     tr.row
                       td Language Pair
                         img(src="../../assets/images/open-close-arrow-brown.png")

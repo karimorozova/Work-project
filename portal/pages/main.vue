@@ -265,6 +265,8 @@ export default {
       this.detailedInfoVisible = false;
       this.detailedProjectVisible = false;
       this.clientRequestShow = false;
+      this.documentsShow = false;
+      this.invoicesShow = false;
       this.navbarList.forEach(item => {
         item.active = false;
       });
