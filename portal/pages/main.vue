@@ -55,8 +55,10 @@
               //-     span.icon__arrow >
             .breadCrumbs 
               span.accountName {{ user.name }} 
-              span.arrows >> 
-              span {{ path }} 
+              span.arrows(v-if="user.name") >> 
+              span {{ path }}
+              span.arrows(v-if="clientRequestShow") >>
+              span {{ serviceType }}
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
                 //- .buttonPanel
@@ -158,7 +160,8 @@ export default {
       ],
       dropdownVisible: false,
       clientRequestShow: false,
-      path: 'Open Quotes'
+      path: 'Open Quotes',
+      serviceType: ""
     };
   },
   methods: {
@@ -325,7 +328,8 @@ export default {
         this.invoicesShow = false;
         this.dropdownVisible = false
       }
-
+      this.path = "New Project";
+      this.serviceType = this.newProject[ind].title
     }
   },
   mounted() {

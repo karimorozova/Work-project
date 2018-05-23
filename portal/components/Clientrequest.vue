@@ -1,8 +1,5 @@
 <template lang="pug">
   .externalWrap
-    .externalWrap__title
-      span NEW REQUEST for: 
-      span {{ service }}
     .mainWrapper  
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -690,6 +687,9 @@ export default {
   width: 85%;
   display: flex;
   flex-direction: column;
+  position: absolute;
+  left: 13%;
+  top: 7%;
   &__title {
     margin-left: 3%;
     width: 100%;
