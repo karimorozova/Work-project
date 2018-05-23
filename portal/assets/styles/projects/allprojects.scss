@@ -4,18 +4,9 @@
     justify-content: center;
     align-items: flex-start;
     padding-top: 80px;
-    position: absolute;
-    left: 50%;
-    margin-left: -40%;
+    margin: 0 auto;
     @media screen and (max-width: 1550px) {
     width: 90%;
-    margin-left: -39%;
-    }
-    @media screen and (max-width: 1380px) {
-    margin-left: -37%;
-    }
-    @media screen and (max-width: 1300px) {
-    margin-left: -41%;
     }
     &__dropMenu {
         max-width: 919px;

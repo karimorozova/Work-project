@@ -1,10 +1,8 @@
 body {
     margin: 0;
-    height: 100vh;
   }
   
   .clientsportalWrapper {
-    height: 100vh;
     margin: 0 auto;
     overflow: auto;
   }
@@ -23,6 +21,7 @@ body {
     align-items: center;
     background-color: #67573e;
     position: relative;
+    height: 6vh;
     .company {
       span {
         font-weight: 600;
@@ -316,46 +315,32 @@ body {
   
   .clientsMainWrapper {
     display: flex;
-    height: 95%;
+    min-height: 94vh;
     position: relative;
+    &__inner {
+      width: 90%;
+    }
     .maininfoWrapper {
-      width: 88%;
-      position: absolute;
-      top: 11%;
-      left: 12%;
-      @media (max-width: 1280px) {
-        left: 16%;
-        width: 84%;
-      }
+      width: 100%;
     }
   
     .detailedInfoWrapper {
-      width: 34%;
-      position: absolute;
-      top: 60px;
-      left: 50%;
       max-width: 919px;
-      margin-left: -400px;
+      margin: 0 auto;
       width: 100%;
     }
   
     .detailedProjectWrapper {
-      width: 34%;
-      position: absolute;
-      top: 60px;
-      left: 50%;
       max-width: 919px;
-      margin-left: -400px;
+      margin: 0 auto;
       width: 100%;
     }
   
     .mainInfo {
       display: flex;
       flex-direction: column;
-      width: 88%;
-      @media screen and (max-width: 1400px){
-        width: 98%;
-      }
+      width: 100%;
+      margin: 0 auto;
       .buttonPanel {
         display: flex;
         justify-content: flex-end;
@@ -379,7 +364,7 @@ body {
     .clientsNavbar {
       position: relative;
       display: flex;
-      height: 100%;
+      min-height: 94vh;
       &__sideBar {
         padding: 25px 0;
         background-color: #998e7e;
@@ -393,9 +378,6 @@ body {
         transition: all 0.5s;
         z-index: 2;
       }
-      // .testExpander {
-      //   width: 200px;
-      // }
   
       &__openHide {
         background: rgb(245, 135, 110);
@@ -422,7 +404,6 @@ body {
         width: 100%;
   
         &_item {
-          // padding-top: 20px;
           padding-bottom: 10px;
           display: flex;
           flex-direction: column;

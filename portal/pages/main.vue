@@ -38,54 +38,47 @@
                   .chevron(@click="showAccountMenu")
         .clientsMainWrapper
             .clientsNavbar
-              //- .clientsNavbar__sideBar(:class="{testExpander: expander}")
               .clientsNavbar__sideBar
                 ul.navbar__ulist
                   li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
                       img(v-if="!note.active" :src="note.imgWhite") 
                       img(v-else :src="note.imgBrown")
-                    //- .title(:class="{showTitle: expander}")
                     .title(:class="{showTitle: true}")
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              //- .clientsNavbar__openHide
-              //-   .icon(@click="expandBar" :class="{openReverse: expander}")
-              //-     span.icon__arrow >
-            .breadCrumbs 
-              span.accountName {{ user.name }} 
-              span.arrows(v-if="user.name") >> 
-              span {{ path }}
-              span.arrows(v-if="clientRequestShow") >>
-              span(v-if="clientRequestShow") {{ serviceType }}
-            .maininfoWrapper
-              .mainInfo(v-if="visibleChecker == false")
-                //- .buttonPanel
-                //-   button.quote New Quote
-                //-   button.project New Project
-                .clientsAll
-                    .quotesComponent
-                      .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                        .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
-                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
-                        .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")
-                    .projectsComponent
-                      .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
-                        .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
-                          img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
-                        .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                          projectsInfo(@projectDetails="projectDetails" :projects="projects")
-            .detailedInfoWrapper
-              QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
-            .detailedProjectWrapper
-              projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById" :user="user")
-            Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
-            invoices(v-if="invoicesShow")
-            documents(v-if="documentsShow")
-            Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
-            Clientrequest(v-if="clientRequestShow")
+            .clientsMainWrapper__inner
+              .breadCrumbs 
+                span.accountName {{ user.name }} 
+                span.arrows(v-if="user.name") >> 
+                span {{ path }}
+                span.arrows(v-if="clientRequestShow") >>
+                span(v-if="clientRequestShow") {{ serviceType }}
+              .maininfoWrapper
+                .mainInfo(v-if="visibleChecker == false")
+                  .clientsAll
+                      .quotesComponent
+                        .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                          .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
+                            img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
+                          .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                            Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")
+                      .projectsComponent
+                        .clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")
+                          .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
+                            img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
+                          .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
+                            projectsInfo(@projectDetails="projectDetails" :projects="projects")
+              .detailedInfoWrapper
+                QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
+              .detailedProjectWrapper
+                projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById" :user="user")
+              Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
+              invoices(v-if="invoicesShow")
+              documents(v-if="documentsShow")
+              Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
+              Clientrequest(v-if="clientRequestShow")
 </template>
 
 <script>
