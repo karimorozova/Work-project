@@ -535,3 +535,15 @@ body {
       margin-bottom: 0;
     }
   }
+
+  .breadCrumbs {
+    max-height: 50px;
+    margin: 20px 40px;
+    color: #67573e;
+    font-size: 20px;
+    .arrows {
+      font-size: 16px;
+      opacity: 0.6;
+      margin: 0 10px;
+    }
+  }

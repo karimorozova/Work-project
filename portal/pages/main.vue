@@ -54,7 +54,9 @@
               //-   .icon(@click="expandBar" :class="{openReverse: expander}")
               //-     span.icon__arrow >
             .breadCrumbs 
-              span {{ user.name }}
+              span.accountName {{ user.name }} 
+              span.arrows >> 
+              span {{ path }} 
             .maininfoWrapper
               .mainInfo(v-if="visibleChecker == false")
                 //- .buttonPanel
@@ -155,7 +157,8 @@ export default {
         {title: "Graphic Localization"}
       ],
       dropdownVisible: false,
-      clientRequestShow: false
+      clientRequestShow: false,
+      path: 'Open Quotes'
     };
   },
   methods: {
@@ -213,6 +216,7 @@ export default {
           this.invoicesShow = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
+          this.path = "Open Quotes"
         }
 
         if (index == 1) {
@@ -222,6 +226,8 @@ export default {
           this.invoicesShow = false
           this.documentsShow = false;
           this.clientRequestShow = false;
+          this.path = "All Projects"
+          
         }
 
         if (index == 2) {
@@ -231,6 +237,7 @@ export default {
           this.detailedProjectVisible = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
+          this.path = "Invoices"          
         }
 
         if (index == 3) {
@@ -240,6 +247,7 @@ export default {
           this.detailedProjectVisible = false;
           this.invoicesShow = false;
           this.clientRequestShow = false;
+          this.path = "Documents"                    
         }
 
         this.accountInfo = false;
@@ -354,7 +362,4 @@ export default {
 <style lang="scss">
 @import "../assets/styles/main.scss";
 
-.breadCrumbs {
-  margin: 20px;
-}
 </style>
