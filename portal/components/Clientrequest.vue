@@ -140,28 +140,25 @@
               span.details__brief-title Enter a short brief
               textarea(rows='4' v-model='brief')
             .details__quote
-              .send
+              .send(:class="{optionChecked: sendOption}" @click="chooseBegin")
                 .send__check
-                  .checker(:class="{checkerChecked: true}")
+                  .checker(:class="{checkerChecked: sendOption}")
                 .send__text
                   p.head Send a Quote
-                  p.insideText i approve for the project to begin immediately and I'll review the quote later.
-              .start
+                  p.insideText I approve for the project to begin immediately and I'll review the quote later.
+              .start(:class="{optionChecked: startOption}" @click="chooseStart")
                 .start__check
-                  .checker
+                  .checker(:class="{checkerChecked: startOption}")
                 .start__text
                   p.head Start Immediately
-                  p.insideText i approve for the project to begin immediately and to receive the quote just for reference.                
+                  p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
             .captcha
               input.buttons(type='submit' value='Submit' name="submit")          
           .warning(v-if="error")
             .message
               .closeWarning(@click="closeWarning")
                 i.fa.fa-times
-              p
-                | Please, fill all the required fields (marked with red 
-                span.asterisk asterisk
-                | )
+              p(v-for="err in errors") {{ err }}
       .orderInfo(v-if='infoShow' :class="{slideToShow: infoSlide}")
           .orderInfo__title
             h3 YOUR ORDER
@@ -220,6 +217,8 @@ export default {
           to: moment().add(-1, 'day').endOf('day').toDate()
         }
       },
+      sendOption: true,
+      startOption: false,
       request: [],
       activeLanguage: '',
       hasTargetChosen: [],
@@ -290,6 +289,14 @@ export default {
     }
   },
   methods: {
+    chooseBegin() {
+      this.sendOption = true;
+      this.startOption = false
+    },
+    chooseStart() {
+      this.sendOption = false;
+      this.startOption = true
+    },
     handleDrop(data, event) {
       event.preventDefault();
       const files = event.dataTransfer.files;
@@ -491,7 +498,6 @@ export default {
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
         
-
         const result = await this.$axios.$post('api/request', sendForm);
     },
     async getServices() {
@@ -508,17 +514,17 @@ export default {
     async checkForm(event) {
       this.request = {
           date: this.deadlineSelect, 
-          contactName: this.contactName, 
-          contactEmail: this.contactEmail,
-          service: this.serviceSelect, 
-          industry: this.industrySelect, 
-          status: 'New', 
+          contactName: this.$store.state.clientInfo.name, 
+          contactEmail: this.$store.state.clientInfo.email,
+          service: this.$store.state.clientInfo.service, 
+          industry: this.$store.state.clientInfo.industry, 
+          status: 'New',
           sourceLanguage: this.sourceSelect, 
           targetLanguages: this.targetSelect, 
-          web: this.web,
-          skype: this.contactSkype, 
-          phone: this.phone, 
-          companyName: this.companyName,
+          web: this.$store.state.clientInfo.web,
+          skype: this.$store.state.clientInfo.skype, 
+          phone: this.$store.state.clientInfo.phone, 
+          companyName: this.$store.state.clientInfo.companyName,
           accountManager: "None selected",
           brief: this.brief,
           files: this.files,
@@ -527,33 +533,17 @@ export default {
 
       this.errors = [];
       
-      if(!this.request.contactName) this.errors.push("Name required");
-      if(!this.request.contactEmail) this.errors.push("Email required");
-      if(!this.request.companyName) this.errors.push("Company Name required");
-      if(this.serviceSelect == 'Select' || this.industrySelect == 'Select' || (this.source == 'Select' && this.target == 'Select')) {
-        this.errors.push("Please, fill the required fields (with red asterisk).")
-      }
-        else if(!this.validEmail(this.request.contactEmail)) {
-        this.errors.push("Email should be like address@email.com");
-      }
-      let captchaValidation = await grecaptcha.getResponse();
-      if(captchaValidation.length === 0) this.errors.push("captcha required");
+      if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
+            
       if(!this.errors.length){
         this.sendForm();
         console.log("sent")
         window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
         this.showError();
-        
         event.preventDefault();
       }
-      //this.$refs.myForm.submit();
-      
-    },
-    validEmail(email) {
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(email);
-    },    
+    }    
   },
   computed: {
     serviceSelected() {
@@ -634,12 +624,9 @@ export default {
 <style lang='scss'>
 @import '../assets/styles/clientrequest/clientrequest.scss';
 .externalWrap {
-  width: 85%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  left: 13%;
-  top: 7%;
   &__title {
     margin-left: 3%;
     width: 100%;
@@ -653,6 +640,7 @@ export default {
   }
   .mainWrapper {
     width: 100%;
+    margin: 0 auto;
   }
   .captcha {
     input {
@@ -670,9 +658,11 @@ export default {
         display: flex;
         align-items: center;
         border: 1px solid #66563D;        
-        padding: 10px;
-        margin-top: 10px;
-        margin-left: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin: 10px;
+        margin-right: 0;
+        cursor: pointer;
         &__check {
           width: 18px;
           height: 18px;
@@ -701,6 +691,9 @@ export default {
             margin-top: 0;
           }
         }
+      }
+      .optionChecked {
+        box-shadow: 0 0 7px rgba(0, 0, 0, .6);
       }
 
     }

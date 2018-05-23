@@ -2,10 +2,6 @@
     .account
         .successModal(v-if="successShow")
             p.successModal__message Your information has been saved
-        .account__header 
-            span(v-if="user.name") {{ user.name }} 
-                span.arrows >> 
-            span My account
         form.account__form(@submit.prevent="saveInfo")
             .companyDetails
                 .companyDetails__title.blockTitle

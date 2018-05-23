@@ -54,10 +54,10 @@
                     .services2 {{ quote.specialization }}
                   .project-manager__detailed_description-thirdblock
                     .services1 Requested On
-                    .services2 {{ quote.startDate.formatted }}
+                    .services2 {{ quote.startDate.formatted.split(" ")[0].split('-').reverse().join('-') }}
                   .project-manager__detailed_description-fourthblock
                     .services1 Suggested Deadline
-                    .services2(v-if="quote.deadline") {{ quote.deadline.formatted }}
+                    .services2(v-if="quote.deadline") {{ quote.deadline.formatted.split(" ")[0].split('-').reverse().join('-') }}
 </template>
 
 <script>

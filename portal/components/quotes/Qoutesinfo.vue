@@ -53,13 +53,9 @@
                           .col
                               span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
                           .col.approve
-                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'")
-                              //- .sp-wrapper
-                              //-   span.appr APPROVE QUOTE                         
+                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")                      
                           .col.reject
-                              img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'")
-                              //- .sp-wrapper
-                              //-   span.rej REJECT QUOTE
+                              img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'" @click="rejectQuote(quote)")
                                          
 </template>
 
@@ -123,6 +119,18 @@ export default {
     },
     showDetailedCalendarOther() {
       this.currentFormVisibleOther = !this.currentFormVisibleOther;
+    },
+    async approveQuote(quote) {
+      this.$axios.get(`portal/approve?quoteId=${quote.id}`, {withCredentials: true})
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+      quote.status = "ACCEPTED"
+    },
+    async rejectQuote(quote) {
+      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})      
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+      quote.status = "REJECTED";
     }
   },
   computed: {
@@ -139,6 +147,7 @@ export default {
           }
           if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status.indexOf("ACCEPTED") == -1) {
               result.push({
+              id: array[i].id,
               requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
               projectId: array[i].idNumber,
               projectName: array[i].name,
