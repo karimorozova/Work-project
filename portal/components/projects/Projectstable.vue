@@ -21,6 +21,7 @@
                             img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortDeadline" :class="{toUp: deadlineSort}")                  
                     .col.col-end
                         span Total Cost
+                    .col.col-d
         .scrollArea
             .row(v-for="(project, index) in clientProjects")
                 .shortInfo
@@ -32,7 +33,9 @@
                         .col.col-md(v-if="project.deadline" @click="projectDetails(index)")
                             span {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
                         .col.col-end(@click="projectDetails(index)")
-                            span {{ project.totalAgreed.formattedAmount }}                              
+                            span {{ project.totalAgreed.formattedAmount }}
+                        .col.col-d
+                            img(src="../../assets/images/download.png")                             
   
 </template>
 
