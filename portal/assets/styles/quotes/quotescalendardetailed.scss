@@ -124,16 +124,8 @@
         }
         &-level5 {
           display: flex;
-          justify-content: space-evenly;
-          margin-right: -8px;
-  
-          .col1 {
-            font-size: 14px;
-            color: #e2dddb;
-            &-text {
-              padding-top: 16%;
-            }
-          }
+          justify-content: flex-end;
+          padding-right: 3px;
           .col2 {
             button {
               background-color: #f5876e;

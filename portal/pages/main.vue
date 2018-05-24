@@ -185,6 +185,7 @@ export default {
       this.projects = result.data.projects;
       this.quotes = result.data.quotes;
       this.languageCombinations = result.data.languageCombinations;
+      this.$store.dispatch('loadLangs', this.languageCombinations);
     },
     expandBar() {
       this.expander = !this.expander;

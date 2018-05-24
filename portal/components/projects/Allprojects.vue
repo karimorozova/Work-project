@@ -15,7 +15,7 @@
                                 span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
                                 .selector__drop(v-if="openSourceLangs")
-                                    select-lang(@chooseLang="chooseSourceLang")
+                                    source-select(@chooseLang="chooseSourceLang")
                     .filterBlock
                         .filterBlock__item.projectName
                             label Project Name
@@ -26,7 +26,7 @@
                                 span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
                                 .selector__drop(v-if="openTargetLangs")
-                                    select-lang(@chooseLang="chooseTargetLang")
+                                    target-select(@chooseLang="chooseTargetLang")
                     .filterBlock
                         .filterBlock__item.request
                             label Request On
@@ -57,7 +57,8 @@
 import moment from 'moment';
 import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
-import LanguagesSelect from "../../components/LanguagesSelect";
+import ClientLangSource from "../../components/ClientLangSource";
+import ClientLangTarget from "../../components/ClientLangTarget";
 
 export default {
     props: {
@@ -160,7 +161,8 @@ export default {
     components: {
         Projectstable,
         quotesCalendarDetailed: QuotesCalendarDetailed,
-        "select-lang": LanguagesSelect
+        "source-select": ClientLangSource,
+        "target-select": ClientLangTarget
     }
 };
 </script>
