@@ -31,7 +31,7 @@
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }},  </template> 
+                <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }}    </template> 
                 <template v-if="targetSelect.length == 0">Select</template>
                 .wrapper(v-on:click.self='showTargetLang')
                 .icon(:class="{ reverse: targetDrop }")
@@ -221,7 +221,6 @@ export default {
       startOption: false,
       request: [],
       activeLanguage: '',
-      hasTargetChosen: [],
       infoSlide: false,
       deadlineDate: '',
       detailFiles: [],
@@ -235,10 +234,8 @@ export default {
       sourceSelect: {lang : 'English (United Kingdom)'},
       selectLangSource: '',
       selectLangTarget: '',
-      selectLangTargetEnglish: '',
       targetlang: ["Select"],
       targetSelect: [],
-      dialectsDrop: false,
       industrySelect: 'Select',
       deadlineSelect: '',
       contactName: '',
@@ -350,10 +347,15 @@ export default {
       this.targetSelect.forEach(item => {
         item.check = false
       })
-      this.targetSelect = [];
+      let targetArray = this.targetLanguages;
+      if (targetArray.length == 1) {
+        this.targetSelect = [targetArray[0]]
+        this.targetSelect[0].check = true;
+      } else {
+        this.targetSelect = [];
+      }
     },
     changeTargetSelect(event) {
-      console.log(event);
       if(event == this.selectLangTarget) {
         this.selectLangTarget = ''        
       } else {
@@ -367,54 +369,6 @@ export default {
             event.check = false;
             this.targetSelect.splice(pos,1);
           }    
-      }
-      console.log(this.targetSelect);
-    },
-    changeTargetDialect(event) {
-     const pos = this.targetSelect.indexOf(event);
-      if(pos === -1){
-        event.check = true;
-        this.targetSelect.push(event);
-      }
-      else{
-        event.check = false;
-        this.targetSelect.splice(pos,1);
-      }
-    },
-    changeTargetSelectEnglish(event) {
-      if(event.lang == this.selectLangTargetEnglish) {
-        this.selectLangTargetEnglish = ''           
-      } else {
-        const pos = this.targetSelect.indexOf(event);
-        if(pos === -1){
-          if(!event.dialects.length) {
-            event.check = true;
-            this.targetSelect.push(event);
-          } else {
-              this.selectLangTargetEnglish = event.lang;            
-              let firstLang = event.dialects[0]; 
-              firstLang.check = true;
-              if(!this.targetSelect.includes(firstLang)) {
-                this.targetSelect.push(firstLang);
-              }
-            }
-        }
-        else{
-          event.check = false;
-          this.targetSelect.splice(pos,1);
-        }    
-      }
-    },
-    changeTargetDialectEnglish(event) {
-       
-     const pos = this.targetSelect.indexOf(event);
-      if(pos === -1){
-        event.check = true;
-        this.targetSelect.push(event);
-      }
-      else{
-        event.check = false;
-        this.targetSelect.splice(pos,1);
       }
     },
     openPicker () {
@@ -538,7 +492,7 @@ export default {
       if(!this.errors.length){
         this.sendForm();
         console.log("sent")
-        window.top.location.href = "https://www.pangea.global/thank-you"; 
+        // window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
         this.showError();
         event.preventDefault();
@@ -562,6 +516,7 @@ export default {
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
+
       return result.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -571,22 +526,18 @@ export default {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
+          if (this.languages[i].sourceLanguage.name == this.sourceSelect.lang)
           result.push({name: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
-      return result.sort((a, b) => {
+      result.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
       });
-    },
-    targetLangForSales() {
-      let result = '';
-      this.targetSelect.forEach(item => {
-        result += item.lang + ', '
-      })
+      
       return result;
     },
     service() {

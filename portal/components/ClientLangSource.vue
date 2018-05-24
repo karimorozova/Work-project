@@ -1,44 +1,44 @@
 <template lang="pug">
     .langsList
         input(type="text" v-model="search" placeholder="Search")
-        span(v-for="lang in filteredLanguages" @click="chooseLang(lang)") {{ lang.lang }}
+        span(v-for="lang in filteredLanguages" @click="chooseLang(lang)") {{ lang.name }}
 </template>
 
 <script>
 export default {
     data() {
         return {
-            languages: [],
+            sourceLanguages: [],
             search: ""
         }
     },
     methods: {
-        async getLanguages() {
-            const result = await this.$axios.$get('api/languages')
-            .then(response => {
-                this.languages = response.sort((a, b) => {
-                    if(a.lang > b.lang) return 1
-                    else return -1;
-                });
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+        sourceLangs() {
+            let array = this.$store.state.clientLanguages;
+            if (array.length) {
+                for(let i = 0; i < array.length; i++) {
+                    this.sourceLanguages.push(array[i].sourceLanguage)
+                }
+            }
         },
         chooseLang(lang) {
-            this.$emit('chooseLang', lang.lang)
+            this.$emit('chooseLang', lang.name)
         }
     },
     computed: {
         filteredLanguages() {
-            let array = this.languages.filter( item => {
-                if(item.lang.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
+            let array = this.sourceLanguages.filter( item => {
+                if(item.name.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
             });
+            array = array.filter((obj, pos, arr) => {
+                return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+            });
+            array.sort( (a, b) => { return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0) });
             return array;
         }
     },
     mounted() {
-        this.getLanguages()
+        this.sourceLangs()
     }
 }
 </script>
@@ -51,6 +51,7 @@ export default {
             padding: 5px 3px;
         }
         span {
+            font-size: 15px;            
             transition: all 0.3s;
             padding: 3px;
             border-bottom: 0.5px solid #67573E;
