@@ -53,29 +53,9 @@
             height: 10px;
             cursor: pointer;
           }
-
-          .double_arrow {
-            .up {
-              margin-left: -19%;
-              margin-bottom: -33%;
-              .arrow_up {
-                height: 10px;
-                cursor: pointer;
-              }
-            }
-
-            .down {
-              .arrow_down {
-                height: 10px;
-                cursor: pointer;
-                transform: rotate(180deg);
-              }
-            }
-          }
-
-          .req_img {
+          .toUp {
             transform: rotate(180deg);
-          }
+          }          
         }
       }
       .col-lg {

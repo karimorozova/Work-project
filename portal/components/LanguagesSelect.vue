@@ -1,13 +1,15 @@
 <template lang="pug">
     .langsList
-        span(v-for="lang in languages" @click="chooseLang(lang)") {{ lang.lang }}
+        input(type="text" v-model="search" placeholder="Search")
+        span(v-for="lang in filteredLanguages" @click="chooseLang(lang)") {{ lang.lang }}
 </template>
 
 <script>
 export default {
     data() {
         return {
-            languages: []
+            languages: [],
+            search: ""
         }
     },
     methods: {
@@ -27,6 +29,14 @@ export default {
             this.$emit('chooseLang', lang.lang)
         }
     },
+    computed: {
+        filteredLanguages() {
+            let array = this.languages.filter( item => {
+                if(item.lang.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
+            });
+            return array;
+        }
+    },
     mounted() {
         this.getLanguages()
     }
@@ -37,6 +47,9 @@ export default {
     .langsList {
         display: flex;
         flex-direction: column;
+        input {
+            padding: 5px 3px;
+        }
         span {
             transition: all 0.3s;
             padding: 3px;

@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    font-family: MyriadPro;
   }
   
   .clientsportalWrapper {
@@ -530,4 +531,13 @@ body {
       opacity: 0.6;
       margin: 0 10px;
     }
+  }
+
+  @font-face {
+    font-family: MyriadPro;
+    src: url('../assets/fonts/MyriadPro-Regular.otf');
+  }
+  @font-face {
+    font-family: MyriadBold;
+    src: url('../assets/fonts/MyriadPro-Bold.otf')
   }

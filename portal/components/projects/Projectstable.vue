@@ -6,23 +6,19 @@
                     .col
                         .col__title 
                             span Request On
-                            img.req_img(src="../../assets/images/white-arrow.png")
+                            img.req_img(src="../../assets/images/white-arrow-down.png" @click="sortReq" :class="{toUp: requestSort}")
                     .col.col-lg
                         .col__title
                             span Project ID
-                            img(src="../../assets/images/white-arrow.png")                        
+                            img(src="../../assets/images/white-arrow-down.png" @click="sortProjId" :class="{toUp: projectIdSort}")                        
                     .col.col-xlg
                         .col__title 
                             span Project Name
-                            .double_arrow
-                              .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                                     
+                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortProjName" :class="{toUp: projectNameSort}")                                     
                     .col.col-md
                         .col__title 
                             span Deadline
-                            .double_arrow
-                              .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                  
+                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortDeadline" :class="{toUp: deadlineSort}")                  
                     .col.col-end
                         span Total Cost
         .scrollArea
@@ -42,6 +38,7 @@
 
 <script>
 import moment from "moment";
+
 export default {
     props: {
         client: {
@@ -81,7 +78,11 @@ export default {
     data() {
         return {
             clientQuotes: [],
-            allProjectsFiltered: []
+            allProjectsFiltered: [],
+            requestSort: false,
+            projectIdSort: false,
+            projectNameSort: false,
+            deadlineSort: false
         }
     },
     methods: {
@@ -106,6 +107,18 @@ export default {
         },
         projectDetails(index) {
             this.$emit('projectDetails', this.clientProjects[index]);
+        },
+        sortReq() {
+            this.requestSort = !this.requestSort;
+        },
+        sortProjId() {
+            this.projectIdSort = !this.projectIdSort;
+        },
+        sortProjName() {
+            this.projectNameSort = !this.projectNameSort;
+        },
+        sortDeadline() {
+            this.deadlineSort = !this.deadlineSort;
         }
     },
     computed: {
@@ -228,6 +241,22 @@ export default {
                         return false
                     })
                 }
+
+                if (this.requestSort) {
+                    filtered.sort( (a, b) => { return b.startDate.millisGMT - a.startDate.millisGMT })
+                } else { filtered.sort( (a, b) => { return a.startDate.millisGMT - b.startDate.millisGMT }) }
+
+                if (this.deadlineSort) {
+                    filtered.sort( (a, b) => { return b.deadline.millisGMT - a.deadline.millisGMT })
+                } else { filtered.sort( (a, b) => { return a.deadline.millisGMT - b.deadline.millisGMT }) }
+
+                if (this.projectIdSort) {
+                    filtered.sort( (a, b) => {return  (a.idNumber > b.idNumber) ? 1 : ((b.idNumber > a.idNumber) ? -1 : 0) })
+                } else { filtered.sort( (a, b) => {return b.idNumber - a.idNumber }) }
+
+                if (this.projectNameSort) {
+                    filtered.sort( (a, b) => { return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0) })
+                } else { filtered.sort( (a, b) => { return b.name - a.name }) }
 
             }
             return filtered;
