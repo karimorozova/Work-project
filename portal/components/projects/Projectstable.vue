@@ -243,12 +243,12 @@ export default {
                 }
 
                 if (this.requestSort) {
-                    filtered.sort( (a, b) => { return b.startDate.millisGMT - a.startDate.millisGMT })
-                } else { filtered.sort( (a, b) => { return a.startDate.millisGMT - b.startDate.millisGMT }) }
+                    filtered.sort( (a, b) => { return a.startDate.millisGMT - b.startDate.millisGMT })
+                } else { filtered.sort( (a, b) => { return b.startDate.millisGMT - a.startDate.millisGMT }) }
 
                 if (this.deadlineSort) {
-                    filtered.sort( (a, b) => { return b.deadline.millisGMT - a.deadline.millisGMT })
-                } else { filtered.sort( (a, b) => { return a.deadline.millisGMT - b.deadline.millisGMT }) }
+                    filtered.sort( (a, b) => { return a.deadline.millisGMT - b.deadline.millisGMT })
+                } else { filtered.sort( (a, b) => { return b.deadline.millisGMT - a.deadline.millisGMT }) }
 
                 if (this.projectIdSort) {
                     filtered.sort( (a, b) => {return  (a.idNumber > b.idNumber) ? 1 : ((b.idNumber > a.idNumber) ? -1 : 0) })
