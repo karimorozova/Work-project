@@ -7,10 +7,10 @@
                 .dropItem__filters
                     .filterBlock
                         .filterBlock__item.projectId
-                            label Project ID
+                            label.inner-label Project ID
                             input(type="text" v-model="projectIdFilter")
                         .filterBlock__item.sourceLangs    
-                            label Source Langs
+                            label.inner-label Source Langs
                             .sourceLangs__select.selector
                                 span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
@@ -18,10 +18,10 @@
                                     source-select(@chooseLang="chooseSourceLang")
                     .filterBlock
                         .filterBlock__item.projectName
-                            label Project Name
+                            label.inner-label Project Name
                             input(type="text" v-model="projectNameFilter")
                         .filterBlock__item.targetLangs
-                            label Target Langs                            
+                            label.inner-label Target Langs                            
                             .targetLangs__select.selector
                                 span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
@@ -29,12 +29,12 @@
                                     target-select(@chooseLang="chooseTargetLang")
                     .filterBlock
                         .filterBlock__item.request
-                            label Request On
+                            label.inner-label Request On
                             input(type="text" :value="requestFilter")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
                         quotesCalendarDetailed(v-if="currentFormVisible" @dateFilter='requestOnFilter')
                         .filterBlock__item.deadline
-                            label Deadline
+                            label.inner-label Deadline
                             input(type="text" :value="deadFilter")
                             img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
                         quotesCalendarDetailed(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")   
