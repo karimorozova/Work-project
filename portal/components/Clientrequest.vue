@@ -1,12 +1,13 @@
 <template lang="pug">
   .externalWrap
-    .mainWrapper  
+    .mainWrapper(v-if="true")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
         .successAlert(v-if="success")
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
+        //- form.mainForm(ref="myForm" @submit.prevent="checkForm" v-if="false")
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number 
             label.asterisk SELECT A LANGUAGE
@@ -181,6 +182,7 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
+    Copywriting(v-if="true")
 </template>
 
 <script>
@@ -201,6 +203,7 @@ import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
+import Copywriting from "./requests/Copywriting.vue";
 
 
 export default {
@@ -561,7 +564,8 @@ export default {
   },
   components: {
     Datepicker,
-    Drop
+    Drop,
+    Copywriting
   },
   mounted(){
     this.getServices();
