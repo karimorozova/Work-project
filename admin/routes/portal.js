@@ -38,6 +38,18 @@ router.get('/clientinfo', async (req, res) => {
     res.send({user, client, projects, quotes, languageCombinations});
 });
 
+router.get('/projectFiles', async (req, res) => {
+    var customer = new ClientApi("", req.cookies.ses);
+    var result = await (customer.projectFilesDownload(req.query.projectId));
+    var files = result.data;
+    //res.setHeader({})
+    res.writeHead(200, {
+        'Content-Type': 'application/force-download',
+        'Content-disposition':'attachment',
+        'filename':'project.zip'});
+    res.end(files);
+})
+
 router.get('/job',async (req, res) => {
     var id = req.query.projectId;
     const jobById = await jobInfo(id);

@@ -50,7 +50,6 @@
                         :targetLangsFilter="targetLangsFilter"
                         :statusFilter="statusFilter"
                     )
-        //- button(@click="getRepos") Click
 </template>
 
 <script>
@@ -84,7 +83,7 @@ export default {
             sourceLangsFilter: '',
             targetLangsFilter: '',
             statusFilter: '',
-            openAll: false,
+            openAll: true,
             openSourceLangs: false,
             openTargetLangs: false,
             openStatus: false,
