@@ -14,11 +14,11 @@
                     .sel_project_block__imgWrapper(@click="showDropdown")
                       img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
                   .clientsTop__dropdown
-                    .additional(v-if="dropdownVisible")
-                      .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+                    .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
+                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
                 .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
-                  .accountMenuWrapper(v-if="accountMenuVisible")
+                  .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
                     .accountBlock
                       .accountBlock__info
                         .icon
@@ -91,7 +91,7 @@ import Allprojects from "../components/projects/Allprojects";
 import invoices from "../components/invoices/invoices";
 import documents from "../components/documents/documents";
 import Clientrequest from "../components/Clientrequest";
-
+import ClickOutside from "vue-click-outside";
 
 export default {
   data() {
@@ -168,6 +168,12 @@ export default {
         // alert("Please, Log in!")
         window.location.replace("/");
       }
+    },
+    hideAccountMenu() {
+      this.accountMenuVisible = false;
+    },
+    hideAdditional() {
+      this.dropdownVisible = false;
     },
     signOut() {
       document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -345,7 +351,10 @@ export default {
     Allprojects,
     invoices,
     documents,
-    Clientrequest
+    Clientrequest,
+  },
+  directives: {
+    ClickOutside
   },
   computed: {
     visibleChecker() {

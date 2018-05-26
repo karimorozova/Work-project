@@ -1,6 +1,6 @@
 const axios = require('axios');
 const querystring = require('querystring');
-
+const fs =require('fs');
 
 var ClientApi = class ClientApi {
     constructor(request, sessionId) {
@@ -90,6 +90,20 @@ var ClientApi = class ClientApi {
         return new Promise(resolve => {
             this.clientApi.get("/projects")
                 .then(function(response) {
+                    resolve(response)
+                }).catch(function(error) {
+                    resolve(error);
+                })
+        })
+    }
+
+    projectFilesDownload(projectId) {
+        return new Promise(resolve => {
+ 
+            this.clientApi.get(`/projects/${projectId}/files/outputFilesAsZip`)
+                .then(function(response) {
+                    const blob = new Blob([JSON.stringify(response.data)]);
+
                     resolve(response)
                 }).catch(function(error) {
                     resolve(error);

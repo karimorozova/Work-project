@@ -48,6 +48,9 @@
                         justify-content: space-between;
                         align-items: center;
                         margin-bottom: 15px;
+                        .inner-label {
+                            margin-bottom: 0;
+                        }
                         input, span {
                             padding: 5px;
                             border: 1px solid #67573e;

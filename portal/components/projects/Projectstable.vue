@@ -34,7 +34,7 @@
                             span {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
                         .col.col-end(@click="projectDetails(index)")
                             span {{ project.totalAgreed.formattedAmount }}
-                        .col.col-d
+                        .col.col-d(@click="downloadZip(index)")
                             img(src="../../assets/images/download.png")                             
   
 </template>
@@ -122,6 +122,16 @@ export default {
         },
         sortDeadline() {
             this.deadlineSort = !this.deadlineSort;
+        },
+        async downloadZip(index) {
+            // this.$axios.get(`/portal/projectFiles?projectId=${this.projects[index].id}`, {withCredentials: true})
+            // .then((res) => {
+            //     let blob = new Blob([res.data], { type: '"application/octet-stream"' } );
+            //     let url = window.URL.createObjectURL(blob);
+            //     window.open(url);
+            // })
+            // .catch(err => console.log(err))
+            console.log('');
         }
     },
     computed: {

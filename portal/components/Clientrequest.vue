@@ -1,5 +1,9 @@
 <template lang="pug">
   .externalWrap
+<<<<<<< HEAD
+=======
+    Marketing
+>>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
     .mainWrapper(v-if="false")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -9,39 +13,38 @@
             p We will answer you as soon as possible.
         //- form.mainForm(ref="myForm" @submit.prevent="checkForm" v-if="false")
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
+          .number.projName
+            label.asterisk PROJECT NAME
+            input(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
           .number 
             label.asterisk SELECT A LANGUAGE
-          .language
-            span(v-if='serviceSelected') Source Language
-            .select.source(v-if='serviceSelected')
-              span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
-                .wrapper(v-on:click.self='showSourceLang')
-                .icon(:class="{ reverse: sourceDrop }")
-                  i.fas.fa-caret-down
-              .source__drop(v-if='sourceDrop')
-                .source__drop-list(v-for='language in sourceLanguages')
-                  .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
-                    img(:src="'/flags/' + language.symbol + '.png'")
-                    span.list-item(:class="{ active: language.name == sourceSelect.lang }") {{ language.name }}
-                      //- img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects.length" :class="{reverseOpenIcon: language.lang == selectLangSource}")
-                  //- .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
-                  //-   template(v-for='(dialect in language.dialects')
-                  //-     .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                  //-       img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                  //-       span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
-            span Target Language(s)
-            .select.target
-              span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }}    </template> 
-                <template v-if="targetSelect.length == 0">Select</template>
-                .wrapper(v-on:click.self='showTargetLang')
-                .icon(:class="{ reverse: targetDrop }")
-                  i.fas.fa-caret-down
-              .target__drop(v-if='targetDrop')
-                .target__drop-list(v-for='language in targetLanguages')
-                  .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
-                    img(:src="'/flags/' + language.symbol  + '.png'")
-                    span.list-item(:class="{ active: language.check }") {{ language.name }}
+          .language(v-click-outside="outsideLangs")
+            .lang-source
+              span(v-if='serviceSelected') Source Language
+              .select.source(v-if='serviceSelected')
+                span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
+                  .wrapper(v-on:click.self='showSourceLang')
+                  .icon(:class="{ reverse: sourceDrop }")
+                    i.fas.fa-caret-down
+                .source__drop(v-if='sourceDrop')
+                  .source__drop-list(v-for='language in sourceLanguages')
+                    .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
+                      img(:src="'/flags/' + language.symbol + '.png'")
+                      span.list-item(:class="{ active: language.name == sourceSelect.lang }") {{ language.name }}
+            .lang-target
+              span Target Language(s)
+              .select.target
+                span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
+                  <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }}    </template> 
+                  <template v-if="targetSelect.length == 0">Select</template>
+                  .wrapper(v-on:click.self='showTargetLang')
+                  .icon(:class="{ reverse: targetDrop }")
+                    i.fas.fa-caret-down
+                .target__drop(v-if='targetDrop')
+                  .target__drop-list(v-for='language in targetLanguages')
+                    .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
+                      img(:src="'/flags/' + language.symbol  + '.png'")
+                      span.list-item(:class="{ active: language.check }") {{ language.name }}
           .number
             label PROJECT DETAILS
           .details
@@ -72,71 +75,6 @@
                   .datepick(@click='openPicker')
                       img(src='../assets/images/calendar.png')
                 span.clarify Select
-            .details__item
-              .inner.buttons.upload-reference
-                span Upload Reference File
-                .upload-btn
-                  .upload-btn__txt Upload
-                  input(name="refFiles" type="file" @change='changeRefFiles')
-                span.clarify Type Text
-                .loadedList
-                  li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
-                    i.fa.fa-times.deleteIcon
-              .inner.date-file_mobileView.deadline
-                span Suggested Deadline
-                .calendar
-                  datepicker(ref="programaticOpen1" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
-                  .datepick(@click='openPicker1')
-                      img(src='../assets/images/calendar.png')
-                span.clarify Select
-              .inner.date-file.file-types
-                span Supported File Types
-                .supported
-                  .supported__icons
-                    .supported__icons_images
-                      img(src='../assets/images/file-types/in.png')
-                      img(src='../assets/images/file-types/excel1.png')
-                      img(src='../assets/images/file-types/word1.png')
-                      img(src='../assets/images/file-types/ini.png')
-                      img(src='../assets/images/file-types/powerpoint1.png')
-                      img(src='../assets/images/file-types/photoshop1.png')
-                    span.filesLink(v-on:click='showFiles') Full List
-            .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
-              .title
-                label SUPPORTED FILE TYPES
-                .crossButton(@click="showFiles")
-                  i.fa.fa-times.close
-              .types
-                .textFiles.types__sector
-                  .fileTypeTitle Text files
-                  .list
-                    li(v-for='type in fileTypes.text') 
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .designFiles.types__sector
-                  .fileTypeTitle Design files
-                  .list
-                    li(v-for='type in fileTypes.design') 
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .webFiles.types__sector
-                  .fileTypeTitle Web files
-                  .list
-                    li(v-for='type in fileTypes.web')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .translationFiles.types__sector
-                  .fileTypeTitle Translation files
-                  .list
-                    li(v-for='type in fileTypes.translation')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .devFiles.types__sector
-                  .fileTypeTitle Dev files
-                  .list
-                    li(v-for='type in fileTypes.dev')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
             .details__brief
               span.details__brief-title Enter a short brief
               textarea(rows='4' v-model='brief')
@@ -203,8 +141,12 @@ import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
+<<<<<<< HEAD
 import Copywriting from "./requests/Copywriting.vue";
 
+=======
+import Marketing from './requests/Marketing.vue';
+>>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
 
 export default {
   name: 'client-form',
@@ -233,6 +175,7 @@ export default {
       targetDrop: false,
       filesDrop: false,
       infoShow: true,
+      projectName: "",
       serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
       sourceSelect: {lang : 'English (United Kingdom)'},
       selectLangSource: '',
@@ -289,6 +232,10 @@ export default {
     }
   },
   methods: {
+    outsideLangs() {
+      this.targetDrop = false;
+      this.sourceDrop = false;
+    },
     chooseBegin() {
       this.sendOption = true;
       this.startOption = false
@@ -565,7 +512,11 @@ export default {
   components: {
     Datepicker,
     Drop,
+<<<<<<< HEAD
     Copywriting
+=======
+    Marketing
+>>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
   },
   mounted(){
     this.getServices();
