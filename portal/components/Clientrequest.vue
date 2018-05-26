@@ -1,9 +1,6 @@
 <template lang="pug">
   .externalWrap
-<<<<<<< HEAD
-=======
     Marketing
->>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
     .mainWrapper(v-if="false")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -141,12 +138,7 @@ import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
-<<<<<<< HEAD
-import Copywriting from "./requests/Copywriting.vue";
-
-=======
 import Marketing from './requests/Marketing.vue';
->>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
 
 export default {
   name: 'client-form',
@@ -512,11 +504,7 @@ export default {
   components: {
     Datepicker,
     Drop,
-<<<<<<< HEAD
-    Copywriting
-=======
     Marketing
->>>>>>> 8771010c98bd3be7c597c73d6e2604a66f7a4546
   },
   mounted(){
     this.getServices();
