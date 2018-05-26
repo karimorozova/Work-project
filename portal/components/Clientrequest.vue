@@ -1,6 +1,6 @@
 <template lang="pug">
   .externalWrap
-    .mainWrapper(v-if="true")
+    .mainWrapper(v-if="false")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
         .successAlert(v-if="success")
