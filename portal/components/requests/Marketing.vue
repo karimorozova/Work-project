@@ -4,7 +4,7 @@
             .container
                 .mark-option
                     .mark-option__title
-                        span 1. Package
+                        span.asterisk 1. Package
                     .mark-option__inner
                         .inner-option
                             .inner-option__check(@click="packageChoice200")
@@ -25,12 +25,12 @@
                         span 2. Select Language
                     .mark-option__inner
                         .inner-langs
-                            span Language(s)
+                            span.inner-langs__title Language(s)
                             .inner-langs__select
-                                span.select-text.clarify(:class="{ color: langSelect.lang != 'Select' }")
+                                span.select-text.clarify(:class="{ color: langSelect != 'Select' && langSelect != '' }")
                                     <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
                                     <template v-if="selectLang.length == 0">Select</template>
-                                    .span-wrapper(v-on:click.self='showLang')
+                                    .span-wrapper(@click.self='showLang')
                                     .icon(:class="{ reverse: langDrop }")
                                         i.fas.fa-caret-down
                                 .select__drop(v-if='langDrop')
@@ -43,7 +43,98 @@
                                                 .pair.pair_dialect(@click="chooseDialect(dialect)")
                                                     img(:src="'/flags/' + dialect.symbol + '.png'")                  
                                                     span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
-
+                .mark-option
+                    .mark-option__title
+                        span 3. General Brief
+                    .mark-option__inner.genBrief
+                        .inner-description.genBrief__item
+                            .inner-description__title.innerTitle
+                                span.innerTitle__title.asterisk Description
+                            .inner-description__textField.textField
+                                textarea#grow(rows="1" @keyup="autoGrow()")                       
+                        .inner-audience.genBrief__item
+                            .inner-audience__title.innerTitle
+                                span.innerTitle__title.asterisk Targeted audience
+                            .inner-audience__textField.textField
+                                textarea(rows="1")
+                        .inner-subject.genBrief__item
+                            .inner-subject__title
+                                span.innerTitle__title.innerTitle.asterisk Subject line
+                                .subject-toggle.toggle
+                            .inner-subject__title
+                                span.innerTitle__title.innerTitle Subject line requirements                               
+                            .inner-subject__textField.textField
+                                textarea(rows="1")
+                        .inner-topics.genBrief__item
+                            .inner-topics__title
+                                span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention                                
+                            .inner-topics__textField
+                                input(type="text")
+                                span or
+                                button(@click="showTopic" :class="{notSure: topicText}") I am not sure
+                            .inner-topics__hiddenText(v-if="topicText")
+                                p.asterisk If you are unsure of what points the mailer should cover, you agree to the following:
+                                ul
+                                    li You give the copywriter freedom to write the mailer as they please.
+                                    li You will only receive 
+                                        span.strong one round of edits 
+                                        | if you think the mailere needs improvement.
+                                p 
+                                    span.strong Rewriting  
+                                    | requests come at a separate cost.
+                        .inner-bonus.genBrief__item
+                            .inner-bonus__title
+                                span.innerTitle__title.innerTitle.asterisk Bonus/Offers
+                                .bonus-toggle.toggle                                                                
+                            .inner-bonus__title
+                                span.innerTitle__title.innerTitle Bonus/Offers details                                
+                            .inner-bonus__textField   
+                                input(type="text")                         
+                        .inner-cta.genBrief__item
+                            .inner-cta__title
+                                span.innerTitle__title.innerTitle CTA: Yes/No
+                                .cta-toggle.toggle
+                        .inner-examples.genBrief__item
+                            .inner-examples__title
+                                span.innerTitle__title.innerTitle Examples
+                            .inner-examples__textField
+                                .inner-examples__web
+                                    input(type="text" placeholder="www.example.com")
+                                    span.clarify.under URL
+                                .inner-examples__button
+                                    .uploadBtn
+                                        .uploadBtn__txt Upload
+                                        input(name="refFiles" type="file" @change='changeRefFiles')
+                                    span.clarify.under Upload Reference File
+                                    .loadedList
+                                        li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                                            i.fa.fa-times.deleteIcon
+                .mark-option
+                    .mark-option__title
+                        span.asterisk 4. Style
+                    .mark-option__inner.styleInner
+                        .inner-option.style
+                            .inner-option__check(@click="styleChoiceUs")
+                                .checker(v-if="styleUs")
+                            .inner-option__image
+                                img(src="../../assets/images/US-icon.png")
+                        .inner-option.style
+                            .inner-option__check(@click="styleChoiceUk")
+                                .checker(v-if="styleUk")
+                            .inner-option__image
+                                img(src="../../assets/images/UK-icon.png")
+                .mark-option
+                    .mark-option__title
+                        span.asterisk 5. Tone of voice
+                    .mark-option__inner.voiceChekers
+                        .inner-option(v-for="(voice, i) in voices")
+                            .inner-option__check(@click="voiceChoice(i)")
+                                .checker(v-if="voice.check")
+                            span.voiceTitle {{ voice.title }}
+                            input(v-if="voice.input" type="text")
+                input.submit(type="submit" value="Submit")
+                .mark-footer
+                    p.clarify Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at a separate cost.
 </template>
 
 <script>
@@ -56,10 +147,56 @@ export default {
             languages: [],
             langSelect: 'Select',
             errors: [],
-            selectLang: []
+            selectLang: [],
+            topicText: false,
+            refFiles: [],
+            styleUs: true,
+            styleUk: false,
+            voices: [
+                { title: "Promotional", check: false},
+                { title: "Formal", check: false},
+                { title: "Informal", check: false},
+                { title: "Excited", check: false},
+                { title: "Straigtforward", check: false},
+                { title: "Serious", check: false},
+                { title: "Relaxed", check: false},
+                { title: "Persuasive", check: false},
+                { title: "Payful/Funny", check: false},
+                { title: "Other", check: false, input: true}
+            ]
         }
     },
     methods: {
+        voiceChoice(ind) {
+            console.log(ind);
+            this.voices[ind].check = !this.voices[ind].check
+        },
+        refRemove(event) {   
+            this.refFiles = [];
+        },
+        changeRefFiles(event) {
+            this.refFiles = event.target.files[0];
+            console.log(this.refFiles);
+        },
+        showTopic() {
+            this.topicText = !this.topicText;
+        },
+        autoGrow() {
+            let grow = document.getElementById('grow');
+            let row = grow.getAttribute("rows");
+            if (grow.clientHeight < grow.scrollHeight)
+            {
+                grow.style.height = grow.scrollHeight + "px";
+                // grow.style.height = 
+                //     (grow.scrollHeight * 2 - grow.clientHeight) + "px";
+                }
+                else {
+                    grow.style.height = grow.clientHeight + "px"
+                }
+                
+            
+            console.log(grow.style.height)
+        },
         packageChoice200() {
             if (this.packageCheck200) {
                 return true
@@ -74,6 +211,22 @@ export default {
             } else {
                 this.packageCheck400 = true;
                 this.packageCheck200 = false
+            }
+        },
+        styleChoiceUs() {
+            if (this.styleUs) {
+                return true
+            } else {
+                this.styleUs = true;
+                this.styleUk = false
+            }
+        },
+        styleChoiceUk() {
+            if (this.styleUk) {
+                return true
+            } else {
+                this.styleUk = true;
+                this.styleUs = false
             }
         },
         showLang() {
@@ -142,138 +295,5 @@ export default {
 
 
 <style lang="scss">
-    .mark-option {
-        width: 80%;
-        margin-bottom: 20px;
-        &__title {
-            font-size: 22px;
-        }
-        &__inner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            .inner-option {
-                font-size: 14px;
-                margin-top: 10px;
-                width: 50%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                &__check {
-                    width: 16px;
-                    height: 16px;
-                    border: 1px solid #BFB09D;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    cursor: pointer;
-                    .checker {
-                        width: 12px;
-                        height: 12px;
-                        border-radius: 50%;
-                        background-color: #66563D;
-                    }
-                }
-            }
-            .inner-langs {
-                &__select {
-                    max-height: 490px;
-                    width: 490px;
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 0 0 10px rgba(0,0,0,0.6);
-                    border-radius: 10px;
-                    padding: 10px;
-                    .select-text {
-                        display: flex;
-                        justify-content: space-between;
-                        width: 100%;
-                        .span-wrapper {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                        }
-                    }
-                    .select__drop {
-                        padding-top: 30px;
-                        display: flex;
-                        flex-direction: column;
-                        flex-wrap: wrap;
-                        &-list {
-                            .dialect {
-                                padding-left: 18px;
-                                position: absolute;
-                                opacity: 0;
-                                transform: translateY(-50px);
-                                transition: all .3s;
-                                z-index: -5;
-                                &_active{
-                                    position: static;
-                                    opacity: 1;
-                                    transform: translateY(0px);
-                                }
-                            }
-                            .pair {
-                                padding: 2px;
-                                display: flex;
-                                align-items: center;
-                                cursor: pointer;
-                                transition: all 0.3s;
-                                position: relative;
-                                &_dialect {  
-                                    &:before, &:after {
-                                        content: "";
-                                        display: block;
-                                        position: absolute;
-                                        background-color: #66563D;
-                                        left: -8px;
-                                    }
-                                    &:before {
-                                        width: 10px;
-                                        height: 1px;
-                                        top: 10px;
-                                    }
-                                    &:after {
-                                        width: 1px;
-                                        height: 11px;
-                                        top: 0;
-                                    }
-                                }
-                                img {
-                                    width: 23px;
-                                    margin-right: 3px;
-                                }
-                                span {
-                                    font-size: 12px;
-                                }
-                                .openIcon {
-                                    width: 8px;
-                                    padding-left: 5px;
-                                }
-                                .reverseOpenIcon {
-                                    transform: rotate(180deg);
-                                    padding-left: 0;
-                                    padding-right: 5px;
-                                }
-                                &:hover {
-                                    box-shadow: 0px 0 15px rgba(102, 86, 61, 0.3);
-                                    border-radius: 5px;
-                                    span {
-                                        transition: all 0.4s;
-                                        transform: translateX(3px);
-                                    }     
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-.active {
-    color: #FF876C;
-}
+    @import "../../assets/styles/clientrequest/marketing.scss";
 </style>
