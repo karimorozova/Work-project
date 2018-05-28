@@ -8,6 +8,7 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
+        //- form.mainForm(ref="myForm" @submit.prevent="checkForm" v-if="false")
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number.projName
             label.asterisk PROJECT NAME
@@ -116,6 +117,7 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
+    Copywriting(v-if="true")
 </template>
 
 <script>
