@@ -1,6 +1,7 @@
 <template lang="pug">
   .externalWrap
-    Marketing
+    Marketing(v-if="false")
+    Copywriting
     .mainWrapper(v-if="false")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -117,7 +118,6 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
-    Copywriting(v-if="true")
 </template>
 
 <script>
