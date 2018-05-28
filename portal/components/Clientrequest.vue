@@ -1,7 +1,7 @@
 <template lang="pug">
   .externalWrap
-    Marketing
-    .mainWrapper(v-if="false")
+    Marketing(v-if="service == 'Marketing'")
+    .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
         .successAlert(v-if="success")
