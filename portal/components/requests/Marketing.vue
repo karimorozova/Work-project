@@ -65,7 +65,7 @@
                             .inner-audience__textField.textField
                                 textarea(rows="1")
                         .inner-subject.genBrief__item
-                            .inner-subject__title.switcher
+                            .inner-subject__title.switching
                                 span.innerTitle__title.innerTitle.asterisk Subject line
                                 .subject-toggle.toggle(@click="toggleSub" :class="{positive: subjectToggle}")
                                     .toggler
@@ -97,7 +97,7 @@
                                     span.strong Rewriting  
                                     | requests come at a separate cost.
                         .inner-bonus.genBrief__item
-                            .inner-bonus__title.switcher
+                            .inner-bonus__title.switching
                                 span.innerTitle__title.innerTitle.asterisk Bonus/Offers
                                 .bonus-toggle.toggle(@click="toggleBon" :class="{positive: bonusToggle}")
                                     .toggler
@@ -111,7 +111,7 @@
                             .inner-bonus__textField(v-if="bonusToggle")
                                 input(type="text")                         
                         .inner-cta.genBrief__item
-                            .inner-cta__title.switcher
+                            .inner-cta__title.switching
                                 span.innerTitle__title.innerTitle CTA: Yes/No
                                 .cta-toggle.toggle(@click="toggleCta" :class="{positive: ctaToggle}")
                                     .toggler
