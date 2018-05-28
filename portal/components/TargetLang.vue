@@ -5,12 +5,12 @@
         .icon(@click="showLanguages")
             i.fa.fa-caret-down
     input.search(v-if="droppedLang && projects[index].icons[1].status" type="text" v-model="search" placeholder="Search")                            
-    .drop(v-if="droppedLang && projects[index].icons[1].status")
+    .drop(v-if="droppedLang && projects[index].icons[1].status" v-click-outside="outClick")
       span.drop_item(@click="changeLang(langIndex, index)" v-for="(lang, langIndex) in targetLanguages" ) {{ lang.lang }}
 </template>
 
 <script>
-
+import ClickOutside from "vue-click-outside";
 
 export default {
   props: {
@@ -74,7 +74,9 @@ export default {
       this.langIndex = langIndex;
       let choice = this.targetLanguages[langIndex];
       this.selectedLang =  choice.symbol;
-      this.$emit("addLanguage", {index, lang: this.targetLanguages[langIndex]})
+      this.$emit("addLanguage", {index, lang: this.targetLanguages[langIndex]});
+      this.droppedLang = false;
+
     },
     async getLanguages() {
         const result = await this.$axios.$get('api/languages')
@@ -84,7 +86,13 @@ export default {
         .catch(e => {
             this.errors.push(e)
         })
+    },
+    outClick() {
+      this.droppedLang = false;
     }
+  },
+  directives: {
+    ClickOutside
   },
   mounted () {
     this.getLanguages()

@@ -2,6 +2,7 @@
   .externalWrap
     Marketing(v-if="service == 'Marketing'")
     Copywriting(v-if="service == 'Copywriting'")
+    Proofing(v-if="service == 'Proofing/QA'")
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -19,7 +20,7 @@
           .language(v-click-outside="outsideLangs")
             .lang-source
               span(v-if='serviceSelected') Source Language
-              .select.source(v-if='serviceSelected')
+              .selectLangs.source(v-if='serviceSelected')
                 span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
                   .wrapper(v-on:click.self='showSourceLang')
                   .icon(:class="{ reverse: sourceDrop }")
@@ -31,7 +32,7 @@
                       span.list-item(:class="{ active: language.name == sourceSelect.lang }") {{ language.name }}
             .lang-target
               span Target Language(s)
-              .select.target
+              .selectLangs.target
                 span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
                   <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }}    </template> 
                   <template v-if="targetSelect.length == 0">Select</template>
@@ -139,7 +140,8 @@ import ClickOutside from 'vue-click-outside';
 import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
 import Marketing from './requests/Marketing.vue';
-import Copywriting from "./requests/Copywriting.vue";
+import Copywriting from './requests/Copywriting.vue';
+import Proofing from './requests/Proofing.vue';
 
 export default {
   name: 'client-form',
@@ -506,7 +508,8 @@ export default {
     Datepicker,
     Drop,
     Marketing,
-    Copywriting
+    Copywriting,
+    Proofing
   },
   mounted(){
     this.getServices();

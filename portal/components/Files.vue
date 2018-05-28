@@ -4,11 +4,13 @@
             span {{ selectFile }}
             .icon(@click="showFiles")
                 i.fa.fa-caret-down
-        .drop(v-if="droppedFile && projects[index].icons[1].status")
+        .drop(v-if="droppedFile && projects[index].icons[1].status" v-click-outside="outClick")
             span.drop_item(@click="changeFile(typeIndex, index)" v-for="(type, typeIndex) in fileType") {{ type }}
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
+
 export default {
     props: {
         index: {
@@ -21,7 +23,7 @@ export default {
     data () {
         return {
             droppedFile: false,
-            fileType: ["Images", "Files", "URLs"],
+            fileType: ["URL", "HTML", "Image"],
             typeIndex: ''
         }
     },
@@ -32,6 +34,10 @@ export default {
         changeFile(typeIndex, index) {
             this.typeIndex = typeIndex;
             this.$emit("addFile", {index, type: this.fileType[typeIndex]})
+            this.droppedFile = false;
+        },
+        outClick() {
+            this.droppedFile = false;
         }
     },
     computed: {
@@ -42,6 +48,9 @@ export default {
                 return this.projects[this.index].fileType.text
             }
         }
+    },
+    directives: {
+        ClickOutside
     }
 }
 </script>

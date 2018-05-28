@@ -5,8 +5,8 @@
                 th.wordcount Wordcount
                 th.key Key
                 th.summary Summary
-                th.lang Target Lang
-                th.file File Type
+                th.lang.asterisk Target Lang
+                th.file.asterisk File Type
                 th.source Source
                 th.target Target
                 th
@@ -42,7 +42,7 @@
 
 <script>
 import axios from "axios";
-import Datepicker from ".//Datepicker.vue";
+import Datepicker from "./Datepicker.vue";
 import moment from "moment";
 import Multiselect from "vue-multiselect";
 import VueLodash from "vue-lodash";
