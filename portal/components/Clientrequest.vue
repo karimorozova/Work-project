@@ -1,8 +1,8 @@
 <template lang="pug">
   .externalWrap
-    Marketing(v-if="false")
-    Copywriting
-    .mainWrapper(v-if="false")
+    Marketing(v-if="service == 'Marketing'")
+    Copywriting(v-if="service == 'Copywriting'")
+    .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
         .successAlert(v-if="success")
@@ -139,6 +139,7 @@ import ClickOutside from 'vue-click-outside';
 import Datepicker from './Datepicker.vue';
 import { Drag, Drop } from 'vue-drag-drop';
 import Marketing from './requests/Marketing.vue';
+import Copywriting from "./requests/Copywriting.vue";
 
 export default {
   name: 'client-form',
@@ -504,7 +505,8 @@ export default {
   components: {
     Datepicker,
     Drop,
-    Marketing
+    Marketing,
+    Copywriting
   },
   mounted(){
     this.getServices();

@@ -4,6 +4,11 @@
             .container
                 .mark-option
                     .mark-option__title
+                        span.asterisk Project name
+                    .mark-option__inner
+                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+                .mark-option
+                    .mark-option__title
                         span.asterisk 1. Package
                     .mark-option__inner
                         .inner-option
@@ -50,24 +55,33 @@
                         .inner-description.genBrief__item
                             .inner-description__title.innerTitle
                                 span.innerTitle__title.asterisk Description
+                                    span.tooltip Please give a brief description of the project in as much detail as possible.
                             .inner-description__textField.textField
                                 textarea#grow(rows="1" @keyup="autoGrow()")                       
                         .inner-audience.genBrief__item
                             .inner-audience__title.innerTitle
                                 span.innerTitle__title.asterisk Targeted audience
+                                    span.tooltip Who will receive this mailer?
                             .inner-audience__textField.textField
                                 textarea(rows="1")
                         .inner-subject.genBrief__item
-                            .inner-subject__title
+                            .inner-subject__title.switcher
                                 span.innerTitle__title.innerTitle.asterisk Subject line
-                                .subject-toggle.toggle
+                                .subject-toggle.toggle(@click="toggleSub" :class="{positive: subjectToggle}")
+                                    .toggler
+                                    .yes 
+                                        span YES
+                                    .no 
+                                        span NO
                             .inner-subject__title
-                                span.innerTitle__title.innerTitle Subject line requirements                               
-                            .inner-subject__textField.textField
+                                span.innerTitle__title.innerTitle(v-if="subjectToggle") Subject line requirements
+                                    span.tooltip Any specific words/themes to include/not include in the subject line?
+                            .inner-subject__textField.textField(v-if="subjectToggle")
                                 textarea(rows="1")
                         .inner-topics.genBrief__item
                             .inner-topics__title
-                                span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention                                
+                                span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention
+                                    span.tooltip What main topics should or should not be covered in the mailer? Please be as detailed as possible.                        
                             .inner-topics__textField
                                 input(type="text")
                                 span or
@@ -83,17 +97,28 @@
                                     span.strong Rewriting  
                                     | requests come at a separate cost.
                         .inner-bonus.genBrief__item
-                            .inner-bonus__title
+                            .inner-bonus__title.switcher
                                 span.innerTitle__title.innerTitle.asterisk Bonus/Offers
-                                .bonus-toggle.toggle                                                                
-                            .inner-bonus__title
+                                .bonus-toggle.toggle(@click="toggleBon" :class="{positive: bonusToggle}")
+                                    .toggler
+                                    .yes 
+                                        span YES
+                                    .no 
+                                        span NO                                                       
+                            .inner-bonus__title(v-if="bonusToggle")
                                 span.innerTitle__title.innerTitle Bonus/Offers details                                
-                            .inner-bonus__textField   
+                                    span.tooltip Please list key info about promotion
+                            .inner-bonus__textField(v-if="bonusToggle")
                                 input(type="text")                         
                         .inner-cta.genBrief__item
-                            .inner-cta__title
+                            .inner-cta__title.switcher
                                 span.innerTitle__title.innerTitle CTA: Yes/No
-                                .cta-toggle.toggle
+                                .cta-toggle.toggle(@click="toggleCta" :class="{positive: ctaToggle}")
+                                    .toggler
+                                    .yes 
+                                        span YES
+                                    .no 
+                                        span NO
                         .inner-examples.genBrief__item
                             .inner-examples__title
                                 span.innerTitle__title.innerTitle Examples
@@ -135,14 +160,39 @@
                 input.submit(type="submit" value="Submit")
                 .mark-footer
                     p.clarify Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at a separate cost.
+            .orderInfo(:style="{transform: slide}")
+                .orderInfo__title
+                    h3 YOUR ORDER
+                .orderInfo__summary
+                    .orderInfo__summary-service
+                        span 1
+                        label SERVICE: 
+                        p.choice {{ service }}
+                    .orderInfo__summary-industry
+                        span 2
+                        label TYPE: 
+                        p.choice Marketing
+                    .orderInfo__summary-languages
+                        span 3
+                        label LANGUAGE:
+                        p.choice &nbsp; <template v-for="language of selectLang" >{{ language.lang }},  </template> <template v-if="selectLang == 0">Select</template>
+                    .orderInfo__summary-industry
+                        span 3
+                        label PACKAGE: 
+                        p.choice {{ packageSelect }}
+                    .orderInfo__summary-deadline
+                        label SUGGESTED DEADLINE
+                        p.choice
 </template>
 
 <script>
 export default {
     data() {
         return {
+            projectName: "",
             packageCheck200: true,
             packageCheck400: false,
+            packageSelect: "0-200",
             langDrop: false,
             languages: [],
             langSelect: 'Select',
@@ -163,10 +213,24 @@ export default {
                 { title: "Persuasive", check: false},
                 { title: "Payful/Funny", check: false},
                 { title: "Other", check: false, input: true}
-            ]
+            ],
+            subjectToggle: false,
+            bonusToggle: false,
+            ctaToggle: false,
+            scrolled: false,
+            slide: '0px'
         }
     },
     methods: {
+        toggleSub() {
+            this.subjectToggle = !this.subjectToggle;
+        },
+        toggleBon() {
+            this.bonusToggle = !this.bonusToggle;
+        },
+        toggleCta() {
+            this.ctaToggle = !this.ctaToggle;
+        },
         voiceChoice(ind) {
             console.log(ind);
             this.voices[ind].check = !this.voices[ind].check
@@ -184,25 +248,17 @@ export default {
         autoGrow() {
             let grow = document.getElementById('grow');
             let row = grow.getAttribute("rows");
-            if (grow.clientHeight < grow.scrollHeight)
-            {
-                grow.style.height = grow.scrollHeight + "px";
-                // grow.style.height = 
-                //     (grow.scrollHeight * 2 - grow.clientHeight) + "px";
-                }
-                else {
-                    grow.style.height = grow.clientHeight + "px"
-                }
-                
-            
-            console.log(grow.style.height)
+            if (grow.clientHeight < grow.scrollHeight) {
+                grow.style.height = (grow.scrollHeight * 2 - grow.clientHeight) + "px";
+            }
         },
         packageChoice200() {
             if (this.packageCheck200) {
                 return true
             } else {
                 this.packageCheck200 = true;
-                this.packageCheck400 = false
+                this.packageCheck400 = false;
+                this.packageSelect = "0-200";
             }
         },
         packageChoice400() {
@@ -210,7 +266,8 @@ export default {
                 return true
             } else {
                 this.packageCheck400 = true;
-                this.packageCheck200 = false
+                this.packageCheck200 = false;
+                this.packageSelect = "200-400";
             }
         },
         styleChoiceUs() {
@@ -272,6 +329,22 @@ export default {
                 this.selectLang.splice(pos,1);
             }
         },
+        handleScroll() {
+            let offSet = window.pageYOffset;
+            let downSlide = offSet - 80;
+            if (offSet > 100) {
+                this.slide = 'translateY(' + downSlide + 'px' + ')';
+            }
+            else {
+                this.slide = 'translateY(0)';
+            }
+        }
+    },
+    created() {
+        window.addEventListener('scroll', this.handleScroll);
+    },
+    destroyed() {
+        window.removeEventListener('scroll', this.handleScroll);        
     },
     computed: {
         sortedLanguages() {
@@ -285,6 +358,9 @@ export default {
             } else {
                 return result    
             }
+        },
+        service() {
+            return this.$store.state.clientInfo.service
         }
     },
     mounted() {
