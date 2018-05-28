@@ -20,6 +20,7 @@ body {
   .clientsTop {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #67573e;
     position: relative;
     height: 6vh;
@@ -367,9 +368,8 @@ body {
       display: flex;
       min-height: 94vh;
       &__sideBar {
-        padding: 25px 0;
+        padding: 35px 0;
         background-color: #998e7e;
-        // width: 121px;
         width: 150px;
         display: flex;
         flex-direction: column;

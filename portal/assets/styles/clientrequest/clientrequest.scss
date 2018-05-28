@@ -190,7 +190,7 @@
       max-width: 660px;
       position: relative;
     }
-    .select {
+    .selectLangs {
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -936,7 +936,7 @@
       }
     }
   
-   table{ /*or other element you want*/
+    .warning{ /*or other element you want*/
        animation-name: blink ;
        animation-duration: .5s ;
        animation-timing-function: step-end ;
