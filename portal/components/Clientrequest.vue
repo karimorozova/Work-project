@@ -10,7 +10,6 @@
           .successAlert__message
             p Thanks for your request.
             p We will answer you as soon as possible.
-        //- form.mainForm(ref="myForm" @submit.prevent="checkForm" v-if="false")
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number.projName
             label.asterisk PROJECT NAME
@@ -19,29 +18,29 @@
             label.asterisk SELECT A LANGUAGE
           .language(v-click-outside="outsideLangs")
             .lang-source
-              span(v-if='serviceSelected') Source Language
-              .selectLangs.source(v-if='serviceSelected')
-                span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
+              span Source Language
+              .selectLangs.source
+                span.inner-text.clarify(:class="{ color: sourceSelect.name != 'Select' }") {{ sourceSelect.name }}
                   .wrapper(v-on:click.self='showSourceLang')
                   .icon(:class="{ reverse: sourceDrop }")
                     i.fas.fa-caret-down
                 .source__drop(v-if='sourceDrop')
                   .source__drop-list(v-for='language in sourceLanguages')
-                    .pair(v-if='serviceSelect.languages[0].source.indexOf(language.symbol) != -1 || serviceSelect.title == "Select"' @click='changeSourceSelect(language)')
+                    .pair(@click='changeSourceSelect(language)')
                       img(:src="'/flags/' + language.symbol + '.png'")
-                      span.list-item(:class="{ active: language.name == sourceSelect.lang }") {{ language.name }}
+                      span.list-item(:class="{ active: language.name == sourceSelect.name }") {{ language.name }}
             .lang-target
               span Target Language(s)
               .selectLangs.target
                 span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                  <template v-if="targetSelect.length > 0" v-for="lang in targetSelect"> {{ lang.name }}    </template> 
-                  <template v-if="targetSelect.length == 0">Select</template>
+                  template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.name }} 
+                  template(v-if="targetSelect.length == 0") Select
                   .wrapper(v-on:click.self='showTargetLang')
                   .icon(:class="{ reverse: targetDrop }")
                     i.fas.fa-caret-down
                 .target__drop(v-if='targetDrop')
                   .target__drop-list(v-for='language in targetLanguages')
-                    .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
+                    .pair(v-if='(sourceSelect.name.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.name == "Select"' @click='changeTargetSelect(language)')
                       img(:src="'/flags/' + language.symbol  + '.png'")
                       span.list-item(:class="{ active: language.check }") {{ language.name }}
           .number
@@ -109,7 +108,7 @@
               span 2
               label LANGUAGE:
               p(v-if='serviceSelect.source') Source:
-                span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
+                span.choice &nbsp; {{ sourceSelect.name }} <template v-if="!sourceSelect">Select</template>
               p Target: 
                 span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.name }},  </template> <template v-if="targetSelect == 0">Select</template>
             .orderInfo__summary-industry
@@ -172,7 +171,7 @@ export default {
       infoShow: true,
       projectName: "",
       serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
-      sourceSelect: {lang : 'English (United Kingdom)'},
+      sourceSelect: {name : 'English (United Kingdom)', id: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'},
       selectLangSource: '',
       selectLangTarget: '',
       targetlang: ["Select"],
@@ -287,7 +286,7 @@ export default {
     },
     changeSourceSelect(event) {
       this.toggleSource();
-      this.sourceSelect.lang = event.name;
+      this.sourceSelect.name = event.name;
       this.targetlang = ["Select"];
       this.targetSelect.forEach(item => {
         item.check = false
@@ -349,7 +348,7 @@ export default {
       this.contactEmail ='',
       this.serviceSelect = {title : 'Select', source : true, languages: [{source: [], target: []}]},
       this.industrySelect = 'Select',
-      this.sourceSelect = {lang: 'English (United Kingdom)'},
+      this.sourceSelect = {name: 'English (United Kingdom)'},
       this.targetlang = ["Select"],
       this.targetDrop = false,
       this.targetSelect = [],
@@ -369,13 +368,18 @@ export default {
       })
     },
     async sendForm() {
-
+        var serviceFull;
+        for(let i = 0; i < this.services.length; i++) {
+          if(this.request.service == this.services[i].title)
+            serviceFull = this.services[i];
+        }
         var sendForm = new FormData();
 
+        sendForm.append("projectName", this.request.projectName);
         sendForm.append("date", this.request.date);
         sendForm.append("contactName", this.request.contactName);
         sendForm.append("contactEmail", this.request.contactEmail);
-        sendForm.append("service", JSON.stringify(this.serviceSelect));
+        sendForm.append("service", JSON.stringify(serviceFull));
         sendForm.append("industry", this.request.industry); 
         sendForm.append("status", "New");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
@@ -396,15 +400,16 @@ export default {
           console.log(this.refFiles[i]);
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
-        
-        const result = await this.$axios.$post('api/request', sendForm);
+        if(this.sendOption) {
+          const result = await this.$axios.$post('api/request', sendForm);          
+        }
+        if(this.startOption) {
+          const result = await this.$axios.$post('api/project-request', sendForm);
+        }
     },
-    async getServices() {
-      const result = await this.$axios.$get('api/services')
-      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
-      for (let i = 0; i < result.length; i++) {
-        this.services.push(result[i])
-      }
+    getServices() {
+      this.services = this.$store.state.services;
+      
     },
     getLanguages() {
       this.languages = this.$store.state.clientLanguages;
@@ -412,6 +417,7 @@ export default {
     
     async checkForm(event) {
       this.request = {
+          projectName: this.projectName,
           date: this.deadlineSelect, 
           contactName: this.$store.state.clientInfo.name, 
           contactEmail: this.$store.state.clientInfo.email,
@@ -431,11 +437,13 @@ export default {
     }
 
       this.errors = [];
-      
+      if(!this.request.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
+      if(!this.deadlineSelect) this.errors.push("Deadline required!");
+      if(!this.detailFiles.length) this. errors.push("File(s) required!");
             
       if(!this.errors.length){
-        this.sendForm();
+        this.sendForm();         
         console.log("sent")
         // window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
@@ -445,17 +453,11 @@ export default {
     }    
   },
   computed: {
-    serviceSelected() {
-      if(this.service == "Copywriting") {
-        return false
-      }
-      return true
-    },
     sourceLanguages() {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, check: false})   
+          result.push({name: this.languages[i].sourceLanguage.name, lang: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
@@ -471,8 +473,8 @@ export default {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
-          if (this.languages[i].sourceLanguage.name == this.sourceSelect.lang)
-          result.push({name: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, check: false})   
+          if (this.languages[i].sourceLanguage.name == this.sourceSelect.name)
+          result.push({name: this.languages[i].targetLanguage.name, lang: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, id: this.languages[i].targetLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {

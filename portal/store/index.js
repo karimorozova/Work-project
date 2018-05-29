@@ -7,6 +7,7 @@ const store = () => new Vuex.Store({
     state: {
         clientLanguages: [],
         clientInfo: {},
+        services: []
     },
     actions: {
         loadLangs(context, payload) {
@@ -14,14 +15,20 @@ const store = () => new Vuex.Store({
         },
         requestInfo(context, obj) {
             context.commit('clientForRequest', obj)
+        },
+        servicesGetting(context, arr) {
+            context.commit('servicesFill', arr)
         }
-    },
+     },
     mutations: {
         langs(state, payload) {
             state.clientLanguages = payload
         },
         clientForRequest(state, payload) {
             state.clientInfo = payload
+        },
+        servicesFill(state, payload) {
+            state.services = payload
         }
     }
 })

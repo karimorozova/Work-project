@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const RequestSchema = new mongoose.Schema({
+  projectName: {
+    type: String,
+    default: '',
+    trim: true
+  },
   date: {
     type: Date,
     default: Date.now

@@ -1,5 +1,6 @@
 const { ClientApi } = require('../models/xtrf');
-const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report')
+const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
+const { getSpecializations } = require('../models/xtrf/home');
 const router = require('express').Router();
 
 router.get('/', (req, res) => {
@@ -74,6 +75,7 @@ router.get('/reject', async (req, res) => {
     var id = req.query.quoteId;
     const result = await customer.quoteReject(id);
     res.send("rejected");
-})
+});
+
 
 module.exports = router;

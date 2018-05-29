@@ -80,6 +80,47 @@ function addQuote(customerId, request) {
     })
 }
 
+function addClassicProject(customerId, request) {
+    return new Promise(resolve => {
+        homeXtrf.get("dictionaries/specialization/all").then(specs => {
+            var industryId;
+            var targetLangs = [];
+            
+            for(let i = 0; i < specs.data.length; i++) {
+                if(specs.data[i].name == request.industry) {
+                    industryId = specs.data[i]
+                }
+            }
+            
+            for(let j = 0; j < request.targetLanguages.length; j++) {
+                targetLangs.push(request.targetLanguages[j].id)
+            }
+            const startDate = Date.now();
+            const endDate = request.date.getTime();
+            homeXtrf.post("projects", {
+                "customerId": customerId,
+                "sourceLanguageId": request.sourceLanguage.id,
+                "specializationId": industryId.id,
+                "targetLanguagesIds": targetLangs,
+                "serviceId": request.service.xtrf,
+                "dates": {
+                  "startDate": {
+                    "time": startDate
+                  },
+                  "deadline": {
+                    "time": endDate
+                  }
+                },
+                "name": request.projectName
+            }).then(function (response) {
+                resolve(response.data);
+            }).catch(function (error) {
+                resolve(error);
+            })  
+        }).catch(err=> console.log(err))
+    })
+}
+
 function generateToken(contactEmail) {
     return new Promise(resolve => {
         homeXtrf.post("customers/persons/accessToken", {
@@ -92,5 +133,14 @@ function generateToken(contactEmail) {
     })
 }
 
+function getSpecializations() {
+    return new Promise(resolve => {
+        homeXtrf.get("dictionaries/specialization/all").then(response =>
+            resolve(response.data))
+        }).catch(function (error) {
+            resolve(error);
+        });
+}
 
-module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, generateToken, createCustomer }
+
+module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, generateToken, createCustomer, addClassicProject }
