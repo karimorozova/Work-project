@@ -174,6 +174,24 @@
                                     .choice-sel(v-else)
                                 span.title2(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]") {{ item.title2 }}                                
                                 input
+                    .copydetails__quote
+                      .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
+                        .send__check
+                          .checker(:class="{checkerChecked: copysendOption}")
+                        .send__text
+                          p.head Send a Quote
+                          p.insideText I approve for the project to begin immediately and I'll review the quote later.
+                      .start(:class="{copyoptionChecked: copystartOption}" @click="copychooseStart")
+                        .start__check
+                          .checker(:class="{checkerChecked: copystartOption}")
+                        .start__text
+                          p.head Start Immediately
+                          p.insideText I approve for the project to begin immediately and to receive the quote just for reference. 
+                    .col-9__block3
+                      .bot
+                        .buttonWrap
+                          button(@click.prevent="cpWrSubmit") Submit
+                        span.foot {{ footSpan }}
                             
 
         .orderInfoCopy(:style="{transform: slide}")
@@ -375,7 +393,10 @@ export default {
       slide: "0px",
       typeSelect: "Article",
       packageSelect: "200-399",
-      sure: false
+      sure: false,
+      footSpan: 'Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at separate cost.',
+      copysendOption: true,
+      copystartOption: false
     };
   },
   methods: {
@@ -506,6 +527,14 @@ export default {
           item.choice = !item.choice;
         }
       });
+    },
+    copychooseBegin() {
+      this.copysendOption = true;
+      this.copystartOption = false
+    },
+    copychooseStart() {
+      this.copysendOption = false;
+      this.copystartOption = true
     }
   },
   computed: {
@@ -539,4 +568,55 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/styles/clientrequest/copywriting.scss";
+
+.copydetails {
+    padding-bottom: 0;
+    flex-direction: column;
+    &__quote {
+      margin-top: 30px;
+      width: 100%;
+      .send, .start {
+        display: flex;
+        align-items: center;
+        border: 1px solid #66563D;        
+        padding-left: 10px;
+        padding-right: 10px;
+        margin: 10px;
+        margin-right: 0;
+        cursor: pointer;
+        &__check {
+          width: 18px;
+          height: 18px;
+          margin-right: 20px;
+          border: 1px solid #66563D;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .checker {
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+          }
+          .checkerChecked {
+            background-color: #66563D;
+          }
+        }
+        &__text {
+          width: 88%;
+          .head {
+            margin-bottom: 5px;
+          }
+          .insideText {
+            font-size: 12px;
+            margin-top: 0;
+          }
+        }
+      }
+      .copyoptionChecked {
+        box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+      }
+
+    }
+  }
 </style>

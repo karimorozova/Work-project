@@ -776,6 +776,7 @@
                 display: flex;
                 flex-direction: column;
                 max-height: 125px;
+                margin-bottom: 20px;
                 .sub {
                     display: flex;
                     align-items: center;
@@ -797,6 +798,30 @@
                             margin-right: 15px;
                         }
                     }
+                }
+            }
+            &__block3 {
+                .bot {
+                    .buttonWrap {
+                        display: flex;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                            button {
+                                background-color: #FF876C;
+                                border-radius: 16px;
+                                outline: none;
+                                border-style: none;
+                                color: #fff;
+                                padding: 15px 20px;
+                                box-shadow: -1px 2px 6px rgba(0, 0, 0, 0.5);
+                            }
+                    }
+                        
+                        .foot {
+                            opacity: 0.67;
+                            font-size: 12px;
+                            white-space: nowrap;
+                        }
                 }
             }
         }
