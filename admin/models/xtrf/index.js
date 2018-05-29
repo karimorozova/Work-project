@@ -33,7 +33,29 @@ async function quote(request) {
     catch (err) {
         console.log("Error adding quote" + err);
     }
+}
 
+async function project(request) {
+
+    console.log("Begin creating project");
+    var customerId = await (HomeApi.findCustomer(request.companyName));
+    if(!customerId)
+    {
+        customerId = await (HomeApi.createCustomer(request));
+    }
+    console.log("Customer id " + customerId);
+    try {
+        console.log("Creating classic project");
+        var token = await (HomeApi.generateToken(request.contactEmail));
+        var sessionId = await (ClientApi.login(token));
+        // var homeApi = new HomeApi(request, sessionId);
+            // here upload files 
+        var projectId = await (HomeApi.addClassicProject(customerId, request));
+        
+    }
+    catch (err) {
+        console.log("Error adding project" + err);
+    }
 }
 
 async function authClient(login, pass) {
@@ -44,7 +66,8 @@ const Models = {
     ClientApi,
     HomeApi,
     quote,
-    authClient
+    authClient,
+    project
 };
 
 module.exports = Models;

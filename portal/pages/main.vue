@@ -334,11 +334,17 @@ export default {
         if (i == 0) item.active = true;
         else item.active = false;
       })
+    },
+    async getServices() {
+      const result = await this.$axios.$get('api/services')
+      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
+      this.$store.dispatch('servicesGetting', result);
     }
   },
   mounted() {
     this.getCookie();
     this.clientInfo();
+    this.getServices();
   },
   components: {
     Quotesinfo,

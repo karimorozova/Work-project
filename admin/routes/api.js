@@ -4,7 +4,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { Requests, Languages, Services } = require('../models');
-const { quote } = require('../models/xtrf');
+const { quote, project } = require('../models/xtrf');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -70,6 +70,47 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
   });
 
 });
+
+router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
+
+  const request = new Requests(req.body);
+
+  const detailFiles = req.files["detailFiles"];
+  const refFiles = req.files["refFiles"];
+
+  request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
+  request.targetLanguages = JSON.parse(req.body.targetLanguages);
+  request.service = JSON.parse(req.body.service)
+  try {
+    await request.save();
+    if(detailFiles){
+      for (var i = 0; i < detailFiles.length; i += 1) {
+        request.detailFiles.push(moveFile(detailFiles[i], request.id));
+      }
+    }
+    if (refFiles) {
+      for (var i = 0; i < refFiles.length; i += 1) {
+        request.refFiles.push(moveFile(refFiles[i], request.id))
+      }
+    }
+  
+    await request.save();
+    sendMail(request);
+    sendMailClient(request);
+    project(request);
+
+    console.log("Saved");
+
+  } catch (err) {
+    console.log(err);
+  }
+
+  res.send({
+    message: "request was added"
+  });
+
+});
+
 
 router.get('/languages', (req, res) => {
   Languages.find()

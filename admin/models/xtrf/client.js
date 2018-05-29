@@ -156,6 +156,8 @@ var ClientApi = class ClientApi {
     }
 
     createQuote() {
+        const srcLang = this.request.sourceLangName();
+        const trgLang = this.request.targetLangName();
         return new Promise(resolve => {
             var jsonData = {
                 'name': `${this.request.companyName}`,
@@ -165,8 +167,8 @@ var ClientApi = class ClientApi {
                 "specialization": {
                     "name": "General"
                 },
-                "sourceLanguage": this.request.sourceLangName(),
-                "targetLanguages": this.request.targetLangName(),
+                "sourceLanguage": srcLang,
+                "targetLanguages": trgLang,
                 "notes": "Coming from website",
                 "autoAccept": false
             };
