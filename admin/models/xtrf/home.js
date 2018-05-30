@@ -65,13 +65,51 @@ function setTargetLanguage(url, trgLanguage) {
     })
 }
 
+function deadlineAdd(url, date) {
+    return new Promise(resolve => {
+        homeXtrf.put(url, {
+            value: date,
+        }).then(function (response) {
+            resolve(response.data);
+        }).catch(function (error) {
+            resolve(error);
+        });
+    })
+}
+
 function addQuote(customerId, request) {
     return new Promise(resolve => {
+        var projectName;
+        if (request.projectName) {
+            projectName = request.projectName;
+        } else {
+            projectName = request.service.title + " - " + request.industry;
+        }
         homeXtrf.post("v2/quotes", {
             clientId: customerId,
-            name: request.service.title + " - " + request.industry,
+            name: projectName,
             serviceId: request.service.xtrf,
             opportunityOfferId: ""
+        }).then(function (response) {
+            resolve(response.data);
+        }).catch(function (error) {
+            resolve(error);
+        });
+    })
+}
+
+function addSmartProject(customerId, request) {
+    return new Promise(resolve => {
+        var projectName;
+        if (request.projectName) {
+            projectName = request.projectName;
+        } else {
+            projectName = request.service.title + " - " + request.industry;
+        }
+        homeXtrf.post("v2/projects", {
+            clientId: customerId,
+            name: projectName,
+            serviceId: request.service.xtrf
         }).then(function (response) {
             resolve(response.data);
         }).catch(function (error) {
@@ -143,4 +181,4 @@ function getSpecializations() {
 }
 
 
-module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, generateToken, createCustomer, addClassicProject }
+module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, generateToken, createCustomer, addClassicProject, addSmartProject }

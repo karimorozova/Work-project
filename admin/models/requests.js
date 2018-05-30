@@ -88,7 +88,7 @@ const RequestSchema = new mongoose.Schema({
 
 RequestSchema.methods.targetLangName = function targetLangName() {
   var res = [];
-  for (var i = 0; i < this.targetLanguages.length; i += 1) {
+  for (var i = 0; i < this.targetLanguages.length; i++) {
     res.push({
       "name": this.targetLanguages[i].lang
     });
@@ -98,7 +98,7 @@ RequestSchema.methods.targetLangName = function targetLangName() {
 
 RequestSchema.methods.targetArray = function targetArray() {
   var res = [];
-  for(var i=0; i < this.targetLanguages.length; i+=1 )
+  for(var i = 0; i < this.targetLanguages.length; i++ )
   {
       res.push(this.targetLanguages[i].xtrf);
   }
@@ -111,6 +111,9 @@ RequestSchema.methods.sourceLangName = function sourceLangName() {
   };
 }
 
+RequestSchema.methods.deadline = function deadline() {
+  return this.date.getTime();
+}
 
 const Requests = mongoose.model('Requests', RequestSchema);
 

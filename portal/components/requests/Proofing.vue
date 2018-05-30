@@ -53,7 +53,7 @@
                         label SERVICE: 
                         p.choice {{ service }}
                     .orderInfo__summary-languages
-                        span 3
+                        span 2
                         label LANGUAGE:
                         p.choice {{ selectedLang }}
                     .orderInfo__summary-deadline

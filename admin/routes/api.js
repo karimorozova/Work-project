@@ -1,10 +1,16 @@
 const router = require('express').Router();
 const multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
+const unirest = require('unirest');
+const querystring = require('querystring');
+const fs = require('fs');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { Requests, Languages, Services } = require('../models');
 const { quote, project } = require('../models/xtrf');
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -30,6 +36,51 @@ function moveFile(oldFile, requestId){
 
   return oldFile.filename;
 }
+
+
+router.get('/wordcount', async (req, res) => {
+  const fileLink = "https://portal.pangea.global/file.txt";
+
+  const resFull = await axios({
+    url: fileLink,
+    method: 'GET',
+    responseType: 'blob', // important
+  });
+
+ /* var wstream = fs.createWriteStream('./dist/wordcount.txt');
+  wstream.write(resFull.data);
+  wstream.end(function () { console.log('done'); });*/
+
+  
+  //var readStream = await fs.readFileSync('./dist/wordcount.txt');
+  
+  unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+    .headers({'Content-Type': 'multipart/form-data'})      
+    .attach('file', './dist/wordcount.txt') // Attachment
+    .end(function (response) {
+     var token = response.body.token;
+
+
+     axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", {
+        filesTokens: [token]
+      }, {headers : {'Content-Type' : 'application/json'}})
+      .then(function (response) {
+        console.log('111');
+      }).catch(function (error) {
+        console.log('222');
+      })
+     /*unirest.post('https://pangea.s.xtrf.eu/qrf/file/estimation')
+     .headers({'Content-Type': 'application/json'})   
+     .field('filesTokens', token)
+     .end((estimateResponse) =>{
+        console.log('ended esimate');
+     })*/
+
+    
+  });
+  res.send('bad request');
+});
+
 
 router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
 

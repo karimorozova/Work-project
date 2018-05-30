@@ -7,7 +7,7 @@
                         span.block1 1. Type
                         span.star *
                     .col-1__block2
-                        .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{active: item.active}")
+                        .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{activeType: item.active}")
                             span.sub1 {{ item.title }}
                             img(v-if="item.active" :src="item.imageN")
                             img(v-else :src="item.imageW")
@@ -18,7 +18,7 @@
                         .inner-langs
                             span.inner-langs__title Language(s)
                             .inner-langs__select
-                                span.select-text.clarify(:class="{ color: langSelect != 'Select' && langSelect != '' }")
+                                span.select-text.clarify(:class="{ color: selectLang.length }")
                                     <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
                                     <template v-if="selectLang.length == 0">Select</template>
                                     .span-wrapper(@click.self='showLang')
@@ -98,7 +98,7 @@
                     .col-4__block7
                         .first
                             span.exp Examples
-                            input.in(type="text" placeholder="www.exampleexample.com" value="")
+                            input.in(type="text" placeholder="www.example.com" value="")
                             span.url URL
                         .second
                             button.but(@click.prevent="") Upload

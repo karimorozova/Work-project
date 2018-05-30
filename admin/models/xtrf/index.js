@@ -38,6 +38,9 @@ async function quote(request) {
 async function project(request) {
 
     console.log("Begin creating project");
+    const classic = request.service.projectType === "regular";
+    console.log(`Project is regular : ${classic}`);
+
     var customerId = await (HomeApi.findCustomer(request.companyName));
     if(!customerId)
     {
@@ -45,12 +48,18 @@ async function project(request) {
     }
     console.log("Customer id " + customerId);
     try {
-        console.log("Creating classic project");
-        var token = await (HomeApi.generateToken(request.contactEmail));
-        var sessionId = await (ClientApi.login(token));
-        // var homeApi = new HomeApi(request, sessionId);
-            // here upload files 
-        var projectId = await (HomeApi.addClassicProject(customerId, request));
+        if (classic) {
+            console.log("Creating classic project");
+            var token = await (HomeApi.generateToken(request.contactEmail));
+            var sessionId = await (ClientApi.login(token));
+                // here upload files 
+            var projectId = await (HomeApi.addClassicProject(customerId, request));
+        } else {
+            var project = await (HomeApi.addSmartProject(customerId, request));
+            var srclang = await (HomeApi.setSrcLanguage("/v2/projects/" + project.id + "/sourceLanguage", request.sourceLanguage.xtrf));
+            var trgLang = await (HomeApi.setTargetLanguage("/v2/projects/" + project.id + "/targetLanguages", request.targetArray()));
+            var deadline = await (HomeApi.deadlineAdd("/v2/projects/" + project.id + "/clientDeadline", request.deadline()));
+        }
         
     }
     catch (err) {

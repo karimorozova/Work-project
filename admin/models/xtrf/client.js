@@ -162,7 +162,7 @@ var ClientApi = class ClientApi {
             var jsonData = {
                 'name': `${this.request.companyName}`,
                 "workflow": {
-                    "name": "Translation [General]"
+                    "name": "Translation & Proofreading [General]"
                 },
                 "specialization": {
                     "name": "General"

@@ -34,14 +34,17 @@
     "path": "^0.12.7",
     "popper.js": "^1.12.9",
     "pug": "^2.0.3",
+    "request": "^2.87.0",
     "sass-loader": "^6.0.7",
     "translate": "^1.0.2",
+    "unirest": "^0.5.1",
     "vue": "^2.5.2",
     "vue-lodash": "^2.0.0",
     "vue-resource": "^1.5.0",
     "vue-router": "^3.0.1",
     "vuejs-datepicker": "^0.9.29",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

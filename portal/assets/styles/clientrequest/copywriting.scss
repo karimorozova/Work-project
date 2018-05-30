@@ -462,6 +462,9 @@
                                 margin-bottom: 12px;
                                 font-size: 12px;
                             }
+                            ::-webkit-input-placeholder {
+                                text-align: center;
+                            }
                             .url {
                                 display: flex;
                                 justify-content: center;
@@ -859,12 +862,15 @@
                 margin: 10px;
         }
 
-        .active {
+        .activeType {
             background-color: #66563D;
             opacity: 0.67;
             color: #fff;
         }
     }
+}
+.color{
+    opacity: 1;
 }
 
 .orderInfoCopy {

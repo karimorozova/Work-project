@@ -171,7 +171,7 @@ export default {
       infoShow: true,
       projectName: "",
       serviceSelect: {title : 'Select', source : true, languages: [{source: [], target: []}]},
-      sourceSelect: {name : 'English (United Kingdom)', id: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'},
+      sourceSelect: {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'},
       selectLangSource: '',
       selectLangTarget: '',
       targetlang: ["Select"],
@@ -457,7 +457,7 @@ export default {
       let result = [];
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].sourceLanguage.name, lang: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, check: false})   
+          result.push({name: this.languages[i].sourceLanguage.name, lang: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, id: this.languages[i].sourceLanguage.id, xtrf: this.languages[i].sourceLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
@@ -474,7 +474,7 @@ export default {
       if(this.languages.length) {
         for(let i = 0; i < this.languages.length; i++) {
           if (this.languages[i].sourceLanguage.name == this.sourceSelect.name)
-          result.push({name: this.languages[i].targetLanguage.name, lang: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, id: this.languages[i].targetLanguage.id, check: false})   
+          result.push({name: this.languages[i].targetLanguage.name, lang: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, id: this.languages[i].targetLanguage.id, xtrf: this.languages[i].targetLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
