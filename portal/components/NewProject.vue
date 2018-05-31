@@ -88,7 +88,9 @@ export default {
       targetLangSelect: "Options",
       selectedFile: "Options",
       readonly: false,
-      showErrors: false
+      showErrors: false,
+      token: '',
+      countWords: null
     };
   },
   methods: {
@@ -136,7 +138,8 @@ export default {
     changePerson(ind) {
       this.personSelected = this.persons[ind];
     },
-    projectAction(index, iconIndex) {
+    // 
+    async projectAction(index, iconIndex) {
       if (iconIndex == 2) {
         // if (this.projects.length > 1)
           this.$emit("projectManage", { index, element: this.projects[index] });
@@ -163,31 +166,41 @@ export default {
           this.showErrors = true;
           this.$emit("showWarning", {show: this.showErrors, index: index});
         } else {
-          const url = "http://localhost:3005/request-qa";
-          let value = this.projects[index].source.text;
 
+          let value = this.projects[index].source.text;
           if (value.indexOf("http") == -1) {
             value = "http://" + value;
           }
-
           this.projects[index].wordcount = "Counting..";
-
-          this.$axios
-            .$post(url, { site: value })
-            .then(res => {
-              this.projects[index].wordcount = res.word;
-            })
-            .catch(err => {
-              console.log(err);
+          let result = await this.$axios.get(`api/wordcount?web=${value}`);
+          console.log(result);  
+          this.token = result.data.token;
+          const req = {filesTokens: [this.token]}
+            
+          let resp = await this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}});
+          if(resp.totalVolume) {
+            this.countWords = response.data.totalVolume.units           
+          } else {
+            setTimeout( () => {
+              this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}})
+              .then((response) => {
+              console.log("response: " + response.data.totalVolume.units);
+              this.projects[index].wordcount = response.data.totalVolume.units;
+              }).catch(function (error) {
+                console.log('222');
+                console.log(error)
+              })
+            }, 2000)
+          }    
+          console.log(resp);
+            this.projects[index].readonly = true;
+            this.$emit("projectSave", {
+              index,
+              element: this.projects[index],
+              saveIndex: 0,
+              editIndex: 1
             });
-          this.projects[index].readonly = true;
-          this.$emit("projectSave", {
-            index,
-            element: this.projects[index],
-            saveIndex: 0,
-            editIndex: 1
-          });
-        }
+          }
       } else if (iconIndex == 1 && !this.projects[index].icons[iconIndex].status) {
         this.projects[index].readonly = false;
         this.$emit('projectSave', {index, editIndex: 1, saveIndex: 0})

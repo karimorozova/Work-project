@@ -8,9 +8,10 @@ const fs = require('fs');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
+const { sendMailPortal } = require('../utils/mailhandlerportal')
 const { Requests, Languages, Services } = require('../models');
 const { quote, project } = require('../models/xtrf');
-
+const reqq = require('request');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -40,51 +41,51 @@ function moveFile(oldFile, requestId){
 
 router.get('/wordcount', async (req, res) => {
   const fileLink = "https://portal.pangea.global/file.txt";
-
+  var link = req.query.web;
+  
+  if (link.indexOf('dropbox') >= 0) {
+    var firstPart = link.split("=")[0];
+    console.log(firstPart);
+    link = firstPart + "=1";
+  }
+  console.log(link);
   const resFull = await axios({
-    url: fileLink,
+    url: link,
     method: 'GET',
     responseType: 'blob', // important
   });
 
- /* var wstream = fs.createWriteStream('./dist/wordcount.txt');
+  // var file = fs.createWriteStream("./dist/english_buisness_message.txt");
+  // var request = axios.get("https://www.dropbox.com/s/dr1cit55idwi1m0/english_buisness_message.txt?dl=1", function(response) {
+  // response.pipe(file);
+  // });
+  
+  var wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
   wstream.write(resFull.data);
-  wstream.end(function () { console.log('done'); });*/
-
-  
-  //var readStream = await fs.readFileSync('./dist/wordcount.txt');
-  
-  unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+  wstream.end(() => { 
+    unirest.post('https://pangea.s.xtrf.eu/qrf/file')
     .headers({'Content-Type': 'multipart/form-data'})      
-    .attach('file', './dist/wordcount.txt') // Attachment
+    .attach('file', './dist/testtest.txt') // Attachment
     .end(function (response) {
-     var token = response.body.token;
-
-
-     axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", {
-        filesTokens: [token]
-      }, {headers : {'Content-Type' : 'application/json'}})
-      .then(function (response) {
-        console.log('111');
-      }).catch(function (error) {
-        console.log('222');
-      })
-     /*unirest.post('https://pangea.s.xtrf.eu/qrf/file/estimation')
-     .headers({'Content-Type': 'application/json'})   
-     .field('filesTokens', token)
-     .end((estimateResponse) =>{
-        console.log('ended esimate');
-     })*/
-
-    
+    var token = response.body.token;
+    fs.unlink('./dist/testtest.txt', (err) => {
+      if (err) throw err;
+      console.log("testest.txt was deleted!")
+    });
+    console.log('done');
+    res.send({token});    
+    });  
   });
-  res.send('bad request');
 });
 
 
 router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
 
   const request = new Requests(req.body);
+  var projectName = "";
+  if (request.projectName) {
+    projectName = request.projectName;
+  }
 
   const detailFiles = req.files["detailFiles"];
   const refFiles = req.files["refFiles"];
@@ -106,7 +107,11 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
     }
   
     await request.save();
-    sendMail(request);
+    if (projectName) {
+      sendMailPortal(request)
+    } else {
+      sendMail(request);    
+    }
     sendMailClient(request);
     quote(request);
 
@@ -125,6 +130,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
 router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
 
   const request = new Requests(req.body);
+  var projectName = "";
+  if (request.projectName) {
+    projectName = request.projectName;
+  }
 
   const detailFiles = req.files["detailFiles"];
   const refFiles = req.files["refFiles"];
@@ -146,7 +155,11 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
     }
   
     await request.save();
-    sendMail(request);
+    if (projectName) {
+      sendMailPortal(request)
+    } else {
+      sendMail(request);    
+    }
     sendMailClient(request);
     project(request);
 

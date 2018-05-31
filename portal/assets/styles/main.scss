@@ -184,7 +184,7 @@ body {
         .accountMenuWrapper {
           .accountBlock {
             width: 192px;
-            height: 119px;
+            height: 124px;
             background-color: #fff;
             box-shadow: 1px 1px 11px black;
             position: absolute;
@@ -192,6 +192,7 @@ body {
             right: -15px;
             border-radius: 6px;
             z-index: 5;
+            overflow: hidden;
             &__info {
               display: flex;
               justify-content: space-around;
