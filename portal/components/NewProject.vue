@@ -98,8 +98,7 @@ export default {
       this.$refs.programaticOpen.showCalendar();
     },
     changeLanguage(data) {
-      this.projects[data.index].targetLang.text = data.lang.symbol;
-      this.projects[data.index].targetLang.xtrf = data.lang.xtrf;
+      this.projects[data.index].targetLang = data.lang;
       this.targetLangSelect = data.lang.symbol;
     },
     chooseFile(data) {
@@ -148,7 +147,7 @@ export default {
         if (!this.projects[index].summary.text) {
           this.$emit("newError", { error: "Please, fill the summary field.", title: "summary" });
         }
-        if (!this.projects[index].targetLang.text) {
+        if (!this.projects[index].targetLang.symbol) {
           this.$emit("newError", {
             error: "Please, choose the target language.", title: "targetLang"
           });

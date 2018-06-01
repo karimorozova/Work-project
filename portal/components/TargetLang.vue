@@ -1,6 +1,6 @@
 <template lang='pug'>
   .tableSelect
-    .select__selected(:class='{errorActive: !projects[index].targetLang.text && !projects[index].targetLang.exist, savedDisable: projects[index].icons[0].status}')
+    .select__selected(:class='{errorActive: !projects[index].targetLang.symbol && !projects[index].targetLang.exist, savedDisable: projects[index].icons[0].status}')
         span {{ targetLangSelect }}
         .icon(@click="showLanguages")
             i.fa.fa-caret-down
@@ -35,10 +35,10 @@ export default {
   },
   computed: {
     targetLangSelect() {
-      if(!this.projects[this.index].targetLang.text){
+      if(!this.projects[this.index].targetLang.symbol){
         return 'Options'
       } else {
-        return this.projects[this.index].targetLang.text
+        return this.projects[this.index].targetLang.symbol
       }
     },
     targetLanguages() {
