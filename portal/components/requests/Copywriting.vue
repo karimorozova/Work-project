@@ -3,6 +3,12 @@
         .copywritingContainer
             form.copywriting-form
                 .col-1
+                    .col-1__block0__title
+                        span.pname Project name
+                        span.star *
+                    .col-1__block0__inner
+                        span.psel {{ typeSelect }} :
+                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
                     .col-1__block1
                         span.block1 1. Type
                         span.star *
@@ -17,23 +23,23 @@
                     .col-2__block2
                         .inner-langs
                             span.inner-langs__title Language(s)
-                            .inner-langs__select
-                                span.select-text.clarify(:class="{ color: selectLang.length }")
-                                    <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
-                                    <template v-if="selectLang.length == 0">Select</template>
-                                    .span-wrapper(@click.self='showLang')
-                                    .icon(:class="{ reverse: langDrop }")
-                                        i.fas.fa-caret-down
-                                .select__drop(v-if='langDrop')
-                                    .select__drop-list(v-for='language in sortedLanguages')
-                                        .pair(@click='chooseLang(language)')
-                                            img(:src="'/flags/' + language.symbol + '.png'")
-                                            span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                                        .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
-                                            template(v-for='dialect in language.dialects')
-                                                .pair.pair_dialect(@click="chooseDialect(dialect)")
-                                                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                                                    span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                              .inner-langs__select
+                                  span.select-text.clarify(:class="{ color: selectLang.length }")
+                                      <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
+                                      <template v-if="selectLang.length == 0">Select</template>
+                                      .span-wrapper(@click.self='showLang')
+                                      .icon(:class="{ reverse: langDrop }")
+                                          i.fas.fa-caret-down
+                                  .select__drop(v-if='langDrop')
+                                      .select__drop-list(v-for='language in sortedLanguages')
+                                          .pair(@click='chooseLang(language)')
+                                              img(:src="'/flags/' + language.symbol + '.png'")
+                                              span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                                          .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
+                                              template(v-for='dialect in language.dialects')
+                                                  .pair.pair_dialect(@click="chooseDialect(dialect)")
+                                                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                                                      span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .col-3
                     .col-3__block1
                         span.block1 3. Package
@@ -101,7 +107,9 @@
                             input.in(type="text" placeholder="www.example.com" value="")
                             span.url URL
                         .second
-                            button.but(@click.prevent="") Upload
+                            .uploadBtn
+                              .uploadBtn__text Upload
+                              input(name="refFiles" type="file" @change='copyChangeRefFiles')
                             span.se Upload Reference File
                 .col-5
                     .col-5__block1
@@ -191,7 +199,7 @@
                       .bot
                         .buttonWrap
                           button(@click.prevent="cpWrSubmit") Submit
-                        span.foot {{ footSpan }}
+                          span.foot {{ footSpan }}
                             
 
         .orderInfoCopy(:style="{transform: slide}")
@@ -535,6 +543,9 @@ export default {
     copychooseStart() {
       this.copysendOption = false;
       this.copystartOption = true
+    },
+    copyChangeRefFiles(event){
+      this.refFiles = event.target.files[0]; 
     }
   },
   computed: {
@@ -572,9 +583,11 @@ export default {
 .copydetails {
     padding-bottom: 0;
     flex-direction: column;
+    margin-bottom: 38px;
     &__quote {
       margin-top: 30px;
       width: 100%;
+      margin-bottom: 40px;
       .send, .start {
         display: flex;
         align-items: center;
