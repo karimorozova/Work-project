@@ -120,11 +120,11 @@ const mailhandler = {
       </tr>
     </tbody>
 </table>`;
-
+    
     let mailOptions = {
       from: 'translation@pangea.global', // sender address
       to: 'pm@pangea.global', // pm@pangea.global list of receivers
-      subject: `A new lead from ${request.companyName}`, // Subject line
+      subject: `A new ${request.typeOfRequest} from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body
     };
