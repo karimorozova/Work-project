@@ -1,6 +1,8 @@
 const axios = require('axios');
 const querystring = require('querystring');
 const fs =require('fs');
+const unirest = require('unirest');
+
 
 var ClientApi = class ClientApi {
     constructor(request, sessionId) {
@@ -158,15 +160,31 @@ var ClientApi = class ClientApi {
     createQuote() {
         const srcLang = this.request.sourceLangName();
         const trgLang = this.request.targetLangName();
+        var name = this.request.companyName;
+        if(this.request.projectName) {
+            name = this.request.projectName;
+        }
+        var filesArr = [];
+        const fileFolder = `./dist/reqfiles/${this.request.id}`;
+        fs.readdirSync(fileFolder).forEach(file => {
+            filesArr.push(file)
+        })
+        // for(let i = 0; i < filesArr.length; i++) {
+        //     this.clientApi.post('https://pangea.s.xtrf.eu/customer-api/system/session/files', fs.readFile(`./dist/reqfiles/${this.request.id}/`+ filesArr[i]))
+        //     .then( response => console.log(response))
+        //     .catch(err => console.log(err))
+        // }        
         return new Promise(resolve => {
             var jsonData = {
-                'name': `${this.request.companyName}`,
+                'name': `${name}`,
                 "workflow": {
                     "name": "Translation & Proofreading [General]"
                 },
                 "specialization": {
                     "name": "General"
                 },
+                // "files": `${this.request.detailFiles}`,
+                // "referenceFiles": `${this.request.refFiles}`,
                 "sourceLanguage": srcLang,
                 "targetLanguages": trgLang,
                 "notes": "Coming from website",

@@ -373,8 +373,13 @@ export default {
           if(this.request.service == this.services[i].title)
             serviceFull = this.services[i];
         }
+        var typeOfRequest = "quote";
+        if (this.startOption) {
+          typeOfRequest = "project";
+        }
         var sendForm = new FormData();
 
+        sendForm.append("typeOfRequest", typeOfRequest);        
         sendForm.append("projectName", this.request.projectName);
         sendForm.append("date", this.request.date);
         sendForm.append("contactName", this.request.contactName);
@@ -480,6 +485,9 @@ export default {
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
+      result = result.filter(item => {
+        return item.name != this.sourceSelect.name;
+      })
       result.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;

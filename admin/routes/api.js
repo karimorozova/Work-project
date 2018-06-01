@@ -107,12 +107,12 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
     }
   
     await request.save();
-    if (projectName) {
-      sendMailPortal(request)
-    } else {
-      sendMail(request);    
-    }
-    sendMailClient(request);
+    // if (projectName) {
+    //   sendMailPortal(request)
+    // } else {
+    //   sendMail(request);    
+    // }
+    // sendMailClient(request);
     quote(request);
 
     console.log("Saved");

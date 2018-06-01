@@ -51,6 +51,7 @@
 </template>
 
 <script>
+
 export default {
     props: {
         client: {
@@ -71,7 +72,7 @@ export default {
             readonly: true,
             successShow: false,
             password: "",
-            confirmPassword: ""
+            confirmPassword: "",
         }
     },
     methods: {
@@ -103,6 +104,9 @@ export default {
                 return skype
             }
         }
+    },
+    computed: {
+       
     }
 }
 </script>

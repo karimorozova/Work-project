@@ -1,5 +1,5 @@
 <template lang="pug">
-    .clientsportalWrapper(v-if="cookies")
+    .clientsportalWrapper(v-if="cookies && client")
         .clientsTop
             .clientsTop__clientName
                 a(href="/main") 
@@ -133,7 +133,7 @@ export default {
       invoicesShow: false,
       documentsShow: false,
       cookies: false,
-      client: {},
+      client: "",
       user: {},
       projects: [],
       quotes: [],
@@ -185,6 +185,9 @@ export default {
       });
       console.log(result);
       this.client = result.data.client;
+      if (!this.client) {
+        window.location.replace("/");        
+      }
       this.user = result.data.user;
       this.projects = result.data.projects;
       this.quotes = result.data.quotes;
