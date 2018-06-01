@@ -44,7 +44,7 @@
             .startProject
                 input.createButton(@click="newProject" type="button" value="Create Project" :disabled="createDisable")
         .summaryInfo
-            .orderInfo(:style="{transform: slide}")
+            .orderInfo
                 .orderInfo__title
                     h3 YOUR ORDER
                 .orderInfo__summary
@@ -55,7 +55,9 @@
                     .orderInfo__summary-languages
                         span 2
                         label LANGUAGE:
-                        p.choice {{ selectedLang }}
+                        p
+                          span.choice(v-if="selectedLangs.length > 0" v-for="lang in selectedLangs") {{ lang.lang }} 
+                          span.choice(v-if="selectedLangs.length == 0") Select
                     .orderInfo__summary-deadline
                         label SUGGESTED DEADLINE
                         p.choice {{ deadlineSelect }}
@@ -119,7 +121,7 @@ export default {
       readonly: false,
       errors: [],
       showErrors: false,
-      selectedLang: 'Select'
+      selectedLangs: []
     };
   },
   methods: {
@@ -210,8 +212,18 @@ export default {
           } 
         );
         this.createDisable = true;
+        this.selectedLangs = [];
       } else {
           this.projects.splice(data.index, 1);
+          var arrayOfLangs = [];
+          for (let i = 0; i < this.projects.length; i++) {
+            arrayOfLangs.push(this.projects[i].targetLang.lang)
+          }
+          this.selectedLangs = this.selectedLangs.filter( item => {
+            if (arrayOfLangs.indexOf(item.lang) >= 0) {
+              return item
+            }
+          })
       }
     },
     projectSaving(data) {
@@ -221,6 +233,21 @@ export default {
       currentForEdit[0].status = !currentForEdit[0].status;
       this.projects[data.index].icons.splice(data.saveIndex, 1, currentForSave[0]);
       this.projects[data.index].icons.splice(data.editIndex, 1, currentForEdit[0]);
+      
+      var contain = false;
+      if(this.selectedLangs.length) {
+        for(let i = 0; i < this.selectedLangs.length; i++) {
+          if (this.selectedLangs[i].lang == this.projects[data.index].targetLang.lang) {
+            contain = true;
+            break
+          }
+        }
+      }
+      
+      if (!contain) {
+        this.selectedLangs.push(this.projects[data.index].targetLang)        
+      }   
+      
       if(currentForSave[0].status) {
         this.createDisable = false
       }

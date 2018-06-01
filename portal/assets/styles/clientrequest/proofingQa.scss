@@ -55,10 +55,11 @@
           }
           &-languages {
             p {
-              .choice {
-                font-size: 16px;
-                color: #FF876C;
-              }
+                margin-top: 5px;
+                .choice {
+                    font-size: 16px;
+                    color: #FF876C;
+                }
             }
           }
           &-deadline {
