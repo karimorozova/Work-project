@@ -32,9 +32,9 @@
                         .inner-langs
                             span.inner-langs__title Language(s)
                             .inner-langs__select
-                                span.select-text.clarify(:class="{ color: langSelect != 'Select' && langSelect != '' }")
-                                    <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
-                                    <template v-if="selectLang.length == 0">Select</template>
+                                span.select-text.clarify(:class="{ color: selectLang.length }")
+                                    template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                    template(v-if="selectLang.length == 0") Select
                                     .span-wrapper(@click.self='showLang')
                                     .icon(:class="{ reverse: langDrop }")
                                         i.fas.fa-caret-down
@@ -181,12 +181,12 @@
                         span 1
                         label SERVICE: 
                         p.choice {{ service }}
-                    .orderInfo__summary-industry
-                        span 2
-                        label TYPE: 
-                        p.choice Marketing
+                    //- .orderInfo__summary-industry
+                    //-     span 2
+                    //-     label TYPE: 
+                    //-     p.choice Marketing
                     .orderInfo__summary-languages
-                        span 3
+                        span 2
                         label LANGUAGE:
                         p.choice &nbsp; <template v-for="language of selectLang" >{{ language.lang }},  </template> <template v-if="selectLang == 0">Select</template>
                     .orderInfo__summary-industry
