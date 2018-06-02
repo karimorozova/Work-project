@@ -9,7 +9,7 @@
                         input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')                            
                 .mark-option
                     .mark-option__title
-                        span 2. Select Language
+                        span 1. Select Language
                     .mark-option__inner
                         .inner-langs
                             span.inner-langs__title Language(s)
@@ -32,7 +32,7 @@
                                                     span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .mark-option
                     .mark-option__title
-                        span.asterisk 1. Package
+                        span.asterisk 2. Package
                     .mark-option__inner
                         .inner-option
                             .inner-option__check(@click="packageChoice200")
