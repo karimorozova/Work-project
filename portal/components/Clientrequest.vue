@@ -396,6 +396,7 @@ export default {
         sendForm.append("accountManager", "None selected");
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
+        sendForm.append("jsession", this.$store.state.session);
         for(var i = 0; i < this.detailFiles.length; i++){
           console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);

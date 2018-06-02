@@ -88,6 +88,10 @@ const RequestSchema = new mongoose.Schema({
     type: Array,
     default: [],
     trim: true
+  },
+  jsession: {
+    type: String,
+    default: ""
   }
 });
 

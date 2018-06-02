@@ -322,6 +322,7 @@ export default {
         }
         this.$store.dispatch('requestInfo', formData);
         this.$store.dispatch('loadLangs', this.languageCombinations);
+        this.$store.dispatch('jsession', this.jsess);
         this.clientRequestShow = true;
         this.accountInfo = false;
         this.allProjectsShow = false;
@@ -374,6 +375,18 @@ export default {
         this.documentsShow ||
         this.clientRequestShow
       );
+    },
+    jsess() {
+      let result = "";
+      let cookies = document.cookie.split(";");
+      console.log(cookies);
+      for(let i = 0; i < cookies.length; i++) {
+        let findSession = cookies[i].split("=");
+        if (findSession[0].indexOf('ses') > 0) {
+          result = findSession[1];
+        }
+      }
+      return result;
     }
   }
 };

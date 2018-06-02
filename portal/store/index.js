@@ -7,7 +7,8 @@ const store = () => new Vuex.Store({
     state: {
         clientLanguages: [],
         clientInfo: {},
-        services: []
+        services: [],
+        session: ""
     },
     actions: {
         loadLangs(context, payload) {
@@ -18,6 +19,9 @@ const store = () => new Vuex.Store({
         },
         servicesGetting(context, arr) {
             context.commit('servicesFill', arr)
+        },
+        jsession(context, payload) {
+            context.commit('sesCook', payload)
         }
      },
     mutations: {
@@ -29,6 +33,9 @@ const store = () => new Vuex.Store({
         },
         servicesFill(state, payload) {
             state.services = payload
+        },
+        sesCook(state, payload) {
+            state.session = payload
         }
     }
 })
