@@ -6,7 +6,30 @@
                     .mark-option__title
                         span.asterisk Project name
                     .mark-option__inner
-                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')                            
+                .mark-option
+                    .mark-option__title
+                        span 2. Select Language
+                    .mark-option__inner
+                        .inner-langs
+                            span.inner-langs__title Language(s)
+                            .inner-langs__select
+                                span.select-text.clarify(:class="{ color: selectLang.length }")
+                                    template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                    template(v-if="selectLang.length == 0") Select
+                                    .span-wrapper(@click.self='showLang')
+                                    .icon(:class="{ reverse: langDrop }")
+                                        i.fas.fa-caret-down
+                                .select__drop(v-if='langDrop')
+                                    .select__drop-list(v-for='language in sortedLanguages')
+                                        .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
+                                            img(:src="'/flags/' + language.symbol + '.png'")
+                                            span.list-item(:class="{ active: language.check }") {{ language.lang }}
+                                        .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
+                                            template(v-for='dialect in language.dialects')
+                                                .pair.pair_dialect(v-if="copyLangs.indexOf(dialect.symbol) != -1" @click="chooseDialect(dialect)")
+                                                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
+                                                    span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .mark-option
                     .mark-option__title
                         span.asterisk 1. Package
@@ -24,30 +47,7 @@
                             .inner-option__amount
                                 p 0-400
                             .inner-option__image
-                                img(src="../../assets/images/200-400.png")                            
-                .mark-option
-                    .mark-option__title
-                        span 2. Select Language
-                    .mark-option__inner
-                        .inner-langs
-                            span.inner-langs__title Language(s)
-                            .inner-langs__select
-                                span.select-text.clarify(:class="{ color: selectLang.length }")
-                                    template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
-                                    template(v-if="selectLang.length == 0") Select
-                                    .span-wrapper(@click.self='showLang')
-                                    .icon(:class="{ reverse: langDrop }")
-                                        i.fas.fa-caret-down
-                                .select__drop(v-if='langDrop')
-                                    .select__drop-list(v-for='language in sortedLanguages')
-                                        .pair(@click='chooseLang(language)')
-                                            img(:src="'/flags/' + language.symbol + '.png'")
-                                            span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                                        .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
-                                            template(v-for='dialect in language.dialects')
-                                                .pair.pair_dialect(@click="chooseDialect(dialect)")
-                                                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                                                    span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
+                                img(src="../../assets/images/200-400.png")
                 .mark-option
                     .mark-option__title
                         span 3. General Brief
@@ -208,6 +208,7 @@ export default {
       packageSelect: "0-200",
       langDrop: false,
       languages: [],
+      copyLangs: [],
       langSelect: "Select",
       errors: [],
       selectLang: [],
@@ -314,6 +315,15 @@ export default {
           this.errors.push(e);
         });
     },
+    async getServices() {
+      const result = await this.$axios.$get('api/services')
+      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
+      for (let i = 0; i < result.length; i++) {
+        if(result[i].title == 'Copywriting') {
+          this.copyLangs = result[i].languages[0].target;
+        }
+      }
+    },
     chooseLang(event) {
       if (event.lang == this.langSelect) {
         this.langSelect = "";
@@ -321,7 +331,7 @@ export default {
         this.langSelect = "";
         const pos = this.selectLang.indexOf(event);
         if (pos === -1) {
-          if (!event.dialects.length) {
+          if (!event.dialects.length || event.lang == 'German') {
             event.check = true;
             this.selectLang.push(event);
           } else {
@@ -386,6 +396,7 @@ export default {
   },
   mounted() {
     this.getLanguages();
+    this.getServices();
   }
 };
 </script>

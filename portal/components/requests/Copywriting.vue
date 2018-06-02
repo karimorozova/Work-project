@@ -32,12 +32,12 @@
                                           i.fas.fa-caret-down
                                   .select__drop(v-if='langDrop')
                                       .select__drop-list(v-for='language in sortedLanguages')
-                                          .pair(@click='chooseLang(language)')
+                                          .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                               img(:src="'/flags/' + language.symbol + '.png'")
                                               span.list-item(:class="{ active: language.check }") {{ language.lang }}
                                           .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
                                               template(v-for='dialect in language.dialects')
-                                                  .pair.pair_dialect(@click="chooseDialect(dialect)")
+                                                  .pair.pair_dialect(v-if="copyLangs.indexOf(dialect.symbol) != -1" @click="chooseDialect(dialect)")
                                                       img(:src="'/flags/' + dialect.symbol + '.png'")                  
                                                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .col-3
@@ -363,8 +363,10 @@ export default {
           choice: false
         }
       ],
+      projectName: "",
       langDrop: false,
       languages: [],
+      copyLangs: [],
       langSelect: "Select",
       selectLang: [],
       designToggle: false,
@@ -487,6 +489,15 @@ export default {
           this.errors.push(e);
         });
     },
+    async getServices() {
+      const result = await this.$axios.$get('api/services')
+      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
+      for (let i = 0; i < result.length; i++) {
+        if(result[i].title == 'Copywriting') {
+          this.copyLangs = result[i].languages[0].target;
+        }
+      }
+    },
     chooseLang(event) {
       if (event.lang == this.langSelect) {
         this.langSelect = "";
@@ -494,7 +505,7 @@ export default {
         this.langSelect = "";
         const pos = this.selectLang.indexOf(event);
         if (pos === -1) {
-          if (!event.dialects.length) {
+          if (!event.dialects.length || event.lang == 'German') {
             event.check = true;
             this.selectLang.push(event);
           } else {
@@ -573,6 +584,7 @@ export default {
   },
   mounted() {
     this.getLanguages();
+    this.getServices();
   }
 };
 </script>
