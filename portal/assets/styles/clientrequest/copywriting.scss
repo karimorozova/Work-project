@@ -480,7 +480,7 @@
                                 margin-bottom: 12px;
                             }
                             .in {
-                                border-radius: 10px;
+                                border-radius: 12px;
                                 padding: 10px;
                                 outline: none;
                                 border-style: none;
@@ -503,7 +503,6 @@
                             display: flex;
                             flex-direction: column;
                             margin-top: 29px;
-                            position: relative;
                             .uploadBtn {
                                 overflow: hidden;
                                 position: relative;
@@ -537,12 +536,10 @@
                                     }
                             }
                             .se {
-                                position: absolute;
-                                top: 47px;
-                                left: 28px;
                                 opacity: 0.5;
                                 font-size: 12px;
-                            }
+                                margin-left: 35px;
+                            }  
                         }
                 }
             }
