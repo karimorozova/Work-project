@@ -92,6 +92,10 @@ const RequestSchema = new mongoose.Schema({
   jsession: {
     type: String,
     default: ""
+  },
+  genBrief: {
+    type: String,
+    default: ""
   }
 });
 

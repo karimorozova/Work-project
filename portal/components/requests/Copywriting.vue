@@ -1,7 +1,7 @@
 <template lang="pug">
     .copywritingWrapper
         .copywritingContainer
-            form.copywriting-form
+            form.copywriting-form(@submit.prevent="checkForm")
                 .col-1
                     .col-1__block0__title
                         span.pname Project name
@@ -63,18 +63,18 @@
                                 span.star *
                                 span.notice Please give a brief description of the project in as match detail as possible.
                         .inner-ta
-                            textarea.ta-block2
+                            textarea.ta-block2(v-model="genBrief.briefDescr")
                     .col-4__block3
                         .descr-1
                             .head-1
                                 span.block3 Targeted Audience
                                 span.notice-1 What kind of audience will read this article?
                         .in-block3
-                            input
+                            input(v-model="genBrief.briefAudience")
                     .col-4__block4
                         span.block4 Suggested title
                         .in-block4
-                            input
+                            input(v-model="genBrief.briefTitle")
                     .col-4__block5
                         .descr-2
                             .head-2
@@ -83,7 +83,7 @@
                                 span.star *
                         .wrap
                             .in-block5
-                                textarea
+                                textarea(v-model="genBrief.briefTopics")
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -104,7 +104,7 @@
                     .col-4__block7
                         .first
                             span.exp Examples
-                            input.in(type="text" placeholder="www.example.com" value="")
+                            input.in(type="text" placeholder="www.example.com" value="" v-model="genBrief.briefExample")
                             span.url URL
                         .second
                             .uploadBtn
@@ -198,7 +198,7 @@
                     .col-9__block3
                       .bot
                         .buttonWrap
-                          button(@click.prevent="cpWrSubmit") Submit
+                          input(type="submit" value="Submit")
                           span.foot {{ footSpan }}
                             
 
@@ -221,7 +221,7 @@
             .orderInfoCopy__summary-package
               span 4
               label PACKAGE: 
-              p.choice {{ packageSelect }}
+              p.choice {{ genBrief.package }}
             .orderInfoCopy__summary-deadline
               label SUGGESTED DEADLINE
               p.choice
@@ -316,10 +316,12 @@ export default {
       ],
       col6__block1: [
         {
+          title: "US",
           image: require("../../assets/images/US-icon.png"),
           choice: true
         },
         {
+          title: "UK",
           image: require("../../assets/images/UK-icon.png"),
           choice: false
         }
@@ -363,6 +365,24 @@ export default {
           choice: false
         }
       ],
+      genBrief: {
+        briefDescr: "",
+        briefAudience: "",
+        briefTitle: "",
+        briefTopics: "",
+        briefSure: "",
+        briefExample: "",
+        briefRef: [],
+        package: "200-399",
+        structure: [],
+        style: "US",
+        tone: [],
+        design: [],
+        seo: []
+      },
+      detailFiles: [],
+      refFiles: [],
+      services: [],
       projectName: "",
       langDrop: false,
       languages: [],
@@ -396,17 +416,16 @@ export default {
           choice: false
         },
         {
-          title1: "META description",
+          title1: "Other",
           choice: false
         }
       ],
       slide: "0px",
       typeSelect: "Article",
-      packageSelect: "200-399",
       sure: false,
       footSpan: 'Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at separate cost.',
       copysendOption: true,
-      copystartOption: false
+      copystartOption: false,
     };
   },
   methods: {
@@ -436,7 +455,7 @@ export default {
       this.col3_block2.forEach((item, i) => {
         if (index == i) {
           item.choice = true;
-          this.packageSelect = item.title;
+          this.genBrief.package = item.title;
         } else {
           item.choice = false;
         }
@@ -454,20 +473,23 @@ export default {
     switchStructure(index) {
       this.col5_block1.forEach((item, i) => {
         if (index == i) {
-          item.choice = true;
-        } else {
-          item.choice = false;
+          item.choice = !item.choice;
         }
-      });
+      })
     },
     switchBlock6(index) {
-      this.col6__block1.forEach((item, i) => {
-        if (index == i) {
-          item.choice = true;
-        } else {
-          item.choice = false;
-        }
-      });
+      let style = this.col6__block1;      
+      if (style[index].choice) {
+        this.styleSelect = style[index].title;
+        return true
+      } else {
+        style.forEach(item => {
+          item.choice = !item.choice;
+          if(item.choice) {
+            this.genBrief.style = item.title
+          }
+        })
+      }
     },
     switchBlock7(index) {
       this.col7__block2.forEach((item, i) => {
@@ -489,7 +511,7 @@ export default {
           this.errors.push(e);
         });
     },
-    async getServices() {
+    async getServiceLangs() {
       const result = await this.$axios.$get('api/services')
       result.sort((a, b) => {return a.sortIndex - b.sortIndex});
       for (let i = 0; i < result.length; i++) {
@@ -557,9 +579,146 @@ export default {
     },
     copyChangeRefFiles(event){
       this.refFiles = event.target.files[0]; 
-    }
+    },
+    async sendForm() {
+        var serviceFull;
+        for(let i = 0; i < this.services.length; i++) {
+          if(this.request.service == this.services[i].title)
+            serviceFull = this.services[i];
+            console.log(serviceFull);
+        }
+        var typeOfRequest = "quote";
+        if (this.copystartOption) {
+          typeOfRequest = "project";
+        }
+
+        this.genBrief.structure = this.structureSelect;
+        this.genBrief.tone = this.toneSelect;
+        this.genBrief.design = this.designSelect;
+        this.genBrief.seo = this.seoSelect;
+
+        var sendForm = new FormData();
+
+        sendForm.append("typeOfRequest", typeOfRequest);        
+        sendForm.append("projectName", this.request.projectName);
+        sendForm.append("date", this.request.date);
+        sendForm.append("contactName", this.request.contactName);
+        sendForm.append("contactEmail", this.request.contactEmail);
+        sendForm.append("service", JSON.stringify(serviceFull));
+        sendForm.append("industry", this.request.industry); 
+        sendForm.append("status", "New");
+        sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
+        sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages)); 
+        sendForm.append("web", this.request.web);
+        sendForm.append("skype", this.request.skype);
+        sendForm.append("phone", this.request.phone);
+        sendForm.append("companyName", this.request.companyName);
+        sendForm.append("accountManager", "None selected");
+        sendForm.append("brief", this.request.brief);
+        sendForm.append("createdAt", this.request.createdAt);
+        sendForm.append("jsession", this.$store.state.session);
+        sendForm.append('genBrief', JSON.stringify(this.genBrief));
+        for(var i = 0; i < this.detailFiles.length; i++){
+          console.log(this.detailFiles[i]);
+          sendForm.append("detailFiles", this.detailFiles[i]);
+        }
+        sendForm.append("refFiles", this.refFiles, this.refFiles.name);
+        /*`for(var i = 0; i < this.refFiles.length; i++){
+          console.log(this.refFiles[i]);
+          sendForm.append("refFiles", this.refFiles[i]);
+        }*/
+        if(this.copysendOption) {
+          const result = await this.$axios.$post('api/request', sendForm);          
+        }
+        if(this.copystartOption) {
+          const result = await this.$axios.$post('api/project-request', sendForm);
+        }
+    },
+        async checkForm(event) {
+      this.request = {
+          projectName: this.projName,
+          date: "", 
+          contactName: this.$store.state.clientInfo.name, 
+          contactEmail: this.$store.state.clientInfo.email,
+          service: this.$store.state.clientInfo.service, 
+          industry: this.$store.state.clientInfo.industry, 
+          status: 'New',
+          sourceLanguage: {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'}, 
+          targetLanguages: this.selectLang, 
+          web: this.$store.state.clientInfo.web,
+          skype: this.$store.state.clientInfo.skype, 
+          phone: this.$store.state.clientInfo.phone, 
+          companyName: this.$store.state.clientInfo.companyName,
+          accountManager: "None selected",
+          brief: "",
+          files: this.files,
+          createdAt: Date.now    
+      }
+
+      this.errors = [];
+      if(!this.projectName) this.errors.push("Project name required!");
+      if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
+      if(!this.toneSelect.length) errors.push("Please, chooose Tone of voice");
+      if(!this.errors.length){
+        this.sendForm();         
+        console.log("sent")
+        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+      } else {
+        this.showError();
+        event.preventDefault();
+      }
+    },
+    showError() {
+      console.log('Errors occured');
+    },
+    getServices() {
+      this.services = this.$store.state.services;     
+    },
   },
   computed: {
+    projName() {
+      let result = "";
+      if (this.projectName) {
+        result = this.typeSelect + ": " + this.projectName;
+      }
+      return result;
+    },
+    structureSelect() {
+      let result = [];
+      this.col5_block1.forEach( (item) => {
+        if(item.choice) {
+          result.push(item.title)
+        }
+      })
+      return result;
+    },
+    designSelect() {
+      let result = []
+      this.col8__block3.forEach( (item) => {
+        if(item.choice) {
+          result.push(item.title)
+        }
+      })
+      return result;
+    },
+    toneSelect() {
+      let result = [];
+      this.col7__block2.forEach((item) => {
+        if(item.choice) {
+          result.push(item.title)
+        }
+      })
+      return result;
+    },
+    seoSelect() {
+      let result = [];
+      this.col9__block2.forEach((item) => {
+        if(item.choice) {
+          result.push(item.title)
+        }
+      })
+      return result;      
+    },
     sortedLanguages() {
       let result = [];
       if (this.languages.length) {
@@ -584,6 +743,7 @@ export default {
   },
   mounted() {
     this.getLanguages();
+    this.getServiceLangs()
     this.getServices();
   }
 };

@@ -163,68 +163,70 @@ var ClientApi = class ClientApi {
         var name = this.request.companyName;
         if(this.request.projectName) {
             name = this.request.projectName;
-        }
-        var filesArr = [];
-        const fileFolder = `./dist/reqfiles/${this.request.id}`;
-        fs.readdirSync(fileFolder).forEach(file => {
-            filesArr.push(file)
-        })
-        var files = [];
-        for(let i = 0; i < filesArr.length; i++) {
-        unirest.post('https://pangea.s.xtrf.eu/customer-api/system/session/files')
-            .header('Cookie', 'JSESSIONID=' + this.request.jsession)
-            .header('Content-Type', 'multipart/form-data')
-            .attach('file', `./dist/reqfiles/${this.request.id}/`+ filesArr[i])
-            .end( (response) => {
-                files.push(response.body[0]);
-                if ((filesArr.length - i) == 1) {
-                    return new Promise(resolve => {
-                        var jsonData = {
-                            'name': `${name}`,
-                            "workflow": {
-                                "name": "Translation & Proofreading [General]"
-                            },
-                            "specialization": {
-                                "name": "General"
-                            },
-                            // "files": files,
-                            // "referenceFiles": `${this.request.refFiles}`,
-                            "sourceLanguage": srcLang,
-                            "targetLanguages": trgLang,
-                            "notes": "Coming from website",
-                            "autoAccept": false
-                        };
-                        this.clientApi.post("quotes", jsonData).then(function (response) {
-                            resolve(response);
-                        }).catch(function (error) {
-                            resolve(error);
-                        })
-                    })
-                }
+        
+            var filesArr = [];
+            const fileFolder = `./dist/reqfiles/${this.request.id}`;
+            fs.readdirSync(fileFolder).forEach(file => {
+                filesArr.push(file)
             })
-        }                
-        // return new Promise(resolve => {
-        //     var jsonData = {
-        //         'name': `${name}`,
-        //         "workflow": {
-        //             "name": "Translation & Proofreading [General]"
-        //         },
-        //         "specialization": {
-        //             "name": "General"
-        //         },
-        //         "files": files,
-        //         // "referenceFiles": `${this.request.refFiles}`,
-        //         "sourceLanguage": srcLang,
-        //         "targetLanguages": trgLang,
-        //         "notes": "Coming from website",
-        //         "autoAccept": false
-        //     };
-        //     this.clientApi.post("quotes", jsonData).then(function (response) {
-        //         resolve(response);
-        //     }).catch(function (error) {
-        //         resolve(error);
-        //     })
-        // })
+            var files = [];
+            for(let i = 0; i < filesArr.length; i++) {
+            unirest.post('https://pangea.s.xtrf.eu/customer-api/system/session/files')
+                .header('Cookie', 'JSESSIONID=' + this.request.jsession)
+                .header('Content-Type', 'multipart/form-data')
+                .attach('file', `./dist/reqfiles/${this.request.id}/`+ filesArr[i])
+                .end( (response) => {
+                    files.push(response.body[0]);
+                    if ((filesArr.length - i) == 1) {
+                        return new Promise(resolve => {
+                            var jsonData = {
+                                'name': `${name}`,
+                                "workflow": {
+                                    "name": "Translation & Proofreading [General]"
+                                },
+                                "specialization": {
+                                    "name": "General"
+                                },
+                                // "files": files,
+                                // "referenceFiles": `${this.request.refFiles}`,
+                                "sourceLanguage": srcLang,
+                                "targetLanguages": trgLang,
+                                "notes": "Coming from website",
+                                "autoAccept": false
+                            };
+                            this.clientApi.post("quotes", jsonData).then(function (response) {
+                                resolve(response);
+                            }).catch(function (error) {
+                                resolve(error);
+                            })
+                        })
+                    }
+                })
+            }
+        }  else {             
+            return new Promise(resolve => {
+                var jsonData = {
+                    'name': `${name}`,
+                    "workflow": {
+                        "name": "Translation & Proofreading [General]"
+                    },
+                    "specialization": {
+                        "name": "General"
+                    },
+                    // "files": files,
+                    // "referenceFiles": `${this.request.refFiles}`,
+                    "sourceLanguage": srcLang,
+                    "targetLanguages": trgLang,
+                    "notes": "Coming from website",
+                    "autoAccept": false
+                };
+                this.clientApi.post("quotes", jsonData).then(function (response) {
+                    resolve(response);
+                }).catch(function (error) {
+                    resolve(error);
+                })
+            })
+        }
     }
 
 }

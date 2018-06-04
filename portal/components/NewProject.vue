@@ -170,28 +170,32 @@ export default {
           if (value.indexOf("http") == -1) {
             value = "http://" + value;
           }
-          this.projects[index].wordcount = "Counting..";
-          let result = await this.$axios.get(`api/wordcount?web=${value}`);
-          console.log(result);  
-          this.token = result.data.token;
-          const req = {filesTokens: [this.token]}
-            
-          let resp = await this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}});
-          if(resp.totalVolume) {
-            this.countWords = response.data.totalVolume.units           
+          if (value.indexOf('.png') >= 0 || value.indexOf('.jpg') >= 0 || value.indexOf('.jpeg') >= 0 || value.indexOf('.gif') >= 0) {
+            this.projects[index].wordcount = 50;  
           } else {
-            setTimeout( () => {
-              this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}})
-              .then((response) => {
-              console.log("response: " + response.data.totalVolume.units);
-              this.projects[index].wordcount = response.data.totalVolume.units;
-              }).catch(function (error) {
-                console.log('222');
-                console.log(error)
-              })
-            }, 2000)
-          }    
-          console.log(resp);
+            this.projects[index].wordcount = "Counting..";
+            let result = await this.$axios.get(`api/wordcount?web=${value}`);
+            console.log(result);  
+            this.token = result.data.token;
+            const req = {filesTokens: [this.token]}
+              
+            let resp = await this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}});
+            if(resp.totalVolume) {
+              this.countWords = response.data.totalVolume.units           
+            } else {
+              setTimeout( () => {
+                this.$axios.post("https://pangea.s.xtrf.eu/qrf/file/estimation", req, {headers : {'Content-Type' : 'application/json'}})
+                .then((response) => {
+                console.log("response: " + response.data.totalVolume.units);
+                this.projects[index].wordcount = response.data.totalVolume.units;
+                }).catch(function (error) {
+                  console.log('222');
+                  console.log(error)
+                })
+              }, 2000)
+            }
+              console.log(resp);
+            }              
             this.projects[index].readonly = true;
             this.$emit("projectSave", {
               index,

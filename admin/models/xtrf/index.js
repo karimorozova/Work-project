@@ -11,6 +11,7 @@ async function quote(request) {
     if(!customerId)
     {
         customerId = await (HomeApi.createCustomer(request));
+        person = await (HomeApi.createPerson(customerId, request.contactEmail, request.contactName)) 
     }
     console.log("Customer id " + customerId);
     try {

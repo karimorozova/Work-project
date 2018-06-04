@@ -159,6 +159,24 @@ function addClassicProject(customerId, request) {
     })
 }
 
+function createPerson(id, contactEmail, personName) {
+    return new Promise(resolve => {
+        homeXtrf.post("customers/persons", {
+            name: personName,
+            customerId: id,
+            contact: {
+                emails: {
+                    primary: contactEmail
+                }
+            }
+        }).then(response => {
+            resolve(response.data)
+        }).catch(err => {
+            resolve(err)
+        })
+    })
+}
+
 function generateToken(contactEmail) {
     return new Promise(resolve => {
         homeXtrf.post("customers/persons/accessToken", {
@@ -181,4 +199,4 @@ function getSpecializations() {
 }
 
 
-module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, generateToken, createCustomer, addClassicProject, addSmartProject }
+module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, createPerson, generateToken, createCustomer, addClassicProject, addSmartProject }

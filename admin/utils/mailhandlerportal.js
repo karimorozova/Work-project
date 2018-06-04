@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 const mailhandler = {
   sendMailPortal(request) {
     var detailFile = "";
+    if(request.genBrief) {
+      detailFile = `<a href='http://admin.pangea.global/reqfiles/${request.id}/written.txt' download target='_self'>written.txt</a>`;
+    }
     if (request.detailFiles.length > 0) {
       for (var i = 0; i < request.detailFiles.length; i++) {
         detailFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
