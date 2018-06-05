@@ -97,9 +97,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
      \nExamples: ${obj.briefExample}; 
      \nStructure: ${JSON.stringify(obj.structure)};
      \nStyle: ${obj.style}
-     \nTone of Voice: ${JSON.stringify(obj.toneSelect)}
+     \nTone of Voice: ${JSON.stringify(obj.tone)}
      \nDesign: ${JSON.stringify(obj.design)}
-     \nSeo: ${JSON.stringify(obj.seo)}`)
+     \nSeo: ${JSON.stringify(obj.seo)}
+     \nCTA: ${obj.cta}`)
     .then(() => {
       console.log('file been written');
       
@@ -111,7 +112,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
 
   request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
   request.targetLanguages = JSON.parse(req.body.targetLanguages);
-  request.service = JSON.parse(req.body.service)
+  request.service = JSON.parse(req.body.service);
   try {
     await request.save();
     if(detailFiles){
@@ -166,7 +167,8 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
      \nStyle: ${obj.style}
      \nTone of Voice: ${JSON.stringify(obj.toneSelect)}
      \nDesign: ${JSON.stringify(obj.design)}
-     \nSeo: ${JSON.stringify(obj.seo)}`)
+     \nSeo: ${JSON.stringify(obj.seo)}
+     \nCTA: ${obj.cta}`)
     .then(() => {
       console.log('file been written');
       

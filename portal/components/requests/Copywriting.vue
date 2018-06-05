@@ -25,8 +25,8 @@
                             span.inner-langs__title Language(s)
                               .inner-langs__select
                                   span.select-text.clarify(:class="{ color: selectLang.length }")
-                                      <template v-if="selectLang.length > 0" v-for="language in selectLang"> {{ language.lang }} </template> 
-                                      <template v-if="selectLang.length == 0">Select</template>
+                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                      template(v-if="selectLang.length == 0") Select
                                       .span-wrapper(@click.self='showLang')
                                       .icon(:class="{ reverse: langDrop }")
                                           i.fas.fa-caret-down
@@ -217,7 +217,9 @@
             .orderInfoCopy__summary-language
               span 3
               label LANGUAGE:
-              p.choice &nbsp; <template v-for="language of selectLang" >{{ language.lang }},  </template> <template v-if="selectLang == 0">Select</template>
+              p.choice &nbsp;
+                template(v-for="language of selectLang") {{ language.lang }},
+                template(v-if="selectLang == 0") Select
             .orderInfoCopy__summary-package
               span 4
               label PACKAGE: 
@@ -380,7 +382,8 @@ export default {
         style: "US",
         tone: [],
         design: [],
-        seo: []
+        seo: [],
+        cta: "No"
       },
       detailFiles: [],
       refFiles: [],
@@ -641,8 +644,8 @@ export default {
           const result = await this.$axios.$post('api/project-request', sendForm);
         }
     },
-        async checkForm(event) {
-      this.request = {
+      async checkForm(event) {
+        this.request = {
           projectName: this.projName,
           date: "", 
           contactName: this.$store.state.clientInfo.name, 
@@ -665,7 +668,7 @@ export default {
       this.errors = [];
       if(!this.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
-      if(!this.toneSelect.length) errors.push("Please, chooose Tone of voice");
+      if(!this.toneSelect.length) errors.push("Please, choose Tone of voice");
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")

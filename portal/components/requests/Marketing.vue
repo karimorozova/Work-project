@@ -2,6 +2,7 @@
     .mark
         .mainWrapper  
             .container
+              form.marketingForm(@submit.prevent="checkForm")
                 .mark-option
                     .mark-option__title
                         span.asterisk Project name
@@ -57,13 +58,13 @@
                                 span.innerTitle__title.asterisk Description
                                     span.tooltip Please give a brief description of the project in as much detail as possible.
                             .inner-description__textField.textField
-                                textarea#grow(rows="1" @keyup="autoGrow()")                       
+                                textarea#grow(rows="1" @keyup="autoGrow()" v-model="genBrief.briefDescr")                       
                         .inner-audience.genBrief__item
                             .inner-audience__title.innerTitle
                                 span.innerTitle__title.asterisk Targeted audience
                                     span.tooltip Who will receive this mailer?
                             .inner-audience__textField.textField
-                                textarea(rows="1")
+                                textarea(rows="1" v-model="genBrief.briefAudience")
                         .inner-subject.genBrief__item
                             .inner-subject__title.switching
                                 span.innerTitle__title.innerTitle.asterisk Subject line
@@ -77,7 +78,7 @@
                                 span.innerTitle__title.innerTitle(v-if="subjectToggle") Subject line requirements
                                     span.tooltip Any specific words/themes to include/not include in the subject line?
                             .inner-subject__textField.textField(v-if="subjectToggle")
-                                textarea(rows="1")
+                                textarea(rows="1" v-model="genBrief.briefTitle")
                         .inner-topics.genBrief__item
                             .inner-topics__title
                                 span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention
@@ -85,7 +86,7 @@
                             .inner-topics__textField
                                 input(type="text")
                                 span or
-                                button(@click="showTopic" :class="{notSure: topicText}") I am not sure
+                                button(@click.prevent="showTopic" :class="{notSure: topicText}") I am not sure
                             .inner-topics__hiddenText(v-if="topicText")
                                 p.asterisk If you are unsure of what points the mailer should cover, you agree to the following:
                                 ul
@@ -109,7 +110,7 @@
                                 span.innerTitle__title.innerTitle Bonus/Offers details                                
                                     span.tooltip Please list key info about promotion
                             .inner-bonus__textField(v-if="bonusToggle")
-                                input(type="text")                         
+                                input(type="text" v-model="genBrief.briefBonus")                         
                         .inner-cta.genBrief__item
                             .inner-cta__title.switching
                                 span.innerTitle__title.innerTitle CTA: Yes/No
@@ -124,7 +125,7 @@
                                 span.innerTitle__title.innerTitle Examples
                             .inner-examples__textField
                                 .inner-examples__web
-                                    input(type="text" placeholder="www.example.com")
+                                    input(type="text" placeholder="www.example.com" v-model="genBrief.briefExample")
                                     span.clarify.under URL
                                 .inner-examples__button
                                     .uploadBtn
@@ -156,7 +157,7 @@
                             .inner-option__check(@click="voiceChoice(i)")
                                 .checker(v-if="voice.check")
                             span.voiceTitle {{ voice.title }}
-                            input(v-if="voice.input" type="text")
+                            input(v-if="voice.input" type="text" v-model="voice.inputText")
                 .markdetails__quote
                       .send(:class="{markoptionChecked: marksendOption}" @click="markchooseBegin")
                         .send__check
@@ -188,11 +189,13 @@
                     .orderInfo__summary-languages
                         span 2
                         label LANGUAGE:
-                        p.choice &nbsp; <template v-for="language of selectLang" >{{ language.lang }},  </template> <template v-if="selectLang == 0">Select</template>
+                        p.choice &nbsp; 
+                          template(v-for="language of selectLang") {{ language.lang }},
+                          template(v-if="selectLang == 0") Select
                     .orderInfo__summary-industry
                         span 3
                         label PACKAGE: 
-                        p.choice {{ packageSelect }}
+                        p.choice {{ genBrief.package }}
                     .orderInfo__summary-deadline
                         label SUGGESTED DEADLINE
                         p.choice
@@ -205,14 +208,16 @@ export default {
       projectName: "",
       packageCheck200: true,
       packageCheck400: false,
-      packageSelect: "0-200",
       langDrop: false,
       languages: [],
       copyLangs: [],
       langSelect: "Select",
       errors: [],
+      service: "Copywriting",
+      services: [],
       selectLang: [],
       topicText: false,
+      detailFiles: [],
       refFiles: [],
       styleUs: true,
       styleUk: false,
@@ -226,8 +231,25 @@ export default {
         { title: "Relaxed", check: false },
         { title: "Persuasive", check: false },
         { title: "Payful/Funny", check: false },
-        { title: "Other", check: false, input: true }
+        { title: "Other", check: false, input: true, inputText: "" }
       ],
+      genBrief: {
+        briefDescr: "",
+        briefAudience: "",
+        briefTitle: "",
+        briefTopics: "",
+        briefSure: "",
+        briefBonus: "",
+        briefExample: "",
+        briefRef: [],
+        package: "0-200",
+        structure: [],
+        style: "US",
+        tone: [],
+        design: "",
+        seo: [],
+        cta: 'No'
+      },
       subjectToggle: false,
       bonusToggle: false,
       ctaToggle: false,
@@ -246,6 +268,11 @@ export default {
     },
     toggleCta() {
       this.ctaToggle = !this.ctaToggle;
+      if(this.ctaToggle) {
+        this.genBrief.cta = "Yes";
+      } else {
+        this.genBrief.cta = "No";        
+      }
     },
     voiceChoice(ind) {
       console.log(ind);
@@ -260,6 +287,11 @@ export default {
     },
     showTopic() {
       this.topicText = !this.topicText;
+      if(this.topicText) {
+        this.genBrief.briefSure = "I am not sure";
+      } else {
+        this.genBrief.briefSure = "";
+      }
     },
     autoGrow() {
       let grow = document.getElementById("grow");
@@ -274,7 +306,7 @@ export default {
       } else {
         this.packageCheck200 = true;
         this.packageCheck400 = false;
-        this.packageSelect = "0-200";
+        this.genBrief.package = "0-200";
       }
     },
     packageChoice400() {
@@ -283,18 +315,21 @@ export default {
       } else {
         this.packageCheck400 = true;
         this.packageCheck200 = false;
-        this.packageSelect = "200-400";
+        this.genBrief.package = "200-400";
       }
     },
     styleChoiceUs() {
-      if (this.styleUs) {
+      this.genBrief.style = 'US';
+      if (this.styleUs) {        
         return true;
       } else {
         this.styleUs = true;
         this.styleUk = false;
+        
       }
     },
     styleChoiceUk() {
+      this.genBrief.style = 'UK';
       if (this.styleUk) {
         return true;
       } else {
@@ -315,7 +350,7 @@ export default {
           this.errors.push(e);
         });
     },
-    async getServices() {
+    async getServiceLangs() {
       const result = await this.$axios.$get('api/services')
       result.sort((a, b) => {return a.sortIndex - b.sortIndex});
       for (let i = 0; i < result.length; i++) {
@@ -369,7 +404,100 @@ export default {
     markchooseStart() {
       this.marksendOption = false;
       this.markstartOption = true;
-    }
+    },
+    async sendForm() {
+        var serviceFull;
+        for(let i = 0; i < this.services.length; i++) {
+          if(this.request.service == this.services[i].title)
+            serviceFull = this.services[i];
+            console.log(serviceFull);
+        }
+        var typeOfRequest = "quote";
+        if (this.copystartOption) {
+          typeOfRequest = "project";
+        }
+
+        this.genBrief.tone = this.toneSelect;
+
+        var sendForm = new FormData();
+
+        sendForm.append("typeOfRequest", typeOfRequest);        
+        sendForm.append("projectName", this.request.projectName);
+        sendForm.append("date", this.request.date);
+        sendForm.append("contactName", this.request.contactName);
+        sendForm.append("contactEmail", this.request.contactEmail);
+        sendForm.append("service", JSON.stringify(serviceFull));
+        sendForm.append("industry", this.request.industry); 
+        sendForm.append("status", "New");
+        sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
+        sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages)); 
+        sendForm.append("web", this.request.web);
+        sendForm.append("skype", this.request.skype);
+        sendForm.append("phone", this.request.phone);
+        sendForm.append("companyName", this.request.companyName);
+        sendForm.append("accountManager", "None selected");
+        sendForm.append("brief", this.request.brief);
+        sendForm.append("createdAt", this.request.createdAt);
+        sendForm.append("jsession", this.$store.state.session);
+        sendForm.append('genBrief', JSON.stringify(this.genBrief));
+        for(var i = 0; i < this.detailFiles.length; i++){
+          console.log(this.detailFiles[i]);
+          sendForm.append("detailFiles", this.detailFiles[i]);
+        }
+        sendForm.append("refFiles", this.refFiles, this.refFiles.name);
+        /*`for(var i = 0; i < this.refFiles.length; i++){
+          console.log(this.refFiles[i]);
+          sendForm.append("refFiles", this.refFiles[i]);
+        }*/
+        if(this.marksendOption) {
+          const result = await this.$axios.$post('api/request', sendForm);          
+        }
+        if(this.markstartOption) {
+          const result = await this.$axios.$post('api/project-request', sendForm);
+        }
+    },
+    async checkForm(event) {
+        this.request = {
+          projectName: this.projectName,
+          date: "", 
+          contactName: this.$store.state.clientInfo.name, 
+          contactEmail: this.$store.state.clientInfo.email,
+          service: this.service, 
+          industry: this.$store.state.clientInfo.industry, 
+          status: 'New',
+          sourceLanguage: {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'}, 
+          targetLanguages: this.selectLang, 
+          web: this.$store.state.clientInfo.web,
+          skype: this.$store.state.clientInfo.skype, 
+          phone: this.$store.state.clientInfo.phone, 
+          companyName: this.$store.state.clientInfo.companyName,
+          accountManager: "None selected",
+          brief: "",
+          files: this.files,
+          createdAt: Date.now    
+      }
+
+      this.errors = [];
+      if(!this.projectName) this.errors.push("Project name required!");
+      if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
+      if(!this.toneSelect.length) errors.push("Please, chooose Tone of voice");
+      if(!this.genBrief.briefDescr) errors.push("Please, enter description of Brief");
+      if(!this.genBrief.briefAudience) errors.push("Please, enter targeted audience");
+      if(!this.errors.length){
+        this.sendForm();         
+        console.log("sent")
+        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+      } else {
+        this.showError();
+        event.preventDefault();
+      }
+    },
+    showError() {
+      console.log('Errors occured');
+    },
+    getServices() {
+      this.services = this.$store.state.services;     
+    },
   },
   created() {
     window.addEventListener("scroll", this.handleScroll);
@@ -378,6 +506,19 @@ export default {
     window.removeEventListener("scroll", this.handleScroll);
   },
   computed: {
+    toneSelect() {
+      let result = [];
+      this.voices.forEach((item) => {
+        if(item.check) {
+          if (item.title == "Other") {
+            result.push(item.inputText)
+          } else {
+            result.push(item.title);
+          }
+        }
+      })
+      return result;
+    },
     sortedLanguages() {
       let result = [];
       if (this.languages.length) {
@@ -389,13 +530,11 @@ export default {
       } else {
         return result;
       }
-    },
-    service() {
-      return this.$store.state.clientInfo.service;
     }
   },
   mounted() {
     this.getLanguages();
+    this.getServiceLangs();
     this.getServices();
   }
 };
@@ -409,7 +548,6 @@ export default {
     padding-bottom: 0;
     flex-direction: column;
     &__quote {
-      margin-top: 30px;
       width: 100%;
       .send, .start {
         display: flex;
@@ -454,5 +592,12 @@ export default {
       }
 
     }
+  }
+
+  .marketingForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 </style>
