@@ -93,6 +93,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
      \nTargeted Audience: ${obj.briefAudience}; 
      \nTitle: ${obj.briefTitle}; 
      \nTopics: ${obj.briefTopics};
+     \nCovered points: ${obj.briefSure};
      \nExamples: ${obj.briefExample}; 
      \nStructure: ${JSON.stringify(obj.structure)};
      \nStyle: ${obj.style}

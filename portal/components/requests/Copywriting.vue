@@ -121,7 +121,7 @@
                                 .choice-sel(v-else)
                             span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
                             img(:src="item.image" v-if="index != 3")
-                            input(v-if="index == 3" :class="{inp_vis: true}")
+                            input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input")
                 .col-6
                     .col-6__block1
                         span.block1 6. Style
@@ -143,7 +143,7 @@
                                 .choice-sel(v-else)
                             .subspan
                                 span.title(:class="{title8: index == 8}") {{ item.title }}
-                            input(v-if="index == 8" :class="{inp_vis: true}")
+                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input")
                 .col-8
                     .col-8__block1
                         span.block1 8. Design
@@ -159,7 +159,7 @@
                                 .empty-choice(v-if="!item.choice")
                                 .choice-sel(v-else)
                             span.title {{ item.title }}
-                            input(v-if="index == 2" :class="{lastInp: true}")
+                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input")
                 .col-9
                     .col-9__block1
                         span.block1 9. SEO
@@ -181,7 +181,7 @@
                                     .empty-choice(v-if="!item.choice")
                                     .choice-sel(v-else)
                                 span.title2(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]") {{ item.title2 }}                                
-                                input
+                                input(v-model="item.input")
                     .copydetails__quote
                       .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
                         .send__check
@@ -310,6 +310,7 @@ export default {
         },
         {
           title: "Others",
+          input: "",
           image: require("../../assets/images/reviews-icon.png"),
           choice: false
         }
@@ -362,6 +363,7 @@ export default {
 
         {
           title: "Other",
+          input: "",
           choice: false
         }
       ],
@@ -402,6 +404,7 @@ export default {
         },
         {
           title: "Other",
+          input: "",
           choice: false
         }
       ],
@@ -409,14 +412,17 @@ export default {
         {
           title1: "META description",
           title2: "Keywords",
+          input: "",
           choice: true
         },
         {
           title1: "Keyword density",
+          input: "",
           choice: false
         },
         {
           title1: "Other",
+          input: "",
           choice: false
         }
       ],
@@ -465,6 +471,7 @@ export default {
       this.col4_block6.forEach((item, i) => {
         if (index == i) {
           item.choice = true;
+          this.genBrief.briefSure = item.title2;
         } else {
           item.choice = false;
         }
@@ -687,7 +694,11 @@ export default {
       let result = [];
       this.col5_block1.forEach( (item) => {
         if(item.choice) {
-          result.push(item.title)
+          if (item.title == "Others") {
+            result.push(item.input)
+          } else {
+            result.push(item.title);
+          }
         }
       })
       return result;
@@ -696,7 +707,11 @@ export default {
       let result = []
       this.col8__block3.forEach( (item) => {
         if(item.choice) {
-          result.push(item.title)
+          if (item.title == "Other") {
+            result.push(item.input)
+          } else {
+            result.push(item.title);
+          }
         }
       })
       return result;
@@ -705,7 +720,11 @@ export default {
       let result = [];
       this.col7__block2.forEach((item) => {
         if(item.choice) {
-          result.push(item.title)
+          if (item.title == "Other") {
+            result.push(item.input)
+          } else {
+            result.push(item.title);
+          }
         }
       })
       return result;
@@ -714,7 +733,8 @@ export default {
       let result = [];
       this.col9__block2.forEach((item) => {
         if(item.choice) {
-          result.push(item.title)
+          let seo = item.title1 + ": " + item.input;
+          result.push(seo)
         }
       })
       return result;      
