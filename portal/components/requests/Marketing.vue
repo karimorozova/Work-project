@@ -16,12 +16,12 @@
                             span.inner-langs__title Language(s)
                             .inner-langs__select
                                 span.select-text.clarify(:class="{ color: selectLang.length }")
-                                    template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                    template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }}; 
                                     template(v-if="selectLang.length == 0") Select
                                     .span-wrapper(@click.self='showLang')
                                     .icon(:class="{ reverse: langDrop }")
                                         i.fas.fa-caret-down
-                                .select__drop(v-if='langDrop')
+                                .select__drop(v-if='langDrop' v-click-outside="outsideLangs")
                                     .select__drop-list(v-for='language in sortedLanguages')
                                         .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                             img(:src="'/flags/' + language.symbol + '.png'")
@@ -58,13 +58,13 @@
                                 span.innerTitle__title.asterisk Description
                                     span.tooltip Please give a brief description of the project in as much detail as possible.
                             .inner-description__textField.textField
-                                textarea#grow(rows="1" @keyup="autoGrow()" v-model="genBrief.briefDescr")                       
+                                textarea#grow(rows="1" @keyup="autoGrow()" v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}                    
                         .inner-audience.genBrief__item
                             .inner-audience__title.innerTitle
                                 span.innerTitle__title.asterisk Targeted audience
                                     span.tooltip Who will receive this mailer?
                             .inner-audience__textField.textField
-                                textarea(rows="1" v-model="genBrief.briefAudience")
+                                textarea(rows="1" v-model="genBrief.briefAudience") {{ genBrief.briefAudience }}
                         .inner-subject.genBrief__item
                             .inner-subject__title.switching
                                 span.innerTitle__title.innerTitle.asterisk Subject line
@@ -75,10 +75,10 @@
                                     .no 
                                         span NO
                             .inner-subject__title
-                                span.innerTitle__title.innerTitle(v-if="subjectToggle") Subject line requirements
-                                    span.tooltip Any specific words/themes to include/not include in the subject line?
+                                span.innerTitle__title.innerTitle(v-if="subjectToggle") Any specific words/themes to include/not include in the subject line?
+                                    //- span.tooltip Any specific words/themes to include/not include in the subject line?
                             .inner-subject__textField.textField(v-if="subjectToggle")
-                                textarea(rows="1" v-model="genBrief.briefTitle")
+                                textarea(rows="1" v-model="genBrief.briefTitle") {{ genBrief.briefTitle }}
                         .inner-topics.genBrief__item
                             .inner-topics__title
                                 span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention
@@ -110,7 +110,7 @@
                                 span.innerTitle__title.innerTitle Bonus/Offers details                                
                                     span.tooltip Please list key info about promotion
                             .inner-bonus__textField(v-if="bonusToggle")
-                                input(type="text" v-model="genBrief.briefBonus")                         
+                                input(type="text" v-model="genBrief.briefBonus" value="genBrief.briefBonus")                         
                         .inner-cta.genBrief__item
                             .inner-cta__title.switching
                                 span.innerTitle__title.innerTitle CTA: Yes/No
@@ -125,7 +125,7 @@
                                 span.innerTitle__title.innerTitle Examples
                             .inner-examples__textField
                                 .inner-examples__web
-                                    input(type="text" placeholder="www.example.com" v-model="genBrief.briefExample")
+                                    input(type="text" placeholder="www.example.com" v-model="genBrief.briefExample" value="genBrief.briefExample")
                                     span.clarify.under URL
                                 .inner-examples__button
                                     .uploadBtn
@@ -181,7 +181,7 @@
                     .orderInfo__summary-service
                         span 1
                         label SERVICE: 
-                        p.choice {{ service }}
+                        p.choice Marketing
                     //- .orderInfo__summary-industry
                     //-     span 2
                     //-     label TYPE: 
@@ -190,7 +190,7 @@
                         span 2
                         label LANGUAGE:
                         p.choice &nbsp; 
-                          template(v-for="language of selectLang") {{ language.lang }},
+                          template(v-for="language of selectLang") {{ language.lang }}; 
                           template(v-if="selectLang == 0") Select
                     .orderInfo__summary-industry
                         span 3
@@ -202,6 +202,8 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
+
 export default {
   data() {
     return {
@@ -260,6 +262,9 @@ export default {
     };
   },
   methods: {
+    outsideLangs() {
+      this.langDrop = false;
+    },
     toggleSub() {
       this.subjectToggle = !this.subjectToggle;
     },
@@ -405,6 +410,54 @@ export default {
       this.marksendOption = false;
       this.markstartOption = true;
     },
+    clearForm() {
+      this.projectName = "";
+      this.refFiles = [];
+      this.detailFiles = [];
+      this.request = [];
+      this.deadlineDate = '';
+      this.deadlineSelect = '';
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.selectLang = [];
+      this.targetDrop = false;
+      this.targetSelect = [];
+      this.brief = '';
+      this.languages.map(item => {
+        if(!item.dialects) {
+          item.check = false
+        } else {
+          item.dialects.map(ditem => {
+            ditem.check = false
+          })
+        }
+      });
+      this.voices.forEach(item => {
+        item.check = false;
+        if(item.input) item.input = "";
+      });
+      this.voices[0].check = true; 
+      this.genBrief = {
+        briefDescr: "",
+        briefAudience: "",
+        briefTitle: "",
+        briefTopics: "",
+        briefSure: "",
+        briefExample: "",
+        briefRef: [],
+        package: "200-399",
+        structure: [],
+        style: "US",
+        tone: [],
+        design: [],
+        seo: [],
+        cta: "No"
+      };
+      this.sure = false;
+      this.topicText = false;
+      this.subjectToggle = false;
+      this.bonusToggle = false;
+      this.ctaToggle = false;
+    },
     async sendForm() {
         var serviceFull;
         for(let i = 0; i < this.services.length; i++) {
@@ -455,6 +508,7 @@ export default {
         if(this.markstartOption) {
           const result = await this.$axios.$post('api/project-request', sendForm);
         }
+        this.clearForm();
     },
     async checkForm(event) {
         this.request = {
@@ -531,6 +585,9 @@ export default {
         return result;
       }
     }
+  },
+  directives: {
+    ClickOutside
   },
   mounted() {
     this.getLanguages();

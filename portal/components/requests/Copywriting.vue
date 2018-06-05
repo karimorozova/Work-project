@@ -8,7 +8,7 @@
                         span.star *
                     .col-1__block0__inner
                         span.psel {{ typeSelect }} :
-                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+                        input.proj(type="text" v-model="projectName" value="projectName" maxlength="50" placeholder='50 characters maximum')
                     .col-1__block1
                         span.block1 1. Type
                         span.star *
@@ -25,12 +25,12 @@
                             span.inner-langs__title Language(s)
                               .inner-langs__select
                                   span.select-text.clarify(:class="{ color: selectLang.length }")
-                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }};  
                                       template(v-if="selectLang.length == 0") Select
                                       .span-wrapper(@click.self='showLang')
                                       .icon(:class="{ reverse: langDrop }")
                                           i.fas.fa-caret-down
-                                  .select__drop(v-if='langDrop')
+                                  .select__drop(v-if='langDrop' v-click-outside="outsideLangs")
                                       .select__drop-list(v-for='language in sortedLanguages')
                                           .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                               img(:src="'/flags/' + language.symbol + '.png'")
@@ -63,18 +63,18 @@
                                 span.star *
                                 span.notice Please give a brief description of the project in as match detail as possible.
                         .inner-ta
-                            textarea.ta-block2(v-model="genBrief.briefDescr")
+                            textarea.ta-block2(v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}
                     .col-4__block3
                         .descr-1
                             .head-1
                                 span.block3 Targeted Audience
                                 span.notice-1 What kind of audience will read this article?
                         .in-block3
-                            input(v-model="genBrief.briefAudience")
+                            input(v-model="genBrief.briefAudience" value="genBrief.briefAudience")
                     .col-4__block4
                         span.block4 Suggested title
                         .in-block4
-                            input(v-model="genBrief.briefTitle")
+                            input(v-model="genBrief.briefTitle" value="genBrief.briefTitle")
                     .col-4__block5
                         .descr-2
                             .head-2
@@ -83,7 +83,7 @@
                                 span.star *
                         .wrap
                             .in-block5
-                                textarea(v-model="genBrief.briefTopics")
+                                textarea(v-model="genBrief.briefTopics" value="genBrief.briefTopics")
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -99,12 +99,12 @@
                                     .choice-sel(v-else)
                                 .descr-3
                                     .head-3
-                                        spna.normsp {{ item.title2 }}
+                                        span.normsp {{ item.title2 }}
                                         span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
                     .col-4__block7
                         .first
                             span.exp Examples
-                            input.in(type="text" placeholder="www.example.com" value="" v-model="genBrief.briefExample")
+                            input.in(type="text" placeholder="www.example.com" value="genBrief.briefExample" v-model="genBrief.briefExample")
                             span.url URL
                         .second
                             .uploadBtn
@@ -121,7 +121,7 @@
                                 .choice-sel(v-else)
                             span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
                             img(:src="item.image" v-if="index != 3")
-                            input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input")
+                            input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input" value="item.input")
                 .col-6
                     .col-6__block1
                         span.block1 6. Style
@@ -143,7 +143,7 @@
                                 .choice-sel(v-else)
                             .subspan
                                 span.title(:class="{title8: index == 8}") {{ item.title }}
-                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input")
+                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input" value="item.input")
                 .col-8
                     .col-8__block1
                         span.block1 8. Design
@@ -159,7 +159,7 @@
                                 .empty-choice(v-if="!item.choice")
                                 .choice-sel(v-else)
                             span.title {{ item.title }}
-                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input")
+                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input" value="item.input")
                 .col-9
                     .col-9__block1
                         span.block1 9. SEO
@@ -181,7 +181,7 @@
                                     .empty-choice(v-if="!item.choice")
                                     .choice-sel(v-else)
                                 span.title2(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]") {{ item.title2 }}                                
-                                input(v-model="item.input")
+                                input(v-model="item.input" value="item.input")
                     .copydetails__quote
                       .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
                         .send__check
@@ -218,7 +218,7 @@
               span 3
               label LANGUAGE:
               p.choice &nbsp;
-                template(v-for="language of selectLang") {{ language.lang }},
+                template(v-for="language of selectLang") {{ language.lang }}; 
                 template(v-if="selectLang == 0") Select
             .orderInfoCopy__summary-package
               span 4
@@ -230,6 +230,8 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
+
 export default {
   data() {
     return {
@@ -438,6 +440,9 @@ export default {
     };
   },
   methods: {
+    outsideLangs() {
+      this.langDrop = false;
+    },
     iamNotSure() {
         this.sure = !this.sure;
     },
@@ -561,9 +566,23 @@ export default {
     },
     toggleSub() {
       this.designToggle = !this.designToggle;
+      if(!this.designToggle) {
+        this.col8__block3.forEach((item,i) => {
+          if(i == 0) { item.choice = true }
+          else { item.choice = false }
+          if(i == 2) item.input = ""
+        })
+      }
     },
     toggleSub2() {
       this.seoToggle = !this.seoToggle;
+      if(!this.seoToggle) {
+        this.col9__block2.forEach((item, i) => {
+          item.input = "";
+          if(i == 0) { item.choice = true }
+          else { item.choice = false }
+        })
+      }
     },
     switchBlock8(index) {
       this.col8__block3.forEach((item, i) => {
@@ -589,6 +608,71 @@ export default {
     },
     copyChangeRefFiles(event){
       this.refFiles = event.target.files[0]; 
+    },
+    clearForm() {
+      this.projectName = "";
+      this.refFiles = [];
+      this.detailFiles = [];
+      this.request = [];
+      this.deadlineDate = '';
+      this.deadlineSelect = '';
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.selectLang = [];
+      this.targetDrop = false;
+      this.targetSelect = [];
+      this.brief = '';
+      this.languages.map(item => {
+        if(!item.dialects) {
+          item.check = false
+        } else {
+          item.dialects.map(ditem => {
+            ditem.check = false
+          })
+        }
+      });
+      this.col1_block2.forEach(item => {
+        if(item.title == "Article") {
+          item.active = true
+        } else {
+          item.active = false
+        }
+      });
+      this.genBrief = {
+        briefDescr: "",
+        briefAudience: "",
+        briefTitle: "",
+        briefTopics: "",
+        briefSure: "",
+        briefExample: "",
+        briefRef: [],
+        package: "200-399",
+        structure: [],
+        style: "US",
+        tone: [],
+        design: [],
+        seo: [],
+        cta: "No"
+      };
+      this.col3_block2.forEach(item => {
+        if(item.title == '200-399') {
+          item.choice = true
+        } else {
+          item.choice = false
+        }
+      });
+      this.sure = false;
+      this.designToggle = false;
+      this.seoToggle = false;
+      this.col5_block1.forEach((item, i) => {
+        if(i == 0) { item.choice = true }
+        else { item.choice = false };
+        if(i == 3) { item.input = "" }
+      });
+      this.col7__block2.forEach((item, i) => {
+        if(i == 0) {item.choice = true}
+        else { item.choice = false };
+        if(i == 8) { item.input = "" }
+      })
     },
     async sendForm() {
         var serviceFull;
@@ -643,6 +727,7 @@ export default {
         if(this.copystartOption) {
           const result = await this.$axios.$post('api/project-request', sendForm);
         }
+        this.clearForm();
     },
       async checkForm(event) {
         this.request = {
@@ -757,6 +842,9 @@ export default {
     service() {
       return this.$store.state.clientInfo.service;
     }
+  },
+  directives: {
+    ClickOutside
   },
   created() {
     window.addEventListener("scroll", this.handleScroll);

@@ -39,56 +39,9 @@ const mailhandler = {
     });
     var msg = `<table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
     <thead>
-      <td colspan="2" class="header" style="border: 2px solid #66563D;background-color: #F8D260;font-size: 15px;font-weight: bold;text-align: center;padding: 8px;width: 50%">CONTACT DETAILS</td>
+      <td colspan="2" class="header" style="border: 2px solid #66563D;background-color: #F8D260;font-size: 15px;font-weight: bold;text-align: center;padding: 8px;width: 50%">PROJECT DETAILS</td>
     </thead>
     <tbody>
-      <tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Name:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.contactName}
-        </td>
-      </tr>
-      <tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Company Name:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.companyName}
-        </td>
-      </tr><tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Email:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.contactEmail}
-        </td>
-      </tr><tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Website:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.web}
-        </td>
-      </tr><tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Phone Number:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.phone}
-        </td>
-      </tr><tr>
-        <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">
-          Skype:
-        </td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">
-          ${request.skype}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" class="header" style="border: 2px solid #66563D;background-color: #F8D260;font-size: 15px;font-weight: bold;text-align: center;padding: 8px;width: 50%">PROJECT DETAILS</td>
-      </tr>
       <tr>
         <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">Service Type:</td>
         <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">${request.service.title}</td>
