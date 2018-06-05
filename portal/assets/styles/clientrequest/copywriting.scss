@@ -861,14 +861,16 @@
                         justify-content: center;
                         margin-bottom: 20px;
                         position: relative;
-                            button {
-                                background-color: #FF876C;
-                                border-radius: 16px;
+                            input {
+                                background-color: #ff876c;
                                 outline: none;
-                                border-style: none;
+                                box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);    
                                 color: #fff;
-                                padding: 15px 20px;
-                                box-shadow: -1px 2px 6px rgba(0, 0, 0, 0.5);
+                                width: 83px;
+                                height: 40px;
+                                border: none;
+                                border-radius: 10px;
+                                margin-top: 15px;
                                 cursor: pointer;
                             }
                             .foot {
@@ -876,7 +878,7 @@
                                 font-size: 12px;
                                 white-space: nowrap;
                                 position: absolute;
-                                top: 98px;
+                                top: 111px;
                                 left: 10px;
                         }
                     }
