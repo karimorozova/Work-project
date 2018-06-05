@@ -100,7 +100,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
      \nDesign: ${JSON.stringify(obj.design)}
      \nSeo: ${JSON.stringify(obj.seo)}`)
     .then(() => {
-      console.log('file benn written');
+      console.log('file been written');
       
     }).catch(err => console.log(err));
   }
@@ -151,6 +151,25 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
   var projectName = "";
   if (request.projectName) {
     projectName = request.projectName;
+  }
+
+  if (req.body.genBrief) {
+    var obj = JSON.parse(req.body.genBrief);
+    await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
+     \nDescription: ${obj.briefDescr};
+     \nTargeted Audience: ${obj.briefAudience}; 
+     \nTitle: ${obj.briefTitle}; 
+     \nTopics: ${obj.briefTopics};
+     \nExamples: ${obj.briefExample}; 
+     \nStructure: ${JSON.stringify(obj.structure)};
+     \nStyle: ${obj.style}
+     \nTone of Voice: ${JSON.stringify(obj.toneSelect)}
+     \nDesign: ${JSON.stringify(obj.design)}
+     \nSeo: ${JSON.stringify(obj.seo)}`)
+    .then(() => {
+      console.log('file been written');
+      
+    }).catch(err => console.log(err));
   }
 
   const detailFiles = req.files["detailFiles"];
