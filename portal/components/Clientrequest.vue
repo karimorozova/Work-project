@@ -18,7 +18,7 @@
             label.asterisk SELECT A LANGUAGE
           .language(v-click-outside="outsideLangs")
             .lang-source
-              span Source Language
+              span.langTitle Source Language
               .selectLangs.source
                 span.inner-text.clarify(:class="{ color: sourceSelect.name != 'Select' }") {{ sourceSelect.name }}
                   .wrapper(v-on:click.self='showSourceLang')
@@ -30,7 +30,7 @@
                       img(:src="'/flags/' + language.symbol + '.png'")
                       span.list-item(:class="{ active: language.name == sourceSelect.name }") {{ language.name }}
             .lang-target
-              span Target Language(s)
+              span.langTitle Target Language(s)
               .selectLangs.target
                 span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
                   template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.name }};  
