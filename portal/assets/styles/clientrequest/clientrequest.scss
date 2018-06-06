@@ -944,19 +944,19 @@
       }
     }
   
-    .warning{ /*or other element you want*/
+    .warning { 
        animation-name: blink ;
        animation-duration: .5s ;
        animation-timing-function: step-end ;
        animation-iteration-count: infinite ;
        animation-direction: alternate ;
-   }
+    }
     .warning {
       position: fixed;
       top: 50%;
       left: 50%;
       margin-left: -150px;
-      margin-top: -60px;
+      margin-top: -120px;
       background-color: white;
       z-index: 10;
       width: 300px;
@@ -1310,6 +1310,8 @@
       input {
         padding: 8px 8px 8px 22px;
         border-radius: 12px;
+        padding: 8px;
+        border-radius: 10px;
         border: 1px solid rgba(102, 86, 61, .5);
         outline: none;
         transition: all 0.3s;

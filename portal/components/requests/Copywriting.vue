@@ -31,12 +31,12 @@
                             span.inner-langs__title Language(s)
                               .inner-langs__select
                                   span.select-text.clarify(:class="{ color: selectLang.length }")
-                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }} 
+                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }};  
                                       template(v-if="selectLang.length == 0") Select
                                       .span-wrapper(@click.self='showLang')
                                       .icon(:class="{ reverse: langDrop }")
                                           i.fas.fa-caret-down
-                                  .select__drop(v-if='langDrop')
+                                  .select__drop(v-if='langDrop' v-click-outside="outsideLangs")
                                       .select__drop-list(v-for='language in sortedLanguages')
                                           .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                               img(:src="'/flags/' + language.symbol + '.png'")
@@ -68,18 +68,18 @@
                                 span.star *
                                 span.notice Please give a brief description of the project in as match detail as possible.
                         .inner-ta
-                            textarea.ta-block2(v-model="genBrief.briefDescr")
+                            textarea.ta-block2(v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}
                     .col-4__block3
                         .descr-1
                             .head-1
                                 span.block3 Targeted Audience
                                 span.notice-1 What kind of audience will read this article?
                         .in-block3
-                            input(v-model="genBrief.briefAudience")
+                            input(v-model="genBrief.briefAudience" value="genBrief.briefAudience")
                     .col-4__block4
                         span.block4 Suggested title
                         .in-block4
-                            input(v-model="genBrief.briefTitle")
+                            input(v-model="genBrief.briefTitle" value="genBrief.briefTitle")
                     .col-4__block5
                         .descr-2
                             .head-2
@@ -88,7 +88,7 @@
                                 span.star *
                         .wrap
                             .in-block5
-                                textarea(v-model="genBrief.briefTopics")
+                                textarea(v-model="genBrief.briefTopics" value="genBrief.briefTopics")
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -104,12 +104,12 @@
                                     .choice-sel(v-else)
                                 .descr-3
                                     .head-3
-                                        spna.normsp {{ item.title2 }}
+                                        span.normsp {{ item.title2 }}
                                         span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
                     .col-4__block7
                         .first
                             span.exp Examples
-                            input.in(type="text" placeholder="www.example.com" value="" v-model="genBrief.briefExample")
+                            input.in(type="text" placeholder="www.example.com" value="genBrief.briefExample" v-model="genBrief.briefExample")
                             span.url URL
                         .second
                             .uploadBtn
@@ -148,7 +148,7 @@
                                 .choice-sel(v-else)
                             .subspan
                                 span.title(:class="{title8: index == 8}") {{ item.title }}
-                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input")
+                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input" value="item.input")
                 .col-8
                     .col-8__block1
                         span.block1 DESIGN
@@ -164,7 +164,7 @@
                                 .empty-choice(v-if="!item.choice")
                                 .choice-sel(v-else)
                             span.title {{ item.title }}
-                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input")
+                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input" value="item.input")
                 .col-9
                     .col-9__block1
                         span.block1 SEO
@@ -186,7 +186,7 @@
                                     .empty-choice(v-if="!item.choice")
                                     .choice-sel(v-else)
                                 span.title2(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]") {{ item.title2 }}                                
-                                input(v-model="item.input")
+                                input(v-model="item.input" value="item.input")
                     .copydetails__quote
                       .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
                         .send__check
@@ -205,8 +205,11 @@
                         .buttonWrap
                           input(type="submit" value="Submit")
                           span.foot {{ footSpan }}
-                            
-
+            .warning(v-if="error")
+              .message
+                .closeWarning(@click="closeWarning")
+                  i.fa.fa-times
+                p(v-for="err in errors") {{ err }}              
         .orderInfoCopy(:style="{transform: slide}")
           .orderInfoCopy__title
             h3 YOUR ORDER
@@ -223,7 +226,7 @@
               span 3
               label LANGUAGE:
               p.choice &nbsp;
-                template(v-for="language of selectLang") {{ language.lang }},
+                template(v-for="language of selectLang") {{ language.lang }}; 
                 template(v-if="selectLang == 0") Select
             .orderInfoCopy__summary-package
               span 4
@@ -238,10 +241,12 @@
 import moment from "moment";
 import Datepicker from "../Datepicker.vue";
 import NewProject from "../NewProject.vue";
+import ClickOutside from 'vue-click-outside';
 
 export default {
   data() {
     return {
+      error: false,
       col1_block2: [
         {
           title: "Article",
@@ -459,9 +464,15 @@ export default {
       },
       deadlineDate: '',
       deadlineSelect: ''
-    }
+    };
   },
   methods: {
+    closeWarning() {
+      this.error = false;
+    },
+    outsideLangs() {
+      this.langDrop = false;
+    },
     iamNotSure() {
         this.sure = !this.sure;
     },
@@ -585,9 +596,23 @@ export default {
     },
     toggleSub() {
       this.designToggle = !this.designToggle;
+      if(!this.designToggle) {
+        this.col8__block3.forEach((item,i) => {
+          if(i == 0) { item.choice = true }
+          else { item.choice = false }
+          if(i == 2) item.input = ""
+        })
+      }
     },
     toggleSub2() {
       this.seoToggle = !this.seoToggle;
+      if(!this.seoToggle) {
+        this.col9__block2.forEach((item, i) => {
+          item.input = "";
+          if(i == 0) { item.choice = true }
+          else { item.choice = false }
+        })
+      }
     },
     switchBlock8(index) {
       this.col8__block3.forEach((item, i) => {
@@ -613,6 +638,71 @@ export default {
     },
     copyChangeRefFiles(event){
       this.refFiles = event.target.files[0]; 
+    },
+    clearForm() {
+      this.projectName = "";
+      this.refFiles = [];
+      this.detailFiles = [];
+      this.request = [];
+      this.deadlineDate = '';
+      this.deadlineSelect = '';
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.selectLang = [];
+      this.targetDrop = false;
+      this.targetSelect = [];
+      this.brief = '';
+      this.languages.map(item => {
+        if(!item.dialects) {
+          item.check = false
+        } else {
+          item.dialects.map(ditem => {
+            ditem.check = false
+          })
+        }
+      });
+      this.col1_block2.forEach(item => {
+        if(item.title == "Article") {
+          item.active = true
+        } else {
+          item.active = false
+        }
+      });
+      this.genBrief = {
+        briefDescr: "",
+        briefAudience: "",
+        briefTitle: "",
+        briefTopics: "",
+        briefSure: "",
+        briefExample: "",
+        briefRef: [],
+        package: "200-399",
+        structure: [],
+        style: "US",
+        tone: [],
+        design: [],
+        seo: [],
+        cta: "No"
+      };
+      this.col3_block2.forEach(item => {
+        if(item.title == '200-399') {
+          item.choice = true
+        } else {
+          item.choice = false
+        }
+      });
+      this.sure = false;
+      this.designToggle = false;
+      this.seoToggle = false;
+      this.col5_block1.forEach((item, i) => {
+        if(i == 0) { item.choice = true }
+        else { item.choice = false };
+        if(i == 3) { item.input = "" }
+      });
+      this.col7__block2.forEach((item, i) => {
+        if(i == 0) {item.choice = true}
+        else { item.choice = false };
+        if(i == 8) { item.input = "" }
+      })
     },
     async sendForm() {
         var serviceFull;
@@ -667,6 +757,7 @@ export default {
         if(this.copystartOption) {
           const result = await this.$axios.$post('api/project-request', sendForm);
         }
+        this.clearForm();
     },
       async checkForm(event) {
         this.request = {
@@ -692,7 +783,9 @@ export default {
       this.errors = [];
       if(!this.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
-      if(!this.toneSelect.length) errors.push("Please, choose Tone of voice");
+      if(!this.genBrief.briefDescr) this.errors.push("Brief description required!");
+      if(!this.genBrief.briefTopics) this.errors.push("Please, enter topics of brief");      
+      if(!this.toneSelect.length) this.errors.push("Please, choose tone of voice");
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
@@ -703,7 +796,10 @@ export default {
       }
     },
     showError() {
-      console.log('Errors occured');
+     this.error = true;
+     setTimeout( () => {
+       this.error = false;
+     }, 4000)
     },
     getServices() {
       this.services = this.$store.state.services;     
@@ -803,6 +899,9 @@ export default {
   components: {
     Datepicker
   },
+  directives: {
+    ClickOutside
+  },
   created() {
     window.addEventListener("scroll", this.handleScroll);
   },
@@ -817,60 +916,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../assets/styles/clientrequest/copywriting.scss";
 
-// .copydetails {
-//     padding-bottom: 0;
-//     flex-direction: column;
-//     margin-bottom: 38px;
-//     &__quote {
-//       margin-top: 30px;
-//       width: 100%;
-//       margin-bottom: 40px;
-//       .send, .start {
-//         display: flex;
-//         align-items: center;
-//         border: 1px solid #66563D;        
-//         padding-left: 10px;
-//         padding-right: 10px;
-//         margin: 10px;
-//         margin-right: 0;
-//         cursor: pointer;
-//         &__check {
-//           width: 18px;
-//           height: 18px;
-//           margin-right: 20px;
-//           border: 1px solid #66563D;
-//           border-radius: 50%;
-//           display: flex;
-//           justify-content: center;
-//           align-items: center;
-//           .checker {
-//             width: 78%;
-//             height: 78%;
-//             border-radius: 50%;
-//           }
-//           .checkerChecked {
-//             background-color: #66563D;
-//           }
-//         }
-//         &__text {
-//           width: 88%;
-//           .head {
-//             margin-bottom: 5px;
-//             font-size: 14px;
-//           }
-//           .insideText {
-//             font-size: 12px;
-//             margin-top: 0;
-//           }
-//         }
-//       }
-//       .copyoptionChecked {
-//         box-shadow: 0 0 7px rgba(0, 0, 0, .6);
-//       }
-
-//     }
-//   }
 </style>

@@ -13,7 +13,7 @@
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number.projName
             label.asterisk PROJECT NAME
-            input(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+            input(type="text" v-model="projectName" value="projectName" maxlength="50" placeholder='50 characters maximum')
           .number 
             label.asterisk SELECT A LANGUAGE
           .language(v-click-outside="outsideLangs")
@@ -33,7 +33,7 @@
               span Target Language(s)
               .selectLangs.target
                 span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                  template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.name }} 
+                  template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.name }};  
                   template(v-if="targetSelect.length == 0") Select
                   .wrapper(v-on:click.self='showTargetLang')
                   .icon(:class="{ reverse: targetDrop }")
@@ -75,20 +75,20 @@
                 span.clarify Select
             .details__brief
               span.details__brief-title Enter a short brief
-              textarea(rows='4' v-model='brief')
+              textarea(rows='4' v-model='brief') {{ brief }}
             .details__quote
               .send(:class="{optionChecked: sendOption}" @click="chooseBegin")
                 .send__check
                   .checker(:class="{checkerChecked: sendOption}")
                 .send__text
                   p.head Send a Quote
-                  p.insideText I approve for the project to begin immediately and I'll review the quote later.
+                  //- p.insideText I approve for the project to begin immediately and I'll review the quote later.
               .start(:class="{optionChecked: startOption}" @click="chooseStart")
                 .start__check
                   .checker(:class="{checkerChecked: startOption}")
                 .start__text
                   p.head Start Immediately
-                  p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
+                  //- p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
             .captcha
               input.buttons(type='submit' value='Submit' name="submit")          
           .warning(v-if="error")
@@ -110,7 +110,9 @@
               p(v-if='serviceSelect.source') Source:
                 span.choice &nbsp; {{ sourceSelect.name }} <template v-if="!sourceSelect">Select</template>
               p Target: 
-                span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.name }},  </template> <template v-if="targetSelect == 0">Select</template>
+                span.choice &nbsp; 
+                  template(v-for="language of targetSelect") {{ language.name }};
+                  template(v-if="targetSelect == 0") Select
             .orderInfo__summary-industry
               span 3
               label INDUSTRY: 
@@ -339,24 +341,17 @@ export default {
       this.error = false;
     },
     clearForm() {
+      this.projectName = "";
       this.refFiles = [];
       this.detailFiles = [];
       this.request = [];
-      this.deadlineDate = '',
-      this.deadlineSelect = '',
-      this.contactName = '',
-      this.contactEmail ='',
-      this.serviceSelect = {title : 'Select', source : true, languages: [{source: [], target: []}]},
-      this.industrySelect = 'Select',
-      this.sourceSelect = {name: 'English (United Kingdom)'},
-      this.targetlang = ["Select"],
-      this.targetDrop = false,
-      this.targetSelect = [],
-      this.web = '',
-      this.contactSkype = '',
-      this.phone = '',
-      this.companyName = '',
-      this.brief = '',
+      this.deadlineDate = '';
+      this.deadlineSelect = '';
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.targetlang = ["Select"];
+      this.targetDrop = false;
+      this.targetSelect = [];
+      this.brief = '';
       this.languages.map(item => {
         if(!item.dialects) {
           item.check = false
@@ -407,11 +402,12 @@ export default {
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
         if(this.sendOption) {
-          const result = await this.$axios.$post('api/request', sendForm);          
+          const result = await this.$axios.$post('api/request', sendForm);         
         }
         if(this.startOption) {
           const result = await this.$axios.$post('api/project-request', sendForm);
         }
+        this.clearForm();
     },
     getServices() {
       this.services = this.$store.state.services;
@@ -564,27 +560,33 @@ export default {
     &__quote {
       margin-top: 30px;
       width: 100%;
+      display: flex;
+      justify-content: center;
       .send, .start {
+        width: 128px;
+        height: 120px;
         display: flex;
+        flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
         border: 1px solid #66563D;        
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 10px;
         margin: 10px;
         margin-right: 0;
+        border-radius: 10px;
         cursor: pointer;
         &__check {
-          width: 18px;
-          height: 18px;
-          margin-right: 20px;
+          width: 16px;
+          height: 16px;
+          // margin-right: 20px;
           border: 1px solid #66563D;
           border-radius: 50%;
           display: flex;
           justify-content: center;
           align-items: center;
           .checker {
-            width: 78%;
-            height: 78%;
+            width: 76%;
+            height: 76%;
             border-radius: 50%;
           }
           .checkerChecked {
@@ -593,6 +595,7 @@ export default {
         }
         &__text {
           width: 88%;
+          text-align: center;
           .head {
             margin-bottom: 5px;
             font-size: 14px;
