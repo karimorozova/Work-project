@@ -1,26 +1,79 @@
 .mark-option {
     width: 95%;
     margin-bottom: 50px;
-    &__title {
+    .nwrap {
+        display: flex;
+        align-items: center;
+        .lblockm {
+            margin-right: 95px;
+            display: flex;
+            flex-direction: column;
+            .mark-option__title1 {
+                    font-size: 22px;
+                    margin-bottom: 20px;
+                        .asterisk {
+                            font-size: 22px;
+                        }
+                }
+                input.proj {
+                    width: 280px;
+                    height: 28px;
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    border-radius: 7px;
+                    border: 1px solid #67573E;
+                    outline: none;
+                    font-family: MyriadPro;
+                }
+                ::-webkit-input-placeholder {
+                    opacity: 0.6;
+                }
+        }
+        .rblockm {
+            display: flex;
+            flex-direction: column;
+            .name {
+                display: flex;
+                flex-direction: column;
+                    .asterisk {
+                        font-size: 22px;
+                    }
+                }
+            .deadline {
+                display: flex;
+                align-items: center;
+                .picker {
+                    input {
+                        font-size: 14px;
+                        text-align: center;
+                        opacity: 0.7;
+                        border-radius: 10px;
+                        border: none;
+                        padding: 8px;
+                        width: 150px;
+                        border: 1px solid rgba(102, 86, 61, 0.5);
+                        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
+                    }
+                }
+                .datepick {
+                    img {
+                        cursor: pointer;
+                        padding-left: 5px;
+                        padding-top: 7px;
+                        width: 20px;
+                        height: 20px;;
+                    }
+                }
+            } 
+        }
+    }
+    &__title2 {
         font-size: 22px;
     }
     &__inner {
         display: flex;
         justify-content: center;
         align-items: center;
-        input.proj {
-            margin-top: 15px;
-            width: 97%;
-            outline: none;
-            border: 1px solid #66563D;
-            border-radius: 7px;
-            padding: 3px;
-            height:19px;
-            font-family: MyriadPro;
-        }
-        ::-webkit-input-placeholder {
-            opacity: 0.6;
-        }
         .inner-option {
             font-size: 14px;
             margin-top: 10px;
@@ -523,3 +576,32 @@ color: #FF876C;
     width: 170px;
     margin-bottom: 15px;
 }
+
+.asterisk {
+    .warning & {
+      font-size: 20px;
+      position: relative;
+      padding-right: 15px;
+    }
+    &:after {
+      content: '*';
+      color: #F00;
+      .warning & {
+        position: absolute;
+        font-size: 30px;
+        right: -1px;
+      }
+    }
+  }
+
+  .vdp-datepicker__calendar {
+    div {
+      .day-header {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .cell {
+        background-color: #eaeaea;
+      }
+    }
+  }

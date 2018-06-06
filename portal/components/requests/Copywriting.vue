@@ -138,17 +138,19 @@
                                     .choice-sel(v-else)
                             img(:src="item.image")
                 .col-7
-                    .col-7__block1
-                        span.block1 TONE OF VOICE
-                        span.star *
-                    .col-7__block2
-                        .sub(v-for="(item, index) in col7__block2" :class="{choice: item.choice}")
-                            .selected(@click="switchBlock7(index)")
-                                .empty-choice(v-if="!item.choice")
-                                .choice-sel(v-else)
-                            .subspan
-                                span.title(:class="{title8: index == 8}") {{ item.title }}
-                            input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input" value="item.input")
+                  .inner-tone
+                    .inner-langs__select.toneSelect
+                        span.select-text.clarify(:class="{ color: genBrief.tone.length }")
+                          template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
+                          template(v-if="genBrief.tone.length == 0") Select
+                          .span-wrapper(@click.self='showTone')
+                          .icon(:class="{ reverse: toneDrop }")
+                              i.fas.fa-caret-down
+                        .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
+                          .select__drop-list(v-for='(voice, i) in voices')
+                              .pair
+                                span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
+                                input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
                 .col-8
                     .col-8__block1
                         span.block1 DESIGN
@@ -193,13 +195,11 @@
                           .checker(:class="{checkerChecked: copysendOption}")
                         .send__text
                           p.head Send a Quote
-                          p.insideText I approve for the project to begin immediately and I'll review the quote later.
                       .start(:class="{copyoptionChecked: copystartOption}" @click="copychooseStart")
                         .start__check
                           .checker(:class="{checkerChecked: copystartOption}")
                         .start__text
                           p.head Start Immediately
-                          p.insideText I approve for the project to begin immediately and to receive the quote just for reference. 
                     .col-9__block3
                       .bot
                         .buttonWrap
@@ -240,7 +240,6 @@
 <script>
 import moment from "moment";
 import Datepicker from "../Datepicker.vue";
-import NewProject from "../NewProject.vue";
 import ClickOutside from 'vue-click-outside';
 
 export default {
@@ -463,7 +462,19 @@ export default {
         }
       },
       deadlineDate: '',
-      deadlineSelect: ''
+      deadlineSelect: '',
+      toneDrop: false,
+      voices: [
+        { title: "Formal", check: false },
+        { title: "Informal", check: false },
+        { title: "Excited", check: false },
+        { title: "Straightforward", check: false },
+        { title: "Serious", check: false },
+        { title: "Relaxed", check: false },
+        { title: "Parsuasive", check: false },
+        { title: "Playful/Funny", check: false },
+        { title: "Other", check: false, input: true, inputText: "" }
+      ]
     };
   },
   methods: {
@@ -813,6 +824,17 @@ export default {
     },
     openPicker() {
       this.$refs.programaticOpen.showCalendar();
+    },
+    voiceChoice(ind) {
+      console.log(ind);
+      this.voices[ind].check = !this.voices[ind].check;
+      this.genBrief.tone = this.toneSelect;
+    },
+    outsideTones() {
+      this.toneDrop = false;
+    },
+    showTone() {
+      this.toneDrop = !this.toneDrop;
     }
   },
   computed: {
@@ -887,6 +909,7 @@ export default {
     service() {
       return this.$store.state.clientInfo.service;
     }
+    
   },
   watch: {
     deadlineSelect() {

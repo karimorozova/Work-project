@@ -4,12 +4,22 @@
             .container
               form.marketingForm(@submit.prevent="checkForm")
                 .mark-option
-                    .mark-option__title
+                  .nwrap
+                    .lblockm
+                      .mark-option__title1
                         span.asterisk PROJECT NAME
-                    .mark-option__inner
-                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')                            
+                      .mark-option__inner
+                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+                    .rblockm
+                      .name
+                        label.asterisk DEADLINE:
+                      .deadline
+                        .picker
+                          datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                        .datepick(@click='openPicker')
+                          img(src='../../assets/images/calendar.png')
                 .mark-option
-                    .mark-option__title
+                    .mark-option__title2
                         span SELECT LANGUAGE
                     .mark-option__inner
                         .inner-langs
@@ -32,7 +42,7 @@
                                                     img(:src="'/flags/' + dialect.symbol + '.png'")                  
                                                     span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .mark-option
-                    .mark-option__title
+                    .mark-option__title2
                         span.asterisk PACKAGE
                     .mark-option__inner
                         .inner-option
@@ -50,7 +60,7 @@
                             .inner-option__image
                                 img(src="../../assets/images/200-400.png")
                 .mark-option
-                    .mark-option__title
+                    .mark-option__title2
                         span GENERAL BRIEF
                     .mark-option__inner.genBrief
                         .inner-description.genBrief__item
@@ -136,7 +146,7 @@
                                         li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
                                             i.fa.fa-times.deleteIcon
                 .mark-option
-                    .mark-option__title
+                    .mark-option__title2
                         span.asterisk STYLE
                     .mark-option__inner.styleInner
                         .inner-option.style
@@ -150,7 +160,7 @@
                             .inner-option__image
                                 img(src="../../assets/images/UK-icon.png")
                 .mark-option
-                    .mark-option__title
+                    .mark-option__title2
                         span.asterisk TONE OF VOICE
                     .mark-option__inner.voiceChekers
                         .inner-tone
@@ -172,13 +182,11 @@
                           .checker(:class="{checkerChecked: marksendOption}")
                         .send__text
                           p.head Send a Quote
-                          p.insideText I approve for the project to begin immediately and I'll review the quote later.
                       .start(:class="{markoptionChecked: markstartOption}" @click="markchooseStart")
                         .start__check
                           .checker(:class="{checkerChecked: markstartOption}")
                         .start__text
                           p.head Start Immediately
-                          p.insideText I approve for the project to begin immediately and to receive the quote just for reference.
                 input.submit(type="submit" value="Submit")
                 .mark-footer
                     p.clarify Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at a separate cost.
@@ -211,10 +219,12 @@
                         p.choice {{ genBrief.package }}
                     .orderInfo__summary-deadline
                         label SUGGESTED DEADLINE
-                        p.choice
+                        p.choice {{ deadlineDate }}
 </template>
 
 <script>
+import moment from "moment";
+import Datepicker from "../Datepicker.vue";
 import ClickOutside from 'vue-click-outside';
 
 export default {
@@ -273,7 +283,21 @@ export default {
       scrolled: false,
       slide: "0px",
       marksendOption: true,
-      markstartOption: false
+      markstartOption: false,
+      state: {
+        highlighted: {
+          days: [6, 0]
+        },
+        disabled: {
+          to: moment()
+            .add(-1, "day")
+            .endOf("day")
+            .toDate()
+        }
+      },
+      deadlineDate: '',
+      deadlineSelect: '',
+      format: 'dd-MM-yyyy'
     };
   },
   methods: {
@@ -581,6 +605,9 @@ export default {
     getServices() {
       this.services = this.$store.state.services;     
     },
+    openPicker() {
+      this.$refs.programaticOpen.showCalendar();
+    }
   },
   created() {
     window.addEventListener("scroll", this.handleScroll);
@@ -615,8 +642,19 @@ export default {
       }
     }
   },
+  components: {
+    Datepicker
+  },
   directives: {
     ClickOutside
+  },
+  watch: {
+    deadlineSelect() {
+      const date = moment(this.deadlineSelect);
+      if(this.deadlineSelect) {
+        this.deadlineDate = date.format('DD-MM-YYYY');
+      }
+    }
   },
   mounted() {
     this.getLanguages();
@@ -633,8 +671,13 @@ export default {
 .markdetails {
     padding-bottom: 0;
     flex-direction: column;
+    margin-bottom: 38px;
     &__quote {
       width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      margin-bottom: 40px;
       .send, .start {
         display: flex;
         align-items: center;
@@ -644,19 +687,22 @@ export default {
         margin: 10px;
         margin-right: 0;
         cursor: pointer;
+        flex-direction: column;
+        width: 128px;
+        height: 120px;
         &__check {
           width: 18px;
           height: 18px;
-          margin-right: 20px;
+          margin-top: 5px;
           border: 1px solid #66563D;
           border-radius: 50%;
           display: flex;
           justify-content: center;
           align-items: center;
           .checker {
-            width: 78%;
-            height: 78%;
-            border-radius: 50%;
+            width: 67%;
+            height: 67%;
+            border-radius: 69%;
           }
           .checkerChecked {
             background-color: #66563D;
@@ -664,8 +710,11 @@ export default {
         }
         &__text {
           width: 88%;
+          display: flex;
+          justify-content: center;
           .head {
             margin-bottom: 5px;
+            font-size: 14px;
           }
           .insideText {
             font-size: 12px;
