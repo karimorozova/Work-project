@@ -1,6 +1,6 @@
 <template lang="pug">
     .copywritingWrapper
-        .copywritingContainer
+        .container
             form.copywriting-form(@submit.prevent="checkForm")
                 .col-1
                     .col-1__block0__title
@@ -200,8 +200,11 @@
                         .buttonWrap
                           input(type="submit" value="Submit")
                           span.foot {{ footSpan }}
-                            
-
+            .warning(v-if="error")
+              .message
+                .closeWarning(@click="closeWarning")
+                  i.fa.fa-times
+                p(v-for="err in errors") {{ err }}              
         .orderInfoCopy(:style="{transform: slide}")
           .orderInfoCopy__title
             h3 YOUR ORDER
@@ -235,6 +238,7 @@ import ClickOutside from 'vue-click-outside';
 export default {
   data() {
     return {
+      error: false,
       col1_block2: [
         {
           title: "Article",
@@ -437,9 +441,13 @@ export default {
       footSpan: 'Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at separate cost.',
       copysendOption: true,
       copystartOption: false,
+      errors: []
     };
   },
   methods: {
+    closeWarning() {
+      this.error = false;
+    },
     outsideLangs() {
       this.langDrop = false;
     },
@@ -753,7 +761,9 @@ export default {
       this.errors = [];
       if(!this.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
-      if(!this.toneSelect.length) errors.push("Please, choose Tone of voice");
+      if(!this.genBrief.briefDescr) this.errors.push("Brief description required!");
+      if(!this.genBrief.briefTopics) this.errors.push("Please, enter topics of brief");      
+      if(!this.toneSelect.length) this.errors.push("Please, choose tone of voice");
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
@@ -764,7 +774,10 @@ export default {
       }
     },
     showError() {
-      console.log('Errors occured');
+     this.error = true;
+     setTimeout( () => {
+       this.error = false;
+     }, 4000)
     },
     getServices() {
       this.services = this.$store.state.services;     

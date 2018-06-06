@@ -6,12 +6,10 @@
     align-items: flex-start;
     margin-bottom: 30px;
 
-    .copywritingContainer {
-        border: 2px solid #67563D;
+    .container {
         position: relative;
         font-family: MyriadPro;
         width: 55%;
-        margin-left: 6%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -302,6 +300,7 @@
                 .inner-ta {
                     margin-bottom: 20px;
                     .ta-block2 {
+                        font-family: MyriadPro;
                         border-radius: 8px;
                         outline: none;
                         width: 93%;
@@ -337,6 +336,7 @@
                 }
                 .in-block3 {
                     input {
+                        font-family: MyriadPro;
                         border-radius: 8px;
                         outline: none;
                         width: 93%;
@@ -352,6 +352,7 @@
                 }
                 .in-block4 {
                     input {
+                        font-family: MyriadPro;
                         border-radius: 8px;
                         outline: none;
                         width: 93%;
@@ -387,20 +388,24 @@
                         }
                     }
                     .wrap {
+                        width: 95%;
                         display: flex;
+                        justify-content: space-between;
                             .in-block5 {
-                                margin-left: -3px;
-                                margin-right: 50px;
+                                width: 55%;
                                     textarea {
+                                        font-family: MyriadPro;
                                         border-radius: 8px;
                                         outline: none;
-                                        width: 145%;
+                                        width: 100%;
                                         border: 1px solid #bfb09d;
                                         padding: 4px 0 4px 7px;
+                                        resize: none;
                                     }
                             }
                             .block5-delim {
-                                margin: 11px 70px 0 98px;
+                                display: flex;
+                                align-items: center;
                             }
                             .block5-but {
                                 margin-top: -2px;
@@ -585,6 +590,7 @@
                         width: 52%;
                     }
                     .inp_vis {
+                        font-family: MyriadPro;
                         display: inline;
                     }
                     &:hover {

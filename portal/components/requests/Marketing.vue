@@ -67,7 +67,7 @@
                                 textarea(rows="1" v-model="genBrief.briefAudience") {{ genBrief.briefAudience }}
                         .inner-subject.genBrief__item
                             .inner-subject__title.switching
-                                span.innerTitle__title.innerTitle.asterisk Subject line
+                                span.innerTitle__title.innerTitle Subject line
                                 .subject-toggle.toggle(@click="toggleSub" :class="{positive: subjectToggle}")
                                     .toggler
                                     .yes 
@@ -99,7 +99,7 @@
                                     | requests come at a separate cost.
                         .inner-bonus.genBrief__item
                             .inner-bonus__title.switching
-                                span.innerTitle__title.innerTitle.asterisk Bonus/Offers
+                                span.innerTitle__title.innerTitle Bonus/Offers
                                 .bonus-toggle.toggle(@click="toggleBon" :class="{positive: bonusToggle}")
                                     .toggler
                                     .yes 
@@ -153,11 +153,19 @@
                     .mark-option__title
                         span.asterisk 5. Tone of voice
                     .mark-option__inner.voiceChekers
-                        .inner-option(v-for="(voice, i) in voices")
-                            .inner-option__check(@click="voiceChoice(i)")
-                                .checker(v-if="voice.check")
-                            span.voiceTitle {{ voice.title }}
-                            input(v-if="voice.input" type="text" v-model="voice.inputText")
+                        .inner-tone
+                            .inner-langs__select.toneSelect
+                                span.select-text.clarify(:class="{ color: genBrief.tone.length }")
+                                    template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
+                                    template(v-if="genBrief.tone.length == 0") Select
+                                    .span-wrapper(@click.self='showTone')
+                                    .icon(:class="{ reverse: toneDrop }")
+                                        i.fas.fa-caret-down
+                                .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
+                                    .select__drop-list(v-for='(voice, i) in voices')
+                                        .pair
+                                            span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
+                                            input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
                 .markdetails__quote
                       .send(:class="{markoptionChecked: marksendOption}" @click="markchooseBegin")
                         .send__check
@@ -174,6 +182,11 @@
                 input.submit(type="submit" value="Submit")
                 .mark-footer
                     p.clarify Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at a separate cost.
+              .warning(v-if="error")
+                .message
+                  .closeWarning(@click="closeWarning")
+                    i.fa.fa-times
+                  p(v-for="err in errors") {{ err }}
             .orderInfo(:style="{transform: slide}")
                 .orderInfo__title
                     h3 YOUR ORDER
@@ -207,6 +220,7 @@ import ClickOutside from 'vue-click-outside';
 export default {
   data() {
     return {
+      toneDrop: false,
       projectName: "",
       packageCheck200: true,
       packageCheck400: false,
@@ -214,6 +228,7 @@ export default {
       languages: [],
       copyLangs: [],
       langSelect: "Select",
+      error: false,
       errors: [],
       service: "Copywriting",
       services: [],
@@ -262,8 +277,17 @@ export default {
     };
   },
   methods: {
+    showTone() {
+      this.toneDrop = !this.toneDrop;
+    },
+    closeWarning() {
+      this.error = false;
+    },
     outsideLangs() {
       this.langDrop = false;
+    },
+    outsideTones() {
+      this.toneDrop = false;
     },
     toggleSub() {
       this.subjectToggle = !this.subjectToggle;
@@ -282,6 +306,7 @@ export default {
     voiceChoice(ind) {
       console.log(ind);
       this.voices[ind].check = !this.voices[ind].check;
+      this.genBrief.tone = this.toneSelect;
     },
     refRemove(event) {
       this.refFiles = [];
@@ -534,9 +559,10 @@ export default {
       this.errors = [];
       if(!this.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
-      if(!this.toneSelect.length) errors.push("Please, chooose Tone of voice");
-      if(!this.genBrief.briefDescr) errors.push("Please, enter description of Brief");
-      if(!this.genBrief.briefAudience) errors.push("Please, enter targeted audience");
+      if(!this.genBrief.briefDescr) this.errors.push("Please, enter description of Brief");
+      if(!this.genBrief.briefAudience) this.errors.push("Please, enter targeted audience");
+      if(!this.genBrief.briefTopics) this.errors.push("Please, enter topics of brief");      
+      if(!this.toneSelect.length) this.errors.push("Please, chooose Tone of voice");
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
@@ -547,7 +573,10 @@ export default {
       }
     },
     showError() {
-      console.log('Errors occured');
+      this.error = true;
+      setTimeout( () => {
+        this.error = false;
+      },4000)
     },
     getServices() {
       this.services = this.$store.state.services;     
@@ -657,4 +686,5 @@ export default {
     justify-content: center;
     align-items: center;
   }
+
 </style>

@@ -82,13 +82,13 @@
                   .checker(:class="{checkerChecked: sendOption}")
                 .send__text
                   p.head Send a Quote
-                  p.insideText I approve for the project to begin immediately and I'll review the quote later.
+                  //- p.insideText I approve for the project to begin immediately and I'll review the quote later.
               .start(:class="{optionChecked: startOption}" @click="chooseStart")
                 .start__check
                   .checker(:class="{checkerChecked: startOption}")
                 .start__text
                   p.head Start Immediately
-                  p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
+                  //- p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
             .captcha
               input.buttons(type='submit' value='Submit' name="submit")          
           .warning(v-if="error")
@@ -560,27 +560,33 @@ export default {
     &__quote {
       margin-top: 30px;
       width: 100%;
+      display: flex;
+      justify-content: center;
       .send, .start {
+        width: 128px;
+        height: 120px;
         display: flex;
+        flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
         border: 1px solid #66563D;        
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 10px;
         margin: 10px;
         margin-right: 0;
+        border-radius: 10px;
         cursor: pointer;
         &__check {
-          width: 18px;
-          height: 18px;
-          margin-right: 20px;
+          width: 16px;
+          height: 16px;
+          // margin-right: 20px;
           border: 1px solid #66563D;
           border-radius: 50%;
           display: flex;
           justify-content: center;
           align-items: center;
           .checker {
-            width: 78%;
-            height: 78%;
+            width: 76%;
+            height: 76%;
             border-radius: 50%;
           }
           .checkerChecked {
@@ -589,8 +595,10 @@ export default {
         }
         &__text {
           width: 88%;
+          text-align: center;
           .head {
             margin-bottom: 5px;
+            font-size: 14px;
           }
           .insideText {
             font-size: 12px;
