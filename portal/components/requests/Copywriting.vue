@@ -120,13 +120,13 @@
                     .col-5__block1
                         span.block1 STRUCTURE TO INCLUDE
                     .block1-wrapper
-                        .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
-                            .selected
-                                .empty-choice(v-if="!item.choice")
-                                .choice-sel(v-else)
-                            span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
-                            img(:src="item.image" v-if="index != 3")
-                            input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input")
+                      .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
+                          .selected
+                              .empty-choice(v-if="!item.choice")
+                              .choice-sel(v-else)
+                          span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
+                          img(:src="item.image" v-if="index != 3")
+                          input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)")
                 .col-6
                     .col-6__block1
                         span.block1 STYLE
@@ -142,8 +142,8 @@
                         span.block1 TONE OF VOICE
                         span.star *
                     .col-7__block2
-                        .sub(v-for="(item, index) in col7__block2" @click="switchBlock7(index)" :class="{choice: item.choice}")
-                            .selected
+                        .sub(v-for="(item, index) in col7__block2" :class="{choice: item.choice}")
+                            .selected(@click="switchBlock7(index)")
                                 .empty-choice(v-if="!item.choice")
                                 .choice-sel(v-else)
                             .subspan
@@ -820,56 +820,57 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/styles/clientrequest/copywriting.scss";
 
-.copydetails {
-    padding-bottom: 0;
-    flex-direction: column;
-    margin-bottom: 38px;
-    &__quote {
-      margin-top: 30px;
-      width: 100%;
-      margin-bottom: 40px;
-      .send, .start {
-        display: flex;
-        align-items: center;
-        border: 1px solid #66563D;        
-        padding-left: 10px;
-        padding-right: 10px;
-        margin: 10px;
-        margin-right: 0;
-        cursor: pointer;
-        &__check {
-          width: 18px;
-          height: 18px;
-          margin-right: 20px;
-          border: 1px solid #66563D;
-          border-radius: 50%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          .checker {
-            width: 78%;
-            height: 78%;
-            border-radius: 50%;
-          }
-          .checkerChecked {
-            background-color: #66563D;
-          }
-        }
-        &__text {
-          width: 88%;
-          .head {
-            margin-bottom: 5px;
-          }
-          .insideText {
-            font-size: 12px;
-            margin-top: 0;
-          }
-        }
-      }
-      .copyoptionChecked {
-        box-shadow: 0 0 7px rgba(0, 0, 0, .6);
-      }
+// .copydetails {
+//     padding-bottom: 0;
+//     flex-direction: column;
+//     margin-bottom: 38px;
+//     &__quote {
+//       margin-top: 30px;
+//       width: 100%;
+//       margin-bottom: 40px;
+//       .send, .start {
+//         display: flex;
+//         align-items: center;
+//         border: 1px solid #66563D;        
+//         padding-left: 10px;
+//         padding-right: 10px;
+//         margin: 10px;
+//         margin-right: 0;
+//         cursor: pointer;
+//         &__check {
+//           width: 18px;
+//           height: 18px;
+//           margin-right: 20px;
+//           border: 1px solid #66563D;
+//           border-radius: 50%;
+//           display: flex;
+//           justify-content: center;
+//           align-items: center;
+//           .checker {
+//             width: 78%;
+//             height: 78%;
+//             border-radius: 50%;
+//           }
+//           .checkerChecked {
+//             background-color: #66563D;
+//           }
+//         }
+//         &__text {
+//           width: 88%;
+//           .head {
+//             margin-bottom: 5px;
+//             font-size: 14px;
+//           }
+//           .insideText {
+//             font-size: 12px;
+//             margin-top: 0;
+//           }
+//         }
+//       }
+//       .copyoptionChecked {
+//         box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+//       }
 
-    }
-  }
+//     }
+//   }
 </style>
