@@ -76,7 +76,8 @@
               invoices(v-if="invoicesShow")
               documents(v-if="documentsShow")
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
-              Clientrequest(v-if="clientRequestShow")
+              Clientrequest(v-if="clientRequestShow" @thankYou="thankYou")
+              Confirmorder(v-if="thanks" :thanksService="thanksService")             
 </template>
 
 <script>
@@ -90,10 +91,12 @@ import invoices from "../components/invoices/invoices";
 import documents from "../components/documents/documents";
 import Clientrequest from "../components/Clientrequest";
 import ClickOutside from "vue-click-outside";
+import Confirmorder from "../components/Confirmorder"
 
 export default {
   data() {
     return {
+      thanks: false,
       companyName: "",
       clientPortal: "CLIENT PORTAL",
       navbarList: [
@@ -152,10 +155,16 @@ export default {
       dropdownVisible: false,
       clientRequestShow: false,
       path: 'Open Quotes',
-      serviceType: ""
+      serviceType: "",
+      thanksService: ""
     };
   },
   methods: {
+    thankYou(data) {
+      this.clientRequestShow = false;
+      this.thanks = true;
+      this.thanksService = data;
+    },
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -204,6 +213,7 @@ export default {
           if (this.detailedInfoVisible && !this.detailedProjectVisible) {
             this.detailedInfoVisible = !this.detailedInfoVisible;
             this.openQuotes = true;
+
           }
           if (!this.detailedInfoVisible && this.detailedProjectVisible) {
             this.detailedProjectVisible = !this.detailedProjectVisible;
@@ -253,7 +263,7 @@ export default {
           this.clientRequestShow = false;
           this.path = "Documents"                    
         }
-
+        this.thanks = false;
         this.accountInfo = false;
       });
     },
@@ -275,6 +285,7 @@ export default {
       this.clientRequestShow = false;
       this.documentsShow = false;
       this.invoicesShow = false;
+      this.thanks = false;
       this.navbarList.forEach(item => {
         item.active = false;
       });
@@ -330,7 +341,8 @@ export default {
         this.detailedProjectVisible = false;
         this.documentsShow = false;
         this.invoicesShow = false;
-        this.dropdownVisible = false
+        this.dropdownVisible = false;
+        this.thanks = false;
       }
       this.path = "New Project";
       this.serviceType = this.newProject[ind].title;
@@ -360,6 +372,7 @@ export default {
     invoices,
     documents,
     Clientrequest,
+    Confirmorder
   },
   directives: {
     ClickOutside
@@ -373,7 +386,8 @@ export default {
         this.allProjectsShow ||
         this.invoicesShow ||
         this.documentsShow ||
-        this.clientRequestShow
+        this.clientRequestShow ||
+        this.thanks
       );
     },
     jsess() {

@@ -8,9 +8,13 @@ const store = () => new Vuex.Store({
         clientLanguages: [],
         clientInfo: {},
         services: [],
-        session: ""
+        session: "",
+        orderDetails: {},
     },
     actions: {
+        loadOrderDetails(context, payload) {
+            context.commit('details', payload)
+        },
         loadLangs(context, payload) {
             context.commit('langs', payload)
         },
@@ -22,9 +26,31 @@ const store = () => new Vuex.Store({
         },
         jsession(context, payload) {
             context.commit('sesCook', payload)
+        },
+        files(context, payload) {
+            context.commit('detfilesToDetails', payload)
+        },
+        referFiles(context, payload) {
+            context.commit('reffilesToDetails', payload)
         }
      },
     mutations: {
+        details(state, payload) {
+            state.orderDetails = payload
+        },
+        detfilesToDetails(state, payload) {
+            if(payload.length) {
+                state.orderDetails.detailFiles = [];
+                for(let i = 0; i < payload.length; i++) {
+                    state.orderDetails.detailFiles.push(payload[i].name);
+                }
+            }
+        },
+        reffilesToDetails(state, payload) {
+            if(payload) {              
+                state.orderDetails.refFiles = payload.name;
+            }
+        },
         langs(state, payload) {
             state.clientLanguages = payload
         },

@@ -4,7 +4,7 @@
     Copywriting(v-if="service == 'Copywriting'")
     Proofing(v-if="service == 'Proofing/QA'")
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
-      .container
+      .container(v-if="!thanks")
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
         .successAlert(v-if="success")
           .successAlert__message
@@ -146,7 +146,11 @@ import Proofing from './requests/Proofing.vue';
 
 export default {
   name: 'client-form',
-  head: {
+  props: {
+    thanks: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {
@@ -447,6 +451,10 @@ export default {
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
+        this.$store.dispatch('loadOrderDetails', this.request);
+        this.$store.dispatch('files', this.detailFiles);
+        this.$store.dispatch('referFiles', this.refFiles);                     
+        this.$emit('thankYou', this.request.service);
         // window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {
         this.showError();
@@ -529,88 +537,5 @@ export default {
 
 <style lang='scss'>
 @import '../assets/styles/clientrequest/clientrequest.scss';
-.externalWrap {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  &__title {
-    margin-left: 3%;
-    width: 100%;
-    text-align: center;
-    margin: 20px 0 10px;
-    span {
-      font-family: MyriadPro;
-      font-size: 26px;
-      color: #66563D;
-    }
-  }
-  .mainWrapper {
-    width: 100%;
-    margin: 0 auto;
-  }
-  .captcha {
-    input {
-      border: none;
-      box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
-    }
-  }
-  .details {
-    padding-bottom: 0;
-    flex-direction: column;
-    &__quote {
-      margin-top: 30px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      .send, .start {
-        width: 128px;
-        height: 120px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        border: 1px solid #66563D;        
-        padding: 10px;
-        margin: 10px;
-        margin-right: 0;
-        border-radius: 10px;
-        cursor: pointer;
-        &__check {
-          width: 16px;
-          height: 16px;
-          // margin-right: 20px;
-          border: 1px solid #66563D;
-          border-radius: 50%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          .checker {
-            width: 76%;
-            height: 76%;
-            border-radius: 50%;
-          }
-          .checkerChecked {
-            background-color: #66563D;
-          }
-        }
-        &__text {
-          width: 88%;
-          text-align: center;
-          .head {
-            margin-bottom: 5px;
-            font-size: 14px;
-          }
-          .insideText {
-            font-size: 12px;
-            margin-top: 0;
-          }
-        }
-      }
-      .optionChecked {
-        box-shadow: 0 0 7px rgba(0, 0, 0, .6);
-      }
 
-    }
-  }
-}
 </style>
