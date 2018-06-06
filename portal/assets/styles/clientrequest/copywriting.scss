@@ -685,13 +685,13 @@
 
         .col-7 {
             margin-bottom: 30px;
-            // &__block1 {
-            //     margin-bottom: 30px;
-            //     .block1 {
-            //         margin-right: 6px;
-            //         font-size: 22px;
-            //     }
-            // }
+            &__block1 {
+                margin-bottom: 30px;
+                .copytone {
+                    margin-right: 6px;
+                    font-size: 22px;
+                }
+            }
             // &__block2 {
             //     display: flex;
             //     flex-wrap: wrap;

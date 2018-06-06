@@ -138,6 +138,8 @@
                                     .choice-sel(v-else)
                             img(:src="item.image")
                 .col-7
+                  .col-7__block1
+                    span.asterisk.copytone TONE OF VOICE
                   .inner-tone
                     .inner-langs__select.toneSelect
                         span.select-text.clarify(:class="{ color: genBrief.tone.length }")
