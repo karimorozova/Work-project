@@ -1,25 +1,31 @@
 <template lang="pug">
     .copywritingWrapper
-        .copywritingContainer
+        .container
             form.copywriting-form(@submit.prevent="checkForm")
                 .col-1
-                    .col-1__block0__title
-                        span.pname Project name
-                        span.star *
-                    .col-1__block0__inner
-                        span.psel {{ typeSelect }} :
-                        input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
+                    .col-1__block0
+                      .lblock
+                        .name
+                          label.asterisk PROJECT NAME: 
+                          input(:class="classes('projectName')" type="text" placeholder="Project Name" v-model="projectName")
+                      .rblock
+                        .name
+                          label.asterisk DEADLINE:
+                        .deadline
+                          .picker
+                            datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                          .datepick(@click='openPicker')
+                            img(src='../../assets/images/calendar.png')
                     .col-1__block1
-                        span.block1 1. Type
-                        span.star *
+                        span.block1 TYPE
                     .col-1__block2
                         .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{activeType: item.active}")
-                            span.sub1 {{ item.title }}
-                            img(v-if="item.active" :src="item.imageN")
-                            img(v-else :src="item.imageW")
+                          span.sub1 {{ item.title }}
+                          img(v-if="item.active" :src="item.imageN")
+                          img(v-else :src="item.imageW")
                 .col-2
                     .col-2__block1
-                        span.block1 2. Select a Language
+                        span.block1 SELECT A LANGUAGE
                     .col-2__block2
                         .inner-langs
                             span.inner-langs__title Language(s)
@@ -42,8 +48,7 @@
                                                       span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .col-3
                     .col-3__block1
-                        span.block1 3. Package
-                        span.star *
+                        span.block1 PACKAGE
                     .col-3__block2
                         .col-3__block2-sub(v-for="(item, index) in col3_block2" @click="switchChoice(index)" :class="{choice: item.choice}")
                             .checkTitle
@@ -55,7 +60,7 @@
 
                 .col-4
                     .col-4__block1
-                        span.block1 4. General Brief
+                        span.block1 GENERAL BRIEF
                     .col-4__block2
                         .descr
                             .head
@@ -113,7 +118,7 @@
                             span.se Upload Reference File
                 .col-5
                     .col-5__block1
-                        span.block1 5. Structure to Include
+                        span.block1 STRUCTURE TO INCLUDE
                     .block1-wrapper
                         .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
                             .selected
@@ -124,7 +129,7 @@
                             input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input")
                 .col-6
                     .col-6__block1
-                        span.block1 6. Style
+                        span.block1 STYLE
                         span.star *
                     .col-6__block2
                         .sub(v-for="(item, index) in col6__block1" @click="switchBlock6(index)" :class="{choice: item.choice}")
@@ -134,7 +139,7 @@
                             img(:src="item.image")
                 .col-7
                     .col-7__block1
-                        span.block1 7. Tone of voice
+                        span.block1 TONE OF VOICE
                         span.star *
                     .col-7__block2
                         .sub(v-for="(item, index) in col7__block2" @click="switchBlock7(index)" :class="{choice: item.choice}")
@@ -146,7 +151,7 @@
                             input(v-if="index == 8" :class="{inp_vis: true}" v-model="item.input")
                 .col-8
                     .col-8__block1
-                        span.block1 8. Design
+                        span.block1 DESIGN
                         .subject-toggle.toggle(@click="toggleSub" :class="{positive: designToggle}")
                             .toggler
                             .yes 
@@ -162,7 +167,7 @@
                             input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input")
                 .col-9
                     .col-9__block1
-                        span.block1 9. SEO
+                        span.block1 SEO
                         .subject-toggle2.toggle(@click="toggleSub2" :class="{positive: seoToggle}")
                             .toggler
                             .yes 
@@ -226,10 +231,14 @@
               p.choice {{ genBrief.package }}
             .orderInfoCopy__summary-deadline
               label SUGGESTED DEADLINE
-              p.choice
+              p.choice {{ deadlineSelect | formating }}
 </template>
 
 <script>
+import moment from "moment";
+import Datepicker from "../Datepicker.vue";
+import NewProject from "../NewProject.vue";
+
 export default {
   data() {
     return {
@@ -255,27 +264,27 @@ export default {
       ],
       col3_block2: [
         {
-          title: "Up to 199",
+          title: "0-200",
           image: require("../../assets/images/UP-TO-199-icon.png"),
           choice: false
         },
         {
-          title: "200-399",
+          title: "0-400",
           image: require("../../assets/images/200-399-icon.png"),
           choice: true
         },
         {
-          title: "400-599",
+          title: "0-600",
           image: require("../../assets/images/400-599-icon.png"),
           choice: false
         },
         {
-          title: "600-999",
+          title: "0-1000",
           image: require("../../assets/images/600-999-icon.png"),
           choice: false
         },
         {
-          title: "1000-1400",
+          title: "0-1400",
           image: require("../../assets/images/1000-1400-icon.png"),
           choice: false
         }
@@ -385,6 +394,7 @@ export default {
         seo: [],
         cta: "No"
       },
+      format: 'dd-MM-yyyy',
       detailFiles: [],
       refFiles: [],
       services: [],
@@ -435,7 +445,21 @@ export default {
       footSpan: 'Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at separate cost.',
       copysendOption: true,
       copystartOption: false,
-    };
+      errors: [],
+      state: {
+        highlighted: {
+          days: [6, 0]
+        },
+        disabled: {
+          to: moment()
+            .add(-1, "day")
+            .endOf("day")
+            .toDate()
+        }
+      },
+      deadlineDate: '',
+      deadlineSelect: ''
+    }
   },
   methods: {
     iamNotSure() {
@@ -684,6 +708,16 @@ export default {
     getServices() {
       this.services = this.$store.state.services;     
     },
+    classes(err) {
+      for(let i = 0; i < this.errors.length; i++ ) {
+        if(this.errors[i].title == err) {
+          return 'errorActive'
+        }
+      }
+    },
+    openPicker() {
+      this.$refs.programaticOpen.showCalendar();
+    }
   },
   computed: {
     projName() {
@@ -757,6 +791,14 @@ export default {
     service() {
       return this.$store.state.clientInfo.service;
     }
+  },
+  filters: {
+    formating(value){
+      if(value) return moment(String(value)).format('DD-MM-YYYY');
+    }
+  },
+  components: {
+    Datepicker
   },
   created() {
     window.addEventListener("scroll", this.handleScroll);

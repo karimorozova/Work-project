@@ -234,9 +234,17 @@
       }
       .lang-source {
         width: 48%;
+          span {
+            display: flex;
+            justify-content: center;
+          }
       }
       .lang-target {
         width: 48%;
+          span {
+            display: flex;
+            justify-content: center;
+          }
       }
       .source {
         max-height: 430px;
@@ -654,7 +662,7 @@
               height: 20px;;
             }
             input {
-              font-size: 18px;
+              font-size: 14px;
               text-align: center;
               opacity: 0.7;
               border-radius: 10px;
@@ -1300,8 +1308,8 @@
       flex-direction: column;
       margin-bottom: 30px;
       input {
-        padding: 8px;
-        border-radius: 5px;
+        padding: 8px 8px 8px 22px;
+        border-radius: 12px;
         border: 1px solid rgba(102, 86, 61, .5);
         outline: none;
         transition: all 0.3s;

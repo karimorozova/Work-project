@@ -5,12 +5,12 @@
               form.marketingForm(@submit.prevent="checkForm")
                 .mark-option
                     .mark-option__title
-                        span.asterisk Project name
+                        span.asterisk PROJECT NAME
                     .mark-option__inner
                         input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')                            
                 .mark-option
                     .mark-option__title
-                        span 1. Select Language
+                        span SELECT LANGUAGE
                     .mark-option__inner
                         .inner-langs
                             span.inner-langs__title Language(s)
@@ -33,7 +33,7 @@
                                                     span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .mark-option
                     .mark-option__title
-                        span.asterisk 2. Package
+                        span.asterisk PACKAGE
                     .mark-option__inner
                         .inner-option
                             .inner-option__check(@click="packageChoice200")
@@ -51,7 +51,7 @@
                                 img(src="../../assets/images/200-400.png")
                 .mark-option
                     .mark-option__title
-                        span 3. General Brief
+                        span GENERAL BRIEF
                     .mark-option__inner.genBrief
                         .inner-description.genBrief__item
                             .inner-description__title.innerTitle
@@ -137,7 +137,7 @@
                                             i.fa.fa-times.deleteIcon
                 .mark-option
                     .mark-option__title
-                        span.asterisk 4. Style
+                        span.asterisk STYLE
                     .mark-option__inner.styleInner
                         .inner-option.style
                             .inner-option__check(@click="styleChoiceUs")
@@ -151,7 +151,7 @@
                                 img(src="../../assets/images/UK-icon.png")
                 .mark-option
                     .mark-option__title
-                        span.asterisk 5. Tone of voice
+                        span.asterisk TONE OF VOICE
                     .mark-option__inner.voiceChekers
                         .inner-option(v-for="(voice, i) in voices")
                             .inner-option__check(@click="voiceChoice(i)")

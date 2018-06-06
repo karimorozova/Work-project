@@ -6,18 +6,17 @@
     align-items: flex-start;
     margin-bottom: 30px;
 
-    .copywritingContainer {
-        border: 2px solid #67563D;
+    .container {
         position: relative;
         font-family: MyriadPro;
         width: 55%;
-        margin-left: 6%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         padding: 40px 40px 0 40px;
-        border-radius: 20px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, .5);
+        border-radius: 15px;;
         color: #67563D;
         position: relative;
 
@@ -27,41 +26,81 @@
         padding-left: 36px;
 
         .col-1 {
-            margin-bottom: 30px;
-            &__block0__title {
-                margin-bottom: 15px;
-                .pname {
-                    font-size: 22px;
-                    margin-right: 5px;
-                }
-            }
-            &__block0__inner {
-                padding-left: 8px;
+            margin-bottom: 35px;
+            &__block0 {
+                color: #67573E;
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
                 margin-bottom: 30px;
-                    .psel {
-                        margin-top: 15px;
-                        margin-right: 15px;
+                .lblock {
+                    margin-right: 95px;
+                    label {
+                        font-size: 22px; 
                     }
-                    input {
-                        margin-top: 15px;
-                        margin-right: 32px;
-                        width: 78%;
-                        outline: none;
-                        border: 1px solid #66563D;
-                        border-radius: 7px;
-                        padding: 3px;
-                        height: 19px;
-                        font-family: MyriadPro;
+                    ::-webkit-input-placeholder {
+                        opacity: 0.6;
+                    } 
+                    .name {
+                        display: flex;
+                        flex-direction: column;
+                            input {
+                                width: 280px;
+                                height: 28px;
+                                padding-left: 5px;
+                                padding-right: 5px;
+                                border-radius: 7px;
+                                border: 1px solid #67573E;
+                                outline: none;
+                            }
                     }
-            }
+                }
+                .rblock {
+                    .name {
+                        width: 50%;
+                        display: flex;
+                        flex-direction: column;
+                            .asterisk {
+                                font-size: 22px;
+                            }
+                        }
+                    .deadline {
+                        display: flex;
+                        align-items: center;
+                        .picker {
+                            input {
+                                font-size: 18px;
+                                text-align: center;
+                                opacity: 0.7;
+                                border-radius: 10px;
+                                border: none;
+                                padding: 8px;
+                                width: 150px;
+                                margin-left: 20px;
+                                border: 1px solid rgba(102, 86, 61, 0.5);
+                                box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
+                            }
+                        }
+                        .datepick {
+                            img {
+                                cursor: pointer;
+                                padding-left: 5px;
+                                padding-top: 7px;
+                                width: 20px;
+                                height: 20px;;
+                            }
+                        }
+                    } 
+                }
+            }        
             &__block1 {
             margin-bottom: 15px;
                 .block1 {
                     font-size: 22px;
                     margin-right: 5px;
+                        &::after {
+                            content: '*';
+                            color: #f00;
+                        }
                 }
                 .block2 {
                     display: flex;
@@ -238,6 +277,10 @@
                 .block1 {
                     font-size: 22px;
                     margin-right: 5px;
+                        &::after {
+                            content: '*';
+                            color: #f00;
+                        }
                 }
             }
             &__block2 {
@@ -252,6 +295,13 @@
                     align-items: center;
                     justify-content: space-between;
                     cursor: pointer;
+                        .checkTitle {
+                            .selected {
+                                display: flex;
+                                justify-content: center;
+                            }
+                        }
+                    
                         span {
                             margin-bottom: 24px;
                             &:last-child {
@@ -614,9 +664,11 @@
                 justify-content: space-evenly;
                     .sub {
                         display: flex;
+                        align-items: center;
                         cursor: pointer;
                             img {
-                                width: 60px;
+                                width: 44px;
+                                height: 23px;
                             }
                     }
             }
@@ -762,6 +814,7 @@
                 .block1 {
                     font-size: 22px;
                     margin-right: 45px;
+                    padding-right: 8px;
                 }
                 .toggle {
                     width: 76px;
@@ -891,9 +944,9 @@
         }
 
         .choice-sel {
-            width: 20px;
-            height: 18px;
-            border-radius: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 12px;
             background-color: #67563D;
             border: 1px solid #bfb09d;
             border-radius: 14px;
@@ -903,9 +956,9 @@
                 content: "";
                 display: block;
                 border: 1px solid #bfb09d;
-                border-radius: 18px;
-                width: 26px;
-                height: 24px;
+                border-radius: 16px;
+                width: 18px;
+                height: 18px;
                 position: absolute;
                 top: -4px;
                 left: -4px;
@@ -914,8 +967,8 @@
         .empty-choice {
                 border: 1px solid #bfb09d;
                 border-radius: 18px;
-                width: 20px;
-                height: 18px;
+                width: 14px;
+                height: 14px;
                 margin: 10px;
         }
 
@@ -996,3 +1049,31 @@ align-items: center;
 }
 }
 
+.asterisk {
+    .warning & {
+      font-size: 20px;
+      position: relative;
+      padding-right: 15px;
+    }
+    &:after {
+      content: '*';
+      color: #F00;
+      .warning & {
+        position: absolute;
+        font-size: 30px;
+        right: -1px;
+      }
+    }
+  }
+
+  .vdp-datepicker__calendar {
+    div {
+      .day-header {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .cell {
+        background-color: #eaeaea;
+      }
+    }
+  }

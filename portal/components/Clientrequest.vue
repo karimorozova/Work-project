@@ -519,8 +519,8 @@ export default {
     Datepicker,
     Drop,
     Marketing,
-    Copywriting,
-    Proofing
+    Proofing,
+    Copywriting
   },
   mounted(){
     this.getServices();
@@ -595,6 +595,7 @@ export default {
           width: 88%;
           .head {
             margin-bottom: 5px;
+            font-size: 14px;
           }
           .insideText {
             font-size: 12px;
