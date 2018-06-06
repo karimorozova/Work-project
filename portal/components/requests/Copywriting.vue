@@ -231,7 +231,7 @@
               p.choice {{ genBrief.package }}
             .orderInfoCopy__summary-deadline
               label SUGGESTED DEADLINE
-              p.choice {{ deadlineSelect | formating }}
+              p.choice {{ deadlineDate }}
 </template>
 
 <script>
@@ -792,9 +792,12 @@ export default {
       return this.$store.state.clientInfo.service;
     }
   },
-  filters: {
-    formating(value){
-      if(value) return moment(String(value)).format('DD-MM-YYYY');
+  watch: {
+    deadlineSelect() {
+      const date = moment(this.deadlineSelect);
+      if(this.deadlineSelect) {
+        this.deadlineDate = date.format('DD-MM-YYYY');
+      }
     }
   },
   components: {
