@@ -1,7 +1,7 @@
 <template lang="pug">
   .externalWrap
     Marketing(v-if="service == 'Marketing'")
-    Copywriting(v-if="service == 'Copywriting'")
+    Copywriting(v-if="service == 'Copywriting'" @thankCopy="thankYou")
     Proofing(v-if="service == 'Proofing/QA'")
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container(v-if="!thanks")

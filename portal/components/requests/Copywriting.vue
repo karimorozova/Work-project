@@ -392,7 +392,7 @@ export default {
         briefSure: "",
         briefExample: "",
         briefRef: [],
-        package: "200-399",
+        package: "0-400",
         structure: [],
         style: "US",
         tone: [],
@@ -802,7 +802,27 @@ export default {
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
-        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+        // window.top.location.href = "https://www.pangea.global/thank-you";
+        var uniqueCopywr = {
+          projectName: this.projName,
+          date: this.deadlineDate,
+          type: this.typeSelect,
+          targetLanguages: this.selectLang,
+          package: this.genBrief.package,
+          description: this.genBrief.briefDescr,
+          audience: this.genBrief.briefAudience,
+          title: this.genBrief.briefTitle,
+          topics: this.genBrief.briefTopics,
+          sure: this.genBrief.briefSure,
+          example: this.genBrief.briefExample,
+          reff: this.genBrief.briefRef,
+          structure: this.structureSelect,
+          style: this.genBrief.style,
+          tone: this.toneSelect,
+          design: this.designSelect,
+          seo: this.seoSelect
+        };
+        this.$store.dispatch('loadOrderDetails', this.uniqueCopywr);
       } else {
         this.showError();
         event.preventDefault();
