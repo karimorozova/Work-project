@@ -37,8 +37,10 @@
                     span.itemName BRIEF:
                     span.itemData {{ briefText }}
         .foot
-            p.footText
+            p.footText(v-if="orderData.requestType == 'QUOTE'")
                 | A {{ orderData.requestType }} WILL BE SENT SHORTLY
+            p.footText(v-else)
+                | THE {{ orderData.requestType }} WILL BEGIN SHORTLY
 </template>
 
 <script>
