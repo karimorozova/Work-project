@@ -32,6 +32,9 @@ const store = () => new Vuex.Store({
         },
         referFiles(context, payload) {
             context.commit('reffilesToDetails', payload)
+        },
+        requestType(context, payload) {
+            context.commit('orderType', payload)
         }
      },
     mutations: {
@@ -50,6 +53,9 @@ const store = () => new Vuex.Store({
             if(payload) {              
                 state.orderDetails.refFiles = payload.name;
             }
+        },
+        orderType(state, payload) {
+            state.orderDetails.requestType = payload;
         },
         langs(state, payload) {
             state.clientLanguages = payload

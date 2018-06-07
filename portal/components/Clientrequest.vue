@@ -2,7 +2,7 @@
   .externalWrap
     Marketing(v-if="service == 'Marketing'")
     Copywriting(v-if="service == 'Copywriting'" @thankCopy="thankYou")
-    Proofing(v-if="service == 'Proofing/QA'")
+    Proofing(v-if="service == 'Proofing/QA'" @thankProof='thankProof')
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container(v-if="!thanks")
         .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
@@ -232,6 +232,10 @@ export default {
     }
   },
   methods: {
+    thankProof(data) {
+      console.log(data);
+      this.$emit('thankProof', data);
+    },
     outsideLangs() {
       this.targetDrop = false;
       this.sourceDrop = false;
@@ -451,9 +455,12 @@ export default {
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
+        var requestType = "QUOTE";
+        if(!this.sendOption) requestType = "PROJECT";
         this.$store.dispatch('loadOrderDetails', this.request);
         this.$store.dispatch('files', this.detailFiles);
-        this.$store.dispatch('referFiles', this.refFiles);                     
+        this.$store.dispatch('referFiles', this.refFiles);
+        this.$store.dispatch('requestType', requestType);                
         this.$emit('thankYou', this.request.service);
         // window.top.location.href = "https://www.pangea.global/thank-you"; 
       } else {

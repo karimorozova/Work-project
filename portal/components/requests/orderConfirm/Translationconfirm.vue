@@ -36,6 +36,9 @@
                 .allDetails__item
                     span.itemName BRIEF:
                     span.itemData {{ briefText }}
+        .foot
+            p.footText
+                | A {{ orderData.requestType }} WILL BE SENT SHORTLY
 </template>
 
 <script>
@@ -109,45 +112,5 @@ export default {
 </script>
 
 <style lang="scss">
-    .confirmation {
-        color: #66573D;
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        .head {
-            &__title {
-                margin-bottom: 50px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                font-size: 22px;
-                .summary {
-                    font-size: 14px;
-                }
-            }
-        }
-        &__mainData {
-            margin-bottom: 80px;
-            display: flex;
-            width: 60%;
-            justify-content: space-between;
-        }
-    }
-    .allDetails {
-        width: 35%;
-        &__item {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-    .itemName {
-        font-size: 22px;
-    }
-    .itemData {
-        font-size: 14px;
-        color: #ff876c;
-    }
+    @import '../../../assets/styles/clientrequest/transthanks.scss';
 </style>

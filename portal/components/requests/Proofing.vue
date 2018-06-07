@@ -284,18 +284,37 @@ export default {
       if(this.errors.length) {
           this.showErrors = true
       } else {
-          const result = await this.$axios.$post('project',{
-          "name" : this.projectName,
-          "serviceId" : 13,
-          "deadline": this.deadline,
-          "clientId": this.company.id,
-          "person": this.personSelected.id,
-          "jobs" : this.projects
-            }).then(req => {
-                  console.log('Req done: ', req)
-                }).catch(err => {
-                  console.error('Error: ', err)
-                })
+        var obj = {};
+        obj.projectName = this.projectName;
+        obj.date = this.deadline;
+        let sorted = this.projects.sort( (a, b) => {
+          if (a.targetLang.lang < b.targetLang.lang) return -1;
+          if (a.targetLang.lang > b.targetLang.lang) return 1;
+        })
+        var result = [];
+        sorted.forEach( function(a) {
+        if (!this[a.targetLang.lang]) {
+            this[a.targetLang.lang] = { lang: a.targetLang.lang, wordcount: 0 };
+            result.push(this[a.targetLang.lang]);
+        }
+            this[a.targetLang.lang].wordcount += a.wordcount;
+        }, Object.create(null));
+
+        obj.countPairs = result;
+        this.$store.dispatch('loadOrderDetails', obj);
+        this.$emit('thankProof', this.service);        
+          // const result = await this.$axios.$post('project',{
+          // "name" : this.projectName,
+          // "serviceId" : 13,
+          // "deadline": this.deadline,
+          // "clientId": this.company.id,
+          // "person": this.personSelected.id,
+          // "jobs" : this.projects
+          //   }).then(req => {
+          //         console.log('Req done: ', req)
+          //       }).catch(err => {
+          //         console.error('Error: ', err)
+          //       })
       }
     }
   },
