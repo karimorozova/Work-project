@@ -31,25 +31,29 @@
             .allDetails
                 .allDetails__item
                     span.itemName BRIEF:
-                    span.itemNameSm DESCRIPTION:
-                    span.itemData {{ orderData.description }}
-                    span.itemNameSm AUDIENCE:
-                    span.itemData {{ orderData.audience }}
-                    span.itemNameSm TITLE:
-                    span.itemData {{ orderData.title }}
-                    span.itemNameSm TOPICS:
-                    span.itemData {{ orderData.topics }}
-                    span.itemNameSm TOPICS:
-                    span.itemData {{ orderData.sure }}
-                    span.itemNameSm URL:
-                    span.itemData {{ orderData.example }}
-                    span.itemNameSm Reference File:
-                    span.itemData {{ orderData.reff }}
+                        .inner-w
+                            span.itemNameSm DESCRIPTION:
+                            span.itemData {{ orderData.description }}
+                        .inner-w
+                            span.itemNameSm AUDIENCE:
+                            span.itemData {{ orderData.audience }}
+                        .inner-w
+                            span.itemNameSm TITLE:
+                            span.itemData {{ orderData.title }}
+                        .inner-w
+                            span.itemNameSm TOPICS:
+                            span.itemData {{ topics }}
+                        .inner-w
+                            span.itemNameSm URL:
+                            span.itemData {{ orderData.example }}
+                        .inner-w
+                            span.itemNameSm Reference File:
+                            span.itemData {{ refFileName }}
         .confirmation__mainData
             .allDetails
                 .allDetails__item
                     span.itemName STRUCTURE:
-                    span.itemData {{ orderData.stucture }}
+                    span.itemData {{ structures }}
         .confirmation__mainData
             .allDetails
                 .allDetails__item
@@ -58,12 +62,12 @@
             .allDetails
                 .allDetails__item
                     span.itemName TONE OF VOICE:
-                    span.itemData {{ orderData.tone }}
+                    span.itemData {{ tones }}
         .confirmation__mainData
             .allDetails
                 .allDetails__item
                     span.itemName DESIGN:
-                    span.itemData {{ orderData.design }}
+                    span.itemData {{ degign }}
             .allDetails
                 .allDetails__item
                     span.itemName SEO:
@@ -80,132 +84,171 @@
 </template>
 
 <script>
-import moment from 'moment';
+import moment from "moment";
 
 export default {
-    props: {
-    },
-    data() {
-        return {
-            orderData: {},
-        }
-    },
-    methods: {
-        getData() {
-            this.orderData = this.$store.state.orderDetails;
-        }
-    },
-    computed: {
-        deadlineSelect() {
-            let date = "";            
-            if(this.orderData.date) {
-                date = moment(this.orderData.date).format('DD/MM/YYYY');
-            }
-            return date;
-        },
-        sourceLang() {
-            let result = "";
-            if(this.orderData.sourceLanguage) {
-                result = this.orderData.sourceLanguage.lang;
-            }
-            return result;
-        },
-        targetLangs() {
-            let result = "";
-            if(this.orderData.targetLanguages) {
-                for(let i = 0; i < this.orderData.targetLanguages.length; i++) {
-                    result += this.orderData.targetLanguages[i].lang + "; "
-                }
-            }
-            return result;
-        },
-        detailFilesList() {
-            let files = "";
-            if(this.orderData.detailFiles) {
-                for(let i = 0; i < this.orderData.detailFiles.length; i++) {
-                    files += this.orderData.detailFiles[i] + "; ";
-                }
-            }
-            return files;
-        },
-        refFileName() {
-            let file = "";
-            if(this.orderData.refFiles) {
-                file = this.orderData.refFiles;
-            }
-            return file;
-        },
-        briefText() {
-            let brief = "";
-            if(this.orderData.brief) {
-                brief = this.orderData.brief;
-            }
-            return brief;
-        }
-    },
-    mounted() {
-        this.getData();
+  props: {},
+  data() {
+    return {
+      orderData: {}
+    };
+  },
+  methods: {
+    getData() {
+      this.orderData = this.$store.state.orderDetails;
     }
-}
+  },
+  computed: {
+    deadlineSelect() {
+      let result = "";
+      if (this.orderData.date) {
+        result = moment(this.orderData.date).format("DD/MM/YYYY");
+      }
+      return result;
+    },
+    sourceLang() {
+      let result = "";
+      if (this.orderData.sourceLanguage) {
+        result = this.orderData.sourceLanguage.lang;
+      }
+      return result;
+    },
+    targetLangs() {
+      let result = "";
+      if (this.orderData.targetLanguages) {
+        for (let i = 0; i < this.orderData.targetLanguages.length; i++) {
+          result += this.orderData.targetLanguages[i].lang + "; ";
+        }
+      }
+      return result;
+    },
+    detailFilesList() {
+      let result = "";
+      if (this.orderData.detailFiles) {
+        for (let i = 0; i < this.orderData.detailFiles.length; i++) {
+          result += this.orderData.detailFiles[i] + "; ";
+        }
+      }
+      return result;
+    },
+    refFileName() {
+      let result = "";
+      if (this.orderData.refFiles) {
+        result = this.orderData.refFiles;
+      }
+      return result;
+    },
+    tones() {
+      let result = "";
+      if (this.orderData.tone) {
+        for (let i = 0; i < this.orderData.tone.length; i++) {
+          result += this.orderData.tone[i] + ", ";
+        }
+      }
+      return result;
+    },
+    degign() {
+      let result = "";
+      if (this.orderData.design) {
+        for (let i = 0; i < this.orderData.design.length; i++) {
+          result += this.orderData.design[i] + "; ";
+        }
+      }
+      return result;
+    },
+    audience() {
+      let result = "";
+      if (this.orderData.audience) {
+        result += this.orderData.audience;
+      }
+      return result;
+    },
+    topics() {
+      let result = "";
+      if (this.orderData.topics) {
+        result = "To mention: " + this.orderData.topic;
+      }
+      return result;
+    },
+    structures() {
+      let result = "";
+      if(this.orderData.structure) {
+        for(let i = 0; i < this.orderData.structure.length; i++) {
+          result += this.orderData.structure[i] + ", " ;
+        }
+      }
+      return result;
+    }
+  },
+  mounted() {
+    this.getData();
+  }
+};
 </script>
 
 <style lang="scss">
-    .confirmation {
-        color: #66573D;
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        .head {
-            &__title {
-                margin-bottom: 50px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                font-size: 22px;
-                .summary {
-                    font-size: 14px;
-                }
-            }
-        }
-        &__mainData {
-            margin-bottom: 80px;
-            display: flex;
-            width: 60%;
-            justify-content: space-between;
-        }
-    }
-    .allDetails {
-        width: 35%;
-        &__item {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-    .itemName {
-        font-size: 22px;
-    }
-    .itemNameSm {
+.confirmation {
+  color: #66573d;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .head {
+    &__title {
+      margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      .summary {
         font-size: 14px;
-        // margin: 14px 0;
-        &:last-child {
-            margin-bottom: 0;
-        }
+      }
     }
-    .itemData {
-        font-size: 14px;
-        color: #ff876c;
-    }
-    .itemDataExSm {
-        font-size: 12px;
-        color: #aca6a5;
-    }
-    .copyconffoot {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+  }
+  &__mainData {
+    margin-bottom: 80px;
+    display: flex;
+    width: 60%;
+    justify-content: space-between;
+  }
+}
+.allDetails {
+  width: 35%;
+  &__item {
+    display: flex;
+    flex-direction: column;
+  }
+}
+.itemName {
+  font-size: 22px;
+}
+.itemNameSm {
+  font-size: 14px;
+  padding-right: 5px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.itemData {
+  font-size: 14px;
+  color: #ff876c;
+}
+.itemDataExSm {
+  font-size: 12px;
+  color: #aca6a5;
+}
+.copyconffoot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.inner-w {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
 </style>

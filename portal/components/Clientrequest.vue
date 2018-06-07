@@ -1,7 +1,7 @@
 <template lang="pug">
   .externalWrap
     Marketing(v-if="service == 'Marketing'")
-    Copywriting(v-if="service == 'Copywriting'" @thankCopy="thankYou")
+    Copywriting(v-if="service == 'Copywriting'" @thankCopy="thankCopy")
     Proofing(v-if="service == 'Proofing/QA'" @thankProof='thankProof')
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
       .container(v-if="!thanks")
@@ -82,7 +82,7 @@
                   .checker(:class="{checkerChecked: sendOption}")
                 .send__text
                   p.head Send a Quote
-                  //- p.insideText I approve for the project to begin immediately and I'll review the quote later.
+                  //-  p.insideText I approve for the project to begin immediately and I'll review the quote later.
               .start(:class="{optionChecked: startOption}" @click="chooseStart")
                 .start__check
                   .checker(:class="{checkerChecked: startOption}")
@@ -235,6 +235,10 @@ export default {
     thankProof(data) {
       console.log(data);
       this.$emit('thankProof', data);
+    },
+    thankCopy(data){
+      console.log(data);
+      this.$emit('thankCopy', data);
     },
     outsideLangs() {
       this.targetDrop = false;

@@ -116,6 +116,9 @@
                               .uploadBtn__text Upload
                               input(name="refFiles" type="file" @change='copyChangeRefFiles')
                             span.se Upload Reference File
+                            .loadedList
+                              li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
+                                i.fa.fa-times.deleteIcon
                 .col-5
                     .col-5__block1
                         span.block1 STRUCTURE TO INCLUDE
@@ -467,16 +470,17 @@ export default {
       deadlineSelect: '',
       toneDrop: false,
       voices: [
+        { title: "Promotional", check: false },
         { title: "Formal", check: false },
         { title: "Informal", check: false },
         { title: "Excited", check: false },
-        { title: "Straightforward", check: false },
+        { title: "Straigtforward", check: false },
         { title: "Serious", check: false },
         { title: "Relaxed", check: false },
-        { title: "Parsuasive", check: false },
-        { title: "Playful/Funny", check: false },
+        { title: "Persuasive", check: false },
+        { title: "Payful/Funny", check: false },
         { title: "Other", check: false, input: true, inputText: "" }
-      ]
+      ],
     };
   },
   methods: {
@@ -815,14 +819,15 @@ export default {
           topics: this.genBrief.briefTopics,
           sure: this.genBrief.briefSure,
           example: this.genBrief.briefExample,
-          reff: this.genBrief.briefRef,
           structure: this.structureSelect,
           style: this.genBrief.style,
           tone: this.toneSelect,
           design: this.designSelect,
           seo: this.seoSelect
         };
-        this.$store.dispatch('loadOrderDetails', this.uniqueCopywr);
+        this.$store.dispatch('loadOrderDetails', uniqueCopywr);
+        this.$store.dispatch('referFiles', this.refFiles);
+        this.$emit('thankCopy', this.service);
       } else {
         this.showError();
         event.preventDefault();
@@ -857,7 +862,10 @@ export default {
     },
     showTone() {
       this.toneDrop = !this.toneDrop;
-    }
+    },
+    refRemove(event) {
+      this.refFiles = [];
+    },
   },
   computed: {
     projName() {
@@ -895,10 +903,10 @@ export default {
     },
     toneSelect() {
       let result = [];
-      this.col7__block2.forEach((item) => {
-        if(item.choice) {
+      this.voices.forEach((item) => {
+        if(item.check) {
           if (item.title == "Other") {
-            result.push(item.input)
+            result.push(item.inputText)
           } else {
             result.push(item.title);
           }
