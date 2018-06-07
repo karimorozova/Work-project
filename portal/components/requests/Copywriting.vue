@@ -10,19 +10,12 @@
                           input(:class="classes('projectName')" type="text" placeholder="Project Name" v-model="projectName")
                       .rblock
                         .name
-                          label.asterisk DEADLINE:
+                          label.asterisk SUGGESTED DEADLINE:
                         .deadline
                           .picker
                             datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
                           .datepick(@click='openPicker')
                             img(src='../../assets/images/calendar.png')
-                    .col-1__block1
-                        span.block1 TYPE
-                    .col-1__block2
-                        .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{activeType: item.active}")
-                          span.sub1 {{ item.title }}
-                          img(v-if="item.active" :src="item.imageN")
-                          img(v-else :src="item.imageW")
                 .col-2
                     .col-2__block1
                         span.block1 SELECT A LANGUAGE
@@ -57,7 +50,13 @@
                                     .choice-sel(v-else)
                                 span.sub1 {{ item.title }}
                             img(:src="item.image")
-
+                    .col-1__block1
+                        span.block1 TYPE
+                    .col-1__block2
+                        .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{activeType: item.active}")
+                          span.sub1 {{ item.title }}
+                          img(v-if="item.active" :src="item.imageN")
+                          img(v-else :src="item.imageW")
                 .col-4
                     .col-4__block1
                         span.block1 GENERAL BRIEF

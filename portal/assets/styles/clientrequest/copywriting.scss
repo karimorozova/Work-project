@@ -31,8 +31,9 @@
                 display: flex;
                 align-items: center;
                 margin-bottom: 30px;
+                justify-content: space-between;
                 .lblock {
-                    margin-right: 95px;
+                    width: 50%;
                     label {
                         font-size: 22px; 
                     }
@@ -55,8 +56,8 @@
                     }
                 }
                 .rblock {
+                    width: 45%;
                     .name {
-                        width: 50%;
                         display: flex;
                         flex-direction: column;
                             .asterisk {
@@ -75,8 +76,7 @@
                                 border: none;
                                 padding: 8px;
                                 width: 150px;
-                                border: 1px solid rgba(102, 86, 61, 0.5);
-                                box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
+                                border: 1px solid rgba(102, 86, 61, 1);
                             }
                         }
                         .datepick {
@@ -93,6 +93,7 @@
             }        
             &__block1 {
             margin-bottom: 15px;
+            margin-top: 40px;
                 .block1 {
                     font-size: 22px;
                     margin-right: 5px;
@@ -104,6 +105,7 @@
                 .block2 {
                     display: flex;
                     justify-content: space-around;
+                    margin-bottom: 10px;
                 }
             }
             &__block2 {
