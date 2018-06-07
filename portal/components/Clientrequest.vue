@@ -12,8 +12,15 @@
             p We will answer you as soon as possible.
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number.projName
-            label.asterisk PROJECT NAME
-            input(type="text" v-model="projectName" value="projectName" maxlength="50" placeholder='50 characters maximum')
+            .projName__project
+              label.asterisk PROJECT NAME
+              input(type="text" v-model="projectName" value="projectName" maxlength="50" placeholder='50 characters maximum')
+            .projName__date.deadline
+              label.asterisk SUGGESTED DEADLINE
+              .calendar
+                datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+                .datepick(@click='openPicker')
+                    img(src='../assets/images/calendar.png')
           .number 
             label.asterisk SELECT A LANGUAGE
           .language(v-click-outside="outsideLangs")
@@ -62,17 +69,17 @@
                 .upload-btn
                   .upload-btn__txt Upload
                   input(name="refFiles" type="file" @change='changeRefFiles')
-                span.clarify Type Text
+                span.clarify Drag &amp; Drop
                 .loadedList
                   li.loadedList__item(v-if="refFiles.name" @click="refRemove(file)") {{ refFiles.name }}
                     i.fa.fa-times.deleteIcon
-              .inner.date-file.deadline
-                span Suggested Deadline
-                .calendar
-                  datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
-                  .datepick(@click='openPicker')
-                      img(src='../assets/images/calendar.png')
-                span.clarify Select
+              //- .inner.date-file.deadline
+              //-   span Suggested Deadline
+              //-   .calendar
+              //-     datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
+              //-     .datepick(@click='openPicker')
+              //-         img(src='../assets/images/calendar.png')
+              //-   span.clarify Select
             .details__brief
               span.details__brief-title Enter a short brief
               textarea(rows='4' v-model='brief') {{ brief }}

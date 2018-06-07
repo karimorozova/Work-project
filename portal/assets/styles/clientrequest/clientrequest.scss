@@ -191,6 +191,8 @@
       position: relative;
     }
     .selectLangs {
+      position: absolute;
+      z-index: 10;
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -229,22 +231,18 @@
       display: flex;
       justify-content: space-between;
       margin-top: 20px;
+      padding-left: 10px;
+      margin-bottom: 90px;
       span {
         padding-bottom: 5px;
       }
       .lang-source {
         width: 48%;
-          .langTitle {
-            display: flex;
-            justify-content: center;
-          }
+        position: relative;
       }
       .lang-target {
         width: 48%;
-        .langTitle {
-            display: flex;
-            justify-content: center;
-          }
+        position: relative;        
       }
       .source {
         max-height: 430px;
@@ -262,6 +260,9 @@
           position: relative;
           max-height: 169px;
           overflow-y: auto;
+          background-color: white;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
           .dialect {
               padding-left: 18px;
               position: absolute;
@@ -339,7 +340,7 @@
         }
       }
       .target {
-        max-height: 430px;
+        max-height: 430px;        
           .inner-text {
             position: relative;
           }
@@ -350,7 +351,10 @@
           padding: 15px 10px 0;
           border-top: 1px solid rgba(0,0,0,0.3);
           max-height: 169px;
-          overflow-y: auto;                
+          overflow-y: auto;
+          background-color: white;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;             
           .dialect {
               padding-left: 18px;
               position: absolute;
@@ -598,14 +602,13 @@
         align-items: flex-start;
         width: 100%;
         .inner {
-          width: 30%;
           display: flex;
           flex-direction: column;
           align-items: center;
           padding-top: 20px;
           padding-bottom: 20px;
           span {
-            font-size: 12px;
+            font-size: 14px;
             padding-top: 9px;
           }
           .supported {
@@ -650,31 +653,31 @@
             }
           }
         }
-        .deadline {
-          .calendar {
-            display: flex;
-            align-items: center;
-            img {
-              cursor: pointer;
-              padding-left: 5px;
-              padding-top: 7px;
-              width: 20px;
-              height: 20px;;
-            }
-            input {
-              font-size: 14px;
-              text-align: center;
-              opacity: 0.7;
-              border-radius: 10px;
-              border: none;
-              padding: 8px;
-              width: 150px;
-              margin-left: 20px;
-              border: 1px solid rgba(102, 86, 61, 0.5);
-              box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
-            }
-          }        
-        }
+        // .deadline {
+        //   .calendar {
+        //     display: flex;
+        //     align-items: center;
+        //     img {
+        //       cursor: pointer;
+        //       padding-left: 5px;
+        //       padding-top: 7px;
+        //       width: 20px;
+        //       height: 20px;;
+        //     }
+        //     input {
+        //       font-size: 14px;
+        //       text-align: center;
+        //       opacity: 0.7;
+        //       border-radius: 10px;
+        //       border: none;
+        //       padding: 8px;
+        //       width: 150px;
+        //       margin-left: 20px;
+        //       border: 1px solid rgba(102, 86, 61, 0.5);
+        //       box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
+        //     }
+        //   }        
+        // }
         .date-file {
           &_mobileView {
             display: none;
@@ -770,7 +773,7 @@
       .loadedList {
         display: flex;
         flex-direction: column;
-        padding-bottom: 40px;
+        padding-bottom: 15px;
         padding-top: 0;
         list-style: none;
         &__item {
@@ -805,7 +808,7 @@
         }
         &-title {
             font-size: 14px;
-            font-family: MyriadBold;
+            font-family: MyriadPro;
         }
       }
     }
@@ -851,12 +854,12 @@
   
     .number {
       position: relative;
-      span {
-        position: absolute;
-        left: -3.5%;
-        top: -14%;
-        font-size: 28px;
-      }
+      // span {
+      //   position: absolute;
+      //   left: -3.5%;
+      //   top: -14%;
+      //   font-size: 28px;
+      // }
       label {
         font-size: 22px;
         @media (max-width: 550px) {
@@ -935,7 +938,8 @@
       input {
             background-color: #FF876C;
             color: white;
-            padding: 10px 65px;
+            width: 83px;
+            height: 40px;
             border-radius: 10px;
             margin-top: 15px;
           }
@@ -1305,9 +1309,19 @@
 
     .projName {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       margin-bottom: 30px;
+      &__project, &__date {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+      }
+      &__date {
+        padding-left: 10px;
+        width: 40%;
+      }
       input {
+        margin-left: 10px;
         padding: 8px 8px 8px 22px;
         border-radius: 12px;
         padding: 8px;
@@ -1348,7 +1362,9 @@
       }
       .details {
         padding-bottom: 0;
+        padding-left: 10px;
         flex-direction: column;
+        width: initial;
         &__quote {
           margin-top: 30px;
           width: 100%;
@@ -1404,4 +1420,36 @@
     
         }
       }
+    }
+
+    .deadline {
+      .calendar {
+        display: flex;
+        align-items: center;
+        img {
+          cursor: pointer;
+          padding-left: 5px;
+          padding-top: 7px;
+          width: 20px;
+          height: 20px;;
+        }
+        input {
+          font-size: 14px;
+          text-align: center;
+          opacity: 0.7;
+          border-radius: 10px;
+          border: none;
+          padding: 8px;
+          width: 150px;
+          margin-left: 10px;
+          border: 1px solid rgba(102, 86, 61, 0.7);
+          // box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);      
+        }
+      }        
+    }
+
+    .langTitle {
+      display: flex;
+      justify-content: center;
+      font-size: 14px;
     }
