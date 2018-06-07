@@ -1,11 +1,11 @@
 <template lang='pug'>
-  .tableSelect
+  .tableSelect(v-click-outside="outClick")
     .select__selected(:class='{errorActive: !projects[index].targetLang.symbol && !projects[index].targetLang.exist, savedDisable: projects[index].icons[0].status}')
         span {{ targetLangSelect }}
         .icon(@click="showLanguages")
             i.fa.fa-caret-down
     input.search(v-if="droppedLang && projects[index].icons[1].status" type="text" v-model="search" placeholder="Search")                            
-    .drop(v-if="droppedLang && projects[index].icons[1].status" v-click-outside="outClick")
+    .drop(v-if="droppedLang && projects[index].icons[1].status")
       span.drop_item(@click="changeLang(langIndex, index)" v-for="(lang, langIndex) in targetLanguages" ) {{ lang.lang }}
 </template>
 

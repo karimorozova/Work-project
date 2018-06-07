@@ -1,9 +1,12 @@
 <template lang="pug">
-    Translationconfirm(v-if="serviceType == 'Translation'")
+    .confirms
+        Translationconfirm(v-if="serviceType == 'Translation' || serviceType == 'Graphic Localization'")
+        Proofingconfirm(v-if="serviceType == 'Proofing/QA'")
 </template>
 
 <script>
 import Translationconfirm from './requests/orderConfirm/Translationconfirm.vue';
+import Proofingconfirm from './requests/orderConfirm/Proofingconfirm.vue';
 
 export default {
     props: {
@@ -25,7 +28,8 @@ export default {
         }
     },
     components: {
-        Translationconfirm
+        Translationconfirm,
+        Proofingconfirm
     },
     mounted() {
         this.serviceDetect()
