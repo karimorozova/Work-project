@@ -84,13 +84,13 @@
                     .col-4__block5
                         .descr-2
                             .head-2
-                                span.block5 Topics to mention or not mention
+                                span.block5(:class="{in_block5_opac: inblock5}") Topics to mention or not mention
                                 span.notice-2(:class="{notice_2_vis: boolForTopicsTool}") {{ topicsToolTip }}
                                 span.star *
                                 img.inform-icon(src="../../assets/images/info-icon.png" @click="topicsTooltip")
                         .wrap
                             .in-block5
-                                textarea(v-model="genBrief.briefTopics" value="genBrief.briefTopics")
+                                textarea.tarcl(v-model="genBrief.briefTopics" value="genBrief.briefTopics" :class="{in_block5_opac: inblock5}")
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -108,6 +108,7 @@
                                       .descr-3
                                           .head-3
                                               span.normsp {{ item.title2 }}
+                                              img.inform-icon(src="../../assets/images/info-icon.png")
                                               span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
                     .col-4__block7
                         .first
@@ -128,10 +129,10 @@
                     .block1-wrapper
                       .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
                           .selected
-                              .empty-choice
-                                  .choice-sel(v-if="item.choice")
+                            .empty-choice
+                              .choice-sel(v-if="item.choice")
                           span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
-                          img(:src="item.image" v-if="index != 3")
+                          img.secImg(:src="item.image1" v-if="index != 3")
                           input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)")
                 .col-6
                     .col-6__block1
@@ -142,23 +143,28 @@
                             .selected
                                 .empty-choice
                                     .choice-sel(v-if="item.choice")
+                            span {{ item.title }}
                             img(:src="item.image")
                 .col-7
                   .col-7__block1
                     span.asterisk.copytone TONE OF VOICE
-                  .inner-tone
-                    .inner-langs__select.toneSelect
-                        span.select-text.clarify(:class="{ color: genBrief.tone.length }")
-                          template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
-                          template(v-if="genBrief.tone.length == 0") Select
-                          .span-wrapper(@click.self='showTone')
-                          .icon(:class="{ reverse: toneDrop }")
-                              i.fas.fa-caret-down
-                        .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
-                          .select__drop-list(v-for='(voice, i) in voices')
-                              .pair
-                                span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
-                                input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
+                  .col-7-container
+                    .toneWrapper(v-for="(voice, index) in voices")
+                      .toneExt
+                        .toneInn
+                      span.spInner {{ voice.title }}
+                      input(v-if="index == 8" v-model="voice.inputText")
+                        //- span.select-text.clarify(:class="{ color: genBrief.tone.length }")
+                        //-   template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
+                        //-   template(v-if="genBrief.tone.length == 0") Select
+                        //-   .span-wrapper(@click.self='showTone')
+                        //-   .icon(:class="{ reverse: toneDrop }")
+                        //-       i.fas.fa-caret-down
+                        //- .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
+                        //-   .select__drop-list(v-for='(voice, i) in voices')
+                        //-       .pair
+                        //-         span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
+                        //-         input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
                 .col-8
                     .col-8__block1
                         span.block1 DESIGN
@@ -313,30 +319,34 @@ export default {
         {
           title1:
             "The copywriter will provide you with bullet points/topics to include in the article and\nyou can approve them beforehand.Please note:this comes at an additional cost",
-          title2: "Request an outline from the copywriter",
+          title2: "Request an outline from\n\t the copywriter",
           choice: false
         }
       ],
       col5_block1: [
         {
           title: "Sub-heading",
-          image: require("../../assets/images/reviews-icon.png"),
+          image: require("../../assets/images/unselected-checkbox.png"),
+          image1: require("../../assets/images/article-icon.png"),
           choice: true
         },
         {
           title: "Only Paragraphs",
-          image: require("../../assets/images/reviews-icon.png"),
+          image: require("../../assets/images/unselected-checkbox.png"),
+          image1: require("../../assets/images/article-icon.png"),
           choice: false
         },
         {
           title: "Bullet points",
-          image: require("../../assets/images/reviews-icon.png"),
+          image: require("../../assets/images/unselected-checkbox.png"),
+          image1: require("../../assets/images/article-icon.png"),
           choice: false
         },
         {
           title: "Others",
           input: "",
-          image: require("../../assets/images/reviews-icon.png"),
+          image: require("../../assets/images/unselected-checkbox.png"),
+          image1: require("../../assets/images/article-icon.png"),
           choice: false
         }
       ],
@@ -475,7 +485,7 @@ export default {
       deadlineSelect: '',
       toneDrop: false,
       voices: [
-        { title: "Promotional", check: false },
+        // { title: "Promotional", check: false },
         { title: "Formal", check: false },
         { title: "Informal", check: false },
         { title: "Excited", check: false },
@@ -491,7 +501,8 @@ export default {
       targetAudienceToolTip: 'What kind of audience will read this article?',
       boolForTargTool: false,
       topicsToolTip: 'What main topics should or should not be discussed in the article? Please be as detailed as possible.',
-      boolForTopicsTool: false
+      boolForTopicsTool: false,
+      inblock5: false
     };
   },
   methods: {
@@ -512,6 +523,8 @@ export default {
     },
     iamNotSure() {
         this.sure = !this.sure;
+        this.inblock5 = !this.inblock5;
+        document.getElementsByClassName("tarcl")[0].readOnly = true;
     },
     handleScroll() {
       let offSet = window.pageYOffset;
