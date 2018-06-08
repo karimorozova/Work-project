@@ -13,10 +13,10 @@
         form.mainForm(ref="myForm" @submit.prevent="checkForm")
           .number.projName
             .projName__project
-              label.asterisk PROJECT NAME
+              label.asterisk PROJECT NAME:
               input(type="text" v-model="projectName" value="projectName" maxlength="50" placeholder='50 characters maximum')
             .projName__date.deadline
-              label.asterisk SUGGESTED DEADLINE
+              label.asterisk SUGGESTED DEADLINE:
               .calendar
                 datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
                 .datepick(@click='openPicker')
