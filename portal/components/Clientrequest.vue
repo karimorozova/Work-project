@@ -89,13 +89,13 @@
                   .checker(:class="{checkerChecked: sendOption}")
                 .send__text
                   p.head Send a Quote
-                  //-  p.insideText I approve for the project to begin immediately and I'll review the quote later.
+                  p.innerText I approve for the project to begin immediately and I'll review the quote later.
               .start(:class="{optionChecked: startOption}" @click="chooseStart")
                 .start__check
                   .checker(:class="{checkerChecked: startOption}")
                 .start__text
                   p.head Start Immediately
-                  //- p.insideText I approve for the project to begin immediately and to receive the quote just for reference.                
+                  p.innerText I approve for the project to begin immediately and to receive the quote just for reference.                
             .captcha
               input.buttons(type='submit' value='Submit' name="submit")          
           .warning(v-if="error")

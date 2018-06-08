@@ -7,12 +7,12 @@
                   .nwrap
                     .lblockm
                       .mark-option__title1
-                        span.asterisk PROJECT NAME
+                        span.asterisk PROJECT NAME:
                       .mark-option__inner
                         input.proj(type="text" v-model="projectName" maxlength="50" placeholder='50 characters maximum')
                     .rblockm
-                      .name
-                        label.asterisk DEADLINE:
+                      .mark-option__title1
+                        span.asterisk SUGGESTED DEADLINE:
                       .deadline
                         .picker
                           datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
@@ -20,7 +20,7 @@
                           img(src='../../assets/images/calendar.png')
                 .mark-option
                     .mark-option__title2
-                        span SELECT LANGUAGE
+                        span.asterisk SELECT A LANGUAGE
                     .mark-option__inner
                         .inner-langs
                             span.inner-langs__title Language(s)
@@ -66,13 +66,15 @@
                         .inner-description.genBrief__item
                             .inner-description__title.innerTitle
                                 span.innerTitle__title.asterisk Description
-                                    span.tooltip Please give a brief description of the project in as much detail as possible.
+                                    span.tooltip(v-if="descrTip") Please give a brief description of the project in as much detail as possible.
+                                img(src="../../assets/images/info-icon.png" @click="descrTipShow")
                             .inner-description__textField.textField
                                 textarea#grow(rows="1" @keyup="autoGrow()" v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}                    
                         .inner-audience.genBrief__item
                             .inner-audience__title.innerTitle
                                 span.innerTitle__title.asterisk Targeted audience
-                                    span.tooltip Who will receive this mailer?
+                                    span.tooltip(v-if="audienceTip") Who will receive this mailer?
+                                img(src="../../assets/images/info-icon.png" @click="audienceTipShow")
                             .inner-audience__textField.textField
                                 textarea(rows="1" v-model="genBrief.briefAudience") {{ genBrief.briefAudience }}
                         .inner-subject.genBrief__item
@@ -86,15 +88,15 @@
                                         span NO
                             .inner-subject__title
                                 span.innerTitle__title.innerTitle(v-if="subjectToggle") Any specific words/themes to include/not include in the subject line?
-                                    //- span.tooltip Any specific words/themes to include/not include in the subject line?
                             .inner-subject__textField.textField(v-if="subjectToggle")
                                 textarea(rows="1" v-model="genBrief.briefTitle") {{ genBrief.briefTitle }}
                         .inner-topics.genBrief__item
-                            .inner-topics__title
-                                span.innerTitle__title.innerTitle.asterisk Topics to mention or not to mention
-                                    span.tooltip What main topics should or should not be covered in the mailer? Please be as detailed as possible.                        
+                            .inner-topics__title.innerTitle(:class="{disable: topicText}")
+                                span.innerTitle__title.asterisk Topics to mention or not to mention
+                                    span.tooltip(v-if="topicsTip") What main topics should or should not be covered in the mailer? Please be as detailed as possible
+                                img(src="../../assets/images/info-icon.png" @click="topicsTipShow")                                
                             .inner-topics__textField
-                                input(type="text")
+                                input(type="text" :readonly="topicText" :class="{disable: topicText}")
                                 span or
                                 button(@click.prevent="showTopic" :class="{notSure: topicText}") I am not sure
                             .inner-topics__hiddenText(v-if="topicText")
@@ -116,9 +118,10 @@
                                         span YES
                                     .no 
                                         span NO                                                       
-                            .inner-bonus__title(v-if="bonusToggle")
-                                span.innerTitle__title.innerTitle Bonus/Offers details                                
-                                    span.tooltip Please list key info about promotion
+                            .inner-bonus__title.innerTitle(v-if="bonusToggle")
+                                span.innerTitle__title Bonus/Offers details                                
+                                    span.tooltip(v-if="bonusTip") Please list key info about promotion
+                                img(src="../../assets/images/info-icon.png" @click="bonusTipShow")                                                                
                             .inner-bonus__textField(v-if="bonusToggle")
                                 input(type="text" v-model="genBrief.briefBonus" value="genBrief.briefBonus")                         
                         .inner-cta.genBrief__item
@@ -153,40 +156,49 @@
                             .inner-option__check(@click="styleChoiceUs")
                                 .checker(v-if="styleUs")
                             .inner-option__image
+                                span US
                                 img(src="../../assets/images/US-icon.png")
                         .inner-option.style
                             .inner-option__check(@click="styleChoiceUk")
                                 .checker(v-if="styleUk")
                             .inner-option__image
+                                span UK
                                 img(src="../../assets/images/UK-icon.png")
                 .mark-option
                     .mark-option__title2
                         span.asterisk TONE OF VOICE
                     .mark-option__inner.voiceChekers
-                        .inner-tone
-                            .inner-langs__select.toneSelect
-                                span.select-text.clarify(:class="{ color: genBrief.tone.length }")
-                                    template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
-                                    template(v-if="genBrief.tone.length == 0") Select
-                                    .span-wrapper(@click.self='showTone')
-                                    .icon(:class="{ reverse: toneDrop }")
-                                        i.fas.fa-caret-down
-                                .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
-                                    .select__drop-list(v-for='(voice, i) in voices')
-                                        .pair
-                                            span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
-                                            input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
+                        .inner-option(v-for="(voice, i) in voices")
+                            .inner-option__check(@click="voiceChoice(i)")
+                              .checker(v-if="voice.check")
+                            span.voiceTitle {{ voice.title }}
+                            input(v-if="voice.input" type="text" v-model="voice.inputText")
+                        //- .inner-tone
+                        //-     .inner-langs__select.toneSelect
+                        //-         span.select-text.clarify(:class="{ color: genBrief.tone.length }")
+                        //-             template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
+                        //-             template(v-if="genBrief.tone.length == 0") Select
+                        //-             .span-wrapper(@click.self='showTone')
+                        //-             .icon(:class="{ reverse: toneDrop }")
+                        //-                 i.fas.fa-caret-down
+                        //-         .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
+                        //-             .select__drop-list(v-for='(voice, i) in voices')
+                        //-                 .pair
+                        //-                     span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
+                        //-                     input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
                 .markdetails__quote
                       .send(:class="{markoptionChecked: marksendOption}" @click="markchooseBegin")
                         .send__check
                           .checker(:class="{checkerChecked: marksendOption}")
                         .send__text
                           p.head Send a Quote
+                          p.innerText I approve for the project to begin immediately and I'll review the quote later.
                       .start(:class="{markoptionChecked: markstartOption}" @click="markchooseStart")
                         .start__check
                           .checker(:class="{checkerChecked: markstartOption}")
                         .start__text
                           p.head Start Immediately
+                          p.innerText I approve for the project to begin immediately and to receive the quote just for reference.
                 input.submit(type="submit" value="Submit")
                 .mark-footer
                     p.clarify Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at a separate cost.
@@ -203,10 +215,6 @@
                         span 1
                         label SERVICE: 
                         p.choice Marketing
-                    //- .orderInfo__summary-industry
-                    //-     span 2
-                    //-     label TYPE: 
-                    //-     p.choice Marketing
                     .orderInfo__summary-languages
                         span 2
                         label LANGUAGE:
@@ -230,7 +238,11 @@ import ClickOutside from 'vue-click-outside';
 export default {
   data() {
     return {
+      descrTip: false,
+      audienceTip: false,
+      topicsTip: false,
       toneDrop: false,
+      bonusTip: false,
       projectName: "",
       packageCheck200: true,
       packageCheck400: false,
@@ -249,7 +261,6 @@ export default {
       styleUs: true,
       styleUk: false,
       voices: [
-        { title: "Promotional", check: false },
         { title: "Formal", check: false },
         { title: "Informal", check: false },
         { title: "Excited", check: false },
@@ -301,6 +312,18 @@ export default {
     };
   },
   methods: {
+    descrTipShow() {
+      this.descrTip = !this.descrTip;
+    },
+    audienceTipShow() {
+      this.audienceTip = !this.audienceTip;
+    },
+    topicsTipShow() {
+      this.topicsTip = !this.topicsTip;
+    },
+    bonusTipShow() {
+      this.bonusTip = !this.bonusTip;
+    },
     showTone() {
       this.toneDrop = !this.toneDrop;
     },
@@ -328,9 +351,13 @@ export default {
       }
     },
     voiceChoice(ind) {
-      console.log(ind);
       this.voices[ind].check = !this.voices[ind].check;
       this.genBrief.tone = this.toneSelect;
+      if(this.voices[ind].input) {
+        if(!this.voices[ind].check) {
+          this.voices[ind].inputText = "";
+        }
+      }
     },
     refRemove(event) {
       this.refFiles = [];
@@ -343,6 +370,7 @@ export default {
       this.topicText = !this.topicText;
       if(this.topicText) {
         this.genBrief.briefSure = "I am not sure";
+        this.briefTopics = "Not sure"
       } else {
         this.genBrief.briefSure = "";
       }
@@ -668,72 +696,6 @@ export default {
 <style lang="scss">
 @import "../../assets/styles/clientrequest/marketing.scss";
 
-.markdetails {
-    padding-bottom: 0;
-    flex-direction: column;
-    margin-bottom: 38px;
-    &__quote {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-top: 30px;
-      margin-bottom: 40px;
-      .send, .start {
-        display: flex;
-        align-items: center;
-        border: 1px solid #66563D;        
-        padding-left: 10px;
-        padding-right: 10px;
-        margin: 10px;
-        margin-right: 0;
-        cursor: pointer;
-        flex-direction: column;
-        width: 128px;
-        height: 120px;
-        &__check {
-          width: 18px;
-          height: 18px;
-          margin-top: 5px;
-          border: 1px solid #66563D;
-          border-radius: 50%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          .checker {
-            width: 67%;
-            height: 67%;
-            border-radius: 69%;
-          }
-          .checkerChecked {
-            background-color: #66563D;
-          }
-        }
-        &__text {
-          width: 88%;
-          display: flex;
-          justify-content: center;
-          .head {
-            margin-bottom: 5px;
-            font-size: 14px;
-          }
-          .insideText {
-            font-size: 12px;
-            margin-top: 0;
-          }
-        }
-      }
-      .markoptionChecked {
-        box-shadow: 0 0 7px rgba(0, 0, 0, .6);
-      }
 
-    }
-  }
-
-  .marketingForm {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
 
 </style>

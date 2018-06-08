@@ -4,11 +4,11 @@
             .proof-newProject
                 .proof-newProject__row
                     .name
-                        label.asterisk Project Name: 
+                        label.asterisk PROJECT NAME: 
                         input(:class="classes('projectName')" type="text" placeholder="Project Name" v-model="projectName")
                 .proof-newProject__row
                     .deadline
-                        label.asterisk Deadline: 
+                        label.asterisk SUGGESTED DEADLINE: 
                         .date(:class="classes('deadline')")
                             datepicker.customClass(ref="programaticOpen" v-model="deadline" placeholder='dd/mm/yyyy' 
                                 :format='format' 
@@ -61,7 +61,6 @@
                     .orderInfo__summary-deadline
                         label SUGGESTED DEADLINE
                         p.choice {{ deadlineSelect }}
-            p.orderSummary ORDER SUMMARY
 </template>
 
 <script>
