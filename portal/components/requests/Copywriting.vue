@@ -90,7 +90,7 @@
                                 img.inform-icon(src="../../assets/images/info-icon.png" @click="topicsTooltip")
                         .wrap
                             .in-block5
-                                textarea.tarcl(v-model="genBrief.briefTopics" value="genBrief.briefTopics" :class="{in_block5_opac: inblock5}")
+                                textarea.tarcl(v-model="genBrief.briefTopics" :class="{in_block5_opac: inblock5}") {{ genBrief.briefTopics }}
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -148,23 +148,12 @@
                 .col-7
                   .col-7__block1
                     span.asterisk.copytone TONE OF VOICE
-                  .col-7-container
-                    .toneWrapper(v-for="(voice, index) in voices")
-                      .toneExt
-                        .toneInn
-                      span.spInner {{ voice.title }}
-                      input(v-if="index == 8" v-model="voice.inputText")
-                        //- span.select-text.clarify(:class="{ color: genBrief.tone.length }")
-                        //-   template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
-                        //-   template(v-if="genBrief.tone.length == 0") Select
-                        //-   .span-wrapper(@click.self='showTone')
-                        //-   .icon(:class="{ reverse: toneDrop }")
-                        //-       i.fas.fa-caret-down
-                        //- .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
-                        //-   .select__drop-list(v-for='(voice, i) in voices')
-                        //-       .pair
-                        //-         span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
-                        //-         input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
+                    .voiceChekers
+                        .inner-option(v-for="(voice, i) in voices")
+                            .inner-option__check(@click="voiceChoice(i)")
+                                .checker(v-if="voice.check")
+                            span.voiceTitle {{ voice.title }}
+                            input(v-if="voice.input" type="text" v-model="voice.inputText")
                 .col-8
                     .col-8__block1
                         span.block1 DESIGN
@@ -175,12 +164,11 @@
                             .no 
                                 span NO
                     .col-8__block3(v-if="designToggle")
-                        .sub(v-for="(item, index) in col8__block3" @click="switchBlock8(index)" :class="{choice: item.choice}")
-                            .selected
-                                .empty-choice
-                                    .choice-sel(v-if="item.choice")
-                            span.title {{ item.title }}
-                            input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input" value="item.input")
+                      .designChekers
+                        .desinner-option(v-for="(item, i) in col8__block3")
+                            .desinner-option__check(@click="designChoice(i)")
+                                .checker(v-if="item.choice")
+                            span.designTitle {{ item.title }}
                 .col-9
                     .col-9__block1
                         span.block1 SEO
@@ -441,7 +429,6 @@ export default {
         },
         {
           title: "Other",
-          input: "",
           choice: false
         }
       ],
@@ -525,6 +512,9 @@ export default {
         this.sure = !this.sure;
         this.inblock5 = !this.inblock5;
         document.getElementsByClassName("tarcl")[0].readOnly = true;
+        if(this.sure) {
+          this.genBrief.briefTopics = this.genBrief.briefSure;
+        }
     },
     handleScroll() {
       let offSet = window.pageYOffset;
@@ -559,7 +549,7 @@ export default {
       this.col4_block6.forEach((item, i) => {
         if (index == i) {
           item.choice = true;
-          this.genBrief.briefSure = item.title2;
+          // this.genBrief.briefSure = item.title2;
         } else {
           item.choice = false;
         }
@@ -890,6 +880,10 @@ export default {
       this.voices[ind].check = !this.voices[ind].check;
       this.genBrief.tone = this.toneSelect;
     },
+    designChoice(ind) {
+      this.col8__block3[ind].choice = !this.col8__block3[ind].choice;
+      this.genBrief.design = this.designSelect;
+    },
     outsideTones() {
       this.toneDrop = false;
     },
@@ -898,7 +892,7 @@ export default {
     },
     refRemove(event) {
       this.refFiles = [];
-    },
+    }
   },
   computed: {
     projName() {
@@ -971,8 +965,19 @@ export default {
     },
     service() {
       return this.$store.state.clientInfo.service;
+    },
+    topicSelect() {
+      let result = '';
+      if(this.sure) {
+        for(let i = 0; i < this.col4_block6.length; i++) {
+          if(col4_block6[i].choice) {
+            console.log(col4_block6[i].title2);
+            result = this.col4_block6[i].title2;
+          }
+        }
+      }
+      return result;      
     }
-    
   },
   watch: {
     deadlineSelect() {
