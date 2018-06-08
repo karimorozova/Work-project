@@ -7,7 +7,7 @@
                       .lblock
                         .name
                           label.asterisk PROJECT NAME: 
-                          input(:class="classes('projectName')" type="text" placeholder="Project Name" v-model="projectName")
+                          input(:class="classes('projectName')" type="text" placeholder="50 characters maximum" v-model="projectName")
                       .rblock
                         .name
                           label.asterisk SUGGESTED DEADLINE:
@@ -46,8 +46,8 @@
                         .col-3__block2-sub(v-for="(item, index) in col3_block2" @click="switchChoice(index)" :class="{choice: item.choice}")
                             .checkTitle
                                 .selected
-                                    .empty-choice(v-if="!item.choice")
-                                    .choice-sel(v-else)
+                                    .empty-choice
+                                        .choice-sel(v-if="item.choice")
                                 span.sub1 {{ item.title }}
                             img(:src="item.image")
                     .col-1__block1
@@ -91,20 +91,21 @@
                             .block5-delim
                                 span.delim or
                             .block5-but
-                                button(@click.prevent="iamNotSure") I am not sure
+                                button(@click.prevent="iamNotSure" :class="{notSure: sure}") I am not sure
                     .col-4__block6(v-if="sure")
                         .col-4__block6-header
                             span.block6 If you are unsure of what points the article should cover, please select one of the following:
                             span.star *
-                        .col-4__block6-main(v-for="(item, index) in col4_block6" @click="switchPoints(index)" :class="{choice: item.choice}")
-                            .main-outer
-                                .selected
-                                    .empty-choice(v-if="!item.choice")
-                                    .choice-sel(v-else)
-                                .descr-3
-                                    .head-3
-                                        span.normsp {{ item.title2 }}
-                                        span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
+                            .sureOptions
+                              .col-4__block6-main(v-for="(item, index) in col4_block6" @click="switchPoints(index)" :class="{choice: item.choice}")
+                                  .main-outer
+                                      .selected
+                                          .empty-choice
+                                              .choice-sel(v-if="item.choice")
+                                      .descr-3
+                                          .head-3
+                                              span.normsp {{ item.title2 }}
+                                              span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
                     .col-4__block7
                         .first
                             span.exp Examples
@@ -124,8 +125,8 @@
                     .block1-wrapper
                       .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
                           .selected
-                              .empty-choice(v-if="!item.choice")
-                              .choice-sel(v-else)
+                              .empty-choice
+                                  .choice-sel(v-if="item.choice")
                           span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
                           img(:src="item.image" v-if="index != 3")
                           input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)")
@@ -136,8 +137,8 @@
                     .col-6__block2
                         .sub(v-for="(item, index) in col6__block1" @click="switchBlock6(index)" :class="{choice: item.choice}")
                             .selected
-                                    .empty-choice(v-if="!item.choice")
-                                    .choice-sel(v-else)
+                                .empty-choice
+                                    .choice-sel(v-if="item.choice")
                             img(:src="item.image")
                 .col-7
                   .col-7__block1
@@ -167,8 +168,8 @@
                     .col-8__block3(v-if="designToggle")
                         .sub(v-for="(item, index) in col8__block3" @click="switchBlock8(index)" :class="{choice: item.choice}")
                             .selected
-                                .empty-choice(v-if="!item.choice")
-                                .choice-sel(v-else)
+                                .empty-choice
+                                    .choice-sel(v-if="item.choice")
                             span.title {{ item.title }}
                             input(v-if="index == 2" :class="{lastInp: true}" v-model="item.input" value="item.input")
                 .col-9
@@ -199,11 +200,13 @@
                           .checker(:class="{checkerChecked: copysendOption}")
                         .send__text
                           p.head Send a Quote
+                          p.insideText I approve for the project to begin immediately and I'll review the quote later.
                       .start(:class="{copyoptionChecked: copystartOption}" @click="copychooseStart")
                         .start__check
                           .checker(:class="{checkerChecked: copystartOption}")
                         .start__text
                           p.head Start Immediately
+                          p.insideText I approve for the project to begin immediately and to receive the quote just for reference.
                     .col-9__block3
                       .bot
                         .buttonWrap

@@ -369,7 +369,7 @@ export default {
       } else {
         this.packageCheck400 = true;
         this.packageCheck200 = false;
-        this.genBrief.package = "200-400";
+        this.genBrief.package = "0-400";
       }
     },
     styleChoiceUs() {
@@ -493,7 +493,7 @@ export default {
         briefSure: "",
         briefExample: "",
         briefRef: [],
-        package: "200-399",
+        package: "0-200",
         structure: [],
         style: "US",
         tone: [],
