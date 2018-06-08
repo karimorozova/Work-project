@@ -65,14 +65,16 @@
                             .head
                                 span.block2 Description
                                 span.star *
-                                span.notice Please give a brief description of the project in as match detail as possible.
+                                img.inform-icon(src="../../assets/images/info-icon.png" @click="descrTooltip")
+                                span.notice(:class="{notice_vis: boolForDescrTool}") {{ descriptionToolTip }}
                         .inner-ta
                             textarea.ta-block2(v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}
                     .col-4__block3
                         .descr-1
                             .head-1
                                 span.block3 Targeted Audience
-                                span.notice-1 What kind of audience will read this article?
+                                span.notice-1(:class="{notice_1_vis: boolForTargTool}") {{ targetAudienceToolTip }}
+                                img.inform-icon(src="../../assets/images/info-icon.png" @click="targTooltip")
                         .in-block3
                             input(v-model="genBrief.briefAudience" value="genBrief.briefAudience")
                     .col-4__block4
@@ -83,8 +85,9 @@
                         .descr-2
                             .head-2
                                 span.block5 Topics to mention or not mention
-                                span.notice-2 What main topics should or should not be discussed in the article? Please be as detailed as possible.
+                                span.notice-2(:class="{notice_2_vis: boolForTopicsTool}") {{ topicsToolTip }}
                                 span.star *
+                                img.inform-icon(src="../../assets/images/info-icon.png" @click="topicsTooltip")
                         .wrap
                             .in-block5
                                 textarea(v-model="genBrief.briefTopics" value="genBrief.briefTopics")
@@ -480,9 +483,24 @@ export default {
         { title: "Payful/Funny", check: false },
         { title: "Other", check: false, input: true, inputText: "" }
       ],
+      descriptionToolTip: 'Please give a brief description of the project in as match detail as possible.',
+      boolForDescrTool: false,
+      targetAudienceToolTip: 'What kind of audience will read this article?',
+      boolForTargTool: false,
+      topicsToolTip: 'What main topics should or should not be discussed in the article? Please be as detailed as possible.',
+      boolForTopicsTool: false
     };
   },
   methods: {
+    descrTooltip() {
+      this.boolForDescrTool = !this.boolForDescrTool;
+    },
+    targTooltip() {
+      this.boolForTargTool = !this.boolForTargTool;
+    },
+    topicsTooltip() {
+      this.boolForTopicsTool = !this.boolForTopicsTool;
+    },
     closeWarning() {
       this.error = false;
     },

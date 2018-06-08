@@ -330,12 +330,11 @@
                         .head {
                             position: relative;
                             margin-top: 20px;
-                            .block2 {
-                                margin-right: 6px;
-                                &:hover ~ .notice {
-                                    visibility: visible;
-                                }
-                            }
+                            // .block2 {
+                            //     &:hover ~ .notice {
+                            //         visibility: visible;
+                            //     }
+                            // }
                             .notice {
                                 margin-left: 70px;
                                 color: #f4866e;
@@ -347,7 +346,10 @@
                                 top: -16px;
                                 left: 1px;
                             }
-                        } 
+                            .notice_vis {
+                                visibility: visible;
+                            }
+                        }
                     }
 
                 .inner-ta {
@@ -369,11 +371,11 @@
                     .head-1 {
                         margin-top: 20px;
                         position: relative;
-                        .block3 {
-                            &:hover ~ .notice-1 {
-                                visibility: visible;
-                            }
-                        }
+                        // .block3 {
+                        //     &:hover ~ .notice-1 {
+                        //         visibility: visible;
+                        //     }
+                        // }
                         .notice-1 {
                             margin-left: 70px;
                             color: #f4866e;
@@ -384,6 +386,9 @@
                             position: absolute;
                             top: -14px;
                             left: 38px;
+                        }
+                        .notice_1_vis {
+                            visibility: visible;
                         }
                     }
                 }
@@ -421,12 +426,11 @@
                         .head-2 {
                             margin-top: 20px;
                             position: relative;
-                            .block5 {
-                                margin-right: 6px;
-                                &:hover ~ .notice-2 {
-                                    visibility: visible;
-                                }
-                            }
+                            // .block5 {
+                            //     &:hover ~ .notice-2 {
+                            //         visibility: visible;
+                            //     }
+                            // }
                             .notice-2 {
                                 margin-left: 70px;
                                 color: #f4866e;
@@ -437,6 +441,9 @@
                                 position: absolute;
                                 top: -16px;
                                 left: -57px;
+                            }
+                            .notice_2_vis {
+                                visibility: visible;
                             }
                         }
                     }
@@ -1315,3 +1322,8 @@ align-items: center;
 
     }
   }
+
+.inform-icon {
+    margin-bottom: -4px;
+    margin-left: -4px;
+}
