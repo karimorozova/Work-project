@@ -192,7 +192,6 @@ export default {
         url: "portal/clientinfo",
         withCredentials: true
       });
-      console.log(result);
       this.client = result.data.client;
       if (!this.client) {
         window.location.replace("/");        
