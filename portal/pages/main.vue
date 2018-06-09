@@ -76,7 +76,7 @@
               invoices(v-if="invoicesShow")
               documents(v-if="documentsShow")
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
-              Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou")
+              Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
               Confirmorder(v-if="thanks" :thanksService="thanksService")             
 </template>
 

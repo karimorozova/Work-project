@@ -18,7 +18,7 @@
                             img(src='../../assets/images/calendar.png')
                 .col-2
                     .col-2__block1
-                        span.block1 SELECT A LANGUAGE
+                        label.asterisk SELECT A LANGUAGE:
                     .col-2__block2
                         .inner-langs
                             span.inner-langs__title Language(s)
@@ -43,11 +43,11 @@
                     .col-3__block1
                         span.block1 PACKAGE
                     .col-3__block2
-                        .col-3__block2-sub(v-for="(item, index) in col3_block2" @click="switchChoice(index)" :class="{choice: item.choice}")
+                        .col-3__block2-sub(v-for="(item, index) in col3_block2" @click="switchcheck(index)" :class="{check: item.check}")
                             .checkTitle
                                 .selected
-                                    .empty-choice
-                                        .choice-sel(v-if="item.choice")
+                                    .empty-check
+                                        .check-sel(v-if="item.check")
                                 span.sub1 {{ item.title }}
                             img(:src="item.image")
                     .col-1__block1
@@ -68,7 +68,7 @@
                                 img.inform-icon(src="../../assets/images/info-icon.png" @click="descrTooltip")
                                 span.notice(:class="{notice_vis: boolForDescrTool}") {{ descriptionToolTip }}
                         .inner-ta
-                            textarea.ta-block2(v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}
+                            textarea.ta-block2(rows="1" @keyup="autoGrow()" v-model="genBrief.briefDescr") {{ genBrief.briefDescr }}
                     .col-4__block3
                         .descr-1
                             .head-1
@@ -90,7 +90,7 @@
                                 img.inform-icon(src="../../assets/images/info-icon.png" @click="topicsTooltip")
                         .wrap
                             .in-block5
-                                textarea.tarcl(v-model="genBrief.briefTopics" :class="{in_block5_opac: inblock5}") {{ genBrief.briefTopics }}
+                                textarea.tarcl(v-model="genBrief.briefTopics" :class="{in_block5_opac: inblock5}" :readonly="sure") {{ genBrief.briefTopics }}
                             .block5-delim
                                 span.delim or
                             .block5-but
@@ -100,16 +100,25 @@
                             span.block6 If you are unsure of what points the article should cover, please select one of the following:
                             span.star *
                             .sureOptions
-                              .col-4__block6-main(v-for="(item, index) in col4_block6" @click="switchPoints(index)" :class="{choice: item.choice}")
-                                  .main-outer
+                              .col-4__block6-main
+                                  .main-outer(:class="{copyoptionChecked: topicsOption}" @click="topicsSure")
                                       .selected
-                                          .empty-choice
-                                              .choice-sel(v-if="item.choice")
+                                          .empty-check
+                                              .check-sel(v-if="topicsOption")
                                       .descr-3
                                           .head-3
-                                              span.normsp {{ item.title2 }}
+                                              span.normsp Give the copywriter freedom
                                               img.inform-icon(src="../../assets/images/info-icon.png")
-                                              span.rsp(:class="{rspSecond: index == 1}") {{ item.title1 }}
+                                              span.rsp(:class="{rspSecond: true}") You give the copywriter freedom to write article as they please. You will only receive one round of edits if you think the article needs improvement.
+                                  .main-outer(:class="{copyoptionChecked: requestOption}" @click="topicsRequest")
+                                      .selected
+                                          .empty-check
+                                              .check-sel(v-if="requestOption")
+                                      .descr-3
+                                          .head-3
+                                              span.normsp Request an outline from the copywriter
+                                                img.inform-icon(src="../../assets/images/info-icon.png")
+                                              span.rsp(:class="{rspSecond: true}") The copywriter will provide you with bullet points/topics to include in the article and you can approve them before hand. Please note: this comes at an additional cost
                     .col-4__block7
                         .first
                             span.exp Examples
@@ -127,22 +136,22 @@
                     .col-5__block1
                         span.block1 STRUCTURE TO INCLUDE
                     .block1-wrapper
-                      .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{choice: item.choice}, {sub_unbord: index == 3}]")
+                      .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{check: item.check}, {sub_unbord: index == 3}]")
                           .selected
-                            .empty-choice
-                              .choice-sel(v-if="item.choice")
+                            .empty-check
+                              .check-sel(v-if="item.check")
                           span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
                           img.secImg(:src="item.image1" v-if="index != 3")
-                          input(v-if="index == 3" :class="{inp_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)")
+                          textarea.inpbl5(v-if="index == 3" :class="{textarea_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)" rows="1" @keyup="autoGrowInp5()")
                 .col-6
                     .col-6__block1
                         span.block1 STYLE
                         span.star *
                     .col-6__block2
-                        .sub(v-for="(item, index) in col6__block1" @click="switchBlock6(index)" :class="{choice: item.choice}")
+                        .sub(v-for="(item, index) in col6__block1" @click="switchBlock6(index)" :class="{check: item.check}")
                             .selected
-                                .empty-choice
-                                    .choice-sel(v-if="item.choice")
+                                .empty-check
+                                    .check-sel(v-if="item.check")
                             span {{ item.title }}
                             img(:src="item.image")
                 .col-7
@@ -150,7 +159,7 @@
                     span.asterisk.copytone TONE OF VOICE
                     .voiceChekers
                         .inner-option(v-for="(voice, i) in voices")
-                            .inner-option__check(@click="voiceChoice(i)")
+                            .inner-option__check(@click="voicecheck(i)")
                                 .checker(v-if="voice.check")
                             span.voiceTitle {{ voice.title }}
                             input(v-if="voice.input" type="text" v-model="voice.inputText")
@@ -166,8 +175,8 @@
                     .col-8__block3(v-if="designToggle")
                       .designChekers
                         .desinner-option(v-for="(item, i) in col8__block3")
-                            .desinner-option__check(@click="designChoice(i)")
-                                .checker(v-if="item.choice")
+                            .desinner-option__check(@click="designcheck(i)")
+                                .checker(v-if="item.check")
                             span.designTitle {{ item.title }}
                 .col-9
                     .col-9__block1
@@ -178,19 +187,16 @@
                                 span YES
                             .no 
                                 span NO
+                        .voiceChekers.seoadd(v-if="seoToggle")
+                            .inner-option.additionalInn
+                                .inner-option__check(@click="voicecheckSeo")
+                                    .checker(v-if="meta.check")
+                                span.voiceTitle {{ meta.title }}
                     .col-9__block2(v-if="seoToggle")
-                        .sub(v-for="(item, index) in col9__block2" @click="switchBlock9(index)" :class="{choice: item.choice}")
-                            .sub__choose
-                                .selected
-                                    .empty-choice(v-if="!item.choice")
-                                    .choice-sel(v-else)
-                                span.title1 {{ item.title1 }}
-                            .sub__input    
-                                .selected(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]")
-                                    .empty-choice(v-if="!item.choice")
-                                    .choice-sel(v-else)
-                                span.title2(v-if="item.title2" :class="[{inv_block: index == 1}, {inv_block: index == 2}]") {{ item.title2 }}                                
-                                input(v-model="item.input" value="item.input")
+                      .sub(v-for="(item, index) in col9__block2")
+                        .sub__choose
+                          span.title1 {{ item.title1 }}                                
+                          input(v-model="item.input" value="item.input")
                     .copydetails__quote
                       .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
                         .send__check
@@ -221,24 +227,24 @@
             .orderInfo__summary-service
               span 1
               label SERVICE: 
-              p.choice {{ service }}
+              p.check {{ service }}
             .orderInfoCopy__summary-type
               span 2
               label TYPE:
-              p.choice {{ typeSelect }}
+              p.check {{ typeSelect }}
             .orderInfoCopy__summary-language
               span 3
               label LANGUAGE:
-              p.choice &nbsp;
+              p.check &nbsp;
                 template(v-for="language of selectLang") {{ language.lang }}; 
                 template(v-if="selectLang == 0") Select
             .orderInfoCopy__summary-package
               span 4
               label PACKAGE: 
-              p.choice {{ genBrief.package }}
+              p.check {{ genBrief.package }}
             .orderInfoCopy__summary-deadline
               label SUGGESTED DEADLINE
-              p.choice {{ deadlineDate }}
+              p.check {{ deadlineDate }}
 </template>
 
 <script>
@@ -274,27 +280,27 @@ export default {
         {
           title: "0-200",
           image: require("../../assets/images/UP-TO-199-icon.png"),
-          choice: false
+          check: false
         },
         {
           title: "0-400",
           image: require("../../assets/images/200-399-icon.png"),
-          choice: true
+          check: true
         },
         {
           title: "0-600",
           image: require("../../assets/images/400-599-icon.png"),
-          choice: false
+          check: false
         },
         {
           title: "0-1000",
           image: require("../../assets/images/600-999-icon.png"),
-          choice: false
+          check: false
         },
         {
           title: "0-1400",
           image: require("../../assets/images/1000-1400-icon.png"),
-          choice: false
+          check: false
         }
       ],
       col4_block6: [
@@ -302,13 +308,13 @@ export default {
           title1:
             "You give the copywriter freedom to write article as they please. You will only receive one round of edits if you think the article needs improvement.",
           title2: "Give the copywriter freedom",
-          choice: true
+          check: true
         },
         {
           title1:
             "The copywriter will provide you with bullet points/topics to include in the article and\nyou can approve them beforehand.Please note:this comes at an additional cost",
-          title2: "Request an outline from\n\t the copywriter",
-          choice: false
+          title2: "Request an outline from the copywriter",
+          check: false
         }
       ],
       col5_block1: [
@@ -316,78 +322,78 @@ export default {
           title: "Sub-heading",
           image: require("../../assets/images/unselected-checkbox.png"),
           image1: require("../../assets/images/article-icon.png"),
-          choice: true
+          check: true
         },
         {
           title: "Only Paragraphs",
           image: require("../../assets/images/unselected-checkbox.png"),
           image1: require("../../assets/images/article-icon.png"),
-          choice: false
+          check: false
         },
         {
           title: "Bullet points",
           image: require("../../assets/images/unselected-checkbox.png"),
           image1: require("../../assets/images/article-icon.png"),
-          choice: false
+          check: false
         },
         {
           title: "Others",
           input: "",
           image: require("../../assets/images/unselected-checkbox.png"),
           image1: require("../../assets/images/article-icon.png"),
-          choice: false
+          check: false
         }
       ],
       col6__block1: [
         {
           title: "US",
           image: require("../../assets/images/US-icon.png"),
-          choice: true
+          check: true
         },
         {
           title: "UK",
           image: require("../../assets/images/UK-icon.png"),
-          choice: false
+          check: false
         }
       ],
       col7__block2: [
         {
           title: "Formal",
-          choice: true
+          check: true
         },
         {
           title: "Informal",
-          choice: false
+          check: false
         },
         {
           title: "Excited",
-          choice: false
+          check: false
         },
         {
           title: "Straightforward",
-          choice: false
+          check: false
         },
         {
           title: "Serious",
-          choice: false
+          check: false
         },
         {
           title: "Relaxed",
-          choice: false
+          check: false
         },
         {
           title: "Parsuasive",
-          choice: false
+          check: false
         },
         {
           title: "Playful/Funny",
-          choice: false
+          check: false
         },
 
         {
           title: "Other",
           input: "",
-          choice: false
+          check: false
         }
       ],
       genBrief: {
@@ -421,33 +427,32 @@ export default {
       col8__block3: [
         {
           title: "Images",
-          choice: true
+          check: true
         },
         {
           title: "Charts",
-          choice: false
+          check: false
         },
         {
           title: "Other",
-          choice: false
+          check: false
         }
       ],
       col9__block2: [
         {
-          title1: "META description",
-          title2: "Keywords",
+          title1: "Keywords",
           input: "",
-          choice: true
+          // check: true
         },
         {
           title1: "Keyword density",
           input: "",
-          choice: false
+          // check: false
         },
         {
           title1: "Other",
           input: "",
-          choice: false
+          // check: false
         }
       ],
       slide: "0px",
@@ -489,10 +494,49 @@ export default {
       boolForTargTool: false,
       topicsToolTip: 'What main topics should or should not be discussed in the article? Please be as detailed as possible.',
       boolForTopicsTool: false,
-      inblock5: false
+      inblock5: false.check,
+      meta: {
+        title: 'Include META tags',
+        check: true
+      },
+      topicsOption: true,
+      requestOption: false
     };
   },
   methods: {
+    topicsSure(){
+      this.topicsOption = true;
+      this.requestOption = false;
+      this.col4_block6[0].check = true;
+      this.col4_block6[1].check = false;
+      this.genBrief.briefTopics = this.col4_block6[0].title2;
+
+    },
+    topicsRequest() {
+      this.topicsOption = false;
+      this.requestOption = true;
+      this.col4_block6[0].check = false;
+      this.col4_block6[1].check = true;
+      this.genBrief.briefTopics = this.col4_block6[1].title2;
+
+    },
+    autoGrow() {
+      let grow = document.getElementsByClassName("ta-block2")[0];
+      let row = grow.getAttribute("rows");
+      if (grow.clientHeight < grow.scrollHeight) {
+        grow.style.height = grow.scrollHeight * 2 - grow.clientHeight + "px";
+      }
+    },
+    autoGrowInp() {
+      let grow = document.getElementsByClassName(".inpbl5")[0];
+      let row = grow.getAttribute("rows");
+      if (grow.clientHeight < grow.scrollHeight) {
+        grow.style.height = grow.scrollHeight * 2 - grow.clientHeight + "px";
+      }
+    },
+    voicecheckSeo() {
+      this.meta.check = !this.meta.check;
+    },
     descrTooltip() {
       this.boolForDescrTool = !this.boolForDescrTool;
     },
@@ -511,9 +555,13 @@ export default {
     iamNotSure() {
         this.sure = !this.sure;
         this.inblock5 = !this.inblock5;
-        document.getElementsByClassName("tarcl")[0].readOnly = true;
+        // document.getElementsByClassName("tarcl")[0].readOnly = this.sure;
         if(this.sure) {
-          this.genBrief.briefTopics = this.genBrief.briefSure;
+          for(let i = 0; i < this.col4_block6.length; i++) {
+            if(this.col4_block6[i].check) {
+              this.genBrief.briefTopics = this.col4_block6[i].title2;
+            }
+          }
         }
     },
     handleScroll() {
@@ -535,42 +583,42 @@ export default {
         }
       });
     },
-    switchChoice(index) {
+    switchcheck(index) {
       this.col3_block2.forEach((item, i) => {
         if (index == i) {
-          item.choice = true;
+          item.check = true;
           this.genBrief.package = item.title;
         } else {
-          item.choice = false;
+          item.check = false;
         }
       });
     },
     switchPoints(index) {
       this.col4_block6.forEach((item, i) => {
         if (index == i) {
-          item.choice = true;
+          item.check = true;
           // this.genBrief.briefSure = item.title2;
         } else {
-          item.choice = false;
+          item.check = false;
         }
       });
     },
     switchStructure(index) {
       this.col5_block1.forEach((item, i) => {
         if (index == i) {
-          item.choice = !item.choice;
+          item.check = !item.check;
         }
       })
     },
     switchBlock6(index) {
       let style = this.col6__block1;      
-      if (style[index].choice) {
+      if (style[index].check) {
         this.styleSelect = style[index].title;
         return true
       } else {
         style.forEach(item => {
-          item.choice = !item.choice;
-          if(item.choice) {
+          item.check = !item.check;
+          if(item.check) {
             this.genBrief.style = item.title
           }
         })
@@ -579,7 +627,7 @@ export default {
     switchBlock7(index) {
       this.col7__block2.forEach((item, i) => {
         if (index == i) {
-          item.choice = !item.choice;
+          item.check = !item.check;
         }
       });
     },
@@ -638,8 +686,8 @@ export default {
       this.designToggle = !this.designToggle;
       if(!this.designToggle) {
         this.col8__block3.forEach((item,i) => {
-          if(i == 0) { item.choice = true }
-          else { item.choice = false }
+          if(i == 0) { item.check = true }
+          else { item.check = false }
           if(i == 2) item.input = ""
         })
       }
@@ -649,22 +697,22 @@ export default {
       if(!this.seoToggle) {
         this.col9__block2.forEach((item, i) => {
           item.input = "";
-          if(i == 0) { item.choice = true }
-          else { item.choice = false }
+          if(i == 0) { item.check = true }
+          else { item.check = false }
         })
       }
     },
     switchBlock8(index) {
       this.col8__block3.forEach((item, i) => {
         if (index == i) {
-          item.choice = !item.choice;
+          item.check = !item.check;
         }
       });
     },
     switchBlock9(index) {
       this.col9__block2.forEach((item, i) => {
         if (index == i) {
-          item.choice = !item.choice;
+          item.check = !item.check;
         }
       });
     },
@@ -725,22 +773,22 @@ export default {
       };
       this.col3_block2.forEach(item => {
         if(item.title == '200-399') {
-          item.choice = true
+          item.check = true
         } else {
-          item.choice = false
+          item.check = false
         }
       });
       this.sure = false;
       this.designToggle = false;
       this.seoToggle = false;
       this.col5_block1.forEach((item, i) => {
-        if(i == 0) { item.choice = true }
-        else { item.choice = false };
+        if(i == 0) { item.check = true }
+        else { item.check = false };
         if(i == 3) { item.input = "" }
       });
       this.col7__block2.forEach((item, i) => {
-        if(i == 0) {item.choice = true}
-        else { item.choice = false };
+        if(i == 0) {item.check = true}
+        else { item.check = false };
         if(i == 8) { item.input = "" }
       })
     },
@@ -848,8 +896,13 @@ export default {
           design: this.designSelect,
           seo: this.seoSelect
         };
+        var requestType = 'QUOTE';
+        if(!this.copysendOption) {
+          requestType = 'PROJECT'
+        }
         this.$store.dispatch('loadOrderDetails', uniqueCopywr);
         this.$store.dispatch('referFiles', this.refFiles);
+        this.$store.dispatch('requestType', requestType);
         this.$emit('thankCopy', this.service);
       } else {
         this.showError();
@@ -875,13 +928,13 @@ export default {
     openPicker() {
       this.$refs.programaticOpen.showCalendar();
     },
-    voiceChoice(ind) {
+    voicecheck(ind) {
       console.log(ind);
       this.voices[ind].check = !this.voices[ind].check;
       this.genBrief.tone = this.toneSelect;
     },
-    designChoice(ind) {
-      this.col8__block3[ind].choice = !this.col8__block3[ind].choice;
+    designcheck(ind) {
+      this.col8__block3[ind].check = !this.col8__block3[ind].check;
       this.genBrief.design = this.designSelect;
     },
     outsideTones() {
@@ -905,7 +958,7 @@ export default {
     structureSelect() {
       let result = [];
       this.col5_block1.forEach( (item) => {
-        if(item.choice) {
+        if(item.check) {
           if (item.title == "Others") {
             result.push(item.input)
           } else {
@@ -918,7 +971,7 @@ export default {
     designSelect() {
       let result = []
       this.col8__block3.forEach( (item) => {
-        if(item.choice) {
+        if(item.check) {
           if (item.title == "Other") {
             result.push(item.input)
           } else {
@@ -944,9 +997,8 @@ export default {
     seoSelect() {
       let result = [];
       this.col9__block2.forEach((item) => {
-        if(item.choice) {
-          let seo = item.title1 + ": " + item.input;
-          result.push(seo)
+        if(item.input) {
+          result.push(item);
         }
       })
       return result;      
@@ -970,7 +1022,7 @@ export default {
       let result = '';
       if(this.sure) {
         for(let i = 0; i < this.col4_block6.length; i++) {
-          if(col4_block6[i].choice) {
+          if(col4_block6[i].check) {
             console.log(col4_block6[i].title2);
             result = this.col4_block6[i].title2;
           }

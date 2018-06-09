@@ -71,14 +71,16 @@
             .allDetails
                 .allDetails__item
                     span.itemName SEO:
-                    span.itemData {{ orderData.seo }}
+                    span.itemData {{ metaExist }}
                     span.itemNameSm KEYWORDS:
                     span.itemData {{ orderData.seo }}
                     span.itemNameSm KEYWORD DENSITY:
                     span.itemData {{ orderData.seo }}
+                    span.itemNameSm OTHER:
+                    span.itemData {{ orderData.seo }}
         .copyconffoot
-            span.itemDataExSm A QUOTE WILL BE SENT SHOURTLY 
-            span.itemDataExSm THE PROJECT WILL BEGIN SHOURTLY 
+            span.itemDataExSm(v-if="orderData.requestType == 'QUOTE'") A QUOTE WILL BE SENT SHOURTLY 
+            span.itemDataExSm(v-else) THE PROJECT WILL BEGIN SHOURTLY 
 
                 
 </template>
@@ -176,6 +178,22 @@ export default {
         for(let i = 0; i < this.orderData.structure.length; i++) {
           result += this.orderData.structure[i] + ", " ;
         }
+      }
+      return result;
+    },
+    seo() {
+      let result = '';
+      if(this.orderData.seo) {
+        for(let i = 0; i < this.orderData.seo.length; i++) {
+          result += this.orderData.seo[i] + ", " ;
+        }
+      }
+      return result;
+    },
+    metaExist() {
+      let result ='';
+      if(this.orderData.seo) {
+        result = 'META description';
       }
       return result;
     }
