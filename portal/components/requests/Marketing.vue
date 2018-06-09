@@ -96,7 +96,7 @@
                                     span.tooltip(v-if="topicsTip") What main topics should or should not be covered in the mailer? Please be as detailed as possible
                                 img(src="../../assets/images/info-icon.png" @click="topicsTipShow")                                
                             .inner-topics__textField
-                                input(type="text" :readonly="topicText" :class="{disable: topicText}")
+                                input(type="text" :readonly="topicText" :class="{disable: topicText}" v-model="genBrief.briefTopics")
                                 span or
                                 button(@click.prevent="showTopic" :class="{notSure: topicText}") I am not sure
                             .inner-topics__hiddenText(v-if="topicText")
@@ -370,7 +370,7 @@ export default {
       this.topicText = !this.topicText;
       if(this.topicText) {
         this.genBrief.briefSure = "I am not sure";
-        this.briefTopics = "Not sure"
+        this.genBrief.briefTopics = "Not sure"
       } else {
         this.genBrief.briefSure = "";
       }
@@ -618,7 +618,26 @@ export default {
       if(!this.errors.length){
         this.sendForm();         
         console.log("sent")
-        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+        // window.top.location.href = "https://www.pangea.global/thank-you";
+        var uniqueMark = {
+          projectName: this.projName,
+          date: this.deadlineDate,
+          type: this.typeSelect,
+          targetLanguages: this.selectLang,
+          package: this.genBrief.package,
+          description: this.genBrief.briefDescr,
+          audience: this.genBrief.briefAudience,
+          title: this.genBrief.briefTitle,
+          topics: this.genBrief.briefTopics,
+          sure: this.genBrief.briefSure,
+          example: this.genBrief.briefExample,
+          structure: this.structureSelect,
+          style: this.genBrief.style,
+          tone: this.toneSelect
+        };
+        this.$store.dispatch('loadOrderDetails', uniqueCopywr);
+        this.$store.dispatch('referFiles', this.refFiles);
+        this.$emit('thankMark', this.service);
       } else {
         this.showError();
         event.preventDefault();

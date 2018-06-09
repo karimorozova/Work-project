@@ -1,6 +1,6 @@
 <template lang="pug">
   .externalWrap
-    Marketing(v-if="service == 'Marketing'")
+    Marketing(v-if="service == 'Marketing'" @thankMark="thankMark")
     Copywriting(v-if="service == 'Copywriting'" @thankCopy="thankCopy")
     Proofing(v-if="service == 'Proofing/QA'" @thankProof='thankProof')
     .mainWrapper(v-if="service == 'Translation' || service == 'Graphic Localization'")
@@ -246,6 +246,10 @@ export default {
     thankCopy(data){
       console.log(data);
       this.$emit('thankCopy', data);
+    },
+    thankMark(data){
+      console.log(data);
+      this.$emit('thankMark', data);
     },
     outsideLangs() {
       this.targetDrop = false;

@@ -12,17 +12,11 @@
             .allDetails
                 .allDetails__item
                     span.itemName SUGGESTED DEADLINE:
-                    span.itemData {{ orderData.date }}
         .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName TYPE:
-                    span.itemData {{ orderData.type }}
             .allDetails
                 .allDetails__item
                     span.itemName LANGUAGE(S):
                     span.itemData {{ targetLangs }}
-        .confirmation__mainData
             .allDetails
                 .allDetails__item
                     span.itemName PACKAGE:
@@ -38,10 +32,16 @@
                             span.itemNameSm AUDIENCE:
                             span.itemData {{ orderData.audience }}
                         .inner-w
-                            span.itemNameSm TITLE:
+                            span.itemNameSm SUBJECT line:
                             span.itemData {{ orderData.title }}
                         .inner-w
                             span.itemNameSm TOPICS:
+                            span.itemData {{ topics }}
+                        .inner-w
+                            span.itemNameSm BONUS/OFFERS:
+                            span.itemData {{ topics }}
+                        .inner-w
+                            span.itemNameSm CTA:
                             span.itemData {{ topics }}
                         .inner-w
                             span.itemNameSm URL:
@@ -52,30 +52,12 @@
         .confirmation__mainData
             .allDetails
                 .allDetails__item
-                    span.itemName STRUCTURE:
-                    span.itemData {{ structures }}
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
                     span.itemName STYLE:
                     span.itemData {{ orderData.style }}
             .allDetails
                 .allDetails__item
                     span.itemName TONE OF VOICE:
                     span.itemData {{ tones }}
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName DESIGN:
-                    span.itemData {{ degign }}
-            .allDetails
-                .allDetails__item
-                    span.itemName SEO:
-                    span.itemData {{ orderData.seo }}
-                    span.itemNameSm KEYWORDS:
-                    span.itemData {{ orderData.seo }}
-                    span.itemNameSm KEYWORD DENSITY:
-                    span.itemData {{ orderData.seo }}
         .copyconffoot
             span.itemDataExSm A QUOTE WILL BE SENT SHOURTLY 
             span.itemDataExSm THE PROJECT WILL BEGIN SHOURTLY 
@@ -143,15 +125,6 @@ export default {
       if (this.orderData.tone) {
         for (let i = 0; i < this.orderData.tone.length; i++) {
           result += this.orderData.tone[i] + ", ";
-        }
-      }
-      return result;
-    },
-    degign() {
-      let result = "";
-      if (this.orderData.design) {
-        for (let i = 0; i < this.orderData.design.length; i++) {
-          result += this.orderData.design[i] + "; ";
         }
       }
       return result;
