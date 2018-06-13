@@ -1,7 +1,7 @@
 <template lang='pug'>
   #app
-    a.b-log-out(href='/logout') Log out
-    a.b-log-in(href='/login') Log in
+    //-  a.b-log-out(href='/logout') Log out
+    //-  a.b-log-in(href='/login') Log in
     router-view
 </template>
 
