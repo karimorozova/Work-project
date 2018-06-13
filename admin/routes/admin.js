@@ -20,6 +20,10 @@ router.get('/login', (req, res) => {
     res.sendFile(path.resolve() + '/dist/index.html');
 });
 
+router.get('/main', (req, res) => {
+    res.sendFile(path.resolve() + '/dist/index.html');
+});
+
 // GET /logout
 router.get('/logout', (req, res, next) => {
     if (req.session) {

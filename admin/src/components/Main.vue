@@ -47,5 +47,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./../assets/scss/adminportal.scss"
+@import "../assets/scss/adminportal.scss"
 </style>
