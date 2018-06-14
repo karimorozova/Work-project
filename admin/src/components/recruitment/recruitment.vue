@@ -1,8 +1,8 @@
 <template lang="pug">
-    .invoices
-        .invoices__title
-            p Invoices
-        .invoices__main
+    .vendors
+        .vendors__title
+            p Vendors
+        .vendors__main
             p Coming soon ...
 </template>
 
@@ -20,5 +20,5 @@ export default {
 </script>
 
 <style lang="scss">
-    @import "../../assets/styles/invoices/invoices.scss";
+    @import "../../assets/styles/vendors/vendors.scss";
 </style>

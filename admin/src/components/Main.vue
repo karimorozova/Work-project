@@ -69,8 +69,9 @@
                           .adminAll__dropMenu_item.projectsTable(v-if="openProjects")
                             projectsInfo(@projectDetails="projectDetails" :projects="projects")
               .detailedInfoWrapper
-                QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
-              invoices(v-if="invoicesShow")
+                QuotesInfoDetailed
+              recruitment(v-if="recruitmentShow")
+              vendors(v-if="vendorsShow")
               documents(v-if="documentsShow")
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
@@ -79,7 +80,8 @@
 import Quotesinfo from "../components/quotes/Qoutesinfo";
 import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
-import invoices from "../components/invoices/invoices";
+import vendors from "../components/vendors/vendors";
+import recruitment from "../components/recruitment/recruitment";
 import documents from "../components/documents/documents";
 import ClickOutside from "vue-click-outside";
 
@@ -130,8 +132,8 @@ export default {
         },
         {
           title: "PROJECTS",
-          imgWhite: require("../assets/images/CATEGORIES/projects-brown.png"),
-          imgBrown: require("../assets/images/CATEGORIES/projects.png"),
+          imgWhite: require("../assets/images/CATEGORIES/projects.png"),
+          imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
           active: false
         },
         {
@@ -206,39 +208,67 @@ export default {
         if (index == 0) {
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false;
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "Open Quotes";
+          this.path = "Dashboard";
         }
 
         if (index == 1) {
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false;
+          this.recruitmentShow = true;
+          this.vendorsShow = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "All Projects";
+          this.path = "Reqruitment";
         }
 
         if (index == 2) {
-          this.invoicesShow = true;
+          this.recruitmentShow = false;
+          this.vendorsShow = true;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "Invoices";
+          this.path = "Vendors";
         }
 
         if (index == 3) {
+          this.recruitmentShow = false;
           this.documentsShow = true;
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false;
+          this.vendorsShow = false;
           this.clientRequestShow = false;
-          this.path = "Documents";
+          this.path = "Languages";
         }
-        this.thanks = false;
+
+        if (index == 4) {
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
+          this.path = "Clients";
+        }
+
+        if (index == 5) {
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
+          this.path = "Quotes";
+        }
+
+        if (index == 6) {
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
+          this.path = "Projects";
+        }
+
+        if (index == 7) {
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
+          this.path = "Finance";
+        }
+
         this.accountInfo = false;
       });
     },
@@ -258,7 +288,8 @@ export default {
       this.detailedProjectVisible = false;
       this.clientRequestShow = false;
       this.documentsShow = false;
-      this.invoicesShow = false;
+      this.vendorsShow = false;
+      this.recruitmentShow = false;
       this.thanks = false;
       this.navbarList.forEach(item => {
         item.active = false;
@@ -287,7 +318,7 @@ export default {
     Quotesinfo,
     QuotesInfoDetailed,
     Accountinfo,
-    invoices,
+    vendors,
     documents
   },
   directives: {
@@ -299,7 +330,7 @@ export default {
         this.detailedInfoVisible ||
         this.detailedProjectVisible ||
         this.accountInfo ||
-        this.invoicesShow ||
+        this.vendorsShow ||
         this.documentsShow ||
         this.clientRequestShow ||
         this.thanks
