@@ -13,9 +13,6 @@ export default {
 </script>
 
 <style lang='scss'>
-#app {
-  padding: 40px;
-}
 .b-log-in,
 .b-log-out{
   padding: 6px;

@@ -1,8 +1,8 @@
 <template lang="pug">
-    .vendors
-        .vendors__title
-            p Recruitment
-        .vendors__main
+    .documents
+        .documents__title
+            p Languages
+        .documents__main
             p Coming soon ...
 </template>
 
@@ -20,5 +20,5 @@ export default {
 </script>
 
 <style lang="scss">
-    @import "../../assets/styles/recruitment/recruitment.scss";
+    @import "../../assets/styles/languages/languages.scss";
 </style>

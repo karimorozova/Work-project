@@ -77,5 +77,5 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import "../assets/scss/login.scss";
+@import "../assets/styles/login.scss";
 </style>

@@ -1,7 +1,7 @@
 <template lang="pug">
     .vendors
         .vendors__title
-            p Recruitment
+            p Finance
         .vendors__main
             p Coming soon ...
 </template>
@@ -20,5 +20,5 @@ export default {
 </script>
 
 <style lang="scss">
-    @import "../../assets/styles/recruitment/recruitment.scss";
+    @import "../../assets/styles/finance/finance.scss";
 </style>

@@ -1,8 +1,8 @@
 <template lang="pug">
-    .documents
-        .documents__title
-            p Documents
-        .documents__main
+    .vendors
+        .vendors__title
+            p Clients
+        .vendors__main
             p Coming soon ...
 </template>
 
@@ -20,5 +20,5 @@ export default {
 </script>
 
 <style lang="scss">
-    @import "../../assets/styles/documents/documents.scss";
+    @import "../../assets/styles/clients/clients.scss";
 </style>
