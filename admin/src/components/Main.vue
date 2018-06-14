@@ -86,9 +86,9 @@ import ClickOutside from "vue-click-outside";
 export default {
   data() {
     return {
-      user:{
-        name: 'Test',
-        email: 'test@test.com'
+      user: {
+        name: "Test",
+        email: "test@test.com"
       },
       adminPortal: "ADMIN PORTAL",
       navbarList: [
@@ -282,6 +282,10 @@ export default {
     this.getCookie();
     this.clientInfo();
     this.getServices();
+    document.body.classList.add("main-body");
+  },
+  destroyed() {
+    document.body.classList.remove("main-body");
   },
   components: {
     Quotesinfo,
