@@ -84,10 +84,14 @@ import documents from "../components/documents/documents";
 import ClickOutside from "vue-click-outside";
 
 export default {
-    data() {
-        return {
-    adminPortal: "ADMIN PORTAL",
-    navbarList: [
+  data() {
+    return {
+      user:{
+        name: 'Test',
+        email: 'test@test.com'
+      },
+      adminPortal: "ADMIN PORTAL",
+      navbarList: [
         {
           title: "DASHBOARD",
           imgWhite: require("../assets/images/CATEGORIES/dashboard.png"),
@@ -142,10 +146,10 @@ export default {
           imgBrown: require("../assets/images/CATEGORIES/report.jpg"),
           active: false
         }
-      ],
-        };
-    },
-    methods: {
+      ]
+    };
+  },
+  methods: {
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -164,7 +168,7 @@ export default {
       this.dropdownVisible = false;
     },
     signOut() {
-      document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = "ses" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       window.location.replace("/");
     },
     async clientInfo() {
@@ -175,13 +179,13 @@ export default {
       });
       this.client = result.data.client;
       if (!this.client) {
-        window.location.replace("/");        
+        window.location.replace("/");
       }
       this.user = result.data.user;
       this.projects = result.data.projects;
       this.quotes = result.data.quotes;
       this.languageCombinations = result.data.languageCombinations;
-      this.$store.dispatch('loadLangs', this.languageCombinations);
+      this.$store.dispatch("loadLangs", this.languageCombinations);
     },
     switchInfo(index) {
       this.navbarList.forEach((item, i) => {
@@ -190,7 +194,6 @@ export default {
           if (this.detailedInfoVisible && !this.detailedProjectVisible) {
             this.detailedInfoVisible = !this.detailedInfoVisible;
             this.openQuotes = true;
-
           }
           if (!this.detailedInfoVisible && this.detailedProjectVisible) {
             this.detailedProjectVisible = !this.detailedProjectVisible;
@@ -206,17 +209,16 @@ export default {
           this.invoicesShow = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "Open Quotes"
+          this.path = "Open Quotes";
         }
 
         if (index == 1) {
           this.detailedInfoVisible = false;
           this.detailedProjectVisible = false;
-          this.invoicesShow = false
+          this.invoicesShow = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "All Projects"
-          
+          this.path = "All Projects";
         }
 
         if (index == 2) {
@@ -225,7 +227,7 @@ export default {
           this.detailedProjectVisible = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "Invoices"          
+          this.path = "Invoices";
         }
 
         if (index == 3) {
@@ -234,7 +236,7 @@ export default {
           this.detailedProjectVisible = false;
           this.invoicesShow = false;
           this.clientRequestShow = false;
-          this.path = "Documents"                    
+          this.path = "Documents";
         }
         this.thanks = false;
         this.accountInfo = false;
@@ -269,12 +271,14 @@ export default {
       this.dropdownVisible = !this.dropdownVisible;
     },
     async getServices() {
-      const result = await this.$axios.$get('api/services')
-      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
-      this.$store.dispatch('servicesGetting', result);
+      const result = await this.$axios.$get("api/services");
+      result.sort((a, b) => {
+        return a.sortIndex - b.sortIndex;
+      });
+      this.$store.dispatch("servicesGetting", result);
     }
-    },
-    mounted() {
+  },
+  mounted() {
     this.getCookie();
     this.clientInfo();
     this.getServices();
@@ -305,18 +309,18 @@ export default {
       let result = "";
       let cookies = document.cookie.split(";");
       console.log(cookies);
-      for(let i = 0; i < cookies.length; i++) {
+      for (let i = 0; i < cookies.length; i++) {
         let findSession = cookies[i].split("=");
-        if (findSession[0].indexOf('ses') > 0) {
+        if (findSession[0].indexOf("ses") > 0) {
           result = findSession[1];
         }
       }
       return result;
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
-@import "../assets/scss/adminportal.scss"
+@import "../assets/scss/adminportal.scss";
 </style>
