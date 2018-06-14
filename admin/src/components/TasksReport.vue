@@ -6,22 +6,22 @@
       .tableFilters
         .tableFilters__project
           label Project ID: 
-          input(type="text" v-model="projectIdFilter" :value="projectIdFilter")
+          input(type="text" v-model="projectIdFilter")
         .tableFilters__dateFrom
           label From: 
-          input(type="date" v-model="projectDeadlineStart" :value="projectDeadlineStart")
+          input(type="date" v-model="projectDeadlineStart")
         .tableFilters__dateTo
           label To: 
-          input(type="date" v-model="projectDeadlineEnd" :value="projectDeadlineEnd")
+          input(type="date" v-model="projectDeadlineEnd" )
         .tableFilters__sourceLang
           label Surce Language: 
-          input(type="text" v-model="sourceLang" :value="sourceLang")
+          input(type="text" v-model="sourceLang")
         .tableFilters__targetLang
           label Target Language: 
           input(type="text" v-model="targetLang")
         .tableFilters__clientName
           label Client Name: 
-          input(type="text" v-model="clientNameFilter" :value="clientNameFilter")
+          input(type="text" v-model="clientNameFilter" )
       table.table.reportTable(border='bordered')
         tr
           th(v-for="title in titles") {{ title }}
