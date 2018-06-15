@@ -1,0 +1,11 @@
+.blanket {
+    padding: 10px 40px;
+    color: #67573e;
+    &__title {
+        font-size: 26px;
+    }
+    &__description {
+        padding-left: 20px;
+        font-size: 20px;
+    }
+}

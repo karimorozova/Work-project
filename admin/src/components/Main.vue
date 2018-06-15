@@ -6,14 +6,9 @@
                   h2.adminPortal ADMIN PORTAL
             .adminTop__searchBlock
                 .dropdownWrapper
-                  .sel_project_block
-                    .sel_project_block__proj
-                      span New Project
-                    .sel_project_block__imgWrapper(@click="showDropdown")
-                      img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
-                  .clientsTop__dropdown
-                    .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+                  .imgwrap(@click="showSlider")
+                    img(src="../assets/images/Other/andmin-button-icon.png" )
+                    span.spwrap configuration
                 .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
                   .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
@@ -46,27 +41,34 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-            .adminMainWrapper__inner
+              .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider")
+                span SETTINGS
+                .slider-inner
+                  .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
+                  .slider-col Services
+                  .slider-col Industries
+            .adminMainWrapper__inner(:class='{"adminMainWrapper__open": sliderBool}')
               .breadCrumbs 
                 span.accountName {{ user.name }} 
                 span.arrows(v-if="user.name") >> 
                 span {{ path }}
                 span.arrows(v-if="clientRequestShow") >>
                 span(v-if="clientRequestShow") {{ serviceType }}
-              .maininfoWrapper
+              .maininfoWrapper(v-if="languagesSettingsVisible")
                 .mainInfo
                   .adminAll
                     .quotesComponent
                       .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")
-              recruitment(v-if="recruitmentShow")
-              vendors(v-if="vendorsShow")
-              languages(v-if="languagesShow")
-              clients(v-if="clientsShow")
-              soonQuotes(v-if="soonQuotesShow")
-              projects(v-if="projectsShow")
-              finance(v-if="financeShow")
+                          Table
+              Blanket(v-if="recruitmentShow" title='Recruitment')
+              Blanket(v-if="vendorsShow" title='Vendor')
+              Blanket(v-if="languagesShow" title='Language')
+              Blanket(v-if="clientsShow" title='Client')
+              Blanket(v-if="soonQuotesShow" title='Soon')
+              Blanket(v-if="projectsShow" title='Projects')
+              Blanket(v-if="financeShow" title='Finance')
+              Blanket(v-if="reportsShow" title='Reports')
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
@@ -74,14 +76,9 @@
 import Quotesinfo from "../components/quotes/Qoutesinfo";
 import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
-import vendors from "../components/vendors/vendors";
-import recruitment from "../components/recruitment/recruitment";
-import languages from "../components/languages/languages";
-import projects from "../components/projects/projects";
-import clients from "../components/clients/clients";
-import soonQuotes from "../components/quotes/soonQuotes";
-import finance from "../components/finance/finance";
+import Blanket from "../components/Blanket/Blanket";
 import ClickOutside from "vue-click-outside";
+import Table from "./Table/Table.vue";
 
 export default {
   data() {
@@ -153,7 +150,7 @@ export default {
       expander: false,
       openQuotes: true,
       quotes: [],
-      path: 'Language Settings',
+      path: "Language Settings",
       recruitmentShow: false,
       vendorsShow: false,
       languagesShow: false,
@@ -161,10 +158,25 @@ export default {
       soonQuotesShow: false,
       projectsShow: false,
       financeShow: false,
-      accountInfo: false
+      reportsShow: false,
+      accountInfo: false,
+      sliderBool: false,
+      slidebarVisible: true,
+      languagesSettingsVisible: false,
+      languagesBgBool: false
     };
   },
   methods: {
+    showLanguagesSettings() {
+      this.languagesSettingsVisible = !this.languagesSettingsVisible;
+      this.languagesBgBool = true;
+    },
+    hideSlider() {
+        this.slidebarVisible = false;
+    },
+    showSlider() {
+      this.sliderBool = true;
+    },
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -177,9 +189,6 @@ export default {
     },
     hideAccountMenu() {
       this.accountMenuVisible = false;
-    },
-    hideAdditional() {
-      this.dropdownVisible = false;
     },
     signOut() {
       document.cookie = "ses" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -341,7 +350,7 @@ export default {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
       }
-    },
+    }
   },
   mounted() {
     this.getCookie();
@@ -354,13 +363,8 @@ export default {
     Quotesinfo,
     QuotesInfoDetailed,
     Accountinfo,
-    vendors,
-    languages,
-    recruitment,
-    clients,
-    soonQuotes,
-    projects,
-    finance
+    Blanket,
+    Table
   },
   directives: {
     ClickOutside
@@ -460,27 +464,27 @@ body.main-body {
   }
 
   .searchWrapper {
-      display: flex;
-      justify-content: flex-start;
-      border: 2px solid #fff;
-      width: 30%;
-      visibility: hidden;
-      @media screen and (max-width: 1520px) {
-        margin-right: 20px;
-      }
-      @media screen and (max-width: 1430px) {
-        margin-right: 40px;
-      }
-      @media screen and (max-width: 1380px) {
-        margin-right: 55px;
-      }
-      @media screen and (max-width: 1330px) {
-        margin-right: 85px;
-      }
-      img {
-        padding-right: 514px;
-      }
+    display: flex;
+    justify-content: flex-start;
+    border: 2px solid #fff;
+    width: 30%;
+    visibility: hidden;
+    @media screen and (max-width: 1520px) {
+      margin-right: 20px;
     }
+    @media screen and (max-width: 1430px) {
+      margin-right: 40px;
+    }
+    @media screen and (max-width: 1380px) {
+      margin-right: 55px;
+    }
+    @media screen and (max-width: 1330px) {
+      margin-right: 85px;
+    }
+    img {
+      padding-right: 514px;
+    }
+  }
 
   &__searchBlock {
     width: 35%;
@@ -490,10 +494,27 @@ body.main-body {
 
     .dropdownWrapper {
       height: 34px;
-      width: 239px;
-      margin-right: 50px;
-      z-index: 3;
-      position: relative;
+      width: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .imgwrap {
+        display: flex;
+        position: relative;
+        .spwrap {
+          color: #fff;
+          visibility: hidden;
+          position: absolute;
+          top: 3px;
+          right: 41px;
+        }
+        &:hover {
+          .spwrap {
+            visibility: visible;
+          }
+        }
+      }
 
       .sel_project_block {
         margin-right: 150px;
@@ -507,7 +528,7 @@ body.main-body {
         align-items: center;
         justify-content: space-between;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  
+
         &__proj {
           border-right: 1px solid #fff;
           line-height: 100%;
@@ -522,7 +543,7 @@ body.main-body {
             white-space: nowrap;
           }
         }
-  
+
         &__imgWrapper {
           display: flex;
           img {
@@ -536,7 +557,7 @@ body.main-body {
           }
         }
       }
-    
+
       .adminTop__dropdown {
         z-index: -1;
         position: absolute;
@@ -550,9 +571,8 @@ body.main-body {
           background-color: #fff;
           font-size: 16px;
           width: 185px;
-    
-          &__listItem,
-          {
+
+          &__listItem {
             padding: 15px;
             border-bottom: 0.2px solid #978d7e;
             cursor: pointer;
@@ -560,7 +580,7 @@ body.main-body {
               background-color: #ddd3c8;
             }
           }
-  
+
           .first {
             &:hover {
               background-color: #ddd3c8;
@@ -590,8 +610,8 @@ body.main-body {
           background-color: #fff;
           box-shadow: 1px 1px 11px black;
           position: absolute;
-          top: 50px;
-          right: -15px;
+          top: 44px;
+          right: -140px;
           border-radius: 6px;
           z-index: 5;
           overflow: hidden;
@@ -677,48 +697,49 @@ body.main-body {
     }
 
     .chevronWrapper {
-          width: 98px;
-          padding-left: 40px;
-        .chevron {
-          position: relative;
-          text-align: center;
-          padding: 12px 12px 12px 12px;
-          margin-bottom: 6px;
-          height: 16px;
-          width: 16px;
-          margin-right: 123px;
-          cursor: pointer;
-          @media screen and (max-width: 1450px){
-            margin-right: 43px;
-          }
-          @media screen and (max-width: 1350px){
-            margin-right: 23px;
-          }
+      width: 140px;
+      padding-left: 40px;
+      .chevron {
+        position: relative;
+        text-align: center;
+        padding: 12px 12px 12px 12px;
+        margin-bottom: 6px;
+        height: 16px;
+        width: 16px;
+        margin-right: 123px;
+        cursor: pointer;
+        transform: rotate(180deg);
+        @media screen and (max-width: 1450px) {
+          margin-right: 43px;
         }
-        
-        .chevron:before {
-          content: '';
-          position: absolute;
-          top: 23px;
-          left: 6px;
-          height: 8%;
-          width: 21%;
-          background: #fff;
-          transform: skew(0deg, 50deg);
+        @media screen and (max-width: 1350px) {
+          margin-right: 23px;
         }
-        .chevron:after {
-          content: '';
-          position: absolute;
-          top: 23px;
-          right: 18px;
-          height: 8%;
-          width: 21%;
-          background: #fff;
-          transform: skew(0deg, -50deg);
-        }
+      }
+
+      .chevron:before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 6px;
+        height: 8%;
+        width: 41%;
+        background: #fff;
+        transform: skew(0deg, 50deg);
+      }
+      .chevron:after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        right: 18px;
+        height: 8%;
+        width: 41%;
+        background: #fff;
+        transform: skew(0deg, -50deg);
       }
     }
   }
+}
 
 .adminMainWrapper {
   display: flex;
@@ -726,6 +747,11 @@ body.main-body {
   position: relative;
   &__inner {
     width: 90%;
+    transition: all 1s;
+    transform: translate(-150px);
+  }
+  &__open {
+    transform: translate(0px);
   }
   .maininfoWrapper {
     width: 100%;
@@ -783,6 +809,44 @@ body.main-body {
       box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
       transition: all 0.5s;
       z-index: 2;
+    }
+
+    &__slider {
+      transform: translate(-150%);
+      width: 216px;
+      // width: 216px;
+      box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
+      display: flex;
+      flex-direction: column;
+      font-family: MyriadPro;
+      color: #67573e;
+      font-size: 22px;
+      transition: all 1s;
+      span {
+        display: flex;
+        justify-content: center;
+        padding: 44px 0;
+        font-weight: 700;
+      }
+
+      .slider-inner {
+        display: flex;
+        flex-direction: column;
+
+        .slider-col {
+          display: flex;
+          justify-content: center;
+          border-top: 1px solid #c4beb6;
+          border-bottom: 1px solid #c4beb6;
+          padding: 5px 0;
+          &:nth-child(2) {
+            border: none;
+          }
+        }
+      }
+    }
+    .slider {
+      transform: translate(-3%);
     }
 
     &__openHide {
@@ -927,8 +991,9 @@ body.main-body {
 }
 
 .breadCrumbs {
-  max-height: 50px;
-  margin: 20px 40px;
+  // max-height: 50px;
+  // margin: 20px 40px;
+  padding: 20px 40px;
   color: #67573e;
   font-size: 20px;
   .arrows {
@@ -940,10 +1005,14 @@ body.main-body {
 
 @font-face {
   font-family: MyriadPro;
-  src: url('../assets/fonts/MyriadPro-Regular.otf');
+  src: url("../assets/fonts/MyriadPro-Regular.otf");
 }
 @font-face {
   font-family: MyriadBold;
-  src: url('../assets/fonts/MyriadPro-Bold.otf')
+  src: url("../assets/fonts/MyriadPro-Bold.otf");
+}
+
+.languagesBg {
+  background-color: #ddd3c8;
 }
 </style>

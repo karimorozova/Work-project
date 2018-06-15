@@ -3,7 +3,7 @@
         Translationconfirm(v-if="serviceType == 'Translation' || serviceType == 'Graphic Localization'")
         Proofingconfirm(v-if="serviceType == 'Proofing/QA'")
         Copywritingconfirm(v-if="serviceType == 'Copywriting'")
-        Marketingconfirm
+        Marketingconfirm(v-if="serviceType == 'Marketing'")
 </template>
 
 <script>
