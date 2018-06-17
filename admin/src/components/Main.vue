@@ -41,7 +41,7 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider")
+              .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider" v-if="sliderBool")
                 span SETTINGS
                 .slider-inner
                   .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
@@ -172,7 +172,7 @@ export default {
       this.languagesBgBool = true;
     },
     hideSlider() {
-        this.slidebarVisible = false;
+        this.sliderBool = false;
     },
     showSlider() {
       this.sliderBool = true;
