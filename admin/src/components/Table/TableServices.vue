@@ -6,16 +6,16 @@
         .b-table__body.b-table__display
             .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
                 .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3}]') {{row.title}} 
-                    IndustriesTableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
-                    IndustriesSelect(v-if='index === 3')
-                    IndustriesRowEdit(v-if='index === 4' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
+                    ServicesTableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
+                    ServicesSelect(v-if='index === 2')
+                    ServicesRowEdit(v-if='index === 3' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
         img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
 </template>
 
 <script>
-import IndustriesSelect from "./industriesRows/IndustriesTableSelect";
-import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
-import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
+import ServicesSelect from "./servicesRows/ServicesTableSelect";
+import ServicesTableImage from "./servicesRows/ServicesTableImage";
+import ServicesRowEdit from "./servicesRows/ServicesRowEdit";
 
 const row = {
   activeTools: [true, false, true],
@@ -25,7 +25,6 @@ const row = {
       image1: '',
       image2: require("../../assets/images/Other/upload-icon.png")
     },
-    { title: "" },
     { title: "" },
     { title: "" },
     { title: ""}
@@ -40,8 +39,8 @@ export default {
         head: [
           { title: "Icon" },
           { title: "Name" },
-          { title: "Generic TB" },
           { title: "Status" },
+          { title: "" },
           { title: "" }
         ],
         body: [
@@ -50,13 +49,14 @@ export default {
             isActiveUpload: false,
             rowInfo: [
               {
-                image1: require("../../assets/images/industries/casino,poker_igaming (2).png"),
+                image1: require("../../assets/images/services/SEO _ Blog Management.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "CASINO, POKER & GAMING"},
+              { title: "SEO & Blog Management"},
               { title: "" },
-              { title: "" },
-              { title: ""}
+              {
+                title: ""
+              }
             ]
           },
           {
@@ -64,13 +64,14 @@ export default {
             isActiveUpload: false,
             rowInfo: [
               {
-                image1: require("../../assets/images/industries/icos_cryptocurrency (2).png"),
+                image1: require("../../assets/images/services/QA and Testing.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "ICO & CRYPTOCURRENCY"},
+              { title: "QA & Testing"},
               { title: "" },
-              { title: "" },
-              {  title: "" }
+              {
+                title: ""
+              }
             ]
           },
           {
@@ -78,13 +79,74 @@ export default {
             isActiveUpload: false,
             rowInfo: [
               {
-                image1: require("../../assets/images/industries/legal icon.png"),
+                image1: require("../../assets/images/services/Localized Graphic Design.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "LEGAL"},
+              { title: "Localized Graphic Design"},
               { title: "" },
+              {
+                title: ""
+              }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/services/Marketing _ Copywriting.png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Marketing _ Copywriting"},
               { title: "" },
-              {  title: "" }
+              {
+                title: ""
+              }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/services/Market Research.png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Market Research"},
+              { title: "" },
+              {
+                title: ""
+              }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/services/Official Translations.png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Official Translations"},
+              { title: "" },
+              {
+                title: ""
+              }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/services/ORM – Online Reputation Management.png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "ORM – Online Reputation Management"},
+              { title: "" },
+              {
+                title: ""
+              }
             ]
           },
         ]
@@ -107,9 +169,9 @@ export default {
 
   computed: {},
   components: {
-    IndustriesTableImage,
-    IndustriesSelect,
-    IndustriesRowEdit
+    ServicesTableImage,
+    ServicesSelect,
+    ServicesRowEdit
   }
 };
 </script>
@@ -161,13 +223,13 @@ export default {
       align-items: center;
 
       &-1 {
-        flex-basis: 20%;
+        flex-basis: 22%;
         border: 1px solid #675842;
         border-bottom: 0;
         border-top: 0;
       }
       &-2 {
-        flex-basis: 20%;
+        flex-basis: 25%;
         white-space: nowrap;
         overflow-x: hidden;
         border: 1px solid #675842;
@@ -178,23 +240,20 @@ export default {
         border-top: 0;
       }
       &-3 {
-        flex-basis: 20%;
+        flex-basis: 28%;
         border: 1px solid #675842;
         border-bottom: 0;
         border-right: 1px;
         border-top: 0;
       }
       &-4 {
-        flex-basis: 20%;
+        flex-basis: 25%;
         border: 1px solid #675842;
         border-bottom: 0;
         border-top: 0;
       }
       &-5 {
-        flex-basis: 20%;
-        border: 1px solid #675842;
-        border-top: 0;
-        border-left: 0;
+        flex-basis: 4%;
         }
     }
     .higher {

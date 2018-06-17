@@ -45,8 +45,8 @@
                 span SETTINGS
                 .slider-inner
                   .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
-                  .slider-col Services
-                  .slider-col Industries
+                  .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") Services
+                  .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") Industries
             .adminMainWrapper__inner(:class='{"adminMainWrapper__open": sliderBool}')
               .breadCrumbs 
                 span.accountName {{ user.name }} 
@@ -61,6 +61,20 @@
                       .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                         .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
                           Table
+              .maininfoWrapper(v-if="servicesSettingsVisible")
+                .mainInfo
+                  .adminAll
+                    .quotesComponent.additionalServices
+                      .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                        .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                          TableServices
+              .maininfoWrapper(v-if="industiesSettingsVisible")
+                .mainInfo
+                  .adminAll
+                    .quotesComponent.additionalIndustries
+                      .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                        .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
+                          TableIndustries
               Blanket(v-if="recruitmentShow" title='Recruitment')
               Blanket(v-if="vendorsShow" title='Vendor')
               Blanket(v-if="languagesShow" title='Language')
@@ -79,6 +93,8 @@ import Accountinfo from "../components/account/Accountinfo";
 import Blanket from "../components/Blanket/Blanket";
 import ClickOutside from "vue-click-outside";
 import Table from "./Table/Table.vue";
+import TableServices from "./Table/TableServices.vue";
+import TableIndustries from "./Table/TableIndustries";
 
 export default {
   data() {
@@ -163,13 +179,37 @@ export default {
       sliderBool: false,
       slidebarVisible: true,
       languagesSettingsVisible: false,
-      languagesBgBool: false
+      languagesBgBool: false,
+      servicesSettingsVisible: false,
+      servicesBgBool: false,
+      industiesSettingsVisible: false,
+      industiesBgBool: false
     };
   },
   methods: {
+    showIndustriesSettings(){
+      this.industiesSettingsVisible = !this.industiesSettingsVisible;
+      this.industiesBgBool = !this.industiesBgBool;
+      if(this.languagesSettingsVisible || this.servicesSettingsVisible) {
+        this.languagesSettingsVisible = false;
+        this.servicesSettingsVisible = false;
+      }
+    },
+    showServicesSettings() {
+      this.servicesSettingsVisible = !this.servicesSettingsVisible;
+      this.servicesBgBool = !this.servicesBgBool;
+      if(this.languagesSettingsVisible || this.industiesSettingsVisible) {
+        this.languagesSettingsVisible = false;
+        this.industiesSettingsVisible = false;
+      }
+    },
     showLanguagesSettings() {
       this.languagesSettingsVisible = !this.languagesSettingsVisible;
-      this.languagesBgBool = true;
+      this.languagesBgBool = !this.languagesBgBool;
+      if(this.servicesSettingsVisible || this.industiesSettingsVisible) {
+        this.servicesSettingsVisible = false;
+        this.industiesSettingsVisible = false;
+      }
     },
     hideSlider() {
         this.sliderBool = false;
@@ -364,7 +404,9 @@ export default {
     QuotesInfoDetailed,
     Accountinfo,
     Blanket,
-    Table
+    Table,
+    TableServices,
+    TableIndustries
   },
   directives: {
     ClickOutside
@@ -418,6 +460,12 @@ body.main-body {
 }
 .quotesComponent {
   margin-bottom: 40px;
+}
+.additionalServices {
+  width: 700px;
+}
+.additionalIndustries {
+  width: 800px;
 }
 .adminTop {
   display: flex;
@@ -752,6 +800,7 @@ body.main-body {
   }
   &__open {
     transform: translate(0px);
+    // transform: translate(15px);
   }
   .maininfoWrapper {
     width: 100%;
@@ -813,7 +862,7 @@ body.main-body {
 
     &__slider {
       transform: translate(-150%);
-      width: 216px;
+      width: 175px;
       // width: 216px;
       box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
       display: flex;

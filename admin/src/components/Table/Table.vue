@@ -1,14 +1,15 @@
 <template lang="pug">
-    .b-table
-        .b-table__head.b-table__display
-            .b-table__col(v-for='(head, index) in table.head' :class='"b-table__col-" + (index + 1)') {{head.title}}
-        .b-table__body.b-table__display
-          .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
-              .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='"b-table__col-" + (index + 1)') {{row.title}} 
-                TableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
-                Select(v-if='index === 5')
-                RowEdit(v-if='index === 6' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
-        img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
+.langWrapper
+  .b-table
+      .b-table__head.b-table__display
+          .b-table__col(v-for='(head, index) in table.head' :class='"b-table__col-" + (index + 1)') {{head.title}}
+      .b-table__body.b-table__display
+        .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
+            .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 5 || index == 6}]') {{row.title}} 
+              TableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
+              Select(v-if='index === 5')
+              RowEdit(v-if='index === 6' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
+  img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
 </template>
 
 <script>
@@ -63,9 +64,39 @@ export default {
               { title: "af" },
               { title: "afr" },
               { title: "" },
+              { title: "" }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
               {
-                title: ""
-              }
+                image1: require("../../assets/images/flags 31x21pix/Arabic (Egypt) [AR-EG].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Arabic (Egypt)" },
+              { title: "AR" },
+              { title: "ar" },
+              { title: "are" },
+              { title: "" },
+              { title: "" }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/flags 31x21pix/Arabic (Morocco) [AR-MA].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Arabic (Morocco)" },
+              { title: "AR" },
+              { title: "ar" },
+              { title: "arm" },
+              { title: "" },
+              { title: "" }
             ]
           }
         ]
@@ -96,71 +127,95 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.b-table {
-  &__row {
-    width: 100%;
-    display: flex;
-    // flex-direction: column;
-  }
-  &__head {
-    background-color: #68573e;
-    opacity: 0.67;
-    display: flex;
-    color: white;
-    .b-table__col {
-      border-right: 1px solid white;
-      &:last-child {
-        border: none;
+.langWrapper {
+  .b-table {
+    &__row {
+      width: 103%;
+      display: flex;
+      padding: 0px 0 44px 0;
+    }
+    &__head {
+      background-color: #68573e;
+      opacity: 0.67;
+      display: flex;
+      color: white;
+      .b-table__col {
+        border-right: 1px solid white;
+        &:last-child {
+          border: none;
+        }
       }
     }
-  }
-  &__body {
-    display: flex;
-    flex-direction: column;
-    .b-table__col {
-      border: 1px solid #675842;
-      border-right: 0.5px;
-      &:last-child {
-        border-right: 1px;
+    &__body {
+      display: flex;
+      flex-direction: column;
+      max-height: 137px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      .b-table__col {
         border: 1px solid #675842;
+        border-right: 0.5px;
+        &:last-child {
+          border-right: 1px;
+          border: 1px solid #675842;
+        }
       }
     }
-  }
-  &__col {
-    padding-left: 10px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-right: 10px;
-    display: flex;
-    align-items: center;
-    &-1 {
-      flex-basis: 15%;
+    &__col {
+      padding-left: 10px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      padding-right: 10px;
+      display: flex;
+      align-items: center;
+      &-1 {
+        flex-basis: 15%;
+      }
+      &-2 {
+        flex-basis: 21%;
+      }
+      &-3 {
+        flex-basis: 10%;
+      }
+      &-4 {
+        flex-basis: 12%;
+      }
+      &-5 {
+        flex-basis: 12%;
+      }
+      &-6 {
+        flex-basis: 11%;
+        padding-right: 0;
+      }
+      &-7 {
+        flex-basis: 16%;
+      }
     }
-    &-2 {
-      flex-basis: 21%;
+    .higher {
+      height: 46px;
     }
-    &-3 {
-      flex-basis: 10%;
-    }
-    &-4 {
-      flex-basis: 12%;
-    }
-    &-5 {
-      flex-basis: 12%;
-    }
-    &-6 {
-      flex-basis: 11%;
-      padding-right: 0;
-    }
-    &-7 {
-      flex-basis: 16%;
-    }
-  }
-  .higher {
-    height: 46px;
   }
   .addLang {
     cursor: pointer;
   }
+  .set_bottom_border {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #675842;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 27px;
+  background-color: #e7e0e0;
+}
+::-webkit-scrollbar-thumb {
+  border-color: #675842;
+  background-color: #675842;
+  border-right: solid 9px #e7e0e0;
+  border-left: solid 9px #e7e0e0;
+}
+::-webkit-scrollbar-thumb:vertical {
+  height: 12px;
 }
 </style>

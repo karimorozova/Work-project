@@ -42,7 +42,7 @@ export default {
       }
         .arr {
           border: 1px solid #68573e;
-          padding: 7px 5px 15px 5px;
+          padding: 7px 0px 15px 9px;
           border-right: 0;
           border-top: 0;
           border-bottom: 0;
@@ -64,9 +64,9 @@ export default {
           display: flex;
           justify-content: flex-start;
           border: 1px solid #68573e;
-          width: 108px;
+          width: 188px;
           background-color: #fff;
-          padding: 15px 0 15px 10px;
+          padding: 10px 0 10px 10px;
             &:last-child {
               border-top: 0;
             }

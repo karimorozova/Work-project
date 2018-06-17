@@ -6,7 +6,7 @@
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
     .b-conf YES
-    .b-conf NO
+    .b-conf No
 </template>
 
 <script>
