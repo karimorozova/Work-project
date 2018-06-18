@@ -13,7 +13,7 @@ const { LanguagesModel, RequestSchema } = require("./models");
 
 // TODO : check origins from localhost only
 const allowedOrigins = [
-  "https://portal.pangea.global",
+  "https://admin.pangea.global",
   "https://vendor.pangea.global",
   "http://localhost:3000",
   "http://localhost:8081"

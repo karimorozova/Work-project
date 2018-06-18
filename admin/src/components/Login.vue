@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     sendForm() {
-      this.$http.post(__WEBPACK__API_URL__ + "/login", this.form).then(
+      this.$http.post("/login", this.form).then(
         response => {
           document.cookie = "ses=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
           this.isLogin = true;

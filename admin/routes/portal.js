@@ -25,6 +25,7 @@ router.post('/auth', async (req, res, next) => {
 
 router.get('/clientinfo', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
+    console.log('req.cookies.ses : ' + req.cookies.ses );
     const userId = await (customer.userInfo());   
     const userInfo = await (customer.fullUserInfo(userId.data.parentId, userId.data.id));
     const fullInfo = await (customer.projectsInfo());

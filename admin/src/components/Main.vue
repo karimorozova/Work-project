@@ -466,6 +466,7 @@ body.main-body {
 }
 .quotesComponent {
   margin-bottom: 40px;
+  background-color: #fff;
 }
 .additionalServices {
   width: 700px;

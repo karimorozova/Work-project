@@ -10,7 +10,7 @@
             .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 5 || index == 6}]') {{row.title}} 
               TableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
               Select(v-if='index === 5')
-              RowEdit(v-if='index === 6' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
+              RowEdit(v-if='index === 6' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools' @onRemove='removeRow(rowIndex)' @onSave="saveRow(indexRow)")
   img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
 </template>
 
@@ -80,9 +80,9 @@ export default {
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
               { title: "Arabic (Egypt)" },
-              { title: "AR" },
+              { title: "AR-EG" },
               { title: "ar" },
-              { title: "are" },
+              { title: "ara" },
               { title: "" },
               { title: "" }
             ]
@@ -96,13 +96,77 @@ export default {
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
               { title: "Arabic (Morocco)" },
-              { title: "AR" },
+              { title: "AR-MA" },
+              { title: "ar" },
+              { title: "ara" },
+              { title: "" },
+              { title: "" }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/flags 31x21pix/Arabic (Saudi Arabia) [AR-SA].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Arabic (Saudi Arabia)" },
+              { title: "AR-SA" },
+              { title: "ar" },
+              { title: "ara" },
+              { title: "" },
+              { title: "" }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/flags 31x21pix/Armenian [HY].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Armenian" },
+              { title: "HY" },
               { title: "ar" },
               { title: "arm" },
               { title: "" },
               { title: "" }
             ]
-          }
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/flags 31x21pix/Azerbaijani (Latin) [AZ-LN].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Azerbaijani (Latin)" },
+              { title: "AZ-LN" },
+              { title: "az" },
+              { title: "are" },
+              { title: "" },
+              { title: "" }
+            ]
+          },
+          {
+            activeTools: [false, true, true],
+            isActiveUpload: false,
+            rowInfo: [
+              {
+                image1: require("../../assets/images/flags 31x21pix/Bengali (India) [BN-IN].png"),
+                image2: require("../../assets/images/Other/upload-icon.png")
+              },
+              { title: "Bengali (India)" },
+              { title: "BN-IN" },
+              { title: "be" },
+              { title: "ben" },
+              { title: "" },
+              { title: "" }
+            ]
+          },
         ]
       },
       titlesp1Value: 'ISO 639-1',
@@ -120,6 +184,10 @@ export default {
       this.table.body[index].activeTools.splice(0, 1, true);
       this.table.body[index].activeTools.splice(1, 1, false);
       this.table.body[index].activeTools.splice(2, 1, true);
+    },
+    removeRow(ind) {
+      console.log(ind);
+      this.table.body.splice(ind, 1);
     }
   },
 

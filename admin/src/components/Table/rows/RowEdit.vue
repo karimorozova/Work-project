@@ -1,8 +1,8 @@
 <template lang="pug">
   .b-edit
-    img.b-edit__tool(:src="saveImg" :class='{"b-edit__tool_active": status[0]}')
+    img.b-edit__tool(:src="saveImg" :class='{"b-edit__tool_active": status[0]}' @click="handleSave")
     img.b-edit__tool(:src="editImg"  :class='{"b-edit__tool_active": status[1]}' @click='handleEdit')
-    img.b-edit__tool(:src="deleteImg"  :class='{"b-edit__tool_active": status[2]}')
+    img.b-edit__tool(:src="deleteImg"  :class='{"b-edit__tool_active": status[2]}' @click="hadleRemove")
 </template>
 
 <script>
@@ -33,6 +33,12 @@ export default {
   methods: {
     handleEdit() {
       this.$emit("onEdit");
+    },
+    hadleRemove(){
+      this.$emit("onRemove");
+    },
+    handleSave(){
+      this.$emit("onSave");
     }
   },
 
