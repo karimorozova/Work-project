@@ -7,6 +7,7 @@
             .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
                 .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3}]') {{row.title}} 
                     IndustriesTableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
+                    IndustriesGenericTB(v-if="index == 2" :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
                     IndustriesSelect(v-if='index === 3')
                     IndustriesRowEdit(v-if='index === 4' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
         img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
@@ -16,19 +17,20 @@
 import IndustriesSelect from "./industriesRows/IndustriesTableSelect";
 import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
 import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
+import IndustriesGenericTB from "./industriesRows/IndustriesGenericTB";
 
 const row = {
   activeTools: [true, false, true],
   isActiveUpload: true,
   rowInfo: [
     {
-      image1: '',
+      image1: "",
       image2: require("../../assets/images/Other/upload-icon.png")
     },
     { title: "" },
+    { image2: require("../../assets/images/Other/upload-icon.png") },
     { title: "" },
-    { title: "" },
-    { title: ""}
+    { title: "" }
   ]
 };
 
@@ -53,10 +55,12 @@ export default {
                 image1: require("../../assets/images/industries/casino,poker_igaming (2).png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "CASINO, POKER & GAMING"},
+              { title: "CASINO, POKER & GAMING" },
+              {
+                image3: require("../../assets/images/Other/Download-icon.png")
+              },
               { title: "" },
-              { title: "" },
-              { title: ""}
+              { title: "" }
             ]
           },
           {
@@ -67,10 +71,12 @@ export default {
                 image1: require("../../assets/images/industries/icos_cryptocurrency (2).png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "ICO & CRYPTOCURRENCY"},
+              { title: "ICO & CRYPTOCURRENCY" },
+              {
+                image3: require("../../assets/images/Other/Download-icon.png")
+              },
               { title: "" },
-              { title: "" },
-              {  title: "" }
+              { title: "" }
             ]
           },
           {
@@ -81,12 +87,14 @@ export default {
                 image1: require("../../assets/images/industries/legal icon.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "LEGAL"},
+              { title: "LEGAL" },
+              {
+                image3: require("../../assets/images/Other/Download-icon.png")
+              },
               { title: "" },
-              { title: "" },
-              {  title: "" }
+              { title: "" }
             ]
-          },
+          }
         ]
       }
     };
@@ -109,7 +117,8 @@ export default {
   components: {
     IndustriesTableImage,
     IndustriesSelect,
-    IndustriesRowEdit
+    IndustriesRowEdit,
+    IndustriesGenericTB
   }
 };
 </script>
@@ -141,8 +150,8 @@ export default {
       display: flex;
       flex-direction: column;
       max-height: 134px;
-        overflow-y: scroll;
-    overflow-x: hidden;
+      overflow-y: scroll;
+      overflow-x: hidden;
       .b-table__col {
         // border: 1px solid #675842;
         // border-right: 0.5px;
@@ -195,7 +204,7 @@ export default {
         border: 1px solid #675842;
         border-top: 0;
         border-left: 0;
-        }
+      }
     }
     .higher {
       height: 46px;

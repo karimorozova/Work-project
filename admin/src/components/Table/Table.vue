@@ -3,6 +3,8 @@
   .b-table
       .b-table__head.b-table__display
           .b-table__col(v-for='(head, index) in table.head' :class='"b-table__col-" + (index + 1)') {{head.title}}
+            ISO(v-if="index == 3" :titlesp1="titlesp1Value" titlesp2="(two letters)")
+            ISO1(v-if="index == 4" :titlesp3="titlesp1Value" titlesp4="(three letters)")
       .b-table__body.b-table__display
         .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
             .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 5 || index == 6}]') {{row.title}} 
@@ -16,6 +18,8 @@
 import Select from "./rows/TableSelect";
 import TableImage from "./rows/TableImage";
 import RowEdit from "./rows/RowEdit";
+import ISO from "./rows/ISO"
+import ISO1 from "./rows/ISO1"
 
 const row = {
   activeTools: [true, false, true],
@@ -45,8 +49,8 @@ export default {
           { title: "Icon" },
           { title: "Name" },
           { title: "Symbol" },
-          { title: "ISO 639-1" },
-          { title: "ISO 639-2" },
+          { title: "" },
+          { title: "" },
           { title: "Status" },
           { title: "" }
         ],
@@ -100,7 +104,9 @@ export default {
             ]
           }
         ]
-      }
+      },
+      titlesp1Value: 'ISO 639-1',
+      titlesp1Value: 'ISO 639-2'
     };
   },
   methods: {
@@ -121,7 +127,9 @@ export default {
   components: {
     TableImage,
     Select,
-    RowEdit
+    RowEdit,
+    ISO,
+    ISO1
   }
 };
 </script>
@@ -155,10 +163,11 @@ export default {
       .b-table__col {
         border: 1px solid #675842;
         border-right: 0.5px;
-        &:last-child {
-          border-right: 1px;
-          border: 1px solid #675842;
-        }
+        border-top: 0;
+        // &:last-child {
+        //   border-right: 1px;
+        //   border: 1px solid #675842;
+        // }
       }
     }
     &__col {
@@ -173,6 +182,7 @@ export default {
       }
       &-2 {
         flex-basis: 21%;
+        border-bottom: 0;
       }
       &-3 {
         flex-basis: 10%;
@@ -189,19 +199,21 @@ export default {
       }
       &-7 {
         flex-basis: 16%;
+        border-bottom: 0;
+        border-top: 0;
       }
     }
+    .set_bottom_border {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #675842;
+  }
     .higher {
       height: 46px;
     }
   }
   .addLang {
     cursor: pointer;
-  }
-  .set_bottom_border {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: #675842;
   }
 }
 

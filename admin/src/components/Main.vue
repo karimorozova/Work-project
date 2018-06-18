@@ -187,32 +187,38 @@ export default {
     };
   },
   methods: {
-    showIndustriesSettings(){
+    showIndustriesSettings() {
       this.industiesSettingsVisible = !this.industiesSettingsVisible;
       this.industiesBgBool = !this.industiesBgBool;
-      if(this.languagesSettingsVisible || this.servicesSettingsVisible) {
+      if (this.languagesSettingsVisible || this.servicesSettingsVisible) {
         this.languagesSettingsVisible = false;
         this.servicesSettingsVisible = false;
       }
+      this.languagesBgBool = false;
+      this.servicesBgBool = false;
     },
     showServicesSettings() {
       this.servicesSettingsVisible = !this.servicesSettingsVisible;
       this.servicesBgBool = !this.servicesBgBool;
-      if(this.languagesSettingsVisible || this.industiesSettingsVisible) {
+      if (this.languagesSettingsVisible || this.industiesSettingsVisible) {
         this.languagesSettingsVisible = false;
         this.industiesSettingsVisible = false;
       }
+      this.languagesBgBool = false;
+      this.industiesBgBool = false;
     },
     showLanguagesSettings() {
       this.languagesSettingsVisible = !this.languagesSettingsVisible;
       this.languagesBgBool = !this.languagesBgBool;
-      if(this.servicesSettingsVisible || this.industiesSettingsVisible) {
+      this.servicesBgBool = false;
+      this.industiesBgBool = false;
+      if (this.servicesSettingsVisible || this.industiesSettingsVisible) {
         this.servicesSettingsVisible = false;
         this.industiesSettingsVisible = false;
       }
     },
     hideSlider() {
-        this.sliderBool = false;
+      this.sliderBool = false;
     },
     showSlider() {
       this.sliderBool = true;
@@ -796,11 +802,12 @@ body.main-body {
   &__inner {
     width: 90%;
     transition: all 1s;
-    transform: translate(-150px);
+    // transform: translate(-150px);
+    transform: translate(7px);
   }
   &__open {
-    transform: translate(0px);
-    // transform: translate(15px);
+    // transform: translate(0px);
+    transform: translate(15px);
   }
   .maininfoWrapper {
     width: 100%;
@@ -861,7 +868,7 @@ body.main-body {
     }
 
     &__slider {
-      transform: translate(-150%);
+      transform: translate(-50%);
       width: 175px;
       // width: 216px;
       box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
@@ -1063,5 +1070,8 @@ body.main-body {
 
 .languagesBg {
   background-color: #ddd3c8;
+}
+.none_langBg {
+  background-color: #fff;
 }
 </style>
