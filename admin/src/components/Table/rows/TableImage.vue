@@ -1,7 +1,7 @@
 <template lang="pug">
   .b-row-image
     img(:src="body.image1")
-    img.imcurs(:src="body.image2" v-show="isActiveUpload")
+    img.imcurs(:src="body.image2" v-show="isActiveUpload" @change='copyChangeRefFiles')
 </template>
 
 <script>
@@ -17,10 +17,15 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      refFiles: [],
+    };
   },
-  methods: {},
-
+  methods: {
+    copyChangeRefFiles(event){
+      this.refFiles = event.target.files[0]; 
+    },
+  },
   computed: {},
   components:{
   }
@@ -33,5 +38,9 @@ export default {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+
+    .imcurs {
+      cursor: pointer;
+    }
 }
 </style>

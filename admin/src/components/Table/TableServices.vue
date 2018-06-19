@@ -2,7 +2,7 @@
 .servicesWrapper
     .b-table
         .b-table__head.b-table__display
-            .b-table__col(v-for='(head, index) in table.head' :class='"b-table__col-" + (index + 1)') {{head.title}}
+            .b-table__col(v-for='(head, index) in table.head' :class='["b-table__col-" + (index + 1), {withoutBorder: index == 3}]') {{head.title}}
         .b-table__body.b-table__display
             .b-table__row(v-for='(fullRowInfo, rowIndex) in table.body')
                 .b-table__col.higher(v-for='(row, index) in fullRowInfo.rowInfo' :class='["b-table__col-" + (index + 1), {set_bottom_border: index == 0 || index == 1 || index == 2 || index == 3}]') {{row.title}} 
@@ -267,6 +267,9 @@ export default {
     border-bottom-width: 1px;
     border-bottom-style: solid;
     border-bottom-color: #675842;
+  }
+  .withoutBorder {
+    border-right: none;
   }
 }
 ::-webkit-scrollbar {

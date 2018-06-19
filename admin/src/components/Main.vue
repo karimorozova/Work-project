@@ -1,12 +1,15 @@
 <template lang="pug">
-    .admminportalWrapper
+    .admminportalWrapper2
         .adminTop
             .adminTop__adminName
                 a(href="/main") 
                   h2.adminPortal ADMIN PORTAL
             .adminTop__searchBlock
                 .dropdownWrapper
-                  .imgwrap(@click="showSlider")
+                  .imgwrap
+                    img(src="../assets/images/Other/andmin-button-icon.png" )
+                    span.spwrap configuration
+                  // .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/andmin-button-icon.png" )
                     span.spwrap configuration
                 .womanWrapper
@@ -41,7 +44,13 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider" v-if="sliderBool")
+              .adminNavbar__slider.slider
+                span SETTINGS
+                .slider-inner
+                  .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
+                  .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") Services
+                  .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") Industries
+              // .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider" v-if="sliderBool")
                 span SETTINGS
                 .slider-inner
                   .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
@@ -79,7 +88,7 @@
               Blanket(v-if="vendorsShow" title='Vendor')
               Blanket(v-if="languagesShow" title='Language')
               Blanket(v-if="clientsShow" title='Client')
-              Blanket(v-if="soonQuotesShow" title='Soon')
+              Blanket(v-if="soonQuotesShow" title='Quotes')
               Blanket(v-if="projectsShow" title='Projects')
               Blanket(v-if="financeShow" title='Finance')
               Blanket(v-if="reportsShow" title='Reports')
@@ -217,12 +226,14 @@ export default {
         this.industiesSettingsVisible = false;
       }
     },
+    /*
     hideSlider() {
       this.sliderBool = false;
     },
     showSlider() {
       this.sliderBool = true;
     },
+    */
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -264,6 +275,7 @@ export default {
           this.languagesShow = false;
           this.clientRequestShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Dashboard";
         }
 
@@ -278,6 +290,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Reqruitment";
         }
 
@@ -292,6 +305,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Vendors";
         }
 
@@ -306,6 +320,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Languages";
         }
 
@@ -317,6 +332,7 @@ export default {
           this.soonQuotesShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Clients";
         }
 
@@ -327,6 +343,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Quotes";
         }
 
@@ -337,6 +354,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = true;
           this.financeShow = false;
+          this.hideAllTables();
           this.path = "Projects";
         }
 
@@ -347,6 +365,7 @@ export default {
           this.clientsShow = false;
           this.projectsShow = false;
           this.financeShow = true;
+          this.hideAllTables();
           this.path = "Finance";
         }
 
@@ -395,6 +414,17 @@ export default {
       for (let i = 0; i < this.navbarList.length; i++) {
         if (i == 1) this.navbarList[i].active = true;
         else this.navbarList[i].active = false;
+      }
+    },
+    hideAllTables() {
+      if (
+        this.languagesSettingsVisible ||
+        this.servicesSettingsVisible ||
+        this.industiesSettingsVisible
+      ) {
+        this.languagesSettingsVisible = false;
+        this.servicesSettingsVisible = false;
+        this.industiesSettingsVisible = false;
       }
     }
   },
@@ -447,13 +477,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-body.main-body {
-  margin: 0;
-  font-family: MyriadPro;
-  background: none;
-}
+// body.main-body {
+//   margin: 0;
+//   font-family: MyriadPro;
+//   background: none;
+// }
 
-.adminportalWrapper {
+.adminportalWrapper2 {
   margin: 0 auto;
   overflow: auto;
 }
@@ -869,7 +899,8 @@ body.main-body {
     }
 
     &__slider {
-      transform: translate(-50%);
+      // transform: translate(-50%);
+      background-color: #fff;
       width: 175px;
       // width: 216px;
       box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
@@ -936,11 +967,11 @@ body.main-body {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin-bottom: 60px;
+        margin-bottom: 20px;
         cursor: pointer;
         transition: all 0.4s;
         &:last-child {
-          margin-bottom: 120px;
+          margin-bottom: 40px;
           @media (max-height: 768px) {
             margin-bottom: 57px;
           }

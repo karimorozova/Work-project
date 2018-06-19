@@ -13,6 +13,9 @@ export default {
 </script>
 
 <style lang='scss'>
+body {
+  overflow: hidden;
+}
 .b-log-in,
 .b-log-out{
   padding: 6px;
