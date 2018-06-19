@@ -935,6 +935,7 @@ export default {
     }
     .slider {
       transform: translate(-3%);
+      background-color: #fff;
     }
 
     &__openHide {
