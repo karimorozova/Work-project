@@ -1,9 +1,9 @@
 <template lang="pug">
 .selectWrapper
-  .info(v-if="!isActiveUpload")
-    span(v-if="chooseYesOrNo") YES
+  .info(v-if="!chooseYesOrNo")
+    span(v-if="hideAgainOptions") YES
     span(v-else) NO
-  .info(v-else="isActiveUpload" v-click-outside="hideDropMenu")
+  .info(v-if="chooseYesOrNo" v-click-outside="hideDropMenu")
     span Option
     .arr(@click="showDD")
       img(src="../../../assets/images/Other/open arrow.png")
@@ -26,31 +26,36 @@ export default {
     return {
       dropdownVisible: false,
       hideAgainOptions: true,
-      chooseYesOrNo: true
-
+      chooseYesOrNo: this.isActiveUpload
     };
   },
   methods: {
     showDD() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    hideDropMenu(){
+    hideDropMenu() {
       this.hideAgainOptions = false;
       this.dropdownVisible = false;
-      this.isActiveUpload = false;
-    },
-    makeChooseYes(){
-      this.isActiveUpload = false;
-    },
-    makeChooseNo(){
       this.chooseYesOrNo = false;
-      this.isActiveUpload = false;
+    },
+    makeChooseYes() {
+      this.hideAgainOptions = true;
+      this.chooseYesOrNo = true;
+    },
+    makeChooseNo() {
+      this.chooseYesOrNo = true;
+      this.hideAgainOptions = false;
     },
   },
   directives: {
     ClickOutside
   },
-  computed: {}
+  computed: {},
+  watch: {
+    isActiveUpload() {
+      this.chooseYesOrNo = this.isActiveUpload;
+    }
+  }
 };
 </script>
 
@@ -63,16 +68,15 @@ export default {
   .info {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
-    span {
-      padding-top: 8px;
-    }
     .arr {
       border: 1px solid #68573e;
-      padding: 5px 5px 13px 0;
+      padding: 14px 5px 13px 0;
       border-right: 0;
       border-top: 0;
       border-bottom: 0;
+      height: 46px;
       img {
         width: 20px;
       }
