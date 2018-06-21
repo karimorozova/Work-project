@@ -833,22 +833,6 @@ export default {
             isActiveUpload: false,
             rowInfo: [
               {
-                image1: require("../../assets/images/flags 31x21pix/Malay [MS].png"),
-                image2: require("../../assets/images/Other/upload-icon.png")
-              },
-              { title: "Malay" },
-              { title: "MS" },
-              { title: "ms-MY" },
-              { title: "msa" },
-              { title: "" },
-              { title: "" }
-            ]
-          },
-          {
-            activeTools: [false, true, true],
-            isActiveUpload: false,
-            rowInfo: [
-              {
                 image1: require("../../assets/images/flags 31x21pix/Marathi [MR].png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },

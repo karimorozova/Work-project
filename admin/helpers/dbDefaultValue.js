@@ -1,6 +1,6 @@
 
 const languagesDefault = [
-    {"lang":"Afrikaans","symbol":"AF","direction":"in"},
+    {"lang":"Afrikaans","symbol":"AF", "iso1":"af","direction":"in"},
     {"lang":"Arabic","symbol":"AR","direction":"both","dialects":[{"lang":"Arabic (Saudi Arabia)","symbol":"AR-SA","direction":"in", "check": false},{"lang":"Arabic (Egypt)","symbol":"AR-EG","direction":"in", "check": false},{"lang":"Arabic (Morocco)","symbol":"AR-MA","direction":"in", "check": false}]},
     {"lang":"Azerbaijani (Latin)","symbol":"AZ-LN","direction":"in"},
     {"lang":"Bulgarian","symbol":"BG","direction":"both"},

@@ -6,12 +6,9 @@
                   h2.adminPortal ADMIN PORTAL
             .adminTop__searchBlock
                 .dropdownWrapper
-                  .imgwrap
+                   .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/andmin-button-icon.png" )
-                    span.spwrap configuration
-                  // .imgwrap(@click="showSlider")
-                    img(src="../assets/images/Other/andmin-button-icon.png" )
-                    span.spwrap configuration
+                    span.spwrap settings
                 .womanWrapper
                   img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
                   .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
@@ -44,46 +41,16 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              .adminNavbar__slider.slider
-                span SETTINGS
-                .slider-inner
-                  .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
-                  .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") Services
-                  .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") Industries
-              // .adminNavbar__slider(:class="{slider: sliderBool}" v-click-outside="hideSlider" v-if="sliderBool")
-                span SETTINGS
-                .slider-inner
-                  .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
-                  .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") Services
-                  .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") Industries
-            .adminMainWrapper__inner(:class='{"adminMainWrapper__open": sliderBool}')
-              .breadCrumbs 
-                span.accountName {{ user.name }} 
-                span.arrows(v-if="user.name") >> 
-                span {{ path }}
-                span.arrows(v-if="clientRequestShow") >>
-                span(v-if="clientRequestShow") {{ serviceType }}
-              .maininfoWrapper(v-if="languagesSettingsVisible")
-                .mainInfo
-                  .adminAll
-                    .quotesComponent
-                      .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                        .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          Table
-              .maininfoWrapper(v-if="servicesSettingsVisible")
-                .mainInfo
-                  .adminAll
-                    .quotesComponent.additionalServices
-                      .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                        .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          TableServices
-              .maininfoWrapper(v-if="industiesSettingsVisible")
-                .mainInfo
-                  .adminAll
-                    .quotesComponent.additionalIndustries
-                      .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
-                        .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                          TableIndustries
+              DashboardSettings(v-if="dashboardShow" :sliderBool="sliderBool")
+              RecruitmentSettings(v-if="recruitmentShow")
+              VendorsSettings(v-if="vendorsShow")
+              LanguagesSettings(v-if="languagesShow")
+              ClientsSettings(v-if="clientsShow")
+              QuotesSettings(v-if="soonQuotesShow")
+              ProjectsSettings(v-if="projectsShow")
+              FinanceSettings(v-if="financeShow")
+              ReportsSettings(v-if="reportsShow")
+              Blanket(v-if="dashboardShowBlanket" title='Welcome to the Pangea Admin')
               Blanket(v-if="recruitmentShow" title='Recruitment')
               Blanket(v-if="vendorsShow" title='Vendor')
               Blanket(v-if="languagesShow" title='Language')
@@ -101,9 +68,18 @@ import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
 import Accountinfo from "../components/account/Accountinfo";
 import Blanket from "../components/Blanket/Blanket";
 import ClickOutside from "vue-click-outside";
-import Table from "./Table/Table.vue";
-import TableServices from "./Table/TableServices.vue";
-import TableIndustries from "./Table/TableIndustries";
+// import Table from "./Table/Table.vue";
+// import TableServices from "./Table/TableServices.vue";
+// import TableIndustries from "./Table/TableIndustries";
+import DashboardSettings from "./sliders/DashboardSettings";
+import RecruitmentSettings from "./sliders/RecruitmentSettings";
+import VendorsSettings from "./sliders/VendorsSettings";
+import LanguagesSettings from "./sliders/LanguagesSettings";
+import ClientsSettings from "./sliders/ClientsSettings";
+import QuotesSettings from "./sliders/QuotesSettings";
+import ProjectsSettings from "./sliders/ProjectsSettings";
+import FinanceSettings from "./sliders/FinanceSettings";
+import ReportsSettings from "./sliders/ReportsSettings";
 
 export default {
   data() {
@@ -176,6 +152,8 @@ export default {
       openQuotes: true,
       quotes: [],
       path: "Language Settings",
+      dashboardShow: true,
+      dashboardShowBlanket: true,
       recruitmentShow: false,
       vendorsShow: false,
       languagesShow: false,
@@ -186,7 +164,6 @@ export default {
       reportsShow: false,
       accountInfo: false,
       sliderBool: false,
-      slidebarVisible: true,
       languagesSettingsVisible: false,
       languagesBgBool: false,
       servicesSettingsVisible: false,
@@ -196,44 +173,24 @@ export default {
     };
   },
   methods: {
-    showIndustriesSettings() {
-      this.industiesSettingsVisible = !this.industiesSettingsVisible;
-      this.industiesBgBool = !this.industiesBgBool;
-      if (this.languagesSettingsVisible || this.servicesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.servicesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.servicesBgBool = false;
-    },
-    showServicesSettings() {
-      this.servicesSettingsVisible = !this.servicesSettingsVisible;
-      this.servicesBgBool = !this.servicesBgBool;
-      if (this.languagesSettingsVisible || this.industiesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.industiesBgBool = false;
-    },
-    showLanguagesSettings() {
-      this.languagesSettingsVisible = !this.languagesSettingsVisible;
-      this.languagesBgBool = !this.languagesBgBool;
-      this.servicesBgBool = false;
-      this.industiesBgBool = false;
-      if (this.servicesSettingsVisible || this.industiesSettingsVisible) {
-        this.servicesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-    },
-    /*
-    hideSlider() {
-      this.sliderBool = false;
-    },
+    // hideSlider() {
+    //   this.sliderBool = false;
+    // },
     showSlider() {
       this.sliderBool = true;
+      this.dashboardShowBlanket = false;
+      if (!this.dashboardShow) {
+        this.dashboardShow = true;
+      }
+      this.recruitmentShow = false;
+      this.vendorsShow = false;
+      this.languagesShow = false;
+      this.clientsShow = false;
+      this.financeShow = false;
+      this.reportsShow = false;
+      this.projectsShow = false;
+      this.soonQuotesShow = false;
     },
-    */
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
       if (document.cookie.indexOf("ses") >= 0) {
@@ -255,41 +212,37 @@ export default {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
           item.active = true;
-          if (this.detailedInfoVisible && !this.detailedProjectVisible) {
-            this.detailedInfoVisible = !this.detailedInfoVisible;
-            this.openQuotes = true;
-          }
-          if (!this.detailedInfoVisible && this.detailedProjectVisible) {
-            this.detailedProjectVisible = !this.detailedProjectVisible;
-            this.openProjects = true;
-          }
         } else {
           item.active = false;
         }
 
         if (index == 0) {
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
-          this.clientRequestShow = false;
+          this.clientsShow = false;
           this.financeShow = false;
+          this.dashboardShow = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShowBlanket = true;
+          this.sliderBool = false;
           this.hideAllTables();
           this.path = "Dashboard";
         }
 
         if (index == 1) {
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
           this.recruitmentShow = true;
           this.vendorsShow = false;
           this.languagesShow = false;
-          this.clientRequestShow = false;
-          this.soonQuotesShow = false;
           this.clientsShow = false;
-          this.projectsShow = false;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Reqruitment";
         }
@@ -297,29 +250,29 @@ export default {
         if (index == 2) {
           this.recruitmentShow = false;
           this.vendorsShow = true;
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
           this.languagesShow = false;
-          this.clientRequestShow = false;
-          this.soonQuotesShow = false;
           this.clientsShow = false;
-          this.projectsShow = false;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Vendors";
         }
 
         if (index == 3) {
           this.recruitmentShow = false;
-          this.languagesShow = true;
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
           this.vendorsShow = false;
-          this.clientRequestShow = false;
-          this.soonQuotesShow = false;
+          this.languagesShow = true;
           this.clientsShow = false;
-          this.projectsShow = false;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Languages";
         }
@@ -332,6 +285,9 @@ export default {
           this.soonQuotesShow = false;
           this.projectsShow = false;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Clients";
         }
@@ -339,10 +295,14 @@ export default {
         if (index == 5) {
           this.recruitmentShow = false;
           this.vendorsShow = false;
-          this.soonQuotesShow = true;
+          this.languagesShow = false;
           this.clientsShow = false;
-          this.projectsShow = false;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = true;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Quotes";
         }
@@ -350,10 +310,14 @@ export default {
         if (index == 6) {
           this.recruitmentShow = false;
           this.vendorsShow = false;
-          this.soonQuotesShow = false;
+          this.languagesShow = false;
           this.clientsShow = false;
-          this.projectsShow = true;
           this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = true;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Projects";
         }
@@ -361,12 +325,31 @@ export default {
         if (index == 7) {
           this.recruitmentShow = false;
           this.vendorsShow = false;
-          this.soonQuotesShow = false;
+          this.languagesShow = false;
           this.clientsShow = false;
-          this.projectsShow = false;
           this.financeShow = true;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = false;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
           this.hideAllTables();
           this.path = "Finance";
+        }
+
+        if (index == 8) {
+          this.recruitmentShow = false;
+          this.vendorsShow = false;
+          this.languagesShow = false;
+          this.clientsShow = false;
+          this.financeShow = false;
+          this.dashboardShowBlanket = false;
+          this.reportsShow = true;
+          this.projectsShow = false;
+          this.soonQuotesShow = false;
+          this.dashboardShow = false;
+          this.hideAllTables();
+          this.path = "Reports";
         }
 
         this.accountInfo = false;
@@ -384,8 +367,6 @@ export default {
     showAccountInfo() {
       this.accountInfo = true;
       this.accountMenuVisible = !this.accountMenuVisible;
-      this.detailedInfoVisible = false;
-      this.detailedProjectVisible = false;
       this.clientRequestShow = false;
       this.languagesShow = false;
       this.vendorsShow = false;
@@ -405,17 +386,6 @@ export default {
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    quoteDetails(data) {
-      this.detailedInfoVisible = data.open;
-      this.quoteIndex = data.index;
-      this.detailedProjectVisible = false;
-      this.allProjectsShow = false;
-      this.clientRequestShow = false;
-      for (let i = 0; i < this.navbarList.length; i++) {
-        if (i == 1) this.navbarList[i].active = true;
-        else this.navbarList[i].active = false;
-      }
-    },
     hideAllTables() {
       if (
         this.languagesSettingsVisible ||
@@ -430,19 +400,28 @@ export default {
   },
   mounted() {
     this.getCookie();
-    document.body.classList.add("main-body");
+    // document.body.classList.add("main-body");
   },
   destroyed() {
-    document.body.classList.remove("main-body");
+    // document.body.classList.remove("main-body");
   },
   components: {
     Quotesinfo,
     QuotesInfoDetailed,
     Accountinfo,
     Blanket,
-    Table,
-    TableServices,
-    TableIndustries
+    // Table,
+    // TableServices,
+    // TableIndustries,
+    DashboardSettings,
+    RecruitmentSettings,
+    VendorsSettings,
+    LanguagesSettings,
+    ClientsSettings,
+    QuotesSettings,
+    ProjectsSettings,
+    FinanceSettings,
+    ReportsSettings
   },
   directives: {
     ClickOutside
@@ -450,8 +429,6 @@ export default {
   computed: {
     visibleChecker() {
       return (
-        this.detailedInfoVisible ||
-        this.detailedProjectVisible ||
         this.accountInfo ||
         this.vendorsShow ||
         this.languagesShow ||
@@ -832,13 +809,13 @@ export default {
   position: relative;
   &__inner {
     width: 90%;
-    transition: all 1s;
+    // transition: all 1s;
     // transform: translate(-150px);
-    transform: translate(7px);
+    // transform: translate(7px);
   }
   &__open {
     // transform: translate(0px);
-    transform: translate(15px);
+    // transform: translate(15px);
   }
   .maininfoWrapper {
     width: 100%;
@@ -899,7 +876,7 @@ export default {
     }
 
     &__slider {
-      // transform: translate(-50%);
+      transform: translate(-50%);
       background-color: #fff;
       width: 175px;
       // width: 216px;
