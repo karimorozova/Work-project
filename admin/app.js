@@ -15,6 +15,7 @@ const { LanguagesModel, RequestSchema } = require("./models");
 const allowedOrigins = [
   "https://admin.pangea.global",
   "https://vendor.pangea.global",
+  "https://portal.pangea.global",
   "http://localhost:3000",
   "http://localhost:8081"
 ];
