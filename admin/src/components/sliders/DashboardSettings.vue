@@ -24,7 +24,7 @@
               .quotesComponent.additionalServices
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    TableServices
+                    TableServices1
         .maininfoWrapper(v-if="industiesSettingsVisible")
           .mainInfo
             .adminAll
@@ -36,7 +36,8 @@
 
 <script>
 import Table from "../Table/Table";
-import TableServices from "../Table/TableServices.vue";
+// import TableServices from "../Table/TableServices.vue";
+import TableServices1 from "../Table/TableServices1.vue";
 import TableIndustries from "../Table/TableIndustries";
 
 export default {
@@ -96,7 +97,8 @@ export default {
   },
   components: {
     Table,
-    TableServices,
+    // TableServices,
+    TableServices1,
     TableIndustries
   },
   watch: {
@@ -122,7 +124,7 @@ export default {
   background-color: #fff;
 }
 .additionalServices {
-  width: 700px;
+  width: 800px;
 }
 .additionalIndustries {
   width: 800px;

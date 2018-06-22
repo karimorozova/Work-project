@@ -1,12 +1,11 @@
 <template lang="pug">
-.selectWrapper
+.languageFormWrapper
   .info
-    span Option
+    span Mono
     .arr(@click="showDD")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    .b-conf YES
-    .b-conf NO
+    .b-conf Duo
 </template>
 
 <script>
@@ -27,9 +26,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.selectWrapper {
+.languageFormWrapper {
   display: flex;
-  justify-content: center;
+  // justify-content: center;
   position: relative;
   width: 34%;
   flex-basis: 16%;
@@ -75,9 +74,9 @@ export default {
       width: 121px;
       background-color: #fff;
       padding: 10px 0 10px 10px;
-      &:last-child {
-        border-top: 0;
-      }
+      // &:last-child {
+      //   border-top: 0;
+      // }
     }
   }
 }

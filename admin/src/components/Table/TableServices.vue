@@ -9,7 +9,7 @@
                     ServicesTableImage(v-if='index === 0' :body='row' :isActiveUpload='fullRowInfo.isActiveUpload')
                     ServicesSelect(v-if='index === 2')
                     ServicesRowEdit(v-if='index === 3' @onEdit='editRow(rowIndex)' :status='fullRowInfo.activeTools')
-        img.addLang(src="../../assets/images/Other/add-icon.png" @click="addLang")
+        button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
 <script>
@@ -22,12 +22,12 @@ const row = {
   isActiveUpload: true,
   rowInfo: [
     {
-      image1: '',
+      image1: "",
       image2: require("../../assets/images/Other/upload-icon.png")
     },
     { title: "" },
     { title: "" },
-    { title: ""}
+    { title: "" }
   ]
 };
 
@@ -52,7 +52,7 @@ export default {
                 image1: require("../../assets/images/services/SEO _ Blog Management.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "SEO & Blog Management"},
+              { title: "SEO & Blog Management" },
               { title: "" },
               {
                 title: ""
@@ -67,7 +67,7 @@ export default {
                 image1: require("../../assets/images/services/QA and Testing.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "QA & Testing"},
+              { title: "QA & Testing" },
               { title: "" },
               {
                 title: ""
@@ -82,7 +82,7 @@ export default {
                 image1: require("../../assets/images/services/Localized Graphic Design.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "Localized Graphic Design"},
+              { title: "Localized Graphic Design" },
               { title: "" },
               {
                 title: ""
@@ -97,7 +97,7 @@ export default {
                 image1: require("../../assets/images/services/Marketing _ Copywriting.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "Marketing _ Copywriting"},
+              { title: "Marketing _ Copywriting" },
               { title: "" },
               {
                 title: ""
@@ -112,7 +112,7 @@ export default {
                 image1: require("../../assets/images/services/Market Research.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "Market Research"},
+              { title: "Market Research" },
               { title: "" },
               {
                 title: ""
@@ -127,7 +127,7 @@ export default {
                 image1: require("../../assets/images/services/Official Translations.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "Official Translations"},
+              { title: "Official Translations" },
               { title: "" },
               {
                 title: ""
@@ -142,20 +142,22 @@ export default {
                 image1: require("../../assets/images/services/ORM – Online Reputation Management.png"),
                 image2: require("../../assets/images/Other/upload-icon.png")
               },
-              { title: "ORM – Online Reputation Management"},
+              { title: "ORM – Online Reputation Management" },
               { title: "" },
               {
                 title: ""
               }
             ]
-          },
+          }
         ]
-      }
+      },
+      disableButton: false
     };
   },
   methods: {
     addLang() {
       this.table.body.push(row);
+      this.disableButton = true;
     },
     editRow(index) {
       console.log(index);
@@ -203,8 +205,8 @@ export default {
       display: flex;
       flex-direction: column;
       max-height: 134px;
-        overflow-y: scroll;
-    overflow-x: hidden;
+      overflow-y: scroll;
+      overflow-x: hidden;
       .b-table__col {
         // border: 1px solid #675842;
         // border-right: 0.5px;
@@ -254,7 +256,7 @@ export default {
       }
       &-5 {
         flex-basis: 4%;
-        }
+      }
     }
     .higher {
       height: 46px;
@@ -262,6 +264,13 @@ export default {
   }
   .addLang {
     cursor: pointer;
+    background-image: url("../../assets/images/Other/add-icon.png");
+    width: 31px;
+    height: 34px;
+    background-color: #fff;
+    border: none;
+    background-repeat: no-repeat;
+    outline: none;
   }
   .set_bottom_border {
     border-bottom-width: 1px;

@@ -1,12 +1,12 @@
 <template lang="pug">
-.selectWrapper
+.calculationWrapper
   .info
-    span Option
+    span Words
     .arr(@click="showDD")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    .b-conf YES
-    .b-conf NO
+    .b-conf Hours
+    .b-conf Package
 </template>
 
 <script>
@@ -27,11 +27,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.selectWrapper {
+.calculationWrapper {
   display: flex;
   justify-content: center;
   position: relative;
-  width: 34%;
+  width: 30%;
   flex-basis: 16%;
   border: 1px solid #9a8f80;
   .info {
@@ -49,7 +49,7 @@ export default {
       border-bottom: 0;
       border-left-width: 2px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       height: 100%;
       cursor: pointer;
