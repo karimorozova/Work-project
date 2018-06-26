@@ -31,14 +31,14 @@
               .quotesComponent.additionalIndustries
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    TableIndustries
+                    TableIndustries1
 </template>
 
 <script>
 import Table from "../Table/Table";
 // import TableServices from "../Table/TableServices.vue";
 import TableServices1 from "../Table/TableServices1.vue";
-import TableIndustries from "../Table/TableIndustries";
+import TableIndustries1 from "../Table/TableIndustries1";
 
 export default {
   props: {
@@ -99,7 +99,7 @@ export default {
     Table,
     // TableServices,
     TableServices1,
-    TableIndustries
+    TableIndustries1
   },
   watch: {
     sliderBool(){

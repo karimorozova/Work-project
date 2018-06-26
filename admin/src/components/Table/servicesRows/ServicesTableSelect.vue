@@ -1,35 +1,73 @@
 <template lang="pug">
 .selectWrapper
-  .info
+  .info(v-if="!chooseSelect")
+    input.first(v-if="hideSelect" v-model="activeStatus.yes" type="text" :readonly="true")
+    input.second(v-else v-model="activeStatus.no" type="text" :readonly="true")
+  .info(v-if="chooseSelect" v-click-outside="hideDropMenuSelect")
     span Option
-    .arr(@click="showDD")
+    .arr(@click="showDDSelect")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    .b-conf YES
-    .b-conf NO
+    input.b-conf(@click="makeChooseYes" v-model="activeStatus.yes" type="text" :readonly="true")
+    input.b-conf(@click="makeChooseNo" v-model="activeStatus.no" type="text" :readonly="true")
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
+
 export default {
+  props: {
+    isActiveUpload: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
-      dropdownVisible: false
+      dropdownVisible: false,
+      activeStatus: {
+        yes: "Yes",
+        no: "No"
+      },
+      hideSelect: true,
+      chooseSelect: this.isActiveUpload
     };
   },
   methods: {
-    showDD() {
+    showDDSelect() {
       this.dropdownVisible = !this.dropdownVisible;
+    },
+    hideDropMenuSelect() {
+      this.dropdownVisible = false;
+    },
+    makeChooseYes() {
+      this.hideSelect = true;
+      this.chooseSelect = false;
+      this.dropdownVisible = false;
+      this.$emit('sendActiveStatusY', this.activeStatus.yes);
+    },
+    makeChooseNo() {
+      this.hideSelect = false;
+      this.chooseSelect = false;
+      this.dropdownVisible = false;
+      this.$emit('sendActiveStatusN', this.activeStatus.no);
     }
   },
-
-  computed: {}
+  directives: {
+    ClickOutside
+  },
+  computed: {},
+  watch: {
+    isActiveUpload() {
+      this.chooseSelect = this.isActiveUpload;
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .selectWrapper {
   display: flex;
-  justify-content: center;
   position: relative;
   width: 34%;
   flex-basis: 16%;
@@ -40,6 +78,15 @@ export default {
     align-items: center;
     width: 100%;
     span {
+      padding-left: 10px;
+    }
+    .first,
+    .second {
+      outline: none;
+      border: none;
+      width: 85px;
+      font-size: 14px;
+      color: #67573e;
       padding-left: 10px;
     }
     .arr {
@@ -71,13 +118,16 @@ export default {
     .b-conf {
       display: flex;
       justify-content: flex-start;
-      border: 1px solid #68573e;
-      width: 121px;
+      width: 115px;
       background-color: #fff;
       padding: 10px 0 10px 10px;
-      &:last-child {
-        border-top: 0;
-      }
+      cursor: pointer;
+      outline: none;
+      border: none;
+      font-size: 14px;
+      color: #67573e;
+      padding-left: 10px;
+      border: 1px solid #68573e;
     }
   }
 }

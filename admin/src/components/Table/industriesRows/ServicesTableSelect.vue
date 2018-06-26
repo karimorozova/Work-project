@@ -1,15 +1,15 @@
 <template lang="pug">
-.languageFormWrapper
-  .info(v-if="!chooseLangBlock")
-    input.first(v-if="hideLanguages" v-model="languageMode.mono" type="text" :readonly="true")
-    input.second(v-else v-model="languageMode.duo" type="text" :readonly="true")
-  .info(v-if="chooseLangBlock" v-click-outside="hideDropMenuLang")
+.selectWrapper
+  .info(v-if="!chooseSelect")
+    input.first(v-if="hideSelect" v-model="activeStatus.yes" type="text" :readonly="true")
+    input.second(v-else v-model="activeStatus.no" type="text" :readonly="true")
+  .info(v-if="chooseSelect" v-click-outside="hideDropMenuSelect")
     span Option
-    .arr(@click="showDDLangForm")
+    .arr(@click="showDDSelect")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    input.b-conf(@click="makeChooseMono" v-model="languageMode.mono" type="text" :readonly="true")
-    input.b-conf(@click="makeChooseDuo" v-model="languageMode.duo" type="text" :readonly="true")
+    input.b-conf(@click="makeChooseYes" v-model="activeStatus.yes" type="text" :readonly="true")
+    input.b-conf(@click="makeChooseNo" v-model="activeStatus.no" type="text" :readonly="true")
 </template>
 
 <script>
@@ -25,32 +25,32 @@ export default {
   data() {
     return {
       dropdownVisible: false,
-      languageMode: {
-        mono: "Mono",
-        duo: "Duo"
+      activeStatus: {
+        yes: "Yes",
+        no: "No"
       },
-      hideLanguages: true,
-      chooseLangBlock: this.isActiveUpload
+      hideSelect: true,
+      chooseSelect: this.isActiveUpload
     };
   },
   methods: {
-    showDDLangForm() {
+    showDDSelect() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    hideDropMenuLang() {
+    hideDropMenuSelect() {
       this.dropdownVisible = false;
     },
-    makeChooseMono() {
-      this.hideLanguages = true;
-      this.chooseLangBlock = false;
+    makeChooseYes() {
+      this.hideSelect = true;
+      this.chooseSelect = false;
       this.dropdownVisible = false;
-      this.$emit('sendToParentM', this.languageMode.mono);
+      this.$emit('sendActiveStatusY', this.activeStatus.yes);
     },
-    makeChooseDuo() {
-      this.hideLanguages = false;
-      this.chooseLangBlock = false;
+    makeChooseNo() {
+      this.hideSelect = false;
+      this.chooseSelect = false;
       this.dropdownVisible = false;
-      this.$emit('sendToParentDuo', this.languageMode.duo);
+      this.$emit('sendActiveStatusN', this.activeStatus.no);
     }
   },
   directives: {
@@ -59,18 +59,18 @@ export default {
   computed: {},
   watch: {
     isActiveUpload() {
-      this.chooseLangBlock = this.isActiveUpload;
+      this.chooseSelect = this.isActiveUpload;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.languageFormWrapper {
+.selectWrapper {
   display: flex;
   position: relative;
   width: 34%;
-  flex-basis: 16%;
+  flex-basis: 20.7%;
   border: 1px solid #9a8f80;
   .info {
     display: flex;
