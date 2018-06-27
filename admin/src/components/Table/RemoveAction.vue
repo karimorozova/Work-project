@@ -1,5 +1,5 @@
 <template lang="pug">
-.errorsMessage(v-if="showRemoveWarningComp")
+.errorsMessage
     .message
     span Do you want to delete data?
     .buttonsBlock
@@ -16,10 +16,6 @@ export default {
     indexToRemove: {
       type: Number
     },
-    showRemoveWarning: {
-      type: Boolean,
-      default: false
-    },
     removeButtonDisable: {
       type: Boolean,
       default: false
@@ -27,34 +23,27 @@ export default {
   },
   data() {
     return {
-      showRemoveWarningComp: this.showRemoveWarning,
       indexToRemoveComp: this.indexToRemove,
       removeButtonDisableComp: this.removeButtonDisable,
       confRem: {
-        showRemoveWarningComp: false,
         removeButtonDisableComp: false
       }
     };
   },
   methods: {
     confirmRemoveComp(ind) {
-      this.showRemoveWarningComp = false;
       let vari = this.indexToRemoveComp;
       console.log(vari);
       this.table.body.splice(vari, 1);
       this.$emit("confirmFromRemove", this.confRem);
     },
     cancelRemoveComp() {
-      this.showRemoveWarningComp = false;
-      this.$emit("cancelFromRemove", this.confRem);
+      this.$emit("cancelFromRemove");
     }
   },
   watch: {
     indexToRemove() {
       this.indexToRemoveComp = this.indexToRemove;
-    },
-    showRemoveWarning() {
-      this.showRemoveWarningComp = this.showRemoveWarning;
     },
     removeButtonDisable() {
       this.removeButtonDisableComp = this.removeButtonDisable;
@@ -112,14 +101,5 @@ export default {
       }
     }
   }
-}
-button {
-  width: 31px;
-  height: 34px;
-  background-color: #fff;
-  border: none;
-  background-repeat: no-repeat;
-  outline: none;
-  cursor: pointer;
 }
 </style>

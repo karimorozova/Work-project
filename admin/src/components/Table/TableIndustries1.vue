@@ -33,8 +33,8 @@
           //     .buttonsBlock
           //       button.confirm(@click="confirmRemove(ind)") Confirm
           //       button.cancel(@click="cancelRemove") Cancel
-          RemoveAction(:table="table" :showRemoveWarning="showRemoveWarning" :removeButtonDisable="removeButtonDisable" :showEditWarning="showEditWarning" :indexToRemove="indexToRemove"
-           @confirmFromRemove="confirmRemove(ind)")
+          RemoveAction(:table="table" :showRemoveWarning="showRemoveWarning" :removeButtonDisable="removeButtonDisable" :showEditWarning="showEditWarning"
+            :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" v-if="showRemoveWarning")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
@@ -189,12 +189,8 @@ export default {
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
       this.indexToEdit = ind;
-      // const currentPosition = ind;
-      // console.log(currentPosition);
-      // if(currentPosition != ind) {
-        this.showEditWarning = true;
-      // }
-      
+      this.showEditWarning = true;
+
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
       this.table.body[ind].activeTools.splice(2, 1, false);
