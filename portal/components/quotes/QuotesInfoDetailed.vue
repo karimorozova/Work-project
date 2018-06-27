@@ -22,8 +22,8 @@
                       .value {{ quote.totalAgreed.formattedAmount }}
                   .quoteContainer-project__third-block
                     .quoteContainer-project__third-block-one(@click="downloadAsPDF")
-                      img(src="../../assets/images/pdf-icon.png")
-                    span Download Full Report
+                    // img(src="../../assets/images/pdf-icon.png")
+                    // span Download Full Report
                 .tableWrapper
                   table.quoteContainer-table
                     tr.row

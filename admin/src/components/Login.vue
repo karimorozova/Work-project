@@ -46,7 +46,7 @@ export default {
     sendForm() {
       this.$http.post("/login", this.form).then(
         response => {
-          document.cookie = "ses=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
+          // document.cookie = "ses=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
           this.isLogin = true;
           window.location.href = "/main";
 
