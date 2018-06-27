@@ -22,8 +22,8 @@
                       .value {{ project.totalAgreed.formattedAmount }}
                   .projContainer-project__third-block
                     .projContainer-project__third-block-one(@click="downloadAsPDF")
-                    //   img(src="../../assets/images/pdf-icon.png")
-                    // span Download Full Report
+                    //-   img(src="../../assets/images/pdf-icon.png")
+                    //- span Download Full Report
                 .tableWrapper
                   table.projContainer-table
                     tr.row
