@@ -128,12 +128,13 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
   
     await request.save();
     if (projectName) {
-      sendMailPortal(request)
+      sendMailPortal(request);
+      quote(request);
     } else {
       sendMail(request);    
     }
     sendMailClient(request);
-    quote(request);
+    // quote(request);
 
     console.log("Saved");
 

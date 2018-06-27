@@ -8,7 +8,7 @@ module.exports = {
 
   axios: {
     // API url
-    //baseURL: 'https://admin.pangea.global'
+    // baseURL: 'https://admin.pangea.global'
     baseURL: 'http://localhost:3001/'
   },
   head: {
