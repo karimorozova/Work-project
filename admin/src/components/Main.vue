@@ -1,5 +1,5 @@
 <template lang="pug">
-    .admminportalWrapper2
+    .admminportalWrapper2(v-if="cookies")
         .adminTop
             .adminTop__adminName
                 a(href="/main") 
@@ -145,6 +145,7 @@ export default {
           active: false
         }
       ],
+      cookies: false,
       dropdownVisible: false,
       clientRequestShow: false,
       accountMenuVisible: false,
@@ -193,7 +194,7 @@ export default {
     },
     getCookie() {
       let sessionCookie = document.cookie.split("=")[1];
-      if (document.cookie.indexOf("ses") >= 0) {
+      if (document.cookie.indexOf("admin") >= 0) {
         this.cookies = true;
         return true;
       } else {
@@ -204,10 +205,10 @@ export default {
     hideAccountMenu() {
       this.accountMenuVisible = false;
     },
-    signOut() {
-      document.cookie = "ses" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-      window.location.replace("/");
-    },
+    // signOut() {
+    //   document.cookie = "ses" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    //   window.location.replace("/");
+    // },
     switchInfo(index) {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
@@ -437,18 +438,18 @@ export default {
         this.thanks
       );
     },
-    jsess() {
-      let result = "";
-      let cookies = document.cookie.split(";");
-      console.log(cookies);
-      for (let i = 0; i < cookies.length; i++) {
-        let findSession = cookies[i].split("=");
-        if (findSession[0].indexOf("ses") > 0) {
-          result = findSession[1];
-        }
-      }
-      return result;
-    }
+    // jsess() {
+    //   let result = "";
+    //   let cookies = document.cookie.split(";");
+    //   console.log(cookies);
+    //   for (let i = 0; i < cookies.length; i++) {
+    //     let findSession = cookies[i].split("=");
+    //     if (findSession[0].indexOf("ses") > 0) {
+    //       result = findSession[1];
+    //     }
+    //   }
+    //   return result;
+    // }
   }
 };
 </script>
