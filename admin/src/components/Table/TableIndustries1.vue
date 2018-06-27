@@ -19,14 +19,22 @@
         ServiceSelect(:isActiveUpload="bodyItem.isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
         td.data5
           button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: bodyItem.activeTools[0]}")
-          button.editB(@click="edit(ind)" :class="{data5_active: bodyItem.activeTools[1]}")
-          button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}")
-          .errorsMessage(v-if="showRemoveWarning")
+          button.editB(@click="edit(ind)" :class="{data5_active: bodyItem.activeTools[1]}" :disabled="!declineReadonly[ind]")
+          .errorsMessage(v-if="showEditWarning")
             .message
-              span Do you really want to delete data?
+              span Previous data wasn't saved. Do you want to save them?
               .buttonsBlock
-                button.confirm Confirm
-                button.cancel Cancel
+                button.confirm(@click="confirmEdit(ind)") Save
+                button.cancel(@click="cancelEdit") Cancel
+          button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
+          // .errorsMessage(v-if="showRemoveWarning")
+          //   .message
+          //     span Do you want to delete data?
+          //     .buttonsBlock
+          //       button.confirm(@click="confirmRemove(ind)") Confirm
+          //       button.cancel(@click="cancelRemove") Cancel
+          RemoveAction(:table="table" :showRemoveWarning="showRemoveWarning" :removeButtonDisable="removeButtonDisable" :showEditWarning="showEditWarning" :indexToRemove="indexToRemove"
+           @confirmFromRemove="confirmRemove(ind)")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
@@ -36,6 +44,7 @@ import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
 import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
 import IndustriesGenericTB from "./industriesRows/IndustriesGenericTB";
 import ServiceSelect from "./industriesRows/ServicesTableSelect";
+import RemoveAction from "./RemoveAction";
 
 const rowNew = {
   activeTools: [false, true, false],
@@ -127,34 +136,76 @@ export default {
           }
         ]
       },
+      disableButton: false,
       declineReadonly: [true, true, true, true, true, true, true],
       uploadedFileIcon: [],
       uploadedFile: [],
       nameTitle: "",
-      showRemoveWarning: false
+      showRemoveWarning: false,
+      removeButtonDisable: false,
+      showEditWarning: false,
+      indexToRemove: "",
+      indexToEdit: ""
     };
   },
   methods: {
+    confirmRemove(ind) {
+      // let vari = this.indexToRemove;
+      // console.log(vari);
+      // this.showRemoveWarning = false;
+      // this.table.body.splice(vari, 1);
+      // this.removeButtonDisable = false;
+    },
+    cancelRemove() {
+      this.showRemoveWarning = false;
+      this.removeButtonDisable = false;
+    },
+    confirmEdit(ind) {
+      let editInd = this.indexToEdit;
+      console.log("Emulate of save");
+      this.showEditWarning = false;
+      this.table.body[editInd].activeTools[0] = true;
+      this.table.body[editInd].activeTools[1] = false;
+      this.declineReadonly[editInd] = true;
+      this.disableButton = false;
+      this.table.body[editInd].isActiveUpload = false;
+    },
+    cancelEdit(ind) {
+      let editCancelInd = this.indexToEdit;
+      this.showEditWarning = false;
+      this.table.body[editCancelInd].activeTools[0] = true;
+      this.table.body[editCancelInd].activeTools[1] = false;
+      this.declineReadonly[editCancelInd] = true;
+      this.disableButton = false;
+      this.table.body[editInd].isActiveUpload = false;
+    },
     addLang() {
       this.table.body.push(rowNew);
       this.disableButton = true;
     },
     edit(ind) {
-      // console.log("Edit row " + ind);
+      console.log("Edit row " + ind);
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
-
+      this.indexToEdit = ind;
+      // const currentPosition = ind;
+      // console.log(currentPosition);
+      // if(currentPosition != ind) {
+        this.showEditWarning = true;
+      // }
+      
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
       this.table.body[ind].activeTools.splice(2, 1, false);
     },
     uploadFile(event) {
-      this.upload = event.target.files[0];
+      this.uploadedFileIcon = event.target.files[0];
     },
     removeRow(ind) {
       this.showRemoveWarning = true;
-      this.table.body.splice(ind, 1);
+      this.removeButtonDisable = true;
+      this.indexToRemove = ind;
     },
     getLangFormData(data) {
       // console.log(data);
@@ -170,6 +221,8 @@ export default {
     },
     async sendData(idx) {
       console.log(idx);
+      let formData = new FormData();
+      formData.append("");
       let totalData = {
         nameTitle: this.table.body[idx].title1,
         uploadedFileIcon: this.uploadFile,
@@ -185,7 +238,8 @@ export default {
     IndustriesSelect,
     IndustriesRowEdit,
     IndustriesGenericTB,
-    ServiceSelect
+    ServiceSelect,
+    RemoveAction
   }
 };
 </script>
@@ -385,12 +439,6 @@ export default {
                 outline: none;
                 cursor: pointer;
               }
-            }
-            &__close {
-              position: absolute;
-              top: -15px;
-              right: 7px;
-              cursor: pointer;
             }
           }
         }
