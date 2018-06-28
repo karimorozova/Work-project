@@ -17,7 +17,15 @@
         td.data6
           button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data6_active: bodyItem.activeTools[0]}")
           button.editB(@click="edit(ind)" :class="{data6_active: bodyItem.activeTools[1]}")
+          .errorsMessage(v-if="showEditWarning")
+            .message
+              span Previous data wasn't saved. Do you want to save them?
+              .buttonsBlock
+                button.confirm(@click="confirmEdit(pos)") Save
+                button.cancel(@click="cancelEdit(ind)") Cancel
           button.removeB(@click="removeRow(ind)" :class="{data6_active: bodyItem.activeTools[2]}")
+          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+            :dataForRemoveAction="dataForRemoveAction")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
@@ -27,7 +35,7 @@ import ServicesTableImage from "./servicesRows/ServicesTableImage";
 import ServicesRowEdit from "./servicesRows/ServicesRowEdit";
 import CalculationUnite from "./servicesRows/CalculationUnite";
 import LanguageForm from "./servicesRows/LanguageForm";
-import SharedSelect from "./servicesRows/SharedSelect";
+import RemoveAction from "./RemoveAction";
 
 const rowNew = {
   activeTools: [false, true, false],
@@ -134,16 +142,63 @@ export default {
       selectBool: ['Yes', 'No'],
       calcFormValue: '',
       activeFormValue: '',
-      declineReadonly: [true, true, true, true, true, true, true]
+      declineReadonly: [true, true, true, true, true, true, true],
+      showRemoveWarning: false,
+      removeButtonDisable: false,
+      showEditWarning: false,
+      indexToRemove: "",
+      indexToEdit: "",
+      secondEditPosition: "",
+      dataForRemoveAction: {
+        spanTitle: "Do you want to delete data?",
+        buttonConf: "Confirm",
+        buttonCanc: "Cancel"
+      }
     };
   },
   methods: {
+    confirmRemove(ind) {
+      this.showRemoveWarning = false;
+      this.removeButtonDisable = false;
+    },
+    cancelRemove() {
+      this.showRemoveWarning = false;
+      this.removeButtonDisable = false;
+    },
+    confirmEdit(secondEditPosition) {
+      let editPosition = this.secondEditPosition;
+      this.showEditWarning = false;
+      this.table.body[editPosition].activeTools[0] = true;
+      this.table.body[editPosition].activeTools[1] = false;
+      this.declineReadonly[editPosition] = true;
+      this.disableButton = false;
+      this.table.body[editPosition].isActiveUpload = false;
+    },
+    cancelEdit(indexToEdit) {
+      let editCancelInd = this.indexToEdit;
+      this.showEditWarning = false;
+      this.table.body[editCancelInd].activeTools[0] = true;
+      this.table.body[editCancelInd].activeTools[1] = false;
+      this.declineReadonly[editCancelInd] = true;
+      this.disableButton = false;
+      this.table.body[editCancelInd].isActiveUpload = false;
+    },
     addLang() {
       this.table.body.push(rowNew);
       this.disableButton = true;
     },
     edit(ind) {
-      // console.log("Edit row " + ind);
+      for (let i = 0; i < this.declineReadonly.length; i++) {
+        if (!this.declineReadonly[i]) {
+          this.showEditWarning = true;
+          this.table.body[i].isActiveUpload = true;
+          this.disableButton = true;
+          this.declineReadonly[i] = false;
+          this.secondEditPosition = i;
+        }
+      }
+
+      this.indexToEdit = ind;
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
@@ -156,22 +211,20 @@ export default {
       this.upload = event.target.files[0];
     },
     removeRow(ind) {
-      this.table.body.splice(ind, 1);
+      this.showRemoveWarning = true;
+      this.removeButtonDisable = true;
+      this.indexToRemove = ind;
     },
     getLangFormData(data) {
-      // console.log(data);
       this.languageFormValue = data;
     },
     getCalcFormData(data){
-      // console.log(data);
       this.calcFormValue = data;
     },
     getActiveStatusFormData(data){
-      // console.log(data);
       this.activeFormValue = data;
     },
     async sendData(idx){
-      console.log(idx)
       let totalData = {
         nameTitle: this.table.body[idx].title1,
         languageFormValue: this.languageFormValue,
@@ -180,6 +233,11 @@ export default {
         activeFormValue: this.activeFormValue
       };
       console.log(totalData);
+      this.table.body[idx].activeTools.splice(0, 1, true);
+      this.table.body[idx].activeTools.splice(1, 1, false);
+      this.table.body[idx].isActiveUpload = false;
+      this.declineReadonly[idx] = true;
+      this.disableButton = false;
     }
   },
 
@@ -190,7 +248,7 @@ export default {
     ServicesRowEdit,
     CalculationUnite,
     LanguageForm,
-    SharedSelect
+    RemoveAction
   }
 };
 </script>
@@ -290,6 +348,55 @@ export default {
         flex-basis: 15%;
         display: flex;
         align-items: center;
+        .errorsMessage {
+          width: 300px;
+          max-height: 160px;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: auto;
+          background-color: white;
+          color: red;
+          z-index: 20;
+          border: 1px solid red;
+          box-shadow: 0 0 15px red;
+          text-align: center;
+          padding-bottom: 15px;
+          padding-top: 0;
+          font-size: 18px;
+          .message {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            span {
+              margin-top: 28px;
+              margin-bottom: 24px;
+            }
+            .buttonsBlock {
+              display: flex;
+              justify-content: space-around;
+              width: 100%;
+              .confirm,
+              .cancel {
+                border: 0;
+                width: 114px;
+                height: 40px;
+                border-radius: 12px;
+                background-color: #ff876c;
+                -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+                box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+                font-size: 14px;
+                color: #fff;
+                outline: none;
+                cursor: pointer;
+              }
+            }
+          }
+        }
       }
       .inprow2 {
         outline: none;

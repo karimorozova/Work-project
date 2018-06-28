@@ -22,12 +22,13 @@
           button.editB(@click="edit(ind)" :class="{data5_active: bodyItem.activeTools[1]}" :disabled="!declineReadonly[ind]")
           .errorsMessage(v-if="showEditWarning")
             .message
-              span Previous data wasn't saved. Do you want to save them?
+              span Data wasn't saved. Do you want to save them?
               .buttonsBlock
                 button.confirm(@click="confirmEdit(pos)") Save
                 button.cancel(@click="cancelEdit(ind)") Cancel
           button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
-          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning")
+          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+            :dataForRemoveAction="dataForRemoveAction")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
@@ -135,11 +136,22 @@ export default {
       uploadedFile: [],
       nameTitle: "",
       showRemoveWarning: false,
+      showEditWarning: false,
       removeButtonDisable: false,
       showEditWarning: false,
       indexToRemove: "",
       indexToEdit: "",
-      secondEditPosition: ""
+      secondEditPosition: "",
+      dataForRemoveAction: {
+        spanTitle: "Do you want to delete data?",
+        buttonConf: "Confirm",
+        buttonCanc: "Cancel"
+      },
+      dataForEditAction: {
+        spanTitle: "Data weren't saved. Do you want to save them?",
+        buttonConf: "Confirm",
+        buttonCanc: "Cancel"
+      }
     };
   },
   methods: {
@@ -151,13 +163,13 @@ export default {
       this.showRemoveWarning = false;
       this.removeButtonDisable = false;
     },
-    confirmEdit(secondEditPosition) {
+    confirmEdit(data) {
       let editPosition = this.secondEditPosition;
       this.showEditWarning = false;
+      this.disableButton = true;
       this.table.body[editPosition].activeTools[0] = true;
       this.table.body[editPosition].activeTools[1] = false;
       this.declineReadonly[editPosition] = true;
-      this.disableButton = true;
       this.table.body[editPosition].isActiveUpload = false;
     },
     cancelEdit(indexToEdit) {
@@ -174,7 +186,6 @@ export default {
       this.disableButton = true;
     },
     edit(ind) {
-      console.log(this.declineReadonly);
       for (let i = 0; i < this.declineReadonly.length; i++) {
         if (!this.declineReadonly[i]) {
           this.showEditWarning = true;
@@ -185,11 +196,10 @@ export default {
         }
       }
 
+      this.indexToEdit = ind;
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
-      console.log("must be false " + this.declineReadonly[ind]);
-      console.log(this.declineReadonly);
 
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
@@ -204,15 +214,12 @@ export default {
       this.indexToRemove = ind;
     },
     getLangFormData(data) {
-      // console.log(data);
       this.languageFormValue = data;
     },
     getCalcFormData(data) {
-      // console.log(data);
       this.calcFormValue = data;
     },
     getActiveStatusFormData(data) {
-      // console.log(data);
       this.activeFormValue = data;
     },
     async sendData(idx) {
@@ -238,7 +245,7 @@ export default {
     IndustriesRowEdit,
     IndustriesGenericTB,
     ServiceSelect,
-    RemoveAction
+    RemoveAction,
   }
 };
 </script>

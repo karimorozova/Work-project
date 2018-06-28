@@ -1,16 +1,19 @@
 <template lang="pug">
 .errorsMessage
   .message
-    span Do you want to delete data?
+    span {{ dataForRemoveAction.spanTitle }}
     .buttonsBlock
-      button.confirm(@click="confirmRemoveComp(ind)") Confirm
-      button.cancel(@click="cancelRemoveComp") Cancel
+      button.confirm(@click="confirmRemoveComp(ind)") {{ dataForRemoveAction.buttonConf }}
+      button.cancel(@click="cancelRemoveComp") {{ dataForRemoveAction.buttonCanc }}
 </template>
 
 <script>
 export default {
   props: {
     table: {
+      type: Object
+    },
+    dataForRemoveAction: {
       type: Object
     },
     indexToRemove: {
