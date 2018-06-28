@@ -7,14 +7,14 @@
       tr.rbody(v-for="(bodyItem, ind) in table.body" :class='"tr__row-" + (ind + 1)' )
         td.data1
           button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.image1 + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-          button.upload1(v-if="disableButton")
+          button.upload1(v-if="!declineReadonly[ind]")
           input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
         td.data2
           input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
         td.data3
           button.download(:style='{backgroundImage: "url(" + bodyItem.image2 + ")"}')
           input.uploadd3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileD")
-          button.upload1(v-if="disableButton")
+          button.upload1(v-if="!declineReadonly[ind]")
           input.uploadud3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
         ServiceSelect(:isActiveUpload="bodyItem.isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
         td.data5
@@ -24,15 +24,9 @@
             .message
               span Previous data wasn't saved. Do you want to save them?
               .buttonsBlock
-                button.confirm(@click="confirmEdit(ind)") Save
+                button.confirm(@click="confirmEdit(pos)") Save
                 button.cancel(@click="cancelEdit(ind)") Cancel
           button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
-          // .errorsMessage(v-if="showRemoveWarning")
-          //   .message
-          //     span Do you want to delete data?
-          //     .buttonsBlock
-          //       button.confirm(@click="confirmRemove(ind)") Confirm
-          //       button.cancel(@click="cancelRemove") Cancel
           RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
@@ -144,7 +138,8 @@ export default {
       removeButtonDisable: false,
       showEditWarning: false,
       indexToRemove: "",
-      indexToEdit: ""
+      indexToEdit: "",
+      secondEditPosition: ""
     };
   },
   methods: {
@@ -156,36 +151,45 @@ export default {
       this.showRemoveWarning = false;
       this.removeButtonDisable = false;
     },
-    confirmEdit(ind) {
-      let editInd = this.indexToEdit;
+    confirmEdit(secondEditPosition) {
+      let editPosition = this.secondEditPosition;
       this.showEditWarning = false;
-      this.table.body[editInd].activeTools[0] = true;
-      this.table.body[editInd].activeTools[1] = false;
-      this.declineReadonly[editInd] = true;
-      this.disableButton = false;
-      this.table.body[editInd].isActiveUpload = false;
+      this.table.body[editPosition].activeTools[0] = true;
+      this.table.body[editPosition].activeTools[1] = false;
+      this.declineReadonly[editPosition] = true;
+      this.disableButton = true;
+      this.table.body[editPosition].isActiveUpload = false;
     },
-    cancelEdit(ind) {
+    cancelEdit(indexToEdit) {
       let editCancelInd = this.indexToEdit;
       this.showEditWarning = false;
       this.table.body[editCancelInd].activeTools[0] = true;
       this.table.body[editCancelInd].activeTools[1] = false;
       this.declineReadonly[editCancelInd] = true;
       this.disableButton = false;
-      this.table.body[editInd].isActiveUpload = false;
+      this.table.body[editCancelInd].isActiveUpload = false;
     },
     addLang() {
       this.table.body.push(rowNew);
       this.disableButton = true;
     },
     edit(ind) {
+      console.log(this.declineReadonly);
+      for (let i = 0; i < this.declineReadonly.length; i++) {
+        if (!this.declineReadonly[i]) {
+          this.showEditWarning = true;
+          this.table.body[i].isActiveUpload = true;
+          this.disableButton = true;
+          this.declineReadonly[i] = false;
+          this.secondEditPosition = i;
+        }
+      }
+
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
-      this.indexToEdit = ind;
-      if(this.declineReadonly[ind] = true) {
-        this.showEditWarning = true;
-      }
+      console.log("must be false " + this.declineReadonly[ind]);
+      console.log(this.declineReadonly);
 
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
@@ -212,15 +216,18 @@ export default {
       this.activeFormValue = data;
     },
     async sendData(idx) {
-      console.log(idx);
       let formData = new FormData();
-      formData.append("");
+      formData.append("uploadedFileIcon", this.uploadedFileIcon);
       let totalData = {
         nameTitle: this.table.body[idx].title1,
         uploadedFileIcon: this.uploadFile,
         activeFormValue: this.activeFormValue
       };
       console.log(totalData);
+      this.table.body[idx].activeTools.splice(0, 1, true);
+      this.table.body[idx].activeTools.splice(1, 1, false);
+      this.table.body[idx].isActiveUpload = false;
+      this.declineReadonly[idx] = true;
     }
   },
 
