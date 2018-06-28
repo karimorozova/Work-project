@@ -25,7 +25,7 @@
               span Previous data wasn't saved. Do you want to save them?
               .buttonsBlock
                 button.confirm(@click="confirmEdit(ind)") Save
-                button.cancel(@click="cancelEdit") Cancel
+                button.cancel(@click="cancelEdit(ind)") Cancel
           button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
           // .errorsMessage(v-if="showRemoveWarning")
           //   .message
@@ -33,8 +33,7 @@
           //     .buttonsBlock
           //       button.confirm(@click="confirmRemove(ind)") Confirm
           //       button.cancel(@click="cancelRemove") Cancel
-          RemoveAction(:table="table" :showRemoveWarning="showRemoveWarning" :removeButtonDisable="removeButtonDisable" :showEditWarning="showEditWarning"
-            :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" v-if="showRemoveWarning")
+          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning")
   button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
@@ -150,11 +149,8 @@ export default {
   },
   methods: {
     confirmRemove(ind) {
-      // let vari = this.indexToRemove;
-      // console.log(vari);
-      // this.showRemoveWarning = false;
-      // this.table.body.splice(vari, 1);
-      // this.removeButtonDisable = false;
+      this.showRemoveWarning = false;
+      this.removeButtonDisable = false;
     },
     cancelRemove() {
       this.showRemoveWarning = false;
@@ -162,7 +158,6 @@ export default {
     },
     confirmEdit(ind) {
       let editInd = this.indexToEdit;
-      console.log("Emulate of save");
       this.showEditWarning = false;
       this.table.body[editInd].activeTools[0] = true;
       this.table.body[editInd].activeTools[1] = false;
@@ -184,12 +179,13 @@ export default {
       this.disableButton = true;
     },
     edit(ind) {
-      console.log("Edit row " + ind);
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
       this.indexToEdit = ind;
-      this.showEditWarning = true;
+      if(this.declineReadonly[ind] = true) {
+        this.showEditWarning = true;
+      }
 
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
