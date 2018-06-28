@@ -13,9 +13,9 @@
           input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
         td.data3
           button.download(:style='{backgroundImage: "url(" + bodyItem.image2 + ")"}')
-          input.uploadd3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileD")
+          input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
           button.upload1(v-if="!declineReadonly[ind]")
-          input.uploadud3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
+          input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
         ServiceSelect(:isActiveUpload="bodyItem.isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
         td.data5
           button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: bodyItem.activeTools[0]}")
@@ -134,6 +134,7 @@ export default {
       declineReadonly: [true, true, true, true, true, true, true],
       uploadedFileIcon: [],
       uploadedFile: [],
+      downloadedFile: [],
       nameTitle: "",
       showRemoveWarning: false,
       showEditWarning: false,
@@ -208,6 +209,12 @@ export default {
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
     },
+    uploadFileGenTB(event) {
+      this.uploadedFile = event.target.files[0];
+    },
+    downloadFile(event) {
+      this.downloadedFile = event.target.files[0];
+    },
     removeRow(ind) {
       this.showRemoveWarning = true;
       this.removeButtonDisable = true;
@@ -225,16 +232,22 @@ export default {
     async sendData(idx) {
       let formData = new FormData();
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
+      formData.append("uploadedFile", this.uploadedFile);
       let totalData = {
         nameTitle: this.table.body[idx].title1,
-        uploadedFileIcon: this.uploadFile,
         activeFormValue: this.activeFormValue
       };
       console.log(totalData);
+      formData.append("totalData", totalData)
       this.table.body[idx].activeTools.splice(0, 1, true);
       this.table.body[idx].activeTools.splice(1, 1, false);
       this.table.body[idx].isActiveUpload = false;
       this.declineReadonly[idx] = true;
+      this.$http.post("/api", formData).then(result => { 
+        console.log(result.data)
+      }).catch(err => {
+        console.log(err);
+      });
     }
   },
 
