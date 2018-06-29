@@ -30,6 +30,38 @@
           RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
             :dataForRemoveAction="dataForRemoveAction")
   button.addLang(@click="addLang" :disabled="disableButton")
+  // br
+  // br
+  // table
+  //   tr
+  //     th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
+  //   .bodyWrapper
+  //     tr.rbody(v-for="(bodyItem, ind) in industries" :class='"tr__row-" + (ind + 1)' )
+  //       td.data1
+  //         button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
+  //         button.upload1(v-if="!declineReadonly[ind]")
+  //         input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
+  //       td.data2
+  //         input.inprow2(v-model="bodyItem.name" :readonly="declineReadonly[ind]")
+  //       td.data3
+  //         button.download(:style='{backgroundImage: "url(" + bodyItem.download + ")"}')
+  //         input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
+  //         button.upload1(v-if="!declineReadonly[ind]")
+  //         input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
+  //       ServiceSelect(:isActiveUpload="isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
+  //       td.data5
+  //         button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: declineReadonly[ind]}")
+  //         button.editB(@click="edit(ind)" :class="{data5_active: !declineReadonly[ind]" :disabled="!declineReadonly[ind]}")
+  //         .errorsMessage(v-if="showEditWarning")
+  //           .message
+  //             span Data wasn't saved. Do you want to save them?
+  //             .buttonsBlock
+  //               button.confirm(@click="confirmEdit(pos)") Save
+  //               button.cancel(@click="cancelEdit(ind)") Cancel
+  //         button.removeB(@click="removeRow(ind)" :disabled="removeButtonDisable")
+  //         RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+  //           :dataForRemoveAction="dataForRemoveAction")
+  // button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
 <script>
@@ -152,10 +184,17 @@ export default {
         spanTitle: "Data weren't saved. Do you want to save them?",
         buttonConf: "Confirm",
         buttonCanc: "Cancel"
-      }
+      },
+      industries: [],
+      isActiveUpload: false
     };
   },
   methods: {
+    async getIndustries(){
+      const preData = await this.$http.get('api/industries');
+      // console.log(preData.body);
+      this.industries = preData.body;
+    },
     confirmRemove(ind) {
       this.showRemoveWarning = false;
       this.removeButtonDisable = false;
@@ -259,6 +298,9 @@ export default {
     IndustriesGenericTB,
     ServiceSelect,
     RemoveAction,
+  },
+  mounted() {
+    this.getIndustries();
   }
 };
 </script>
@@ -343,13 +385,13 @@ export default {
         height: 24px;
       }
       .video_special {
-        height: 18px;
+        height: 25px;
       }
-      .icos_special {
-        margin-left: 6px;
-      }
+      // .icos_special {
+      //   margin-left: 6px;
+      // }
       .more_special {
-        height: 14px;
+        height: 22px;
       }
       td {
         border: 1px solid #9a8f80;

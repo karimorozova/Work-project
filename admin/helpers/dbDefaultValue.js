@@ -154,11 +154,22 @@ const servicesDefault = [
     {sortIndex: 10, xtrf: 11, projectType: "regular", title: "Official Translation", source: true, languages: {source: ["DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "FR", "FR-FR", "FR-BE", "HE", "NL-NL", "NL-BE", "PT-BR", "TH"], target: ["DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "FR", "FR-FR", "FR-BE", "HE", "NL-NL", "NL-BE", "PT-BR", "ES-419", "ES-AR", "FR-CA", "FR-CH", "IT", "IT-IT", "IT-CH", "NB", "NL", "PL", "RO", "RU"]}},
 ];
 
+const industriesDefault = [
+    {name: 'CASINO, POKER & IGAMING', icon: '/static/industries/casino-poker-igaming.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'CFDS & ONLINE TRADING', icon: '/static/industries/cfds-online-tranding.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx',active: true},
+    {name: 'HOTEL & REAL ESTATES', icon: '/static/industries/hotel-real-estates.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'ICOS & CRYPTOCURRENCY', icon: '/static/industries/icos-cryptocurrency.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'LEGAL', icon: '/static/industries/legal-icon.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'VIDEO GAMES', icon: '/static/industries/video-games.png', download: '/static/Download-icon.png', generic: ['/static/example.xlsx'], active: true},
+    {name: 'MORE', icon: '/static/industries/more-icon.png', download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
+];
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
     usersDefault,
-    servicesDefault
+    servicesDefault,
+    industriesDefault
 };
 
 

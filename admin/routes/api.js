@@ -9,7 +9,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { sendMailPortal } = require('../utils/mailhandlerportal')
-const { Requests, Languages, Services } = require('../models');
+const { Requests, Languages, Services, Industries } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
 const fileType = require('file-type');
@@ -239,6 +239,16 @@ router.get('/services', (req, res) => {
       res.statusCode(500);
       res.send('Something wrond with DB')
     })
+});
+
+router.get('/industries', (req, res) => {
+  Industries.find().then(results => {
+    res.send(results)
+  }).catch(err => {
+    console.log(err);
+    res.statusCode(500);
+    res.send('Something wrong with DB');
+  });
 });
 
 module.exports = router;
