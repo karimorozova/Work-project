@@ -1,10 +1,10 @@
 <template lang="pug">
 .errorsMessage
-    .message
-    span Do you want to delete data?
+  .message
+    span {{ dataForRemoveAction.spanTitle }}
     .buttonsBlock
-        button.confirm(@click="confirmRemoveComp(ind)") Confirm
-        button.cancel(@click="cancelRemoveComp") Cancel
+      button.confirm(@click="confirmRemoveComp(ind)") {{ dataForRemoveAction.buttonConf }}
+      button.cancel(@click="cancelRemoveComp") {{ dataForRemoveAction.buttonCanc }}
 </template>
 
 <script>
@@ -13,29 +13,23 @@ export default {
     table: {
       type: Object
     },
+    dataForRemoveAction: {
+      type: Object
+    },
     indexToRemove: {
       type: Number
-    },
-    removeButtonDisable: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
     return {
-      indexToRemoveComp: this.indexToRemove,
-      removeButtonDisableComp: this.removeButtonDisable,
-      confRem: {
-        removeButtonDisableComp: false
-      }
+      indexToRemoveComp: this.indexToRemove
     };
   },
   methods: {
     confirmRemoveComp(ind) {
       let vari = this.indexToRemoveComp;
-      console.log(vari);
       this.table.body.splice(vari, 1);
-      this.$emit("confirmFromRemove", this.confRem);
+      this.$emit("confirmFromRemove");
     },
     cancelRemoveComp() {
       this.$emit("cancelFromRemove");
@@ -44,9 +38,6 @@ export default {
   watch: {
     indexToRemove() {
       this.indexToRemoveComp = this.indexToRemove;
-    },
-    removeButtonDisable() {
-      this.removeButtonDisableComp = this.removeButtonDisable;
     }
   }
 };

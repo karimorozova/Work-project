@@ -118,7 +118,7 @@ export default {
     .b-conf {
       display: flex;
       justify-content: flex-start;
-      width: 115px;
+      width: 153px;
       background-color: #fff;
       padding: 10px 0 10px 10px;
       cursor: pointer;

@@ -7,35 +7,61 @@
       tr.rbody(v-for="(bodyItem, ind) in table.body" :class='"tr__row-" + (ind + 1)' )
         td.data1
           button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.image1 + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-          button.upload1(v-if="disableButton")
+          button.upload1(v-if="!declineReadonly[ind]")
           input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
         td.data2
           input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
         td.data3
           button.download(:style='{backgroundImage: "url(" + bodyItem.image2 + ")"}')
-          input.uploadd3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileD")
-          button.upload1(v-if="disableButton")
-          input.uploadud3(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
+          input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
+          button.upload1(v-if="!declineReadonly[ind]")
+          input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
         ServiceSelect(:isActiveUpload="bodyItem.isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
         td.data5
           button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: bodyItem.activeTools[0]}")
           button.editB(@click="edit(ind)" :class="{data5_active: bodyItem.activeTools[1]}" :disabled="!declineReadonly[ind]")
           .errorsMessage(v-if="showEditWarning")
             .message
-              span Previous data wasn't saved. Do you want to save them?
+              span Data wasn't saved. Do you want to save them?
               .buttonsBlock
-                button.confirm(@click="confirmEdit(ind)") Save
-                button.cancel(@click="cancelEdit") Cancel
+                button.confirm(@click="confirmEdit(pos)") Save
+                button.cancel(@click="cancelEdit(ind)") Cancel
           button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
-          // .errorsMessage(v-if="showRemoveWarning")
-          //   .message
-          //     span Do you want to delete data?
-          //     .buttonsBlock
-          //       button.confirm(@click="confirmRemove(ind)") Confirm
-          //       button.cancel(@click="cancelRemove") Cancel
-          RemoveAction(:table="table" :showRemoveWarning="showRemoveWarning" :removeButtonDisable="removeButtonDisable" :showEditWarning="showEditWarning"
-            :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" v-if="showRemoveWarning")
+          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+            :dataForRemoveAction="dataForRemoveAction")
   button.addLang(@click="addLang" :disabled="disableButton")
+  // br
+  // br
+  // table
+  //   tr
+  //     th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
+  //   .bodyWrapper
+  //     tr.rbody(v-for="(bodyItem, ind) in industries" :class='"tr__row-" + (ind + 1)' )
+  //       td.data1
+  //         button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
+  //         button.upload1(v-if="!declineReadonly[ind]")
+  //         input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
+  //       td.data2
+  //         input.inprow2(v-model="bodyItem.name" :readonly="declineReadonly[ind]")
+  //       td.data3
+  //         button.download(:style='{backgroundImage: "url(" + bodyItem.download + ")"}')
+  //         input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
+  //         button.upload1(v-if="!declineReadonly[ind]")
+  //         input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
+  //       ServiceSelect(:isActiveUpload="isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
+  //       td.data5
+  //         button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: declineReadonly[ind]}")
+  //         button.editB(@click="edit(ind)" :class="{data5_active: !declineReadonly[ind]" :disabled="!declineReadonly[ind]}")
+  //         .errorsMessage(v-if="showEditWarning")
+  //           .message
+  //             span Data wasn't saved. Do you want to save them?
+  //             .buttonsBlock
+  //               button.confirm(@click="confirmEdit(pos)") Save
+  //               button.cancel(@click="cancelEdit(ind)") Cancel
+  //         button.removeB(@click="removeRow(ind)" :disabled="removeButtonDisable")
+  //         RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+  //           :dataForRemoveAction="dataForRemoveAction")
+  // button.addLang(@click="addLang" :disabled="disableButton")
 </template>
 
 <script>
@@ -140,56 +166,80 @@ export default {
       declineReadonly: [true, true, true, true, true, true, true],
       uploadedFileIcon: [],
       uploadedFile: [],
+      downloadedFile: [],
       nameTitle: "",
       showRemoveWarning: false,
+      showEditWarning: false,
       removeButtonDisable: false,
       showEditWarning: false,
       indexToRemove: "",
-      indexToEdit: ""
+      indexToEdit: "",
+      secondEditPosition: "",
+      dataForRemoveAction: {
+        spanTitle: "Do you want to delete data?",
+        buttonConf: "Confirm",
+        buttonCanc: "Cancel"
+      },
+      dataForEditAction: {
+        spanTitle: "Data weren't saved. Do you want to save them?",
+        buttonConf: "Confirm",
+        buttonCanc: "Cancel"
+      },
+      industries: [],
+      isActiveUpload: false
     };
   },
   methods: {
+    async getIndustries(){
+      const preData = await this.$http.get('api/industries');
+      // console.log(preData.body);
+      this.industries = preData.body;
+    },
     confirmRemove(ind) {
-      // let vari = this.indexToRemove;
-      // console.log(vari);
-      // this.showRemoveWarning = false;
-      // this.table.body.splice(vari, 1);
-      // this.removeButtonDisable = false;
+      this.showRemoveWarning = false;
+      this.removeButtonDisable = false;
     },
     cancelRemove() {
       this.showRemoveWarning = false;
       this.removeButtonDisable = false;
     },
-    confirmEdit(ind) {
-      let editInd = this.indexToEdit;
-      console.log("Emulate of save");
+    confirmEdit(data) {
+      let editPosition = this.secondEditPosition;
       this.showEditWarning = false;
-      this.table.body[editInd].activeTools[0] = true;
-      this.table.body[editInd].activeTools[1] = false;
-      this.declineReadonly[editInd] = true;
-      this.disableButton = false;
-      this.table.body[editInd].isActiveUpload = false;
+      this.disableButton = true;
+      this.table.body[editPosition].activeTools[0] = true;
+      this.table.body[editPosition].activeTools[1] = false;
+      this.declineReadonly[editPosition] = true;
+      this.table.body[editPosition].isActiveUpload = false;
     },
-    cancelEdit(ind) {
+    cancelEdit(indexToEdit) {
       let editCancelInd = this.indexToEdit;
       this.showEditWarning = false;
       this.table.body[editCancelInd].activeTools[0] = true;
       this.table.body[editCancelInd].activeTools[1] = false;
       this.declineReadonly[editCancelInd] = true;
       this.disableButton = false;
-      this.table.body[editInd].isActiveUpload = false;
+      this.table.body[editCancelInd].isActiveUpload = false;
     },
     addLang() {
       this.table.body.push(rowNew);
       this.disableButton = true;
     },
     edit(ind) {
-      console.log("Edit row " + ind);
+      for (let i = 0; i < this.declineReadonly.length; i++) {
+        if (!this.declineReadonly[i]) {
+          this.showEditWarning = true;
+          this.table.body[i].isActiveUpload = true;
+          this.disableButton = true;
+          this.declineReadonly[i] = false;
+          this.secondEditPosition = i;
+        }
+      }
+
+      this.indexToEdit = ind;
       this.disableButton = true;
       this.table.body[ind].isActiveUpload = true;
       this.declineReadonly[ind] = false;
-      this.indexToEdit = ind;
-      this.showEditWarning = true;
 
       this.table.body[ind].activeTools.splice(0, 1, false);
       this.table.body[ind].activeTools.splice(1, 1, true);
@@ -198,33 +248,45 @@ export default {
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
     },
+    uploadFileGenTB(event) {
+      this.uploadedFile = event.target.files[0];
+    },
+    downloadFile(event) {
+      this.downloadedFile = event.target.files[0];
+    },
     removeRow(ind) {
       this.showRemoveWarning = true;
       this.removeButtonDisable = true;
       this.indexToRemove = ind;
     },
     getLangFormData(data) {
-      // console.log(data);
       this.languageFormValue = data;
     },
     getCalcFormData(data) {
-      // console.log(data);
       this.calcFormValue = data;
     },
     getActiveStatusFormData(data) {
-      // console.log(data);
       this.activeFormValue = data;
     },
     async sendData(idx) {
-      console.log(idx);
       let formData = new FormData();
-      formData.append("");
+      formData.append("uploadedFileIcon", this.uploadedFileIcon);
+      formData.append("uploadedFile", this.uploadedFile);
       let totalData = {
         nameTitle: this.table.body[idx].title1,
-        uploadedFileIcon: this.uploadFile,
         activeFormValue: this.activeFormValue
       };
       console.log(totalData);
+      formData.append("totalData", totalData)
+      this.table.body[idx].activeTools.splice(0, 1, true);
+      this.table.body[idx].activeTools.splice(1, 1, false);
+      this.table.body[idx].isActiveUpload = false;
+      this.declineReadonly[idx] = true;
+      this.$http.post("/api", formData).then(result => { 
+        console.log(result.data)
+      }).catch(err => {
+        console.log(err);
+      });
     }
   },
 
@@ -235,7 +297,10 @@ export default {
     IndustriesRowEdit,
     IndustriesGenericTB,
     ServiceSelect,
-    RemoveAction
+    RemoveAction,
+  },
+  mounted() {
+    this.getIndustries();
   }
 };
 </script>
@@ -320,13 +385,13 @@ export default {
         height: 24px;
       }
       .video_special {
-        height: 18px;
+        height: 25px;
       }
-      .icos_special {
-        margin-left: 6px;
-      }
+      // .icos_special {
+      //   margin-left: 6px;
+      // }
       .more_special {
-        height: 14px;
+        height: 22px;
       }
       td {
         border: 1px solid #9a8f80;

@@ -2,13 +2,15 @@ const {
   Languages,
   Requests,
   User,
-  Services
+  Services,
+  Industries
 } = require('../models');
 const {
   languagesDefault,
   requestsDefault,
   usersDefault,
-  servicesDefault
+  servicesDefault,
+  industriesDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
@@ -31,18 +33,17 @@ function languages() {
             var smth = xtrfLangs.find(x => x.symbol == lang.symbol);
             lang.xtrf = smth.id;
 
-            if(lang.dialects){
-                for(const dialect of lang.dialects)
-                {
-                    dialect.xtrf = xtrfLangs.find(x=> x.symbol == dialect.symbol).id;
-                }
+            if (lang.dialects) {
+              for (const dialect of lang.dialects) {
+                dialect.xtrf = xtrfLangs.find(x => x.symbol == dialect.symbol).id;
+              }
             }
           }
 
           for (const lang of languagesDefault) {
             new Languages(lang).save().then((lang) => {
 
-              })
+            })
               .catch((err) => {
                 console.log(`Lang: ${lang.lang} wasn't save. Because of ${err.message}`)
               });
@@ -121,11 +122,29 @@ function services() {
       }
     })
 }
+
+function industries() {
+  Industries.find({}).then(industries => {
+    //console.log("industries length :  " + industriesDefault.length);
+    if (!industries.length) {
+      for (var industry of industriesDefault) {
+        console.log(industry.name);
+        new Industries(industry).save().then(industry => {
+          console.log(`industry ${industry.name} was saved!`);
+        }).catch(err => {
+          console.log(`Industry ${industry.name} wasn't saved. Because of ${err.message}`);
+        });
+      }
+    }
+  });
+}
+
 async function checkCollections() {
   await languages();
   await requests();
   await users();
   await services();
+  await industries();
 }
 
 module.exports = checkCollections();
