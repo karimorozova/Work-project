@@ -17,28 +17,28 @@
               .quotesComponent
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    Table
+                    Table1
         .maininfoWrapper(v-if="servicesSettingsVisible")
           .mainInfo
             .adminAll
               .quotesComponent.additionalServices
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    TableServices1
+                    TableServices
         .maininfoWrapper(v-if="industiesSettingsVisible")
           .mainInfo
             .adminAll
               .quotesComponent.additionalIndustries
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    TableIndustries1
+                    TableIndustries
 </template>
 
 <script>
-import Table from "../Table/Table";
+import Table1 from "../Table/Table1";
 // import TableServices from "../Table/TableServices.vue";
-import TableServices1 from "../Table/TableServices1.vue";
-import TableIndustries1 from "../Table/TableIndustries1";
+import TableServices from "../Table/TableServices.vue";
+import TableIndustries from "../Table/TableIndustries";
 
 export default {
   props: {
@@ -96,10 +96,9 @@ export default {
     }
   },
   components: {
-    Table,
-    // TableServices,
-    TableServices1,
-    TableIndustries1
+    Table1,
+    TableServices,
+    TableIndustries
   },
   watch: {
     sliderBool(){
@@ -232,6 +231,7 @@ export default {
           border-top: 1px solid #c4beb6;
           border-bottom: 1px solid #c4beb6;
           padding: 5px 30px;
+          cursor: pointer;
           &:nth-child(2) {
             border: none;
           }

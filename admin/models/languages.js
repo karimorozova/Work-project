@@ -7,7 +7,19 @@ const LanguageSchema = new mongoose.Schema({
         default : '', 
         trim : true 
     },
+    icon: {
+        type: String,
+        default: ''
+    },
     symbol:{
+        type: String,
+        default: ''
+    },
+    iso1: {
+        type: String,
+        default: ''
+    },
+    iso2: {
         type: String,
         default: ''
     },
