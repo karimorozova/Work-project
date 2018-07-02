@@ -40,8 +40,8 @@
                       td.second-ceil {{ job[20] }}
                       td.third-ceil {{ job[11] }}
                       td.fourth-ceil {{ job[17] }}
-                      td.fifth-ceil(@click="downloadDetail(jobIndex)")
-                        img(src="../../assets/images/download.png")
+                      td.fifth-ceil
+                        img(src="../../assets/images/download.png" v-if="job[20] == 'Ready'" @click="downloadDetail(jobIndex)")
               .project-manager
                 .project-manager__detailed_info
                   .manager-icon
@@ -102,43 +102,14 @@ export default {
       console.log("Implement this method");
     },
     async downloadDetail(jobIndex) {
-      console.log("Start downloading job details...");
-      let job = this.jobsById[jobIndex];
-      let info = [
-        `Project ID: ${job[0]}`,
-        `Project Name: ${job[1]}`,
-        `Start Date: ${job[2].split(' ')[0]}`,
-        `Deadline: ${job[3].split(' ')[0]}`,
-        `Source Language: ${job[4]}`,
-        `Target Language: ${job[5]}`,
-        `Project Service: ${job[6]}`,
-        `ID: ${job[7]}`,
-        `Provider Name: ${job[8]}`,
-        `Job Type: ${job[9]}`,
-        `Provider rate: ${job[10]}`,
-        `Wordcount payable: ${job[11]}`,
-        `Total cost: ${job[12]}`,
-        `Customer name: ${job[13]}`,
-        `Customer rate: ${job[14]}`,
-        `Wordcount receivable: ${job[15]}`,
-        `Sum: ${job[16]}`,
-        `Total agreed: ${job[17]}`,
-        `Special instructions: ${job[18]}`,
-        `Invoiced: ${job[19]}`,
-        `Job status: ${job[20]}`,
-      ]
-      await this.$axios.get("api/taskDetail", {
-        params: {
-          info
-        }
-      })
-      .then(res => {
-        let blob = new Blob([res.data], {type: 'application/xls'});
-        let link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'task' + jobIndex + '.xls';
-        link.click()
-      });
+      console.log("Start downloading task details...");
+      let result = await this.$axios.get(`/portal/taskFiles?taskId=${this.jobsById[jobIndex][23]}`, {withCredentials: true});
+      let file = await this.$axios.get(`/portal/downloadTask?taskId=${this.jobsById[jobIndex][23]}`);
+      
+      let link = document.createElement('a');
+          link.href = file.data;
+          link.click();
+      let del = await this.$axios.get(`/portal/deleteZip?taskId=${this.jobsById[jobIndex][23]}`);
     }
   },
   computed: {

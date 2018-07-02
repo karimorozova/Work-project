@@ -58,13 +58,10 @@ router.get('/projectFiles', async (request, res) => {
         
         resp.pipe(wstream);
     });
-        
-    req.end(()=> {
-        console.log("Pipe is done");
-        setTimeout( () => {
-            res.send(`File created!`);
-        }, 2000)
-    });
+    req.end(); 
+    wstream.on('finish', () => {
+        res.send('File created!')
+    })
     
 })
 
@@ -73,10 +70,43 @@ router.get('/downloadProject', (req, res) => {
 })
 
 router.get('/deleteZip', (req, res) => {
+    var fileName = 'project';
+    var fileId = req.query.projectId;
+    if (req.query.taskId) {
+        fileName = 'task';
+        fileId = req.query.taskId;
+    }
     setTimeout(() => {
-        fs.unlink(`./dist/project${req.query.projectId}.zip`, (err) => console.log(err));
+        fs.unlink(`./dist/${fileName}${fileId}.zip`, (err) => console.log(err));
     }, 6000)
     res.send('Deleted');
+})
+
+router.get('/taskFiles', async (request, res) => {
+    var options = {
+        hostname: 'pangea.s.xtrf.eu',
+        path: `/customer-api/projects/tasks/${request.query.taskId}/files/outputFilesAsZip`,
+        method: 'GET',
+        headers: {
+            'Cookie': `JSESSIONID=${request.cookies.ses}`,
+        }
+    };
+
+    var wstream = fs.createWriteStream(`./dist/task${request.query.taskId}.zip`);
+    var req = await https.request(options, (resp) => {
+        
+        resp.pipe(wstream);
+    });
+        
+    req.end(); 
+    wstream.on('finish', () => {
+        res.send('File created!')
+    })
+    
+})
+
+router.get('/downloadTask', (req, res) => {
+    res.send(`http://localhost:3001/task${req.query.taskId}.zip`);
 })
 
 router.get('/job',async (req, res) => {

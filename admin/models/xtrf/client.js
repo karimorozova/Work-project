@@ -99,17 +99,6 @@ var ClientApi = class ClientApi {
         })
     }
 
-    projectFilesDownload(projectId) {
-        return new Promise(resolve => {
-             this.clientApi.get(`/projects/${projectId}/files/outputFilesAsZip`)
-                .then(function(response) {
-                    resolve(response.data)
-                }).catch(function(error) {
-                    resolve(error);
-                })
-        })
-    }
-
     quotesInfo() {
         return new Promise(resolve => {
             this.clientApi.get("/quotes")

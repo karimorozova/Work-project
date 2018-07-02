@@ -52,7 +52,7 @@
                       .col
                         span(@click="openProjectsInfoDetailed(index)") {{ project.totalCost }}
                       .col.download
-                        img(src="../../assets/images/download.png")
+                        //- img(src="../../assets/images/download.png")
 </template>
 
 
