@@ -48,10 +48,10 @@
           input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
           button.upload1(v-if="!declineReadonly[ind]")
           input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
-        ServiceSelect(:isActiveUpload="isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
+        ServiceSelect(:isActiveUpload="isActiveUpload[ind]" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
         td.data5
-          button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: declineReadonly[ind]}")
-          button.editB(@click="edit(ind)" :class="{data5_active: !declineReadonly[ind]" :disabled="!declineReadonly[ind]}")
+          button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: activeTools[ind].save}")
+          button.editB(@click="edit(ind)" :class="{data5_active: activeTools[ind].edit" :disabled="!declineReadonly[ind]}")
           .errorsMessage(v-if="showEditWarning")
             .message
               span Data wasn't saved. Do you want to save them?
@@ -99,7 +99,7 @@ export default {
         body: [
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/casino,poker_igaming (2).png"),
             title1: "CASINO, POKER & IGAMING",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -108,7 +108,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/cfds_online tranding (2).png"),
             title1: "CFDS & ONLINE TRADING",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -117,7 +117,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/hotel _real estates (2).png"),
             title1: "HOTEL & REAL ESTATES",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -126,7 +126,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/icos_cryptocurrency (2).png"),
             title1: "ICOS & CRYPTOCURRENCY",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -135,7 +135,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/legal icon.png"),
             title1: "LEGAL",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -144,7 +144,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/video games (2).png"),
             title1: "VIDEO GAMES",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -153,7 +153,7 @@ export default {
           },
           {
             activeTools: [true, false, false],
-            isActiveUpload: false,
+            // isActiveUpload: false,
             image1: require("../../assets/images/industries/more-icon.png"),
             title1: "MORE",
             image2: require("../../assets/images/Other/Download-icon.png"),
@@ -164,6 +164,16 @@ export default {
       },
       disableButton: false,
       declineReadonly: [true, true, true, true, true, true, true],
+      activeTools: [
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        {save: true, edit: false, delete: true},
+        ],
+      isActiveUpload: [false, false, false, false, false, false, false],
       uploadedFileIcon: [],
       uploadedFile: [],
       downloadedFile: [],
@@ -186,12 +196,13 @@ export default {
         buttonCanc: "Cancel"
       },
       industries: [],
-      isActiveUpload: false
+      // isActiveUpload: false
     };
   },
   methods: {
     async getIndustries(){
       const preData = await this.$http.get('api/industries');
+      console.log(preData.body)
       this.industries = preData.body;
     },
     confirmRemove(ind) {
@@ -207,19 +218,26 @@ export default {
       let editPosition = this.secondEditPosition;
       this.showEditWarning = false;
       this.disableButton = true;
-      this.table.body[editPosition].activeTools[0] = true;
-      this.table.body[editPosition].activeTools[1] = false;
+      // this.table.body[editPosition].activeTools[0] = true;
+      // this.table.body[editPosition].activeTools[1] = false;
+      console.log(this.activeTools)
+      this.activeTools[editPosition].save = true;
+      this.activeTools[editPosition].edit = false;
       this.declineReadonly[editPosition] = true;
-      this.table.body[editPosition].isActiveUpload = false;
+      // this.table.body[editPosition].isActiveUpload = false;
+      this.isActiveUpload[editPosition] = false;
     },
     cancelEdit(indexToEdit) {
       let editCancelInd = this.indexToEdit;
       this.showEditWarning = false;
-      this.table.body[editCancelInd].activeTools[0] = true;
-      this.table.body[editCancelInd].activeTools[1] = false;
+      // this.table.body[editCancelInd].activeTools[0] = true;
+      // this.table.body[editCancelInd].activeTools[1] = false;
+      this.activeTools[editPosition].save = true;
+      this.activeTools[editPosition].edit = false;
       this.declineReadonly[editCancelInd] = true;
       this.disableButton = false;
-      this.table.body[editCancelInd].isActiveUpload = false;
+      // this.table.body[editCancelInd].isActiveUpload = false;
+      this.isActiveUpload[editCancelInd] = false;
     },
     addLang() {
       this.table.body.push(rowNew);
@@ -230,7 +248,7 @@ export default {
       for (let i = 0; i < this.declineReadonly.length; i++) {
         if (!this.declineReadonly[i]) {
           this.showEditWarning = true;
-          this.table.body[i].isActiveUpload = true;
+          // this.table.body[i].isActiveUpload = true;
           this.disableButton = true;
           this.declineReadonly[i] = false;
           this.secondEditPosition = i;
@@ -239,12 +257,15 @@ export default {
 
       this.indexToEdit = ind;
       this.disableButton = true;
-      this.table.body[ind].isActiveUpload = true;
+      // this.table.body[ind].isActiveUpload = true;
+      this.isActiveUpload[ind] = true;
       this.declineReadonly[ind] = false;
 
-      this.table.body[ind].activeTools.splice(0, 1, false);
-      this.table.body[ind].activeTools.splice(1, 1, true);
-      this.table.body[ind].activeTools.splice(2, 1, false);
+      // this.table.body[ind].activeTools.splice(0, 1, false);
+      // this.table.body[ind].activeTools.splice(1, 1, true);
+      // this.table.body[ind].activeTools.splice(2, 1, false);
+      this.activeTools[ind].save = false;
+      this.activeTools[ind].edit = true;
     },
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
@@ -279,9 +300,12 @@ export default {
       };
       console.log(totalData);
       formData.append("totalData", totalData)
-      this.table.body[idx].activeTools.splice(0, 1, true);
-      this.table.body[idx].activeTools.splice(1, 1, false);
-      this.table.body[idx].isActiveUpload = false;
+      // this.table.body[idx].activeTools.splice(0, 1, true);
+      // this.table.body[idx].activeTools.splice(1, 1, false);
+      // this.table.body[idx].isActiveUpload = false;
+      this.activeTools[idx].save = true;
+      this.activeTools[idx].edit = false;
+      this.isActiveUpload[idx] = false;
       this.declineReadonly[idx] = true;
       this.$http.post("/api", formData).then(result => { 
         console.log(result.data)

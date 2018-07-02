@@ -9,6 +9,10 @@ const IndustriesSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    download: {
+        type: String,
+        default: ''
+    },
     generic: {
         type: String,
         default: ''
