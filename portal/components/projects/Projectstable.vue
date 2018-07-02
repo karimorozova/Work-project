@@ -124,14 +124,14 @@ export default {
             this.deadlineSort = !this.deadlineSort;
         },
         async downloadZip(index) {
-            // this.$axios.get(`/portal/projectFiles?projectId=${this.projects[index].id}`, {withCredentials: true})
-            // .then((res) => {
-            //     let blob = new Blob([res.data], { type: '"application/octet-stream"' } );
-            //     let url = window.URL.createObjectURL(blob);
-            //     window.open(url);
-            // })
-            // .catch(err => console.log(err))
-            console.log('');
+            console.log('Start downloading project files...');           
+            let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.projects[index].id}`, {withCredentials: true});
+            let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.projects[index].id}`);
+            
+            let link = document.createElement('a');
+                link.href = file.data;
+                link.click();
+            let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.projects[index].id}`);
         }
     },
     computed: {

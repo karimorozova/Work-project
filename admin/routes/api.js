@@ -41,6 +41,20 @@ function moveFile(oldFile, requestId){
   return oldFile.filename;
 }
 
+router.get('/taskDetail', async (req, res) => {
+  console.log("In task details");
+  let array = req.query.info;
+  var file = fs.createWriteStream('./dist/taskdetail.xls');
+  file.on('error', (err) => { console.log(err) });
+  array.forEach( (el) => {
+    file.write( el + "\r\n");
+  });
+  file.end();
+  file.on('finish', () => {
+    var taskfile = "./dist/taskdetail.xls";
+    res.download(taskfile);
+  })
+})
 
 router.get('/wordcount', async (req, res) => {
   
@@ -69,7 +83,7 @@ router.get('/wordcount', async (req, res) => {
         var token = response.body.token;
         fs.unlink('./dist/testtest.txt', (err) => {
           if (err) throw err;
-          console.log("testest.txt was deleted!")
+          console.log("testtеst.txt was deleted!")
         });
         console.log('done');
         res.send({token});    

@@ -101,12 +101,9 @@ var ClientApi = class ClientApi {
 
     projectFilesDownload(projectId) {
         return new Promise(resolve => {
- 
-            this.clientApi.get(`/projects/${projectId}/files/outputFilesAsZip`)
+             this.clientApi.get(`/projects/${projectId}/files/outputFilesAsZip`)
                 .then(function(response) {
-                    const blob = new Blob([JSON.stringify(response.data)]);
-
-                    resolve(response)
+                    resolve(response.data)
                 }).catch(function(error) {
                     resolve(error);
                 })

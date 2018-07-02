@@ -2,6 +2,9 @@ const { ClientApi } = require('../models/xtrf');
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const { getSpecializations } = require('../models/xtrf/home');
 const router = require('express').Router();
+const fs = require('fs');
+var unirest = require('unirest');
+const https = require('https');
 
 router.get('/', (req, res) => {
     res.send("portal");
@@ -25,7 +28,7 @@ router.post('/auth', async (req, res, next) => {
 
 router.get('/clientinfo', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
-    console.log('req.cookies.ses : ' + req.cookies.ses );
+    // console.log('req.cookies.ses : ' + req.cookies.ses );
     const userId = await (customer.userInfo());   
     const userInfo = await (customer.fullUserInfo(userId.data.parentId, userId.data.id));
     const fullInfo = await (customer.projectsInfo());
@@ -40,16 +43,40 @@ router.get('/clientinfo', async (req, res) => {
     res.send({user, client, projects, quotes, languageCombinations});
 });
 
-router.get('/projectFiles', async (req, res) => {
-    var customer = new ClientApi("", req.cookies.ses);
-    var result = await (customer.projectFilesDownload(req.query.projectId));
-    var files = result.data;
-    //res.setHeader({})
-    res.writeHead(200, {
-        'Content-Type': 'application/force-download',
-        'Content-disposition':'attachment',
-        'filename':'project.zip'});
-    res.end(files);
+router.get('/projectFiles', async (request, res) => {
+    var options = {
+        hostname: 'pangea.s.xtrf.eu',
+        path: `/customer-api/projects/${request.query.projectId}/files/outputFilesAsZip`,
+        method: 'GET',
+        headers: {
+            'Cookie': `JSESSIONID=${request.cookies.ses}`,
+        }
+    };
+
+    var wstream = fs.createWriteStream(`./dist/project${request.query.projectId}.zip`);
+    var req = await https.request(options, (resp) => {
+        
+        resp.pipe(wstream);
+    });
+        
+    req.end(()=> {
+        console.log("Pipe is done");
+        setTimeout( () => {
+            res.send(`File created!`);
+        }, 2000)
+    });
+    
+})
+
+router.get('/downloadProject', (req, res) => {
+    res.send(`http://localhost:3001/project${req.query.projectId}.zip`);
+})
+
+router.get('/deleteZip', (req, res) => {
+    setTimeout(() => {
+        fs.unlink(`./dist/project${req.query.projectId}.zip`, (err) => console.log(err));
+    }, 6000)
+    res.send('Deleted');
 })
 
 router.get('/job',async (req, res) => {
