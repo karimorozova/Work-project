@@ -125,13 +125,13 @@ export default {
         },
         async downloadZip(index) {
             console.log('Start downloading project files...');           
-            let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.projects[index].id}`, {withCredentials: true});
-            let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.projects[index].id}`);
+            let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.clientProjects[index].id}`, {withCredentials: true});
+            let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.clientProjects[index].id}`);
             
             let link = document.createElement('a');
                 link.href = file.data;
                 link.click();
-            let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.projects[index].id}`);
+            let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.clientProjects[index].id}`);
         }
     },
     computed: {
@@ -141,11 +141,6 @@ export default {
                 let array = this.projects;
                 let finalDeadline = '';
                 for(let i = 0; i < array.length; i++) {
-                //     if(array[i].deadline) {
-                //      finalDeadline = moment(new Date(array[i].deadline.millisGMT)).format("DD-MM-YYYY");
-                //     } else {
-                //         finalDeadline = ''
-                // }
                 if(array[i].status == "CLOSED") {
                         result.push({
                         requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
@@ -154,7 +149,7 @@ export default {
                         idNumber: array[i].idNumber,
                         name: array[i].name,
                         status: array[i].status,
-                        deadline: array[i].deadline, //moment(new Date()).format("DD-MM-YYYY"),
+                        deadline: array[i].deadline,
                         totalAgreed: array[i].totalAgreed,
                         projectManager: array[i].projectManager,
                         service: array[i].service,
