@@ -44,14 +44,15 @@
           .row(v-for="(quote,index) in clientQuotes")
               .shortInfo
                   .row__columns_info
-                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.requestOn }}
-                      .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.projectId }}
-                      .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.projectName }}
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                      .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.idNumber }}
+                      .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.name }}
                       .col.col-4(@click="openQuotesInfoDetailed(index)") {{ quote.status }}
-                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.deadline }}
+                      .col(@click="openQuotesInfoDetailed(index)") 
+                        span(v-if="quote.deadline") {{ quote.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
                       .col.col-5.colSplit
                           .col
-                              span(@click="openQuotesInfoDetailed") {{ quote.totalCost }}
+                              span(@click="openQuotesInfoDetailed(index)") {{ quote.totalAgreed.formattedAmount }}
                           .col.approve
                               img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")                      
                           .col.reject
@@ -103,7 +104,7 @@ export default {
     },
     openQuotesInfoDetailed(index) {
       this.detailedInfoVisible = true;
-      this.$emit("quoteDetails", {open: this.detailedInfoVisible, index: index} );
+      this.$emit("quoteDetails", {quote: this.clientQuotes[index]} );
     },
     showStatuses() {
       this.statusesBar = !this.statusesBar;
@@ -146,19 +147,11 @@ export default {
             finalDeadline = ''
           }
           if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status.indexOf("ACCEPTED") == -1) {
-              result.push({
-              id: array[i].id,
-              requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
-              projectId: array[i].idNumber,
-              projectName: array[i].name,
-              status: array[i].status,
-              deadline: finalDeadline, //moment(new Date()).format("DD-MM-YYYY"),
-              totalCost: array[i].totalAgreed.formattedAmount,
-              fullInfoAppear: false
-            })
+              result.push(array[i])
           }
         }
       }
+      // result.fullInfoAppear = false;
       return result;
     }
   },

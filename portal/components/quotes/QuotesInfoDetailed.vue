@@ -75,6 +75,9 @@ export default {
         quotes: {
             type: Array
         },
+        quote: {
+          type: Object
+        },
         quoteIndex: {
             type: Number
         }
@@ -94,7 +97,7 @@ export default {
       console.log("Implement this method");
     },
     async getTasksOfQuote() {
-      this.$axios.get(`portal/tasksInfo?quoteId=${this.quotes[this.quoteIndex].id}`)
+      this.$axios.get(`portal/tasksInfo?quoteId=${this.quote.id}`)
         .then(res => {
           var tasksInfo = res.data.tasksOfQuote;
           for(let i = 0; i < tasksInfo.length; i++) {
@@ -109,23 +112,19 @@ export default {
         .catch(err => console.log(err))
     },
     async approveQuote() {
-      this.$axios.get(`portal/approve?quoteId=${this.quotes[this.quoteIndex].id}`, {withCredentials: true})
+      this.$axios.get(`portal/approve?quoteId=${this.quote.id}`, {withCredentials: true})
       .then(res => console.log(res))
       .catch(err => console.log(err));
-      this.quotes[this.quoteIndex].status = "ACCEPTED"
+      this.quote.status = "ACCEPTED"
     },
     async rejectQuote() {
-      this.$axios.get(`portal/reject?quoteId=${this.quotes[this.quoteIndex].id}`, {withCredentials: true})      
+      this.$axios.get(`portal/reject?quoteId=${this.quote.id}`, {withCredentials: true})      
       .then(res => console.log(res))
       .catch(err => console.log(err));
-      this.quotes[this.quoteIndex].status = "REJECTED";
+      this.quote.status = "REJECTED";
     }
   },
-  computed: {
-    quote() {
-      return this.quotes[this.quoteIndex]
-    }
-  },
+  computed: {},
   mounted() {
     this.getTasksOfQuote()
   }

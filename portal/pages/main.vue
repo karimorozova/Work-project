@@ -69,7 +69,7 @@
                           .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                             projectsInfo(@projectDetails="projectDetails" :projects="projects")
               .detailedInfoWrapper
-                QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes")
+                QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes" :quote="quote")
               .detailedProjectWrapper
                 projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById" :user="user")
               Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')
@@ -140,6 +140,7 @@ export default {
       user: {},
       projects: [],
       quotes: [],
+      quote: {},
       project: {},
       jobsById: [],
       languageCombinations: [],
@@ -290,8 +291,8 @@ export default {
       });
     },
     quoteDetails(data) {
-      this.detailedInfoVisible = data.open;
-      this.quoteIndex = data.index;
+      this.detailedInfoVisible = true;
+      this.quote = data.quote;
       this.detailedProjectVisible = false;
       this.allProjectsShow = false;
       this.clientRequestShow = false;

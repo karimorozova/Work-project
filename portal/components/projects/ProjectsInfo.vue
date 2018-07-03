@@ -43,16 +43,17 @@
       .row(v-for="(project,index) in clientProjects")
           .shortInfo
               .row__columns_info
-                  .col(@click="openProjectsInfoDetailed(index)") {{ project.requestOn }}
-                  .col.proj(@click="openProjectsInfoDetailed(index)") {{ project.projectId }}
-                  .col.col-5(@click="openProjectsInfoDetailed(index)") {{ project.projectName }}
+                  .col(@click="openProjectsInfoDetailed(index)") {{ project.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                  .col.proj(@click="openProjectsInfoDetailed(index)") {{ project.idNumber }}
+                  .col.col-5(@click="openProjectsInfoDetailed(index)") {{ project.name }}
                   .col.col-4(@click="openProjectsInfoDetailed(index)") {{ project.status }}
-                  .col(@click="openProjectsInfoDetailed(index)") {{ project.deadline }}
+                  .col(@click="openProjectsInfoDetailed(index)")
+                    span(v-if="project.deadline") {{ project.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
                   .col.col-5.colSplit
                       .col
-                        span(@click="openProjectsInfoDetailed(index)") {{ project.totalCost }}
+                        span(@click="openProjectsInfoDetailed(index)") {{ project.totalAgreed.formattedAmount }}
                       .col.download
-                        img(src="../../assets/images/download.png")
+                        //- img(src="../../assets/images/download.png")
 </template>
 
 
@@ -81,11 +82,11 @@ export default {
   },
   methods: {
     async openProjectsInfoDetailed(index) {
-      console.log(this.projects[index])
-      var id = this.projects[index].id;
+      console.log(this.clientProjects[index])
+      var id = this.clientProjects[index].id;
       this.$axios.get(`portal/job?projectId=${id}`)
       .then(res => {
-        this.$emit("projectDetails", {project: this.projects[index], jobs: res.data.jobById})
+        this.$emit("projectDetails", {project: this.clientProjects[index], jobs: res.data.jobById})
       }).catch(err => {console.log(err)})
       this.projectInfoDetailed = !this.projectInfoDetailed;
     }
@@ -103,15 +104,7 @@ export default {
             finalDeadline = ''
           }
           if(array[i].status == "OPENED" || array[i].status == "REQUESTED") {
-              result.push({
-              requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
-              projectId: array[i].idNumber,
-              projectName: array[i].name,
-              status: array[i].status,
-              deadline: finalDeadline, //moment(new Date()).format("DD-MM-YYYY"),
-              totalCost: array[i].totalAgreed.formattedAmount,
-              fullInfoAppear: false
-            })
+              result.push(array[i])
           }         
         }
       }
