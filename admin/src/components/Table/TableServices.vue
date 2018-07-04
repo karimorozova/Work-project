@@ -1,5 +1,33 @@
 <template lang="pug">
 .servicesWrapper
+  // table
+  //   tr
+  //     th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
+  //   .bodyWrapper
+  //     tr.rbody(v-for="(bodyItem, ind) in table.body" :class='"tr__row-" + (ind + 1)' )
+  //       td.data1
+  //         button(:style='{backgroundImage: "url(" + bodyItem.image1 + ")"}')
+  //         button.upload1(v-if="disableButton")
+  //         input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
+  //       td.data2
+  //         input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
+  //       LanguageForm(:isActiveUpload="bodyItem.isActiveUpload" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData")
+  //       CalculationUnite(:isActiveUpload="bodyItem.isActiveUpload" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData")
+  //       td.data5
+  //         input.inprow2(type="checkbox" :disabled="!industries.active" v-model="industries.active" :checked="industries.active")
+  //       td.data6
+  //         button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data6_active: bodyItem.activeTools[0]}")
+  //         button.editB(@click="edit(ind)" :class="{data6_active: bodyItem.activeTools[1]}")
+  //         .errorsMessage(v-if="showEditWarning")
+  //           .message
+  //             span Previous data wasn't saved. Do you want to save them?
+  //             .buttonsBlock
+  //               button.confirm(@click="confirmEdit(pos)") Save
+  //               button.cancel(@click="cancelEdit(ind)") Cancel
+  //         button.removeB(@click="removeRow(ind)" :class="{data6_active: bodyItem.activeTools[2]}")
+  //         RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
+  //           :dataForRemoveAction="dataForRemoveAction")
+  // button.addLang(@click="addLang" :disabled="disableButton")
   table
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}

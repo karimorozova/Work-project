@@ -291,16 +291,24 @@ router.post("/removelanguages", async(req, res) => {
 router.post("/saveindustries", async (req, res) => {
   var langID = req.body.dbIndex;
   var objForUpdate = {
-    lang: req.body.languageName,
-    symbol: req.body.languageSymbol,
-    iso1: req.body.languageIso1,
-    iso2: req.body.languageIso2,
-    active: req.body.languageActive
+    name: req.body.nameTitle,
+    active: req.body.activeFormValue
   };
   console.log(objForUpdate);
-  Languages.update({"_id": langID}, objForUpdate).then(result => {
+  Industries.update({"_id": langID}, objForUpdate).then(result => {
     console.log(result);
   }).catch(err => {
+    console.log(err);
+  });
+});
+
+router.post("/removeindustries", async(req, res) => {
+  var langID = req.body.industryRem;
+  Industries.deleteOne({"_id": langID})
+  .then(result => {
+    console.log(result);
+  })
+  .catch(err => {
     console.log(err);
   });
 });
