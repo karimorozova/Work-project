@@ -64,7 +64,7 @@ export default {
       this.hideAgainOptions = false;
       this.hideAgainOptions1 = false;
       this.hideAgainOptions2 = true;
-      this.$emit('calcSendThird', this.calculationUnit.words);
+      this.$emit('calcSendThird', this.calculationUnit.packages);
     }
   },
   directives: {

@@ -5,35 +5,37 @@
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
     .bodyWrapper
       tr.rbody(v-for="(industry, ind) in industries" :class='"tr__row-" + (ind + 1)' )
-        td.data1(:class="{outliner: !declineReadonly[ind]}")
+        td.data1(:class="{outliner: industry.crud}")
           button.indusryicons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-          button.upload1(v-if="!declineReadonly[ind]")
-          input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
-        td.data2(:class="{outliner: !declineReadonly[ind]}")
-          input.inprow2(v-model="industry.name" :readonly="declineReadonly[ind]")
+          button.upload1(v-if="industry.crud")
+          input.upload(v-if="industry.crud" @change="uploadFile" :readonly="!industry.crud" type="file" name="uploadedFileIcon")
+        td.data2(:class="{outliner: industry.crud}")
+          input.inprow2(v-model="industry.name" :readonly="!industry.crud")
           input.inprow2(v-model="industry._id" type="hidden")
-        td.data3(:class="{outliner: !declineReadonly[ind]}")
-          // button.download(:style='{backgroundImage: "url(" + industry.download + ")"}')
-          // input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
+        td.data3(:class="{outliner: industry.crud}")
           a.hyperlink(href="industry.generic" download)
             img(:src="industry.download")
-          button.upload1(v-if="!declineReadonly[ind]")
-          input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
-        td.data4(:class="{outliner: !declineReadonly[ind]}")
-          input.inprow2(type="checkbox" :disabled="!industry.active" v-model="industry.active" :checked="industry.active")
+          button.upload1(v-if="industry.crud")
+          input.uploadud3(v-if="industry.crud" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
+        td.data4(:class="{outliner: industry.crud}")
+          input.inprow2(type="checkbox" :disabled="!industry.crud" v-model="industry.active" :checked="industry.crud")
         td.data5
-          button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: activeTools[ind].save}")
-          button.editB(@click="edit(ind)" :class="{data5_active: activeTools[ind].edit" :disabled="!declineReadonly[ind]}")
-          .errorsMessage(v-if="showEditWarning")
-            .message
-              span Data wasn't saved. Do you want to save them?
-              .buttonsBlock
-                button.confirm(@click="confirmEdit(pos)") Save
-                button.cancel(@click="cancelEdit(ind)") Cancel
-          button.removeB(@click="removeRow(ind)" :disabled="removeButtonDisable")
-          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
-            :dataForRemoveAction="dataForRemoveAction")
-  button.addLang(@click="addLang" :disabled="disableButton")
+          button.saveB(@click="sendData(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
+          button.editB(@click="edit(ind)" :disabled="industry.crud" :class="{data5_active: industry.crud}")
+          button.removeB(@click="removeRow(ind)" :disabled="industry.crud")
+  .errorsMessage(v-if="showEditWarning")
+    .message
+      span {{ dataForEditAction.spanTitle }}
+      .buttonsBlock
+        button.confirm(@click="confirmEdit(indexToEdit)") {{ dataForEditAction.buttonConf }}
+        button.cancel(@click="cancelEdit(indexToEdit)") {{ dataForEditAction.buttonCanc }}
+  .errorsMessage(v-if="showRemoveWarning")
+    .message
+      span {{ dataForRemoveAction.spanTitle }}
+      .buttonsBlock
+        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
+        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  button.addLang(@click="addIndustry" :disabled="disableButton")
 </template>
 
 <script>
@@ -45,9 +47,6 @@ import ServiceSelect from "./industriesRows/ServicesTableSelect";
 import RemoveAction from "./RemoveAction";
 
 const rowNew = {
-  activeTools: [false, true, false],
-  isActiveUpload: true,
-  image1: "",
   image2: require("../../assets/images/Other/upload-icon.png"),
   title: "",
   image2: require("../../assets/images/Other/upload-icon.png"),
@@ -69,28 +68,14 @@ export default {
           { title: "" }
         ]
       },
-      disableButton: false,
-      declineReadonly: [true, true, true, true, true, true, true],
-      activeTools: [
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true },
-        { save: true, edit: false, delete: true }
-      ],
-      isActiveUpload: [false, false, false, false, false, false, false],
       uploadedFileIcon: [],
       uploadedFile: [],
       downloadedFile: [],
       nameTitle: "",
       showRemoveWarning: false,
       showEditWarning: false,
-      removeButtonDisable: false,
-      showEditWarning: false,
-      indexToRemove: "",
-      indexToEdit: "",
+      indexToRemove: 0,
+      indexToEdit: 0,
       secondEditPosition: "",
       dataForRemoveAction: {
         spanTitle: "Do you want to delete data?",
@@ -99,10 +84,12 @@ export default {
       },
       dataForEditAction: {
         spanTitle: "Data weren't saved. Do you want to save them?",
-        buttonConf: "Confirm",
+        buttonConf: "Save",
         buttonCanc: "Cancel"
       },
-      industries: []
+      industries: [],
+      dbIndex: '',
+      disableButton: false
     };
   },
   methods: {
@@ -111,55 +98,30 @@ export default {
       console.log(preData.body);
       this.industries = preData.body;
     },
-    confirmRemove(ind) {
-      this.showRemoveWarning = false;
-      this.removeButtonDisable = false;
-      this.declineReadonly.splice(ind, 1);
-    },
-    cancelRemove() {
-      this.showRemoveWarning = false;
-      this.removeButtonDisable = false;
-    },
-    confirmEdit(data) {
-      let editPosition = this.secondEditPosition;
-      this.showEditWarning = false;
+    addIndustry() {
       this.disableButton = true;
-      console.log(this.activeTools);
-      this.activeTools[editPosition].save = true;
-      this.activeTools[editPosition].edit = false;
-      this.declineReadonly[editPosition] = true;
-      this.isActiveUpload[editPosition] = false;
-    },
-    cancelEdit(indexToEdit) {
-      let editCancelInd = this.indexToEdit;
-      this.showEditWarning = false;
-      this.activeTools[editPosition].save = true;
-      this.activeTools[editPosition].edit = false;
-      this.declineReadonly[editCancelInd] = true;
-      this.disableButton = false;
-      this.isActiveUpload[editCancelInd] = false;
-    },
-    addLang() {
-      this.table.body.push(rowNew);
-      this.disableButton = true;
-      this.declineReadonly.splice(1, 0, true);
+      this.languages.push({});
     },
     edit(ind) {
-      for (let i = 0; i < this.declineReadonly.length; i++) {
-        if (!this.declineReadonly[i]) {
+      for (let i = 0; i < this.industries.length; i++) {
+        if (this.industries[i].crud) {
           this.showEditWarning = true;
-          this.disableButton = true;
-          this.declineReadonly[i] = false;
-          this.secondEditPosition = i;
+          this.indexToEdit = i;
         }
       }
 
-      this.indexToEdit = ind;
-      this.disableButton = true;
-      this.isActiveUpload[ind] = true;
-      this.declineReadonly[ind] = false;
-      this.activeTools[ind].save = false;
-      this.activeTools[ind].edit = true;
+      this.industries[ind].crud = true;
+    },
+    confirmEdit(indexToEdit) {
+      let confirmIndex = this.indexToEdit;
+      this.showEditWarning = false;
+      this.industries[confirmIndex].crud = false;
+      this.sendData(confirmIndex);
+    },
+    cancelEdit(indexToEdit) {
+      let cancelIndex = this.indexToEdit;
+      this.showEditWarning = false;
+      this.industries[cancelIndex].crud = false;
     },
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
@@ -167,13 +129,28 @@ export default {
     uploadFileGenTB(event) {
       this.uploadedFile = event.target.files[0];
     },
-    downloadFile(event) {
-      this.downloadedFile = event.target.files[0];
-    },
     removeRow(ind) {
       this.showRemoveWarning = true;
-      this.removeButtonDisable = true;
       this.indexToRemove = ind;
+    },
+    confirmRemove(indexToRemove) {
+      let confirmRIndex = this.indexToRemove;
+      this.industries[confirmRIndex].crud = false;
+      let formData = new FormData();
+      let remObj = {
+        industryRem: this.industries[confirmRIndex]._id
+      };
+      this.$http.post("api/removeindustries", remObj).then(result => {
+      }).catch(err => {
+        console.log(err);
+      });
+      this.showRemoveWarning = false;
+      this.industries = this.industries.filter((s, i) => i !== this.indexToRemove );
+    },
+    cancelRemove(indexToRemove) {
+      let cancelRIndex = this.indexToRemove;
+      this.industries[cancelRIndex].crud = false;
+      this.showRemoveWarning = false;
     },
     getLangFormData(data) {
       this.languageFormValue = data;
@@ -189,23 +166,22 @@ export default {
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
       formData.append("uploadedFile", this.uploadedFile);
       let totalData = {
-        nameTitle: this.table.body[idx].title1,
-        activeFormValue: this.activeFormValue
+        nameTitle: this.industries[idx].name,
+        activeFormValue: this.industries[idx].active,
+        dbIndex: this.industries[idx]._id
+
       };
       console.log(totalData);
       formData.append("totalData", totalData);
-      this.activeTools[idx].save = true;
-      this.activeTools[idx].edit = false;
-      this.isActiveUpload[idx] = false;
-      this.declineReadonly[idx] = true;
       this.$http
-        .post("/saveindustries", formData)
+        .post("api/saveindustries", totalData)
         .then(result => {
           console.log(result.data);
         })
         .catch(err => {
           console.log(err);
         });
+        this.industries[idx].crud = false;
     }
   },
 
@@ -226,6 +202,7 @@ export default {
 
 <style lang="scss" scoped>
 .servicesWrapper {
+  position: relative;
   table {
     width: 100%;
     border: 1px solid #9a8f80;
@@ -377,59 +354,10 @@ export default {
         flex-basis: 20.7%;
       }
       .data5 {
-        flex-basis: 17.1%;
+        flex-basis: 21.1%;
         display: flex;
         justify-content: center;
         align-items: center;
-        .errorsMessage {
-          width: 300px;
-          max-height: 160px;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          margin: auto;
-          background-color: white;
-          color: red;
-          z-index: 20;
-          border: 1px solid red;
-          box-shadow: 0 0 15px red;
-          text-align: center;
-          padding-bottom: 15px;
-          padding-top: 0;
-          font-size: 18px;
-          .message {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            span {
-              margin-top: 28px;
-              margin-bottom: 24px;
-            }
-            .buttonsBlock {
-              display: flex;
-              justify-content: space-around;
-              width: 100%;
-              .confirm,
-              .cancel {
-                border: 0;
-                width: 114px;
-                height: 40px;
-                border-radius: 12px;
-                background-color: #ff876c;
-                -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-                box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-                font-size: 14px;
-                color: #fff;
-                outline: none;
-                cursor: pointer;
-              }
-            }
-          }
-        }
       }
       .inprow2 {
         outline: none;
@@ -440,8 +368,6 @@ export default {
       }
     }
     .bodyWrapper {
-      max-height: 184px;
-      overflow-y: scroll;
     }
     .data5_active {
       opacity: 0.5;
@@ -488,5 +414,55 @@ export default {
 
 .outliner {
   box-shadow: -1px 3px 12px #22b6e6;
+}
+
+.errorsMessage {
+  width: 300px;
+  max-height: 160px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-color: white;
+  color: red;
+  z-index: 20;
+  border: 1px solid red;
+  box-shadow: 0 0 15px red;
+  text-align: center;
+  padding-bottom: 15px;
+  padding-top: 0;
+  font-size: 18px;
+  .message {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    span {
+      margin-top: 28px;
+      margin-bottom: 24px;
+    }
+    .buttonsBlock {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      .confirm,
+      .cancel {
+        border: 0;
+        width: 114px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: #ff876c;
+        -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+        box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+        font-size: 14px;
+        color: #fff;
+        outline: none;
+        cursor: pointer;
+      }
+    }
+  }
 }
 </style>

@@ -33,19 +33,18 @@
       span.pageNums__number(@click="toPage(num)" :class='{current: num == currentPage-1}') {{ num + 1 }}
     .next(@click="nextPage" :class='{nonActive: !hasNext}') 
       span Next page
-    
   .errorsMessage(v-if="showEditWarning")
     .message
       span {{ dataForEditAction.spanTitle }}
       .buttonsBlock
         button.confirm(@click="confirmEdit(indexToEdit)") Save
         button.cancel(@click="cancelEdit(indexToEdit)") Cancel
-  // .errorsMessage(v-if="showRemoveWarning")
-  //   .message
-  //     span {{ dataForRemoveAction.spanTitle }}
-  //     .buttonsBlock
-  //       button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
-  //       button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  .errorsMessage(v-if="showRemoveWarning")
+    .message
+      span {{ dataForRemoveAction.spanTitle }}
+      .buttonsBlock
+        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
+        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
 </template>
 
 <script>
@@ -99,7 +98,7 @@ export default {
       languageActive: "",
       dbIndex: '',
       indexToEdit: 0,
-      // indexToRemove: 0
+      indexToRemove: 0
     };
   },
   methods: {
@@ -139,32 +138,29 @@ export default {
       this.showEditWarning = false;
       this.languages[cancelIndex].crud = false;
     },
-    // remove(ind) {
-    //   this.languages[ind].crud = true;
-    //   this.showRemoveWarning = true;
-    //   this.indexToRemove = ind;
-    // },
-    // confirmRemove(indexToRemove) {
-    //   let confirmRIndex = this.indexToRemove;
-    //   this.languages[confirmRIndex].crud = false;
-    //   let formData = new FormData();
-    //   let remObj = {
-    //     languageRem: this.languages[confirmRIndex]._id
-    //   };
-    //   this.$http.post("api/removelanguages", remObj).then(result => {
-    //   }).catch(err => {
-    //     console.log(err);
-    //   });
-    //   this.showRemoveWarning = false;
-    //   this.languages.filter(languages => {
-    //       return this.languages.splice(this.indexToRemove, 1);
-    //     });
-    // },
-    // cancelRemove(indexToRemove) {
-    //   let cancelRIndex = this.indexToRemove;
-    //   this.languages[cancelRIndex].crud = false;
-    //   this.showRemoveWarning = false;
-    // },
+    remove(ind) {
+      this.showRemoveWarning = true;
+      this.indexToRemove = ind;
+    },
+    confirmRemove(indexToRemove) {
+      let confirmRIndex = this.indexToRemove;
+      this.languages[confirmRIndex].crud = false;
+      let formData = new FormData();
+      let remObj = {
+        languageRem: this.languages[confirmRIndex]._id
+      };
+      this.$http.post("api/removelanguages", remObj).then(result => {
+      }).catch(err => {
+        console.log(err);
+      });
+      this.showRemoveWarning = false;
+      this.languages = this.languages.filter((s, i) => i !== this.indexToRemove );
+    },
+    cancelRemove(indexToRemove) {
+      let cancelRIndex = this.indexToRemove;
+      this.languages[cancelRIndex].crud = false;
+      this.showRemoveWarning = false;
+    },
     async getLanguages() {
       await this.$http
         .get("api/languages")
@@ -203,7 +199,7 @@ export default {
         languageSymbol: this.languages[ind].symbol,
         languageIso1: this.languages[ind].iso1,
         languageIso2: this.languages[ind].iso2,
-        languageActive: this.languages[ind].check,
+        languageActive: this.languages[ind].active,
         dbIndex: this.languages[ind]._id
       };
       formData.append("langObj", langObj);

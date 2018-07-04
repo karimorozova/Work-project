@@ -6,16 +6,32 @@ const ServicesSchema = new mongoose.Schema({
         type: Number,
         default: 100,
     },
-    title: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    title: {
+        type: String,
+        default: '',
+        trim: true
     },
     icon: {
         type: String,
         default: ''
     },
-    source:{
+    active: {
+        type: Boolean,
+        default: true
+    },
+    crud: {
+        type: Boolean,
+        default: false
+    },
+    languageForm: {
+        type: String,
+        default: 'Mono'
+    },
+    calculationUnit: {
+        type: String,
+        default: 'Words'
+    },
+    source: {
         type: Boolean,
         default: false
     },
@@ -23,7 +39,7 @@ const ServicesSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    xtrf:{
+    xtrf: {
         type: String,
         default: '',
     },
@@ -31,9 +47,9 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         default: "regular",
     },
-    createdAt : { 
-        type : Date, 
-        default : Date.now 
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 

@@ -4,60 +4,34 @@
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
     .bodyWrapper
-      tr.rbody(v-for="(bodyItem, ind) in table.body" :class='"tr__row-" + (ind + 1)' )
-        td.data1
-          button(:style='{backgroundImage: "url(" + bodyItem.image1 + ")"}')
-          button.upload1(v-if="disableButton")
-          input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
-        td.data2
-          input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
-        LanguageForm(:isActiveUpload="bodyItem.isActiveUpload" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData")
-        CalculationUnite(:isActiveUpload="bodyItem.isActiveUpload" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData")
-        td.data5
-          input.inprow2(type="checkbox" :disabled="!industries.active" v-model="industries.active" :checked="industries.active")
+      tr.rbody(v-for="(service, ind) in services" :class='"tr__row-" + (ind + 1)' )
+        td.data1(:class="{outliner: service.crud}")
+          button(:style='{backgroundImage: "url(" + service.icon + ")"}')
+          button.upload1(v-if="service.crud")
+          input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFile")
+        td.data2(:class="{outliner: service.crud}")
+          input.inprow2(v-model="service.title" :readonly="!service.crud")
+        LanguageForm(:isActiveUpload="service.crud" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData" :class="{outliner: service.crud}" )
+        CalculationUnite(:isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
+        td.data5(:class="{outliner: service.crud}")
+          input.inprow2(type="checkbox" :disabled="!service.crud" v-model="service.active" :checked="service.crud")
         td.data6
-          button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data6_active: bodyItem.activeTools[0]}")
-          button.editB(@click="edit(ind)" :class="{data6_active: bodyItem.activeTools[1]}")
-          .errorsMessage(v-if="showEditWarning")
-            .message
-              span Previous data wasn't saved. Do you want to save them?
-              .buttonsBlock
-                button.confirm(@click="confirmEdit(pos)") Save
-                button.cancel(@click="cancelEdit(ind)") Cancel
-          button.removeB(@click="removeRow(ind)" :class="{data6_active: bodyItem.activeTools[2]}")
-          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
-            :dataForRemoveAction="dataForRemoveAction")
-  button.addLang(@click="addLang" :disabled="disableButton")
-  br
-  br
-  table
-    tr
-      th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-    .bodyWrapper
-      tr.rbody(v-for="(bodyItem, ind) in services" :class='"tr__row-" + (ind + 1)' )
-        td.data1
-          button(:style='{backgroundImage: "url(" + bodyItem.icon + ")"}')
-          button.upload1(v-if="disableButton")
-          input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFile")
-        td.data2
-          input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
-        LanguageForm(:isActiveUpload="bodyItem.isActiveUpload" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData")
-        CalculationUnite(:isActiveUpload="bodyItem.isActiveUpload" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData")
-        td.data5
-          input.inprow2(type="checkbox" :disabled="!industries.active" v-model="industries.active" :checked="industries.active")
-        td.data6
-          button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data6_active: bodyItem.activeTools[0]}")
-          button.editB(@click="edit(ind)" :class="{data6_active: bodyItem.activeTools[1]}")
-          .errorsMessage(v-if="showEditWarning")
-            .message
-              span Previous data wasn't saved. Do you want to save them?
-              .buttonsBlock
-                button.confirm(@click="confirmEdit(pos)") Save
-                button.cancel(@click="cancelEdit(ind)") Cancel
-          button.removeB(@click="removeRow(ind)" :class="{data6_active: bodyItem.activeTools[2]}")
-          RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
-            :dataForRemoveAction="dataForRemoveAction")
-  button.addLang(@click="addLang" :disabled="disableButton")
+          button.saveB(@click="sendData(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
+          button.editB(@click="edit(ind)" :disabled="service.crud" :class="{data6_active: service.crud}")
+          button.removeB(@click="removeRow(ind)" :disabled="service.crud")
+  .errorsMessage(v-if="showEditWarning")
+    .message
+      span {{ dataForEditAction.spanTitle }}
+      .buttonsBlock
+        button.confirm(@click="confirmEdit(indexToEdit)") {{ dataForEditAction.buttonConf }}
+        button.cancel(@click="cancelEdit(indexToEdit)") {{ dataForEditAction.buttonCanc }}
+  .errorsMessage(v-if="showRemoveWarning")
+    .message
+      span {{ dataForRemoveAction.spanTitle }}
+      .buttonsBlock
+        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
+        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  button.addService(@click="addLang" :disabled="disableButton")
 </template>
 
 <script>
@@ -69,8 +43,6 @@ import LanguageForm from "./servicesRows/LanguageForm";
 import RemoveAction from "./RemoveAction";
 
 const rowNew = {
-  activeTools: [false, true, false],
-  isActiveUpload: true,
   image1: "",
   image2: require("../../assets/images/Other/upload-icon.png"),
   title: "",
@@ -92,152 +64,61 @@ export default {
           { title: "Calculation Utin" },
           { title: "Active" },
           { title: "" }
-        ],
-        body: [
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/SEO _ Blog Management.png"),
-            title1: "SEO & Blog Management",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/QA and Testing.png"),
-            title1: "QA & Testing",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/Localized Graphic Design.png"),
-            title1: "Localized Graphic Design",
-            title2: "testtest",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/Marketing _ Copywriting.png"),
-            title1: "Marketing _ Copywriting",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/Market Research.png"),
-            title1: "Market Research",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/Official Translations.png"),
-            title1: "Official Translations",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/services/ORM – Online Reputation Management.png"),
-            title1: "ORM – Online Reputation Management",
-            title2: "test",
-            title3: "test",
-            title4: "test",
-            title5: ""
-          }
         ]
       },
       disableButton: false,
       uploadedFile: [],
-      nameTitle: '',
-      languageFormValue: '',
-      selectBool: ['Yes', 'No'],
-      calcFormValue: '',
-      activeFormValue: '',
-      declineReadonly: [true, true, true, true, true, true, true],
+      nameTitle: "",
+      languageFormValue: "",
+      selectBool: ["Yes", "No"],
+      calcFormValue: "",
+      activeFormValue: "",
       showRemoveWarning: false,
-      removeButtonDisable: false,
       showEditWarning: false,
-      indexToRemove: "",
-      indexToEdit: "",
+      indexToRemove: 0,
+      indexToEdit: 0,
       secondEditPosition: "",
       dataForRemoveAction: {
         spanTitle: "Do you want to delete data?",
         buttonConf: "Confirm",
         buttonCanc: "Cancel"
       },
-      services: []
+      dataForEditAction: {
+        spanTitle: "Data weren't saved. Do you want to save them?",
+        buttonConf: "Save",
+        buttonCanc: "Cancel"
+      },
+      services: [],
+      isActiveUpload: false,
+      languageFormTrans: '',
+      calculationUniteTrans: '',
+      dbIndex: '',
     };
   },
   methods: {
-    confirmRemove(ind) {
-      this.showRemoveWarning = false;
-      this.removeButtonDisable = false;
-    },
-    cancelRemove() {
-      this.showRemoveWarning = false;
-      this.removeButtonDisable = false;
-    },
-    confirmEdit(secondEditPosition) {
-      let editPosition = this.secondEditPosition;
-      this.showEditWarning = false;
-      this.table.body[editPosition].activeTools[0] = true;
-      this.table.body[editPosition].activeTools[1] = false;
-      this.declineReadonly[editPosition] = true;
-      this.disableButton = false;
-      this.table.body[editPosition].isActiveUpload = false;
-    },
-    cancelEdit(indexToEdit) {
-      let editCancelInd = this.indexToEdit;
-      this.showEditWarning = false;
-      this.table.body[editCancelInd].activeTools[0] = true;
-      this.table.body[editCancelInd].activeTools[1] = false;
-      this.declineReadonly[editCancelInd] = true;
-      this.disableButton = false;
-      this.table.body[editCancelInd].isActiveUpload = false;
-    },
     addLang() {
-      this.table.body.push(rowNew);
       this.disableButton = true;
     },
     edit(ind) {
-      for (let i = 0; i < this.declineReadonly.length; i++) {
-        if (!this.declineReadonly[i]) {
+      for (let i = 0; i < this.services.length; i++) {
+        if (this.services[i].crud) {
           this.showEditWarning = true;
-          this.table.body[i].isActiveUpload = true;
-          this.disableButton = true;
-          this.declineReadonly[i] = false;
-          this.secondEditPosition = i;
+          this.indexToEdit = i;
         }
       }
 
-      this.indexToEdit = ind;
-      this.disableButton = true;
-      this.table.body[ind].isActiveUpload = true;
-      this.declineReadonly[ind] = false;
-
-      this.table.body[ind].activeTools.splice(0, 1, false);
-      this.table.body[ind].activeTools.splice(1, 1, true);
-      this.table.body[ind].activeTools.splice(2, 1, false);
+      this.services[ind].crud = true;
+    },
+    confirmEdit(indexToEdit) {
+      let confirmIndex = this.indexToEdit;
+      this.showEditWarning = false;
+      this.services[confirmIndex].crud = false;
+      this.sendData(confirmIndex);
+    },
+    cancelEdit(indexToEdit) {
+      let cancelIndex = this.indexToEdit;
+      this.showEditWarning = false;
+      this.services[cancelIndex].crud = false;
     },
     uploadFile(event) {
       this.upload = event.target.files[0];
@@ -247,33 +128,60 @@ export default {
       this.removeButtonDisable = true;
       this.indexToRemove = ind;
     },
+    confirmRemove(indexToRemove) {
+      let confirmRIndex = this.indexToRemove;
+      this.services[confirmRIndex].crud = false;
+      let formData = new FormData();
+      let remObj = {
+        serviceRem: this.services[confirmRIndex]._id
+      };
+      this.$http.post("api/removeservices", remObj).then(result => {
+      }).catch(err => {
+        console.log(err);
+      });
+      this.showRemoveWarning = false;
+      this.services = this.services.filter((s, i) => i !== this.indexToRemove );
+    },
+    cancelRemove(indexToRemove) {
+      let cancelRIndex = this.indexToRemove;
+      this.services[cancelRIndex].crud = false;
+      this.showRemoveWarning = false;
+    },
     getLangFormData(data) {
       this.languageFormValue = data;
     },
-    getCalcFormData(data){
+    getCalcFormData(data) {
       this.calcFormValue = data;
     },
-    getActiveStatusFormData(data){
+    getActiveStatusFormData(data) {
       this.activeFormValue = data;
     },
-    async sendData(idx){
+    async sendData(idx) {
+      let formData = new FormData();
+      formData.append("uploadedFileIcon", this.uploadedFileIcon);
+      formData.append("uploadedFile", this.uploadedFile);
       let totalData = {
-        nameTitle: this.table.body[idx].title1,
+        nameTitle: this.services[idx].title,
+        activeFormValue: this.services[idx].active,
+        dbIndex: this.services[idx]._id,
         languageFormValue: this.languageFormValue,
-        calcFormValue: this.calcFormValue,
-        uploadedFile: this.uploadFile,
-        activeFormValue: this.activeFormValue
+        calcFormValue: this.calcFormValue
       };
-      console.log(totalData);
-      this.table.body[idx].activeTools.splice(0, 1, true);
-      this.table.body[idx].activeTools.splice(1, 1, false);
-      this.table.body[idx].isActiveUpload = false;
-      this.declineReadonly[idx] = true;
-      this.disableButton = false;
+      // console.log(totalData);
+      formData.append("totalData", totalData);
+      this.$http
+        .post("api/saveservices", totalData)
+        .then(result => {
+          console.log(result.data);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+        this.services[idx].crud = false;
     },
-    async getServices(){
+    async getServices() {
       const preData = await this.$http.get("api/services");
-      console.log(preData.body);
+      // console.log(preData.body);
       this.services = preData.body;
     }
   },
@@ -286,12 +194,16 @@ export default {
     CalculationUnite,
     LanguageForm,
     RemoveAction
+  },
+  mounted() {
+    this.getServices();
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .servicesWrapper {
+  position: relative;
   table {
     width: 100%;
     border: 1px solid #9a8f80;
@@ -346,7 +258,7 @@ export default {
         padding-right: 0;
         border: none;
         outline: none;
-        // margin-top: 10px;
+        margin-right: 5px;
         width: 20px;
         height: 20px;
       }
@@ -381,59 +293,16 @@ export default {
         display: flex;
         align-items: center;
       }
+      .data5 {
+        display: flex;
+        flex-basis: 15.7%;
+        align-items: center;
+      }
       .data6 {
-        flex-basis: 15%;
+        flex-basis: 18.7%;
         display: flex;
         align-items: center;
-        .errorsMessage {
-          width: 300px;
-          max-height: 160px;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          margin: auto;
-          background-color: white;
-          color: red;
-          z-index: 20;
-          border: 1px solid red;
-          box-shadow: 0 0 15px red;
-          text-align: center;
-          padding-bottom: 15px;
-          padding-top: 0;
-          font-size: 18px;
-          .message {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            span {
-              margin-top: 28px;
-              margin-bottom: 24px;
-            }
-            .buttonsBlock {
-              display: flex;
-              justify-content: space-around;
-              width: 100%;
-              .confirm,
-              .cancel {
-                border: 0;
-                width: 114px;
-                height: 40px;
-                border-radius: 12px;
-                background-color: #ff876c;
-                -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-                box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-                font-size: 14px;
-                color: #fff;
-                outline: none;
-                cursor: pointer;
-              }
-            }
-          }
-        }
+        justify-content: center;
       }
       .inprow2 {
         outline: none;
@@ -444,15 +313,15 @@ export default {
       }
     }
     .bodyWrapper {
-      max-height: 184px;
-      overflow-y: scroll;
+      // max-height: 184px;
+      // overflow-y: scroll;
     }
     .data6_active {
       opacity: 0.5;
     }
   }
 
-  .addLang {
+  .addService {
     cursor: pointer;
     background-image: url("../../assets/images/Other/add-icon.png");
   }
@@ -487,5 +356,59 @@ export default {
 }
 ::-webkit-scrollbar-thumb:vertical {
   height: 12px;
+}
+
+.outliner {
+  box-shadow: -1px 3px 12px #22b6e6;
+}
+
+.errorsMessage {
+  width: 300px;
+  max-height: 160px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-color: white;
+  color: red;
+  z-index: 20;
+  border: 1px solid red;
+  box-shadow: 0 0 15px red;
+  text-align: center;
+  padding-bottom: 15px;
+  padding-top: 0;
+  font-size: 18px;
+  .message {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    span {
+      margin-top: 28px;
+      margin-bottom: 24px;
+    }
+    .buttonsBlock {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      .confirm,
+      .cancel {
+        border: 0;
+        width: 114px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: #ff876c;
+        -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+        box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
+        font-size: 14px;
+        color: #fff;
+        outline: none;
+        cursor: pointer;
+      }
+    }
+  }
 }
 </style>
