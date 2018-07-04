@@ -11,6 +11,10 @@ const ServicesSchema = new mongoose.Schema({
         default : '', 
         trim : true 
     },
+    icon: {
+        type: String,
+        default: ''
+    },
     source:{
         type: Boolean,
         default: false

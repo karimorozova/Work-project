@@ -7,7 +7,7 @@
         ISO1(v-if="key == 4" :titlesp3="titlesp2Value" titlesp4="(three letters)")
     .bodyWrapper
       tr.rbody(v-for="(language, ind) in languages" :class='"tr__row-" + (ind + 1)' )
-        td.data1
+        td.data1(:class="{outliner: language.crud}")
           button.languageicons(:style='{backgroundImage: "url(" + language.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
           button.upload1(v-if="language.crud")
           input.upload(v-if="true" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")

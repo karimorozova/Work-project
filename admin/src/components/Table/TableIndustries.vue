@@ -4,21 +4,23 @@
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
     .bodyWrapper
-      tr.rbody(v-for="(bodyItem, ind) in industries" :class='"tr__row-" + (ind + 1)' )
-        td.data1
-          button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
+      tr.rbody(v-for="(industry, ind) in industries" :class='"tr__row-" + (ind + 1)' )
+        td.data1(:class="{outliner: !declineReadonly[ind]}")
+          button.indusryicons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
           button.upload1(v-if="!declineReadonly[ind]")
           input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
-        td.data2
-          input.inprow2(v-model="bodyItem.name" :readonly="declineReadonly[ind]")
-        td.data3
-          // button.download(:style='{backgroundImage: "url(" + bodyItem.download + ")"}')
+        td.data2(:class="{outliner: !declineReadonly[ind]}")
+          input.inprow2(v-model="industry.name" :readonly="declineReadonly[ind]")
+          input.inprow2(v-model="industry._id" type="hidden")
+        td.data3(:class="{outliner: !declineReadonly[ind]}")
+          // button.download(:style='{backgroundImage: "url(" + industry.download + ")"}')
           // input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
-          a(href="bodyItem.generic" download)
-            img(:src="bodyItem.download")
+          a.hyperlink(href="industry.generic" download)
+            img(:src="industry.download")
           button.upload1(v-if="!declineReadonly[ind]")
           input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
-        ServiceSelect(:isActiveUpload="isActiveUpload[ind]" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
+        td.data4(:class="{outliner: !declineReadonly[ind]}")
+          input.inprow2(type="checkbox" :disabled="!industry.active" v-model="industry.active" :checked="industry.active")
         td.data5
           button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: activeTools[ind].save}")
           button.editB(@click="edit(ind)" :class="{data5_active: activeTools[ind].edit" :disabled="!declineReadonly[ind]}")
@@ -70,14 +72,14 @@ export default {
       disableButton: false,
       declineReadonly: [true, true, true, true, true, true, true],
       activeTools: [
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        {save: true, edit: false, delete: true},
-        ],
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true },
+        { save: true, edit: false, delete: true }
+      ],
       isActiveUpload: [false, false, false, false, false, false, false],
       uploadedFileIcon: [],
       uploadedFile: [],
@@ -100,14 +102,13 @@ export default {
         buttonConf: "Confirm",
         buttonCanc: "Cancel"
       },
-      industries: [],
-      // isActiveUpload: false
+      industries: []
     };
   },
   methods: {
-    async getIndustries(){
-      const preData = await this.$http.get('api/industries');
-      console.log(preData.body)
+    async getIndustries() {
+      const preData = await this.$http.get("api/industries");
+      console.log(preData.body);
       this.industries = preData.body;
     },
     confirmRemove(ind) {
@@ -123,25 +124,19 @@ export default {
       let editPosition = this.secondEditPosition;
       this.showEditWarning = false;
       this.disableButton = true;
-      // this.table.body[editPosition].activeTools[0] = true;
-      // this.table.body[editPosition].activeTools[1] = false;
-      console.log(this.activeTools)
+      console.log(this.activeTools);
       this.activeTools[editPosition].save = true;
       this.activeTools[editPosition].edit = false;
       this.declineReadonly[editPosition] = true;
-      // this.table.body[editPosition].isActiveUpload = false;
       this.isActiveUpload[editPosition] = false;
     },
     cancelEdit(indexToEdit) {
       let editCancelInd = this.indexToEdit;
       this.showEditWarning = false;
-      // this.table.body[editCancelInd].activeTools[0] = true;
-      // this.table.body[editCancelInd].activeTools[1] = false;
       this.activeTools[editPosition].save = true;
       this.activeTools[editPosition].edit = false;
       this.declineReadonly[editCancelInd] = true;
       this.disableButton = false;
-      // this.table.body[editCancelInd].isActiveUpload = false;
       this.isActiveUpload[editCancelInd] = false;
     },
     addLang() {
@@ -153,7 +148,6 @@ export default {
       for (let i = 0; i < this.declineReadonly.length; i++) {
         if (!this.declineReadonly[i]) {
           this.showEditWarning = true;
-          // this.table.body[i].isActiveUpload = true;
           this.disableButton = true;
           this.declineReadonly[i] = false;
           this.secondEditPosition = i;
@@ -162,13 +156,8 @@ export default {
 
       this.indexToEdit = ind;
       this.disableButton = true;
-      // this.table.body[ind].isActiveUpload = true;
       this.isActiveUpload[ind] = true;
       this.declineReadonly[ind] = false;
-
-      // this.table.body[ind].activeTools.splice(0, 1, false);
-      // this.table.body[ind].activeTools.splice(1, 1, true);
-      // this.table.body[ind].activeTools.splice(2, 1, false);
       this.activeTools[ind].save = false;
       this.activeTools[ind].edit = true;
     },
@@ -204,19 +193,19 @@ export default {
         activeFormValue: this.activeFormValue
       };
       console.log(totalData);
-      formData.append("totalData", totalData)
-      // this.table.body[idx].activeTools.splice(0, 1, true);
-      // this.table.body[idx].activeTools.splice(1, 1, false);
-      // this.table.body[idx].isActiveUpload = false;
+      formData.append("totalData", totalData);
       this.activeTools[idx].save = true;
       this.activeTools[idx].edit = false;
       this.isActiveUpload[idx] = false;
       this.declineReadonly[idx] = true;
-      this.$http.post("/api", formData).then(result => { 
-        console.log(result.data)
-      }).catch(err => {
-        console.log(err);
-      });
+      this.$http
+        .post("/saveindustries", formData)
+        .then(result => {
+          console.log(result.data);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
 
@@ -227,7 +216,7 @@ export default {
     IndustriesRowEdit,
     IndustriesGenericTB,
     ServiceSelect,
-    RemoveAction,
+    RemoveAction
   },
   mounted() {
     this.getIndustries();
@@ -290,7 +279,7 @@ export default {
         padding-right: 0;
         border: none;
         outline: none;
-        // margin-top: 10px;
+        margin-right: 5px;
         width: 20px;
         height: 20px;
       }
@@ -378,6 +367,14 @@ export default {
           top: 12px;
           left: 65px;
         }
+        .hyperlink {
+          margin-right: 40px;
+        }
+      }
+      .data4 {
+        display: flex;
+        align-items: center;
+        flex-basis: 20.7%;
       }
       .data5 {
         flex-basis: 17.1%;
@@ -487,5 +484,9 @@ export default {
 }
 ::-webkit-scrollbar-thumb:vertical {
   height: 12px;
+}
+
+.outliner {
+  box-shadow: -1px 3px 12px #22b6e6;
 }
 </style>
