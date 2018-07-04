@@ -3,8 +3,8 @@
   table
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-      ISO(v-if="index == 3" :titlesp1="titlesp1Value" titlesp2="(two letters)")
-      ISO1(v-if="index == 4" :titlesp3="titlesp2Value" titlesp4="(three letters)")
+        ISO(v-if="key == 3" :titlesp1="titlesp1Value" titlesp2="(two letters)")
+        ISO1(v-if="key == 4" :titlesp3="titlesp2Value" titlesp4="(three letters)")
     .bodyWrapper
       tr.rbody(v-for="(language, ind) in languages" :class='"tr__row-" + (ind + 1)' )
         td.data1
@@ -14,30 +14,30 @@
         td.data2(:class="{outliner: language.crud}")
           input.inprow2(v-model="language.lang" :readonly="!language.crud" )
           input.inprow2(v-model="language._id" type="hidden")
-        td.data3(:class="{outliner: language.crud}")
-          input.inprow2(v-model="language.symbol" :readonly="!language.crud" )
+        td.data3
+          input.inprow2(v-model="language.symbol" :readonly="true" )
         td.data4
           input.inprow2(v-model="language.iso1" :readonly="true")
         td.data5
           input.inprow2(v-model="language.iso2" :readonly="true")
-        td.data6
+        td.data6(:class="{outliner: language.crud}")
           input.inprow2(type="checkbox" :disabled="!language.crud" v-model="language.active" :checked="language.crud")
         td.data7
           button.saveB(@click="sendData(ind)" :disabled="!language.crud" :class="{data5_active: !language.crud}")
           button.editB(@click="edit(ind, language)" :class="{data5_active: language.crud}" :disabled="language.crud")
-          button.removeB(@click="remove(ind)" :disabled="language.crud")
+          // button.removeB(@click="remove(ind)" :disabled="language.crud")
   .errorsMessage(v-if="showEditWarning")
     .message
       span {{ dataForEditAction.spanTitle }}
       .buttonsBlock
         button.confirm(@click="confirmEdit(indexToEdit)") Save
         button.cancel(@click="cancelEdit(indexToEdit)") Cancel
-  .errorsMessage(v-if="showRemoveWarning")
-    .message
-      span {{ dataForRemoveAction.spanTitle }}
-      .buttonsBlock
-        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
-        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  // .errorsMessage(v-if="showRemoveWarning")
+  //   .message
+  //     span {{ dataForRemoveAction.spanTitle }}
+  //     .buttonsBlock
+  //       button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
+  //       button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
 </template>
 
 <script>
@@ -55,8 +55,8 @@ export default {
           { title: "Icon" },
           { title: "Name" },
           { title: "Symbol" },
-          { title: "ISO 639-1" },
-          { title: "ISO 639-2" },
+          { title: "" },
+          { title: "" },
           { title: "Active" },
           { title: "" }
         ]
@@ -90,7 +90,7 @@ export default {
       languageActive: "",
       dbIndex: '',
       indexToEdit: 0,
-      indexToRemove: 0
+      // indexToRemove: 0
     };
   },
   methods: {
@@ -115,32 +115,32 @@ export default {
       this.showEditWarning = false;
       this.languages[cancelIndex].crud = false;
     },
-    remove(ind) {
-      this.languages[ind].crud = true;
-      this.showRemoveWarning = true;
-      this.indexToRemove = ind;
-    },
-    confirmRemove(indexToRemove) {
-      let confirmRIndex = this.indexToRemove;
-      this.languages[confirmRIndex].crud = false;
-      let formData = new FormData();
-      let remObj = {
-        languageRem: this.languages[confirmRIndex]._id
-      };
-      this.$http.post("api/removelanguages", remObj).then(result => {
-      }).catch(err => {
-        console.log(err);
-      });
-      this.showRemoveWarning = false;
-      this.languages.filter(languages => {
-          return this.languages.splice(this.indexToRemove, 1);
-        });
-    },
-    cancelRemove(indexToRemove) {
-      let cancelRIndex = this.indexToRemove;
-      this.languages[cancelRIndex].crud = false;
-      this.showRemoveWarning = false;
-    },
+    // remove(ind) {
+    //   this.languages[ind].crud = true;
+    //   this.showRemoveWarning = true;
+    //   this.indexToRemove = ind;
+    // },
+    // confirmRemove(indexToRemove) {
+    //   let confirmRIndex = this.indexToRemove;
+    //   this.languages[confirmRIndex].crud = false;
+    //   let formData = new FormData();
+    //   let remObj = {
+    //     languageRem: this.languages[confirmRIndex]._id
+    //   };
+    //   this.$http.post("api/removelanguages", remObj).then(result => {
+    //   }).catch(err => {
+    //     console.log(err);
+    //   });
+    //   this.showRemoveWarning = false;
+    //   this.languages.filter(languages => {
+    //       return this.languages.splice(this.indexToRemove, 1);
+    //     });
+    // },
+    // cancelRemove(indexToRemove) {
+    //   let cancelRIndex = this.indexToRemove;
+    //   this.languages[cancelRIndex].crud = false;
+    //   this.showRemoveWarning = false;
+    // },
     async getLanguages() {
       await this.$http
         .get("api/languages")

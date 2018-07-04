@@ -1,37 +1,5 @@
 <template lang="pug">
 .servicesWrapper
-  // table
-  //   tr
-  //     th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-  //   .bodyWrapper
-  //     tr.rbody(v-for="(bodyItem, ind) in table.body" :class='"tr__row-" + (ind + 1)' )
-  //       td.data1
-  //         button.indusryicons(:style='{backgroundImage: "url(" + bodyItem.image1 + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-  //         button.upload1(v-if="!declineReadonly[ind]")
-  //         input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
-  //       td.data2
-  //         input.inprow2(v-model="bodyItem.title1" :readonly="declineReadonly[ind]")
-  //       td.data3
-  //         button.download(:style='{backgroundImage: "url(" + bodyItem.image2 + ")"}')
-  //         input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
-  //         button.upload1(v-if="!declineReadonly[ind]")
-  //         input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
-  //       ServiceSelect(:isActiveUpload="bodyItem.isActiveUpload" @sendActiveStatusY="getActiveStatusFormData" @sendActiveStatusN="getActiveStatusFormData")
-  //       td.data5
-  //         button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: bodyItem.activeTools[0]}")
-  //         button.editB(@click="edit(ind)" :class="{data5_active: bodyItem.activeTools[1]}" :disabled="!declineReadonly[ind]")
-  //         .errorsMessage(v-if="showEditWarning")
-  //           .message
-  //             span Data wasn't saved. Do you want to save them?
-  //             .buttonsBlock
-  //               button.confirm(@click="confirmEdit(pos)") Save
-  //               button.cancel(@click="cancelEdit(ind)") Cancel
-  //         button.removeB(@click="removeRow(ind)" :class="{data5_active: bodyItem.activeTools[2]}" :disabled="removeButtonDisable")
-  //         RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
-  //           :dataForRemoveAction="dataForRemoveAction")
-  // button.addLang(@click="addLang" :disabled="disableButton")
-  // br
-  // br
   table
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
@@ -97,71 +65,6 @@ export default {
           { title: "Generic TB" },
           { title: "Active" },
           { title: "" }
-        ],
-        body: [
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/casino,poker_igaming (2).png"),
-            title1: "CASINO, POKER & IGAMING",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/cfds_online tranding (2).png"),
-            title1: "CFDS & ONLINE TRADING",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/hotel _real estates (2).png"),
-            title1: "HOTEL & REAL ESTATES",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/icos_cryptocurrency (2).png"),
-            title1: "ICOS & CRYPTOCURRENCY",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/legal icon.png"),
-            title1: "LEGAL",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/video games (2).png"),
-            title1: "VIDEO GAMES",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title3: "YES",
-            title4: ""
-          },
-          {
-            activeTools: [true, false, false],
-            isActiveUpload: false,
-            image1: require("../../assets/images/industries/more-icon.png"),
-            title1: "MORE",
-            image2: require("../../assets/images/Other/Download-icon.png"),
-            title4: "YES",
-            title5: ""
-          }
         ]
       },
       disableButton: false,

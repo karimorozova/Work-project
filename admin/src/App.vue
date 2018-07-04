@@ -14,7 +14,7 @@ export default {
 
 <style lang='scss'>
 body {
-  overflow: hidden;
+  // overflow: hidden;
 }
 .b-log-in,
 .b-log-out{

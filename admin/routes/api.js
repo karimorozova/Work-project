@@ -265,7 +265,7 @@ router.get('/industries', (req, res) => {
   });
 });
 
-router.post("/savelanguages", async (req, res) => {
+router.post("/savelanguages", upload.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
   var langID = req.body.dbIndex;
   var objForUpdate = {
     lang: req.body.languageName,
@@ -273,8 +273,10 @@ router.post("/savelanguages", async (req, res) => {
     iso1: req.body.languageIso1,
     iso2: req.body.languageIso2,
     active: req.body.languageActive
-  }
+  };
+  console.log(objForUpdate);
   Languages.update({"_id": langID}, objForUpdate).then(result => {
+    console.log(result);
   }).catch(err => {
     console.log(err);
   });
