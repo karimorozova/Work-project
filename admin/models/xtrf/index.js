@@ -8,10 +8,12 @@ async function quote(request) {
     console.log(`Project is regular : ${classic}`);
 
     var customerId = await (HomeApi.findCustomer(request.companyName));
+    var personId = 0;
     if(!customerId)
     {
         customerId = await (HomeApi.createCustomer(request));
-        person = await (HomeApi.createPerson(customerId, request.contactEmail, request.contactName)) 
+        var person = await (HomeApi.createPerson(customerId, request.contactEmail, request.contactName));
+        personId = person.id
     }
     console.log("Customer id " + customerId);
     try {
@@ -23,7 +25,7 @@ async function quote(request) {
             var clientApi = new ClientApi(request, sessionId);
             // here upload files 
 
-            var quoteId = await (clientApi.createQuote());
+            var quoteId = await (clientApi.createQuote(personId));
         }
         else {
             var quote = await (HomeApi.addQuote(customerId, request));
@@ -43,6 +45,7 @@ async function project(request) {
     console.log(`Project is regular : ${classic}`);
 
     var customerId = await (HomeApi.findCustomer(request.companyName));
+    
     if(!customerId)
     {
         customerId = await (HomeApi.createCustomer(request));

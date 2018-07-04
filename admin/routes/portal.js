@@ -135,5 +135,16 @@ router.get('/reject', async (req, res) => {
     res.send("rejected");
 });
 
+router.get('/xtmTest', async (req, res) => {
+    unirest.post('https://www.xtm-cloud.com/rest-api/projects')
+    .headers({'Authorization': "XTM-Basic lGoRADtSF14/TQomvOJnHsEhNZLn0NBL81J2rJA6g5RknA6yOC0LRCDWhLDP9OWaTl+GM7dPQX7Z5zqRgx2Y/A==", 
+    'Content-Type': 'multipart/form-data'})
+    .field('customerId', 23)
+    .field('name',  'Project-Test')
+    .end( (response) => {
+        console.log(response.body);
+        res.send('Done')
+    })
+})
 
 module.exports = router;

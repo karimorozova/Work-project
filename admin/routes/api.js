@@ -69,10 +69,6 @@ router.get('/wordcount', async (req, res) => {
         responseType: 'blob', // important
       });
 
-      // var file = fs.createWriteStream("./dist/english_buisness_message.txt");
-      // var request = axios.get("https://www.dropbox.com/s/dr1cit55idwi1m0/english_buisness_message.txt?dl=1", function(response) {
-      // response.pipe(file);
-      // });
       var wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
       wstream.write(resFull.data);
       wstream.end(() => { 
