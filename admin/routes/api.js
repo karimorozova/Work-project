@@ -313,4 +313,31 @@ router.post("/removeindustries", async(req, res) => {
   });
 });
 
+router.post("/saveservices", async (req, res) => {
+  var langID = req.body.dbIndex;
+  var objForUpdate = {
+    title: req.body.nameTitle,
+    active: req.body.activeFormValue,
+    languageForm: req.body.languageFormValue,
+    calculationUnit: req.body.calcFormValue
+  };
+  console.log(objForUpdate);
+  Services.update({"_id": langID}, objForUpdate).then(result => {
+    console.log(result);
+  }).catch(err => {
+    console.log(err);
+  });
+});
+
+router.post("/removeservices", async(req, res) => {
+  var langID = req.body.serviceRem;
+  Services.deleteOne({"_id": langID})
+  .then(result => {
+    console.log(result);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+});
+
 module.exports = router;

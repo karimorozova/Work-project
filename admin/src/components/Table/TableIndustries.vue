@@ -1,39 +1,5 @@
 <template lang="pug">
 .servicesWrapper
-  // table
-  //   tr
-  //     th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-  //   .bodyWrapper
-  //     tr.rbody(v-for="(industry, ind) in industries" :class='"tr__row-" + (ind + 1)' )
-  //       td.data1(:class="{outliner: !declineReadonly[ind]}")
-  //         button.indusryicons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-  //         button.upload1(v-if="!declineReadonly[ind]")
-  //         input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
-  //       td.data2(:class="{outliner: !declineReadonly[ind]}")
-  //         input.inprow2(v-model="industry.name" :readonly="declineReadonly[ind]")
-  //         input.inprow2(v-model="industry._id" type="hidden")
-  //       td.data3(:class="{outliner: !declineReadonly[ind]}")
-  //         // button.download(:style='{backgroundImage: "url(" + industry.download + ")"}')
-  //         // input.uploadd3(v-if="disableButton" @change="downloadFile" :readonly="true" type="file" name="downloadedFile")
-  //         a.hyperlink(href="industry.generic" download)
-  //           img(:src="industry.download")
-  //         button.upload1(v-if="!declineReadonly[ind]")
-  //         input.uploadud3(v-if="disableButton" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
-  //       td.data4(:class="{outliner: !declineReadonly[ind]}")
-  //         input.inprow2(type="checkbox" :disabled="industry.active" v-model="industry.active" :checked="industry.active")
-  //       td.data5
-  //         button.saveB(@click="sendData(ind)" :disabled="!disableButton" :class="{data5_active: activeTools[ind].save}")
-  //         button.editB(@click="edit(ind)" :class="{data5_active: activeTools[ind].edit" :disabled="!declineReadonly[ind]}")
-  //         .errorsMessage(v-if="showEditWarning")
-  //           .message
-  //             span Data wasn't saved. Do you want to save them?
-  //             .buttonsBlock
-  //               button.confirm(@click="confirmEdit(pos)") Save
-  //               button.cancel(@click="cancelEdit(ind)") Cancel
-  //         button.removeB(@click="removeRow(ind)" :disabled="removeButtonDisable")
-  //         RemoveAction(:table="table" :indexToRemove="indexToRemove" @confirmFromRemove="confirmRemove(ind)" @cancelFromRemove="cancelRemove" v-if="showRemoveWarning"
-  //           :dataForRemoveAction="dataForRemoveAction")
-  // button.addLang(@click="addLang" :disabled="disableButton")
   table
     tr
       th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
@@ -61,8 +27,8 @@
     .message
       span {{ dataForEditAction.spanTitle }}
       .buttonsBlock
-        button.confirm(@click="confirmEdit(indexToEdit)") Save
-        button.cancel(@click="cancelEdit(indexToEdit)") Cancel
+        button.confirm(@click="confirmEdit(indexToEdit)") {{ dataForEditAction.buttonConf }}
+        button.cancel(@click="cancelEdit(indexToEdit)") {{ dataForEditAction.buttonCanc }}
   .errorsMessage(v-if="showRemoveWarning")
     .message
       span {{ dataForRemoveAction.spanTitle }}
@@ -118,7 +84,7 @@ export default {
       },
       dataForEditAction: {
         spanTitle: "Data weren't saved. Do you want to save them?",
-        buttonConf: "Confirm",
+        buttonConf: "Save",
         buttonCanc: "Cancel"
       },
       industries: [],
