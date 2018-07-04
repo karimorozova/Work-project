@@ -28,7 +28,7 @@ export default {
   methods: {
     confirmRemoveComp(ind) {
       let vari = this.indexToRemoveComp;
-      this.table.body.splice(vari, 1);
+    //  this.table.body.splice(vari, 1);
       this.$emit("confirmFromRemove");
     },
     cancelRemoveComp() {

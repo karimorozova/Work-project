@@ -1,14 +1,17 @@
 <template lang="pug">
   .b-row-image
-    img(:src="body.image1")
-    img.imcurs(:src="body.image2" v-show="isActiveUpload" name="refFiles" type="file" @change='copyChangeRefFiles')
+    // img(:src="body.image1")
+    // img.imcurs(:src="body.image2" v-show="isActiveUpload" name="refFiles" type="file" @change='copyChangeRefFiles')
+    button.language(:style='{backgroundImage: "url(" + languages.icon + ")"}')
+    button.upload
+    input.upload(v-if="disableButton" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
 </template>
 
 <script>
 
 export default {
   props: {
-    body: {
+    languages: {
       type: Object,
     },
     isActiveUpload: {

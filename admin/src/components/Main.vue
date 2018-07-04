@@ -905,6 +905,7 @@ export default {
           border-top: 1px solid #c4beb6;
           border-bottom: 1px solid #c4beb6;
           padding: 5px 0;
+          cursor: pointer;
           &:nth-child(2) {
             border: none;
           }
