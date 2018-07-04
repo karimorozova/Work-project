@@ -15,6 +15,10 @@ const LanguageSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     iso1: {
         type: String,
         default: ''
@@ -26,6 +30,10 @@ const LanguageSchema = new mongoose.Schema({
     dialects:{
         type: Array,
         default: [],
+    },
+    crud: {
+        type: Boolean,
+        default: false
     },
     xtrf:{
         type: String,

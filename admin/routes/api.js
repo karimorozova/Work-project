@@ -29,7 +29,7 @@ var upload = multer({
   storage: storage
 });
 
-function moveFile(oldFile, requestId){
+function moveFile(oldFile, requestId) {
 
   var newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
 
@@ -57,42 +57,42 @@ function moveFile(oldFile, requestId){
 // })
 
 router.get('/wordcount', async (req, res) => {
-  
-   var link = req.query.web;
-      if (link.indexOf('dropbox') >= 0) {
-        var firstPart = link.split("=")[0];
-        link = firstPart + "=1";
-      }
-      const resFull = await axios({
-        url: link,
-        method: 'GET',
-        responseType: 'blob', // important
-      });
 
-      // var file = fs.createWriteStream("./dist/english_buisness_message.txt");
-      // var request = axios.get("https://www.dropbox.com/s/dr1cit55idwi1m0/english_buisness_message.txt?dl=1", function(response) {
-      // response.pipe(file);
-      // });
-      var wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
-      wstream.write(resFull.data);
-      wstream.end(() => { 
-        unirest.post('https://pangea.s.xtrf.eu/qrf/file')
-        .headers({'Content-Type': 'multipart/form-data'})      
-        .attach('file', './dist/testtest.txt') // Attachment
-        .end(function (response) {
+  var link = req.query.web;
+  if (link.indexOf('dropbox') >= 0) {
+    var firstPart = link.split("=")[0];
+    link = firstPart + "=1";
+  }
+  const resFull = await axios({
+    url: link,
+    method: 'GET',
+    responseType: 'blob', // important
+  });
+
+  // var file = fs.createWriteStream("./dist/english_buisness_message.txt");
+  // var request = axios.get("https://www.dropbox.com/s/dr1cit55idwi1m0/english_buisness_message.txt?dl=1", function(response) {
+  // response.pipe(file);
+  // });
+  var wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
+  wstream.write(resFull.data);
+  wstream.end(() => {
+    unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+      .headers({ 'Content-Type': 'multipart/form-data' })
+      .attach('file', './dist/testtest.txt') // Attachment
+      .end(function (response) {
         var token = response.body.token;
         fs.unlink('./dist/testtest.txt', (err) => {
           if (err) throw err;
           console.log("testtеst.txt was deleted!")
         });
         console.log('done');
-        res.send({token});    
-        });  
+        res.send({ token });
       });
+  });
 });
 
 
-router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
+router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
 
   const request = new Requests(req.body);
   var projectName = "";
@@ -115,10 +115,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
      \nDesign: ${JSON.stringify(obj.design)}
      \nSeo: ${JSON.stringify(obj.seo)}
      \nCTA: ${obj.cta}`)
-    .then(() => {
-      console.log('file been written');
-      
-    }).catch(err => console.log(err));
+      .then(() => {
+        console.log('file been written');
+
+      }).catch(err => console.log(err));
   }
 
   const detailFiles = req.files["detailFiles"];
@@ -129,7 +129,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
   request.service = JSON.parse(req.body.service);
   try {
     await request.save();
-    if(detailFiles){
+    if (detailFiles) {
       for (var i = 0; i < detailFiles.length; i += 1) {
         request.detailFiles.push(moveFile(detailFiles[i], request.id));
       }
@@ -139,13 +139,13 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
         request.refFiles.push(moveFile(refFiles[i], request.id))
       }
     }
-  
+
     await request.save();
     if (projectName) {
       sendMailPortal(request);
       quote(request);
     } else {
-      sendMail(request);    
+      sendMail(request);
     }
     sendMailClient(request);
     // quote(request);
@@ -162,7 +162,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles
 
 });
 
-router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: 'refFiles'}]), async (req, res) => {
+router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
 
   const request = new Requests(req.body);
   var projectName = "";
@@ -184,10 +184,10 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
      \nDesign: ${JSON.stringify(obj.design)}
      \nSeo: ${JSON.stringify(obj.seo)}
      \nCTA: ${obj.cta}`)
-    .then(() => {
-      console.log('file been written');
-      
-    }).catch(err => console.log(err));
+      .then(() => {
+        console.log('file been written');
+
+      }).catch(err => console.log(err));
   }
 
   const detailFiles = req.files["detailFiles"];
@@ -198,7 +198,7 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
   request.service = JSON.parse(req.body.service)
   try {
     await request.save();
-    if(detailFiles){
+    if (detailFiles) {
       for (var i = 0; i < detailFiles.length; i += 1) {
         request.detailFiles.push(moveFile(detailFiles[i], request.id));
       }
@@ -208,12 +208,12 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles'}, { name: '
         request.refFiles.push(moveFile(refFiles[i], request.id))
       }
     }
-  
+
     await request.save();
     if (projectName) {
       sendMailPortal(request)
     } else {
-      sendMail(request);    
+      sendMail(request);
     }
     sendMailClient(request);
     project(request);
@@ -262,6 +262,32 @@ router.get('/industries', (req, res) => {
     console.log(err);
     res.statusCode(500);
     res.send('Something wrong with DB');
+  });
+});
+
+router.post("/savelanguages", async (req, res) => {
+  var langID = req.body.dbIndex;
+  var objForUpdate = {
+    lang: req.body.languageName,
+    symbol: req.body.languageSymbol,
+    iso1: req.body.languageIso1,
+    iso2: req.body.languageIso2,
+    active: req.body.languageActive
+  }
+  Languages.update({"_id": langID}, objForUpdate).then(result => {
+  }).catch(err => {
+    console.log(err);
+  });
+});
+
+router.post("/removelanguages", async(req, res) => {
+  var langID = req.body.languageRem;
+  Languages.deleteOne({"_id": langID})
+  .then(result => {
+    // console.log(result);
+  })
+  .catch(err => {
+    console.log(err);
   });
 });
 
