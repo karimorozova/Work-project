@@ -95,6 +95,7 @@
             </tbody>
           </table>
         </div>
+        <button @click="xtm">XTM Test</button>
     </div>
 </template>
 
@@ -155,7 +156,21 @@ export default {
       ]
     };
   },
-  methods: {},
+  methods: {
+    async xtm() {
+      await this.$axios({
+        method: 'POST',
+        url: 'https://www.xtm-cloud.com/rest-api/projects',
+        withCredentials: true,
+        headers: {
+          "Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHsEhNZLn0NBL81J2rJA6g5RknA6yOC0LRCDWhLDP9OWaTl+GM7dPQX7Z5zqRgx2Y/A==",
+        },
+        "Content-Type": "multipart/form-data"
+      }).then(res => {
+        consol.log(res)
+      }).catch(err => console.log(err))
+    }
+  },
   mounted() {},
   components: {
       // 'data-tables': Datatables,

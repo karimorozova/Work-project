@@ -393,7 +393,7 @@ export default {
     jsess() {
       let result = "";
       let cookies = document.cookie.split(";");
-      console.log(cookies);
+      // console.log(cookies);
       for(let i = 0; i < cookies.length; i++) {
         let findSession = cookies[i].split("=");
         if (findSession[0].indexOf('ses') > 0) {

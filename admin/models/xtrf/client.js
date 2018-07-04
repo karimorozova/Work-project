@@ -143,7 +143,7 @@ var ClientApi = class ClientApi {
         })
     }
 
-    createQuote() {
+    createQuote(personId) {
         const srcLang = this.request.sourceLangName();
         const trgLang = this.request.targetLangName();
         var name = this.request.companyName;
@@ -189,29 +189,58 @@ var ClientApi = class ClientApi {
                     }
                 })
             }
-        }  else {             
-            return new Promise(resolve => {
-                var jsonData = {
-                    'name': `${name}`,
-                    "workflow": {
-                        "name": "Translation & Proofreading [General]"
-                    },
-                    "specialization": {
-                        "name": "General"
-                    },
-                    // "files": files,
-                    // "referenceFiles": `${this.request.refFiles}`,
-                    "sourceLanguage": srcLang,
-                    "targetLanguages": trgLang,
-                    "notes": "Coming from website",
-                    "autoAccept": false
-                };
-                this.clientApi.post("quotes", jsonData).then(function (response) {
-                    resolve(response);
-                }).catch(function (error) {
-                    resolve(error);
+        }  else {
+            if(personId) {
+                return new Promise(resolve => {
+                    var jsonData1 = {
+                        "name": `${name}`,
+                        "workflow": {
+                            "name": "Translation & Proofreading [General]"
+                        },
+                        "specialization": {
+                            "name": "General"
+                        },
+                        // "files": files,
+                        // "referenceFiles": `${this.request.refFiles}`,
+                        "sourceLanguage": srcLang,
+                        "targetLanguages": trgLang,
+                        "notes": "Coming from website",
+                        "autoAccept": false,
+                        "person": {
+                            "id": personId
+                        }
+                    };
+                    this.clientApi.post("quotes", jsonData1).then(function (response) {
+                        resolve(response);
+                    }).catch(function (error) {
+                        resolve(error);
+                    })
                 })
-            })
+            } else {
+                return new Promise(resolve => {
+                    var jsonData2 = {
+                        'name': `${name}`,
+                        "workflow": {
+                            "name": "Translation & Proofreading [General]"
+                        },
+                        "specialization": {
+                            "name": "General"
+                        },
+                        // "files": files,
+                        // "referenceFiles": `${this.request.refFiles}`,
+                        "sourceLanguage": srcLang,
+                        "targetLanguages": trgLang,
+                        "notes": "Coming from website",
+                        "autoAccept": false
+                    };
+                    this.clientApi.post("quotes", jsonData2).then(function (response) {
+                        resolve(response);
+                    }).catch(function (error) {
+                        resolve(error);
+                    })
+                })
+            }
+            
         }
     }
 
