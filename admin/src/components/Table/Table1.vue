@@ -6,7 +6,7 @@
         ISO(v-if="key == 3" :titlesp1="titlesp1Value" titlesp2="(two letters)")
         ISO1(v-if="key == 4" :titlesp3="titlesp2Value" titlesp4="(three letters)")
     .bodyWrapper
-      tr.rbody(v-for="(language, ind) in languages" :class='"tr__row-" + (ind + 1)' )
+      tr.rbody(v-for="(language, ind) in langPaging[currentPage-1]" :class='"tr__row-" + (ind + 1)' )
         td.data1(:class="{outliner: language.crud}")
           button.languageicons(:style='{backgroundImage: "url(" + language.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
           button.upload1(v-if="language.crud")
@@ -26,6 +26,14 @@
           button.saveB(@click="sendData(ind)" :disabled="!language.crud" :class="{data5_active: !language.crud}")
           button.editB(@click="edit(ind, language)" :class="{data5_active: language.crud}" :disabled="language.crud")
           // button.removeB(@click="remove(ind)" :disabled="language.crud")
+  .paging
+    .prev(@click="prevPage" :class='{nonActive: !hasPrev}') 
+      span Previous page
+    .pageNums(v-for="(arr, num) in langPaging")
+      span.pageNums__number(@click="toPage(num)" :class='{current: num == currentPage-1}') {{ num + 1 }}
+    .next(@click="nextPage" :class='{nonActive: !hasNext}') 
+      span Next page
+    
   .errorsMessage(v-if="showEditWarning")
     .message
       span {{ dataForEditAction.spanTitle }}
@@ -50,6 +58,7 @@ export default {
   props: {},
   data() {
     return {
+      currentPage: 1,
       table: {
         head: [
           { title: "Icon" },
@@ -94,6 +103,21 @@ export default {
     };
   },
   methods: {
+    toPage(num) {
+      this.currentPage = num + 1;
+    },
+    nextPage() {
+      if(this.currentPage < this.pagesTotal) {
+        this.currentPage = this.currentPage + 1
+      }
+    },
+    prevPage() {
+      if(this.currentPage > 1) {
+        this.currentPage = this.currentPage -1
+      } else {
+        return true
+      }
+    },
     edit(ind) {
       for (let i = 0; i < this.languages.length; i++) {
         if (this.languages[i].crud) {
@@ -145,7 +169,24 @@ export default {
       await this.$http
         .get("api/languages")
         .then(response => {
-          this.languages = response.body;
+          var result = response.body;
+          var dialectArr = [];
+          for(let i = 0; i < result.length; i++) {
+            if(result[i].dialects) {
+              for(let j = 0; j < result[i].dialects.length; j++) {
+                dialectArr.push(result[i].dialects[j])
+              }
+            }
+          }
+          dialectArr.forEach(item => {
+            result.push(item)
+          });
+          result.sort( (a, b) => {
+            if(a.lang < b.lang) return -1;
+            if(a.lang > b.lang) return 1;
+          })
+          this.languages = result;            
+          console.log(this.languages);
         })
         .catch(e => {
           this.errors.push(e);
@@ -176,6 +217,42 @@ export default {
           console.log(err);
         });
       this.languages[ind].crud = false;
+    }
+  },
+  computed: {
+    hasNext() {
+      return (this.currentPage < this.pagesTotal)? 1: 0
+    },
+    hasPrev() {
+      return (this.currentPage > 1)? 1: 0
+    },
+    pagesTotal() {
+      let number = 0;
+      if(this.langPaging.length) {
+        number = this.langPaging.length
+      }
+      return number
+    },
+    langPaging() {
+      let result = [];
+      let page = [];
+      if(this.languages.length) {
+        for(let i = 14; i < this.languages.length; i = i + 15) {
+          page = [];
+          for(let j = i - 14; j <= i; j++) {
+            page.push(this.languages[j])
+          }
+            result.push(page);
+          if(i + 15 > this.languages.length) {
+            page = [];
+            for(let m = i + 1; m < this.languages.length; m++) {
+              page.push(this.languages[m])
+            }
+            result.push(page)
+          }
+        }
+      }
+      return result;
     }
   },
   components: {
@@ -372,8 +449,8 @@ export default {
       }
     }
     .bodyWrapper {
-      max-height: 584px;
-      overflow-y: scroll;
+      max-height: 700px;
+      overflow-y: hidden;
     }
     .data5_active {
       opacity: 0.5;
@@ -470,5 +547,39 @@ export default {
 
 .outliner {
   box-shadow: -1px 3px 12px #22b6e6;
+}
+
+.paging {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .prev, .next {
+    text-align: center;
+    padding: 5px;
+    width: 130px;
+    border: 1px solid green;
+    margin: 5px;
+    cursor: pointer;
+  }
+  .nonActive {
+    opacity: 0.4;
+  }
+}
+
+.pageNums {
+  margin-left: 10px;
+  margin-right: 10px;
+  &__number {
+    cursor: pointer;
+    margin-right: 5px;
+    &:first-child {
+      margin-left: 5px;
+    }
+  }
+  .current {
+    border: 1px solid gold;
+    padding: 4px;
+  }
 }
 </style>
