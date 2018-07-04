@@ -140,9 +140,7 @@ export default {
         console.log(err);
       });
       this.showRemoveWarning = false;
-      this.services.filter(services => {
-          return this.services.splice(this.indexToRemove, 1);
-        });
+      this.services = this.services.filter((s, i) => i !== this.indexToRemove );
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;

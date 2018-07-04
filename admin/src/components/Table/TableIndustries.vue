@@ -145,9 +145,7 @@ export default {
         console.log(err);
       });
       this.showRemoveWarning = false;
-      this.industries.filter(industries => {
-          return this.industries.splice(this.indexToRemove, 1);
-        });
+      this.industries = this.industries.filter((s, i) => i !== this.indexToRemove );
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;

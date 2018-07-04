@@ -131,9 +131,7 @@ export default {
         console.log(err);
       });
       this.showRemoveWarning = false;
-      this.languages.filter(languages => {
-          return this.languages.splice(this.indexToRemove, 1);
-        });
+      this.languages = this.languages.filter((s, i) => i !== this.indexToRemove );
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;
