@@ -302,7 +302,6 @@
           li(v-for="social in socialsArray")
             a(:href="social.socialLink")
               img.socialsImage(:src="social.image")
-    script(src='/salesforce.js')          
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -330,6 +329,9 @@ var sbjs = require('sourcebuster');
 export default {
   name: 'pang-form',
   head: {
+    script: [
+      { src: './hotjar.js' }
+    ]
   },
   data () {
     return {
