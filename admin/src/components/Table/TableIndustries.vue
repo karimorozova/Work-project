@@ -35,7 +35,7 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
-  button.addIndustries(@click="addIndustry" :disabled="disableButton")
+  button.addIndustries(@click="addIndustry" )
 </template>
 
 <script>
