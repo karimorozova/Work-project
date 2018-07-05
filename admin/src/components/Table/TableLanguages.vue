@@ -213,11 +213,6 @@ export default {
           console.log(err);
         });
       this.languages[ind].crud = false;
-      setTimeout(() => {
-        this.languages = [];
-        this.getLanguages();
-        console.log('again languages are getting')
-      }, 5000)
     }
   },
   computed: {

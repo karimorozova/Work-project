@@ -25,7 +25,7 @@
               .shortInfo
                   .row__columns_info
                       .col.first
-                        img(src="../../assets/images/flags 31x21pix/Afrikaans [AF].png")
+                        img(src="../../assets/images/flags 31x21pix/Afrikaans[AF].png")
                         img.upload(src="../../assets/images/Other/upload-icon.png")
                       .col.proj Africanas
                       .col.col-5 AF
