@@ -8,7 +8,7 @@
         td.data1(:class="{outliner: service.crud}")
           button(:style='{backgroundImage: "url(" + service.icon + ")"}')
           button.upload1(v-if="service.crud")
-          input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFile")
+          input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFileIcon")
         td.data2(:class="{outliner: service.crud}")
           input.inprow2(v-model="service.title" :readonly="!service.crud")
         LanguageForm(:isActiveUpload="service.crud" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData" :class="{outliner: service.crud}" )
@@ -56,7 +56,7 @@ export default {
         ]
       },
       disableButton: false,
-      uploadedFile: [],
+      uploadedFileIcon: [],
       nameTitle: "",
       languageFormValue: "",
       selectBool: ["Yes", "No"],
@@ -123,7 +123,7 @@ export default {
       this.services[cancelIndex].crud = false;
     },
     uploadFile(event) {
-      this.upload = event.target.files[0];
+      this.uploadedFileIcon = event.target.files[0];
     },
     removeRow(ind) {
       this.showRemoveWarning = true;
@@ -138,7 +138,7 @@ export default {
         serviceRem: this.services[confirmRIndex]._id
       };
       this.$http
-        .post("api/removeservices", remObj)
+        .post("service/removeservices", remObj)
         .then(result => {})
         .catch(err => {
           console.log(err);
@@ -163,7 +163,6 @@ export default {
     async sendData(idx) {
       let formData = new FormData();
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
-      formData.append("uploadedFile", this.uploadedFile);
       let totalData = {
         nameTitle: this.services[idx].title,
         activeFormValue: this.services[idx].active,
@@ -171,10 +170,11 @@ export default {
         languageFormValue: this.languageFormValue,
         calcFormValue: this.calcFormValue
       };
-      // console.log(totalData);
-      formData.append("totalData", totalData);
+      for(let proper in totalData) {
+        formData.append(proper, totalData[proper]);
+      }
       this.$http
-        .post("api/saveservices", totalData)
+        .post("service/saveservices", formData)
         .then(result => {
           console.log(result.data);
         })
