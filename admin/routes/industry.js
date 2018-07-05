@@ -18,7 +18,7 @@ const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './static/industries/')
+    cb(null, './static/')
   },
   filename: function (req, file, cb) {
     console.log(file)
@@ -30,14 +30,17 @@ var uploadIndustries = multer({
   storage: storage
 });
 
-router.post("/saveindustries", uploadIndustries.single("uploadedFileIcon"), async (req, res) => {
+router.post("/saveindustries", uploadIndustries.fields([{name: "uploadedFileIcon"}, {name: "uploadedFile"}]), async (req, res) => {
   var langID = req.body.dbIndex;
-  var iconPath = req.file.path;
-  console.log(iconPath);
+  var iconsArray = req.files["uploadedFileIcon"];
+  var iconPath = iconsArray[0].path;
+  var genericArray = req.files["uploadedFile"];
+  var genericPath = genericArray[0].path;
   var objForUpdate = {
     name: req.body.nameTitle,
     active: req.body.activeFormValue,
-    icon: iconPath
+    icon: iconPath,
+    generic: genericPath
   };
   console.log(objForUpdate);
   Industries.update({"_id": langID}, objForUpdate).then(result => {
