@@ -42,6 +42,16 @@ function moveFile(oldFile, requestId) {
   return oldFile.filename;
 }
 
+function moveLangIcon(oldFile, newPath) {
+
+  mv(oldFile.path, newPath, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
+  console.log('Flag icon moved!')
+}
+
 // router.get('/taskDetail', async (req, res) => {
 //   console.log("In task details");
 //   let array = req.query.info;
@@ -261,8 +271,14 @@ router.get('/industries', (req, res) => {
   });
 });
 
-router.post("/savelanguages", async (req, res) => {
+router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {
+  const flag = req.files["flag"];
   var langID = req.body.dbIndex;
+  let languageIcon = await Languages.find({'_id': langID});
+  let icon = './dist' + languageIcon[0].icon;
+  if (flag) {
+    moveLangIcon(flag[0], icon)
+  }
   var objForUpdate = {
     lang: req.body.languageName,
     symbol: req.body.languageSymbol,
@@ -272,9 +288,10 @@ router.post("/savelanguages", async (req, res) => {
   };
   console.log(objForUpdate);
   Languages.update({"_id": langID}, objForUpdate).then(result => {
-    console.log(result);
+    res.send(result);
   }).catch(err => {
     console.log(err);
+    res.send('Something went wrong :(');
   });
 });
 
