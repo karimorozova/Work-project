@@ -190,9 +190,7 @@ export default {
       if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = (e) => {
-          console.log(e);
           this.imageData = e.target.result;
-          console.log(this.imageData)
         }
         reader.readAsDataURL(input.files[0]);
       }
@@ -205,27 +203,21 @@ export default {
       langObj.append('languageIso2', this.languages[ind].iso2)
       langObj.append('languageActive', this.languages[ind].active)
       langObj.append('dbIndex', this.languages[ind]._id)
-      // let langObj = {
-      //   languageName: this.languages[ind].lang,
-      //   languageSymbol: this.languages[ind].symbol,
-      //   languageIso1: this.languages[ind].iso1,
-      //   languageIso2: this.languages[ind].iso2,
-      //   languageActive: this.languages[ind].active,
-      //   dbIndex: this.languages[ind]._id
-      // };
       langObj.append("flag", this.file[0]);
-      console.log(langObj);
       this.$http
         .post("api/savelanguages", langObj)
         .then(result => {
           console.log(result.data);
-          this.languages = [];
-          this.getLanguages();          
         })
         .catch(err => {
           console.log(err);
         });
       this.languages[ind].crud = false;
+      setTimeout(() => {
+        this.languages = [];
+        this.getLanguages();
+        console.log('again languages are getting')
+      }, 5000)
     }
   },
   computed: {
@@ -382,6 +374,11 @@ export default {
         position: relative;
         .iconPreview {
           position: relative;
+          .preview {
+            max-width: 31px;
+            max-height: 21px;
+            overflow: hidden;
+          }
         }
       }
       .data2 {
