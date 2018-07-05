@@ -44,7 +44,6 @@ import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
 import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
 import IndustriesGenericTB from "./industriesRows/IndustriesGenericTB";
 import ServiceSelect from "./industriesRows/ServicesTableSelect";
-import RemoveAction from "./RemoveAction";
 
 const rowNew = {
   image2: require("../../assets/images/Other/upload-icon.png"),
@@ -191,8 +190,7 @@ export default {
     IndustriesSelect,
     IndustriesRowEdit,
     IndustriesGenericTB,
-    ServiceSelect,
-    RemoveAction
+    ServiceSelect
   },
   mounted() {
     this.getIndustries();

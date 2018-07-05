@@ -40,7 +40,6 @@ import ServicesTableImage from "./servicesRows/ServicesTableImage";
 import ServicesRowEdit from "./servicesRows/ServicesRowEdit";
 import CalculationUnite from "./servicesRows/CalculationUnite";
 import LanguageForm from "./servicesRows/LanguageForm";
-import RemoveAction from "./RemoveAction";
 
 const rowNew = {
   image1: "",
@@ -192,8 +191,7 @@ export default {
     ServicesSelect,
     ServicesRowEdit,
     CalculationUnite,
-    LanguageForm,
-    RemoveAction
+    LanguageForm
   },
   mounted() {
     this.getServices();

@@ -17,7 +17,7 @@
               .quotesComponent
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    Table1
+                    TableLanguages
         .maininfoWrapper(v-if="servicesSettingsVisible")
           .mainInfo
             .adminAll
@@ -35,8 +35,7 @@
 </template>
 
 <script>
-import Table1 from "../Table/Table1";
-// import TableServices from "../Table/TableServices.vue";
+import TableLanguages from "../Table/TableLanguages";
 import TableServices from "../Table/TableServices.vue";
 import TableIndustries from "../Table/TableIndustries";
 
@@ -96,7 +95,7 @@ export default {
     }
   },
   components: {
-    Table1,
+    TableLanguages,
     TableServices,
     TableIndustries
   },

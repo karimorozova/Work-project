@@ -25,7 +25,6 @@
         td.data7
           button.saveB(@click="sendData(ind)" :disabled="!language.crud" :class="{data5_active: !language.crud}")
           button.editB(@click="edit(ind, language)" :class="{data5_active: language.crud}" :disabled="language.crud")
-          // button.removeB(@click="remove(ind)" :disabled="language.crud")
   .paging
     .prev(@click="prevPage" :class='{nonActive: !hasPrev}') 
       span Previous page
@@ -39,12 +38,6 @@
       .buttonsBlock
         button.confirm(@click="confirmEdit(indexToEdit)") Save
         button.cancel(@click="cancelEdit(indexToEdit)") Cancel
-  .errorsMessage(v-if="showRemoveWarning")
-    .message
-      span {{ dataForRemoveAction.spanTitle }}
-      .buttonsBlock
-        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
-        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
 </template>
 
 <script>
@@ -79,11 +72,6 @@ export default {
       isActiveUpload: [],
       showRemoveWarning: false,
       showEditWarning: false,
-      dataForRemoveAction: {
-        spanTitle: "Do you want to delete data?",
-        buttonConf: "Confirm",
-        buttonCanc: "Cancel"
-      },
       dataForEditAction: {
         spanTitle: "Data weren't saved. Do you want to save them?",
         buttonConf: "Confirm",
@@ -96,7 +84,7 @@ export default {
       languageIso1: "",
       languageIso2: "",
       languageActive: "",
-      dbIndex: '',
+      dbIndex: "",
       indexToEdit: 0,
       indexToRemove: 0
     };
@@ -106,15 +94,15 @@ export default {
       this.currentPage = num + 1;
     },
     nextPage() {
-      if(this.currentPage < this.pagesTotal) {
-        this.currentPage = this.currentPage + 1
+      if (this.currentPage < this.pagesTotal) {
+        this.currentPage = this.currentPage + 1;
       }
     },
     prevPage() {
-      if(this.currentPage > 1) {
-        this.currentPage = this.currentPage -1
+      if (this.currentPage > 1) {
+        this.currentPage = this.currentPage - 1;
       } else {
-        return true
+        return true;
       }
     },
     edit(ind) {
@@ -149,12 +137,16 @@ export default {
       let remObj = {
         languageRem: this.languages[confirmRIndex]._id
       };
-      this.$http.post("api/removelanguages", remObj).then(result => {
-      }).catch(err => {
-        console.log(err);
-      });
+      this.$http
+        .post("api/removelanguages", remObj)
+        .then(result => {})
+        .catch(err => {
+          console.log(err);
+        });
       this.showRemoveWarning = false;
-      this.languages = this.languages.filter((s, i) => i !== this.indexToRemove );
+      this.languages = this.languages.filter(
+        (s, i) => i !== this.indexToRemove
+      );
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;
@@ -167,21 +159,21 @@ export default {
         .then(response => {
           var result = response.body;
           var dialectArr = [];
-          for(let i = 0; i < result.length; i++) {
-            if(result[i].dialects) {
-              for(let j = 0; j < result[i].dialects.length; j++) {
-                dialectArr.push(result[i].dialects[j])
+          for (let i = 0; i < result.length; i++) {
+            if (result[i].dialects) {
+              for (let j = 0; j < result[i].dialects.length; j++) {
+                dialectArr.push(result[i].dialects[j]);
               }
             }
           }
           dialectArr.forEach(item => {
-            result.push(item)
+            result.push(item);
           });
-          result.sort( (a, b) => {
-            if(a.lang < b.lang) return -1;
-            if(a.lang > b.lang) return 1;
-          })
-          this.languages = result;            
+          result.sort((a, b) => {
+            if (a.lang < b.lang) return -1;
+            if (a.lang > b.lang) return 1;
+          });
+          this.languages = result;
           console.log(this.languages);
         })
         .catch(e => {
@@ -217,34 +209,34 @@ export default {
   },
   computed: {
     hasNext() {
-      return (this.currentPage < this.pagesTotal)? 1: 0
+      return this.currentPage < this.pagesTotal ? 1 : 0;
     },
     hasPrev() {
-      return (this.currentPage > 1)? 1: 0
+      return this.currentPage > 1 ? 1 : 0;
     },
     pagesTotal() {
       let number = 0;
-      if(this.langPaging.length) {
-        number = this.langPaging.length
+      if (this.langPaging.length) {
+        number = this.langPaging.length;
       }
-      return number
+      return number;
     },
     langPaging() {
       let result = [];
       let page = [];
-      if(this.languages.length) {
-        for(let i = 14; i < this.languages.length; i = i + 15) {
+      if (this.languages.length) {
+        for (let i = 14; i < this.languages.length; i = i + 15) {
           page = [];
-          for(let j = i - 14; j <= i; j++) {
-            page.push(this.languages[j])
+          for (let j = i - 14; j <= i; j++) {
+            page.push(this.languages[j]);
           }
-            result.push(page);
-          if(i + 15 > this.languages.length) {
+          result.push(page);
+          if (i + 15 > this.languages.length) {
             page = [];
-            for(let m = i + 1; m < this.languages.length; m++) {
-              page.push(this.languages[m])
+            for (let m = i + 1; m < this.languages.length; m++) {
+              page.push(this.languages[m]);
             }
-            result.push(page)
+            result.push(page);
           }
         }
       }
@@ -352,9 +344,6 @@ export default {
       .video_special {
         height: 25px;
       }
-      // .icos_special {
-      //   margin-left: 6px;
-      // }
       .more_special {
         height: 22px;
       }
@@ -430,7 +419,7 @@ export default {
         align-items: center;
       }
       .data7 {
-        flex-basis: 13.8%;
+        flex-basis: 16.5%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -445,18 +434,12 @@ export default {
       }
     }
     .bodyWrapper {
-      max-height: 700px;
-      overflow-y: hidden;
+      height: 700px;
     }
     .data5_active {
       opacity: 0.5;
       position: relative;
     }
-  }
-
-  .addLang {
-    cursor: pointer;
-    background-image: url("../../assets/images/Other/add-icon.png");
   }
 
   button {
@@ -550,7 +533,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  .prev, .next {
+  .prev,
+  .next {
     text-align: center;
     padding: 5px;
     width: 130px;
