@@ -10,7 +10,10 @@
         td.data1(:class="{outliner: language.crud}")
           button.languageicons(:style='{backgroundImage: "url(" + language.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
           button.upload1(v-if="language.crud")
-          input.upload(v-if="true" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
+          .iconPreview(v-if="language.crud")
+            input.upload(v-if="language.crud" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
+            .preview(v-if="imageData.length > 0")
+              img(:src="imageData")
         td.data2(:class="{outliner: language.crud}")
           input.inprow2(v-model="language.lang" :readonly="!language.crud" )
           input.inprow2(v-model="language._id" type="hidden")
@@ -86,7 +89,9 @@ export default {
       languageActive: "",
       dbIndex: "",
       indexToEdit: 0,
-      indexToRemove: 0
+      indexToRemove: 0,
+      file: [],
+      imageData: ''
     };
   },
   methods: {
@@ -174,32 +179,48 @@ export default {
             if (a.lang > b.lang) return 1;
           });
           this.languages = result;
-          console.log(this.languages);
         })
         .catch(e => {
           this.errors.push(e);
         });
     },
     uploadFile(event) {
-      this.upload = event.target.files[0];
+      this.file.push(event.target.files[0]);
+      var input = event.target;
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          console.log(e);
+          this.imageData = e.target.result;
+          console.log(this.imageData)
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
     },
     async sendData(ind) {
-      let formData = new FormData();
-      formData.append("uploadedFileIcon", this.uploadedFileIcon);
-      let langObj = {
-        languageName: this.languages[ind].lang,
-        languageSymbol: this.languages[ind].symbol,
-        languageIso1: this.languages[ind].iso1,
-        languageIso2: this.languages[ind].iso2,
-        languageActive: this.languages[ind].active,
-        dbIndex: this.languages[ind]._id
-      };
-      formData.append("langObj", langObj);
+      let langObj = new FormData();
+      langObj.append('languageName', this.languages[ind].lang)
+      langObj.append('languageSymbol', this.languages[ind].symbol)
+      langObj.append('languageIso1', this.languages[ind].iso1)
+      langObj.append('languageIso2', this.languages[ind].iso2)
+      langObj.append('languageActive', this.languages[ind].active)
+      langObj.append('dbIndex', this.languages[ind]._id)
+      // let langObj = {
+      //   languageName: this.languages[ind].lang,
+      //   languageSymbol: this.languages[ind].symbol,
+      //   languageIso1: this.languages[ind].iso1,
+      //   languageIso2: this.languages[ind].iso2,
+      //   languageActive: this.languages[ind].active,
+      //   dbIndex: this.languages[ind]._id
+      // };
+      langObj.append("flag", this.file[0]);
       console.log(langObj);
       this.$http
         .post("api/savelanguages", langObj)
         .then(result => {
           console.log(result.data);
+          this.languages = [];
+          this.getLanguages();          
         })
         .catch(err => {
           console.log(err);
@@ -299,7 +320,8 @@ export default {
         padding-left: 0;
         padding-right: 0;
         background-repeat: no-repeat;
-        width: 22px;
+        width: 94px;
+        height: 35px;
         border: none;
         outline: none;
         margin-top: -3px;
@@ -308,8 +330,8 @@ export default {
         overflow: hidden;
         opacity: 0;
         position: absolute;
-        top: 12px;
-        left: 90px;
+        left: -100px;
+        top: -10px;
       }
       .upload1 {
         background-image: url("../../assets/images/Other/upload-icon.png");
@@ -319,7 +341,7 @@ export default {
         outline: none;
         width: 20px;
         height: 20px;
-        margin-right: 25px;
+        // margin-right: 25px;
       }
       .saveB {
         background-image: url("../../assets/images/Other/save-icon-qa-form.png");
@@ -358,6 +380,9 @@ export default {
         justify-content: space-between;
         align-items: center;
         position: relative;
+        .iconPreview {
+          position: relative;
+        }
       }
       .data2 {
         flex-basis: 21.8%;
