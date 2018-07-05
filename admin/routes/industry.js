@@ -30,12 +30,21 @@ var uploadIndustries = multer({
   storage: storage
 });
 
-router.post("/saveindustries", uploadIndustries.fields([{name: "uploadedFileIcon"}, {name: "uploadedFile"}]), async (req, res) => {
+router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
   var langID = req.body.dbIndex;
-  var iconsArray = req.files["uploadedFileIcon"];
-  var iconPath = iconsArray[0].path;
-  var genericArray = req.files["uploadedFile"];
-  var genericPath = genericArray[0].path;
+  var iconsArray = [];
+  var iconPath;
+  if(iconsArray.length) {
+    iconsArray = req.files["uploadedFileIcon"];
+    iconPath = iconsArray[0].path;
+  }
+  var genericArray = [];
+  var genericPath;
+  if (genericArray.length) {
+    genericArray = req.files["uploadedFile"];
+    genericPath = genericArray[0].path;
+  }
+
   var objForUpdate = {
     name: req.body.nameTitle,
     active: req.body.activeFormValue,
@@ -43,22 +52,22 @@ router.post("/saveindustries", uploadIndustries.fields([{name: "uploadedFileIcon
     generic: genericPath
   };
   console.log(objForUpdate);
-  Industries.update({"_id": langID}, objForUpdate).then(result => {
-    console.log(result);
+  Industries.update({ "_id": langID }, objForUpdate).then(result => {
+    // console.log(result);
   }).catch(err => {
     console.log(err);
   });
 });
 
-router.post("/removeindustries", async(req, res) => {
+router.post("/removeindustries", async (req, res) => {
   var langID = req.body.industryRem;
-  Industries.deleteOne({"_id": langID})
-  .then(result => {
-    console.log(result);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+  Industries.deleteOne({ "_id": langID })
+    .then(result => {
+      // console.log(result);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
 
 module.exports = router;

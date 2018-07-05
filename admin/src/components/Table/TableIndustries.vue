@@ -10,7 +10,7 @@
           button.upload1(v-if="industry.crud")
           input.upload(v-if="industry.crud" @change="uploadFile" :readonly="!industry.crud" type="file" name="uploadedFileIcon")
         td.data2(:class="{outliner: industry.crud}")
-          input.inprow2(v-model="industry.name" :readonly="!industry.crud")
+          input.inprow2(v-model="industry.name" :readonly="!industry.crud" )
           input.inprow2(v-model="industry._id" type="hidden")
         td.data3(:class="{outliner: industry.crud}")
           a.hyperlink(:href="industry.generic" download="example.xlsx")
@@ -78,7 +78,7 @@ export default {
         buttonCanc: "Cancel"
       },
       industries: [],
-      dbIndex: '',
+      dbIndex: "",
       disableButton: false
     };
   },
@@ -87,12 +87,19 @@ export default {
       const preData = await this.$http.get("api/industries");
       this.industries = preData.body;
       this.industries.sort((x, y) => {
-        if(x.name > y.name) return 1;
-        if(x.name < y.name) return -1;
+        if (x.name > y.name) return 1;
+        if (x.name < y.name) return -1;
       });
     },
     addIndustry() {
-      this.industries.push({icon: "", name: "", generic: "", active: true, download: "", crud: true});
+      this.industries.push({
+        icon: "",
+        name: "",
+        generic: "",
+        active: true,
+        download: "",
+        crud: true
+      });
       this.disableButton = true;
     },
     edit(ind) {
@@ -133,12 +140,16 @@ export default {
       let remObj = {
         industryRem: this.industries[confirmRIndex]._id
       };
-      this.$http.post("industry/removeindustries", remObj).then(result => {
-      }).catch(err => {
-        console.log(err);
-      });
+      this.$http
+        .post("industry/removeindustries", remObj)
+        .then(result => {})
+        .catch(err => {
+          console.log(err);
+        });
       this.showRemoveWarning = false;
-      this.industries = this.industries.filter((s, i) => i !== this.indexToRemove );
+      this.industries = this.industries.filter(
+        (s, i) => i !== this.indexToRemove
+      );
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;
@@ -162,21 +173,17 @@ export default {
         nameTitle: this.industries[idx].name,
         activeFormValue: this.industries[idx].active,
         dbIndex: this.industries[idx]._id
-
       };
-      console.log(totalData);
-      for(let prop in totalData){
-        formData.append(prop, totalData[prop])
+      for (let prop in totalData) {
+        formData.append(prop, totalData[prop]);
       }
       this.$http
         .post("industry/saveindustries", formData)
-        .then(result => {
-          console.log(result.data);
-        })
+        .then(result => {})
         .catch(err => {
           console.log(err);
         });
-        this.industries[idx].crud = false;
+      this.industries[idx].crud = false;
     }
   },
 
