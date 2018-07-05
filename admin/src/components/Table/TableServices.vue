@@ -18,7 +18,7 @@
         td.data6
           button.saveB(@click="sendData(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
           button.editB(@click="edit(ind)" :disabled="service.crud" :class="{data6_active: service.crud}")
-          button.removeB(@click="removeRow(ind)" :disabled="service.crud")
+          button.removeB(@click="removeRow(ind)" )
   .errorsMessage(v-if="showEditWarning")
     .message
       span {{ dataForEditAction.spanTitle }}
@@ -31,7 +31,7 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
-  button.addService(@click="addLang" :disabled="disableButton")
+  button.addService(@click="addService" :disabled="disableButton")
 </template>
 
 <script>
@@ -40,16 +40,6 @@ import ServicesTableImage from "./servicesRows/ServicesTableImage";
 import ServicesRowEdit from "./servicesRows/ServicesRowEdit";
 import CalculationUnite from "./servicesRows/CalculationUnite";
 import LanguageForm from "./servicesRows/LanguageForm";
-
-const rowNew = {
-  image1: "",
-  image2: require("../../assets/images/Other/upload-icon.png"),
-  title: "",
-  title: "",
-  title: "",
-  title: "",
-  title: ""
-};
 
 export default {
   props: {},
@@ -89,13 +79,21 @@ export default {
       },
       services: [],
       isActiveUpload: false,
-      languageFormTrans: '',
-      calculationUniteTrans: '',
-      dbIndex: '',
+      languageFormTrans: "",
+      calculationUniteTrans: "",
+      dbIndex: ""
     };
   },
   methods: {
-    addLang() {
+    addService() {
+      this.services.push({
+        icon: "",
+        title: "",
+        languageForm: "",
+        calculationUnit: "",
+        active: true,
+        crud: true
+      });
       this.disableButton = true;
     },
     edit(ind) {
@@ -134,12 +132,14 @@ export default {
       let remObj = {
         serviceRem: this.services[confirmRIndex]._id
       };
-      this.$http.post("api/removeservices", remObj).then(result => {
-      }).catch(err => {
-        console.log(err);
-      });
+      this.$http
+        .post("api/removeservices", remObj)
+        .then(result => {})
+        .catch(err => {
+          console.log(err);
+        });
       this.showRemoveWarning = false;
-      this.services = this.services.filter((s, i) => i !== this.indexToRemove );
+      this.services = this.services.filter((s, i) => i !== this.indexToRemove);
     },
     cancelRemove(indexToRemove) {
       let cancelRIndex = this.indexToRemove;
@@ -176,7 +176,7 @@ export default {
         .catch(err => {
           console.log(err);
         });
-        this.services[idx].crud = false;
+      this.services[idx].crud = false;
     },
     async getServices() {
       const preData = await this.$http.get("api/services");
