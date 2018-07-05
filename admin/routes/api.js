@@ -29,6 +29,7 @@ var upload = multer({
   storage: storage
 });
 
+
 function moveFile(oldFile, requestId) {
 
   var newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
@@ -260,14 +261,14 @@ router.get('/industries', (req, res) => {
   });
 });
 
-router.post("/savelanguages", upload.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
+router.post("/savelanguages", async (req, res) => {
   var langID = req.body.dbIndex;
   var objForUpdate = {
     lang: req.body.languageName,
     symbol: req.body.languageSymbol,
     iso1: req.body.languageIso1,
     iso2: req.body.languageIso2,
-    active: req.body.languageActive
+    active: req.body.languageActive,
   };
   console.log(objForUpdate);
   Languages.update({"_id": langID}, objForUpdate).then(result => {
@@ -282,31 +283,6 @@ router.post("/removelanguages", async(req, res) => {
   Languages.deleteOne({"_id": langID})
   .then(result => {
     // console.log(result);
-  })
-  .catch(err => {
-    console.log(err);
-  });
-});
-
-router.post("/saveindustries", async (req, res) => {
-  var langID = req.body.dbIndex;
-  var objForUpdate = {
-    name: req.body.nameTitle,
-    active: req.body.activeFormValue
-  };
-  console.log(objForUpdate);
-  Industries.update({"_id": langID}, objForUpdate).then(result => {
-    console.log(result);
-  }).catch(err => {
-    console.log(err);
-  });
-});
-
-router.post("/removeindustries", async(req, res) => {
-  var langID = req.body.industryRem;
-  Industries.deleteOne({"_id": langID})
-  .then(result => {
-    console.log(result);
   })
   .catch(err => {
     console.log(err);

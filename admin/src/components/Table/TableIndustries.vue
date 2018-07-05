@@ -13,7 +13,7 @@
           input.inprow2(v-model="industry.name" :readonly="!industry.crud")
           input.inprow2(v-model="industry._id" type="hidden")
         td.data3(:class="{outliner: industry.crud}")
-          a.hyperlink(href="industry.generic" download)
+          a.hyperlink(:href="industry.generic" download="example.xlsx")
             img(:src="industry.download")
           button.upload1(v-if="industry.crud")
           input.uploadud3(v-if="industry.crud" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
@@ -85,8 +85,11 @@ export default {
   methods: {
     async getIndustries() {
       const preData = await this.$http.get("api/industries");
-      console.log(preData.body);
       this.industries = preData.body;
+      this.industries.sort((x, y) => {
+        if(x.name > y.name) return 1;
+        if(x.name < y.name) return -1;
+      });
     },
     addIndustry() {
       this.industries.push({icon: "", name: "", generic: "", active: true, download: "", crud: true});
@@ -130,7 +133,7 @@ export default {
       let remObj = {
         industryRem: this.industries[confirmRIndex]._id
       };
-      this.$http.post("api/removeindustries", remObj).then(result => {
+      this.$http.post("industry/removeindustries", remObj).then(result => {
       }).catch(err => {
         console.log(err);
       });
@@ -162,9 +165,11 @@ export default {
 
       };
       console.log(totalData);
-      formData.append("totalData", totalData);
+      for(let prop in totalData){
+        formData.append(prop, totalData[prop])
+      }
       this.$http
-        .post("api/saveindustries", totalData)
+        .post("industry/saveindustries", formData)
         .then(result => {
           console.log(result.data);
         })
