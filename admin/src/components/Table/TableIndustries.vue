@@ -22,7 +22,7 @@
         td.data5
           button.saveB(@click="sendData(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
           button.editB(@click="edit(ind)" :disabled="industry.crud" :class="{data5_active: industry.crud}")
-          button.removeB(@click="removeRow(ind)" :disabled="industry.crud")
+          button.removeB(@click="removeRow(ind)" )
   .errorsMessage(v-if="showEditWarning")
     .message
       span {{ dataForEditAction.spanTitle }}
@@ -35,7 +35,7 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
-  button.addIndustries(@click="addIndustry" )
+  button.addIndustries(@click="addIndustry" :disabled="disableButton")
 </template>
 
 <script>
