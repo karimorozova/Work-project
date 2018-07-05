@@ -35,7 +35,7 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
-  button.addLang(@click="addIndustry" :disabled="disableButton")
+  button.addIndustries(@click="addIndustry" :disabled="disableButton")
 </template>
 
 <script>
@@ -44,15 +44,6 @@ import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
 import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
 import IndustriesGenericTB from "./industriesRows/IndustriesGenericTB";
 import ServiceSelect from "./industriesRows/ServicesTableSelect";
-
-const rowNew = {
-  image2: require("../../assets/images/Other/upload-icon.png"),
-  title: "",
-  image2: require("../../assets/images/Other/upload-icon.png"),
-  title: "",
-  title: "",
-  title: ""
-};
 
 export default {
   props: {},
@@ -98,8 +89,8 @@ export default {
       this.industries = preData.body;
     },
     addIndustry() {
+      this.industries.push({icon: "", name: "", generic: "", active: true, download: "", crud: true});
       this.disableButton = true;
-      this.languages.push({});
     },
     edit(ind) {
       for (let i = 0; i < this.industries.length; i++) {
@@ -373,7 +364,7 @@ export default {
     }
   }
 
-  .addLang {
+  .addIndustries {
     cursor: pointer;
     background-image: url("../../assets/images/Other/add-icon.png");
   }

@@ -92,7 +92,12 @@ export default {
         languageForm: "",
         calculationUnit: "",
         active: true,
-        crud: true
+        crud: true,
+        sortIndex: this.services.length+1,
+        source: true,
+        xtrf: 11,
+        projectType: "regular",
+        createdAt: ""
       });
       this.disableButton = true;
     },
