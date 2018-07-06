@@ -204,6 +204,9 @@ export default {
       langObj.append('languageActive', this.languages[ind].active)
       langObj.append('dbIndex', this.languages[ind]._id)
       langObj.append("flag", this.file[0]);
+      if(this.file[0]) {
+        langObj.append('lastModified', this.file[0].lastModified);
+      }
       this.$http
         .post("api/savelanguages", langObj)
         .then(result => {
@@ -213,6 +216,12 @@ export default {
           console.log(err);
         });
       this.languages[ind].crud = false;
+      setTimeout(()=> {
+        this.languages = [];
+        this.getLanguages();
+        this.imageData = "";
+      }, 1000)
+      
     }
   },
   computed: {
