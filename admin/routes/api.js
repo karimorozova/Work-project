@@ -42,9 +42,11 @@ function moveFile(oldFile, requestId) {
   return oldFile.filename;
 }
 
-function moveLangIcon(oldFile, newPath) {
-
-  mv(oldFile.path, newPath, function (err) {
+function moveLangIcon(oldFile, date) {
+  var newFile = './dist/static/flags31x21pix/new' + date + oldFile.filename
+  mv(oldFile.path, newFile, {
+    mkdirp: true
+  }, function (err) {
     if(err) {
       console.log(err);
     }
@@ -275,9 +277,14 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
   const flag = req.files["flag"];
   var langID = req.body.dbIndex;
   let languageIcon = await Languages.find({'_id': langID});
-  let icon = './dist' + languageIcon[0].icon;
+  var existIcon = languageIcon[0].icon;
+  let old = './dist' + languageIcon[0].icon;
   if (flag) {
-    moveLangIcon(flag[0], icon)
+    fs.unlinkSync(old, (err) => {
+      console.log('old file removed');
+    });
+    moveLangIcon(flag[0], req.body.lastModified);
+    existIcon = `/static/flags31x21pix/new${req.body.lastModified}` + flag[0].filename; 
   }
   var objForUpdate = {
     lang: req.body.languageName,
@@ -285,8 +292,8 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
     iso1: req.body.languageIso1,
     iso2: req.body.languageIso2,
     active: req.body.languageActive,
+    icon: existIcon
   };
-  console.log(objForUpdate);
   Languages.update({"_id": langID}, objForUpdate).then(result => {
     res.send(result);
   }).catch(err => {
