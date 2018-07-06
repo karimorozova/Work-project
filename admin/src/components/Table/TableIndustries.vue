@@ -394,8 +394,6 @@ export default {
         width: 100%;
       }
     }
-    .bodyWrapper {
-    }
     .data5_active {
       opacity: 0.5;
       position: relative;

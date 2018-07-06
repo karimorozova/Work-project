@@ -810,13 +810,6 @@ export default {
   position: relative;
   &__inner {
     width: 90%;
-    // transition: all 1s;
-    // transform: translate(-150px);
-    // transform: translate(7px);
-  }
-  &__open {
-    // transform: translate(0px);
-    // transform: translate(15px);
   }
   .maininfoWrapper {
     width: 100%;
@@ -948,6 +941,8 @@ export default {
         justify-content: center;
         align-items: center;
         margin-bottom: 20px;
+        margin-left: 0;
+        margin-right: 0;
         cursor: pointer;
         transition: all 0.4s;
         &:last-child {

@@ -342,10 +342,6 @@ export default {
         width: 100%;
       }
     }
-    .bodyWrapper {
-      // max-height: 184px;
-      // overflow-y: scroll;
-    }
     .data6_active {
       opacity: 0.5;
     }

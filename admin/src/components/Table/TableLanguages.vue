@@ -460,7 +460,7 @@ export default {
       }
     }
     .bodyWrapper {
-      height: 700px;
+      height: 690px;
     }
     .data5_active {
       opacity: 0.5;
