@@ -184,7 +184,9 @@ export default {
       this.$http
         .post("service/saveservices", formData)
         .then(result => {
-          // console.log(result.data);
+          setTimeout(() => {
+            this.getServices()
+          }, 1000)
         })
         .catch(err => {
           console.log(err);

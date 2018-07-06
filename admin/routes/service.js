@@ -58,8 +58,10 @@ router.post("/saveservices", uploadServices.single("uploadedFileIcon"), async (r
     }
   }
   Services.update({ "_id": langID }, objForUpdate).then(result => {
+    res.send('Service updated')
   }).catch(err => {
     console.log(err);
+    res.send('Something wrong...')
   });
 });
 

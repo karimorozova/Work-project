@@ -79,9 +79,11 @@ router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIco
   }
   console.log(objForUpdate);
   Industries.update({ "_id": langID }, objForUpdate).then(result => {
+    res.send('done');
     // console.log(result);
   }).catch(err => {
     console.log(err);
+    res.send('Something wrong...')
   });
 });
 

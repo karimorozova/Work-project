@@ -92,6 +92,7 @@ export default {
   },
   methods: {
     async getIndustries() {
+      console.log('Getting industries...')
       const preData = await this.$http.get("api/industries");
       this.industries = preData.body;
       this.industries.sort((x, y) => {
@@ -187,7 +188,11 @@ export default {
       }
       this.$http
         .post("industry/saveindustries", formData)
-        .then(result => {})
+        .then(result => {
+          setTimeout(() => {
+            this.getIndustries();
+          }, 1000)
+        })
         .catch(err => {
           console.log(err);
         });

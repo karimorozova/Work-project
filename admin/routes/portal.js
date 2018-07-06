@@ -136,36 +136,40 @@ router.get('/reject', async (req, res) => {
 });
 
 router.get('/xtmTest', async (req, res) => {
-    // unirest.post('https://www.xtm-cloud.com/rest-api/projects')
-    // .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHsEhNZLn0NBL81J2rJA6g5RknA6yOC0LRCDWhLDP9OWaTl+GM7dPQX7Z5zqRgx2Y/A==",
-    // 'Content-Type': 'multipart/form-data'}) 
-    // .field('customerId', 23)
-    // .field('name',  'Project-Test')
-    // .end( (response) => {
-    //     console.log(response.body);
-    //     res.send('Done')
-    // })
-    
-    var options = {
-        host: 'xtm-cloud.com',
-        path: '/rest-api/projects',
-        method: 'POST',
-        headers: {
-            "Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHsEhNZLn0NBL81J2rJA6g5RknA6yOC0LRCDWhLDP9OWaTl+GM7dPQX7Z5zqRgx2Y/A==",
-            'Content-Type': 'multipart/form-data'
-        }
-    }
-
-    var requ = https.request(options, (resp) => {
-        console.log('There...');
-        resp.on('data', (body) => {
-            console.log('Done');
-        })
+    unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
+    .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    'Content-Type': 'multipart/form-data'}) 
+    .field('customerId', 23)
+    .field('name',  'Project-Test')
+    .field('sourceLanguage', 'pl_PL')
+    .field('targetLanguages', 'en_GB')
+    .field('workflowId', 2890)
+    .end( (response) => {
+        console.log(response.body);
+        res.send('Done')
     })
-    requ.write('{"customerId": 23}');
-    requ.write('{"name": "Project-test"}')
-    requ.end();
-    res.send('Done');
+    
+    // var options = {
+    //     host: 'xtm-cloud.com',
+    //     path: '/rest-api/projects',
+    //     method: 'POST',
+    //     headers: {
+    //         "Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHsEhNZLn0NBL81J2rJA6g5RknA6yOC0LRCDWhLDP9OWaTl+GM7dPQX7Z5zqRgx2Y/A==",
+    //         'Content-Type': 'multipart/form-data'
+    //     }
+    // }
+
+    // var requ = https.request(options, (resp) => {
+    //     console.log('There...');
+    //     resp.on('data', (body) => {
+    //         console.log('Done');
+    //     })
+    // })
+    // requ.write('{"customerId": 23}');
+    // requ.write('{"name": "Project-test"}');
+    // requ.write('{"templateId": 7292575}');
+    // requ.end();
+    // res.send('Done');
 })
 
 module.exports = router;
