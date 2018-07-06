@@ -213,6 +213,12 @@ export default {
           console.log(err);
         });
       this.languages[ind].crud = false;
+      setTimeout(()=> {
+        this.languages = [];
+        this.getLanguages();
+        this.imageData = "";
+      }, 1000)
+      
     }
   },
   computed: {
