@@ -69,6 +69,7 @@ router.post("/removeservices", async (req, res) => {
   var langID = req.body.serviceRem;
   Services.deleteOne({ "_id": langID })
     .then(result => {
+      res.send();
     })
     .catch(err => {
       console.log(err);

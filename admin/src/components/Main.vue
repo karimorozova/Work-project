@@ -48,7 +48,7 @@
               ClientsSettings(v-if="clientsShow")
               QuotesSettings(v-if="soonQuotesShow")
               ProjectsSettings(v-if="projectsShow")
-              FinanceSettings(v-if="financeShow")
+              FinanceSettings(v-if="financeShow" :sliderBool="sliderBool" @hideFinanceBlanket="hideFinance")
               ReportsSettings(v-if="reportsShow")
               Blanket(v-if="dashboardShowBlanket" title='Welcome to the Pangea Admin')
               Blanket(v-if="recruitmentShow" title='Recruitment')
@@ -57,7 +57,7 @@
               Blanket(v-if="clientsShow" title='Client')
               Blanket(v-if="soonQuotesShow" title='Quotes')
               Blanket(v-if="projectsShow" title='Projects')
-              Blanket(v-if="financeShow" title='Finance')
+              Blanket(v-if="financeShowBlanket" title='Finance')
               Blanket(v-if="reportsShow" title='Reports')
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
@@ -155,6 +155,7 @@ export default {
       path: "Language Settings",
       dashboardShow: true,
       dashboardShowBlanket: true,
+      financeShowBlanket: false,
       recruitmentShow: false,
       vendorsShow: false,
       languagesShow: false,
@@ -397,6 +398,9 @@ export default {
         this.servicesSettingsVisible = false;
         this.industiesSettingsVisible = false;
       }
+    },
+    hideFinance(data){
+      this.financeShowBlanket = data;
     }
   },
   mounted() {

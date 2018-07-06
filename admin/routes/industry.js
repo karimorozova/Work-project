@@ -91,6 +91,7 @@ router.post("/removeindustries", async (req, res) => {
   var langID = req.body.industryRem;
   Industries.deleteOne({ "_id": langID })
     .then(result => {
+      res.send();
       // console.log(result);
     })
     .catch(err => {

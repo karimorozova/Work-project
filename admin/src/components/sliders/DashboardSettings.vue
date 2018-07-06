@@ -1,5 +1,5 @@
 <template lang="pug">
-.admminportalWrapper2
+.adminportalWrapper2
   .adminMainWrapper
     .adminNavbar
       .adminNavbar__slider(:class="{slider: slidebarVisible}")
