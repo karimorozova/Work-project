@@ -18,13 +18,22 @@ const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './static/')
+    cb(null, './static/industries')
   },
   filename: function (req, file, cb) {
     console.log(file)
     cb(null, file.originalname)
   }
 });
+
+function moveExcelFile(oldFile, newPath) {
+
+  mv(oldFile.path, newPath, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
+}
 
 var uploadIndustries = multer({
   storage: storage
@@ -33,24 +42,41 @@ var uploadIndustries = multer({
 router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
   var langID = req.body.dbIndex;
   var iconsArray = [];
-  var iconPath;
-  if(iconsArray.length) {
-    iconsArray = req.files["uploadedFileIcon"];
+  iconsArray = req.files["uploadedFileIcon"];
+  var iconPath = "";
+  if(iconsArray !== undefined) {
     iconPath = iconsArray[0].path;
+    console.log(iconPath);
   }
   var genericArray = [];
-  var genericPath;
-  if (genericArray.length) {
-    genericArray = req.files["uploadedFile"];
+  genericArray = req.files["uploadedFile"];
+  var genericPath = "";
+  var excelName = "";
+  if (genericArray !== undefined) {
     genericPath = genericArray[0].path;
+    excelName = genericArray[0].filename;
+    moveExcelFile(genericArray[0], "static/" + excelName);
   }
+  var nameVal = req.body.nameTitle;
 
   var objForUpdate = {
-    name: req.body.nameTitle,
-    active: req.body.activeFormValue,
-    icon: iconPath,
-    generic: genericPath
+    active: req.body.activeFormValue
   };
+  if(nameVal.length ) {
+    objForUpdate = {
+      name: nameVal,
+    };
+  }
+  if(iconPath.length ) {
+    objForUpdate = {
+      icon: iconPath
+    };
+  }
+  if(genericPath.length ) {
+    objForUpdate = {
+      generic: genericPath
+    };
+  }
   console.log(objForUpdate);
   Industries.update({ "_id": langID }, objForUpdate).then(result => {
     // console.log(result);

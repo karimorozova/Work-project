@@ -18,7 +18,7 @@ const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './static/')
+    cb(null, './static/services')
   },
   filename: function (req, file, cb) {
     console.log(file)

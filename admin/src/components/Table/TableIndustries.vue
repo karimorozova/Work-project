@@ -20,7 +20,8 @@
         td.data4(:class="{outliner: industry.crud}")
           input.inprow2(type="checkbox" :disabled="!industry.crud" v-model="industry.active" :checked="industry.crud")
         td.data5
-          button.saveB(@click="sendData(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
+          //button.saveB(@click="sendData(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
+          button.saveB(@click="checkFields(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
           button.editB(@click="edit(ind)" :disabled="industry.crud" :class="{data5_active: industry.crud}")
           button.removeB(@click="removeRow(ind)" )
   .errorsMessage(v-if="showEditWarning")
@@ -35,6 +36,11 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  .errorsMessage(v-if="showEmptyWarning")
+    .message
+      span Field 'Name' must not empty!
+      .buttonsBlock
+        button.confirm(@click="ok") Ok
   button.addIndustries(@click="addIndustry" :disabled="disableButton")
 </template>
 
@@ -64,6 +70,7 @@ export default {
       nameTitle: "",
       showRemoveWarning: false,
       showEditWarning: false,
+      showEmptyWarning: false,
       indexToRemove: 0,
       indexToEdit: 0,
       secondEditPosition: "",
@@ -79,7 +86,8 @@ export default {
       },
       industries: [],
       dbIndex: "",
-      disableButton: false
+      disableButton: false,
+      errors: []
     };
   },
   methods: {
@@ -184,6 +192,19 @@ export default {
           console.log(err);
         });
       this.industries[idx].crud = false;
+    },
+    checkFields(ind) {
+      if (!this.industries[ind].name.length) {
+        this.showEmptyWarning = true;
+        this.errors.push("Field 'Name' must not empty!");
+      }
+      if(!this.errors.length){
+        this.sendData(ind);
+      }
+    },
+    ok() {
+      this.showEmptyWarning = false;
+      this.errors.splice(0, 1);
     }
   },
 
