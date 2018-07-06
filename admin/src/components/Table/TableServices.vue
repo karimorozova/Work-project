@@ -16,7 +16,8 @@
         td.data5(:class="{outliner: service.crud}")
           input.inprow2(type="checkbox" :disabled="!service.crud" v-model="service.active" :checked="service.crud")
         td.data6
-          button.saveB(@click="sendData(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
+          // button.saveB(@click="sendData(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
+          button.saveB(@click="checkFields(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
           button.editB(@click="edit(ind)" :disabled="service.crud" :class="{data6_active: service.crud}")
           button.removeB(@click="removeRow(ind)" )
   .errorsMessage(v-if="showEditWarning")
@@ -31,6 +32,11 @@
       .buttonsBlock
         button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
+  .errorsMessage(v-if="showEmptyWarning")
+    .message
+      span Field 'Name' must not empty!
+      .buttonsBlock
+        button.confirm(@click="ok") Ok
   button.addService(@click="addService" :disabled="disableButton")
 </template>
 
@@ -81,7 +87,9 @@ export default {
       isActiveUpload: false,
       languageFormTrans: "",
       calculationUniteTrans: "",
-      dbIndex: ""
+      dbIndex: "",
+      errors: [],
+      showEmptyWarning: false
     };
   },
   methods: {
@@ -176,7 +184,7 @@ export default {
       this.$http
         .post("service/saveservices", formData)
         .then(result => {
-          console.log(result.data);
+          // console.log(result.data);
         })
         .catch(err => {
           console.log(err);
@@ -187,6 +195,23 @@ export default {
       const preData = await this.$http.get("api/services");
       // console.log(preData.body);
       this.services = preData.body;
+      this.services.sort((x, y) => {
+        if (x.title > y.title) return 1;
+        if (x.title < y.title) return -1;
+      });
+    },
+    checkFields(ind) {
+      if (!this.services[ind].title.length) {
+        this.showEmptyWarning = true;
+        this.errors.push("Field 'Name' must not empty!");
+      }
+      if(!this.errors.length){
+        this.sendData(ind);
+      }
+    },
+    ok() {
+      this.showEmptyWarning = false;
+      this.errors.splice(0, 1);
     }
   },
 
