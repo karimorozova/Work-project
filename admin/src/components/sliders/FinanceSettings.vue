@@ -6,8 +6,8 @@
       .adminNavbar__slider.slider
         span FINANCE
         .slider-inner
-            .slider-col(@click="showRatesMono" :class="{financesBg: ratesmonoBgBool}") Rates Mono
-            .slider-col(@click="showRatesDuo" :class="{financesBg: servicesBgBool}") Rates Duo
+            .slider-col(@click="showRatesMono" :class="{activeBack: monoActive}") Rates Mono
+            .slider-col(@click="showRatesDuo" :class="{activeBack: duoActive}") Rates Duo
       // .adminMainWrapper__inner(:class='{"adminMainWrapper__open": slidebarVisible}')
       .adminMainWrapper__inner.adminMainWrapper__open
         .breadCrumbs 
@@ -18,7 +18,7 @@
               .quotesComponent
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
-                    RatesDuo
+                    RatesDuo(v-if="duoActive")
 </template>
 
 <script>
@@ -33,6 +33,8 @@ export default {
   },
   data() {
     return {
+      duoActive: true,
+      monoActive: false,
       ratesmonoSettingsVisible: false,
       ratesmonoBgBool: false,
       ratesduoSettingsVisible: false,
@@ -43,6 +45,8 @@ export default {
   },
   methods: {
     showRatesDuo() {
+      this.duoActive = true;
+      this.monoActive = false;
       this.ratesduoSettingsVisible = !this.ratesduoSettingsVisible;
       if (this.ratesmonoSettingsVisible) {
         this.ratesmonoSettingsVisible = false;
@@ -51,6 +55,8 @@ export default {
       this.$emit("hideFinanceBlanket", this.ratesmonoBgBool);
     },
     showRatesMono() {
+      this.duoActive = false;
+      this.monoActive = true;
       this.ratesmonoSettingsVisible = !this.ratesmonoSettingsVisible;
       this.ratesmonoBgBool = !this.ratesmonoBgBool;
       if (this.ratesduoSettingsVisible) {
@@ -72,15 +78,13 @@ export default {
 <style lang="scss" scoped>
 .adminportalWrapper2 {
   margin: 0 auto;
-  overflow: auto;
+  // overflow: auto;
 }
 .quotesComponent {
-  width: 960px;
+  // width: 960px;
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   justify-content: center;
-}
-.quotesComponent {
   background-color: #fff;
 }
 .additionalServices {
@@ -92,7 +96,7 @@ export default {
 
 .adminMainWrapper {
   display: flex;
-  min-height: 94vh;
+  height: 100%;
   position: relative;
   &__inner {
     width: 90%;
@@ -195,8 +199,11 @@ export default {
           white-space: nowrap;
           cursor: pointer;
           &:nth-child(2) {
-            border: none;
+            border-bottom: 1px solid #c4beb6;
           }
+        }
+        .activeBack {
+          background-color: #c4beb6;
         }
       }
     }

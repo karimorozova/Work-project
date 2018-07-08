@@ -2,9 +2,9 @@
 .adminNavbar__slider.slider
     span RECRUITMENT
     .slider-inner
-        .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") TEST1
-        .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") TEST2
-        .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") TEST3
+        .slider-col(:class="{languagesBg: languagesBgBool}") TEST1
+        .slider-col(:class="{languagesBg: servicesBgBool}") TEST2
+        .slider-col(:class="{languagesBg: industiesBgBool}") TEST3
 </template>
 
 <script>

@@ -56,7 +56,7 @@ export default {
           { title: "Icon" },
           { title: "Name" },
           { title: "Language Form" },
-          { title: "Calculation Utin" },
+          { title: "Calculation Unit" },
           { title: "Active" },
           { title: "" }
         ]

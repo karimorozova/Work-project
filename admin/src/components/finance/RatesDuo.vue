@@ -1,220 +1,125 @@
 <template lang="pug">
-.ratesduoWrapper
-  table
-    tr
-      th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-    .bodyWrapper
-      tr.rbody(v-for="(service, ind) in services" :class='"tr__row-" + (ind + 1)' )
-        td.data1(:class="{outliner: service.crud}")
-          button(:style='{backgroundImage: "url(" + service.icon + ")"}')
-          button.upload1(v-if="service.crud")
-          input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFileIcon")
-        td.data2(:class="{outliner: service.crud}")
-          input.inprow2(v-model="service.title" :readonly="!service.crud")
-        CalculationUnite(:isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
-        CalculationUnite(:isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
-        td.data5(:class="{outliner: service.crud}")
-          input.inprow2(type="checkbox" :disabled="!service.crud" v-model="service.active" :checked="service.crud")
-        td.data6
-          button.saveB(@click="checkFields(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
-          button.editB(@click="edit(ind)" :disabled="service.crud" :class="{data6_active: service.crud}")
-          button.removeB(@click="removeRow(ind)" )
-  .errorsMessage(v-if="showEditWarning")
-    .message
-      span {{ dataForEditAction.spanTitle }}
-      .buttonsBlock
-        button.confirm(@click="confirmEdit(indexToEdit)") {{ dataForEditAction.buttonConf }}
-        button.cancel(@click="cancelEdit(indexToEdit)") {{ dataForEditAction.buttonCanc }}
-  .errorsMessage(v-if="showRemoveWarning")
-    .message
-      span {{ dataForRemoveAction.spanTitle }}
-      .buttonsBlock
-        button.confirm(@click="confirmRemove(indexToRemove)") {{ dataForRemoveAction.buttonConf }}
-        button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
-  .errorsMessage(v-if="showEmptyWarning")
-    .message
-      span Field 'Name' must not empty!
-      .buttonsBlock
-        button.confirm(@click="ok") Ok
-  button.addService(@click="addService" :disabled="disableButton")
+.duoWrap
+  .filters
+    .filters__item.sourceMenu
+      label Source Language
+        LanguagesSelect(:selectedLang="sourceSelect")
+    .filters__item.targetMenu
+      label Target Language
+        LanguagesSelect(:selectedLang="targetSelect")
+    .filters__item.industryMenu
+      label Industry
+      .select
+        span.selected {{ industrySelect }}
+        .arrowButton
+          img(src="../../assets/images/open-close-arrow-brown.png")
+    .filters__item.serviceMenu
+      label Service
+      .select
+        span.selected {{ serviceSelect }}
+        .arrowButton
+          img(src="../../assets/images/open-close-arrow-brown.png")
+  .addButton
+    input(type="button" value="Add several languages")           
+  table.duoFinance
+    thead
+      th(v-for="head in tableHeader") {{ head.title }}
+    tbody
+      tr(v-for="info in fullInfo")
+        td {{ info.sourceLanguage }}
+        td {{ info.targetLanguage }}
+        td {{ info.industry }}
+        td
+          input(type="checkbox" :checked="info.active")
+        template(v-for="rate in info.rates")
+          td {{ rate }}
+        td
+          template(v-for="(icon, index) in info.icons") 
+            span.crudIcon {{ icon }}
+  .addRow
+    .addRow__plus
+      span +
 </template>
 
 <script>
 import CalculationUnite from "./ratesduoRows/CalculationUnite";
+import LanguagesSelect from "../LanguagesSelect";
 
 export default {
   props: {},
   data() {
     return {
-      table: {
-        head: [
-          { title: "Source Language" },
-          { title: "Target Language" },
-          { title: "Language Form" },
-          { title: "Calculation Utin" },
-          { title: "Active" },
-          { title: "" }
-        ]
-      },
-      disableButton: false,
-      uploadedFileIcon: [],
-      nameTitle: "",
-      languageFormValue: "",
-      selectBool: ["Yes", "No"],
-      calcFormValue: "",
-      activeFormValue: "",
-      showRemoveWarning: false,
-      showEditWarning: false,
-      indexToRemove: 0,
-      indexToEdit: 0,
-      secondEditPosition: "",
-      dataForRemoveAction: {
-        spanTitle: "Do you want to delete data?",
-        buttonConf: "Confirm",
-        buttonCanc: "Cancel"
-      },
-      dataForEditAction: {
-        spanTitle: "Data weren't saved. Do you want to save them?",
-        buttonConf: "Save",
-        buttonCanc: "Cancel"
-      },
+      sourceSelect: {lang: "English"},
+      targetSelect: {lang: "Select"},
+      industrySelect: "All",
+      serviceSelect: "Translation",
+      heads: [
+        { title: "Source Language" },
+        { title: "Target Language" },
+        { title: "Industry" },
+        { title: "Active" },
+        { title: "" }
+      ],
+      fullInfo: [
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]}
+      ],
       services: [],
-      isActiveUpload: false,
-      languageFormTrans: "",
-      calculationUniteTrans: "",
-      dbIndex: "",
-      errors: [],
-      showEmptyWarning: false
-    };
-  },
-  methods: {
-    addService() {
-      this.services.push({
-        icon: "",
-        title: "",
-        languageForm: "",
-        calculationUnit: "",
-        active: true,
-        crud: true,
-        sortIndex: this.services.length+1,
-        source: true,
-        xtrf: 11,
-        projectType: "regular",
-        createdAt: ""
-      });
-      this.disableButton = true;
-    },
-    edit(ind) {
-      for (let i = 0; i < this.services.length; i++) {
-        if (this.services[i].crud) {
-          this.showEditWarning = true;
-          this.indexToEdit = i;
-        }
-      }
-
-      this.services[ind].crud = true;
-    },
-    confirmEdit(indexToEdit) {
-      let confirmIndex = this.indexToEdit;
-      this.showEditWarning = false;
-      this.services[confirmIndex].crud = false;
-      this.sendData(confirmIndex);
-    },
-    cancelEdit(indexToEdit) {
-      let cancelIndex = this.indexToEdit;
-      this.showEditWarning = false;
-      this.services[cancelIndex].crud = false;
-    },
-    uploadFile(event) {
-      this.uploadedFileIcon = event.target.files[0];
-    },
-    removeRow(ind) {
-      this.showRemoveWarning = true;
-      this.removeButtonDisable = true;
-      this.indexToRemove = ind;
-    },
-    confirmRemove(indexToRemove) {
-      let confirmRIndex = this.indexToRemove;
-      this.services[confirmRIndex].crud = false;
-      let formData = new FormData();
-      let remObj = {
-        serviceRem: this.services[confirmRIndex]._id
-      };
-      this.$http
-        .post("service/removeservices", remObj)
-        .then(result => {})
-        .catch(err => {
-          console.log(err);
-        });
-      this.showRemoveWarning = false;
-      this.services = this.services.filter((s, i) => i !== this.indexToRemove);
-    },
-    cancelRemove(indexToRemove) {
-      let cancelRIndex = this.indexToRemove;
-      this.services[cancelRIndex].crud = false;
-      this.showRemoveWarning = false;
-    },
-    getLangFormData(data) {
-      this.languageFormValue = data;
-    },
-    getCalcFormData(data) {
-      this.calcFormValue = data;
-    },
-    getActiveStatusFormData(data) {
-      this.activeFormValue = data;
-    },
-    async sendData(idx) {
-      let formData = new FormData();
-      formData.append("uploadedFileIcon", this.uploadedFileIcon);
-      let totalData = {
-        nameTitle: this.services[idx].title,
-        activeFormValue: this.services[idx].active,
-        dbIndex: this.services[idx]._id,
-        languageFormValue: this.languageFormValue,
-        calcFormValue: this.calcFormValue
-      };
-      for(let proper in totalData) {
-        formData.append(proper, totalData[proper]);
-      }
-      this.$http
-        .post("service/saveservices", formData)
-        .then(result => {
-          setTimeout(() => {
-            this.getServices()
-          }, 1000)
-        })
-        .catch(err => {
-          console.log(err);
-        });
-      this.services[idx].crud = false;
-    },
-    async getServices() {
-      const preData = await this.$http.get("api/services");
-      // console.log(preData.body);
-      this.services = preData.body;
-      this.services.sort((x, y) => {
-        if (x.title > y.title) return 1;
-        if (x.title < y.title) return -1;
-      });
-    },
-    checkFields(ind) {
-      if (!this.services[ind].title.length) {
-        this.showEmptyWarning = true;
-        this.errors.push("Field 'Name' must not empty!");
-      }
-      if(!this.errors.length){
-        this.sendData(ind);
-      }
-    },
-    ok() {
-      this.showEmptyWarning = false;
-      this.errors.splice(0, 1);
     }
   },
 
-  computed: {},
+  methods: {
+    async getServices() {
+      const preData = await this.$http.get("api/services");
+      this.services = preData.body;
+      this.services.forEach(item => {
+        if(item.title == 'Translation') {
+          item.crud = true
+        } else {
+          item.crud = false
+        }
+      })
+    },
+    async getLanguages() {
+      await this.$http.get('api/languages')
+      .then(response => {
+        let sortedArray = response.body;
+        sortedArray.sort( (a,b) => {
+          if(a.lang < b.lang) return -1;
+          if(a.lang > b.lang) return 1;
+        });
+      this.languages = sortedArray;
+        for(let i = 0; i < sortedArray.length; i++) {
+          if(sortedArray[i].lang == 'English') {
+            this.sourceSelect = sortedArray[i];
+          }
+        }
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
+    },
+  },
+
+  computed: {
+    tableHeader() {
+      let result = [];
+      for(let i = 0; i < 5; i++) {
+        result.push(this.heads[i])
+      }
+      for(let j = 0; j < this.services.length; j++) {
+        if(this.services[j].crud) {
+          result.splice(-1, 0, {title: this.services[j].title} )
+        }
+      }
+      return result;
+    }
+  },
   components: {
-    CalculationUnite
+    CalculationUnite,
+    LanguagesSelect
   },
   mounted() {
     this.getServices();
@@ -223,208 +128,108 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.ratesduoWrapper {
-  position: relative;
-  table {
-    width: 100%;
-    border: 1px solid #9a8f80;
-    font-size: 14px;
-    tr {
-      display: flex;
-      th {
-        background-color: #9a8f80;
-        color: #fff;
-        font-size: 14px;
-        border-right: 2px solid #fff;
-        padding: 5px 0 5px 10px;
-        font-weight: normal;
-      }
-      .th__col-1 {
-        flex-basis: 11.7%;
-      }
-      .th__col-2 {
-        flex-basis: 27.5%;
-      }
-      .th__col-3 {
-        flex-basis: 16%;
-      }
-      .th__col-4 {
-        flex-basis: 16%;
-      }
-      .th__col-5 {
-        flex-basis: 16%;
-      }
-      .th__col-6 {
-        flex-basis: 18.5%;
-        border-right: none;
-      }
-      .upload {
-        padding-left: 0;
-        padding-right: 0;
-        width: 22px;
-        border: none;
-        outline: none;
-        margin-top: -3px;
-        margin-right: 2px;
-        cursor: pointer;
-        overflow: hidden;
-        opacity: 0;
-        position: absolute;
-        top: 12px;
-        left: 55px;
-      }
-      .upload1 {
-        background-image: url("../../assets/images/Other/upload-icon.png");
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
-        outline: none;
-        margin-right: 5px;
-        width: 20px;
-        height: 20px;
-      }
-      .saveB {
-        background-image: url("../../assets/images/Other/save-icon-qa-form.png");
-        height: 22px;
-      }
-      .editB {
-        background-image: url("../../assets/images/Other/save-icon-qa.png");
-        height: 22px;
-      }
-      .removeB {
-        background-image: url("../../assets/images/Other/delete-icon-qa-form.png");
-        height: 22px;
-      }
-      td {
-        border: 1px solid #9a8f80;
-        height: 46px;
-        padding-left: 10px;
-      }
-      .data1 {
-        display: flex;
-        flex-basis: 11.5%;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-      }
-      .data2 {
-        flex-basis: 27.5%;
-        white-space: nowrap;
-        overflow-x: hidden;
-        display: flex;
-        align-items: center;
-      }
-      .data5 {
-        display: flex;
-        flex-basis: 15.7%;
-        align-items: center;
-      }
-      .data6 {
-        flex-basis: 18.7%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .inprow2 {
-        outline: none;
-        border: none;
-        font-size: 14px;
-        color: #67573e;
-        width: 100%;
-      }
-    }
-    .data6_active {
-      opacity: 0.5;
-    }
-  }
-
-  .addService {
-    cursor: pointer;
-    background-image: url("../../assets/images/Other/add-icon.png");
-  }
-
-  button {
-    width: 31px;
-    height: 34px;
-    background-color: #fff;
-    border: none;
-    background-repeat: no-repeat;
-    outline: none;
-    cursor: pointer;
-  }
-  .set_bottom_border {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: #675842;
-  }
-  .withoutBorder {
-    border-right: none;
+.duoWrap {
+  font-family: MyriadPro;
+  min-width: 850px; 
+}
+.duoFinance {
+  border-collapse: collapse;
+  width: 100%;
+  thead, tbody {
+    border: 1px solid #BFB09D;
   }
 }
-::-webkit-scrollbar {
-  width: 27px;
-  background-color: #e7e0e0;
+th, td {
+  padding: 5px;
+  font-size: 14px;
+  font-weight: normal;
+  white-space: nowrap;
 }
-::-webkit-scrollbar-thumb {
-  border-color: #675842;
-  background-color: #675842;
-  border-right: solid 9px #e7e0e0;
-  border-left: solid 9px #e7e0e0;
+th {
+  padding-right: 20px;
+  background-color: #988C7E;
+  color: white;
+  border-right: 1px solid #FFF;
+  &:last-child {
+    border-right: none; 
+  }
 }
-::-webkit-scrollbar-thumb:vertical {
-  height: 12px;
+td {
+  border: 1px solid #BFB09D;
 }
-
-.outliner {
-  box-shadow: -1px 3px 12px #22b6e6;
+.crudIcon {
+  margin: 0 5px;
 }
-
-.errorsMessage {
-  width: 300px;
-  max-height: 160px;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  background-color: white;
-  color: red;
-  z-index: 20;
-  border: 1px solid red;
-  box-shadow: 0 0 15px red;
-  text-align: center;
-  padding-bottom: 15px;
-  padding-top: 0;
-  font-size: 18px;
-  .message {
-    position: relative;
+.filters {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  &__item {
+    width: 22%;
     display: flex;
     flex-direction: column;
+    label {
+      font-size: 12px;
+      margin-bottom: 0;
+    }
+    .select {
+      border: 1px solid #BFB09D;
+      border-radius: 5px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      .selected {
+        border-right: 1px solid #BFB09D;
+        width: 82%;
+        padding: 3px 5px;
+        font-size: 14px;
+        opacity: 0.7;
+      }
+      .arrowButton {
+        width: 18%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img {
+          padding-right: 2px;
+        }
+      }
+    }
+  }
+}
+.addButton {
+  width: 100%;
+  text-align: right;
+  margin-bottom: 15px;
+  input {
+    color: white;
+    font-size: 14px;
+    width: 180px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    background-color: #ff876c;
+    border: 1px solid #ff876c;
+    cursor: pointer;
+  }
+}
+.addRow {
+  margin-top: 10px;
+  margin-left: 25px; 
+  &__plus {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+    border: 1px solid #BFB09D;
     span {
-      margin-top: 28px;
-      margin-bottom: 24px;
-    }
-    .buttonsBlock {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      .confirm,
-      .cancel {
-        border: 0;
-        width: 114px;
-        height: 40px;
-        border-radius: 12px;
-        background-color: #ff876c;
-        -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-        box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-        font-size: 14px;
-        color: #fff;
-        outline: none;
-        cursor: pointer;
-      }
+      font-size: 28px;
+      color: #BFB09D;
+      opacity: .7;
     }
   }
 }

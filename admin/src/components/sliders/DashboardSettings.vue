@@ -110,15 +110,13 @@ export default {
 <style lang="scss" scoped>
 .adminportalWrapper2 {
   margin: 0 auto;
-  overflow: auto;
+  // overflow: auto;
 }
 .quotesComponent {
-  width: 1000px;
+  // width: 1000px;
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   justify-content: center;
-}
-.quotesComponent {
   background-color: #fff;
 }
 .additionalServices {
@@ -130,7 +128,7 @@ export default {
 
 .adminMainWrapper {
   display: flex;
-  min-height: 94vh;
+  height: 100%;
   position: relative;
   &__inner {
     width: 90%;
