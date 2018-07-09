@@ -32,31 +32,28 @@ var uploadServices = multer({
 
 router.post("/saveservices", uploadServices.single("uploadedFileIcon"), async (req, res) => {
   var langID = req.body.dbIndex;
-  var iconPath;
-  if (iconPath === undefined) {
-    iconPath = "";
-  }
-  else {
+  var iconPath = "";
+  
+  if (req.file) {
     iconPath = req.file.path;
   }
 
-  console.log(iconPath);
   var objForUpdate = {
     active: req.body.activeFormValue,
     languageForm: req.body.languageFormValue,
     calculationUnit: req.body.calcFormValue
   };
+  
   var nameVal = req.body.nameTitle;
+  
   if (nameVal.length) {
-    objForUpdate = {
-      title: nameVal
-    }
+    objForUpdate.title = nameVal;
   }
+
   if(iconPath.length) {
-    objForUpdate = {
-      icon: iconPath
-    }
+    objForUpdate.icon = iconPath;
   }
+
   Services.update({ "_id": langID }, objForUpdate).then(result => {
     res.send('Service updated')
   }).catch(err => {
@@ -69,7 +66,7 @@ router.post("/removeservices", async (req, res) => {
   var langID = req.body.serviceRem;
   Services.deleteOne({ "_id": langID })
     .then(result => {
-      res.send();
+      res.send('Removed');
     })
     .catch(err => {
       console.log(err);

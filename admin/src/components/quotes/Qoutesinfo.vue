@@ -42,7 +42,7 @@
                           .col
                             img.save(src="../../assets/images/Other/save-none active.png" v-if="true")
                             img.save(src="../../assets/images/Other/save-icon-qa-form.png" v-if="false")
-                            img(src="../../assets/images/Other/save-icon-qa.png" v-if="true")                      
+                            img(src="../../assets/images/Other/edit-icon-qa.png" v-if="true")                      
                             img(src="../../assets/images/Other/save-none active.png" v-if="false")
                             img(src="../../assets/images/Other/delete-icon-qa-form.png")
 </template>

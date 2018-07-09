@@ -292,7 +292,7 @@ export default {
         height: 22px;
       }
       .editB {
-        background-image: url("../../assets/images/Other/save-icon-qa.png");
+        background-image: url("../../assets/images/Other/edit-icon-qa.png");
         height: 22px;
       }
       .removeB {

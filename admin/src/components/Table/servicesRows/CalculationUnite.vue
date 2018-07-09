@@ -1,17 +1,13 @@
 <template lang="pug">
 .calculationWrapper
-  .info(v-if="!chooseBetweenThird")
-    input.first(v-if="hideAgainOptions" v-model="calculationUnit.words" type="text" :readonly="true")
-    input.second(v-if="hideAgainOptions1" v-model="calculationUnit.hours" type="text" :readonly="true")
-    input.third(v-if="hideAgainOptions2" v-model="calculationUnit.packages" type="text" :readonly="true")
-  .info(v-if="chooseBetweenThird" v-click-outside="hideDropMenu")
-    span Option
+  .info(v-if="isActiveUpload" v-click-outside="hideDropMenu")
+    span {{ unitOption }}
     .arr(@click="showDDCalculation")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    input.b-conf(@click="makeChooseWords" v-model="calculationUnit.words" type="text" :readonly="true")
-    input.b-conf(@click="makeChooseHours" v-model="calculationUnit.hours" type="text" :readonly="true")
-    input.b-conf(@click="makeChoosePackages" v-model="calculationUnit.packages" type="text" :readonly="true")
+    span.optionForm(@click="makeChooseWords") Words
+    span.optionForm(@click="makeChooseHours") Hours
+    span.optionForm(@click="makeChoosePackages") Packages
 </template>
 
 <script>
@@ -22,6 +18,12 @@ export default {
     isActiveUpload: {
       type: Boolean,
       default: false
+    },
+    unitOption: {
+      type: String
+    },
+    index: {
+      type: Number
     }
   },
   data() {
@@ -34,8 +36,7 @@ export default {
       },
       hideAgainOptions: true,
       hideAgainOptions1: false,
-      hideAgainOptions2: false,
-      chooseBetweenThird: this.isActiveUpload
+      hideAgainOptions2: false
     };
   },
   methods: {
@@ -48,23 +49,21 @@ export default {
     makeChooseWords() {
       this.hideAgainOptions = true;
       this.hideAgainOptions1 = false;
-      this.chooseBetweenThird = false;
       this.dropdownVisible = false;
-      this.$emit('calcSendFirst', this.calculationUnit.words);
+      this.$emit('calcSendFirst', {unit: this.calculationUnit.words, index: this.index});
     },
     makeChooseHours() {
-      this.chooseBetweenThird = false;
       this.hideAgainOptions = false;
       this.hideAgainOptions1 = true;
       this.hideAgainOptions2 = false;
-      this.$emit('calcSendSecond', this.calculationUnit.hours);
+      this.$emit('calcSendSecond', {unit: this.calculationUnit.hours, index: this.index});
     },
     makeChoosePackages() {
       this.chooseBetweenThird = false;
       this.hideAgainOptions = false;
       this.hideAgainOptions1 = false;
       this.hideAgainOptions2 = true;
-      this.$emit('calcSendThird', this.calculationUnit.packages);
+      this.$emit('calcSendThird', {unit: this.calculationUnit.packages, index: this.index});
     }
   },
   directives: {
@@ -81,25 +80,16 @@ export default {
 
 <style lang="scss" scoped>
 .calculationWrapper {
-  display: flex;
+   display: flex;
   position: relative;
-  width: 34%;
-  flex-basis: 16%;
   border: 1px solid #9a8f80;
+  height: 100%;
   .info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     span {
-      padding-left: 10px;
-    }
-    .first, .second, .third {
-      outline: none;
-      border: none;
-      width: 85px;
-      font-size: 14px;
-      color: #67573e;
       padding-left: 10px;
     }
     .arr {
@@ -120,6 +110,7 @@ export default {
   }
 
   .drop {
+    width: 100%;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -128,10 +119,9 @@ export default {
     z-index: 3;
     box-shadow: 1px 1px 6px #000;
 
-    .b-conf {
+    .optionForm {
       display: flex;
       justify-content: flex-start;
-      width: 115px;
       background-color: #fff;
       padding: 10px 0 10px 10px;
       cursor: pointer;

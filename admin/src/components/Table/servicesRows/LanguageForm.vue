@@ -1,15 +1,12 @@
 <template lang="pug">
 .languageFormWrapper
-  .info(v-if="!chooseLangBlock")
-    input.first(v-if="hideLanguages" v-model="languageMode.mono" type="text" :readonly="true")
-    input.second(v-else v-model="languageMode.duo" type="text" :readonly="true")
-  .info(v-if="chooseLangBlock" v-click-outside="hideDropMenuLang")
-    span Option
+  .info(v-if="isActiveUpload" v-click-outside="outClick")
+    span {{ formOption }}
     .arr(@click="showDDLangForm")
       img(src="../../../assets/images/Other/open arrow.png")
   .drop(v-if="dropdownVisible")
-    input.b-conf(@click="makeChooseMono" v-model="languageMode.mono" type="text" :readonly="true")
-    input.b-conf(@click="makeChooseDuo" v-model="languageMode.duo" type="text" :readonly="true")
+    span.optionForm(@click="makeChooseMono") Mono
+    span.optionForm(@click="makeChooseDuo") Duo
 </template>
 
 <script>
@@ -20,43 +17,46 @@ export default {
     isActiveUpload: {
       type: Boolean,
       default: false
+    },
+    formOption: {
+      type: String
+    },
+    index: {
+      type: Number
     }
   },
   data() {
     return {
+      
       dropdownVisible: false,
       languageMode: {
         mono: "Mono",
         duo: "Duo"
-      },
-      hideLanguages: true,
-      chooseLangBlock: this.isActiveUpload
+      }
     };
   },
   methods: {
     showDDLangForm() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    hideDropMenuLang() {
+    outClick() {
       this.dropdownVisible = false;
     },
     makeChooseMono() {
-      this.hideLanguages = true;
-      this.chooseLangBlock = false;
       this.dropdownVisible = false;
-      this.$emit('sendToParentM', this.languageMode.mono);
+      this.$emit('sendToParentM', {form: this.languageMode.mono, index: this.index});
     },
     makeChooseDuo() {
-      this.hideLanguages = false;
-      this.chooseLangBlock = false;
       this.dropdownVisible = false;
-      this.$emit('sendToParentDuo', this.languageMode.duo);
+      this.$emit('sendToParentDuo', {form: this.languageMode.duo, index: this.index});
     }
   },
   directives: {
     ClickOutside
   },
-  computed: {},
+  computed: {
+    
+  },
   watch: {
     isActiveUpload() {
       this.chooseLangBlock = this.isActiveUpload;
@@ -69,24 +69,14 @@ export default {
 .languageFormWrapper {
   display: flex;
   position: relative;
-  width: 34%;
-  flex-basis: 16%;
   border: 1px solid #9a8f80;
+  height: 100%;
   .info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     span {
-      padding-left: 10px;
-    }
-    .first,
-    .second {
-      outline: none;
-      border: none;
-      width: 85px;
-      font-size: 14px;
-      color: #67573e;
       padding-left: 10px;
     }
     .arr {
@@ -107,6 +97,7 @@ export default {
   }
 
   .drop {
+    width: 100%;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -115,10 +106,9 @@ export default {
     z-index: 3;
     box-shadow: 1px 1px 6px #000;
 
-    .b-conf {
+    .optionForm {
       display: flex;
       justify-content: flex-start;
-      width: 115px;
       background-color: #fff;
       padding: 10px 0 10px 10px;
       cursor: pointer;

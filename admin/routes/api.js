@@ -247,7 +247,7 @@ router.get('/languages', (req, res) => {
     .catch(err => {
       console.log(err)
       res.statusCode(500);
-      res.send('Something wrond with DB')
+      res.send('Something wrong with DB')
     })
 });
 
@@ -259,7 +259,7 @@ router.get('/services', (req, res) => {
     .catch(err => {
       console.log(err)
       res.statusCode(500);
-      res.send('Something wrond with DB')
+      res.send('Something wrong with DB')
     })
 });
 

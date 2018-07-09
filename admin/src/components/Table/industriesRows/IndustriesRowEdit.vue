@@ -20,7 +20,7 @@ export default {
     },
     editImg: {
       type: String,
-      default: require("../../../assets/images/Other/save-icon-qa.png")
+      default: require("../../../assets/images/Other/edit-icon-qa.png")
     },
     deleteImg: {
       type: String,

@@ -1,22 +1,27 @@
 <template lang="pug">
 .servicesWrapper
   table
-    tr
-      th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-    .bodyWrapper
-      tr.rbody(v-for="(service, ind) in services" :class='"tr__row-" + (ind + 1)' )
-        td.data1(:class="{outliner: service.crud}")
-          button(:style='{backgroundImage: "url(" + service.icon + ")"}')
-          button.upload1(v-if="service.crud")
-          input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFileIcon")
-        td.data2(:class="{outliner: service.crud}")
+    thead
+      tr
+        th(v-for="(headItem, key) in head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
+    tbody.bodyWrapper
+      tr(v-for="(service, ind) in services")
+        td(:class="{outliner: service.crud}")
+          .data1
+            button(:style='{backgroundImage: "url(" + service.icon + ")"}')
+            button.upload1(v-if="service.crud")
+            input.upload(v-if="service.crud" @change="uploadFile" :readonly="services.crud" type="file" name="uploadedFileIcon")
+        td(:class="{outliner: service.crud}")
           input.inprow2(v-model="service.title" :readonly="!service.crud")
-        LanguageForm(:isActiveUpload="service.crud" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData" :class="{outliner: service.crud}" )
-        CalculationUnite(:isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
-        td.data5(:class="{outliner: service.crud}")
+        td.langForm {{ service.languageForm }}
+          .innerComponent(v-if="service.crud")
+            LanguageForm(:formOption="service.languageForm" :index="ind" :isActiveUpload="service.crud" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData" :class="{outliner: service.crud}" )
+        td.calcUnit {{ service.calculationUnit }}
+          .innerComponent(v-if="service.crud")
+            CalculationUnite(:unitOption="service.calculationUnit" :index="ind" :isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
+        td(:class="{outliner: service.crud}")
           input.inprow2(type="checkbox" :disabled="!service.crud" v-model="service.active" :checked="service.crud")
         td.data6
-          // button.saveB(@click="sendData(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
           button.saveB(@click="checkFields(ind)" :disabled="!service.crud" :class="{data6_active: !service.crud}")
           button.editB(@click="edit(ind)" :disabled="service.crud" :class="{data6_active: service.crud}")
           button.removeB(@click="removeRow(ind)" )
@@ -24,8 +29,8 @@
     .message
       span {{ dataForEditAction.spanTitle }}
       .buttonsBlock
-        button.confirm(@click="confirmEdit(indexToEdit)") {{ dataForEditAction.buttonConf }}
-        button.cancel(@click="cancelEdit(indexToEdit)") {{ dataForEditAction.buttonCanc }}
+        button.confirm(@click="confirmEdit") {{ dataForEditAction.buttonConf }}
+        button.cancel(@click="cancelEdit") {{ dataForEditAction.buttonCanc }}
   .errorsMessage(v-if="showRemoveWarning")
     .message
       span {{ dataForRemoveAction.spanTitle }}
@@ -34,16 +39,13 @@
         button.cancel(@click="cancelRemove(indexToRemove)") {{ dataForRemoveAction.buttonCanc }}
   .errorsMessage(v-if="showEmptyWarning")
     .message
-      span Field 'Name' must not empty!
+      span Field 'Name' must not be empty!
       .buttonsBlock
         button.confirm(@click="ok") Ok
-  button.addService(@click="addService" :disabled="disableButton")
+  button.addService(@click="addService")
 </template>
 
 <script>
-import ServicesSelect from "./servicesRows/ServicesTableSelect";
-import ServicesTableImage from "./servicesRows/ServicesTableImage";
-import ServicesRowEdit from "./servicesRows/ServicesRowEdit";
 import CalculationUnite from "./servicesRows/CalculationUnite";
 import LanguageForm from "./servicesRows/LanguageForm";
 
@@ -51,16 +53,14 @@ export default {
   props: {},
   data() {
     return {
-      table: {
-        head: [
-          { title: "Icon" },
-          { title: "Name" },
-          { title: "Language Form" },
-          { title: "Calculation Unit" },
-          { title: "Active" },
-          { title: "" }
-        ]
-      },
+      head: [
+        { title: "Icon" },
+        { title: "Name" },
+        { title: "Language Form" },
+        { title: "Calculation Unit" },
+        { title: "Active" },
+        { title: "" }
+      ],
       disableButton: false,
       uploadedFileIcon: [],
       nameTitle: "",
@@ -94,6 +94,12 @@ export default {
   },
   methods: {
     addService() {
+      for(let i = 0; i < this.services.length; i++) {
+        if (this.services[i].crud) {
+          this.showEditWarning = true;
+          break;
+        }
+      }
       this.services.push({
         icon: "",
         title: "",
@@ -107,7 +113,6 @@ export default {
         projectType: "regular",
         createdAt: ""
       });
-      this.disableButton = true;
     },
     edit(ind) {
       for (let i = 0; i < this.services.length; i++) {
@@ -119,16 +124,15 @@ export default {
 
       this.services[ind].crud = true;
     },
-    confirmEdit(indexToEdit) {
-      let confirmIndex = this.indexToEdit;
+    confirmEdit() {
       this.showEditWarning = false;
-      this.services[confirmIndex].crud = false;
-      this.sendData(confirmIndex);
+      this.services[this.indexToEdit].crud = false;
+      this.sendData(this.indexToEdit);
     },
-    cancelEdit(indexToEdit) {
-      let cancelIndex = this.indexToEdit;
+    cancelEdit() {
       this.showEditWarning = false;
-      this.services[cancelIndex].crud = false;
+      this.services[this.indexToEdit].crud = false;
+      this.getServices();
     },
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
@@ -139,48 +143,44 @@ export default {
       this.indexToRemove = ind;
     },
     confirmRemove(indexToRemove) {
-      let confirmRIndex = this.indexToRemove;
-      this.services[confirmRIndex].crud = false;
-      let formData = new FormData();
+      this.services[indexToRemove].crud = false;
       let remObj = {
-        serviceRem: this.services[confirmRIndex]._id
+        serviceRem: this.services[indexToRemove]._id
       };
       this.$http
         .post("service/removeservices", remObj)
-        .then(result => {})
+        .then(result => {
+          this.showRemoveWarning = false;
+          this.services.splice(indexToRemove, 1);
+        })
         .catch(err => {
           console.log(err);
         });
-      this.showRemoveWarning = false;
-      this.services = this.services.filter((s, i) => i !== this.indexToRemove);
+      
     },
     cancelRemove(indexToRemove) {
-      let cancelRIndex = this.indexToRemove;
-      this.services[cancelRIndex].crud = false;
+      this.services[indexToRemove].crud = false;
       this.showRemoveWarning = false;
+      this.getServices();
     },
     getLangFormData(data) {
-      this.languageFormValue = data;
+      this.services[data.index].languageForm = data.form;
     },
     getCalcFormData(data) {
-      this.calcFormValue = data;
+      this.services[data.index].calculationUnit = data.unit;
     },
     getActiveStatusFormData(data) {
       this.activeFormValue = data;
     },
     async sendData(idx) {
       let formData = new FormData();
+      formData.append("nameTitle", this.services[idx].title);
+      formData.append("activeFormValue", this.services[idx].active);
+      formData.append("dbIndex", this.services[idx]._id);
+      formData.append("languageFormValue", this.services[idx].languageForm);
+      formData.append("calcFormValue", this.services[idx].calculationUnit);
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
-      let totalData = {
-        nameTitle: this.services[idx].title,
-        activeFormValue: this.services[idx].active,
-        dbIndex: this.services[idx]._id,
-        languageFormValue: this.languageFormValue,
-        calcFormValue: this.calcFormValue
-      };
-      for(let proper in totalData) {
-        formData.append(proper, totalData[proper]);
-      }
+
       this.$http
         .post("service/saveservices", formData)
         .then(result => {
@@ -195,7 +195,6 @@ export default {
     },
     async getServices() {
       const preData = await this.$http.get("api/services");
-      // console.log(preData.body);
       this.services = preData.body;
       this.services.sort((x, y) => {
         if (x.title > y.title) return 1;
@@ -205,7 +204,7 @@ export default {
     checkFields(ind) {
       if (!this.services[ind].title.length) {
         this.showEmptyWarning = true;
-        this.errors.push("Field 'Name' must not empty!");
+        this.errors.push("Field 'Name' must not be empty!");
       }
       if(!this.errors.length){
         this.sendData(ind);
@@ -219,9 +218,6 @@ export default {
 
   computed: {},
   components: {
-    ServicesTableImage,
-    ServicesSelect,
-    ServicesRowEdit,
     CalculationUnite,
     LanguageForm
   },
@@ -239,7 +235,6 @@ export default {
     border: 1px solid #9a8f80;
     font-size: 14px;
     tr {
-      display: flex;
       th {
         background-color: #9a8f80;
         color: #fff;
@@ -249,22 +244,9 @@ export default {
         font-weight: normal;
       }
       .th__col-1 {
-        flex-basis: 11.7%;
-      }
-      .th__col-2 {
-        flex-basis: 27.5%;
-      }
-      .th__col-3 {
-        flex-basis: 16%;
-      }
-      .th__col-4 {
-        flex-basis: 16%;
-      }
-      .th__col-5 {
-        flex-basis: 16%;
+        width: 100px;
       }
       .th__col-6 {
-        flex-basis: 18.5%;
         border-right: none;
       }
       .upload {
@@ -297,7 +279,7 @@ export default {
         height: 22px;
       }
       .editB {
-        background-image: url("../../assets/images/Other/save-icon-qa.png");
+        background-image: url("../../assets/images/Other/edit-icon-qa.png");
         height: 22px;
       }
       .removeB {
@@ -311,35 +293,18 @@ export default {
       }
       .data1 {
         display: flex;
-        flex-basis: 11.5%;
         justify-content: space-between;
         align-items: center;
         position: relative;
       }
-      .data2 {
-        flex-basis: 27.5%;
-        white-space: nowrap;
-        overflow-x: hidden;
-        display: flex;
-        align-items: center;
-      }
-      .data5 {
-        display: flex;
-        flex-basis: 15.7%;
-        align-items: center;
-      }
       .data6 {
-        flex-basis: 18.7%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        text-align: center;
       }
       .inprow2 {
         outline: none;
         border: none;
         font-size: 14px;
         color: #67573e;
-        width: 100%;
       }
     }
     .data6_active {
@@ -385,7 +350,7 @@ export default {
 }
 
 .outliner {
-  box-shadow: -1px 3px 12px #22b6e6;
+  box-shadow: inset 0 0 5px #22b6e6;
 }
 
 .errorsMessage {
@@ -435,6 +400,18 @@ export default {
         cursor: pointer;
       }
     }
+  }
+}
+.langForm, .calcUnit {
+  position: relative;
+  .innerComponent {
+    position: absolute;
+    background-color: #fff;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
   }
 }
 </style>

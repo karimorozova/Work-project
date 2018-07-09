@@ -44,8 +44,6 @@
 </template>
 
 <script>
-import Select from "./rows/TableSelect";
-import RowEdit from "./rows/RowEdit";
 import ISO from "./rows/ISO";
 import ISO1 from "./rows/ISO1";
 
@@ -261,8 +259,6 @@ export default {
     }
   },
   components: {
-    Select,
-    RowEdit,
     ISO,
     ISO1
   },
@@ -344,7 +340,7 @@ export default {
         height: 22px;
       }
       .editB {
-        background-image: url("../../assets/images/Other/save-icon-qa.png");
+        background-image: url("../../assets/images/Other/edit-icon-qa.png");
         height: 22px;
       }
       .removeB {

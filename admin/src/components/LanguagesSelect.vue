@@ -108,7 +108,7 @@ export default {
             }
             &:hover {
                 padding-left: 5px;
-                color: #FFF;
+                // color: #FFF;
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }

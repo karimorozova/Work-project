@@ -25,19 +25,20 @@
     thead
       th(v-for="head in tableHeader") {{ head.title }}
     tbody
-      tr(v-for="info in fullInfo")
+      tr(v-for="(info, index) in fullInfo")
         td {{ info.sourceLanguage }}
         td {{ info.targetLanguage }}
         td {{ info.industry }}
         td
-          input(type="checkbox" :checked="info.active")
-        template(v-for="rate in info.rates")
-          td {{ rate }}
-        td
-          template(v-for="(icon, index) in info.icons") 
-            span.crudIcon {{ icon }}
+          input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
+        template(v-for="(rate, rateInd) in info.rates")
+          td 
+            input.rates(:value="rate" v-model="info.rates[rateInd]" :readonly="info.icons[1].active")
+        td.iconsField
+          template(v-for="(icon, iconIndex) in info.icons") 
+            img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
   .addRow
-    .addRow__plus
+    .addRow__plus(@click="addNewRow")
       span +
 </template>
 
@@ -50,7 +51,7 @@ export default {
   data() {
     return {
       sourceSelect: {lang: "English"},
-      targetSelect: {lang: "Select"},
+      targetSelect: {lang: "All"},
       industrySelect: "All",
       serviceSelect: "Translation",
       heads: [
@@ -61,26 +62,58 @@ export default {
         { title: "" }
       ],
       fullInfo: [
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: ["save", "edit", "del"]}
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
     }
   },
 
   methods: {
-    async getServices() {
-      const preData = await this.$http.get("api/services");
-      this.services = preData.body;
-      this.services.forEach(item => {
-        if(item.title == 'Translation') {
-          item.crud = true
-        } else {
-          item.crud = false
-        }
+    action(index, iconIndex) {
+      if(iconIndex == 0) {
+        this.fullInfo[index].icons[0].active = false;
+        this.fullInfo[index].icons[1].active = true;
+      }
+
+      if(iconIndex == 1) {
+        this.fullInfo[index].icons[1].active = false;
+        this.fullInfo[index].icons[0].active = true;
+      }
+
+      if(iconIndex == 2) {
+        this.fullInfo.splice(index, 1);
+      }
+    },
+    addNewRow() {
+      this.fullInfo.push({
+        sourceLanguage: "", 
+        targetLanguage: "", 
+        industry: "", 
+        active: true, 
+        rates: [' '], 
+        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       })
+    },
+    async getServices() {
+      await this.$http.get("api/services")
+      .then(res => {
+        this.services = res.data.filter(item => {
+          if(item.languageForm == "Duo") {
+            return item;
+          }
+        });
+        this.services.forEach(item => {
+          if(item.title == 'Translation') {
+            item.crud = true
+          } else {
+            item.crud = false
+          }
+        })
+      })
+      .catch(err => console.log(err))
     },
     async getLanguages() {
       await this.$http.get('api/languages')
@@ -157,8 +190,16 @@ th {
 td {
   border: 1px solid #BFB09D;
 }
+.iconsField{
+  text-align: center;
+}
 .crudIcon {
   margin: 0 5px;
+  opacity: .5;
+  cursor: pointer;
+}
+.activeIcon {
+  opacity: 1;
 }
 .filters {
   margin-bottom: 20px;
@@ -232,5 +273,9 @@ td {
       opacity: .7;
     }
   }
+}
+.rates {
+  border: none;
+  outline: none;
 }
 </style>

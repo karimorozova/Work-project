@@ -44,15 +44,14 @@ router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIco
   var iconsArray = [];
   iconsArray = req.files["uploadedFileIcon"];
   var iconPath = "";
-  if(iconsArray !== undefined) {
+  if(iconsArray[0].path) {
     iconPath = iconsArray[0].path;
-    console.log(iconPath);
   }
   var genericArray = [];
   genericArray = req.files["uploadedFile"];
   var genericPath = "";
   var excelName = "";
-  if (genericArray !== undefined) {
+  if (genericArray[0].path) {
     genericPath = genericArray[0].path;
     excelName = genericArray[0].filename;
     moveExcelFile(genericArray[0], "static/" + excelName);
@@ -63,19 +62,13 @@ router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIco
     active: req.body.activeFormValue
   };
   if(nameVal.length ) {
-    objForUpdate = {
-      name: nameVal,
-    };
+    objForUpdate.name = nameVal
   }
   if(iconPath.length ) {
-    objForUpdate = {
-      icon: iconPath
-    };
+    objForUpdate.icon = iconPath
   }
   if(genericPath.length ) {
-    objForUpdate = {
-      generic: genericPath
-    };
+    objForUpdate.generic = genericPath
   }
   console.log(objForUpdate);
   Industries.update({ "_id": langID }, objForUpdate).then(result => {
