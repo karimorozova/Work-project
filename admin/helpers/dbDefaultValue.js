@@ -155,13 +155,13 @@ const servicesDefault = [
 ];
 
 const industriesDefault = [
-    {name: 'CASINO, POKER & IGAMING', icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'CFDS & ONLINE TRADING', icon: '/static/industries/cfds-online-tranding.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx',active: true},
-    {name: 'HOTEL & REAL ESTATES', icon: '/static/industries/hotel-real-estates.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'ICOS & CRYPTOCURRENCY', icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'LEGAL', icon: '/static/industries/legal-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'VIDEO GAMES', icon: '/static/industries/video-games.png', "crud": false, download: '/static/Download-icon.png', generic: ['/static/example.xlsx'], active: true},
-    {name: 'MORE', icon: '/static/industries/more-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
+    {name: 'Casino, Poker & Igaming', icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'CFDs & Online Trading', icon: '/static/industries/cfds-online-tranding.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx',active: true},
+    {name: 'Hotel & Real Estates', icon: '/static/industries/hotel-real-estates.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'ICOs & Cryptocurrency', icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Legal', icon: '/static/industries/legal-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Video Games', icon: '/static/industries/video-games.png', "crud": false, download: '/static/Download-icon.png', generic: ['/static/example.xlsx'], active: true},
+    {name: 'More', icon: '/static/industries/more-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
 ];
 
 const defaultValue = {

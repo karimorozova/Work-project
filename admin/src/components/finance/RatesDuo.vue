@@ -3,40 +3,41 @@
   .filters
     .filters__item.sourceMenu
       label Source Language
-        LanguagesSelect(:selectedLang="sourceSelect")
+        LanguagesSelect(:selectedLang="sourceSelect" @chosenLang="chosenSource")
     .filters__item.targetMenu
       label Target Language
-        LanguagesSelect(:selectedLang="targetSelect")
+        LanguagesSelect(:selectedLang="targetSelect" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
-      .select
-        span.selected {{ industrySelect }}
-        .arrowButton
-          img(src="../../assets/images/open-close-arrow-brown.png")
+        IndustrySelect(:selectedInd="industrySelect" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      .select
-        span.selected {{ serviceSelect }}
-        .arrowButton
-          img(src="../../assets/images/open-close-arrow-brown.png")
+        ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
   .addButton
     input(type="button" value="Add several languages")           
-  table.duoFinance
-    thead
-      th(v-for="head in tableHeader") {{ head.title }}
-    tbody
-      tr(v-for="(info, index) in fullInfo")
-        td {{ info.sourceLanguage }}
-        td {{ info.targetLanguage }}
-        td {{ info.industry }}
-        td
-          input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
-        template(v-for="(rate, rateInd) in info.rates")
-          td 
-            input.rates(:value="rate" v-model="info.rates[rateInd]" :readonly="info.icons[1].active")
-        td.iconsField
-          template(v-for="(icon, iconIndex) in info.icons") 
-            img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
+  .tableData
+    table.duoFinance
+      thead
+        th(v-for="head in tableHeader") {{ head.title }}
+      tbody
+        tr(v-for="(info, index) in fullInfo")
+          td.dropOption {{ info.sourceLanguage }}
+            .innerComponent(v-if="!info.icons[1].active")
+              LanguagesSelect(:selectedLang="{lang: info.sourceLanguage}")
+          td.dropOption {{ info.targetLanguage }}
+            .innerComponent(v-if="!info.icons[1].active")
+              LanguagesSelect(:selectedLang="{lang: info.targetLanguage}")
+          td.dropOption {{ info.industry }}
+            .innerComponent(v-if="!info.icons[1].active")
+              IndustrySelect(:selectedInd="{name: info.industry}")
+          td
+            input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
+          template(v-for="(rate, rateInd) in info.rates")
+            td 
+              input.rates(:value="rate" v-model="info.rates[rateInd]" :readonly="info.icons[1].active")
+          td.iconsField
+            template(v-for="(icon, iconIndex) in info.icons") 
+              img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -45,6 +46,8 @@
 <script>
 import CalculationUnite from "./ratesduoRows/CalculationUnite";
 import LanguagesSelect from "../LanguagesSelect";
+import IndustrySelect from "../IndustrySelect";
+import ServiceSelect from "../ServiceSelect";
 
 export default {
   props: {},
@@ -52,8 +55,8 @@ export default {
     return {
       sourceSelect: {lang: "English"},
       targetSelect: {lang: "All"},
-      industrySelect: "All",
-      serviceSelect: "Translation",
+      industrySelect: {name: "All"},
+      serviceSelect: {title: "Translation"},
       heads: [
         { title: "Source Language" },
         { title: "Target Language" },
@@ -63,8 +66,8 @@ export default {
       ],
       fullInfo: [
         {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.4], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.11], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
         {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
@@ -72,6 +75,18 @@ export default {
   },
 
   methods: {
+    chosenServ(data) {
+      this.serviceSelect = data;
+    },
+    chosenSource(data) {
+      this.sourceSelect = data;
+    },
+    chosenTarget(data) {
+      this.targetSelect = data;
+    },
+    chosenInd(data) {
+      this.industrySelect = data;
+    },
     action(index, iconIndex) {
       if(iconIndex == 0) {
         this.fullInfo[index].icons[0].active = false;
@@ -152,7 +167,9 @@ export default {
   },
   components: {
     CalculationUnite,
-    LanguagesSelect
+    LanguagesSelect,
+    IndustrySelect,
+    ServiceSelect
   },
   mounted() {
     this.getServices();
@@ -170,13 +187,33 @@ export default {
   width: 100%;
   thead, tbody {
     border: 1px solid #BFB09D;
+    display: block;
+    width: 100%;
   }
+  tbody {
+    height: 151px;
+    max-height: 173px;
+    overflow-y: scroll;
+  }
+}
+tr {
+  display: block;
 }
 th, td {
   padding: 5px;
   font-size: 14px;
   font-weight: normal;
   white-space: nowrap;
+  width: 127px;
+  &:last-child {
+    width: 180px;
+  }
+  &:nth-of-type(4) {
+    width: 100px;
+  }
+  &:nth-of-type(3) {
+    width: 180px;
+  }
 }
 th {
   padding-right: 20px;
@@ -184,7 +221,8 @@ th {
   color: white;
   border-right: 1px solid #FFF;
   &:last-child {
-    border-right: none; 
+    border-right: none;
+    width: 196px;
   }
 }
 td {
@@ -212,29 +250,6 @@ td {
     label {
       font-size: 12px;
       margin-bottom: 0;
-    }
-    .select {
-      border: 1px solid #BFB09D;
-      border-radius: 5px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      .selected {
-        border-right: 1px solid #BFB09D;
-        width: 82%;
-        padding: 3px 5px;
-        font-size: 14px;
-        opacity: 0.7;
-      }
-      .arrowButton {
-        width: 18%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        img {
-          padding-right: 2px;
-        }
-      }
     }
   }
 }
@@ -277,5 +292,18 @@ td {
 .rates {
   border: none;
   outline: none;
+  width: 50px;
+}
+.dropOption {
+  position: relative;
+  .innerComponent {
+    position: absolute;
+    background-color: #fff;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+  }
 }
 </style>

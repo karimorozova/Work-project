@@ -1,11 +1,11 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            span.selected {{ selectedLang.lang }}
-            .arrowButton(@click="showLangs")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
-        .drop(v-if="droppedLang")
-            span.drop__item(v-for="(language, index) in languages" @click="changeLang(index)") {{ language.lang }}
+            span.selected {{ selectedServ.title }}
+            .arrowButton(@click="showServs")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
+        .drop(v-if="droppedServ")
+            span.drop__item(v-for="(service, index) in services" @click="changeServ(index)") {{ service.title }}
 </template>
 
 <script>
@@ -13,50 +13,47 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedLang: {
+        selectedServ: {
             type: Object
         }
     },
     data() {
         return {
-            languages: [],
-            droppedLang: false,
+            services: [],
+            droppedServ: false,
             errors: []
         }
     },
     methods: {
-        showLangs() {
-            this.droppedLang = !this.droppedLang;
+        showServs() {
+            this.droppedServ = !this.droppedServ;
         },
-        async getLanguages() {
-            await this.$http.get('api/languages')
+        async getServices() {
+            await this.$http.get('api/services')
             .then(response => {
-                let sortedArray = response.body;
+                let sortedArray = response.data
                 sortedArray.sort( (a,b) => {
-                    if(a.lang < b.lang) return -1;
-                    if(a.lang > b.lang) return 1;
+                    if(a.title < b.title) return -1;
+                    if(a.title > b.title) return 1;
                 });
-                this.languages = sortedArray;
-                if(this.selectedLang.lang == "All") {
-                    this.languages.unshift({lang: "All"})
-                }
+                this.services = sortedArray;
             })
             .catch(e => {
                 this.errors.push(e)
             })
         },
         outClick() {
-            this.droppedLang = false;
+            this.droppedServ = false;
         },
-        changeLang(index) {
-            this.$emit("chosenLang", this.languages[index])
+        changeServ(index) {
+            this.$emit("chosenServ", this.services[index])
         }
     },
     directives: {
         ClickOutside
     },
     mounted () {
-        this.getLanguages()
+        this.getServices()
     }
 }
 </script>
@@ -68,6 +65,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    overflow: hidden;
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -87,16 +85,6 @@ export default {
             transform: rotate(180deg);
         }
     }
-    .innerComponent & {
-        border: none;
-        border-radius: 0;
-        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
-        height: 100%;
-        .selected {
-            padding-top: 5px;
-            opacity: 1;
-        }
-    }
 }
 .dropSelect {
     position: relative;
@@ -110,7 +98,7 @@ export default {
         display: flex;
         flex-direction: column;
         background-color: white;
-        z-index: 15;
+        z-index: 5;
         &__item {
             padding: 2px;
             border-bottom: .5px solid #BFB09D;
@@ -121,12 +109,9 @@ export default {
             }
             &:hover {
                 padding-left: 5px;
-                background-color: rgba(191, 176, 157, 0.363);
+                background-color: rgba(191, 176, 157, 0.5);
             }
         }
-    }
-    .innerComponent & {
-        height: 100%;
     }
 }
 </style>

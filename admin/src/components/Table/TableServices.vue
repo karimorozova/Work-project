@@ -245,6 +245,7 @@ export default {
       }
       .th__col-1 {
         width: 100px;
+        border-left: 2px solid #9a8f80;
       }
       .th__col-6 {
         border-right: none;
@@ -287,7 +288,7 @@ export default {
         height: 22px;
       }
       td {
-        border: 1px solid #9a8f80;
+        border: 2px solid #9a8f80;
         height: 46px;
         padding-left: 10px;
       }

@@ -7,6 +7,7 @@ var unirest = require('unirest');
 const https = require('https');
 const soap = require('soap');
 const Scookie = require('soap-cookie');
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 router.get('/', (req, res) => {
     res.send("portal");
@@ -150,28 +151,55 @@ router.get('/xtmTest', async (req, res) => {
     //     console.log(response.body);
     //     res.send('Done')
     // })
-    var url = 'http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl';
-    soap.createClient(url, (err, client) => {
-        if(err) {
-            console.log(err);
-            res.send('Bad things are happening..')
+    var customerName = "TestSoapCustomer";
+    var str = '<?xml version="1.0" encoding="UTF-8"?>' +
+        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
+    '<soapenv:Header/>' +
+    '<soapenv:Body>' +
+      '<pm:createCustomer>'+
+         '<loginAPI>'+
+            '<client>Pangea</client>' +
+            '<password>pm</password>' +
+            '<userId>3150</userId>' +
+         '</loginAPI>' +
+         '<customer>' + 
+            '<customerBase>' +
+               `<name>${customerName}</name>` +
+            '</customerBase>' +
+         '</customer>' +
+         '<options/>' +
+      '</pm:createCustomer>' +
+    '</soapenv:Body>' +
+    '</soapenv:Envelope>';
+    function createCORSRequest(method, url) {
+        var xhr = new XMLHttpRequest();
+        if ("withCredentials" in xhr) {
+            xhr.open(method, url, false);
+        } else if (typeof XDomainRequest != "undefined") {
+            alert
+            xhr = new XDomainRequest();
+            xhr.open(method, url);
         } else {
-            client.checkUserLogin('pm','pm', (err, result) => {
-                if(err) {
-                    console.log(err)
-                } else {
-                    console.log('Logged in..')
-                    var header = client.lastResponseHeaders;
-                    client.setSecurity(new SCookie(header));
-                }
-            })
-            client.findCustomer('ALL', (err, result) => {
-                console.log('Something is happening...');
-                res.send('done');
-            })
+            console.log("CORS not supported");
+            alert("CORS not supported");
+            xhr = null;
         }
-        
-    })
+        return xhr;
+    }
+    var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+    if(!xhr){
+    console.log("XHR issue");
+    return;
+    }
+
+    xhr.onload = function (){
+    var results = xhr.responseText;
+    console.log(results);
+    res.send('Soap request done!');
+    }
+
+    xhr.setRequestHeader('Content-Type', 'text/xml');
+    xhr.send(str);
 })
 
 
