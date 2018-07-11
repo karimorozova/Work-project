@@ -90,8 +90,8 @@
               .manager__drop-list(v-for="(manager, index) in managers")
                 span.list-item(@click="chooseManager(index)") {{ manager }}
         .buttons
-          input.save(type="submit" value="Save")(@click='saveChanges')
-          input.exit(type="button" value="Exit")(@click='hideOrderInfo')
+          input.save(type="submit" value="Save" @click='saveChanges')
+          input.exit(type="button" value="Exit" @click='hideOrderInfo')
 </template>
 <script>
 
