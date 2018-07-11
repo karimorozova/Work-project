@@ -31,9 +31,9 @@ export default {
 };
 </script>
 
-<style lang="scss">
-body {
-  background-image: url("/assets/images/image-background.jpg");
+<style lang="scss" scoped>
+.restoreMain {
+  background-image: url("../assets/images/image-background.jpg");
 }
 
 .restoreWrapper {

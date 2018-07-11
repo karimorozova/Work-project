@@ -15,6 +15,10 @@ export default {
     props: {
         selectedLang: {
             type: Object
+        },
+        parentIndex: {
+            type: Number,
+            default: 0
         }
     },
     data() {
@@ -49,7 +53,7 @@ export default {
             this.droppedLang = false;
         },
         changeLang(index) {
-            this.$emit("chosenLang", this.languages[index])
+            this.$emit("chosenLang", {data: this.languages[index], index: this.parentIndex})
         }
     },
     directives: {
@@ -85,6 +89,10 @@ export default {
         }
         .reverseIcon {
             transform: rotate(180deg);
+        }
+        .innerComponent & {
+            background-color: white;
+            box-shadow: inset -1px 0 5px #bfb09d;
         }
     }
     .innerComponent & {

@@ -16,24 +16,28 @@
   .addButton
     input(type="button" value="Add several languages")           
   .tableData
-    table.duoFinance
+    table.duoFinance(:style="{width: tableWidth}")
       thead
         th(v-for="head in tableHeader") {{ head.title }}
       tbody
         tr(v-for="(info, index) in fullInfo")
-          td.dropOption {{ info.sourceLanguage }}
+          td.dropOption {{ info.sourceLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
-              LanguagesSelect(:selectedLang="{lang: info.sourceLanguage}")
-          td.dropOption {{ info.targetLanguage }}
+              LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource")
+          td.dropOption {{ info.targetLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
-              LanguagesSelect(:selectedLang="{lang: info.targetLanguage}")
-          td.dropOption {{ info.industry }}
+              LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
+          td.dropOption
+            span(v-if="info.industry.name == 'All'") {{ info.industry.name }}
+            .dropOption__image
+              img(v-if="info.industry.name != 'All'" :src="info.industry.icon")
+              span.titleTooltip(v-if="info.industry.name != 'All'") {{ info.industry.name }}
             .innerComponent(v-if="!info.icons[1].active")
-              IndustrySelect(:selectedInd="{name: info.industry}")
+              IndustrySelect(:parentIndex="index" :selectedInd="info.industry" @chosenInd="changeIndustry")
           td
             input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
           template(v-for="(rate, rateInd) in info.rates")
-            td 
+            td(:class="{addShadow: !info.icons[1].active}") 
               input.rates(:value="rate" v-model="info.rates[rateInd]" :readonly="info.icons[1].active")
           td.iconsField
             template(v-for="(icon, iconIndex) in info.icons") 
@@ -65,27 +69,36 @@ export default {
         { title: "" }
       ],
       fullInfo: [
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.4], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.11], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: "English", targetLanguage: "French", industry: "All", active: true, rates: [0.15], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
     }
   },
 
   methods: {
+    changeSource(data) {
+      this.fullInfo[data.index].sourceLanguage = data.data;
+    },
+    changeTarget(data) {
+      this.fullInfo[data.index].targetLanguage = data.data;
+    },
+    changeIndustry(data) {
+      this.fullInfo[data.index].industry = data.data;
+    },
     chosenServ(data) {
       this.serviceSelect = data;
     },
     chosenSource(data) {
-      this.sourceSelect = data;
+      this.sourceSelect = data.data;
     },
     chosenTarget(data) {
-      this.targetSelect = data;
+      this.targetSelect = data.data;
     },
     chosenInd(data) {
-      this.industrySelect = data;
+      this.industrySelect = data.data;
     },
     action(index, iconIndex) {
       if(iconIndex == 0) {
@@ -103,12 +116,20 @@ export default {
       }
     },
     addNewRow() {
+      let ratesFields = this.fullInfo[0].rates.length;
+      let rates = [];
+      if(ratesFields) {
+        for(let i = 0; i < ratesFields; i++) {
+          rates.push(" ");
+        }
+      }
+
       this.fullInfo.push({
         sourceLanguage: "", 
         targetLanguage: "", 
         industry: "", 
         active: true, 
-        rates: [' '], 
+        rates: rates, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       })
     },
@@ -163,6 +184,15 @@ export default {
         }
       }
       return result;
+    },
+    tableWidth() {
+      let result = 850;
+      let cols = this.tableHeader.length;
+      if(cols > 6) {
+        result += 150;
+      }
+      result += 'px';
+      return result;
     }
   },
   components: {
@@ -181,6 +211,10 @@ export default {
 .duoWrap {
   font-family: MyriadPro;
   min-width: 850px; 
+}
+.tableData {
+  max-width: 850px;
+  overflow-x: scroll;
 }
 .duoFinance {
   border-collapse: collapse;
@@ -201,18 +235,23 @@ tr {
 }
 th, td {
   padding: 5px;
+  padding-right: 0;
   font-size: 14px;
   font-weight: normal;
   white-space: nowrap;
-  width: 127px;
+  width: 150px;
+  &:first-child, &:nth-of-type(2) {
+    min-width: 150px;
+  }
   &:last-child {
-    width: 180px;
+    width: 140px;
   }
   &:nth-of-type(4) {
-    width: 100px;
+    min-width: 67px;
+    width: 67px;
   }
   &:nth-of-type(3) {
-    width: 180px;
+    min-width: 178px;
   }
 }
 th {
@@ -222,7 +261,7 @@ th {
   border-right: 1px solid #FFF;
   &:last-child {
     border-right: none;
-    width: 196px;
+    width: 157px;
   }
 }
 td {
@@ -305,5 +344,25 @@ td {
     right: 0;
     z-index: 5;
   }
+  &__image {
+    max-height: 21px;
+    width: 30px;
+    .titleTooltip {
+      position: absolute;
+      display: none;
+      color: #ff876c;
+      font-size: 12px;
+      top: 8px;
+      left: 35px;
+    }
+    &:hover {
+      .titleTooltip {
+        display: block;
+      }
+    }
+  }
+}
+.addShadow {
+  box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 </style>

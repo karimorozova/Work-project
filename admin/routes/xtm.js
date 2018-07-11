@@ -3,6 +3,7 @@ const fs = require('fs');
 const unirest = require('unirest');
 const https = require('https');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const parser = require('xml2json');
 
 router.get('/newproject', async (req, res) => {
     unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
@@ -112,9 +113,12 @@ router.get('/xtmwords', async (req, res) => {
     }
 
     xhr.onload = function (){
-    var results = xhr.responseText;
-    console.log(results);
-    res.send(results);
+    // var results = '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope' + xhr.responseText.split('<soap:Envelope')[1].split('--uuid')[0];
+    var results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
+    console.log(parser.toJson(results));
+    let object = JSON.parse(parser.toJson(results));
+    let wordsTotal = object.projectMetrics.coreMetrics.totalWords;
+    res.send(wordsTotal);
     }
 
     xhr.setRequestHeader('Content-Type', 'text/xml');

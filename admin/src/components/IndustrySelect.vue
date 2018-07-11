@@ -15,6 +15,10 @@ export default {
     props: {
         selectedInd: {
             type: Object
+        },
+        parentIndex: {
+            type: Number,
+            default: 0
         }
     },
     data() {
@@ -51,7 +55,7 @@ export default {
             this.droppedInd = false;
         },
         changeInd(index) {
-            this.$emit("chosenInd", this.industries[index])
+            this.$emit("chosenInd", {data: this.industries[index], index: this.parentIndex})
         }
     },
     directives: {
@@ -88,6 +92,10 @@ export default {
         }
         .reverseIcon {
             transform: rotate(180deg);
+        }
+        .innerComponent & {
+            background-color: white;
+            box-shadow: inset -1px 0 5px #bfb09d;
         }
     }
     .innerComponent & {
