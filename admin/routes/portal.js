@@ -67,7 +67,7 @@ router.get('/projectFiles', async (request, res) => {
 })
 
 router.get('/downloadProject', (req, res) => {
-    res.send(`http://localhost:3001/project${req.query.projectId}.zip`);
+    res.send(`https://admin.pangea.global/project${req.query.projectId}.zip`);
 })
 
 router.get('/deleteZip', (req, res) => {
@@ -107,7 +107,7 @@ router.get('/taskFiles', async (request, res) => {
 })
 
 router.get('/downloadTask', (req, res) => {
-    res.send(`http://localhost:3001/task${req.query.taskId}.zip`);
+    res.send(`https://admin.pangea.global/task${req.query.taskId}.zip`);
 })
 
 router.get('/job',async (req, res) => {
