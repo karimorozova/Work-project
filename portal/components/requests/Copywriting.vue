@@ -24,7 +24,7 @@
                             span.inner-langs__title Language(s)
                               .inner-langs__select
                                   span.select-text.clarify(:class="{ color: selectLang.length }")
-                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }};  
+                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }}; 
                                       template(v-if="selectLang.length == 0") Select
                                       .span-wrapper(@click.self='showLang')
                                       .icon(:class="{ reverse: langDrop }")

@@ -54,8 +54,8 @@
             span Target Language(s)
             .select.target
               span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                <template v-if="targetSelect.length > 0" v-for="language in targetSelect"> {{ language.lang }} </template> 
-                <template v-if="targetSelect.length == 0">Select</template>
+                template(v-if="targetSelect.length > 0" v-for="language in targetSelect") {{ language.lang }}; 
+                template(v-if="targetSelect.length == 0") Select
                 .wrapper(v-on:click.self='showTargetLang')
                 .icon(:class="{ reverse: targetDrop }")
                   i.fas.fa-caret-down
@@ -273,7 +273,9 @@
               p(v-if='serviceSelect.source') Source:
                 span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
               p Target: 
-                span.choice &nbsp; <template v-for="language of targetSelect" >{{ language.lang }} </template> <template v-if="targetSelect == 0">Select</template>
+                span.choice &nbsp;
+                  template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.lang }}; 
+                  template(v-if="targetSelect.length == 0") Select
             .orderInfo__summary-industry
               span 3
               label INDUSTRY: 
@@ -330,7 +332,7 @@ export default {
   name: 'pang-form',
   head: {
     script: [
-      { src: './hotjar.js' }
+      { src: '/static/hotjar.js' }
     ]
   },
   data () {

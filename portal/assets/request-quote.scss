@@ -254,7 +254,7 @@ body {
       padding-bottom: 5px;
     }
     .source {
-      max-height: 430px;
+      max-height: 453px;
       @media (max-width: 710px) {
         max-height: 250px;
       }
@@ -270,7 +270,7 @@ body {
         padding-right: 10px;
         border-top: 1px solid rgba(0,0,0,0.3);
         position: relative;
-        max-height: 390px;
+        max-height: 400px;
         @media (max-width: 710px) {
           flex-wrap: nowrap;
           overflow: scroll;
@@ -347,7 +347,7 @@ body {
       }
     }
     .target {
-      max-height: 430px;
+      max-height: 453px;
         @media (max-width: 710px) {
           max-height: 250px;
         }
@@ -360,7 +360,7 @@ body {
         flex-wrap: wrap;
         padding: 15px 10px 0;
         border-top: 1px solid rgba(0,0,0,0.3);
-        max-height: 390px;        
+        max-height: 400px;        
         @media (max-width: 710px) {
           flex-wrap: nowrap;
           overflow: scroll;

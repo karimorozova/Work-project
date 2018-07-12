@@ -56,7 +56,7 @@
                         span 2
                         label LANGUAGE:
                         p
-                          span.choice(v-if="selectedLangs.length > 0" v-for="lang in selectedLangs") {{ lang.lang }} 
+                          span.choice(v-if="selectedLangs.length > 0" v-for="lang in selectedLangs") {{ lang.lang }}; 
                           span.choice(v-if="selectedLangs.length == 0") Select
                     .orderInfo__summary-deadline
                         label SUGGESTED DEADLINE

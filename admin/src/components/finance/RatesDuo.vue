@@ -69,10 +69,10 @@ export default {
         { title: "" }
       ],
       fullInfo: [
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
     }
@@ -90,6 +90,11 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
+      for(let i = 0; i < this.services.length; i++) {
+        if(this.services[i].title == this.serviceSelect.title) {
+          this.services[i].crud = !this.services[i].crud;
+        }
+      }
     },
     chosenSource(data) {
       this.sourceSelect = data.data;
@@ -173,6 +178,19 @@ export default {
   },
 
   computed: {
+    rates() {
+      let result = [" "];
+      let count = 0
+      for(let i = 0; i < this.services.length; i++) {
+        if(this.services[i].crud) {
+          count += 1;
+        }
+      }
+      for(let j = 0; j < count; j++) {
+        result.push(" ");
+      }
+      return result;
+    },
     tableHeader() {
       let result = [];
       for(let i = 0; i < 5; i++) {

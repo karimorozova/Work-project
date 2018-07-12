@@ -118,8 +118,8 @@
                 span.choice &nbsp; {{ sourceSelect.name }} <template v-if="!sourceSelect">Select</template>
               p Target: 
                 span.choice &nbsp; 
-                  template(v-for="language of targetSelect") {{ language.name }};
-                  template(v-if="targetSelect == 0") Select
+                  template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.name }}; 
+                  template(v-if="targetSelect.length == 0") Select
             .orderInfo__summary-industry
               span 3
               label INDUSTRY: 
@@ -424,12 +424,20 @@ export default {
           console.log(this.refFiles[i]);
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
-        if(this.sendOption) {
-          const result = await this.$axios.$post('api/request', sendForm);         
-        }
-        if(this.startOption) {
-          const result = await this.$axios.$post('api/project-request', sendForm);
-        }
+
+        /////////////////////////////////////
+        //Start Comment because of XTM testing
+        // if(this.sendOption) {
+        //   const result = await this.$axios.$post('api/request', sendForm);         
+        // }
+        // if(this.startOption) {
+        //   const result = await this.$axios.$post('api/project-request', sendForm);
+        // }
+        //End Comment because of XTM testing
+        ////////////////////////////////////
+
+        const result = await this.$axios.$post('xtm/request', sendForm);
+
         this.clearForm();
     },
     getServices() {
