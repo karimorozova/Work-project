@@ -23,7 +23,7 @@
         tr(v-for="(info, index) in fullInfo")
           td.dropOption {{ info.sourceLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
-              LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource")
+              LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
           td.dropOption {{ info.targetLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
               LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
@@ -36,9 +36,9 @@
               IndustrySelect(:parentIndex="index" :selectedInd="info.industry" @chosenInd="changeIndustry")
           td
             input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
-          template(v-for="(rate, rateInd) in info.rates")
+          template(v-for="(rate, rateInd) in rates")
             td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="rate" v-model="info.rates[rateInd]" :readonly="info.icons[1].active")
+              input.rates(:value="rate.value"  :readonly="info.icons[1].active")
           td.iconsField
             template(v-for="(icon, iconIndex) in info.icons") 
               img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
@@ -69,16 +69,27 @@ export default {
         { title: "" }
       ],
       fullInfo: [
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: this.rates, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
     }
   },
 
   methods: {
+    handleScroll() {
+      let element = document.getElementsByTagName('tbody')[0];
+      element.scrollTop = element.scrollHeight;
+    },
+    scrollDrop(data) {
+      if(data.drop) {
+        let element = document.getElementsByTagName('tbody')[0];
+        setTimeout(() => {
+          element.scrollTop = element.scrollHeight;
+        }, 100)
+      }
+    },
     changeSource(data) {
       this.fullInfo[data.index].sourceLanguage = data.data;
     },
@@ -120,7 +131,7 @@ export default {
         this.fullInfo.splice(index, 1);
       }
     },
-    addNewRow() {
+    async addNewRow() {
       let ratesFields = this.fullInfo[0].rates.length;
       let rates = [];
       if(ratesFields) {
@@ -130,13 +141,16 @@ export default {
       }
 
       this.fullInfo.push({
-        sourceLanguage: "", 
-        targetLanguage: "", 
-        industry: "", 
+        sourceLanguage: {lang: ""}, 
+        targetLanguage: {lang: ""}, 
+        industry: {name: ""}, 
         active: true, 
         rates: rates, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
-      })
+      });
+      setTimeout( () => {
+        this.handleScroll();
+      },100);
     },
     async getServices() {
       await this.$http.get("api/services")
@@ -174,21 +188,21 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
-    },
+    }
   },
-
   computed: {
     rates() {
-      let result = [" "];
-      let count = 0
+      let result = [];
       for(let i = 0; i < this.services.length; i++) {
         if(this.services[i].crud) {
-          count += 1;
+          let title = this.services[i].title;
+          result.push({
+            title: title,
+            value: title + 11 
+            })
         }
       }
-      for(let j = 0; j < count; j++) {
-        result.push(" ");
-      }
+      
       return result;
     },
     tableHeader() {
@@ -207,7 +221,8 @@ export default {
       let result = 850;
       let cols = this.tableHeader.length;
       if(cols > 6) {
-        result += 150;
+        let count = cols - 6;
+        result += 150*count;
       }
       result += 'px';
       return result;
@@ -243,9 +258,10 @@ export default {
     width: 100%;
   }
   tbody {
-    height: 151px;
+    height: 168px;
     max-height: 173px;
     overflow-y: scroll;
+    transition: all 0.3s;
   }
 }
 tr {

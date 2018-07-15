@@ -1,9 +1,10 @@
 <template lang="pug">
 .servicesWrapper
   table
-    tr
-      th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-    .bodyWrapper
+    thead
+      tr
+        th(v-for="(headItem, key) in head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
+    tbody.bodyWrapper
       tr.rbody(v-for="(industry, ind) in industries" :class='"tr__row-" + (ind + 1)' )
         td.data1(:class="{outliner: industry.crud}")
           button.indusryicons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
@@ -13,14 +14,13 @@
           input.inprow2(v-model="industry.name" :readonly="!industry.crud" )
           input.inprow2(v-model="industry._id" type="hidden")
         td.data3(:class="{outliner: industry.crud}")
-          a.hyperlink(:href="industry.generic" download="example.xlsx")
+          a.hyperlink(:href="industry.generic" :download="industry.name + '.xlsx'")
             img(:src="industry.download")
           button.upload1(v-if="industry.crud")
           input.uploadud3(v-if="industry.crud" @change="uploadFileGenTB" :readonly="true" type="file" name="uploadedFile")
         td.data4(:class="{outliner: industry.crud}")
           input.inprow2(type="checkbox" :disabled="!industry.crud" v-model="industry.active" :checked="industry.crud")
         td.data5
-          //button.saveB(@click="sendData(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
           button.saveB(@click="checkFields(ind)" :disabled="!industry.crud" :class="{data5_active: !industry.crud}")
           button.editB(@click="edit(ind)" :disabled="industry.crud" :class="{data5_active: industry.crud}")
           button.removeB(@click="removeRow(ind)" )
@@ -41,7 +41,7 @@
       span Field 'Name' must not empty!
       .buttonsBlock
         button.confirm(@click="ok") Ok
-  button.addIndustries(@click="addIndustry" :disabled="disableButton")
+  button.addIndustries(@click="addIndustry" :disabled='disableButton')
 </template>
 
 <script>
@@ -55,15 +55,13 @@ export default {
   props: {},
   data() {
     return {
-      table: {
-        head: [
-          { title: "Icon" },
-          { title: "Name" },
-          { title: "Generic TB" },
-          { title: "Active" },
-          { title: "" }
-        ]
-      },
+      head: [
+        { title: "Icon" },
+        { title: "Name" },
+        { title: "Generic TB" },
+        { title: "Active" },
+        { title: "" }
+      ],
       uploadedFileIcon: [],
       uploadedFile: [],
       downloadedFile: [],
@@ -101,6 +99,13 @@ export default {
       });
     },
     addIndustry() {
+      for(let i = 0; i < this.industries.length; i++) {
+        if (this.industries[i].crud) {
+          this.showEditWarning = true;
+          this.disableButton = true;
+          break;
+        }
+      }
       this.industries.push({
         icon: "",
         name: "",
@@ -109,7 +114,6 @@ export default {
         download: "",
         crud: true
       });
-      this.disableButton = true;
     },
     edit(ind) {
       for (let i = 0; i < this.industries.length; i++) {
@@ -121,16 +125,17 @@ export default {
 
       this.industries[ind].crud = true;
     },
-    confirmEdit(indexToEdit) {
-      let confirmIndex = this.indexToEdit;
+    confirmEdit() {
       this.showEditWarning = false;
-      this.industries[confirmIndex].crud = false;
-      this.sendData(confirmIndex);
+      this.industries[this.indexToEdit].crud = false;
+      this.sendData(this.indexToEdit);
+      this.disableButton = false;
     },
-    cancelEdit(indexToEdit) {
-      let cancelIndex = this.indexToEdit;
+    cancelEdit() {
       this.showEditWarning = false;
-      this.industries[cancelIndex].crud = false;
+      this.industries[this.indexToEdit].crud = false;
+      this.getIndustries();
+      this.disableButton = false;
     },
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];
@@ -142,12 +147,11 @@ export default {
       this.showRemoveWarning = true;
       this.indexToRemove = ind;
     },
-    confirmRemove(indexToRemove) {
-      let confirmRIndex = this.indexToRemove;
-      this.industries[confirmRIndex].crud = false;
+    confirmRemove() {
+      this.industries[this.indexToRemove].crud = false;
       let formData = new FormData();
       let remObj = {
-        industryRem: this.industries[confirmRIndex]._id
+        industryRem: this.industries[this.indexToRemove]._id
       };
       this.$http
         .post("industry/removeindustries", remObj)
@@ -160,9 +164,8 @@ export default {
         (s, i) => i !== this.indexToRemove
       );
     },
-    cancelRemove(indexToRemove) {
-      let cancelRIndex = this.indexToRemove;
-      this.industries[cancelRIndex].crud = false;
+    cancelRemove() {
+      this.industries[this.indexToRemove].crud = false;
       this.showRemoveWarning = false;
     },
     getLangFormData(data) {
@@ -176,16 +179,12 @@ export default {
     },
     async sendData(idx) {
       let formData = new FormData();
+      formData.append("nameTitle", this.industries[idx].name);
+      formData.append("activeFormValue", this.industries[idx].active);
+      formData.append("dbIndex", this.industries[idx]._id);
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
       formData.append("uploadedFile", this.uploadedFile);
-      let totalData = {
-        nameTitle: this.industries[idx].name,
-        activeFormValue: this.industries[idx].active,
-        dbIndex: this.industries[idx]._id
-      };
-      for (let prop in totalData) {
-        formData.append(prop, totalData[prop]);
-      }
+      
       this.$http
         .post("industry/saveindustries", formData)
         .then(result => {

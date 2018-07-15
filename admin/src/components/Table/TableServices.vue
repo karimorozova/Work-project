@@ -42,7 +42,7 @@
       span Field 'Name' must not be empty!
       .buttonsBlock
         button.confirm(@click="ok") Ok
-  button.addService(@click="addService")
+  button.addService(@click="addService" :disabled="disabledButton")
 </template>
 
 <script>
@@ -97,6 +97,7 @@ export default {
       for(let i = 0; i < this.services.length; i++) {
         if (this.services[i].crud) {
           this.showEditWarning = true;
+          this.disabledButton = true;
           break;
         }
       }
@@ -128,11 +129,13 @@ export default {
       this.showEditWarning = false;
       this.services[this.indexToEdit].crud = false;
       this.sendData(this.indexToEdit);
+      this.disabledButton = false;
     },
     cancelEdit() {
       this.showEditWarning = false;
       this.services[this.indexToEdit].crud = false;
       this.getServices();
+      this.disabledButton = false;
     },
     uploadFile(event) {
       this.uploadedFileIcon = event.target.files[0];

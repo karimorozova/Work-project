@@ -31,6 +31,7 @@ export default {
     methods: {
         showLangs() {
             this.droppedLang = !this.droppedLang;
+            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex})
         },
         async getLanguages() {
             await this.$http.get('api/languages')
@@ -131,6 +132,9 @@ export default {
                 padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.363);
             }
+        }
+        .innerComponent & {
+            max-height: 130px;
         }
     }
     .innerComponent & {

@@ -43,7 +43,7 @@ function moveFile(oldFile, requestId) {
 }
 
 function moveLangIcon(oldFile, date) {
-  var newFile = './dist/static/flags31x21pix/new' + date + oldFile.filename
+  var newFile = './dist/static/flags31x21pix/' + date + '-' + oldFile.filename;
   mv(oldFile.path, newFile, {
     mkdirp: true
   }, function (err) {
@@ -279,12 +279,13 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
   let languageIcon = await Languages.find({'_id': langID});
   var existIcon = languageIcon[0].icon;
   let old = './dist' + languageIcon[0].icon;
+  let date = new Date().getTime();
   if (flag) {
     fs.unlinkSync(old, (err) => {
       console.log('old file removed');
     });
-    moveLangIcon(flag[0], req.body.lastModified);
-    existIcon = `/static/flags31x21pix/new${req.body.lastModified}` + flag[0].filename; 
+    moveLangIcon(flag[0], date);
+    existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
   }
   var objForUpdate = {
     lang: req.body.languageName,
@@ -306,10 +307,11 @@ router.post("/removelanguages", async(req, res) => {
   var langID = req.body.languageRem;
   Languages.deleteOne({"_id": langID})
   .then(result => {
-    // console.log(result);
+    res.send('Removed')
   })
   .catch(err => {
     console.log(err);
+    res.send('Something is wrong...')
   });
 });
 

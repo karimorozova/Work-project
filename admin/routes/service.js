@@ -18,7 +18,7 @@ const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './static/services')
+    cb(null, './dist/uploads/')
   },
   filename: function (req, file, cb) {
     console.log(file)
@@ -26,16 +26,30 @@ var storage = multer.diskStorage({
   }
 });
 
+function moveServiceIcon(oldFile, date) {
+  var newFile = './dist/static/services/' + date + '-' + oldFile.filename
+  mv(oldFile.path, newFile, {
+    mkdirp: true
+  }, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
+  console.log('Flag icon moved!')
+}
+
 var uploadServices = multer({
   storage: storage
 });
 
-router.post("/saveservices", uploadServices.single("uploadedFileIcon"), async (req, res) => {
-  var langID = req.body.dbIndex;
+router.post("/saveservices", uploadServices.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
+  var serviceID = req.body.dbIndex;
+  var serviceIcon = req.files["uploadedFileIcon"];
   var iconPath = "";
-  
-  if (req.file) {
-    iconPath = req.file.path;
+  let date = new Date().getTime();
+  if (serviceIcon) {
+    moveServiceIcon(serviceIcon[0], date);
+    iconPath = `/static/services/${date}-` + serviceIcon[0].filename;
   }
 
   var objForUpdate = {
@@ -54,7 +68,7 @@ router.post("/saveservices", uploadServices.single("uploadedFileIcon"), async (r
     objForUpdate.icon = iconPath;
   }
 
-  Services.update({ "_id": langID }, objForUpdate).then(result => {
+  Services.update({ "_id": serviceID }, objForUpdate).then(result => {
     res.send('Service updated')
   }).catch(err => {
     console.log(err);
@@ -63,8 +77,8 @@ router.post("/saveservices", uploadServices.single("uploadedFileIcon"), async (r
 });
 
 router.post("/removeservices", async (req, res) => {
-  var langID = req.body.serviceRem;
-  Services.deleteOne({ "_id": langID })
+  var serviceID = req.body.serviceRem;
+  Services.deleteOne({ "_id": serviceID })
     .then(result => {
       res.send('Removed');
     })

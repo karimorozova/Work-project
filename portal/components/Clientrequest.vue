@@ -236,6 +236,7 @@ export default {
       languages: [
       
       ],
+      xtmProjects: []
     }
   },
   methods: {
@@ -437,7 +438,8 @@ export default {
         ////////////////////////////////////
 
         const result = await this.$axios.$post('xtm/request', sendForm);
-
+        console.log(result);
+        this.xtmProjects = result;
         this.clearForm();
     },
     getServices() {
@@ -466,7 +468,7 @@ export default {
           accountManager: "None selected",
           brief: this.brief,
           files: this.files,
-          createdAt: Date.now    
+          createdAt: moment(new Date()).format('YYYY MM DD')    
     }
 
       this.errors = [];

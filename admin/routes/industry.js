@@ -18,7 +18,7 @@ const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './static/industries')
+    cb(null, './dist/uploads/')
   },
   filename: function (req, file, cb) {
     console.log(file)
@@ -26,9 +26,23 @@ var storage = multer.diskStorage({
   }
 });
 
-function moveExcelFile(oldFile, newPath) {
+function moveIndustryIcon(oldFile, date) {
+  var newFile = './dist/static/industries/' + date + '-' + oldFile.filename
+  mv(oldFile.path, newFile, {
+    mkdirp: true
+  }, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
+  console.log('Flag icon moved!')
+}
 
-  mv(oldFile.path, newPath, function (err) {
+function moveExcelFile(oldFile, date) {
+  var newFile = './dist/static/industries/exel/' + date + '-' + oldFile.filename
+  mv(oldFile.path, newFile, {
+    mkdirp: true
+  }, function (err) {
     if(err) {
       console.log(err);
     }
@@ -40,21 +54,19 @@ var uploadIndustries = multer({
 });
 
 router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
-  var langID = req.body.dbIndex;
-  var iconsArray = [];
-  iconsArray = req.files["uploadedFileIcon"];
+  var industryID = req.body.dbIndex;
+  var iconsArray = req.files["uploadedFileIcon"];
   var iconPath = "";
-  if(iconsArray[0].path) {
-    iconPath = iconsArray[0].path;
+  let date = new Date().getTime();
+  if(iconsArray) {
+    moveIndustryIcon(iconsArray[0], date);
+    iconPath = `/static/industries/${date}-` + iconsArray[0].filename;
   }
-  var genericArray = [];
-  genericArray = req.files["uploadedFile"];
+  var genericArray = req.files["uploadedFile"];
   var genericPath = "";
-  var excelName = "";
-  if (genericArray[0].path) {
-    genericPath = genericArray[0].path;
-    excelName = genericArray[0].filename;
-    moveExcelFile(genericArray[0], "static/" + excelName);
+  if (genericArray) {
+    moveExcelFile(genericArray[0], date);
+    genericPath = `/static/industries/exel/${date}` + '-' + genericArray[0].filename;    
   }
   var nameVal = req.body.nameTitle;
 
@@ -64,16 +76,15 @@ router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIco
   if(nameVal.length ) {
     objForUpdate.name = nameVal
   }
-  if(iconPath.length ) {
+  if(iconPath) {
     objForUpdate.icon = iconPath
   }
-  if(genericPath.length ) {
+  if(genericPath) {
     objForUpdate.generic = genericPath
   }
   console.log(objForUpdate);
-  Industries.update({ "_id": langID }, objForUpdate).then(result => {
+  Industries.update({ "_id": industryID }, objForUpdate).then(result => {
     res.send('done');
-    // console.log(result);
   }).catch(err => {
     console.log(err);
     res.send('Something wrong...')
@@ -81,10 +92,10 @@ router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIco
 });
 
 router.post("/removeindustries", async (req, res) => {
-  var langID = req.body.industryRem;
-  Industries.deleteOne({ "_id": langID })
+  var industryID = req.body.industryRem;
+  Industries.deleteOne({ "_id": industryID })
     .then(result => {
-      res.send();
+      res.send('Removed');
       // console.log(result);
     })
     .catch(err => {

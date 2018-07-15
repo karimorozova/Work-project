@@ -134,6 +134,9 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
+        .innerComponent & {
+            height: 130px;
+        }
     }
     .innerComponent & {
         height: 100%;
