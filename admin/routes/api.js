@@ -9,7 +9,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { sendMailPortal } = require('../utils/mailhandlerportal')
-const { Requests, Languages, Services, Industries } = require('../models');
+const { Requests, Projects, Languages, Services, Industries } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
 const fileType = require('file-type');
@@ -238,6 +238,17 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
 });
 
+router.get('/allprojects', (req, res) => {
+  Projects.find()
+    .then(result => {
+      res.send(result)
+    })
+    .catch(err => {
+      console.log(err);
+      res.statusCode(500);
+      res.send('Something wrong with DB!')
+    })
+})
 
 router.get('/languages', (req, res) => {
   Languages.find()

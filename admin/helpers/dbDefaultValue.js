@@ -164,9 +164,12 @@ const industriesDefault = [
     {name: 'More', icon: '/static/industries/more-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
 ];
 
+const projectsDefault = [];
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
+    projectsDefault,
     usersDefault,
     servicesDefault,
     industriesDefault

@@ -1,6 +1,7 @@
 const {
   Languages,
   Requests,
+  Projects,
   User,
   Services,
   Industries
@@ -8,6 +9,7 @@ const {
 const {
   languagesDefault,
   requestsDefault,
+  projectsDefault,
   usersDefault,
   servicesDefault,
   industriesDefault
@@ -83,7 +85,26 @@ function requests() {
     })
 }
 
+function projects() {
+  Projects.find({})
+    .then(projects => {
+      if (!projects.length) {
+        for (const proj of projectsDefault) {
+          new Projects(proj).save()
+            .then((res) => {
+              //console.log(`Project: with name ${proj.projectId} was save!`)
+            })
+            .catch((err) => {
+              console.log(`Project: with id ${proj.projectId} wasn't save. Because of ${err.message}`)
+            });
+        }
 
+      }
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
 
 function users() {
   User.find({})
@@ -142,6 +163,7 @@ function industries() {
 async function checkCollections() {
   await languages();
   await requests();
+  await projects();
   await users();
   await services();
   await industries();

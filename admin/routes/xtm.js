@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const multer = require('multer');
-const { Requests, Languages, Services, Industries } = require('../models');
+const { Requests, Projects, Languages, Services, Industries } = require('../models');
 const fs = require('fs');
 const mv = require('mv');
 const unirest = require('unirest');
@@ -10,7 +10,7 @@ const parser = require('xml2json');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './dist/reqfiles/11111')
+      cb(null, './dist/reqfiles/xtm')
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname)
@@ -32,16 +32,19 @@ function moveFile(oldFile, requestId) {
 }
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
+    let project = new Projects(req.body);
+    project.projectId = req.body.createdAt + ' - [01]';
     let xtmData = req.body;
-    let date = xtmData.createdAt
-    let sourcelang = JSON.parse(xtmData.sourceLanguage);
+    let date = xtmData.createdAt;
+    let sourceLanguage = JSON.parse(xtmData.sourceLanguage);
     let targetLanguages = JSON.parse(xtmData.targetLanguages);
-    let symbol = sourcelang.symbol.split('-');
+
+    let symbol = sourceLanguage.symbol.split('-');
     let source = symbol[0].toLowerCase() + '_' + symbol[1];
     let target = [];
 
-    const detailFiles = await req.files["detailFiles"];
-    const refFiles = await req.files["refFiles"];
+    const detailFiles = req.files["detailFiles"];
+    const refFiles = req.files["refFiles"];
     if (detailFiles) {
         var detFile = detailFiles[0].path;
     }
@@ -52,7 +55,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     }
     var ids = [];
     for(let i = 0; i < target.length; i++) {
-        let name = await date + ' [0' + (i + 1) +'] ' + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
+        let name = date + ' [01] ' + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
     unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'multipart/form-data'}) 
@@ -62,16 +65,19 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
         .field('targetLanguages', target[i])
         .field('workflowId', 2890)
         .attach('translationFiles[0].file', detFile)
-        .end( (response) => {
-            console.log(response.body);
+        .end( async (response) => {
             ids.push(response.body.projectId);
+            project.jobs.push({id: response.body.projectId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
+            console.log(ids);
             if(target.length - i == 1) {
-                res.send(ids);
+                await project.save();
+                let finalArray = await ids;
+                res.send(finalArray);
                 setTimeout(() => {
                     fs.unlink(detFile, (err) => console.log(err));
                 },2000);
             }
-        })   
+        })  
     }
 })
 
@@ -100,8 +106,8 @@ router.get('/metrics', async (req, res) => {
         })
 })
 
-router.get('/customer-projects', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects?customerIds=23')
+router.get('/status', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/status?fetchLevel=STEPS')
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
@@ -110,6 +116,45 @@ router.get('/customer-projects', async (req, res) => {
         })
 })
 
+router.get('/estimates', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/proposal')
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'})
+        .end( (response) => {
+            console.log(response.body);
+        res.send(response.body)
+        })
+})
+
+router.get('/jobs-metrics', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/metrics/jobs?jobIds=5531')
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'})
+        .end( (response) => {
+            console.log(response.body);
+        res.send(response.body)
+        })
+})
+
+router.get('/customer-projects', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects?customerIds=5041&Ids=5500')
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'})
+        .end( (response) => {
+            console.log(response.body);
+        res.send(response.body)
+        })
+})
+
+router.get('/projects-analysis', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/analysis?fetchLevel=JOBS')
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'})
+        .end( (response) => {
+            console.log(response.body);
+        res.send(response.body)
+        })
+})
 
 router.get('/newcustomer', async (req, res) => {
     var customerName = "TestSoapCustomer";
@@ -224,15 +269,15 @@ router.get('/editor', async (req, res) => {
       '<pm:obtainXTMEditorLink>' +
          '<loginAPI>' +
             '<client>Pangea</client>' +
-            '<password>ling</password>' +
-            '<userId>3155</userId>' +
+            '<password>pm</password>' +
+            '<userId>3150</userId>' +
          '</loginAPI>' +
          '<editor>' +
             '<customerDescriptor>' +
                '<id>23</id>' +
             '</customerDescriptor>' +
             '<jobDescriptor>' +
-               '<id>5531</id>' +
+               '<id>5529</id>' +
             '</jobDescriptor>' +
             '<userDescriptor>' +
                '<id>3150</id>' +
@@ -243,11 +288,9 @@ router.get('/editor', async (req, res) => {
             '</userOptions>' +
             '<workflowOptions>' +
                '<currentWorkflowStep>' +
-                  '<id>2890</id>' +
-                  '<workflowStep>Translate</workflowStep>' +
-               '</currentWorkflowStep>' +
-               '<lqaDecisionType>YES_SAVING_RESULTS_FOR_USER</lqaDecisionType>' +
-               '<manageType>FINISH</manageType>' + 
+                  '<id>2885</id>' +
+                '</currentWorkflowStep>' +
+            '</workflowOptions>' + 
          '</editor>' +
          '<options/>' +
       '</pm:obtainXTMEditorLink>' +
@@ -276,8 +319,11 @@ router.get('/editor', async (req, res) => {
     }
 
     xhr.onload = function (){
-    var results = xhr.responseText;
-    res.send(results);
+    var results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
+    console.log(parser.toJson(results));
+    let object = JSON.parse(parser.toJson(results));
+    let editorLink = object.editorURL;
+    res.send(editorLink);
     }
 
     xhr.setRequestHeader('Content-Type', 'text/xml');
