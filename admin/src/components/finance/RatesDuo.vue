@@ -74,6 +74,7 @@ export default {
         {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
+      ratesArray: []
     }
   },
 
@@ -157,6 +158,15 @@ export default {
       .then(res => {
         this.services = res.data.filter(item => {
           if(item.languageForm == "Duo") {
+            let title = item.title;
+            this.ratesArray.push({
+              title : [{
+                source: '',
+                target: '',
+                industry: '',
+                value: ''
+              }]
+            })
             return item;
           }
         });

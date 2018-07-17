@@ -33,6 +33,7 @@ function moveFile(oldFile, requestId) {
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
     let project = new Projects(req.body);
+    project.status = "Open";
     project.projectId = req.body.createdAt + ' - [01]';
     let xtmData = req.body;
     let date = xtmData.createdAt;
@@ -68,7 +69,6 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
         .end( async (response) => {
             ids.push(response.body.projectId);
             project.jobs.push({id: response.body.projectId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
-            console.log(ids);
             if(target.length - i == 1) {
                 await project.save();
                 let finalArray = await ids;
@@ -97,7 +97,8 @@ router.get('/newproject', async (req, res) => {
 })
 
 router.get('/metrics', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/metrics')
+    let projectId = parseInt(req.query.projectId);
+    unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
@@ -262,6 +263,7 @@ router.get('/xtmwords', async (req, res) => {
 })
 
 router.get('/editor', async (req, res) => {
+    let jobId = parseInt(req.query.jobId);
     let str = '<?xml version="1.0" encoding="UTF-8"?>' +
     '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
    '<soapenv:Header/>' +
@@ -277,7 +279,7 @@ router.get('/editor', async (req, res) => {
                '<id>23</id>' +
             '</customerDescriptor>' +
             '<jobDescriptor>' +
-               '<id>5529</id>' +
+               `<id>${jobId}</id>` +
             '</jobDescriptor>' +
             '<userDescriptor>' +
                '<id>3150</id>' +

@@ -50,6 +50,10 @@ const ServicesSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    rates: {
+        type: Array,
+        default: [],
     }
 });
 
