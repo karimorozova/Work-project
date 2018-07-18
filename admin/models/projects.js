@@ -6,6 +6,10 @@ const RequestSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  xtmId: {
+    type: Number,
+    default: 0
+  },
   projectName: {
     type: String,
     default: '',

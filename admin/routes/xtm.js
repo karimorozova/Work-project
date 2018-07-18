@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
+const { saveJobs } = require('../models/xtmApi');
 const fs = require('fs');
 const mv = require('mv');
 const unirest = require('unirest');
@@ -34,7 +35,7 @@ function moveFile(oldFile, requestId) {
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
     let project = new Projects(req.body);
     project.status = "Open";
-    project.projectId = req.body.createdAt + ' - [01]';
+    project.projectId = req.body.createdAt + ' [01]';
     let xtmData = req.body;
     let date = xtmData.createdAt;
     let sourceLanguage = JSON.parse(xtmData.sourceLanguage);
@@ -57,29 +58,43 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     var ids = [];
     for(let i = 0; i < target.length; i++) {
         let name = date + ' [01] ' + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
-    unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
-        'Content-Type': 'multipart/form-data'}) 
-        .field('customerId', 23)
-        .field('name',  name)
-        .field('sourceLanguage', source)
-        .field('targetLanguages', target[i])
-        .field('workflowId', 2890)
-        .attach('translationFiles[0].file', detFile)
-        .end( async (response) => {
-            ids.push(response.body.projectId);
-            project.jobs.push({id: response.body.projectId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
-            if(target.length - i == 1) {
-                await project.save();
-                let finalArray = await ids;
-                res.send(finalArray);
-                setTimeout(() => {
-                    fs.unlink(detFile, (err) => console.log(err));
-                },2000);
-            }
-        })  
+        let proj = await saveJobs({
+            name: name,
+            source: source,
+            target: target[i],
+            file: detFile 
+        });
+        project.xtmId = await proj.body.projectId;
+        await ids.push(proj.body.jobs[0].jobId);
+        await project.jobs.push({id: proj.body.jobs[0].jobId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
+        if(target.length - i == 1) {
+            await project.save();
+            let finalArray = await ids;
+            res.send(finalArray);
+            setTimeout(() => {
+                fs.unlink(detFile, (err) => {
+                    if(err) {
+                        console.log(err)
+                    }
+                });
+            },2000);
+        }    
     }
 })
+
+router.post('/saveproject', async (req, res) => {
+    let project = req.body;
+    let projectId = req.body.projectId;
+    Projects.update({projectId: projectId}, project)
+    .then(result => {
+        res.send(result)
+    })
+    .catch(err => {
+        console.log(err)
+        res.send('Something wrong...')
+    })
+})
+
 
 router.get('/newproject', async (req, res) => {
     unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
@@ -91,7 +106,7 @@ router.get('/newproject', async (req, res) => {
         .field('targetLanguages', 'en_GB')
         .field('workflowId', 2890)
         .end( (response) => {
-            console.log(response.body);
+            // console.log(response.body);
         res.send('Done')
         })
 })
@@ -102,7 +117,7 @@ router.get('/metrics', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
+            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -112,7 +127,7 @@ router.get('/status', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
+            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -122,7 +137,7 @@ router.get('/estimates', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
+            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -152,7 +167,7 @@ router.get('/projects-analysis', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
+            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -252,7 +267,7 @@ router.get('/xtmwords', async (req, res) => {
     xhr.onload = function (){
     // var results = '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope' + xhr.responseText.split('<soap:Envelope')[1].split('--uuid')[0];
     var results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
-    console.log(parser.toJson(results));
+    // console.log(parser.toJson(results));
     let object = JSON.parse(parser.toJson(results));
     let wordsTotal = object.projectMetrics.coreMetrics.totalWords;
     res.send(wordsTotal);
@@ -322,7 +337,7 @@ router.get('/editor', async (req, res) => {
 
     xhr.onload = function (){
     var results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
-    console.log(parser.toJson(results));
+    // console.log(parser.toJson(results));
     let object = JSON.parse(parser.toJson(results));
     let editorLink = object.editorURL;
     res.send(editorLink);

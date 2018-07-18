@@ -25,11 +25,13 @@
                     th Language Pair
                     th Status
                     th Wordcount
+                    th Cost
             tbody
                 tr(v-for="(job, i) in project.jobs" @click="edit(i)")
                     td {{ job.sourceLanguage }} >> {{ job.targetLanguage }}
                     td {{ job.status }}
                     td {{ job.wordcount }}
+                    td {{ job.cost }}
 </template>
 
 <script>
@@ -42,38 +44,21 @@ export default {
     },
     methods: {
         async getProjects() {
-            this.$axios.$get('/api/allprojects')
-            .then(res => {
-                this.project = res[0];
-                this.project.createdAt = moment(this.project.createdAt).format('DD-MM-YYYY');
-                this.project.date = moment(this.project.date).format('DD-MM-YYYY');
-            })
-            .then(res => {
-                if(this.project.jobs) {
-                    this.$axios.$get(`/xtm/xtmwords?projectId=${this.project.jobs[0].id}`)
-                    .then(res => {
-                        this.project.jobs.forEach(item => {
-                            item.wordcount = res;
-                        });
-                    })
-                    .catch(err => console.log(err));
-                }
-            })
-            .then(res => {
-                for(let i = 0; i < this.project.jobs.length; i++) {
-                    this.$axios.$get(`/xtm/metrics?projectId=${this.project.jobs[i].id}`)
-                    .then(res => {
-                        this.project.jobs[i].id = res[0].jobsMetrics[0].jobId;
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
+            let projectsArray = await this.$axios.$get('/api/allprojects');
+            this.project = projectsArray[0];
+                // this.project.createdAt = moment(this.project.createdAt).format('DD-MM-YYYY');
+                // this.project.date = moment(this.project.date).format('DD-MM-YYYY');
+            if(this.project.jobs) {
+                let words = await this.$axios.$get(`/xtm/xtmwords?projectId=${this.project.xtmId}`);
+                this.project.jobs.forEach(item => {
+                    item.wordcount = words;
+                });
+                 
+            let saveProject = await this.$axios.$post('/xtm/saveproject', this.project);
+            let jobsCosts = await this.$axios.$post('/service/jobcost', this.project);
+            projectsArray = await this.$axios.$get('/api/allprojects');
+            this.project = projectsArray[0];
+            }
         },
         async edit(i) {
             let jobId = this.project.jobs[i].id;

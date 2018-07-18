@@ -36,9 +36,9 @@
               IndustrySelect(:parentIndex="index" :selectedInd="info.industry" @chosenInd="changeIndustry")
           td
             input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
-          template(v-for="(rate, rateInd) in rates")
-            td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="rate.value"  :readonly="info.icons[1].active")
+          // template(v-for="(rate, rateInd) in rates")
+          td(:class="{addShadow: !info.icons[1].active}") 
+            input.rates(:value="info.rates.value" v-model="info.rates.value" :readonly="info.icons[1].active")
           td.iconsField
             template(v-for="(icon, iconIndex) in info.icons") 
               img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
@@ -69,9 +69,9 @@ export default {
         { title: "" }
       ],
       fullInfo: [
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "French"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Spanish"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English"}, targetLanguage: {lang: "Russian"}, industry: {name: "All"}, active: true, rates: [" "], icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
+        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "French (France)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "Arabic (Saudi Arabia)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
+        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "German (Germany)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
       ],
       services: [],
       ratesArray: []
@@ -117,10 +117,17 @@ export default {
     chosenInd(data) {
       this.industrySelect = data.data;
     },
-    action(index, iconIndex) {
+    async action(index, iconIndex) {
       if(iconIndex == 0) {
         this.fullInfo[index].icons[0].active = false;
         this.fullInfo[index].icons[1].active = true;
+        this.$http.post('/service/rates', this.fullInfo[index])
+        .then(res => {
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
       }
 
       if(iconIndex == 1) {
