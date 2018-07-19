@@ -20,25 +20,28 @@
       thead
         th(v-for="head in tableHeader") {{ head.title }}
       tbody
-        tr(v-for="(info, index) in fullInfo")
-          td.dropOption {{ info.sourceLanguage.lang }}
+        tr(v-for="(info, index) in testInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
+          td.dropOption 
+            template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.sourceLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
               LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-          td.dropOption {{ info.targetLanguage.lang }}
+          td.dropOption 
+            template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.targetLanguage.lang }}
             .innerComponent(v-if="!info.icons[1].active")
               LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
           td.dropOption
-            span(v-if="info.industry.name == 'All'") {{ info.industry.name }}
+            span(v-if="industrySelect.name == 'All'") All
             .dropOption__image
-              img(v-if="info.industry.name != 'All'" :src="info.industry.icon")
-              span.titleTooltip(v-if="info.industry.name != 'All'") {{ info.industry.name }}
+              img(v-if="industrySelect.name != 'All'" :src="info.industry.icon")
+              span.titleTooltip(v-if="industrySelect.name != 'All'")
+                template(v-for="ind in info.industry") {{ ind.name }}
             .innerComponent(v-if="!info.icons[1].active")
               IndustrySelect(:parentIndex="index" :selectedInd="info.industry" @chosenInd="changeIndustry")
           td
-            input(type="checkbox" :checked="info.active" v-model="fullInfo[index].active" :disabled="info.icons[1].active")
+            input(type="checkbox" :checked="info.active" :disabled="info.icons[1].active")
           // template(v-for="(rate, rateInd) in rates")
           td(:class="{addShadow: !info.icons[1].active}") 
-            input.rates(:value="info.rates.value" v-model="info.rates.value" :readonly="info.icons[1].active")
+            input.rates(:value="info.industry[0].value" :readonly="info.icons[1].active")
           td.iconsField
             template(v-for="(icon, iconIndex) in info.icons") 
               img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
@@ -68,6 +71,7 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
+      testInfo: [],
       fullInfo: [
         {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "French (France)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
         {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "Arabic (Saudi Arabia)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
@@ -180,6 +184,19 @@ export default {
         this.services.forEach(item => {
           if(item.title == 'Translation') {
             item.crud = true
+            for(let i = 0; i < item.rates.length; i++) {
+              this.testInfo.push({
+                sourceLanguage: item.rates[i].source,
+                targetLanguage: item.rates[i].target,
+                industry: item.rates[i].industry,
+                active: true,
+                icons: [
+                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                ]
+              })
+            }
           } else {
             item.crud = false
           }
@@ -235,7 +252,7 @@ export default {
       return result;
     },
     tableWidth() {
-      let result = 850;
+      let result = 870;
       let cols = this.tableHeader.length;
       if(cols > 6) {
         let count = cols - 6;
@@ -260,10 +277,10 @@ export default {
 <style lang="scss" scoped>
 .duoWrap {
   font-family: MyriadPro;
-  min-width: 850px; 
+  min-width: 870px; 
 }
 .tableData {
-  max-width: 850px;
+  max-width: 870px;
   overflow-x: scroll;
 }
 .duoFinance {
@@ -292,7 +309,7 @@ th, td {
   white-space: nowrap;
   width: 150px;
   &:first-child, &:nth-of-type(2) {
-    min-width: 150px;
+    min-width: 160px;
   }
   &:last-child {
     width: 140px;

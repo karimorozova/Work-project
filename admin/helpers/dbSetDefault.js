@@ -4,7 +4,8 @@ const {
   Projects,
   User,
   Services,
-  Industries
+  Industries,
+  Ratesduo
 } = require('../models');
 const {
   languagesDefault,
@@ -12,7 +13,8 @@ const {
   projectsDefault,
   usersDefault,
   servicesDefault,
-  industriesDefault
+  industriesDefault,
+  ratesduoDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
@@ -146,7 +148,6 @@ function services() {
 
 function industries() {
   Industries.find({}).then(industries => {
-    //console.log("industries length :  " + industriesDefault.length);
     if (!industries.length) {
       for (var industry of industriesDefault) {
         console.log(industry.name);
@@ -160,13 +161,84 @@ function industries() {
   });
 }
 
+function allLanguages() {
+  let result = [];
+  for(let i = 0; i < languagesDefault.length; i++) {
+    result.push(languagesDefault[i]);
+    if(languagesDefault[i].dialects) {
+      for(let j = 0; j < languagesDefault[i].dialects.length; j++) {
+        result.push(languagesDefault[i].dialects[j])
+      }
+    }
+  }
+  return result;
+}
+
+async function ratesduo(titleName) {
+  let service = await servicesDefault.find(item => {
+    return item.title == titleName
+  });
+  let allLangs = await allLanguages();
+  let ratesSource = await allLangs.filter(item => {
+    if(service.languages.source.indexOf(item.symbol) > 0) {
+      return item;
+    }
+  });
+
+  let ratesTarget = await allLangs.filter(item => {
+    if(service.languages.target.indexOf(item.symbol) > 0) {
+      return item;
+    }
+  });
+
+  let industries = await industriesDefault.map(item => {
+    if(titleName == 'Translation') {
+      item.rate = 0.1;
+    }
+    if(titleName == 'Proofing') {
+      item.rate = 0.025;
+    }
+    if(titleName == 'QA and Testing') {
+      item.rate = 0.05;
+    }
+    return item
+  })
+
+  for(let i = 0; i < ratesSource.length; i++) {
+    if(ratesSource[i].symbol == 'EN' || ratesSource[i].symbol == 'EN-GB' || ratesSource[i].symbol == 'EN-US') {
+      for(let j = 0; j < ratesTarget.length; j++) {
+        service.rates.push({
+          source: ratesSource[i],
+          target: ratesTarget[j],
+          industry: industries
+        })
+      }
+    }
+    else {
+      let targetLang = ratesTarget.find(item => {return item.symbol == 'EN-GB'});
+      service.rates.push({
+        source: ratesSource[i],
+        target: targetLang,
+        industry: industries
+      })
+    }
+  }
+  Services.update({'title': titleName}, service)
+  .then(res => {
+    console.log(`Rates to service ${titleName} added`)
+  })  
+}
+
 async function checkCollections() {
   await languages();
   await requests();
   await projects();
   await users();
-  await services();
   await industries();
+  await services();
+  await ratesduo("Translation");
+  await ratesduo("Proofing");
+  await ratesduo("QA and Testing");
 }
 
 module.exports = checkCollections();

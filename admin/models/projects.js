@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const RequestSchema = new mongoose.Schema({
+const ProjectsSchema = new mongoose.Schema({
   projectId: {
     type: String,
     default: '',
@@ -82,6 +82,6 @@ const RequestSchema = new mongoose.Schema({
   }
 });
 
-const Projects = mongoose.model('Projects', RequestSchema);
+const Projects = mongoose.model('Projects', ProjectsSchema);
 
 module.exports = Projects;

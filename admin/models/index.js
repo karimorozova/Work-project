@@ -5,6 +5,7 @@ const User = require('./user');
 const Services = require('./services');
 const Reports = require('./reports');
 const Industries = require('./industries');
+const Ratesduo = require('./ratesduo');
 
 const Models = {
     Languages,
@@ -14,6 +15,7 @@ const Models = {
     Services,
     Reports,
     Industries,
+    Ratesduo
 };
 
 module.exports = Models;
