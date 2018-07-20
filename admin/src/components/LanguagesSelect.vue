@@ -90,6 +90,7 @@ export default {
         padding: 3px 5px;
         font-size: 14px;
         opacity: 0.7;
+        height: 31px;
     }
     .arrowButton {
         width: 18%;
@@ -140,7 +141,7 @@ export default {
                 border: none;
             }
             &:hover {
-                padding-left: 5px;
+                // padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.363);
             }
         }

@@ -9,7 +9,7 @@
         LanguagesSelect(:selectedLang="targetSelect" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
-        IndustrySelect(:selectedInd="industrySelect" @chosenInd="chosenInd")
+        IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
         ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
@@ -20,31 +20,30 @@
       thead
         th(v-for="head in tableHeader") {{ head.title }}
       tbody
-        tr(v-for="(info, index) in testInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
-          td.dropOption 
-            template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.sourceLanguage.lang }}
-            .innerComponent(v-if="!info.icons[1].active")
-              LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-          td.dropOption 
-            template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.targetLanguage.lang }}
-            .innerComponent(v-if="!info.icons[1].active")
-              LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
-          td.dropOption
-            span(v-if="industrySelect.name == 'All'") All
-            .dropOption__image
-              img(v-if="industrySelect.name != 'All'" :src="info.industry.icon")
-              span.titleTooltip(v-if="industrySelect.name != 'All'")
-                template(v-for="ind in info.industry") {{ ind.name }}
-            .innerComponent(v-if="!info.icons[1].active")
-              IndustrySelect(:parentIndex="index" :selectedInd="info.industry" @chosenInd="changeIndustry")
-          td
-            input(type="checkbox" :checked="info.active" :disabled="info.icons[1].active")
-          // template(v-for="(rate, rateInd) in rates")
-          td(:class="{addShadow: !info.icons[1].active}") 
-            input.rates(:value="info.industry[0].value" :readonly="info.icons[1].active")
-          td.iconsField
-            template(v-for="(icon, iconIndex) in info.icons") 
-              img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
+        template(v-for="(info, index) in testInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
+          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
+            td.dropOption 
+              template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.sourceLanguage.lang }}
+              .innerComponent(v-if="!info.icons[1].active")
+                LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
+            td.dropOption 
+              template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.targetLanguage.lang }}
+              .innerComponent(v-if="!info.icons[1].active")
+                LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
+            td.dropOption              
+              span(v-if="!indus.icon") {{ indus.name }}
+              .dropOption__image
+                img(v-if="indus.icon" :src="indus.icon")
+                span.titleTooltip {{ indus.name }}
+              .innerComponent(v-if="!info.icons[1].active")
+                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry")
+            td
+              input(type="checkbox" :checked="info.active" :disabled="info.icons[1].active")
+            td(:class="{addShadow: !info.icons[1].active}") 
+              input.rates(:value="info.industry[0].rate" :readonly="info.icons[1].active")
+            td.iconsField
+              template(v-for="(icon, iconIndex) in info.icons") 
+                img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -62,7 +61,8 @@ export default {
     return {
       sourceSelect: {lang: "English"},
       targetSelect: {lang: "All"},
-      industrySelect: {name: "All"},
+      industryFilter: [{name: "All"}],
+      industrySelected: [{name: 'All'}],
       serviceSelect: {title: "Translation"},
       heads: [
         { title: "Source Language" },
@@ -72,13 +72,9 @@ export default {
         { title: "" }
       ],
       testInfo: [],
-      fullInfo: [
-        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "French (France)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "Arabic (Saudi Arabia)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]},
-        {sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguage: {lang: "German (Germany)"}, industry: {name: "All"}, active: true, rates: {title: "Translation", value: ""}, icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]}
-      ],
       services: [],
-      ratesArray: []
+      ratesArray: [],
+      currentActive: ''
     }
   },
 
@@ -91,18 +87,40 @@ export default {
       if(data.drop) {
         let element = document.getElementsByTagName('tbody')[0];
         setTimeout(() => {
-          element.scrollTop = element.scrollHeight;
+          let elem1 = document.getElementsByClassName('drop')[0];
+          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'end'});
+          console.log(elem1);
+          // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
         }, 100)
       }
     },
     changeSource(data) {
-      this.fullInfo[data.index].sourceLanguage = data.data;
+      this.testInfo[data.index].sourceLanguage = data.data;
     },
     changeTarget(data) {
-      this.fullInfo[data.index].targetLanguage = data.data;
+      this.testInfo[data.index].targetLanguage = data.data;
     },
     changeIndustry(data) {
-      this.fullInfo[data.index].industry = data.data;
+      if(this.industrySelected[0].name == 'All') {
+        this.industrySelected.splice(0, 1, data.data)
+      } else {
+        let hasIndustry = false;
+        for(let i in this.industrySelected) {
+          if(this.industrySelected[i].name == data.data.name) {
+            this.industrySelected.splice(i, 1);
+            hasIndustry = true;
+          }
+        }
+        if(!hasIndustry) {
+          this.industrySelected.push(data.data);
+        }
+      }
+      if(!this.industrySelected.length || data.data.name == 'All') {
+        this.industrySelected = [];
+        this.industrySelected.push({
+          name: 'All'
+        })
+      }
     },
     chosenServ(data) {
       this.serviceSelect = data;
@@ -119,13 +137,32 @@ export default {
       this.targetSelect = data.data;
     },
     chosenInd(data) {
-      this.industrySelect = data.data;
+      if(this.industryFilter[0].name == 'All') {
+        this.industryFilter.splice(0, 1, data.data);
+      } else {
+        let hasIndustry = false;
+        for(let i in this.industryFilter) {
+          if(this.industryFilter[i].name == data.data.name) {
+            this.industryFilter.splice(i, 1);
+            hasIndustry = true;
+          }
+        }
+        if(!hasIndustry) {
+          this.industryFilter.push(data.data);
+        }
+      }
+      if(!this.industryFilter.length || data.data.name == 'All') {
+        this.industryFilter = [];
+        this.industryFilter.push({
+          name: 'All'
+        })
+      }
     },
     async action(index, iconIndex) {
       if(iconIndex == 0) {
-        this.fullInfo[index].icons[0].active = false;
-        this.fullInfo[index].icons[1].active = true;
-        this.$http.post('/service/rates', this.fullInfo[index])
+        this.testInfo[index].icons[0].active = false;
+        this.testInfo[index].icons[1].active = true;
+        this.$http.post('/service/rates', this.testInfo[index])
         .then(res => {
           console.log(res)
         })
@@ -135,16 +172,28 @@ export default {
       }
 
       if(iconIndex == 1) {
-        this.fullInfo[index].icons[1].active = false;
-        this.fullInfo[index].icons[0].active = true;
+        for(let elem of this.testInfo[index].industry) {
+          this.industrySelected.push(elem)  
+        }
+
+        this.currentActive = index;
+        for(let i in this.testInfo) {
+          if(i == index) {
+            this.testInfo[i].icons[1].active = false;
+            this.testInfo[i].icons[0].active = true;   
+          } else {
+              this.testInfo[i].icons[1].active = true;
+              this.testInfo[i].icons[0].active = false;
+          }
+        }
       }
 
       if(iconIndex == 2) {
-        this.fullInfo.splice(index, 1);
+        this.testInfo.splice(index, 1);
       }
     },
     async addNewRow() {
-      let ratesFields = this.fullInfo[0].rates.length;
+      let ratesFields = this.testInfo[0].rates.length;
       let rates = [];
       if(ratesFields) {
         for(let i = 0; i < ratesFields; i++) {
@@ -169,15 +218,6 @@ export default {
       .then(res => {
         this.services = res.data.filter(item => {
           if(item.languageForm == "Duo") {
-            let title = item.title;
-            this.ratesArray.push({
-              title : [{
-                source: '',
-                target: '',
-                industry: '',
-                value: ''
-              }]
-            })
             return item;
           }
         });
@@ -185,17 +225,19 @@ export default {
           if(item.title == 'Translation') {
             item.crud = true
             for(let i = 0; i < item.rates.length; i++) {
-              this.testInfo.push({
-                sourceLanguage: item.rates[i].source,
-                targetLanguage: item.rates[i].target,
-                industry: item.rates[i].industry,
-                active: true,
-                icons: [
-                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                ]
-              })
+              for(let elem of item.rates[i].industry) {
+                this.testInfo.push({
+                  sourceLanguage: item.rates[i].source,
+                  targetLanguage: item.rates[i].target,
+                  industry: [elem],
+                  active: true,
+                  icons: [
+                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                  ]
+                })
+              }
             }
           } else {
             item.crud = false
@@ -225,18 +267,22 @@ export default {
     }
   },
   computed: {
-    rates() {
+    filterIndustry() {
       let result = [];
-      for(let i = 0; i < this.services.length; i++) {
-        if(this.services[i].crud) {
-          let title = this.services[i].title;
-          result.push({
-            title: title,
-            value: title + 11 
-            })
+      if(this.industryFilter.length) {
+        for(let elem of this.industryFilter) {
+          result.push(elem.name)
         }
       }
-      
+      return result;
+    },
+    infoIndustries() {
+      let result = [];
+      if(this.industrySelected.length) {
+        for(let elem of this.industrySelected) {
+          result.push(elem.name);
+        }
+      }
       return result;
     },
     tableHeader() {
@@ -351,7 +397,7 @@ td {
   display: flex;
   justify-content: space-between;
   &__item {
-    width: 22%;
+    width: 23%;
     display: flex;
     flex-direction: column;
     label {

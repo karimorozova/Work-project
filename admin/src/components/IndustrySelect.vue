@@ -1,11 +1,18 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            span.selected {{ selectedInd.name }}
+            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
+                .selected
+                    img(v-for="name in selectedInd" :src="name.icon") 
+            template(v-if="!selectedInd.length || selectedInd[0].name == 'All'") 
+                span.selected All
             .arrowButton(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            span.drop__item(v-for="(industry, index) in industries" @click="changeInd(index)") {{ industry.name }}
+            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)")
+                .checkbox
+                    .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
+                span {{ industry.name }}
 </template>
 
 <script>
@@ -14,7 +21,10 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedInd: {
-            type: Object
+            type: Array
+        },
+        filteredIndustries: {
+            type: Array,
         },
         parentIndex: {
             type: Number,
@@ -81,6 +91,7 @@ export default {
         padding: 3px 5px;
         font-size: 14px;
         opacity: 0.7;
+        height: 31px;
     }
     .arrowButton {
         width: 18%;
@@ -121,7 +132,10 @@ export default {
         display: flex;
         flex-direction: column;
         background-color: white;
+        z-index: 6;
         &__item {
+            display: flex;
+            align-items: center;
             padding: 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
@@ -130,7 +144,10 @@ export default {
                 border: none;
             }
             &:hover {
-                padding-left: 5px;
+                // span {
+                //     transition: all 0.3s;
+                //     padding-left: 5px;
+                // }
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
@@ -140,6 +157,35 @@ export default {
     }
     .innerComponent & {
         height: 100%;
+    }
+}
+.checkbox {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #67573E;
+    margin-right: 3px;
+    .checked {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            border: 1px solid #67573E;
+            top: 6px;
+            left: 1px;
+            transform: rotate(45deg);
+        }
+        &::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            border: 1px solid #67573E;
+            top: 5px;
+            left: 3px;
+            transform: rotate(-58deg);
+        }
     }
 }
 </style>

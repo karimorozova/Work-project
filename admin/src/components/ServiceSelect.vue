@@ -36,7 +36,13 @@ export default {
                     if(a.title < b.title) return -1;
                     if(a.title > b.title) return 1;
                 });
-                this.services = sortedArray;
+                this.services = sortedArray.filter(item => {
+                    if(item.title == 'Translation' ||
+                    item.title == 'Proofing' || 
+                    item.title == 'QA and Testing') {
+                        return item
+                    }
+                });
             })
             .catch(e => {
                 this.errors.push(e)
@@ -72,6 +78,7 @@ export default {
         padding: 3px 5px;
         font-size: 14px;
         opacity: 0.7;
+        height: 31px;
     }
     .arrowButton {
         width: 18%;
@@ -108,7 +115,7 @@ export default {
                 border: none;
             }
             &:hover {
-                padding-left: 5px;
+                // padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }

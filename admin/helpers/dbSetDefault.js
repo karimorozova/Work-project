@@ -179,31 +179,32 @@ async function ratesduo(titleName) {
     return item.title == titleName
   });
   let allLangs = await allLanguages();
-  let ratesSource = await allLangs.filter(item => {
+  let ratesSource = allLangs.filter(item => {
     if(service.languages.source.indexOf(item.symbol) > 0) {
       return item;
     }
   });
 
-  let ratesTarget = await allLangs.filter(item => {
+  let ratesTarget = allLangs.filter(item => {
     if(service.languages.target.indexOf(item.symbol) > 0) {
       return item;
     }
   });
 
-  let industries = await industriesDefault.map(item => {
-    if(titleName == 'Translation') {
-      item.rate = 0.1;
-    }
-    if(titleName == 'Proofing') {
-      item.rate = 0.025;
-    }
-    if(titleName == 'QA and Testing') {
-      item.rate = 0.05;
-    }
-    return item
-  })
+  let serviceRate = 0.1;
+  if(titleName == 'Proofing') {
+    serviceRate = 0.025
+  }
+  if(titleName == 'QA and Testing') {
+    serviceRate = 0.05
+  }
 
+  let industries = industriesDefault.map(item => {
+    item.rate = serviceRate;
+    return item
+  });
+
+  await industries.push({name: 'All', rate: serviceRate, crud: true});
   for(let i = 0; i < ratesSource.length; i++) {
     if(ratesSource[i].symbol == 'EN' || ratesSource[i].symbol == 'EN-GB' || ratesSource[i].symbol == 'EN-US') {
       for(let j = 0; j < ratesTarget.length; j++) {
