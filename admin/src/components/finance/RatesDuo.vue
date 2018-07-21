@@ -20,27 +20,27 @@
       thead
         th(v-for="head in tableHeader") {{ head.title }}
       tbody
-        template(v-for="(info, index) in testInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
+        template(v-for="(info, index) in fullInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
             td.dropOption 
-              template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.sourceLanguage.lang }}
+              template(v-if='info.sourceLanguage.lang == sourceSelect.lang || !info.sourceLanguage.lang || sourceSelect.lang == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.dropOption 
-              template(v-if='info.sourceLanguage.lang == sourceSelect.lang') {{ info.targetLanguage.lang }}
+              template(v-if='info.sourceLanguage.lang == sourceSelect.lang || !info.targetLanguage.lang || targetSelect.lang == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
-                LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget")
+                LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.dropOption              
               span(v-if="!indus.icon") {{ indus.name }}
               .dropOption__image
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
               .innerComponent(v-if="!info.icons[1].active")
-                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry")
+                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="info.active" :disabled="info.icons[1].active")
+              input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="info.industry[0].rate" :readonly="info.icons[1].active")
+              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
             td.iconsField
               template(v-for="(icon, iconIndex) in info.icons") 
                 img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
@@ -71,14 +71,17 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
-      testInfo: [],
+      fullInfo: [],
       services: [],
-      ratesArray: [],
+      changedRate: '',
       currentActive: ''
     }
   },
 
   methods: {
+    changeRate(event) {
+      this.changedRate = +event.target.value
+    },
     handleScroll() {
       let element = document.getElementsByTagName('tbody')[0];
       element.scrollTop = element.scrollHeight;
@@ -95,10 +98,10 @@ export default {
       }
     },
     changeSource(data) {
-      this.testInfo[data.index].sourceLanguage = data.data;
+      this.fullInfo[data.index].sourceLanguage = data.data;
     },
     changeTarget(data) {
-      this.testInfo[data.index].targetLanguage = data.data;
+      this.fullInfo[data.index].targetLanguage = data.data;
     },
     changeIndustry(data) {
       if(this.industrySelected[0].name == 'All') {
@@ -118,7 +121,9 @@ export default {
       if(!this.industrySelected.length || data.data.name == 'All') {
         this.industrySelected = [];
         this.industrySelected.push({
-          name: 'All'
+          crud: true,
+          name: 'All',
+          rate: 0.1
         })
       }
     },
@@ -160,9 +165,15 @@ export default {
     },
     async action(index, iconIndex) {
       if(iconIndex == 0) {
-        this.testInfo[index].icons[0].active = false;
-        this.testInfo[index].icons[1].active = true;
-        this.$http.post('/service/rates', this.testInfo[index])
+        this.fullInfo[index].icons[0].active = false;
+        this.fullInfo[index].icons[1].active = true;
+        this.fullInfo[index].industry = [];
+        for(let elem of this.industrySelected) {
+          elem.rate = this.changedRate;
+          this.fullInfo[index].industry.push(elem)
+        };
+        this.fullInfo[index].title = 'Translation';
+        this.$http.post('/service/rates', this.fullInfo[index])
         .then(res => {
           console.log(res)
         })
@@ -172,41 +183,33 @@ export default {
       }
 
       if(iconIndex == 1) {
-        for(let elem of this.testInfo[index].industry) {
+        for(let elem of this.fullInfo[index].industry) {
+          this.industrySelected = [];
           this.industrySelected.push(elem)  
         }
 
         this.currentActive = index;
-        for(let i in this.testInfo) {
+        for(let i in this.fullInfo) {
           if(i == index) {
-            this.testInfo[i].icons[1].active = false;
-            this.testInfo[i].icons[0].active = true;   
+            this.fullInfo[i].icons[1].active = false;
+            this.fullInfo[i].icons[0].active = true;   
           } else {
-              this.testInfo[i].icons[1].active = true;
-              this.testInfo[i].icons[0].active = false;
+              this.fullInfo[i].icons[1].active = true;
+              this.fullInfo[i].icons[0].active = false;
           }
         }
       }
 
       if(iconIndex == 2) {
-        this.testInfo.splice(index, 1);
+        this.fullInfo.splice(index, 1);
       }
     },
     async addNewRow() {
-      let ratesFields = this.testInfo[0].rates.length;
-      let rates = [];
-      if(ratesFields) {
-        for(let i = 0; i < ratesFields; i++) {
-          rates.push(" ");
-        }
-      }
-
       this.fullInfo.push({
-        sourceLanguage: {lang: ""}, 
+        sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
-        industry: {name: ""}, 
+        industry: [{name: "All", rate: 0}], 
         active: true, 
-        rates: rates, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       });
       setTimeout( () => {
@@ -226,7 +229,7 @@ export default {
             item.crud = true
             for(let i = 0; i < item.rates.length; i++) {
               for(let elem of item.rates[i].industry) {
-                this.testInfo.push({
+                this.fullInfo.push({
                   sourceLanguage: item.rates[i].source,
                   targetLanguage: item.rates[i].target,
                   industry: [elem],
@@ -445,7 +448,7 @@ td {
 .rates {
   border: none;
   outline: none;
-  width: 50px;
+  width: 140px;
 }
 .dropOption {
   position: relative;

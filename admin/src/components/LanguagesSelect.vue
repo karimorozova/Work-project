@@ -53,9 +53,9 @@ export default {
                     if(a.lang > b.lang) return 1;
                 });
                 this.languages = sortedArray;
-                if(this.selectedLang.lang == "All") {
+                // if(this.selectedLang.lang == "All") {
                     this.languages.unshift({lang: "All"})
-                }
+                // }
             })
             .catch(e => {
                 this.errors.push(e)

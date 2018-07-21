@@ -175,68 +175,73 @@ function allLanguages() {
 }
 
 async function ratesduo(titleName) {
-  let service = await servicesDefault.find(item => {
-    return item.title == titleName
-  });
-  let allLangs = await allLanguages();
-  let ratesSource = allLangs.filter(item => {
-    if(service.languages.source.indexOf(item.symbol) > 0) {
-      return item;
+  let findService = await Services.find({'title': titleName});
+  if(!findService[0].rates.length) {
+    let service = servicesDefault.find(item => {
+      if(item.title == titleName) {
+        return item;
+      }
+    })
+    let allLangs = await allLanguages();
+    let ratesSource = allLangs.filter(item => {
+      if(service.languages.source.indexOf(item.symbol) > 0) {
+        return item;
+      }
+    });
+
+    let ratesTarget = allLangs.filter(item => {
+      if(service.languages.target.indexOf(item.symbol) > 0) {
+        return item;
+      }
+    });
+
+    let serviceRate = 0.1;
+    if(titleName == 'Proofing') {
+      serviceRate = 0.025
     }
-  });
-
-  let ratesTarget = allLangs.filter(item => {
-    if(service.languages.target.indexOf(item.symbol) > 0) {
-      return item;
+    if(titleName == 'QA and Testing') {
+      serviceRate = 0.05
     }
-  });
 
-  let serviceRate = 0.1;
-  if(titleName == 'Proofing') {
-    serviceRate = 0.025
-  }
-  if(titleName == 'QA and Testing') {
-    serviceRate = 0.05
-  }
+    let industries = industriesDefault.map(item => {
+      item.rate = serviceRate;
+      return item
+    });
 
-  let industries = industriesDefault.map(item => {
-    item.rate = serviceRate;
-    return item
-  });
-
-  await industries.push({name: 'All', rate: serviceRate, crud: true});
-  for(let i = 0; i < ratesSource.length; i++) {
-    if(ratesSource[i].symbol == 'EN' || ratesSource[i].symbol == 'EN-GB' || ratesSource[i].symbol == 'EN-US') {
-      for(let j = 0; j < ratesTarget.length; j++) {
+    await industries.push({name: 'All', rate: serviceRate, crud: true});
+    for(let i = 0; i < ratesSource.length; i++) {
+      if(ratesSource[i].symbol == 'EN' || ratesSource[i].symbol == 'EN-GB' || ratesSource[i].symbol == 'EN-US') {
+        for(let j = 0; j < ratesTarget.length; j++) {
+          service.rates.push({
+            source: ratesSource[i],
+            target: ratesTarget[j],
+            industry: industries
+          })
+        }
+      }
+      else {
+        let targetLang = ratesTarget.find(item => {return item.symbol == 'EN-GB'});
         service.rates.push({
           source: ratesSource[i],
-          target: ratesTarget[j],
+          target: targetLang,
           industry: industries
         })
       }
     }
-    else {
-      let targetLang = ratesTarget.find(item => {return item.symbol == 'EN-GB'});
-      service.rates.push({
-        source: ratesSource[i],
-        target: targetLang,
-        industry: industries
-      })
-    }
-  }
-  Services.update({'title': titleName}, service)
-  .then(res => {
-    console.log(`Rates to service ${titleName} added`)
-  })  
+    Services.update({'title': titleName}, service)
+    .then(res => {
+      console.log(`Rates to service ${titleName} added`)
+    })
+  } 
 }
 
 async function checkCollections() {
   await languages();
+  await services();
   await requests();
   await projects();
   await users();
   await industries();
-  await services();
   await ratesduo("Translation");
   await ratesduo("Proofing");
   await ratesduo("QA and Testing");

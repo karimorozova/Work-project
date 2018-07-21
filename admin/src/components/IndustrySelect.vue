@@ -41,6 +41,7 @@ export default {
     methods: {
         showInds() {
             this.droppedInd = !this.droppedInd;
+            this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex})
         },
         async getIndustries() {
             await this.$http.get('api/industries')

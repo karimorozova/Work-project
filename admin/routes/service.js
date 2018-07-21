@@ -125,7 +125,7 @@ router.post('/rates', async (req, res) => {
   console.log('We are in the rates!!');
   var rate = req.body;
   var rates = [];
-  await Services.find({title: rate.rates.title})
+  await Services.find({title: rate.title})
   .then(result  => {
     rates = result[0].rates;
   })
