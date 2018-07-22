@@ -92,68 +92,44 @@ router.post('/jobcost', async (req, res) => {
   var jobs = req.body.jobs;
   var service = JSON.parse(project.service);
 
-  
-    await Services.find({'title': service.title})
-    .then(result => {
-      var rates = result[0].rates;
+  let result = await Services.find({'title': service.title});
+  var rates = result[0].rates;
       for(let i = 0; i < jobs.length; i++) {
         for(let j = 0; j < rates.length; j++) {
-          if(jobs[i].sourceLanguage == rates[j].sourceLanguage.lang &&
-            jobs[i].targetLanguage == rates[j].targetLanguage.lang && 
+          if(jobs[i].sourceLanguage == rates[j].source.lang &&
+            jobs[i].targetLanguage == rates[j].target.lang && 
             (project.industry == rates[j].industry.name || rates[j].industry.name == 'All')) {
               jobs[i].cost = +jobs[i].wordcount * +rates[j].rates.value;
           }
         }
-      }
-    })
-    .catch(err => {
-      console.log('Cannot find service');
-      console.log(err)
-    });
+      }  
 
-  await Projects.update({projectId: project.projectId}, {'jobs': jobs})
-  .then(result => {
-    res.send(result)
-  })
-  .catch(err => {
-    console.log(err);
-    res.send('Something wrong');
-  })
+  let updateProject = await Projects.update({projectId: project.projectId}, {'jobs': jobs});
+  res.send(updateProject);
 })
 
 router.post('/rates', async (req, res) => {
   console.log('We are in the rates!!');
-  var rate = req.body;
+  var rate = await req.body;
   var rates = [];
-  await Services.find({title: rate.title})
-  .then(result  => {
-    rates = result[0].rates;
-  })
-  .catch(err => {
-    console.log(err)
-  });
-  var found = 0;
-  for(let i = 0; i < rates.length; i++) {
-    if(rate.sourceLanguage.lang == rates[i].sourceLanguage.lang &&
-      rate.targetLanguage.lang == rates[i].targetLanguage.lang &&
-      rate.industry.name == rates[i].industry.name) {
-        rates.splice(i, 1, rate);
-        found = 1
-        break;
+  let service = await Services.find({'title': rate.title});
+  rates = service[0].rates;
+  
+  for(let j = 0; j < rate.industry.length; j++) {
+    for(let i = 0; i < rates.length; i++) {
+      if(rate.sourceLanguage.lang == rates[i].sourceLanguage.lang &&
+        rate.targetLanguage.lang == rates[i].targetLanguage.lang) {
+        for(let elem of rates[i].industry) {
+          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
+            elem.rate = rate.industry[j].rate
+          }
+        }
       }
-  }
-  if(!found) {
-    rates.push(rate);
+    }
   }
 
-  Services.update({title: rate.rates.title}, {rates: rates})
-  .then(result => {
-    res.send(result)
-  })
-  .catch(err => {
-    console.log(err)
-    res.send(err)
-  })
+  let result = await Services.update({'title': rate.title}, {'rates': rates});
+  res.send(result) 
 })
 
 module.exports = router;

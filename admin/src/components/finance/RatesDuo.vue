@@ -92,7 +92,6 @@ export default {
         setTimeout(() => {
           let elem1 = document.getElementsByClassName('drop')[0];
           elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'end'});
-          console.log(elem1);
           // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
         }, 100)
       }
@@ -163,7 +162,7 @@ export default {
         })
       }
     },
-    async action(index, iconIndex) {
+    action(index, iconIndex) {
       if(iconIndex == 0) {
         this.fullInfo[index].icons[0].active = false;
         this.fullInfo[index].icons[1].active = true;
@@ -187,7 +186,7 @@ export default {
           this.industrySelected = [];
           this.industrySelected.push(elem)  
         }
-
+        this.changedRate = this.fullInfo[index].industry[0].rate;
         this.currentActive = index;
         for(let i in this.fullInfo) {
           if(i == index) {
@@ -204,7 +203,7 @@ export default {
         this.fullInfo.splice(index, 1);
       }
     },
-    async addNewRow() {
+    addNewRow() {
       this.fullInfo.push({
         sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
@@ -216,8 +215,8 @@ export default {
         this.handleScroll();
       },100);
     },
-    async getServices() {
-      await this.$http.get("api/services")
+    getServices() {
+      this.$http.get("api/services")
       .then(res => {
         this.services = res.data.filter(item => {
           if(item.languageForm == "Duo") {
@@ -249,8 +248,8 @@ export default {
       })
       .catch(err => console.log(err))
     },
-    async getLanguages() {
-      await this.$http.get('api/languages')
+    getLanguages() {
+      this.$http.get('api/languages')
       .then(response => {
         let sortedArray = response.body;
         sortedArray.sort( (a,b) => {
