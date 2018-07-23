@@ -1,11 +1,14 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            span.selected {{ selectedLang.lang }}
+            span.selected(v-if="selectedLang.length == 1") {{ selectedLang[0] }}
+            .selected(v-if="selectedLang.length > 1") 
+                span(v-for="lang in selectedLang") {{ lang }}; 
             .arrowButton(@click="showLangs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
+        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
         .drop(v-if="droppedLang")
-            span.drop__item(v-for="(language, index) in languages" @click="changeLang(index)") {{ language.lang }}
+            span.drop__item(v-for="(language, index) in filteredLangs" @click="changeLang(index)") {{ language.lang }}
 </template>
 
 <script>
@@ -14,7 +17,7 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedLang: {
-            type: Object
+            type: Array
         },
         parentIndex: {
             type: Number,
@@ -25,7 +28,8 @@ export default {
         return {
             languages: [],
             droppedLang: false,
-            errors: []
+            errors: [],
+            searchLang: ''
         }
     },
     methods: {
@@ -65,7 +69,17 @@ export default {
             this.droppedLang = false;
         },
         changeLang(index) {
-            this.$emit("chosenLang", {data: this.languages[index], index: this.parentIndex})
+            this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex})
+        }
+    },
+    computed: {
+        filteredLangs() {
+            let result = this.languages.filter(item => {
+                if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+                    return item
+                }
+            })
+            return result;
         }
     },
     directives: {
@@ -132,6 +146,7 @@ export default {
         flex-direction: column;
         background-color: white;
         z-index: 15;
+        padding-top: 25px;
         &__item {
             padding: 2px;
             border-bottom: .5px solid #BFB09D;
@@ -151,6 +166,20 @@ export default {
     }
     .innerComponent & {
         height: 100%;
+    }
+    .search {
+        position: absolute;
+        z-index: 50;
+        width: 92%;
+        padding: 5px 3px;
+        color: #67573E;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
+        border: 1px solid rgba(125, 138, 180, 0.466);
+        border-right: none;
+        .innerComponent & {
+            width: 90%;
+        }
     }
 }
 </style>

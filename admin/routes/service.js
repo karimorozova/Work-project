@@ -97,9 +97,15 @@ router.post('/jobcost', async (req, res) => {
       for(let i = 0; i < jobs.length; i++) {
         for(let j = 0; j < rates.length; j++) {
           if(jobs[i].sourceLanguage == rates[j].source.lang &&
-            jobs[i].targetLanguage == rates[j].target.lang && 
-            (project.industry == rates[j].industry.name || rates[j].industry.name == 'All')) {
-              jobs[i].cost = +jobs[i].wordcount * +rates[j].rates.value;
+            jobs[i].targetLanguage == rates[j].target.lang ) {
+              for(let elem of rates[j].industry) {
+                if(project.industry == elem.name) {
+                  jobs[i].cost = +jobs[i].wordcount * +elem.rate;
+                }
+                if(project.industry == 'General' && elem.name == 'All') {
+                  jobs[i].cost = +jobs[i].wordcount * +elem.rate;
+                }
+              }
           }
         }
       }  
@@ -117,8 +123,8 @@ router.post('/rates', async (req, res) => {
   
   for(let j = 0; j < rate.industry.length; j++) {
     for(let i = 0; i < rates.length; i++) {
-      if(rate.sourceLanguage.lang == rates[i].sourceLanguage.lang &&
-        rate.targetLanguage.lang == rates[i].targetLanguage.lang) {
+      if(rate.sourceLanguage.lang == rates[i].source.lang &&
+        rate.targetLanguage.lang == rates[i].target.lang) {
         for(let elem of rates[i].industry) {
           if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
             elem.rate = rate.industry[j].rate

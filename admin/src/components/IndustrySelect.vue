@@ -66,7 +66,7 @@ export default {
             this.droppedInd = false;
         },
         changeInd(index) {
-            this.$emit("chosenInd", {data: this.industries[index], index: this.parentIndex})
+            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentIndex})
         }
     },
     directives: {

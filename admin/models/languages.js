@@ -19,6 +19,10 @@ const LanguageSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    xtm: {
+        type: String,
+        default: ''
+    },
     iso1: {
         type: String,
         default: ''

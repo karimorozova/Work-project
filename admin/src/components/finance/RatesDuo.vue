@@ -20,14 +20,14 @@
       thead
         th(v-for="head in tableHeader") {{ head.title }}
       tbody
-        template(v-for="(info, index) in fullInfo" v-if="(info.sourceLanguage.lang == sourceSelect.lang || sourceSelect.lang == 'All') && (info.targetLanguage.lang == targetSelect.lang || targetSelect.lang == 'All')")
+        template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
             td.dropOption 
-              template(v-if='info.sourceLanguage.lang == sourceSelect.lang || !info.sourceLanguage.lang || sourceSelect.lang == "All"') {{ info.sourceLanguage.lang }}
+              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.dropOption 
-              template(v-if='info.sourceLanguage.lang == sourceSelect.lang || !info.targetLanguage.lang || targetSelect.lang == "All"') {{ info.targetLanguage.lang }}
+              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.dropOption              
@@ -59,8 +59,8 @@ export default {
   props: {},
   data() {
     return {
-      sourceSelect: {lang: "English"},
-      targetSelect: {lang: "All"},
+      sourceSelect: ["EN"],
+      targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
       serviceSelect: {title: "Translation"},
@@ -97,27 +97,27 @@ export default {
       }
     },
     changeSource(data) {
-      this.fullInfo[data.index].sourceLanguage = data.data;
+      this.fullInfo[data.index].sourceLanguage = data.lang;
     },
     changeTarget(data) {
-      this.fullInfo[data.index].targetLanguage = data.data;
+      this.fullInfo[data.index].targetLanguage = data.lang;
     },
     changeIndustry(data) {
       if(this.industrySelected[0].name == 'All') {
-        this.industrySelected.splice(0, 1, data.data)
+        this.industrySelected.splice(0, 1, data.industry)
       } else {
         let hasIndustry = false;
         for(let i in this.industrySelected) {
-          if(this.industrySelected[i].name == data.data.name) {
+          if(this.industrySelected[i].name == data.industry.name) {
             this.industrySelected.splice(i, 1);
             hasIndustry = true;
           }
         }
         if(!hasIndustry) {
-          this.industrySelected.push(data.data);
+          this.industrySelected.push(data.industry);
         }
       }
-      if(!this.industrySelected.length || data.data.name == 'All') {
+      if(!this.industrySelected.length || data.industry.name == 'All') {
         this.industrySelected = [];
         this.industrySelected.push({
           crud: true,
@@ -128,34 +128,62 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      for(let i = 0; i < this.services.length; i++) {
-        if(this.services[i].title == this.serviceSelect.title) {
-          this.services[i].crud = !this.services[i].crud;
-        }
-      }
+      // for(let i = 0; i < this.services.length; i++) {
+        // if(this.services[i].title == this.serviceSelect.title) {
+        //   this.services[i].crud = !this.services[i].crud;
+        // }
+      this.fullInfo = [];
+      this.getServices();
+      // }
     },
     chosenSource(data) {
-      this.sourceSelect = data.data;
+      if(this.sourceSelect[0] == 'All') {
+        this.sourceSelect = [];
+        this.sourceSelect.push(data.lang.symbol)
+      } else {
+          let index = this.sourceSelect.indexOf(data.lang.symbol);
+          if(index != -1) {
+            this.sourceSelect.splice(index, 1);
+          } else {
+            this.sourceSelect.push(data.lang.symbol)
+          }
+      }
+      if(data.lang.lang == 'All' || !this.sourceSelect.length) {
+        this.sourceSelect = ['All'];
+      }
     },
     chosenTarget(data) {
-      this.targetSelect = data.data;
+      if(this.targetSelect[0] == 'All') {
+        this.targetSelect = [];
+        this.targetSelect.push(data.lang.symbol)
+      } else {
+          let index = this.targetSelect.indexOf(data.lang.symbol);
+          if(index != -1) {
+            this.targetSelect.splice(index, 1);
+          } else {
+            this.targetSelect.push(data.lang.symbol)
+          }
+      }
+      if(data.lang.lang == 'All' || !this.targetSelect.length) {
+        this.targetSelect = ['All'];
+      }
     },
     chosenInd(data) {
       if(this.industryFilter[0].name == 'All') {
-        this.industryFilter.splice(0, 1, data.data);
+        this.industryFilter.splice(0, 1, data.industry);
       } else {
         let hasIndustry = false;
         for(let i in this.industryFilter) {
-          if(this.industryFilter[i].name == data.data.name) {
+          if(this.industryFilter[i].name == data.industry.name) {
             this.industryFilter.splice(i, 1);
             hasIndustry = true;
           }
         }
         if(!hasIndustry) {
-          this.industryFilter.push(data.data);
+          this.industryFilter.push(data.industry);
         }
       }
-      if(!this.industryFilter.length || data.data.name == 'All') {
+      if(!this.industryFilter.length || data.industry.name == 'All') {
         this.industryFilter = [];
         this.industryFilter.push({
           name: 'All'
@@ -171,7 +199,6 @@ export default {
           elem.rate = this.changedRate;
           this.fullInfo[index].industry.push(elem)
         };
-        this.fullInfo[index].title = 'Translation';
         this.$http.post('/service/rates', this.fullInfo[index])
         .then(res => {
           console.log(res)
@@ -224,11 +251,12 @@ export default {
           }
         });
         this.services.forEach(item => {
-          if(item.title == 'Translation') {
+          if(item.title == this.serviceSelect.title) {
             item.crud = true
             for(let i = 0; i < item.rates.length; i++) {
               for(let elem of item.rates[i].industry) {
                 this.fullInfo.push({
+                  title: item.title,
                   sourceLanguage: item.rates[i].source,
                   targetLanguage: item.rates[i].target,
                   industry: [elem],
