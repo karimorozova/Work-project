@@ -326,4 +326,8 @@ router.post("/removelanguages", async(req, res) => {
   });
 });
 
+router.get("/startproject", (req, res) => {
+  console.log(req.body)
+})
+
 module.exports = router;

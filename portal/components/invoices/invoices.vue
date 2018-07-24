@@ -14,11 +14,11 @@
                     th Suggested deadline
             tbody
                 tr
-                    td {{ project.createdAt }}
+                    td {{ requestDate }}
                     td {{ project.projectId }}
                     td {{ project.projectName }}
                     td {{ project.status }}
-                    td {{ project.date }}
+                    td {{ deadline }}
         table.jobsTable
             thead
                 tr
@@ -46,8 +46,6 @@ export default {
         async getProjects() {
             let projectsArray = await this.$axios.$get('/api/allprojects');
             this.project = projectsArray[0];
-                // this.project.createdAt = moment(this.project.createdAt).format('DD-MM-YYYY');
-                // this.project.date = moment(this.project.date).format('DD-MM-YYYY');
             if(this.project.jobs) {
                 let words = await this.$axios.$get(`/xtm/xtmwords?projectId=${this.project.xtmId}`);
                 this.project.jobs.forEach(item => {
@@ -72,6 +70,22 @@ export default {
             .catch(err => {
                 console.log(err)
             })
+        }
+    },
+    computed: {
+        requestDate() {
+            let result = '';
+            if(this.project.createdAt) {
+                result = moment(this.project.createdAt).format('DD-MM-YYYY');
+            }
+            return result;
+        },
+        deadline() {
+            let result = '';
+            if(this.project.date) {
+                result = moment(this.project.date).format('DD-MM-YYYY');
+            }
+            return result;
         }
     },
     mounted() {

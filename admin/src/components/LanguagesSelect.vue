@@ -8,7 +8,10 @@
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
         .drop(v-if="droppedLang")
-            span.drop__item(v-for="(language, index) in filteredLangs" @click="changeLang(index)") {{ language.lang }}
+            .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
+                .checkbox
+                    .checkbox__check(:class="{checked: selectedLang.indexOf(language.symbol) != -1}")
+                span {{ language.lang }}
 </template>
 
 <script>
@@ -22,6 +25,10 @@ export default {
         parentIndex: {
             type: Number,
             default: 0
+        },
+        addAll: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -57,9 +64,9 @@ export default {
                     if(a.lang > b.lang) return 1;
                 });
                 this.languages = sortedArray;
-                // if(this.selectedLang.lang == "All") {
-                    this.languages.unshift({lang: "All"})
-                // }
+                if(this.addAll) {
+                    this.languages.unshift({lang: "All", symbol: "All"})
+                }
             })
             .catch(e => {
                 this.errors.push(e)
@@ -105,6 +112,10 @@ export default {
         font-size: 14px;
         opacity: 0.7;
         height: 31px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        overflow: auto;
     }
     .arrowButton {
         width: 18%;
@@ -146,9 +157,11 @@ export default {
         flex-direction: column;
         background-color: white;
         z-index: 15;
-        padding-top: 25px;
+        padding-top: 24px;
         &__item {
-            padding: 2px;
+            display: flex;
+            align-items: center;
+            padding: 12px 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -162,6 +175,10 @@ export default {
         }
         .innerComponent & {
             max-height: 130px;
+            padding-top: 28px;
+            span {
+                width: 88%;
+            }
         }
     }
     .innerComponent & {
@@ -179,6 +196,35 @@ export default {
         border-right: none;
         .innerComponent & {
             width: 90%;
+        }
+    }
+}
+.checkbox {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #67573E;
+    margin-right: 3px;
+    .checked {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            border: 1px solid #67573E;
+            top: 6px;
+            left: 1px;
+            transform: rotate(45deg);
+        }
+        &::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            border: 1px solid #67573E;
+            top: 5px;
+            left: 3px;
+            transform: rotate(-58deg);
         }
     }
 }

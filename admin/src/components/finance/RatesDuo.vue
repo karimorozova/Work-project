@@ -3,10 +3,10 @@
   .filters
     .filters__item.sourceMenu
       label Source Language
-        LanguagesSelect(:selectedLang="sourceSelect" @chosenLang="chosenSource")
+        LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
     .filters__item.targetMenu
       label Target Language
-        LanguagesSelect(:selectedLang="targetSelect" @chosenLang="chosenTarget")
+        LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
         IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
@@ -25,11 +25,11 @@
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
-                LanguagesSelect(:parentIndex="index" :selectedLang="info.sourceLanguage" @chosenLang="changeSource" @scrollDrop="scrollDrop")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
+              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
-                LanguagesSelect(:parentIndex="index" :selectedLang="info.targetLanguage" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.dropOption              
               span(v-if="!indus.icon") {{ indus.name }}
               .dropOption__image

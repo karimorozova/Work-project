@@ -93,6 +93,10 @@ export default {
         font-size: 14px;
         opacity: 0.7;
         height: 31px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        overflow: auto;
     }
     .arrowButton {
         width: 18%;

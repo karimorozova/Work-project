@@ -428,9 +428,9 @@ export default {
 
         /////////////////////////////////////
         //Start Comment because of XTM testing
-        // if(this.sendOption) {
-        //   const result = await this.$axios.$post('api/request', sendForm);         
-        // }
+        if(this.sendOption) {
+          const result = await this.$axios.$post('api/request', sendForm);         
+        }
         // if(this.startOption) {
         //   const result = await this.$axios.$post('api/project-request', sendForm);
         // }
