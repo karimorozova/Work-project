@@ -63,7 +63,7 @@ export default {
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
-      serviceSelect: {title: "Translation"},
+      serviceSelect: ["Translation"],
       heads: [
         { title: "Source Language" },
         { title: "Target Language" },
@@ -127,13 +127,27 @@ export default {
       }
     },
     chosenServ(data) {
-      this.serviceSelect = data;
+      if(data.title == "Translation") {
+        return true
+      }
+
+      if(this.serviceSelect.indexOf(data.title) != -1) {
+        let index = this.serviceSelect.indexOf(data.title);
+        for(let elem of this.serviceSelect) {
+          if(elem == data.title) {
+            this.serviceSelect.splice(index, 1)
+          }
+        }
+      } else {
+        this.serviceSelect.push(data.title)
+      }
+
       // for(let i = 0; i < this.services.length; i++) {
         // if(this.services[i].title == this.serviceSelect.title) {
         //   this.services[i].crud = !this.services[i].crud;
         // }
-      this.fullInfo = [];
-      this.getServices();
+      // this.fullInfo = [];
+      // this.getServices();
       // }
     },
     chosenSource(data) {
@@ -251,8 +265,10 @@ export default {
           }
         });
         this.services.forEach(item => {
-          if(item.title == this.serviceSelect.title) {
+          if(item.title == "Translation") {
             item.crud = true
+          }
+          if(item.title == "Translation" || item.title == "Proofing" || item.title == "QA and Testing") {
             for(let i = 0; i < item.rates.length; i++) {
               for(let elem of item.rates[i].industry) {
                 this.fullInfo.push({
