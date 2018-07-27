@@ -271,10 +271,12 @@ export default {
 <style lang="scss" scoped>
 .langWrapper {
   position: relative;
+  font-family: MyriadPro;
   table {
     width: 100%;
     border: 1px solid #9a8f80;
     font-size: 14px;
+    border-collapse: collapse;
     tr {
       display: flex;
       th {
@@ -456,7 +458,7 @@ export default {
       }
     }
     .bodyWrapper {
-      height: 690px;
+      height: 750px;
     }
     .data5_active {
       opacity: 0.5;
@@ -555,6 +557,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 10px;
   .prev,
   .next {
     text-align: center;

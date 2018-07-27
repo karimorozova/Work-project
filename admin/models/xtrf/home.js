@@ -7,6 +7,17 @@ const homeXtrf = axios.create({
     }
 });
 
+function getAllCustomers() {
+    return new Promise(resolve => {
+        homeXtrf.get("customers").then(response => {
+            resolve(response.data)
+        }).catch(err => {
+            console.log("Error on getting cutomers from XTRF!");
+            resolve(error)
+        })
+    })
+}
+
 function createCustomer(request) {
     return new Promise(resolve => {
         homeXtrf.post("customers", {
@@ -177,6 +188,32 @@ function createPerson(id, contactEmail, personName) {
     })
 }
 
+function getTokenCircular(obj) {
+    return new Promise(resolve => {
+        let email = obj.email.toString();
+        homeXtrf.post("customers/persons/accessToken", {
+            'loginOrEmail': email
+        }).then(function (response) {
+            resolve(response.data.token);
+        }).catch(function (error) {
+            resolve(error);
+        });
+    })
+}
+
+function getPerson(id) {
+    return new Promise(resolve => {
+        homeXtrf.get(`customers/${id}?embed=persons`)
+        .then(response => {
+            let email = response.data.persons[0].contact.emails.primary;
+            resolve(email)
+        })
+        .catch(err => {
+            resolve(err)
+        })
+    })
+}
+
 function generateToken(contactEmail) {
     return new Promise(resolve => {
         homeXtrf.post("customers/persons/accessToken", {
@@ -199,4 +236,4 @@ function getSpecializations() {
 }
 
 
-module.exports = { findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, createPerson, generateToken, createCustomer, addClassicProject, addSmartProject }
+module.exports = { getAllCustomers, getTokenCircular, getPerson, findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, createPerson, generateToken, createCustomer, addClassicProject, addSmartProject }

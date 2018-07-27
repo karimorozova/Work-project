@@ -6,12 +6,24 @@ import * as getters from './getters';
 Vue.use(Vuex);
 
 const state = {
-    count: 0
+    count: 0,
+    services: [],
+    customers: [],
+    clientLangs: []
 };
 
 const mutations = {
     INCREMENT_COUNTER(state){
         state.count++
+    },
+    servicesFill(state, payload) {
+        state.services = payload
+    },
+    allCustomers(state, payload) {
+        state.customers = payload
+    },
+    customerlangs(state, payload) {
+        state.clientLangs = payload
     }
 };
 

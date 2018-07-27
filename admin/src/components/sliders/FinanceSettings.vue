@@ -12,7 +12,7 @@
       .adminMainWrapper__inner.adminMainWrapper__open
         .breadCrumbs 
           span {{ path }}
-        .maininfoWrapper
+        .maininfoWrapper(v-if="duoActive")
           .mainInfo
             .adminAll
               .quotesComponent
@@ -77,7 +77,7 @@ export default {
 
 <style lang="scss" scoped>
 .adminportalWrapper2 {
-  margin: 0 auto;
+  // margin: 0 auto;
   // overflow: auto;
 }
 .quotesComponent {
@@ -168,7 +168,7 @@ export default {
     }
 
     &__slider {
-      transform: translate(-100%);
+      // transform: translate(-100%);
       background-color: #fff;
       // width: 175px;
       // width: 216px;
@@ -208,7 +208,7 @@ export default {
       }
     }
     .slider {
-      transform: translate(0%);
+      // transform: translate(0%);
       background-color: #fff;
     }
 
@@ -312,7 +312,7 @@ export default {
       }
       &_item {
         width: 100%;
-        padding: 1.5% 0.5% 1.5% 0;
+        padding: 15px 2px;
         transition: all 0.4s;
       }
       .reverseImage {

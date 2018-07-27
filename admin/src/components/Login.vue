@@ -48,7 +48,7 @@ export default {
         response => {
           document.cookie = "who=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
           this.isLogin = true;
-          window.location.href = "/main";
+          window.location.href = "/";
 
           /*
           setTimeout(() => {

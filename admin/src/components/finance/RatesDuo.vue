@@ -63,7 +63,7 @@ export default {
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
-      serviceSelect: ["Translation"],
+      serviceSelect: {title: "Translation"},
       heads: [
         { title: "Source Language" },
         { title: "Target Language" },
@@ -127,27 +127,13 @@ export default {
       }
     },
     chosenServ(data) {
-      if(data.title == "Translation") {
-        return true
-      }
-
-      if(this.serviceSelect.indexOf(data.title) != -1) {
-        let index = this.serviceSelect.indexOf(data.title);
-        for(let elem of this.serviceSelect) {
-          if(elem == data.title) {
-            this.serviceSelect.splice(index, 1)
-          }
-        }
-      } else {
-        this.serviceSelect.push(data.title)
-      }
-
+      this.serviceSelect = data;
       // for(let i = 0; i < this.services.length; i++) {
         // if(this.services[i].title == this.serviceSelect.title) {
         //   this.services[i].crud = !this.services[i].crud;
         // }
-      // this.fullInfo = [];
-      // this.getServices();
+      this.fullInfo = [];
+      this.getServices();
       // }
     },
     chosenSource(data) {
@@ -265,10 +251,8 @@ export default {
           }
         });
         this.services.forEach(item => {
-          if(item.title == "Translation") {
+          if(item.title == this.serviceSelect.title) {
             item.crud = true
-          }
-          if(item.title == "Translation" || item.title == "Proofing" || item.title == "QA and Testing") {
             for(let i = 0; i < item.rates.length; i++) {
               for(let elem of item.rates[i].industry) {
                 this.fullInfo.push({
@@ -372,20 +356,20 @@ export default {
   min-width: 870px; 
 }
 .tableData {
-  max-width: 870px;
+  max-width: 872px;
   overflow-x: scroll;
 }
 .duoFinance {
   border-collapse: collapse;
-  width: 100%;
+  width: 868px;
   thead, tbody {
     border: 1px solid #BFB09D;
     display: block;
     width: 100%;
   }
   tbody {
-    height: 168px;
-    max-height: 173px;
+    height: 184px;
+    // max-height: 173px;
     overflow-y: scroll;
     transition: all 0.3s;
   }
@@ -399,7 +383,7 @@ th, td {
   font-size: 14px;
   font-weight: normal;
   white-space: nowrap;
-  width: 150px;
+  width: 142px;
   &:first-child, &:nth-of-type(2) {
     min-width: 160px;
   }
@@ -415,7 +399,6 @@ th, td {
   }
 }
 th {
-  padding-right: 20px;
   background-color: #988C7E;
   color: white;
   border-right: 1px solid #FFF;
@@ -491,7 +474,7 @@ td {
 .rates {
   border: none;
   outline: none;
-  width: 140px;
+  width: 114px;
 }
 .dropOption {
   position: relative;

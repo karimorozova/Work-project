@@ -139,7 +139,6 @@ export default {
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
         height: 100%;
         .selected {
-            padding-top: 5px;
             opacity: 1;
         }
     }
@@ -174,7 +173,7 @@ export default {
             }
         }
         .innerComponent & {
-            max-height: 130px;
+            max-height: 118px;
             padding-top: 28px;
             span {
                 width: 88%;
@@ -187,7 +186,7 @@ export default {
     .search {
         position: absolute;
         z-index: 50;
-        width: 92%;
+        width: 90%;
         padding: 5px 3px;
         color: #67573E;
         outline: none;
@@ -195,7 +194,7 @@ export default {
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
         .innerComponent & {
-            width: 90%;
+            width: 88%;
         }
     }
 }

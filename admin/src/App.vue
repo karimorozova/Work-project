@@ -14,7 +14,7 @@ export default {
 
 <style lang='scss'>
 body {
-  // overflow: hidden;
+  font-family: MyriadPro;
 }
 .b-log-in,
 .b-log-out{

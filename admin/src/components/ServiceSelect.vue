@@ -1,9 +1,7 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            .selected 
-                span(v-for="serv in selectedServ") {{ serv }}
-                    span(v-if="selectedServ.length > 1") ; 
+            span.selected {{ selectedServ.title }} 
             .arrowButton(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
@@ -16,7 +14,7 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedServ: {
-            type: Array
+            type: Object
         }
     },
     data() {
@@ -82,6 +80,8 @@ export default {
         opacity: 0.7;
         height: 31px;
         overflow: auto;
+        display: flex;
+        align-items: center;
     }
     .arrowButton {
         width: 18%;

@@ -27,6 +27,14 @@ router.post('/auth', async (req, res, next) => {
     }
 });
 
+router.get('/language-combinations', async (req, res) => {
+    let customer = new ClientApi("", req.cookies.ses);
+    let id = +req.query.customerId;
+    let result = await customer.languageComb(id);
+    let languages = result.data;
+    res.send(languages);
+})
+
 router.get('/clientinfo', async (req, res) => {
     var customer = new ClientApi("", req.cookies.ses);
     // console.log('req.cookies.ses : ' + req.cookies.ses );

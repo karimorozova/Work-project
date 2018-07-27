@@ -237,6 +237,7 @@ export default {
     width: 100%;
     border: 1px solid #9a8f80;
     font-size: 14px;
+    border-collapse: collapse;
     tr {
       th {
         background-color: #9a8f80;

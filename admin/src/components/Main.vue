@@ -1,12 +1,20 @@
 <template lang="pug">
     .admminportalWrapper2(v-if="cookies")
         .adminTop
-            .adminTop__adminName
-                a(href="/main") 
-                  h2.adminPortal ADMIN PORTAL
+            .adminTop__adminName 
+                h2.adminPortal ADMIN PORTAL
             .adminTop__searchBlock
+                .create-project
+                  .sel_project_block
+                    .sel_project_block__proj
+                      span New Project
+                    .sel_project_block__imgWrapper(@click="showDropdown")
+                      img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
+                  .clientsTop__dropdown
+                    .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
+                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
                 .dropdownWrapper
-                   .imgwrap(@click="showSlider")
+                  .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/andmin-button-icon.png" )
                     span.spwrap settings
                 .womanWrapper
@@ -41,45 +49,45 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-              DashboardSettings(v-if="dashboardShow" :sliderBool="sliderBool")
-              RecruitmentSettings(v-if="recruitmentShow")
-              VendorsSettings(v-if="vendorsShow")
-              LanguagesSettings(v-if="languagesShow")
-              ClientsSettings(v-if="clientsShow")
-              QuotesSettings(v-if="soonQuotesShow")
-              ProjectsSettings(v-if="projectsShow")
-              FinanceSettings(v-if="financeShow" :sliderBool="sliderBool" @hideFinanceBlanket="hideFinance")
-              ReportsSettings(v-if="reportsShow")
-              Blanket(v-if="dashboardShowBlanket" title='Welcome to the Pangea Admin')
-              Blanket(v-if="recruitmentShow" title='Recruitment')
-              Blanket(v-if="vendorsShow" title='Vendor')
-              Blanket(v-if="languagesShow" title='Language')
-              Blanket(v-if="clientsShow" title='Client')
-              Blanket(v-if="soonQuotesShow" title='Quotes')
-              Blanket(v-if="projectsShow" title='Projects')
-              Blanket(v-if="financeShowBlanket" title='Finance')
-              Blanket(v-if="reportsShow" title='Reports')
-              Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
+            router-view(:sliderBool="sliderBool" @customerLangs='customerLangs')
+              // DashboardSettings(v-if="dashboardShow" :sliderBool="sliderBool")
+              // RecruitmentSettings(v-if="recruitmentShow")
+              // VendorsSettings(v-if="vendorsShow")
+              // LanguagesSettings(v-if="languagesShow")
+              // ClientsSettings(v-if="clientsShow")
+              // QuotesSettings(v-if="soonQuotesShow")
+              // ProjectsSettings(v-if="projectsShow")
+              // FinanceSettings(v-if="financeShow" :sliderBool="sliderBool" @hideFinanceBlanket="hideFinance")
+              // ReportsSettings(v-if="reportsShow")
+            Blanket(v-if="navbarList[0].active && dashboardShowBlanket" title='Welcome to the Pangea Admin')
+              // Blanket(v-if="recruitmentShow" title='Recruitment')
+              // Blanket(v-if="vendorsShow" title='Vendor')
+              // Blanket(v-if="languagesShow" title='Language')
+              // Blanket(v-if="clientsShow" title='Client')
+              // Blanket(v-if="soonQuotesShow" title='Quotes')
+              // Blanket(v-if="projectsShow" title='Projects')
+              // Blanket(v-if="financeShowBlanket" title='Finance')
+              // Blanket(v-if="reportsShow" title='Reports')
+            Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
 <script>
-import Quotesinfo from "../components/quotes/Qoutesinfo";
-import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
+// import Quotesinfo from "../components/quotes/Qoutesinfo";
 import Accountinfo from "../components/account/Accountinfo";
 import Blanket from "../components/Blanket/Blanket";
 import ClickOutside from "vue-click-outside";
 // import Table from "./Table/Table.vue";
 // import TableServices from "./Table/TableServices.vue";
 // import TableIndustries from "./Table/TableIndustries";
-import DashboardSettings from "./sliders/DashboardSettings";
-import RecruitmentSettings from "./sliders/RecruitmentSettings";
-import VendorsSettings from "./sliders/VendorsSettings";
-import LanguagesSettings from "./sliders/LanguagesSettings";
-import ClientsSettings from "./sliders/ClientsSettings";
-import QuotesSettings from "./sliders/QuotesSettings";
-import ProjectsSettings from "./sliders/ProjectsSettings";
-import FinanceSettings from "./sliders/FinanceSettings";
-import ReportsSettings from "./sliders/ReportsSettings";
+// import DashboardSettings from "./sliders/DashboardSettings";
+// import RecruitmentSettings from "./sliders/RecruitmentSettings";
+// import VendorsSettings from "./sliders/VendorsSettings";
+// import LanguagesSettings from "./sliders/LanguagesSettings";
+// import ClientsSettings from "./sliders/ClientsSettings";
+// import QuotesSettings from "./sliders/QuotesSettings";
+// import ProjectsSettings from "./sliders/ProjectsSettings";
+// import FinanceSettings from "./sliders/FinanceSettings";
+// import ReportsSettings from "./sliders/ReportsSettings";
 
 export default {
   data() {
@@ -88,7 +96,6 @@ export default {
         name: "Test",
         email: "test@test.com"
       },
-      adminPortal: "ADMIN PORTAL",
       navbarList: [
         {
           title: "DASHBOARD",
@@ -145,6 +152,13 @@ export default {
           active: false
         }
       ],
+      newProject: [
+        {title: "Translation"},
+        {title: "Copywriting"},
+        {title: "Marketing"},
+        {title: "Proofing/QA"},
+        {title: "Graphic Localization"}
+      ],
       cookies: false,
       dropdownVisible: false,
       clientRequestShow: false,
@@ -175,10 +189,58 @@ export default {
     };
   },
   methods: {
+    async customerLangs(data) {
+      let person = await this.$http.get(`api/person?customerId=${data.id}`);
+      let personEmail = person.body.email;
+      console.log(personEmail);
+      let token = await this.$http.post('api/get-token', {email: personEmail});
+      console.log(token);
+      let sessionId = await this.$http.post('api/token-session', {token: token});
+      console.log('session: ' + sessionId);
+      document.cookie = "ses=" + sessionId.body + "; " + "maxAge=60;" 
+      let result = await this.$http.get(`portal/language-combinations?customerId=${data.id}`);
+      this.$store.dispatch('gettingClientLangs', result.body);
+      console.log(result);
+    },
+    async getCustomers() {
+      let result = await this.$http.get('api/customers');
+      this.$store.dispatch('customersGetting', result.body);
+    },
+    dataForRequest(index) {
+      if (index == 0) {
+        this.$router.push('translation-request');
+        this.dashboardShowBlanket = false;
+      }
+      this.hideAdditional();
+    },
+    mainPageRender() {
+      for(let elem of this.navbarList) {
+        if(window.location.toString().indexOf(elem.title.toLowerCase()) != -1) {
+          let path = '/' + elem.title.toLowerCase()
+          this.$router.push(path);
+          elem.active = true;
+        } else {
+          elem.active = false
+        }
+      }
+    },
+    hideAdditional() {
+      this.dropdownVisible = false;
+    },
     // hideSlider() {
     //   this.sliderBool = false;
     // },
     showSlider() {
+      if(window.location.toString().indexOf('dashboard') == -1) {
+        this.$router.push('dashboard')
+      }
+      for(let elem of this.navbarList) {
+        if(elem.title == 'DASHBOARD') {
+          elem.active = true
+        } else {
+          elem.active = false
+        }
+      }
       this.sliderBool = true;
       this.dashboardShowBlanket = false;
       if (!this.dashboardShow) {
@@ -200,7 +262,7 @@ export default {
         return true;
       } else {
         console.log("login failed");
-        window.location.replace("/");
+        window.location.replace("/login");
       }
     },
     hideAccountMenu() {
@@ -217,8 +279,12 @@ export default {
         } else {
           item.active = false;
         }
+      })
 
         if (index == 0) {
+          if(window.location.toString().indexOf('dashboard') == -1) {
+            this.$router.push('dashboard')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -230,11 +296,14 @@ export default {
           this.soonQuotesShow = false;
           this.dashboardShowBlanket = true;
           this.sliderBool = false;
-          this.hideAllTables();
+          // this.hideAllTables();
           this.path = "Dashboard";
         }
 
         if (index == 1) {
+          if(window.location.toString().indexOf('recruitment') == -1) {
+            this.$router.push('recruitment')
+          }
           this.recruitmentShow = true;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -250,6 +319,9 @@ export default {
         }
 
         if (index == 2) {
+          if(window.location.toString().indexOf('vendors') == -1) {
+            this.$router.push('vendors')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = true;
           this.languagesShow = false;
@@ -265,6 +337,9 @@ export default {
         }
 
         if (index == 3) {
+          if(window.location.toString().indexOf('languages') == -1) {
+            this.$router.push('languages')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = true;
@@ -280,6 +355,9 @@ export default {
         }
 
         if (index == 4) {
+          if(window.location.toString().indexOf('clients') == -1) {
+            this.$router.push('clients')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.clientsShow = true;
@@ -295,6 +373,9 @@ export default {
         }
 
         if (index == 5) {
+          if(window.location.toString().indexOf('quotes') == -1) {
+            this.$router.push('quotes')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -310,6 +391,9 @@ export default {
         }
 
         if (index == 6) {
+          if(window.location.toString().indexOf('projects') == -1) {
+            this.$router.push('projects')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -325,6 +409,9 @@ export default {
         }
 
         if (index == 7) {
+          if(window.location.toString().indexOf('finance') == -1) {
+            this.$router.push('finance')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -340,6 +427,9 @@ export default {
         }
 
         if (index == 8) {
+          if(window.location.toString().indexOf('reports') == -1) {
+            this.$router.push('reports')
+          }
           this.recruitmentShow = false;
           this.vendorsShow = false;
           this.languagesShow = false;
@@ -355,7 +445,6 @@ export default {
         }
 
         this.accountInfo = false;
-      });
     },
     showQuotes() {
       this.openQuotes = !this.openQuotes;
@@ -401,32 +490,40 @@ export default {
     },
     hideFinance(data){
       this.financeShowBlanket = data;
+    },
+    async getServices() {
+      const result = await this.$http.get('api/services');
+      let services = result.body;
+      services.sort((a, b) => {return a.sortIndex - b.sortIndex});
+      this.$store.dispatch('servicesGetting', services);
     }
   },
   mounted() {
     this.getCookie();
+    this.mainPageRender();
+    this.getServices();
+    this.getCustomers();
     // document.body.classList.add("main-body");
   },
   destroyed() {
     // document.body.classList.remove("main-body");
   },
   components: {
-    Quotesinfo,
-    QuotesInfoDetailed,
-    Accountinfo,
+    // Quotesinfo,
+    // Accountinfo,
     Blanket,
     // Table,
     // TableServices,
     // TableIndustries,
-    DashboardSettings,
-    RecruitmentSettings,
-    VendorsSettings,
-    LanguagesSettings,
-    ClientsSettings,
-    QuotesSettings,
-    ProjectsSettings,
-    FinanceSettings,
-    ReportsSettings
+    // DashboardSettings,
+    // RecruitmentSettings,
+    // VendorsSettings,
+    // LanguagesSettings,
+    // ClientsSettings,
+    // QuotesSettings,
+    // ProjectsSettings,
+    // FinanceSettings,
+    // ReportsSettings
   },
   directives: {
     ClickOutside
@@ -466,7 +563,7 @@ export default {
 // }
 
 .adminportalWrapper2 {
-  margin: 0 auto;
+  // margin: 0 auto;
   // overflow: auto;
 }
 
@@ -509,6 +606,7 @@ export default {
     margin-left: 150px;
     a {
       text-decoration: none;
+      padding-top: 11px;
     }
     .adminPortal {
       color: #fff;
@@ -763,7 +861,6 @@ export default {
 
     .chevronWrapper {
       width: 140px;
-      padding-left: 40px;
       .chevron {
         position: relative;
         text-align: center;
@@ -771,7 +868,6 @@ export default {
         margin-bottom: 6px;
         height: 16px;
         width: 16px;
-        margin-right: 123px;
         cursor: pointer;
         transform: rotate(180deg);
         @media screen and (max-width: 1450px) {
@@ -785,22 +881,21 @@ export default {
       .chevron:before {
         content: "";
         position: absolute;
-        top: 8px;
-        left: 6px;
+        top: 15px;
         height: 8%;
-        width: 41%;
+        width: 29%;
         background: #fff;
-        transform: skew(0deg, 50deg);
+        transform: skew(0deg,50deg);
       }
       .chevron:after {
         content: "";
         position: absolute;
-        top: 8px;
-        right: 18px;
+        top: 15px;
         height: 8%;
-        width: 41%;
+        left: 8px;
+        width: 29%;
         background: #fff;
-        transform: skew(0deg, -50deg);
+        transform: skew(0deg,-50deg);
       }
     }
   }
@@ -873,7 +968,7 @@ export default {
     }
 
     &__slider {
-      transform: translate(-50%);
+      // transform: translate(-50%);
       background-color: #fff;
       width: 175px;
       // width: 216px;
@@ -1083,5 +1178,84 @@ export default {
 }
 .none_langBg {
   background-color: #fff;
+}
+
+.create-project {
+  height: 34px;
+  width: 239px;
+  margin-right: 83px;
+  z-index: 3;
+  position: relative;
+  .sel_project_block {
+    margin-right: 150px;
+    width: 239px;
+    width: 33%;
+    background-color: #f5876e;
+    border-radius: 14px;
+    width: 100%;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+
+    &__proj {
+      border-right: 1px solid #fff;
+      line-height: 100%;
+      color: #fff;
+      padding-right: 60px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      span {
+        padding-right: 33px;
+        padding-left: 14px;
+        white-space: nowrap;
+      }
+    }
+
+    &__imgWrapper {
+      display: flex;
+      height: 33px;
+      width: 48px;
+      img {
+        transform: rotate(180deg);
+        padding: 10px 17px;
+        cursor: pointer;
+        width: 14px;
+      }
+      .rotate {
+        transform: rotate(0deg);
+        padding-left: 14px;
+      }
+    }
+  }
+
+  .clientsTop__dropdown {
+    z-index: -1;
+    position: absolute;
+    right: 47px;
+    top: 22px;
+
+    .additional {
+      padding-top: 10px;
+      border: 2px solid #978d7e;
+      color: #67573e;
+      background-color: #fff;
+      font-size: 16px;
+      width: 188px;
+
+      &__listItem,
+      {
+        padding: 13px;
+        font-family: MyriadPro;
+        border-bottom: 0.2px solid #978d7e;
+        cursor: pointer;
+        &:hover {
+          background-color: #ddd3c8;
+        }
+      }
+    }
+  }
 }
 </style>

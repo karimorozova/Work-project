@@ -4,6 +4,8 @@ const axios = require('axios');
 const FormData = require('form-data');
 const unirest = require('unirest');
 const querystring = require('querystring');
+const HomeApi = require('../models/xtrf/home');
+const ClientApi = require('../models/xtrf/client');
 const fs = require('fs');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
@@ -283,6 +285,28 @@ router.get('/industries', (req, res) => {
     res.send('Something wrong with DB');
   });
 });
+
+router.get('/customers', async (req, res) => {
+  let customers = await HomeApi.getAllCustomers();
+  res.send(customers)
+})
+
+router.get('/person', async (req, res) => {
+  let person = await HomeApi.getPerson(req.query.customerId);
+  let email = {'email': person};
+  res.send(email);
+})
+
+router.post('/get-token', async (req, res) => {
+  let email = {'email': req.body.email};
+  let token = await HomeApi.getTokenCircular(email);
+  res.send(token);
+})
+
+router.post('/token-session', async (req, res) => {
+  let sessionId = await ClientApi.login(req.body.token.body);
+  res.send(sessionId);
+})
 
 router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {
   const flag = req.files["flag"];

@@ -8,7 +8,7 @@
             .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") Languages
             .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") Services
             .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") Industries
-      .adminMainWrapper__inner(:class='{"adminMainWrapper__open": slidebarVisible}')
+      .adminMainWrapper__inner(v-if="sliderBool" :class='{"adminMainWrapper__open": slidebarVisible}')
         .breadCrumbs 
           span {{ path }}
         .maininfoWrapper(v-if="languagesSettingsVisible")
@@ -48,6 +48,7 @@ export default {
   },
   data() {
     return {
+      cookies: false,
       languagesSettingsVisible: false,
       languagesBgBool: false,
       servicesSettingsVisible: false,
@@ -109,7 +110,7 @@ export default {
 
 <style lang="scss" scoped>
 .adminportalWrapper2 {
-  margin: 0 auto;
+  // margin: 0 auto;
   // overflow: auto;
 }
 .quotesComponent {
@@ -202,7 +203,7 @@ export default {
     &__slider {
       transform: translate(-100%);
       background-color: #fff;
-      // width: 175px;
+      width: 175px;
       // width: 216px;
       box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
       display: flex;

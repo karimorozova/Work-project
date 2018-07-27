@@ -233,6 +233,7 @@ export default {
     width: 100%;
     border: 1px solid #9a8f80;
     font-size: 14px;
+    border-collapse: collapse;
     tr {
       display: flex;
       th {
