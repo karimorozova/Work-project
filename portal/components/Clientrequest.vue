@@ -233,9 +233,9 @@ export default {
             'resx', 'ini'
           ]    
       },
-      languages: [
-      
+      clientLanguages: [
       ],
+      languages: [],
       xtmProjects: []
     }
   },
@@ -415,6 +415,7 @@ export default {
         sendForm.append("accountManager", "None selected");
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
+        sendForm.append("dateFormatted", moment(this.request.createdAt).format('YYYY MM DD'));
         sendForm.append("jsession", this.$store.state.session);
         for(var i = 0; i < this.detailFiles.length; i++){
           console.log(this.detailFiles[i]);
@@ -446,8 +447,8 @@ export default {
       this.services = this.$store.state.services;
       
     },
-    getLanguages() {
-      this.languages = this.$store.state.clientLanguages;
+    getClientLanguages() {
+      this.clientLanguages = this.$store.state.clientLanguages;
     },
     
     async checkForm(event) {
@@ -468,7 +469,7 @@ export default {
           accountManager: "None selected",
           brief: this.brief,
           files: this.files,
-          createdAt: moment(new Date()).format('YYYY MM DD')    
+          createdAt: new Date()    
     }
 
       this.errors = [];
@@ -492,19 +493,45 @@ export default {
         this.showError();
         event.preventDefault();
       }
-    }    
+    },
+    async getLanguages() {
+      let result = await this.$axios.$get('api/languages');
+      let allLangs = [];
+      result.map(item => {
+        if(!item.dialects) {
+          allLangs.push(item);
+        } else {
+          allLangs.push(item);
+          for(let elem of item.dialects) {
+            allLangs.push(elem)
+          }
+        }
+      });
+      this.languages = allLangs;
+    },
   },
   computed: {
     sourceLanguages() {
       let result = [];
-      if(this.languages.length) {
-        for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].sourceLanguage.name, lang: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, id: this.languages[i].sourceLanguage.id, xtrf: this.languages[i].sourceLanguage.id, check: false})   
+      if(this.clientLanguages.length) {
+        for(let i = 0; i < this.clientLanguages.length; i++) {
+          result.push({name: this.clientLanguages[i].sourceLanguage.name, lang: this.clientLanguages[i].sourceLanguage.name, symbol: this.clientLanguages[i].sourceLanguage.symbol, id: this.clientLanguages[i].sourceLanguage.id, xtrf: this.clientLanguages[i].sourceLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
+
+      if(this.languages.length) {
+        for(let lang of this.languages) {
+          for(let elem of result) {
+            if(lang.symbol == elem.symbol) {
+              elem.icon = lang.icon;
+              elem.xtm = lang.xtm;
+            }
+          }
+        }
+      }
 
       return result.sort((a, b) => {
         if (a.name < b.name) return -1;
@@ -513,10 +540,10 @@ export default {
     },
     targetLanguages() {
       let result = [];
-      if(this.languages.length) {
-        for(let i = 0; i < this.languages.length; i++) {
-          if (this.languages[i].sourceLanguage.name == this.sourceSelect.name)
-          result.push({name: this.languages[i].targetLanguage.name, lang: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, id: this.languages[i].targetLanguage.id, xtrf: this.languages[i].targetLanguage.id, check: false})   
+      if(this.clientLanguages.length) {
+        for(let i = 0; i < this.clientLanguages.length; i++) {
+          if (this.clientLanguages[i].sourceLanguage.name == this.sourceSelect.name)
+          result.push({name: this.clientLanguages[i].targetLanguage.name, lang: this.clientLanguages[i].targetLanguage.name, symbol: this.clientLanguages[i].targetLanguage.symbol, id: this.clientLanguages[i].targetLanguage.id, xtrf: this.clientLanguages[i].targetLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
@@ -525,6 +552,18 @@ export default {
       result = result.filter(item => {
         return item.name != this.sourceSelect.name;
       })
+
+      if(this.languages.length) {
+        for(let lang of this.languages) {
+          for(let elem of result) {
+            if(lang.symbol == elem.symbol) {
+              elem.icon = lang.icon;
+              elem.xtm = lang.xtm;
+            }
+          }
+        }
+      }
+
       result.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -560,6 +599,7 @@ export default {
   },
   mounted(){
     this.getServices();
+    this.getClientLanguages();
     this.getLanguages();
     
   }

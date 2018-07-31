@@ -18,6 +18,17 @@ function getAllCustomers() {
     })
 }
 
+function customerInfo(id) {
+    return new Promise(resolve => {
+        homeXtrf.get(`customers/${id}`).then(response => {
+            resolve(response.data)
+        }).catch(err => {
+            console.log("Error on getting cutomer info from XTRF!");
+            resolve(error)
+        })
+    })
+}
+
 function createCustomer(request) {
     return new Promise(resolve => {
         homeXtrf.post("customers", {
@@ -190,13 +201,13 @@ function createPerson(id, contactEmail, personName) {
 
 function getTokenCircular(obj) {
     return new Promise(resolve => {
-        let email = obj.email.toString();
+        let email = obj.email;
         homeXtrf.post("customers/persons/accessToken", {
             'loginOrEmail': email
         }).then(function (response) {
             resolve(response.data.token);
         }).catch(function (error) {
-            resolve(error);
+            resolve(error.response.data);
         });
     })
 }
@@ -236,4 +247,4 @@ function getSpecializations() {
 }
 
 
-module.exports = { getAllCustomers, getTokenCircular, getPerson, findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, createPerson, generateToken, createCustomer, addClassicProject, addSmartProject }
+module.exports = { getAllCustomers, customerInfo, getTokenCircular, getPerson, findCustomer, addQuote, setTargetLanguage, setSrcLanguage, deadlineAdd, createPerson, generateToken, createCustomer, addClassicProject, addSmartProject }

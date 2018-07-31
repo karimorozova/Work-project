@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
-const { saveJobs } = require('../models/xtmApi');
+const { saveJobs, saveTemplateJobs } = require('../models/xtmApi');
 const fs = require('fs');
 const mv = require('mv');
 const unirest = require('unirest');
@@ -34,13 +34,26 @@ function moveFile(oldFile, requestId) {
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
     let project = new Projects(req.body);
+    let todayStart = new Date();
+    todayStart.setUTCHours(0,0,0,0);
+    let todayEnd = new Date(todayStart);
+    todayEnd.setUTCHours(23,59,59,0);
+    let todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
+    let nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
     project.status = "Open";
-    project.projectId = req.body.createdAt + ' [01]';
+    project.projectId = req.body.dateFormatted + ' ' + nextNumber;
+    let date = req.body.dateFormatted;
     let xtmData = req.body;
-    let date = xtmData.createdAt;
     let sourceLanguage = JSON.parse(xtmData.sourceLanguage);
     let targetLanguages = JSON.parse(xtmData.targetLanguages);
-
+    let templateId;
+    let workflowId;
+    if(xtmData.template) {
+        templateId = xtmData.template;
+    }
+    if(xtmData.workflow) {
+        workflowId = xtmData.workflow;
+    }
     let symbol = sourceLanguage.symbol.split('-');
     let source = symbol[0].toLowerCase() + '_' + symbol[1];
     let target = [];
@@ -52,18 +65,32 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     }
 
     for(let i  = 0; i < targetLanguages.length; i++) {
-        symbol = targetLanguages[i].symbol.split('-');
-        target.push(symbol[0].toLowerCase() + '_' + symbol[1]);
+        // symbol = targetLanguages[i].symbol.split('-');
+        // target.push(symbol[0].toLowerCase() + '_' + symbol[1]);
+        target.push(targetLanguages[i].xtm);
     }
     var ids = [];
     for(let i = 0; i < target.length; i++) {
-        let name = date + ' [01] ' + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
-        let proj = await saveJobs({
-            name: name,
-            source: source,
-            target: target[i],
-            file: detFile 
-        });
+        let name = date + ` ${nextNumber} ` + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
+        let proj;
+        if(xtmData.customerId) {
+            proj = await saveTemplateJobs({
+                customerId: xtmData.customerId,
+                name: name,
+                source: source,
+                target: target[i],
+                file: detFile,
+                templateId: templateId,
+                workflowId: workflowId
+            });
+        } else {
+            proj = await saveJobs({
+                name: name,
+                source: source,
+                target: target[i],
+                file: detFile
+            });
+        }
         project.xtmId = await proj.body.projectId;
         await ids.push(proj.body.jobs[0].jobId);
         await project.jobs.push({id: proj.body.jobs[0].jobId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
@@ -80,6 +107,24 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
             },2000);
         }    
     }
+})
+
+router.get('/xtm-customers', async (req, res) => {
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/customers')
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'}) 
+        .end((response) => {
+            res.send(response.body);
+        })
+})
+
+router.get('/xtm-clientinfo', async (req, res) => {
+    unirest.get(`http://wstest2.xtm-intl.com/rest-api/customers?fetchAddress=YES&ids=${req.query.id}`)
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'}) 
+        .end((response) => {
+            res.send(response.body);
+        })
 })
 
 router.post('/saveproject', async (req, res) => {

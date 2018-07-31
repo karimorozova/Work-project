@@ -14,7 +14,7 @@
           .number.customers(v-click-outside="outsideCustomers")
             label.asterisk CUSTOMER:
             .customers__menu
-              span.inner-text(:class="{ color: customerSelected != 'Select' }") {{ customerSelected }}
+              span.inner-text(:class="{ color: customerSelected.name != 'Select' }") {{ customerSelected.name }}
                 .wrapper(@click.self="showCustomers")
                 .icon(:class="{reverse: customerDrop}")
                   i.fa.fa-caret-down
@@ -33,6 +33,31 @@
                 datepicker(ref="programaticOpen" placeholder='dd-mm-yyyy' :format='format' v-model='deadlineSelect' monday-first=true :highlighted='state.highlighted' :disabled='state.disabled')
                 .datepick(@click='openPicker')
                     img(src='../../assets/images/calendar.png')
+          .number
+            label.asterisk TEMPLATE AND WORKFLOW
+          .template-workflow
+            .lang-source(v-click-outside="outsideTemplates")
+              span.langTitle Select Template
+              .selectLangs.source
+                span.inner-text.clarify(:class="{ color: templateSelect.name != 'Select' }") {{ templateSelect.name }}
+                  .wrapper(@click.self='showTemplate')
+                  .icon(:class="{ reverse: templateDrop }")
+                    i.fa.fa-caret-down
+                .source__drop(v-if='templateDrop')
+                  .source__drop-list(v-for='template in templates')
+                    .pair(@click='changeTemplate(template)')
+                      span.list-item(:class="{ active: template.name == templateSelect.name }") {{ template.name }}
+            .lang-target(v-click-outside="outsideWorkflow")
+              span.langTitle Select Workflow
+              .selectLangs.source
+                span.inner-text.clarify(:class="{ color: workflowSelect.name != 'Select' }") {{ workflowSelect.name }}
+                  .wrapper(@click.self='showWorkflow')
+                  .icon(:class="{ reverse: workflowDrop }")
+                    i.fa.fa-caret-down
+                .source__drop(v-if='workflowDrop')
+                  .source__drop-list(v-for='workflow in workflows')
+                    .pair(@click='changeWorkflow(workflow)')
+                      span.list-item(:class="{ active: workflow.name == workflowSelect.name }") {{ workflow.name }}
           .number 
             label.asterisk SELECT A LANGUAGE
           .language(v-click-outside="outsideLangs")
@@ -46,7 +71,7 @@
                 .source__drop(v-if='sourceDrop')
                   .source__drop-list(v-for='language in sourceLanguages')
                     .pair(@click='changeSourceSelect(language)')
-                      img(:src="language.icon")
+                      img(:src="'./'+language.icon")
                       span.list-item(:class="{ active: language.name == sourceSelect.name }") {{ language.name }}
             .lang-target
               span.langTitle Target Language(s)
@@ -60,7 +85,7 @@
                 .target__drop(v-if='targetDrop')
                   .target__drop-list(v-for='language in targetLanguages')
                     .pair(v-if='(sourceSelect.name.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.name == "Select"' @click='changeTargetSelect(language)')
-                      img(:src="language.icon")
+                      img(:src="'./'+language.icon")
                       span.list-item(:class="{ active: language.check }") {{ language.name }}
           .number
             label PROJECT DETAILS
@@ -169,6 +194,10 @@ export default {
     thanks: {
       type: Boolean,
       default: false
+    },
+    clientLanguages: {
+      type: Array,
+      default: []
     }
   },
   data () {
@@ -181,6 +210,19 @@ export default {
           to: moment().add(-1, 'day').endOf('day').toDate()
         }
       },
+      templates: [
+        {name: 'Excel segment limit', id: 'XLSwithLimit'},
+        {name: 'Multilingual Excel', id: 'multiexcel'},
+        {name: 'Standard processing', id: '247336FD'},        
+      ],
+      templateSelect: {name: 'Select', id: 0},
+      templateDrop: false,
+      workflows: [
+        {name: 'Translate', id: 2890},
+        {name: 'Translate, review', id: 2929},
+      ],
+      workflowSelect: {name: 'Select', id: 2890},
+      workflowDrop: false,
       customerDrop: false,
       searchCustomer: "",
       sendOption: true,
@@ -247,17 +289,33 @@ export default {
             'resx', 'ini'
           ]    
       },
-      languages: [
-      
-      ],
       xtmProjects: [],
-      customerSelected: 'Select'
+      customerSelected: {name: 'Select'},
     }
   },
   methods: {
+    showTemplate() {
+      this.templateDrop = !this.templateDrop;
+    },
+    changeTemplate(tem) {
+      this.templateSelect = tem;
+    },
+    outsideTemplates() {
+      this.templateDrop = false;
+    },
+    showWorkflow() {
+      this.workflowDrop = !this.workflowDrop;
+    },
+    changeWorkflow(work) {
+      this.workflowSelect = work;
+    },
+    outsideWorkflow() {
+      this.workflowDrop = false;
+    },
     chooseCustomer(ind) {
-      this.customerSelected = this.customers[ind].name;
-      this.$emit('customerLangs', {id: this.customers[ind].id, name: this.customers[ind].name});
+      this.customerSelected = this.customers[ind];
+      this.getClientInfo(this.customers[ind].id);
+      this.$emit('customerLangs', this.customers[ind]);
     },
     showCustomers() {
       this.customerDrop = !this.customerDrop;
@@ -389,14 +447,22 @@ export default {
     closeWarning() {
       this.error = false;
     },
+    async getClientInfo(customerId) {
+      let result = await this.$http.get(`../customer-info?customerId=${customerId}`);
+      console.log("client-info: " + result);
+    },
     clearForm() {
+      this.customerSelected = {name: 'Select'};
+      this.searchCustomer = '';
+      this.templateSelect = {name: 'Select', id: 0};
+      this.workflowSelect = {name: 'Select', id: 2890};
       this.projectName = "";
       this.refFiles = [];
       this.detailFiles = [];
       this.request = [];
       this.deadlineDate = '';
       this.deadlineSelect = '';
-      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)', xtm: 'en_GB'};
       this.targetlang = ["Select"];
       this.targetDrop = false;
       this.targetSelect = [];
@@ -437,10 +503,15 @@ export default {
         sendForm.append("skype", this.request.skype);
         sendForm.append("phone", this.request.phone);
         sendForm.append("companyName", this.request.companyName);
+        sendForm.append("customerId", this.request.customerId);
         sendForm.append("accountManager", "None selected");
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
-        sendForm.append("jsession", this.$store.state.session);
+        sendForm.append("template", this.request.template);
+        sendForm.append("workflow", this.request.workflow);
+        sendForm.append("dateFormatted", moment(this.request.createdAt).format('YYYY MM DD'));
+
+        // sendForm.append("jsession", this.$store.state.session);
         for(var i = 0; i < this.detailFiles.length; i++){
           console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
@@ -462,38 +533,39 @@ export default {
         //End Comment because of XTM testing
         ////////////////////////////////////
 
-        const result = await this.$axios.$post('xtm/request', sendForm);
+        const result = await this.$http.post('../xtm/request', sendForm);
         console.log(result);
         this.xtmProjects = result;
         this.clearForm();
     },
     getServices() {
       this.services = this.$store.state.services;
-      
     },
-    getLanguages() {
-      this.languages = this.$store.state.clientLangs;
+    getClientLanguages() {
+      this.clientLanguages = this.$store.state.clientLangs;
     },
-    
     async checkForm(event) {
       this.request = {
+          customerId: this.customerSelected.xtmId,
           projectName: this.projectName,
           date: this.deadlineSelect, 
-          contactName: this.$store.state.clientInfo.name, 
-          contactEmail: this.$store.state.clientInfo.email,
-          service: this.$store.state.clientInfo.service, 
-          industry: this.$store.state.clientInfo.industry, 
+          contactName: 'testName',//this.$store.state.clientInfo.name, 
+          contactEmail: 'test@Email.com', //this.$store.state.clientInfo.email,
+          service: 'Translation', //this.$store.state.clientInfo.service, 
+          industry: 'General', //this.$store.state.clientInfo.industry, 
           status: 'New',
+          template: this.templateSelect.id,
+          workflow: this.workflowSelect.id,
           sourceLanguage: this.sourceSelect, 
           targetLanguages: this.targetSelect, 
-          web: this.$store.state.clientInfo.web,
-          skype: this.$store.state.clientInfo.skype, 
-          phone: this.$store.state.clientInfo.phone, 
-          companyName: this.$store.state.clientInfo.companyName,
+          web: '', //this.$store.state.clientInfo.web,
+          skype: '', //this.$store.state.clientInfo.skype, 
+          phone: '1212121212', //this.$store.state.clientInfo.phone, 
+          companyName: this.customerSelected.name, //this.$store.state.clientInfo.companyName,
           accountManager: "None selected",
           brief: this.brief,
           files: this.files,
-          createdAt: moment(new Date()).format('YYYY MM DD')    
+          createdAt: new Date()
     }
 
       this.errors = [];
@@ -520,11 +592,30 @@ export default {
     }    
   },
   computed: {
+    languages() {
+      let result = [];
+      if(this.$store.state.languages.length) {
+        result = this.$store.state.languages;
+      }
+      return result;
+    },
     customers() {
       let result = [];
+      
       if(this.$store.state.customers.length) {
         result = this.$store.state.customers;
       }
+
+      if(this.$store.state.xtmCustomers.length) {
+        for(let cust of this.$store.state.xtmCustomers) {
+          for(let elem of result) {
+            if(cust.name == elem.name) {
+              elem.xtmId = cust.id
+            }
+          }
+        }
+      }
+
       result = result.filter(item => {
         if(item.name.toLowerCase().indexOf(this.searchCustomer.toLowerCase()) != -1) {
           return item;
@@ -534,14 +625,25 @@ export default {
     },
     sourceLanguages() {
       let result = [];
-      if(this.languages.length) {
-        for(let i = 0; i < this.languages.length; i++) {
-          result.push({name: this.languages[i].sourceLanguage.name, lang: this.languages[i].sourceLanguage.name, symbol: this.languages[i].sourceLanguage.symbol, id: this.languages[i].sourceLanguage.id, xtrf: this.languages[i].sourceLanguage.id, check: false})   
+      if(this.clientLanguages.length) {
+        for(let i = 0; i < this.clientLanguages.length; i++) {
+          result.push({name: this.clientLanguages[i].sourceLanguage.name, lang: this.clientLanguages[i].sourceLanguage.name, symbol: this.clientLanguages[i].sourceLanguage.symbol, id: this.clientLanguages[i].sourceLanguage.id, xtrf: this.clientLanguages[i].sourceLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
       });
+
+      if(this.languages.length) {
+        for(let lang of this.languages) {
+          for(let elem of result) {
+            if(lang.symbol == elem.symbol) {
+              elem.icon = lang.icon;
+              elem.xtm = lang.xtm;
+            }
+          }
+        }
+      }
 
       return result.sort((a, b) => {
         if (a.name < b.name) return -1;
@@ -550,10 +652,10 @@ export default {
     },
     targetLanguages() {
       let result = [];
-      if(this.languages.length) {
-        for(let i = 0; i < this.languages.length; i++) {
-          if (this.languages[i].sourceLanguage.name == this.sourceSelect.name)
-          result.push({name: this.languages[i].targetLanguage.name, lang: this.languages[i].targetLanguage.name, symbol: this.languages[i].targetLanguage.symbol, id: this.languages[i].targetLanguage.id, xtrf: this.languages[i].targetLanguage.id, check: false})   
+      if(this.clientLanguages.length) {
+        for(let i = 0; i < this.clientLanguages.length; i++) {
+          if (this.clientLanguages[i].sourceLanguage.name == this.sourceSelect.name)
+          result.push({name: this.clientLanguages[i].targetLanguage.name, lang: this.clientLanguages[i].targetLanguage.name, symbol: this.clientLanguages[i].targetLanguage.symbol, id: this.clientLanguages[i].targetLanguage.id, xtrf: this.clientLanguages[i].targetLanguage.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
@@ -562,6 +664,18 @@ export default {
       result = result.filter(item => {
         return item.name != this.sourceSelect.name;
       })
+
+      if(this.languages.length) {
+        for(let lang of this.languages) {
+          for(let elem of result) {
+            if(lang.symbol == elem.symbol) {
+              elem.icon = lang.icon;
+              elem.xtm = lang.xtm;
+            }
+          }
+        }
+      }
+
       result.sort((a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -599,7 +713,6 @@ export default {
   },
   mounted(){
     this.getServices();
-    this.getLanguages();    
   }
 }
 

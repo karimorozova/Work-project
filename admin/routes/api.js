@@ -56,21 +56,6 @@ function moveLangIcon(oldFile, date) {
   console.log('Flag icon moved!')
 }
 
-// router.get('/taskDetail', async (req, res) => {
-//   console.log("In task details");
-//   let array = req.query.info;
-//   var file = fs.createWriteStream('./dist/taskdetail.xls');
-//   file.on('error', (err) => { console.log(err) });
-//   array.forEach( (el) => {
-//     file.write( el + "\r\n");
-//   });
-//   file.end();
-//   file.on('finish', () => {
-//     var taskfile = "./dist/taskdetail.xls";
-//     res.download(taskfile);
-//   })
-// })
-
 router.get('/wordcount', async (req, res) => {
 
   var link = req.query.web;
@@ -299,13 +284,23 @@ router.get('/person', async (req, res) => {
 
 router.post('/get-token', async (req, res) => {
   let email = {'email': req.body.email};
-  let token = await HomeApi.getTokenCircular(email);
-  res.send(token);
+  try {
+    let token = await HomeApi.getTokenCircular(email);
+    res.send(token);
+  } catch (err) {
+    res.send(err);
+    console.log(err);
+  }
 })
 
 router.post('/token-session', async (req, res) => {
-  let sessionId = await ClientApi.login(req.body.token.body);
-  res.send(sessionId);
+  try {
+    let sessionId = await ClientApi.login(req.body.token.body);
+      res.send(sessionId);
+  } catch(err) {
+    res.send(err)
+  }
+  
 })
 
 router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {

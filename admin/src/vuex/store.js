@@ -9,6 +9,8 @@ const state = {
     count: 0,
     services: [],
     customers: [],
+    xtmCustomers: [],
+    languages: [],
     clientLangs: []
 };
 
@@ -21,6 +23,12 @@ const mutations = {
     },
     allCustomers(state, payload) {
         state.customers = payload
+    },
+    allXtmCustomers(state, payload) {
+        state.xtmCustomers = payload
+    },
+    allLangs(state, payload) {
+        state.languages = payload
     },
     customerlangs(state, payload) {
         state.clientLangs = payload

@@ -49,7 +49,10 @@
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
-            router-view(:sliderBool="sliderBool" @customerLangs='customerLangs')
+            router-view(:sliderBool="sliderBool"
+              :clientLanguages="clientLanguages"
+              @customerLangs='customerLangs'
+              )
               // DashboardSettings(v-if="dashboardShow" :sliderBool="sliderBool")
               // RecruitmentSettings(v-if="recruitmentShow")
               // VendorsSettings(v-if="vendorsShow")
@@ -185,26 +188,51 @@ export default {
       servicesSettingsVisible: false,
       servicesBgBool: false,
       industiesSettingsVisible: false,
-      industiesBgBool: false
+      industiesBgBool: false,
+      clientLanguages: [] 
     };
   },
   methods: {
     async customerLangs(data) {
+      console.log(data);
       let person = await this.$http.get(`api/person?customerId=${data.id}`);
       let personEmail = person.body.email;
       console.log(personEmail);
       let token = await this.$http.post('api/get-token', {email: personEmail});
-      console.log(token);
+      console.log(token.body);
       let sessionId = await this.$http.post('api/token-session', {token: token});
-      console.log('session: ' + sessionId);
+      console.log('session: ' + sessionId.body);
       document.cookie = "ses=" + sessionId.body + "; " + "maxAge=60;" 
       let result = await this.$http.get(`portal/language-combinations?customerId=${data.id}`);
       this.$store.dispatch('gettingClientLangs', result.body);
-      console.log(result);
+      if(typeof result.body == 'string') {
+        this.clientLanguages = []  
+      } else {
+        this.clientLanguages = result.body;
+      }
     },
     async getCustomers() {
       let result = await this.$http.get('api/customers');
       this.$store.dispatch('customersGetting', result.body);
+    },
+    async getXtmCustomers() {
+      let result = await this.$http.get('xtm/xtm-customers');
+      this.$store.dispatch('xtmCustomersGetting', result.body);
+    },
+    async getLanguages() {
+      let result = await this.$http.get('api/languages');
+      let allLangs = [];
+      result.body.map(item => {
+        if(!item.dialects) {
+          allLangs.push(item);
+        } else {
+          allLangs.push(item);
+          for(let elem of item.dialects) {
+            allLangs.push(elem)
+          }
+        }
+      })
+      this.$store.dispatch('allLanguages', allLangs);
     },
     dataForRequest(index) {
       if (index == 0) {
@@ -503,6 +531,8 @@ export default {
     this.mainPageRender();
     this.getServices();
     this.getCustomers();
+    this.getXtmCustomers();
+    this.getLanguages();
     // document.body.classList.add("main-body");
   },
   destroyed() {

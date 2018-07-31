@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const path = require('path');
+const HomeApi = require('../models/xtrf/home');
 const { User, Requests, Reports } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
@@ -82,6 +83,11 @@ router.post('/login', (req, res, next) => {
         return next(err);
     }
 });
+
+router.get('/customer-info', async (req, res) => {
+    let customer = await HomeApi.customerInfo(req.query.customerId);
+    res.send(customer)
+})
 
 async function updateReports() {
     console.log("Begin test");
