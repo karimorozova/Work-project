@@ -8,6 +8,8 @@ const config = require("./server-config.json");
 const mongoose = require("mongoose");
 const port = config.server.port;
 const db = mongoose.connection;
+const checkCollections = require("./helpers/dbSetDefault");
+const { LanguagesModel, RequestSchema } = require("./models");
 const history = require('connect-history-api-fallback');
 
 // TODO : check origins from localhost only
