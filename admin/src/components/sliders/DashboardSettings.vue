@@ -1,5 +1,6 @@
 <template lang="pug">
 .adminportalWrapper2
+  Blanket(title='Welcome to the Pangea Admin')
   .adminMainWrapper
     .adminNavbar
       .adminNavbar__slider(:class="{slider: slidebarVisible}")
@@ -35,6 +36,7 @@
 </template>
 
 <script>
+import Blanket from "../Blanket/Blanket";
 import TableLanguages from "../Table/TableLanguages";
 import TableServices from "../Table/TableServices.vue";
 import TableIndustries from "../Table/TableIndustries";
@@ -96,6 +98,7 @@ export default {
     }
   },
   components: {
+    Blanket,
     TableLanguages,
     TableServices,
     TableIndustries

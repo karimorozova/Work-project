@@ -15,6 +15,7 @@ import ProjectsSettings from '@/components/sliders/ProjectsSettings'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
+import Accountinfo from '@/components/account/Accountinfo'
 
 Vue.use(Router)
 
@@ -43,6 +44,11 @@ export default new Router({
       component: Main,
       props: true,
       children: [
+        {
+          path: 'accountinfo',
+          name: 'accountinfo',
+          component: Accountinfo
+        },
         {
           path: 'dashboard',
           name: 'dashboard',

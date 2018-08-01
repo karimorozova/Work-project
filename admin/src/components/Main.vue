@@ -62,7 +62,7 @@
               // ProjectsSettings(v-if="projectsShow")
               // FinanceSettings(v-if="financeShow" :sliderBool="sliderBool" @hideFinanceBlanket="hideFinance")
               // ReportsSettings(v-if="reportsShow")
-            Blanket(v-if="navbarList[0].active && dashboardShowBlanket" title='Welcome to the Pangea Admin')
+              // Blanket(v-if="navbarList[0].active && dashboardShowBlanket" title='Welcome to the Pangea Admin')
               // Blanket(v-if="recruitmentShow" title='Recruitment')
               // Blanket(v-if="vendorsShow" title='Vendor')
               // Blanket(v-if="languagesShow" title='Language')
@@ -296,10 +296,11 @@ export default {
     hideAccountMenu() {
       this.accountMenuVisible = false;
     },
-    // signOut() {
-    //   document.cookie = "ses" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    signOut() {
+      document.cookie = "who" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      this.$router.push('/login');
     //   window.location.replace("/");
-    // },
+    },
     switchInfo(index) {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
@@ -484,20 +485,21 @@ export default {
       this.accountMenuVisible = !this.accountMenuVisible;
     },
     showAccountInfo() {
-      this.accountInfo = true;
-      this.accountMenuVisible = !this.accountMenuVisible;
-      this.clientRequestShow = false;
-      this.languagesShow = false;
-      this.vendorsShow = false;
-      this.recruitmentShow = false;
-      this.clientsShow = false;
-      this.soonQuotesShow = false;
-      this.projectsShow = false;
-      this.thanks = false;
-      this.financeShow = false;
-      this.navbarList.forEach(item => {
-        item.active = false;
-      });
+      this.$router.push('accountinfo');
+      // this.accountInfo = true;
+      // this.accountMenuVisible = !this.accountMenuVisible;
+      // this.clientRequestShow = false;
+      // this.languagesShow = false;
+      // this.vendorsShow = false;
+      // this.recruitmentShow = false;
+      // this.clientsShow = false;
+      // this.soonQuotesShow = false;
+      // this.projectsShow = false;
+      // this.thanks = false;
+      // this.financeShow = false;
+      // this.navbarList.forEach(item => {
+      //   item.active = false;
+      // });
     },
     backToMain() {
       this.$refs.againMain.baseURI;
