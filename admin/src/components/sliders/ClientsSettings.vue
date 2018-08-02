@@ -1,58 +1,131 @@
 <template lang="pug">
-.adminNavbar__slider.slider
+.clients
+  .adminNavbar__slider.slider
     span CLIENTS
     .slider-inner
-        .slider-col General Information
+      .slider-col General Information
+  .clients__data
+    .title General Information
+    .gen-info
+      .gen-info__block
+        .block-item
+          label Company Name:
+          input(type="text")
+        .block-item
+          label Website:
+          input(type="text")
+        .block-item
+          label Industry:
+          input(type="text")
+        .block-item
+          label Status:
+          input(type="text")
+      .gen-info__block
+        .block-item
+          label Contract:
+          .contract
+            .contract__upload
+              input.upload(type="file")
+            .contract__download
+              img(src="../../assets/images/Other/upload-icon.png")
+          label NDA:
+          .contract
+            .contract__upload
+              input.upload(type="file")
+            .contract__download
+              img(src="../../assets/images/Other/upload-icon.png")
+        .block-item
+          label Account Manager:
+          input(type="text")
+        .block-item
+          label Sales Manager:
+          input(type="text")
+        .block-item
+          label Project Manager:
+          input(type="text")
+
 </template>
 
 <script>
 export default {
   data() {
     return {
-      languagesSettingsVisible: false,
-      languagesBgBool: false,
-      servicesSettingsVisible: false,
-      servicesBgBool: false,
-      industiesSettingsVisible: false,
-      industiesBgBool: false
+      
     };
   },
   methods: {
-    showIndustriesSettings() {
-      this.industiesSettingsVisible = !this.industiesSettingsVisible;
-      this.industiesBgBool = !this.industiesBgBool;
-      if (this.languagesSettingsVisible || this.servicesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.servicesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.servicesBgBool = false;
-    },
-    showServicesSettings() {
-      this.servicesSettingsVisible = !this.servicesSettingsVisible;
-      this.servicesBgBool = !this.servicesBgBool;
-      if (this.languagesSettingsVisible || this.industiesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.industiesBgBool = false;
-    },
-    showLanguagesSettings() {
-      this.languagesSettingsVisible = !this.languagesSettingsVisible;
-      this.languagesBgBool = !this.languagesBgBool;
-      this.servicesBgBool = false;
-      this.industiesBgBool = false;
-      if (this.servicesSettingsVisible || this.industiesSettingsVisible) {
-        this.servicesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-    }
+    
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.clients {
+  display: flex;
+  &__data {
+    margin-top: 20px;
+    margin-left: 20px;
+  }
+}
+.gen-info {
+  margin: 20px 10px;
+  padding: 40px;
+  box-shadow: 0 0 15px #67573e9d;
+  width: 800px;
+  display: flex;
+  justify-content: space-between;
+  &__block {
+    width: 40%;
+  }
+}
+.block-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  label {
+    margin-bottom: 0;
+  }
+  input {
+    border: 1px solid #67573e;
+    border-radius: 10px;
+    width: 191px;
+    height: 28px;
+  }
+}
+.contract {
+  display: flex;
+  align-items: center;
+  width: 22%;
+  justify-content: space-between;
+  &__upload {
+    position: relative;
+    background: url("../../assets/images/Other/upload-icon.png");
+    background-repeat: no-repeat;
+    width: 40%;
+    height: 22px;
+    overflow: hidden;
+    .upload {
+      padding-left: 0;
+      padding-right: 0;
+      width: 33px;
+      height: 22px;
+      border: none;
+      outline: none;
+      margin-top: -3px;
+      margin-right: 2px;
+      opacity: 0;
+      z-index: 2;
+      position: absolute;
+      cursor: pointer;
+      left: -10px;
+    }
+  }
+  &__download {
+    width: 40%;
+    cursor: pointer;
+  }
+}
 .adminNavbar {
   position: relative;
   display: flex;
@@ -71,6 +144,7 @@ export default {
   }
 
   &__slider {
+    height: 100%;
     // transform: translate(-50%);
     background-color: #fff;
     width: 175px;
@@ -99,10 +173,9 @@ export default {
         border-top: 1px solid #c4beb6;
         border-bottom: 1px solid #c4beb6;
         padding: 5px 0;
+        background-color: #c4beb6;
+        font-size: 18px;
         cursor: pointer;
-        &:nth-child(2) {
-          border: none;
-        }
       }
     }
   }
@@ -111,4 +184,5 @@ export default {
     background-color: #fff;
   }
 }
+
 </style>

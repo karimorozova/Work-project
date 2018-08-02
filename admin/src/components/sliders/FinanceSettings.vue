@@ -76,10 +76,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.adminportalWrapper2 {
-  // margin: 0 auto;
-  // overflow: auto;
-}
+
 .quotesComponent {
   // width: 960px;
   display: flex;
