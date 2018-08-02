@@ -1,5 +1,5 @@
 <template lang="pug">
-    .admminportalWrapper2(v-if="cookies")
+    .admminportalWrapper2
         .adminTop
             .adminTop__adminName 
                 h2.adminPortal ADMIN PORTAL
@@ -283,22 +283,23 @@ export default {
       this.projectsShow = false;
       this.soonQuotesShow = false;
     },
-    getCookie() {
-      let sessionCookie = document.cookie.split("=")[1];
-      if (document.cookie.indexOf("admin") >= 0) {
-        this.cookies = true;
-        return true;
-      } else {
-        console.log("login failed");
-        window.location.replace("/login");
-      }
-    },
+    // getCookie() {
+    //   let sessionCookie = document.cookie.split("=")[1];
+    //   if (document.cookie.indexOf("admin") >= 0) {
+    //     this.cookies = true;
+    //     return true;
+    //   } else {
+    //     console.log("login failed");
+    //     window.location.replace("/login");
+    //   }
+    // },
     hideAccountMenu() {
       this.accountMenuVisible = false;
     },
     signOut() {
-      document.cookie = "who" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      this.$store.dispatch("logout");
       this.$router.push('/login');
+      // document.cookie = "who" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     //   window.location.replace("/");
     },
     switchInfo(index) {
@@ -528,8 +529,15 @@ export default {
       this.$store.dispatch('servicesGetting', services);
     }
   },
+  beforeRouteUpdate (to, from, next) {
+    if(localStorage.getItem('token')) {
+      next()
+    } else {
+      next('/login')
+    }
+  },
   mounted() {
-    this.getCookie();
+    // this.getCookie();
     this.mainPageRender();
     this.getServices();
     this.getCustomers();

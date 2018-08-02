@@ -21,7 +21,7 @@
           input.checkboxWrapper__input(type="checkbox")
           label.checkboxWrapper__label Remember me
         .buttonWrapper
-          button(@click='sendForm' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
+          button(@click='login' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
           h2(v-if='isLogin') You are logged in!
         .formFooter
           span.firstLabel(@click="forget") Forgot Your Password?
@@ -43,25 +43,35 @@ export default {
     };
   },
   methods: {
-    sendForm() {
-      this.$http.post("/login", this.form).then(
-        response => {
-          document.cookie = "who=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
-          this.isLogin = true;
-          window.location.href = "/";
-
-          /*
-          setTimeout(() => {
-            this.$router.push("/");
-          }, 1500); 
-          */
-        },
-        err => {
-          console.log("Errored : ");
-          console.log(err);
-        }
-      );
+    login() {
+      this.$http.post('../login', this.form)
+      .then(res => {
+        this.$store.dispatch("login", res.body)
+        .then(() => {
+          this.$router.push("/")
+        });
+      })
+      
     },
+    // sendForm() {
+    //   this.$http.post("/login", this.form).then(
+    //     response => {
+    //       document.cookie = "who=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
+    //       this.isLogin = true;
+    //       window.location.href = "/";
+
+    //       /*
+    //       setTimeout(() => {
+    //         this.$router.push("/");
+    //       }, 1500); 
+    //       */
+    //     },
+    //     err => {
+    //       console.log("Errored : ");
+    //       console.log(err);
+    //     }
+    //   );
+    // },
     forget(){
       this.forgotLink = !this.forgotLink;
     } 

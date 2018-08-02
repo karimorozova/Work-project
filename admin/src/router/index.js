@@ -43,6 +43,22 @@ export default new Router({
       redirect: '/dashboard',
       component: Main,
       props: true,
+      beforeEnter: (to, from, next) => {
+        if(localStorage.getItem("token")) {
+          let tokenObject = JSON.parse(localStorage.getItem("token"));
+          let tokenDate = new Date(tokenObject.timestamp).getTime();
+          let date = new Date().getTime()
+          if(tokenDate <= date) {
+            localStorage.removeItem("token")
+            next('/login')  
+          } else {
+            next()
+          }
+        next()
+        } else {
+          next('/login')
+        }
+      },
       children: [
         {
           path: 'accountinfo',

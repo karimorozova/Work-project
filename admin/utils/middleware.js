@@ -1,5 +1,5 @@
 
-const middeware = {
+const middleware = {
     requiresLogin(req, res, next) {
         if (req.session && req.session.userId) {
             return next();
@@ -11,4 +11,4 @@ const middeware = {
     }
 }
 
-module.exports = middeware;
+module.exports = middleware;

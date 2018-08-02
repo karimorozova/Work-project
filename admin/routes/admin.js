@@ -74,7 +74,7 @@ router.post('/login', (req, res, next) => {
             } else {
                 req.session.userId = user._id;
                 res.statusCode = 200;
-                res.send('admin');
+                res.send(user._id);
             }
         });
     } else {

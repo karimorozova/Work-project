@@ -11,10 +11,21 @@ const state = {
     customers: [],
     xtmCustomers: [],
     languages: [],
-    clientLangs: []
+    clientLangs: [],
+    isLoggedIn: !!localStorage.getItem("token")
 };
 
 const mutations = {
+    LOGIN(state) {
+        state.pending = true;
+    },
+    LOGIN_SUCCESS(state) {
+        state.isLoggedIn = true;
+        state.pending = false;
+    },
+    LOGOUT(state) {
+        state.isLoggedIn = false;
+    },
     INCREMENT_COUNTER(state){
         state.count++
     },

@@ -6,9 +6,14 @@
 </template>
 
 <script>
-
+import { mapGetters, mapActions } from "vuex";
 export default {
-  name: 'app'
+  name: 'app',
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'isLoggedIn'
+    })
+  }
 }
 </script>
 
