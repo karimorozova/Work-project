@@ -10,16 +10,16 @@
       .gen-info__block
         .block-item
           label Company Name:
-          input(type="text")
+          input(type="text" placeholder="Company Name" v-model="genInfo.companyName")
         .block-item
           label Website:
-          input(type="text")
+          input(type="text" placeholder="Website" v-model="genInfo.website")
         .block-item
           label Industry:
-          input(type="text")
+          ClientIndustrySelect(:selectedInd="genInfo.industry" @chosenInd="chosenInd")
         .block-item
           label Status:
-          input(type="text")
+          ClientStatusSelect(:selectedStatus="genInfo.status" @chosenStatus="chosenStatus")
       .gen-info__block
         .block-item
           label Contract:
@@ -27,34 +27,71 @@
             .contract__upload
               input.upload(type="file")
             .contract__download
-              img(src="../../assets/images/Other/upload-icon.png")
+              img(src="../../assets/images/Other/Download-icon.png")
           label NDA:
           .contract
             .contract__upload
               input.upload(type="file")
             .contract__download
-              img(src="../../assets/images/Other/upload-icon.png")
+              img(src="../../assets/images/Other/Download-icon.png")
         .block-item
           label Account Manager:
-          input(type="text")
+          AMSelect(:selectedManager="genInfo.accountManager" @chosenManager="chosenAccManager")
         .block-item
           label Sales Manager:
-          input(type="text")
+          AMSelect(:selectedManager="genInfo.salesManager" @chosenManager="chosenSalesManager")
         .block-item
           label Project Manager:
-          input(type="text")
-
+          AMSelect(:selectedManager="genInfo.projectManager" @chosenManager="chosenProjManager")
+    .title Contact Details
+    .contact-details
+      ContactDetails
 </template>
 
 <script>
+import ClientIndustrySelect from '../clients/ClientIndustrySelect';
+import ClientStatusSelect from '../clients/ClientStatusSelect';
+import AMSelect from '../clients/AMSelect';
+import ContactDetails from '../clients/ContactDetails';
+
 export default {
   data() {
     return {
-      
+      genInfo: {
+        companyName: '',
+        website: '',
+        industry: {},
+        status: '',
+        contract: '',
+        nda: '',
+        accountManager: {},
+        salesManager: {},
+        projectManager: {}
+      }
     };
   },
   methods: {
-    
+    chosenInd(data) {
+      this.genInfo.industry = data;
+    },
+    chosenStatus(data) {
+      this.genInfo.status = data;
+    },
+    chosenAccManager(data) {
+      this.genInfo.accountManager = data;
+    },
+    chosenSalesManager(data) {
+      this.genInfo.salesManager = data;
+    },
+    chosenProjManager(data) {
+      this.genInfo.projectManager = data;
+    }
+  },
+  components: {
+    ClientIndustrySelect,
+    ClientStatusSelect,
+    AMSelect,
+    ContactDetails
   }
 };
 </script>
@@ -67,14 +104,16 @@ export default {
     margin-left: 20px;
   }
 }
-.gen-info {
+.gen-info, .contact-details {
   margin: 20px 10px;
   padding: 40px;
   box-shadow: 0 0 15px #67573e9d;
   width: 800px;
-  display: flex;
-  justify-content: space-between;
-  &__block {
+}  
+  .gen-info {
+    display: flex;
+    justify-content: space-between;
+    &__block {
     width: 40%;
   }
 }
@@ -87,10 +126,18 @@ export default {
     margin-bottom: 0;
   }
   input {
+    font-size: 14px;
+    color: #67573e;
     border: 1px solid #67573e;
-    border-radius: 10px;
-    width: 191px;
+    border-radius: 5px;
+    padding: 0 3px;
+    outline: none;
+    width: 185px;
     height: 28px;
+  }
+  ::-webkit-input-placeholder {
+    padding: 10px 5px;
+    opacity: 0.5;
   }
 }
 .contract {

@@ -20,6 +20,7 @@ export default {
 <style lang='scss'>
 body {
   font-family: MyriadPro;
+  color: #67573E;
 }
 .b-log-in,
 .b-log-out{

@@ -596,16 +596,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// body.main-body {
-//   margin: 0;
-//   font-family: MyriadPro;
-//   background: none;
-// }
-
-.adminportalWrapper2 {
-  // margin: 0 auto;
-  // overflow: auto;
-}
 
 .quotesComponent {
   // width: 1000px;

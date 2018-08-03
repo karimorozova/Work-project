@@ -156,7 +156,7 @@ export default {
         flex-direction: column;
         background-color: white;
         z-index: 15;
-        padding-top: 24px;
+        padding-top: 29px;
         &__item {
             display: flex;
             align-items: center;

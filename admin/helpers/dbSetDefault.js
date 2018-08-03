@@ -112,16 +112,36 @@ function users() {
   User.find({})
     .then(users => {
       if (!users.length) {
-        for (const user of usersDefault) {
-          new User(user).save()
-            .then((user) => {
-              console.log(`User ${user.username} was save!`)
+        instance.get('/users').then(res => {
+          let usersArray = res.data;
+          for(let person of usersArray) {
+            instance.get(`/users/${person.id}`).then(res => {
+              let newUser = {
+                email: res.data.email,
+                username: res.data.login,
+                group: res.data.userGroupName,
+                firstName: res.data.firstName,
+                lastName: res.data.lastName,
+                gender: res.data.gender,
+                phone: res.data.mobilePhone,
+                position: res.data.positionName,
+                password: 12345
+              };
+              new User(newUser).save().
+              then(user => {
+                console.log(`User ${user.username} saved!`)
+              })
+              .catch((err) => {
+                console.log(`User with ${person.id} wasn't save. Because of ${err.message}`)
+              });
             })
             .catch((err) => {
-              console.log(`User ${user.username} wasn't save. Because of ${err.message}`)
+              console.log(`Cannot get user with id: ${person.id} because of ${err.message}`)
             });
-        }
-
+          }
+        }).catch(err => {
+          console.log('Cannot get users')
+        })
       }
     })
     .catch(err => {

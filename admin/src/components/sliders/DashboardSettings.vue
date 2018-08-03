@@ -1,6 +1,5 @@
 <template lang="pug">
 .adminportalWrapper2
-  Blanket(title='Welcome to the Pangea Admin')
   .adminMainWrapper
     .adminNavbar
       .adminNavbar__slider(:class="{slider: slidebarVisible}")
@@ -33,6 +32,7 @@
                 .adminAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
                   .adminAll__dropMenu_item.quotesTable(v-if="openQuotes")
                     TableIndustries
+    Blanket(title='Welcome to the Pangea Admin' v-if="!slidebarVisible")    
 </template>
 
 <script>

@@ -3,16 +3,16 @@
   .filters
     .filters__item.sourceMenu
       label Source Language
-        LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
+      LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
     .filters__item.targetMenu
       label Target Language
-        LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
+      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
-        IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
+      IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-        ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
+      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
   .addButton
     input(type="button" value="Add several languages")           
   .tableData
