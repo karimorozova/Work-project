@@ -15,6 +15,9 @@ export default {
     props: {
         selectedServ: {
             type: Object
+        },
+        direction: {
+            type: String
         }
     },
     data() {
@@ -36,13 +39,25 @@ export default {
                     if(a.title < b.title) return -1;
                     if(a.title > b.title) return 1;
                 });
-                this.services = sortedArray.filter(item => {
-                    if(item.title == 'Translation' ||
-                    item.title == 'Proofing' || 
-                    item.title == 'QA and Testing') {
-                        return item
-                    }
-                });
+                if(this.direction == 'duo') {
+                    this.services = sortedArray.filter(item => {
+                        if(item.languageForm == 'Duo') {
+                            if(item.title == 'Translation' ||
+                                item.title == 'Proofing' || 
+                                item.title == 'QA and Testing') {
+                                    return item
+                            }
+                        }
+                        
+                    })
+                }
+                if(this.direction == 'mono') {
+                    this.services = sortedArray.filter(item => {
+                        if(item.languageForm == 'Mono') {
+                            return item
+                        }
+                    })
+                }
             })
             .catch(e => {
                 this.errors.push(e)

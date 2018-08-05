@@ -2,19 +2,14 @@
 .duoWrap
   .filters
     .filters__item.sourceMenu
-      label Source Language
+      label Language
       LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
-    .filters__item.targetMenu
-      label Target Language
-      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")
-  .addButton
-    input(type="button" value="Add several languages")           
+      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
@@ -51,7 +46,6 @@
 </template>
 
 <script>
-import CalculationUnite from "./ratesduoRows/CalculationUnite";
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSelect from "../ServiceSelect";
@@ -60,15 +54,15 @@ export default {
   props: {},
   data() {
     return {
-      direction: 'duo',
+      direction: 'mono',
       sourceSelect: ["EN"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
-      serviceSelect: {title: "Translation"},
+      serviceSelect: {title: "Copywriting"},
       heads: [
-        { title: "Source Language" },
-        { title: "Target Language" },
+        { title: "Language" },
+        { title: "Package" },
         { title: "Industry" },
         { title: "Active" },
         { title: "" }
@@ -93,7 +87,7 @@ export default {
         let element = document.getElementsByTagName('tbody')[0];
         setTimeout(() => {
           let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'end'});
+          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
           // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
         }, 100)
       }
@@ -234,8 +228,8 @@ export default {
     },
     addNewRow() {
       this.fullInfo.push({
-        sourceLanguage: {lang: "English"}, 
-        targetLanguage: {lang: ""}, 
+        language: {lang: "English"}, 
+        package: 3000, 
         industry: [{name: "All", rate: 0}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
@@ -248,7 +242,7 @@ export default {
       this.$http.get("api/services")
       .then(res => {
         this.services = res.data.filter(item => {
-          if(item.languageForm == "Duo") {
+          if(item.languageForm == "Mono") {
             return item;
           }
         });
@@ -330,7 +324,7 @@ export default {
       return result;
     },
     tableWidth() {
-      let result = 870;
+      let result = 850;
       let cols = this.tableHeader.length;
       if(cols > 6) {
         let count = cols - 6;
@@ -341,7 +335,6 @@ export default {
     }
   },
   components: {
-    CalculationUnite,
     LanguagesSelect,
     IndustrySelect,
     ServiceSelect
@@ -355,7 +348,7 @@ export default {
 <style lang="scss" scoped>
 .duoWrap {
   font-family: MyriadPro;
-  min-width: 870px; 
+  min-width: 850px; 
 }
 .tableData {
   max-width: 872px;

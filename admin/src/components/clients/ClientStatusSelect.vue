@@ -137,33 +137,5 @@ export default {
         }
     }
 }
-.checkbox {
-    width: 13px;
-    height: 13px;
-    border: 1px solid #67573E;
-    margin-right: 3px;
-    .checked {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        &::before {
-            content: '';
-            position: absolute;
-            width: 5px;
-            border: 1px solid #67573E;
-            top: 6px;
-            left: 1px;
-            transform: rotate(45deg);
-        }
-        &::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            border: 1px solid #67573E;
-            top: 5px;
-            left: 3px;
-            transform: rotate(-58deg);
-        }
-    }
-}
+
 </style>

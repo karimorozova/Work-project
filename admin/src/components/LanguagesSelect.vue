@@ -140,6 +140,7 @@ export default {
         height: 100%;
         .selected {
             opacity: 1;
+            padding: 2px 5px;
         }
     }
 }

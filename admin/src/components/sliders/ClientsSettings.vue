@@ -46,6 +46,15 @@
     .title Contact Details
     .contact-details
       ContactDetails
+    .title Rates    
+    .rates
+      ClientRates
+    .title Sales Information
+    .sales
+      ClientSalesInfo
+    .title Billing Informations
+    .billing
+      ClientBillInfo
 </template>
 
 <script>
@@ -53,6 +62,9 @@ import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import AMSelect from '../clients/AMSelect';
 import ContactDetails from '../clients/ContactDetails';
+import ClientRates from '../clients/ClientRates';
+import ClientSalesInfo from '../clients/ClientSalesInfo';
+import ClientBillInfo from '../clients/ClientBillInfo';
 
 export default {
   data() {
@@ -91,7 +103,10 @@ export default {
     ClientIndustrySelect,
     ClientStatusSelect,
     AMSelect,
-    ContactDetails
+    ContactDetails,
+    ClientRates,
+    ClientSalesInfo,
+    ClientBillInfo
   }
 };
 </script>
@@ -104,20 +119,25 @@ export default {
     margin-left: 20px;
   }
 }
-.gen-info, .contact-details {
-  margin: 20px 10px;
+.gen-info, .contact-details, .rates, .sales, .billing {
+  margin: 20px 10px 40px 10px;
   padding: 40px;
   box-shadow: 0 0 15px #67573e9d;
   width: 800px;
-}  
-  .gen-info {
-    display: flex;
-    justify-content: space-between;
-    &__block {
+}
+.rates {
+  padding: 10px;
+  width: 860px;
+}
+.gen-info {
+  display: flex;
+  justify-content: space-between;
+  &__block {
     width: 40%;
   }
 }
 .block-item {
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;

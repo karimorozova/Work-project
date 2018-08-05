@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import CalculationUnite from "./ratesduoRows/CalculationUnite";
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSelect from "../ServiceSelect";
@@ -93,7 +92,7 @@ export default {
         let element = document.getElementsByTagName('tbody')[0];
         setTimeout(() => {
           let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'end'});
+          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
           // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
         }, 100)
       }
@@ -330,7 +329,7 @@ export default {
       return result;
     },
     tableWidth() {
-      let result = 870;
+      let result = 850;
       let cols = this.tableHeader.length;
       if(cols > 6) {
         let count = cols - 6;
@@ -341,7 +340,6 @@ export default {
     }
   },
   components: {
-    CalculationUnite,
     LanguagesSelect,
     IndustrySelect,
     ServiceSelect
@@ -355,7 +353,7 @@ export default {
 <style lang="scss" scoped>
 .duoWrap {
   font-family: MyriadPro;
-  min-width: 870px; 
+  min-width: 850px; 
 }
 .tableData {
   max-width: 872px;
