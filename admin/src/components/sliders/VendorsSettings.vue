@@ -59,24 +59,10 @@ export default {
   position: relative;
   display: flex;
   min-height: 94vh;
-  &__sideBar {
-    padding: 35px 0;
-    background-color: #998e7e;
-    width: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
-    transition: all 0.5s;
-    z-index: 2;
-  }
-
   &__slider {
     // transform: translate(-50%);
     background-color: #fff;
     width: 175px;
-    // width: 216px;
     box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
     display: flex;
     flex-direction: column;
