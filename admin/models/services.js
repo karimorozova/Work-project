@@ -39,6 +39,10 @@ const ServicesSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    languageCombinations: {
+        type: Array,
+        default: []
+    },
     xtrf: {
         type: String,
         default: '',

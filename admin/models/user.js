@@ -20,17 +20,14 @@ const UserSchema = new mongoose.Schema({
   },
   group: {
     type: String,
-    required: true,
     trim: true
   },
   firstName: {
     type: String,
-    required: true,
     trim: true
   },
   lastName: {
     type: String,
-    required: true,
     trim: true
   },
   gender: {
@@ -43,7 +40,6 @@ const UserSchema = new mongoose.Schema({
   },
   position: {
     type: String,
-    required: true,
     trim: true
   }
 });

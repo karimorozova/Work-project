@@ -332,7 +332,7 @@ export default {
   name: 'pang-form',
   head: {
     script: [
-      { src: '/static/hotjar.js' }
+      { src: './hotjar.js' }
     ]
   },
   data () {
@@ -818,13 +818,21 @@ export default {
   },
   computed: {
     sortedLanguages() {
-      let moveToStart;
-      for(let i = 0; i < this.languages.length; i++) {
-        if(this.languages[i].lang == 'English') {
-          moveToStart = this.languages.splice(i, 1);
-          this.languages.unshift(moveToStart[0]);
-        }
+      if(this.languages.length) {
+        let moveToStart;
+        this.languages = this.languages.sort((a, b) => {
+          if(a.lang > b.lang) return 1;
+          if(a.lang < b.lang) return -1;
+        });
+        
+        for(let i = 0; i < this.languages.length; i++) {
+          if(this.languages[i].lang == 'English') {
+            moveToStart = this.languages.splice(i, 1);
+            this.languages.unshift(moveToStart[0]);
+          }
+        }  
       }
+      
       return this.languages;
     },
     targetLangForSales() {

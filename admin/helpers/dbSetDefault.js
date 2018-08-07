@@ -150,11 +150,11 @@ function users() {
 }
 
 function services() {
-  Services.find({})
-    .then(services => {
+  return Services.find({})
+    .then(async (services) => {
       if (!services.length) {
         for (const service of servicesDefault) {
-          new Services(service).save()
+          await new Services(service).save()
             .then((service) => {
               console.log(`Service ${service.title} was saved!`)
             })
@@ -164,6 +164,54 @@ function services() {
         }
       }
     })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+async function serviceDuoLangs() {
+  let languages = await Languages.find({});
+  let services = await Services.find({"languageForm": "Duo"});
+  let englishLangs = [];
+
+  for(let language of languages) {
+    if(language.lang.indexOf("English") != -1) {
+      englishLangs.push(language);
+      if(language.dialects) {
+        for(let dialect of language.dialects) {
+          if(dialect.lang.indexOf("English") != -1) {
+            englishLangs.push(dialect)
+          }
+        }
+      }
+    }
+  }
+
+  for(let serv of services) {
+    if(!serv.languageCombinations.length) {
+    for(let lang of languages) {
+      if(serv.languages[0].target.indexOf(lang.symbol) != -1) {
+        for(let eng of englishLangs) {
+          serv.languageCombinations.push({
+            source: eng,
+            target: lang
+          })
+        }
+      }
+      if(serv.languages[0].source.indexOf(lang.symbol) != -1) {
+        for(let eng of englishLangs) {
+          serv.languageCombinations.push({
+            source: lang,
+            target: eng
+          })
+        }
+      }
+    }
+    await Services.update({"title": serv.title}, serv);
+    }
+  }
+
+  
 }
 
 function industries() {
@@ -197,12 +245,12 @@ function allLanguages() {
 async function ratesduo(titleName) {
   let findService = await Services.find({'title': titleName});
   if(!findService[0].rates.length) {
-    let service = servicesDefault.find(item => {
+    var service = servicesDefault.find(item => {
       if(item.title == titleName) {
         return item;
       }
     })
-    let allLangs = await allLanguages();
+    let allLangs = allLanguages();
     let ratesSource = allLangs.filter(item => {
       if(service.languages.source.indexOf(item.symbol) > 0) {
         return item;
@@ -228,7 +276,7 @@ async function ratesduo(titleName) {
       return item
     });
 
-    await industries.push({name: 'All', rate: serviceRate, crud: true});
+    industries.push({name: 'All', rate: serviceRate, crud: true});
     for(let i = 0; i < ratesSource.length; i++) {
       if(ratesSource[i].symbol == 'EN' || ratesSource[i].symbol == 'EN-GB' || ratesSource[i].symbol == 'EN-US') {
         for(let j = 0; j < ratesTarget.length; j++) {
@@ -265,6 +313,7 @@ async function checkCollections() {
   await ratesduo("Translation");
   await ratesduo("Proofing");
   await ratesduo("QA and Testing");
+  await serviceDuoLangs();
 }
 
 module.exports = checkCollections();
