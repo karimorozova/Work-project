@@ -36,18 +36,9 @@ function languages() {
           for (const lang of languagesDefault) {
             var addXtrfId = xtrfLangs.find(x => x.symbol == lang.symbol);
             lang.xtrf = addXtrfId.id;
-
-            if (lang.dialects) {
-              for (const dialect of lang.dialects) {
-                dialect.xtrf = xtrfLangs.find(x => x.symbol == dialect.symbol).id;
-              }
-            }
           }
           // let count = 1;
           for (const lang of languagesDefault) {
-            if(!lang.dialects) {
-              lang.dialects = null;
-            }
             await new Languages(lang).save().then((lang) => {
 
             })
@@ -173,7 +164,7 @@ function services() {
 }
 
 async function serviceMonoLangs() {
-  let languages = await allLanguages();
+  let languages = await Languages.find();
   let services = await Services.find({"languageForm": "Mono"});
   for(let serv of services) {
     if(!serv.languageCombinations.length) {
@@ -191,7 +182,7 @@ async function serviceMonoLangs() {
 }
 
 async function serviceDuoLangs() {
-  let languages = await allLanguages();
+  let languages = await Languages.find();
   let services = await Services.find({"languageForm": "Duo"});
   let englishLangs = [];
 
@@ -243,24 +234,6 @@ function industries() {
   });
 }
 
-async function allLanguages() {
-  let result = [];
-  let languages = await Languages.find();
-  for(let i = 0; i < languages.length; i++) {
-    result.push(languages[i]);
-    if(languages[i].dialects) {
-      for(let j = 0; j < languages[i].dialects.length; j++) {
-        result.push(languages[i].dialects[j])
-      }
-    }
-  }
-  let copy = JSON.stringify(result);
-  copy = JSON.parse(copy);
-  for(let lang of copy) {
-    lang.dialects = null;
-  }
-  return copy;
-}
 
 async function ratesduo(titleName) {
   let findService = await Services.find({'title': titleName});
@@ -270,7 +243,7 @@ async function ratesduo(titleName) {
         return item;
       }
     })
-    let allLangs = await allLanguages();
+    let allLangs = await Languages.find();
     let ratesSource = allLangs.filter(item => {
       if(service.languages.source.indexOf(item.symbol) > 0) {
         return item;

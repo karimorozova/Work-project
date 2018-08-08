@@ -160,23 +160,11 @@ export default {
       await this.$http
         .get("api/languages")
         .then(response => {
-          var result = response.body;
-          var dialectArr = [];
-          for (let i = 0; i < result.length; i++) {
-            if (result[i].dialects) {
-              for (let j = 0; j < result[i].dialects.length; j++) {
-                dialectArr.push(result[i].dialects[j]);
-              }
-            }
-          }
-          dialectArr.forEach(item => {
-            result.push(item);
-          });
-          result.sort((a, b) => {
+          let result = response.body; 
+          this.languages = result.sort((a, b) => {
             if (a.lang < b.lang) return -1;
             if (a.lang > b.lang) return 1;
           });
-          this.languages = result;
         })
         .catch(e => {
           this.errors.push(e);

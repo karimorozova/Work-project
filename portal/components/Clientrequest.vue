@@ -377,13 +377,7 @@ export default {
       this.targetSelect = [];
       this.brief = '';
       this.languages.map(item => {
-        if(!item.dialects) {
-          item.check = false
-        } else {
-          item.dialects.map(ditem => {
-            ditem.check = false
-          })
-        }
+        item.check = false
       })
     },
     async sendForm() {
@@ -496,18 +490,7 @@ export default {
     },
     async getLanguages() {
       let result = await this.$axios.$get('api/languages');
-      let allLangs = [];
-      result.map(item => {
-        if(!item.dialects) {
-          allLangs.push(item);
-        } else {
-          allLangs.push(item);
-          for(let elem of item.dialects) {
-            allLangs.push(elem)
-          }
-        }
-      });
-      this.languages = allLangs;
+      this.languages = result;
     },
   },
   computed: {

@@ -733,14 +733,22 @@ export default {
       }
     },
     async getLanguages() {
-      const result = await this.$axios.$get('api/languages')
-      .then(response => {
-        this.languages = response;
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
-
+      const result = await this.$axios.$get('api/languages');
+      this.languages = result;
+      for(let lang of this.languages) {
+        if(lang.children) {
+          lang.dialects = [];
+          for(let i = 0; i < this.languages.length;) {
+            if(this.languages[i].parent == lang.symbol) {
+                lang.dialects.push(this.languages[i]);
+                this.languages.splice(i, 1);
+                i--;
+            } else {
+              i++
+            }
+          }
+        }
+      }
     },
     
     async checkForm(event) {

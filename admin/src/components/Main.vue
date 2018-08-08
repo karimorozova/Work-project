@@ -47,50 +47,16 @@
                       img(v-else :src="note.imgBrown")
                     .title(:class="{showTitle: true}")
                       span {{ note.title }}
-                .logoImage(v-if="expander")
-                .balloons(v-else)
+                //- .logoImage
+                .balloons
             router-view(:sliderBool="sliderBool"
               :clientLanguages="clientLanguages"
               @customerLangs='customerLangs'
               )
-              // DashboardSettings(v-if="dashboardShow" :sliderBool="sliderBool")
-              // RecruitmentSettings(v-if="recruitmentShow")
-              // VendorsSettings(v-if="vendorsShow")
-              // LanguagesSettings(v-if="languagesShow")
-              // ClientsSettings(v-if="clientsShow")
-              // QuotesSettings(v-if="soonQuotesShow")
-              // ProjectsSettings(v-if="projectsShow")
-              // FinanceSettings(v-if="financeShow" :sliderBool="sliderBool" @hideFinanceBlanket="hideFinance")
-              // ReportsSettings(v-if="reportsShow")
-              // Blanket(v-if="navbarList[0].active && dashboardShowBlanket" title='Welcome to the Pangea Admin')
-              // Blanket(v-if="recruitmentShow" title='Recruitment')
-              // Blanket(v-if="vendorsShow" title='Vendor')
-              // Blanket(v-if="languagesShow" title='Language')
-              // Blanket(v-if="clientsShow" title='Client')
-              // Blanket(v-if="soonQuotesShow" title='Quotes')
-              // Blanket(v-if="projectsShow" title='Projects')
-              // Blanket(v-if="financeShowBlanket" title='Finance')
-              // Blanket(v-if="reportsShow" title='Reports')
-            Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
 </template>
 
 <script>
-// import Quotesinfo from "../components/quotes/Qoutesinfo";
-import Accountinfo from "../components/account/Accountinfo";
-import Blanket from "../components/Blanket/Blanket";
 import ClickOutside from "vue-click-outside";
-// import Table from "./Table/Table.vue";
-// import TableServices from "./Table/TableServices.vue";
-// import TableIndustries from "./Table/TableIndustries";
-// import DashboardSettings from "./sliders/DashboardSettings";
-// import RecruitmentSettings from "./sliders/RecruitmentSettings";
-// import VendorsSettings from "./sliders/VendorsSettings";
-// import LanguagesSettings from "./sliders/LanguagesSettings";
-// import ClientsSettings from "./sliders/ClientsSettings";
-// import QuotesSettings from "./sliders/QuotesSettings";
-// import ProjectsSettings from "./sliders/ProjectsSettings";
-// import FinanceSettings from "./sliders/FinanceSettings";
-// import ReportsSettings from "./sliders/ReportsSettings";
 
 export default {
   data() {
@@ -162,33 +128,12 @@ export default {
         {title: "Proofing/QA"},
         {title: "Graphic Localization"}
       ],
-      cookies: false,
       dropdownVisible: false,
-      clientRequestShow: false,
       accountMenuVisible: false,
-      expander: false,
-      openQuotes: true,
       quotes: [],
       path: "Language Settings",
-      dashboardShow: true,
-      dashboardShowBlanket: true,
-      financeShowBlanket: false,
-      recruitmentShow: false,
-      vendorsShow: false,
-      languagesShow: false,
-      clientsShow: false,
-      soonQuotesShow: false,
-      projectsShow: false,
-      financeShow: false,
-      reportsShow: false,
       accountInfo: false,
       sliderBool: false,
-      languagesSettingsVisible: false,
-      languagesBgBool: false,
-      servicesSettingsVisible: false,
-      servicesBgBool: false,
-      industiesSettingsVisible: false,
-      industiesBgBool: false,
       clientLanguages: [] 
     };
   },
@@ -221,23 +166,12 @@ export default {
     },
     async getLanguages() {
       let result = await this.$http.get('api/languages');
-      let allLangs = [];
-      result.body.map(item => {
-        if(!item.dialects) {
-          allLangs.push(item);
-        } else {
-          allLangs.push(item);
-          for(let elem of item.dialects) {
-            allLangs.push(elem)
-          }
-        }
-      })
+      let allLangs = result.body;
       this.$store.dispatch('allLanguages', allLangs);
     },
     dataForRequest(index) {
       if (index == 0) {
         this.$router.push('translation-request');
-        this.dashboardShowBlanket = false;
       }
       this.hideAdditional();
     },
@@ -255,9 +189,6 @@ export default {
     hideAdditional() {
       this.dropdownVisible = false;
     },
-    // hideSlider() {
-    //   this.sliderBool = false;
-    // },
     showSlider() {
       if(window.location.toString().indexOf('dashboard') == -1) {
         this.$router.push('dashboard')
@@ -270,37 +201,13 @@ export default {
         }
       }
       this.sliderBool = true;
-      this.dashboardShowBlanket = false;
-      if (!this.dashboardShow) {
-        this.dashboardShow = true;
-      }
-      this.recruitmentShow = false;
-      this.vendorsShow = false;
-      this.languagesShow = false;
-      this.clientsShow = false;
-      this.financeShow = false;
-      this.reportsShow = false;
-      this.projectsShow = false;
-      this.soonQuotesShow = false;
     },
-    // getCookie() {
-    //   let sessionCookie = document.cookie.split("=")[1];
-    //   if (document.cookie.indexOf("admin") >= 0) {
-    //     this.cookies = true;
-    //     return true;
-    //   } else {
-    //     console.log("login failed");
-    //     window.location.replace("/login");
-    //   }
-    // },
     hideAccountMenu() {
       this.accountMenuVisible = false;
     },
     signOut() {
       this.$store.dispatch("logout");
       this.$router.push('/login');
-      // document.cookie = "who" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    //   window.location.replace("/");
     },
     switchInfo(index) {
       this.navbarList.forEach((item, i) => {
@@ -315,18 +222,7 @@ export default {
           if(window.location.toString().indexOf('dashboard') == -1) {
             this.$router.push('dashboard')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShow = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShowBlanket = true;
           this.sliderBool = false;
-          // this.hideAllTables();
           this.path = "Dashboard";
         }
 
@@ -334,17 +230,6 @@ export default {
           if(window.location.toString().indexOf('recruitment') == -1) {
             this.$router.push('recruitment')
           }
-          this.recruitmentShow = true;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Reqruitment";
         }
 
@@ -352,17 +237,6 @@ export default {
           if(window.location.toString().indexOf('vendors') == -1) {
             this.$router.push('vendors')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = true;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Vendors";
         }
 
@@ -370,17 +244,6 @@ export default {
           if(window.location.toString().indexOf('languages') == -1) {
             this.$router.push('languages')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = true;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Languages";
         }
 
@@ -388,17 +251,6 @@ export default {
           if(window.location.toString().indexOf('clients') == -1) {
             this.$router.push('clients')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.clientsShow = true;
-          this.languagesShow = false;
-          this.soonQuotesShow = false;
-          this.projectsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Clients";
         }
 
@@ -406,17 +258,6 @@ export default {
           if(window.location.toString().indexOf('quotes') == -1) {
             this.$router.push('quotes')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = true;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Quotes";
         }
 
@@ -424,17 +265,6 @@ export default {
           if(window.location.toString().indexOf('projects') == -1) {
             this.$router.push('projects')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = true;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Projects";
         }
 
@@ -442,17 +272,6 @@ export default {
           if(window.location.toString().indexOf('finance') == -1) {
             this.$router.push('finance')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = true;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = false;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Finance";
         }
 
@@ -460,67 +279,17 @@ export default {
           if(window.location.toString().indexOf('reports') == -1) {
             this.$router.push('reports')
           }
-          this.recruitmentShow = false;
-          this.vendorsShow = false;
-          this.languagesShow = false;
-          this.clientsShow = false;
-          this.financeShow = false;
-          this.dashboardShowBlanket = false;
-          this.reportsShow = true;
-          this.projectsShow = false;
-          this.soonQuotesShow = false;
-          this.dashboardShow = false;
-          this.hideAllTables();
           this.path = "Reports";
         }
-
-        this.accountInfo = false;
-    },
-    showQuotes() {
-      this.openQuotes = !this.openQuotes;
-    },
-    showProjects() {
-      this.openProjects = !this.openProjects;
-    },
+    },    
     showAccountMenu() {
       this.accountMenuVisible = !this.accountMenuVisible;
     },
     showAccountInfo() {
       this.$router.push('accountinfo');
-      // this.accountInfo = true;
-      // this.accountMenuVisible = !this.accountMenuVisible;
-      // this.clientRequestShow = false;
-      // this.languagesShow = false;
-      // this.vendorsShow = false;
-      // this.recruitmentShow = false;
-      // this.clientsShow = false;
-      // this.soonQuotesShow = false;
-      // this.projectsShow = false;
-      // this.thanks = false;
-      // this.financeShow = false;
-      // this.navbarList.forEach(item => {
-      //   item.active = false;
-      // });
-    },
-    backToMain() {
-      this.$refs.againMain.baseURI;
     },
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
-    },
-    hideAllTables() {
-      if (
-        this.languagesSettingsVisible ||
-        this.servicesSettingsVisible ||
-        this.industiesSettingsVisible
-      ) {
-        this.languagesSettingsVisible = false;
-        this.servicesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-    },
-    hideFinance(data){
-      this.financeShowBlanket = data;
     },
     async getServices() {
       const result = await this.$http.get('api/services');
@@ -537,80 +306,24 @@ export default {
     }
   },
   mounted() {
-    // this.getCookie();
     this.mainPageRender();
     this.getServices();
     this.getCustomers();
     this.getXtmCustomers();
     this.getLanguages();
-    // document.body.classList.add("main-body");
-  },
-  destroyed() {
-    // document.body.classList.remove("main-body");
   },
   components: {
-    // Quotesinfo,
-    // Accountinfo,
-    Blanket,
-    // Table,
-    // TableServices,
-    // TableIndustries,
-    // DashboardSettings,
-    // RecruitmentSettings,
-    // VendorsSettings,
-    // LanguagesSettings,
-    // ClientsSettings,
-    // QuotesSettings,
-    // ProjectsSettings,
-    // FinanceSettings,
-    // ReportsSettings
   },
   directives: {
     ClickOutside
   },
-  computed: {
-    visibleChecker() {
-      return (
-        this.accountInfo ||
-        this.vendorsShow ||
-        this.languagesShow ||
-        this.clientRequestShow ||
-        this.recruitmentShow ||
-        this.thanks
-      );
-    },
-    // jsess() {
-    //   let result = "";
-    //   let cookies = document.cookie.split(";");
-    //   console.log(cookies);
-    //   for (let i = 0; i < cookies.length; i++) {
-    //     let findSession = cookies[i].split("=");
-    //     if (findSession[0].indexOf("ses") > 0) {
-    //       result = findSession[1];
-    //     }
-    //   }
-    //   return result;
-    // }
-  }
+  computed: { 
+  }  
 };
 </script>
 
 <style lang="scss" scoped>
 
-.quotesComponent {
-  // width: 1000px;
-  display: flex;
-  // flex-direction: column;
-  justify-content: center;
-  margin-bottom: 40px;
-  background-color: #fff;
-}
-.additionalServices {
-  width: 700px;
-}
-.additionalIndustries {
-  width: 800px;
-}
 .adminTop {
   display: flex;
   align-items: center;
@@ -618,16 +331,6 @@ export default {
   background-color: #67573e;
   position: relative;
   height: 6vh;
-  .company {
-    span {
-      font-weight: 600;
-      font-size: 24px;
-      font-weight: bold;
-      color: darkslategray;
-      font-style: italic;
-    }
-  }
-
   &__adminName {
     width: 35%;
     display: flex;
@@ -645,40 +348,7 @@ export default {
       font-family: MyriadPro;
       font-weight: 700;
     }
-
-    .searchWrapper {
-      display: flex;
-      justify-content: flex-start;
-      border: 2px solid #fff;
-      img {
-        padding-right: 514px;
-      }
-    }
   }
-
-  .searchWrapper {
-    display: flex;
-    justify-content: flex-start;
-    border: 2px solid #fff;
-    width: 30%;
-    visibility: hidden;
-    @media screen and (max-width: 1520px) {
-      margin-right: 20px;
-    }
-    @media screen and (max-width: 1430px) {
-      margin-right: 40px;
-    }
-    @media screen and (max-width: 1380px) {
-      margin-right: 55px;
-    }
-    @media screen and (max-width: 1330px) {
-      margin-right: 85px;
-    }
-    img {
-      padding-right: 514px;
-    }
-  }
-
   &__searchBlock {
     width: 35%;
     display: flex;
@@ -747,37 +417,6 @@ export default {
           }
           .rotate {
             transform: rotate(0deg);
-          }
-        }
-      }
-
-      .adminTop__dropdown {
-        z-index: -1;
-        position: absolute;
-        right: 50px;
-        top: 22px;
-
-        .additional {
-          padding-top: 10px;
-          border: 2px solid #978d7e;
-          color: #67573e;
-          background-color: #fff;
-          font-size: 16px;
-          width: 185px;
-
-          &__listItem {
-            padding: 15px;
-            border-bottom: 0.2px solid #978d7e;
-            cursor: pointer;
-            &:hover {
-              background-color: #ddd3c8;
-            }
-          }
-
-          .first {
-            &:hover {
-              background-color: #ddd3c8;
-            }
           }
         }
       }
@@ -938,47 +577,6 @@ export default {
   &__inner {
     width: 90%;
   }
-  .maininfoWrapper {
-    width: 100%;
-  }
-
-  .detailedInfoWrapper {
-    max-width: 919px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .detailedProjectWrapper {
-    max-width: 919px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .mainInfo {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0 auto;
-    .buttonPanel {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 5%;
-
-      button {
-        color: #fff;
-        font-size: 15px;
-        box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
-        background-color: #f5876e;
-        border-radius: 18px;
-        border: none;
-        width: 180px;
-        height: 43px;
-        margin: 15px 18px 0;
-        outline: none;
-        cursor: pointer;
-      }
-    }
-  }
   .adminNavbar {
     font-family: MyriadPro;
     position: relative;
@@ -996,72 +594,12 @@ export default {
       transition: all 0.5s;
       z-index: 2;
     }
-
-    &__slider {
-      // transform: translate(-50%);
-      background-color: #fff;
-      width: 175px;
-      // width: 216px;
-      box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
-      display: flex;
-      flex-direction: column;
-      font-family: MyriadPro;
-      color: #67573e;
-      font-size: 22px;
-      transition: all 1s;
-      span {
-        display: flex;
-        justify-content: center;
-        padding: 44px 0;
-        font-weight: 700;
-      }
-
-      .slider-inner {
-        display: flex;
-        flex-direction: column;
-
-        .slider-col {
-          display: flex;
-          justify-content: center;
-          border-top: 1px solid #c4beb6;
-          border-bottom: 1px solid #c4beb6;
-          padding: 5px 0;
-          cursor: pointer;
-          &:nth-child(2) {
-            border: none;
-          }
-        }
-      }
-    }
-    .slider {
-      transform: translate(-3%);
-      background-color: #fff;
-    }
-
-    &__openHide {
-      background: rgb(245, 135, 110);
-      color: white;
-      width: 27px;
-      height: 38px;
-      top: 0;
-      right: 0px;
-      text-align: center;
-      cursor: pointer;
-      z-index: 1;
-      .icon {
-        font-size: 32px;
-      }
-      .openReverse {
-        transform: rotate(180deg);
-      }
-    }
     .navbar__ulist {
       list-style: none;
       font-size: 15px;
       font-weight: bold;
       padding: 0;
       width: 100%;
-
       &_item {
         padding-bottom: 10px;
         display: flex;
@@ -1079,10 +617,6 @@ export default {
             margin-bottom: 57px;
           }
         }
-
-        .intothelist {
-          margin-bottom: 78%;
-        }
         .title {
           transition: all 0.4s;
           opacity: 0;
@@ -1098,31 +632,20 @@ export default {
           color: #978d7e;
         }
       }
-
-      .activeSecondLi {
-        li {
-          &:nth-child(2) {
-            background-color: white;
-            .title {
-              color: #978d7e;
-            }
-          }
-        }
-      }
     }
 
-    .logoImage {
-      transition: all 0.4s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: url("../assets/images/logo_white.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      width: 175px;
-      height: 59px;
-      padding-bottom: 61px;
-    }
+    // .logoImage {
+    //   transition: all 0.4s;
+    //   display: flex;
+    //   justify-content: center;
+    //   align-items: center;
+    //   background-image: url("../assets/images/logo_white.png");
+    //   background-size: contain;
+    //   background-repeat: no-repeat;
+    //   width: 175px;
+    //   height: 59px;
+    //   padding-bottom: 61px;
+    // }
 
     .balloons {
       transition: all 0.4s;
@@ -1137,61 +660,6 @@ export default {
       padding-bottom: 41px;
     }
   }
-
-  .adminAll {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    &__dropMenu {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      border: 0.4px solid #67573e;
-      border-radius: 18px;
-      box-shadow: 0 3px 13px rgba(0, 0, 0, 0.3);
-      margin-right: 36px;
-      margin-bottom: 10px;
-      padding: 0 14px;
-      color: #67573e;
-      transition: all 0.2s;
-      &_select {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 1.5%;
-        cursor: pointer;
-      }
-      &_item {
-        width: 100%;
-        padding: 1.5% 0.5% 1.5% 0;
-        transition: all 0.4s;
-      }
-      .reverseImage {
-        transform: rotate(180deg);
-      }
-    }
-  }
-  .borderAngle {
-    border-radius: 0;
-    border: none;
-    margin-bottom: 0;
-  }
-}
-
-.breadCrumbs {
-  // max-height: 50px;
-  // margin: 20px 40px;
-  padding: 20px 40px;
-  color: #67573e;
-  font-size: 20px;
-  .arrows {
-    font-size: 16px;
-    opacity: 0.6;
-    margin: 0 10px;
-  }
 }
 
 @font-face {
@@ -1201,13 +669,6 @@ export default {
 @font-face {
   font-family: MyriadBold;
   src: url("../assets/fonts/MyriadPro-Bold.otf");
-}
-
-.languagesBg {
-  background-color: #ddd3c8;
-}
-.none_langBg {
-  background-color: #fff;
 }
 
 .create-project {

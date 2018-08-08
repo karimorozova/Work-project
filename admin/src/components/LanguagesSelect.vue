@@ -48,22 +48,10 @@ export default {
             await this.$http.get('api/languages')
             .then(response => {
                 let sortedArray = response.body;
-                var dialectArr = [];
-                for (let i = 0; i < sortedArray.length; i++) {
-                    if (sortedArray[i].dialects.length) {
-                        for (let j = 0; j < sortedArray[i].dialects.length; j++) {
-                            dialectArr.push(sortedArray[i].dialects[j]);
-                        }
-                    }
-                }
-                dialectArr.forEach(item => {
-                    sortedArray.push(item);
-                });
-                sortedArray.sort( (a,b) => {
+                this.languages = sortedArray.sort( (a,b) => {
                     if(a.lang < b.lang) return -1;
                     if(a.lang > b.lang) return 1;
                 });
-                this.languages = sortedArray;
                 if(this.addAll) {
                     this.languages.unshift({lang: "All", symbol: "All"})
                 }

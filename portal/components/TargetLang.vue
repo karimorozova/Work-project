@@ -43,26 +43,19 @@ export default {
     },
     targetLanguages() {
       let allLang = [];
-      this.languages.map( (item) => {
-          if(item.dialects.length) {
-              allLang.push(item);
-              for(let i = 0; i < item.dialects.length; i++) {
-                  allLang.push(item.dialects[i])
-              }
-          } else {
-              allLang.push(item);
-          }
-      })
-
-      let array = allLang.filter(item => {
-          if(item.lang.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
-      })
-      array.sort((a, b) => {
-          if(a.lang > b.lang) return 1
-          else return -1;
-      });
-
-      return array;
+      if(this.languages.length) {
+        this.languages.map((item) => {
+          allLang.push(item);
+        })
+        allLang= allLang.filter(item => {
+            if(item.lang.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
+        })
+        allLang.sort((a, b) => {
+            if(a.lang > b.lang) return 1
+            else return -1;
+        });
+      }
+      return allLang;
     }
   },
   methods: {

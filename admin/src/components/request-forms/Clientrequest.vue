@@ -468,13 +468,7 @@ export default {
       this.targetSelect = [];
       this.brief = '';
       this.languages.map(item => {
-        if(!item.dialects) {
-          item.check = false
-        } else {
-          item.dialects.map(ditem => {
-            ditem.check = false
-          })
-        }
+        item.check = false
       })
     },
     async sendForm() {

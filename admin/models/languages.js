@@ -31,9 +31,17 @@ const LanguageSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    dialects:{
-        type: Array,
-        default: [],
+    children: {
+        type: Boolean,
+        default: false
+    },
+    parent: {
+        type: String,
+        default: ""
+    },
+    china: {
+        type: String,
+        default: ""
     },
     crud: {
         type: Boolean,

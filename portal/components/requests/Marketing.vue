@@ -36,11 +36,6 @@
                                         .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                             img(:src="'/flags/' + language.symbol + '.png'")
                                             span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                                        .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
-                                            template(v-for='dialect in language.dialects')
-                                                .pair.pair_dialect(v-if="copyLangs.indexOf(dialect.symbol) != -1" @click="chooseDialect(dialect)")
-                                                    img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                                                    span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .mark-option
                     .mark-option__title2
                         span.asterisk PACKAGE
@@ -173,19 +168,6 @@
                               .checker(v-if="voice.check")
                             span.voiceTitle {{ voice.title }}
                             input(v-if="voice.input" type="text" v-model="voice.inputText")
-                        //- .inner-tone
-                        //-     .inner-langs__select.toneSelect
-                        //-         span.select-text.clarify(:class="{ color: genBrief.tone.length }")
-                        //-             template(v-if="genBrief.tone.length > 0" v-for="tone in toneSelect") {{ tone }};  
-                        //-             template(v-if="genBrief.tone.length == 0") Select
-                        //-             .span-wrapper(@click.self='showTone')
-                        //-             .icon(:class="{ reverse: toneDrop }")
-                        //-                 i.fas.fa-caret-down
-                        //-         .select__drop(v-if='toneDrop' v-click-outside="outsideTones")
-                        //-             .select__drop-list(v-for='(voice, i) in voices')
-                        //-                 .pair
-                        //-                     span.toneSpan(:class="{ active: voice.check }" @click='voiceChoice(i)') {{ voice.title }}
-                        //-                     input.toneInput(v-if="voice.input && voice.check" v-model="voice.inputText")
                 .markdetails__quote
                       .send(:class="{markoptionChecked: marksendOption}" @click="markchooseBegin")
                         .send__check
@@ -447,27 +429,14 @@ export default {
       } else {
         this.langSelect = "";
         const pos = this.selectLang.indexOf(event);
-        if (pos === -1) {
-          if (!event.dialects.length || event.lang == 'German') {
-            event.check = true;
-            this.selectLang.push(event);
-          } else {
-            this.langSelect = event.lang;
-          }
+        if (pos === -1) {       
+          event.check = true;
+          this.selectLang.push(event);
+          this.langSelect = event.lang;
         } else {
           event.check = false;
           this.selectLang.splice(pos, 1);
         }
-      }
-    },
-    chooseDialect(event) {
-      const pos = this.selectLang.indexOf(event);
-      if (pos === -1) {
-        event.check = true;
-        this.selectLang.push(event);
-      } else {
-        event.check = false;
-        this.selectLang.splice(pos, 1);
       }
     },
     handleScroll() {
@@ -500,13 +469,7 @@ export default {
       this.targetSelect = [];
       this.brief = '';
       this.languages.map(item => {
-        if(!item.dialects) {
-          item.check = false
-        } else {
-          item.dialects.map(ditem => {
-            ditem.check = false
-          })
-        }
+        item.check = false
       });
       this.voices.forEach(item => {
         item.check = false;

@@ -34,11 +34,6 @@
                                           .pair(v-if="copyLangs.indexOf(language.symbol) != -1" @click='chooseLang(language)')
                                               img(:src="'/flags/' + language.symbol + '.png'")
                                               span.list-item(:class="{ active: language.check }") {{ language.lang }}
-                                          .select__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == langSelect }")
-                                              template(v-for='dialect in language.dialects')
-                                                  .pair.pair_dialect(v-if="copyLangs.indexOf(dialect.symbol) != -1" @click="chooseDialect(dialect)")
-                                                      img(:src="'/flags/' + dialect.symbol + '.png'")                  
-                                                      span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
                 .col-3
                     .col-3__block1
                         span.block1 PACKAGE
@@ -660,26 +655,13 @@ export default {
         this.langSelect = "";
         const pos = this.selectLang.indexOf(event);
         if (pos === -1) {
-          if (!event.dialects.length || event.lang == 'German') {
             event.check = true;
             this.selectLang.push(event);
-          } else {
             this.langSelect = event.lang;
-          }
         } else {
           event.check = false;
           this.selectLang.splice(pos, 1);
         }
-      }
-    },
-    chooseDialect(event) {
-      const pos = this.selectLang.indexOf(event);
-      if (pos === -1) {
-        event.check = true;
-        this.selectLang.push(event);
-      } else {
-        event.check = false;
-        this.selectLang.splice(pos, 1);
       }
     },
     toggleSub() {
@@ -740,13 +722,7 @@ export default {
       this.targetSelect = [];
       this.brief = '';
       this.languages.map(item => {
-        if(!item.dialects) {
-          item.check = false
-        } else {
-          item.dialects.map(ditem => {
-            ditem.check = false
-          })
-        }
+        item.check = false
       });
       this.col1_block2.forEach(item => {
         if(item.title == "Article") {
