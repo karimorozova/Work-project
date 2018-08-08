@@ -27,15 +27,15 @@ var instance = axios.create({
 });
 
 function languages() {
-  Languages.find({})
-    .then(languages => {
+  return Languages.find({})
+    .then(async languages => {
       if (!languages.length) {
-        instance.get("/dictionaries/language/all").then(function (xtrfReq) {
+         await instance.get("/dictionaries/language/all").then( async function (xtrfReq) {
           const xtrfLangs = xtrfReq.data;
 
           for (const lang of languagesDefault) {
-            var smth = xtrfLangs.find(x => x.symbol == lang.symbol);
-            lang.xtrf = smth.id;
+            var addXtrfId = xtrfLangs.find(x => x.symbol == lang.symbol);
+            lang.xtrf = addXtrfId.id;
 
             if (lang.dialects) {
               for (const dialect of lang.dialects) {
@@ -43,16 +43,19 @@ function languages() {
               }
             }
           }
-
+          // let count = 1;
           for (const lang of languagesDefault) {
-            new Languages(lang).save().then((lang) => {
+            if(!lang.dialects) {
+              lang.dialects = null;
+            }
+            await new Languages(lang).save().then((lang) => {
 
             })
               .catch((err) => {
                 console.log(`Lang: ${lang.lang} wasn't save. Because of ${err.message}`)
               });
           }
-
+          console.log('Langs are saved!');
           //resolve(response.data);
         }).catch(function (error) {
           console.log("error gettings xtrf langs");
@@ -169,21 +172,32 @@ function services() {
     })
 }
 
+async function serviceMonoLangs() {
+  let languages = await allLanguages();
+  let services = await Services.find({"languageForm": "Mono"});
+  for(let serv of services) {
+    if(!serv.languageCombinations.length) {
+      for(let lang of languages) {
+        if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
+          serv.languageCombinations.push({
+            source: null,
+            target: lang
+          })
+        }
+      }
+    }
+    await Services.update({"title": serv.title}, serv);
+  }
+}
+
 async function serviceDuoLangs() {
-  let languages = await Languages.find({});
+  let languages = await allLanguages();
   let services = await Services.find({"languageForm": "Duo"});
   let englishLangs = [];
 
   for(let language of languages) {
     if(language.lang.indexOf("English") != -1) {
       englishLangs.push(language);
-      if(language.dialects) {
-        for(let dialect of language.dialects) {
-          if(dialect.lang.indexOf("English") != -1) {
-            englishLangs.push(dialect)
-          }
-        }
-      }
     }
   }
 
@@ -229,17 +243,23 @@ function industries() {
   });
 }
 
-function allLanguages() {
+async function allLanguages() {
   let result = [];
-  for(let i = 0; i < languagesDefault.length; i++) {
-    result.push(languagesDefault[i]);
-    if(languagesDefault[i].dialects) {
-      for(let j = 0; j < languagesDefault[i].dialects.length; j++) {
-        result.push(languagesDefault[i].dialects[j])
+  let languages = await Languages.find();
+  for(let i = 0; i < languages.length; i++) {
+    result.push(languages[i]);
+    if(languages[i].dialects) {
+      for(let j = 0; j < languages[i].dialects.length; j++) {
+        result.push(languages[i].dialects[j])
       }
     }
   }
-  return result;
+  let copy = JSON.stringify(result);
+  copy = JSON.parse(copy);
+  for(let lang of copy) {
+    lang.dialects = null;
+  }
+  return copy;
 }
 
 async function ratesduo(titleName) {
@@ -250,7 +270,7 @@ async function ratesduo(titleName) {
         return item;
       }
     })
-    let allLangs = allLanguages();
+    let allLangs = await allLanguages();
     let ratesSource = allLangs.filter(item => {
       if(service.languages.source.indexOf(item.symbol) > 0) {
         return item;
@@ -313,6 +333,7 @@ async function checkCollections() {
   await ratesduo("Translation");
   await ratesduo("Proofing");
   await ratesduo("QA and Testing");
+  await serviceMonoLangs();
   await serviceDuoLangs();
 }
 

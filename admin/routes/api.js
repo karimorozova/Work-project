@@ -249,16 +249,54 @@ router.get('/languages', (req, res) => {
     })
 });
 
-router.get('/services', (req, res) => {
-  Services.find()
-    .then(results => {
-      res.send(results)
-    })
-    .catch(err => {
+router.get('/services', async (req, res) => {
+  try {
+  let languages = await Languages.find();
+  let allLangs = [];
+  for(let i = 0; i < languages.length; i++) {
+    allLangs.push(languages[i]);
+    if(languages[i].dialects) {
+      for(let j = 0; j < languages[i].dialects.length; j++) {
+        allLangs.push(languages[i].dialects[j])
+      }
+    }
+  };
+  
+  let services = await Services.find();
+
+  for(let serv of services) {
+    for(let combination of serv.languageCombinations) {
+      for(let lang of allLangs) {
+        if(serv.languageForm == 'Duo') {
+          if(combination.source.symbol === lang.symbol) {
+            combination.source.lang = lang.lang;
+            combination.source.icon = lang.icon;
+            combination.source.active = lang.active;
+          }
+        }
+        if(combination.target.symbol === lang.symbol) {
+          combination.target.lang = lang.lang;
+          combination.target.icon = lang.icon;
+          combination.target.active = lang.active;
+        }
+      }
+    }
+    await Services.update({title: serv.title}, serv)
+  }
+    res.send(services);
+  } catch(err) {
       console.log(err)
-      res.statusCode(500);
       res.send('Something wrong with DB')
-    })
+  }
+  // Services.find()
+  //   .then(results => {
+  //     res.send(results)
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //     res.statusCode(500);
+  //     res.send('Something wrong with DB')
+  //   })
 });
 
 router.get('/industries', (req, res) => {
