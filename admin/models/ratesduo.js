@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
 
 const RatesduoSchema = new mongoose.Schema({
-  sourceLanguage: {
+  source: {
     type: Object,
     default: {}
   },
-  targetLanguage: {
+  target: {
     type: Object,
     default: {}
   },
   industry: {
-    type: Array,
-    default: []
-  },
-  service: {
     type: Object,
     default: {}
+  },
+  services: {
+    type: Array,
+    default: []
   },
   active: {
     type: Boolean,

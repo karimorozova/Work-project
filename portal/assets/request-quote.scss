@@ -510,6 +510,7 @@ body {
       border: 1px solid #66563D;
       border-radius: 10px;
       width: 29%;
+      min-height: 75px;
       padding: 2px;
       padding-left: 10px;
       margin: 5px;
@@ -532,7 +533,7 @@ body {
       .image {
         width: 50px;
         height: 50px;
-        background-image: url('../assets/images/Legal.png');
+        // background-image: url('../assets/images/Legal.png');
         background-size: contain;
         background-position: center; 
         background-repeat: no-repeat;
@@ -547,17 +548,22 @@ body {
         background-repeat: no-repeat;
         background-position: center; 
       }
-      p {
+      p.industry__name {
+        max-width: 130px;
         padding-top: 5px;
         padding-left: 10px;
       }
       &:hover {
         background-color: #66563D;
         color: white;
+        .image {
+          filter: invert(100%) brightness(5);;
+          -webkit-filter: invert(100%) brightness(5);
+        }
         .image-white {
           z-index: 1;
         }
-      } 
+      }
     }
     .more {
       padding-top: 10px;
@@ -944,52 +950,52 @@ body {
     }
   }
 
-  .image {
-    .legal & {
-      background-image: url('../assets/images/Legal.png');
-    }
-    .hotel & {
-      background-image: url('../assets/images/hotel.png');      
-    }
-    .trading & {
-      background-image: url('../assets/images/CFDs-Online-Trading.png');      
-    }
-    .crypto & {
-      background-image: url('../assets/images/Cryptocurrency.png');      
-    }
-    .casino & {
-      background-image: url('../assets/images/casino-poker-igaming.png');      
-    }
-    .games & {
-      background-image: url('../assets/images/Video-Games.png');      
-    }
-    .other & {
-      background-image: url('../assets/images/Other.png');      
-    }
-  }
-  .image-white {
-    .legal & {    
-      background-image: url('../assets/images/Legal-white.png');
-    }
-    .hotel & {
-      background-image: url('../assets/images/hotel-white.png');      
-    }
-    .trading & {
-      background-image: url('../assets/images/CFDs-Online-Trading-white.png');      
-    }
-    .crypto & {
-      background-image: url('../assets/images/Cryptocurrency-white.png');      
-    }
-    .casino & {
-      background-image: url('../assets/images/casino-poker-igaming-white.png');      
-    }
-    .games & {
-      background-image: url('../assets/images/Video-Games-white.png'); 
-    }
-    .other & {
-      background-image: url('../assets/images/Other-white.png');      
-    }
-  }
+  // .image {
+  //   .legal & {
+  //     background-image: url('../assets/images/Legal.png');
+  //   }
+  //   .hotel & {
+  //     background-image: url('../assets/images/hotel.png');      
+  //   }
+  //   .trading & {
+  //     background-image: url('../assets/images/CFDs-Online-Trading.png');      
+  //   }
+  //   .crypto & {
+  //     background-image: url('../assets/images/Cryptocurrency.png');      
+  //   }
+  //   .casino & {
+  //     background-image: url('../assets/images/casino-poker-igaming.png');      
+  //   }
+  //   .games & {
+  //     background-image: url('../assets/images/Video-Games.png');      
+  //   }
+  //   .other & {
+  //     background-image: url('../assets/images/Other.png');      
+  //   }
+  // }
+  // .image-white {
+  //   .legal & {    
+  //     background-image: url('../assets/images/Legal-white.png');
+  //   }
+  //   .hotel & {
+  //     background-image: url('../assets/images/hotel-white.png');      
+  //   }
+  //   .trading & {
+  //     background-image: url('../assets/images/CFDs-Online-Trading-white.png');      
+  //   }
+  //   .crypto & {
+  //     background-image: url('../assets/images/Cryptocurrency-white.png');      
+  //   }
+  //   .casino & {
+  //     background-image: url('../assets/images/casino-poker-igaming-white.png');      
+  //   }
+  //   .games & {
+  //     background-image: url('../assets/images/Video-Games-white.png'); 
+  //   }
+  //   .other & {
+  //     background-image: url('../assets/images/Other-white.png');      
+  //   }
+  // }
 
   .openIcon {
     width: 10px;
@@ -998,6 +1004,10 @@ body {
   .activeIndustry {
     background-color: #66563D;
     color: white;
+    .image {
+      filter: invert(100%) brightness(5);
+      -webkit-filter: invert(100%) brightness(5);
+    }
     .image-white {
       z-index: 1;
     }

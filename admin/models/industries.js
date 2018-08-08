@@ -24,6 +24,10 @@ const IndustriesSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    rate: {
+        type: Number,
+        default: 0
     }
 });
 

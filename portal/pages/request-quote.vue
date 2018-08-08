@@ -78,42 +78,43 @@
             span 3
             label.asterisk CHOOSE AN INDUSTRY 
           .industry
-            .industry__item.casino(:class="{activeIndustry: industrySelect == industryList.casino.text}" @click='() => changeIndustry("casino")')
-              .image
-              .image-white
-              p Casino, Poker
-                br
-                | &amp; IGaming
-            .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
-              .image
-              .image-white
-              p CFDs &amp; Online
-                br
-                | Trading
-            .industry__item.crypto(:class="{activeIndustry: industrySelect == industryList.crypto.text}" @click='() => changeIndustry("crypto")')
-              .image
-              .image-white
-              p ICOs &amp; Crypto-
-                br
-                | Currency
-            .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
-              .image
-              .image-white
-              p Video Games
-            .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
-              .image
-              .image-white
-              p Hotel &amp;
-                br 
-                | Real Estates
-            .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
-              .image
-              .image-white
-              p Legal 
-            .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
-              .image
-              .image-white
-              p Other
+            .industry__item.casino(v-for="industry in dbIndustry" :class="{activeIndustry: industrySelect == industry.name}" @click='() => changeIndustry(industry)')
+              .image(:style="{ backgroundImage: 'url(' + 'https://admin.pangea.global' + industry.icon + ')' }")
+              //- .image-white
+              //- p Casino, Poker
+              //-   br
+              //-   | &amp; IGaming
+              p.industry__name {{ industry.name }}
+            //- .industry__item.trading(:class="{activeIndustry: industrySelect == industryList.trading.text}" @click='() => changeIndustry("trading")')
+            //-   .image
+            //-   .image-white
+            //-   p CFDs &amp; Online
+            //-     br
+            //-     | Trading
+            //- .industry__item.crypto(:class="{activeIndustry: industrySelect == industryList.crypto.text}" @click='() => changeIndustry("crypto")')
+            //-   .image
+            //-   .image-white
+            //-   p ICOs &amp; Crypto-
+            //-     br
+            //-     | Currency
+            //- .industry__item.games(:class="{activeIndustry: industrySelect == industryList.games.text}" @click='() => changeIndustry("games")')
+            //-   .image
+            //-   .image-white
+            //-   p Video Games
+            //- .industry__item.hotel(:class="{activeIndustry: industrySelect == industryList.hotel.text}" @click='() => changeIndustry("hotel")')
+            //-   .image
+            //-   .image-white
+            //-   p Hotel &amp;
+            //-     br 
+            //-     | Real Estates
+            //- .industry__item.legal(:class="{activeIndustry: industrySelect == industryList.legal.text}" @click='() => changeIndustry("legal")')
+            //-   .image
+            //-   .image-white
+            //-   p Legal 
+            //- .industry__item.other(:class="{activeIndustry: industrySelect == industryList.other.text}" @click='() => changeIndustry("other")')
+            //-   .image
+            //-   .image-white
+            //-   p Other
           .number
             span 4
             label PROJECT DETAILS
@@ -380,6 +381,7 @@ export default {
       targetlang: ["Select"],
       targetSelect: [],
       dialectsDrop: false,
+      industries: [],
       industrySelect: 'Select',
       deadlineSelect: '',
       contactName: '',
@@ -519,8 +521,8 @@ export default {
         this.sourceSelect = {lang: 'English (United Kingdom)', xtrf : 61}
       }
     },
-    changeIndustry(name) {
-      this.industrySelect = this.industryList[name].text;
+    changeIndustry(indus) {
+      this.industrySelect = indus.name;
     },
     showSourceLang() {
       this.toggleSource()
@@ -734,7 +736,9 @@ export default {
     },
     async getLanguages() {
       const result = await this.$axios.$get('api/languages');
-      this.languages = result;
+      this.languages = result.filter(item => {
+        return item.active
+      });
       for(let lang of this.languages) {
         if(lang.children) {
           lang.dialects = [];
@@ -749,6 +753,10 @@ export default {
           }
         }
       }
+    },
+    async getIndustries() {
+      const result = await this.$axios.$get('api/industries');
+      this.industries = result;
     },
     
     async checkForm(event) {
@@ -890,6 +898,13 @@ export default {
       })
       
       return result;
+    },
+    dbIndustry() {
+      let result = [{name: "", icon: ""}];
+      if(this.industries.length) {
+        result = this.industries;
+      }
+      return result;
     }
   },
   watch: {
@@ -912,6 +927,7 @@ export default {
     this.google();
     this.getServices();
     this.getLanguages();
+    this.getIndustries();
     sbjs.init({ callback: this.go });
     console.log(sbjs.get.current.src);
   }

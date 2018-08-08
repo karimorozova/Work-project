@@ -22,7 +22,7 @@
           th(v-for="head in tableHeader") {{ head.title }}
       tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
+          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -255,12 +255,12 @@ export default {
         this.services.forEach(item => {
           if(item.title == this.serviceSelect.title) {
             item.crud = true
-            for(let i = 0; i < item.rates.length; i++) {
-              for(let elem of item.rates[i].industry) {
+            for(let i = 0; i < item.languageCombinations.length; i++) {
+              for(let elem of item.languageCombinations[i].industries) {
                 this.fullInfo.push({
                   title: item.title,
-                  sourceLanguage: item.rates[i].source,
-                  targetLanguage: item.rates[i].target,
+                  sourceLanguage: item.languageCombinations[i].source,
+                  targetLanguage: item.languageCombinations[i].target,
                   industry: [elem],
                   active: true,
                   icons: [
