@@ -1,59 +1,61 @@
 <template lang="pug">
 .finance-settings
-  .adminNavbar__slider.slider
+  .adminNavbar__slider
     span FINANCE
     .slider-inner
-        .slider-col(@click="showRatesMono" :class="{activeBack: monoActive}") Rates Mono
-        .slider-col(@click="showRatesDuo" :class="{activeBack: duoActive}") Rates Duo
-  .mono-rates(v-if="monoActive") 
-    .quotesComponent
-      RatesMono 
-  .duo-rates(v-if="duoActive")
-    .quotesComponent
-      RatesDuo
+        .slider-col Rates
+  .rates-block
+    .title Rates
+    .rates 
+      .quotesComponent
+        .monoRates(:class="{straightAngle: monoDrop}")
+          .monoRates__open 
+            .select(@click="openMono")
+              span Mono
+              img(src="../../assets/images/Other/open.png" :class="{reverse: monoDrop}") 
+            .rates-drop(v-if="monoDrop")
+              RatesMono(:services="services")
+        .duoRates(:class="{straightAngle: duoDrop}")
+          .duoRates__open
+            .select(@click="openDuo")
+              span Duo
+              img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
+            .rates-drop(v-if="duoDrop")
+              RatesDuo(:services="services")
 </template>
 
 <script>
 import RatesDuo from "../finance/RatesDuo";
 import RatesMono from "../finance/RatesMono";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
-    sliderBool: {
-      type: Boolean,
-      default: false
-    }
   },
   data() {
     return {
-      duoActive: true,
-      monoActive: false,
-      ratesmonoSettingsVisible: false,
-      ratesmonoBgBool: false,
-      ratesduoSettingsVisible: false,
-      ratesduoBgBool: false,
-      slidebarVisible: this.sliderBool,
-      openQuotes: true,
+      monoDrop: false,
+      duoDrop: false,
     };
   },
   methods: {
-    showRatesDuo() {
-      this.duoActive = true;
-      this.monoActive = false;
+    openMono() {
+      this.monoDrop = !this.monoDrop;
     },
-    showRatesMono() {
-      this.duoActive = false;
-      this.monoActive = true;
+    openDuo() {
+      this.duoDrop = !this.duoDrop;
     }
+  },
+  computed: {
+    ...mapGetters({
+      services: "getVeuxServices"
+    }) 
   },
   components: {
     RatesMono,
     RatesDuo
   },
-  watch: {
-    sliderBool(){
-      this.slidebarVisible = this.sliderBool;
-    }
+  mounted() {
   }
 };
 </script>
@@ -66,17 +68,61 @@ export default {
   min-height: 94vh;
 }
 
-.duo-rates, .mono-rates {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.rates-block {
   margin: 20px;
+  .title {
+    font-size: 24px;
+  }
+}
+
+.rates {
+  margin: 20px 10px;
+  padding: 20px 10px;
+  box-shadow: 0 0 15px #67573e9d;
+  width: 886px;
 }
 
 .quotesComponent {
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0 0 15px #67573e9d;
+    width: 880px;
+    display: flex;
+    flex-direction: column;
+}
+
+.monoRates, .duoRates {
+    width: 100%;
+    max-height: 450px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
+    border-radius: 10px;
+    padding: 0 3px;
+}
+
+.monoRates {
+    margin-bottom: 60px;
+}
+
+.straightAngle {
+    border-radius: 0;
+}
+
+.select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 7px;
+    .reverse {
+        transform: rotate(180deg); 
+    }
+    img {
+        opacity: 0.5;
+    }
+}
+
+.rates-drop {
+    height: 400px;
+    padding: 5px 2px;
+    border-top: 1px solid rgba(103, 87, 62, 0.5);
 }
 
 .adminNavbar {
@@ -84,12 +130,9 @@ export default {
   display: flex;
   min-height: 94vh;
   &__slider {
-    // transform: translate(-100%);
     background-color: #fff;
     width: 175px;
     box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
-    display: flex;
-    flex-direction: column;
     font-family: MyriadPro;
     color: #67573e;
     font-size: 22px;
@@ -102,35 +145,16 @@ export default {
     }
 
     .slider-inner {
-      display: flex;
-      flex-direction: column;
-
       .slider-col {
         display: flex;
         justify-content: center;
+        background-color: #c4beb6;
         border-top: 1px solid #c4beb6;
         border-bottom: 1px solid #c4beb6;
         padding: 5px 30px;
-        white-space: nowrap;
-        cursor: pointer;
-        &:nth-child(2) {
-          border-bottom: 1px solid #c4beb6;
-        }
-      }
-      .activeBack {
-        background-color: #c4beb6;
       }
     }
   }
-  .slider {
-    background-color: #fff;
-  }
-}
-
-.borderAngle {
-  border-radius: 0;
-  border: none;
-  margin-bottom: 0;
 }
 
 @font-face {

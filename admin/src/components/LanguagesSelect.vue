@@ -135,6 +135,7 @@ export default {
 .dropSelect {
     position: relative;
     .drop {
+        font-size: 14px;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;

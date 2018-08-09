@@ -10,21 +10,19 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
         selectedServ: {
             type: Object
-        },
-        direction: {
-            type: String
         }
     },
     data() {
         return {
-            services: [],
             droppedServ: false,
-            errors: []
+            errors: [],
+            services: []
         }
     },
     methods: {
@@ -32,35 +30,15 @@ export default {
             this.droppedServ = !this.droppedServ;
         },
         getServices() {
-            this.$http.get('api/services')
-            .then(response => {
-                let sortedArray = response.data
-                sortedArray.sort( (a,b) => {
-                    if(a.title < b.title) return -1;
-                    if(a.title > b.title) return 1;
-                });
-                if(this.direction == 'duo') {
-                    this.services = sortedArray.filter(item => {
-                        if(item.languageForm == 'Duo') {
-                            if(item.title == 'Translation' ||
-                                item.title == 'Proofing' || 
-                                item.title == 'QA and Testing') {
-                                    return item
-                            }
-                        }
-                        
-                    })
+            this.services = this.veuxServices;
+            this.services.sort( (a,b) => {
+                if(a.title < b.title) return -1;
+                if(a.title > b.title) return 1;
+            });
+            this.services = this.services.filter(item => {
+                if(item.languageForm == 'Mono') {
+                    return item
                 }
-                if(this.direction == 'mono') {
-                    this.services = sortedArray.filter(item => {
-                        if(item.languageForm == 'Mono') {
-                            return item
-                        }
-                    })
-                }
-            })
-            .catch(e => {
-                this.errors.push(e)
             })
         },
         outClick() {
@@ -70,6 +48,11 @@ export default {
             this.$emit("chosenServ", this.services[index])
         }
     },
+    computed: {
+        ...mapGetters({
+            veuxServices: "getVeuxServices"
+        }) 
+    },  
     directives: {
         ClickOutside
     },
@@ -114,6 +97,7 @@ export default {
 .dropSelect {
     position: relative;
     .drop {
+        font-size: 14px;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;

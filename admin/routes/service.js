@@ -115,17 +115,16 @@ router.post('/jobcost', async (req, res) => {
 })
 
 router.post('/rates', async (req, res) => {
-  console.log('We are in the rates!!');
   var rate = await req.body;
   var rates = [];
   let service = await Services.find({'title': rate.title});
-  rates = service[0].rates;
+  rates = service[0].languageCombinations;
   
   for(let j = 0; j < rate.industry.length; j++) {
     for(let i = 0; i < rates.length; i++) {
       if(rate.sourceLanguage.lang == rates[i].source.lang &&
         rate.targetLanguage.lang == rates[i].target.lang) {
-        for(let elem of rates[i].industry) {
+        for(let elem of rates[i].industries) {
           if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
             elem.rate = rate.industry[j].rate
           }
@@ -134,7 +133,7 @@ router.post('/rates', async (req, res) => {
     }
   }
 
-  let result = await Services.update({'title': rate.title}, {'rates': rates});
+  let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
   res.send(result) 
 })
 

@@ -12,7 +12,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")
+      ServiceDuoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
   .addButton
     input(type="button" value="Add several languages")           
   .tableData
@@ -48,19 +48,38 @@
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
+  .unique-message(v-if="notUnique")
+    .message
+      p The combination you want to add already exists!
+      .message__info-list
+        li Source: 
+          span.info-item {{ uniqueCheck.source }}
+        li Target: 
+          span.info-item {{ uniqueCheck.target }}
+        li Industry: 
+          span.info-item {{ uniqueCheck.industry }}
+      span.close(@click="closeUnique") +
+  .edition-message(v-if="editing")
+    .message
+      p Please finish the current edition first!
+      span.close(@click="closeEditionMessage") +
 </template>
 
 <script>
 import CalculationUnite from "./ratesduoRows/CalculationUnite";
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceSelect from "../ServiceSelect";
+import ServiceDuoSelect from "../ServiceDuoSelect";
 
 export default {
-  props: {},
+  props: {
+    services: {
+      type: Array,
+      default: []
+    }
+  },
   data() {
     return {
-      direction: 'duo',
       sourceSelect: ["EN"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
@@ -73,14 +92,23 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
+      // services: [],
       fullInfo: [],
-      services: [],
       changedRate: '',
-      currentActive: ''
+      currentActive: 'none',
+      notUnique: false,
+      editing: false,
+      uniqueCheck: {source: "", target: "", industry: ""}
     }
   },
 
   methods: {
+    closeUnique() {
+      this.notUnique = false;
+    },
+    closeEditionMessage() {
+      this.editing = false
+    },
     changeRate(event) {
       this.changedRate = +event.target.value
     },
@@ -90,11 +118,15 @@ export default {
     },
     scrollDrop(data) {
       if(data.drop) {
-        let element = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByTagName('tbody')[0];
         setTimeout(() => {
-          let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'end'});
-          // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
+          const offsetBottom = data.offsetTop + data.offsetHeight*2;
+          const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+          console.log(offsetBottom);
+          console.log(scrollBottom);
+          if (offsetBottom > scrollBottom) {
+            tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
+          }
         }, 100)
       }
     },
@@ -109,9 +141,9 @@ export default {
         this.industrySelected.splice(0, 1, data.industry)
       } else {
         let hasIndustry = false;
-        for(let i in this.industrySelected) {
-          if(this.industrySelected[i].name == data.industry.name) {
-            this.industrySelected.splice(i, 1);
+        for(let ind in this.industrySelected) {
+          if(this.industrySelected[ind].name == data.industry.name) {
+            this.industrySelected.splice(ind, 1);
             hasIndustry = true;
           }
         }
@@ -130,13 +162,8 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      // for(let i = 0; i < this.services.length; i++) {
-        // if(this.services[i].title == this.serviceSelect.title) {
-        //   this.services[i].crud = !this.services[i].crud;
-        // }
       this.fullInfo = [];
-      this.getServices();
-      // }
+      this.combinations();
     },
     chosenSource(data) {
       if(this.sourceSelect[0] == 'All') {
@@ -193,21 +220,52 @@ export default {
       }
     },
     action(index, iconIndex) {
+      if(this.currentActive != "none") {
+        if(index != this.currentActive) {
+          this.editing = true;
+          return true;
+        }
+      }
       if(iconIndex == 0) {
-        this.fullInfo[index].icons[0].active = false;
-        this.fullInfo[index].icons[1].active = true;
-        this.fullInfo[index].industry = [];
-        for(let elem of this.industrySelected) {
-          elem.rate = this.changedRate;
-          this.fullInfo[index].industry.push(elem)
-        };
-        this.$http.post('/service/rates', this.fullInfo[index])
-        .then(res => {
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err)
-        })
+        var exist = false;
+        for(let ind in this.fullInfo) {
+          if(ind != index) {
+            for(let indus of this.industrySelected) {
+            if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
+              this.fullInfo[index].sourceLanguage.lang == this.fullInfo[ind].sourceLanguage.lang &&
+              this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
+                exist = true;
+                this.uniqueCheck = {
+                  source: this.fullInfo[index].sourceLanguage.lang,
+                  target: this.fullInfo[index].targetLanguage.lang,
+                  industry: indus.name,
+                }
+                break;
+              }
+            }
+          }
+          if(exist) break;
+        }        
+        if(!exist) {
+          this.fullInfo[index].icons[0].active = false;
+          this.fullInfo[index].icons[1].active = true;
+          this.fullInfo[index].industry = [];
+          
+          for(let elem of this.industrySelected) {
+            elem.rate = this.changedRate;
+            this.fullInfo[index].industry.push(elem)
+          };
+          this.$http.post('/service/rates', this.fullInfo[index])
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          });
+          this.currentActive = "none";
+        } else {
+          this.notUnique = true;
+        }
       }
 
       if(iconIndex == 1) {
@@ -230,9 +288,13 @@ export default {
 
       if(iconIndex == 2) {
         this.fullInfo.splice(index, 1);
+        this.currentActive = "none";
       }
     },
     addNewRow() {
+      this.sourceSelect = ["All"],
+      this.targetSelect = ["All"],
+      this.industryFilter = [{name: "All"}],
       this.fullInfo.push({
         sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
@@ -244,58 +306,30 @@ export default {
         this.handleScroll();
       },100);
     },
-    getServices() {
-      this.$http.get("api/services")
-      .then(res => {
-        this.services = res.data.filter(item => {
-          if(item.languageForm == "Duo") {
-            return item;
-          }
-        });
-        this.services.forEach(item => {
-          if(item.title == this.serviceSelect.title) {
-            item.crud = true
-            for(let i = 0; i < item.languageCombinations.length; i++) {
-              for(let elem of item.languageCombinations[i].industries) {
-                this.fullInfo.push({
-                  title: item.title,
-                  sourceLanguage: item.languageCombinations[i].source,
-                  targetLanguage: item.languageCombinations[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
+    combinations() {
+      for(let item of this.services) {
+        if(item.languageForm == 'Duo' && item.title == this.serviceSelect.title) {
+          item.crud = true
+          for(let i = 0; i < item.languageCombinations.length; i++) {
+            for(let elem of item.languageCombinations[i].industries) {
+              this.fullInfo.push({
+                title: item.title,
+                sourceLanguage: item.languageCombinations[i].source,
+                targetLanguage: item.languageCombinations[i].target,
+                industry: [elem],
+                active: true,
+                icons: [
+                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                ]
+              })
             }
-          } else {
-            item.crud = false
           }
-        })
-      })
-      .catch(err => console.log(err))
-    },
-    getLanguages() {
-      this.$http.get('api/languages')
-      .then(response => {
-        let sortedArray = response.body;
-        sortedArray.sort( (a,b) => {
-          if(a.lang < b.lang) return -1;
-          if(a.lang > b.lang) return 1;
-        });
-      this.languages = sortedArray;
-        for(let i = 0; i < sortedArray.length; i++) {
-          if(sortedArray[i].lang == 'English') {
-            this.sourceSelect = sortedArray[i];
-          }
+        } else {
+          item.crud = false
         }
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
+      }
     }
   },
   computed: {
@@ -322,11 +356,7 @@ export default {
       for(let i = 0; i < 5; i++) {
         result.push(this.heads[i])
       }
-      for(let j = 0; j < this.services.length; j++) {
-        if(this.services[j].crud) {
-          result.splice(-1, 0, {title: this.services[j].title} )
-        }
-      }
+      result.splice(-1, 0, this.serviceSelect)
       return result;
     },
     tableWidth() {
@@ -344,16 +374,17 @@ export default {
     CalculationUnite,
     LanguagesSelect,
     IndustrySelect,
-    ServiceSelect
+    ServiceDuoSelect
   },
-  mounted() {
-    this.getServices();
+  created() {
+    this.combinations();
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .duoWrap {
+  position: relative;
   font-family: MyriadPro;
   min-width: 872px; 
 }
@@ -510,5 +541,58 @@ td {
 }
 .addShadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+}
+
+.unique-message, .edition-message {
+  position: absolute;
+  border: 1px solid #ff876c;
+  background-color: #FFF;
+  box-shadow: 0 0 15px #ff876c;
+  width: 300px;
+  top: 50%;
+  left: 50%;
+  margin-left: -150px;
+  padding: 0 15px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  .close {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    top: -2px;
+    right: -9px;
+    transform: rotate(45deg);
+    cursor: pointer;
+  }
+  .message {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    &__info-list {
+      li {
+        list-style: none;
+        .info-item {
+          color: #ff876c;
+          font-weight: 500;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  p {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.unique-message {
+  height: 150px;
+  margin-top: -75px; 
+}
+
+.edition-message {
+  height: 70px;
+  margin-top: -35px;
 }
 </style>

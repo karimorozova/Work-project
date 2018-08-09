@@ -39,9 +39,16 @@ export default {
         }
     },
     methods: {
-        showInds() {
+        showInds(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr") {
+                    return item;
+                }
+            })
+            console.log(tr);
             this.droppedInd = !this.droppedInd;
-            this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex})
+            this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: tr.offsetTop, offsetHeight: tr.offsetHeight})
         },
         async getIndustries() {
             await this.$http.get('api/industries')
@@ -128,6 +135,7 @@ export default {
 .dropSelect {
     position: relative;
     .drop {
+        font-size: 14px;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;

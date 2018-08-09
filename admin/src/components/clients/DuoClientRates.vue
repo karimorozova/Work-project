@@ -12,7 +12,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")
+      ServiceDuoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")
   .addButton
     input(type="button" value="Add several languages")           
   .tableData
@@ -53,7 +53,7 @@
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceSelect from "../ServiceSelect";
+import ServiceDuoSelect from "../ServiceDuoSelect";
 
 export default {
   props: {},
@@ -342,7 +342,7 @@ export default {
   components: {
     LanguagesSelect,
     IndustrySelect,
-    ServiceSelect
+    ServiceDuoSelect
   },
   mounted() {
     this.getServices();

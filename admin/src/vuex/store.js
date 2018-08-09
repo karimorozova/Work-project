@@ -12,6 +12,7 @@ const state = {
     xtmCustomers: [],
     languages: [],
     clientLangs: [],
+    duoRates: [],
     isLoggedIn: !!localStorage.getItem("token")
 };
 
@@ -43,6 +44,9 @@ const mutations = {
     },
     customerlangs(state, payload) {
         state.clientLangs = payload
+    },
+    duoRatesFill(state, payload) {
+        state.duoRates = payload
     }
 };
 

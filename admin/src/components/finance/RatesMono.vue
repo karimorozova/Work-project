@@ -3,29 +3,27 @@
   .filters
     .filters__item.sourceMenu
       label Language
-      LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
+      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
     .filters__item.industryMenu
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")           
+      ServiceMonoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
       tbody
-        template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
+        template(v-for="(info, index) in fullInfo" v-if="targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All'")
+          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
-              .innerComponent(v-if="!info.icons[1].active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-            td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
+              template(v-if='!info.targetLanguage.symbol || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+            td(:class="{addShadow: !info.icons[1].active}")
+              input.rates(:value="info.package" @input="changePackage" :readonly="info.icons[1].active")
             td.dropOption              
               span(v-if="!indus.icon") {{ indus.name }}
               .dropOption__image
@@ -48,14 +46,17 @@
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceSelect from "../ServiceSelect";
+import ServiceMonoSelect from "../ServiceMonoSelect";
 
 export default {
-  props: {},
+  props: {
+    services: {
+      type: Array,
+      default: []
+    }
+  },
   data() {
     return {
-      direction: 'mono',
-      sourceSelect: ["EN"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
@@ -68,8 +69,8 @@ export default {
         { title: "" }
       ],
       fullInfo: [],
-      services: [],
       changedRate: '',
+      changedPackage: '',
       currentActive: ''
     }
   },
@@ -77,6 +78,9 @@ export default {
   methods: {
     changeRate(event) {
       this.changedRate = +event.target.value
+    },
+    changePackage(event) {
+      this.changedPackage = +event.target.value
     },
     handleScroll() {
       let element = document.getElementsByTagName('tbody')[0];
@@ -88,12 +92,8 @@ export default {
         setTimeout(() => {
           let elem1 = document.getElementsByClassName('drop')[0];
           elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
-          // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
         }, 100)
       }
-    },
-    changeSource(data) {
-      this.fullInfo[data.index].sourceLanguage = data.lang;
     },
     changeTarget(data) {
       this.fullInfo[data.index].targetLanguage = data.lang;
@@ -118,35 +118,14 @@ export default {
         this.industrySelected.push({
           crud: true,
           name: 'All',
-          rate: 0.1
+          rate: 0.12
         })
       }
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      // for(let i = 0; i < this.services.length; i++) {
-        // if(this.services[i].title == this.serviceSelect.title) {
-        //   this.services[i].crud = !this.services[i].crud;
-        // }
       this.fullInfo = [];
-      this.getServices();
-      // }
-    },
-    chosenSource(data) {
-      if(this.sourceSelect[0] == 'All') {
-        this.sourceSelect = [];
-        this.sourceSelect.push(data.lang.symbol)
-      } else {
-          let index = this.sourceSelect.indexOf(data.lang.symbol);
-          if(index != -1) {
-            this.sourceSelect.splice(index, 1);
-          } else {
-            this.sourceSelect.push(data.lang.symbol)
-          }
-      }
-      if(data.lang.lang == 'All' || !this.sourceSelect.length) {
-        this.sourceSelect = ['All'];
-      }
+      this.combinations();
     },
     chosenTarget(data) {
       if(this.targetSelect[0] == 'All') {
@@ -228,68 +207,43 @@ export default {
     },
     addNewRow() {
       this.fullInfo.push({
-        language: {lang: "English"}, 
-        package: 3000, 
+        targetlanguage: {lang: "English"}, 
+        package: 200, 
         industry: [{name: "All", rate: 0}], 
         active: true, 
-        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
+        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
+          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
+          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        ]
       });
       setTimeout( () => {
         this.handleScroll();
       },100);
     },
-    getServices() {
-      this.$http.get("api/services")
-      .then(res => {
-        this.services = res.data.filter(item => {
-          if(item.languageForm == "Mono") {
-            return item;
-          }
-        });
-        this.services.forEach(item => {
-          if(item.title == this.serviceSelect.title) {
-            item.crud = true
-            for(let i = 0; i < item.rates.length; i++) {
-              for(let elem of item.rates[i].industry) {
-                this.fullInfo.push({
-                  title: item.title,
-                  sourceLanguage: item.rates[i].source,
-                  targetLanguage: item.rates[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
+    combinations() {
+      for(let item of this.services) {
+        if(item.languageForm == 'Mono' && item.title == this.serviceSelect.title) {
+          item.crud = true
+          for(let i = 0; i < item.languageCombinations.length; i++) {
+            for(let elem of item.languageCombinations[i].industries) {
+              this.fullInfo.push({
+                title: item.title,
+                package: item.languageCombinations[i].package,
+                targetLanguage: item.languageCombinations[i].target,
+                industry: [elem],
+                active: true,
+                icons: [
+                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                ]
+              })
             }
-          } else {
-            item.crud = false
           }
-        })
-      })
-      .catch(err => console.log(err))
-    },
-    getLanguages() {
-      this.$http.get('api/languages')
-      .then(response => {
-        let sortedArray = response.body;
-        sortedArray.sort( (a,b) => {
-          if(a.lang < b.lang) return -1;
-          if(a.lang > b.lang) return 1;
-        });
-      this.languages = sortedArray;
-        for(let i = 0; i < sortedArray.length; i++) {
-          if(sortedArray[i].lang == 'English') {
-            this.sourceSelect = sortedArray[i];
-          }
+        } else {
+          item.crud = false
         }
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
+      }
     }
   },
   computed: {
@@ -314,13 +268,9 @@ export default {
     tableHeader() {
       let result = [];
       for(let i = 0; i < 5; i++) {
-        result.push(this.heads[i])
+        result.push(this.heads[i]);
       }
-      for(let j = 0; j < this.services.length; j++) {
-        if(this.services[j].crud) {
-          result.splice(-1, 0, {title: this.services[j].title} )
-        }
-      }
+      result.splice(-1, 0, this.serviceSelect);
       return result;
     },
     tableWidth() {
@@ -337,10 +287,10 @@ export default {
   components: {
     LanguagesSelect,
     IndustrySelect,
-    ServiceSelect
+    ServiceMonoSelect
   },
   mounted() {
-    this.getServices();
+    this.combinations();
   }
 };
 </script>

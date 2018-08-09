@@ -9,7 +9,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")           
+      ServiceMonoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
@@ -48,7 +48,7 @@
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceSelect from "../ServiceSelect";
+import ServiceMonoSelect from "../ServiceMonoSelect";
 
 export default {
   props: {},
@@ -337,7 +337,7 @@ export default {
   components: {
     LanguagesSelect,
     IndustrySelect,
-    ServiceSelect
+    ServiceMonoSelect
   },
   mounted() {
     this.getServices();

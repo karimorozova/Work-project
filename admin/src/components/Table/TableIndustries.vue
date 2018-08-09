@@ -49,7 +49,6 @@ import IndustriesSelect from "./industriesRows/IndustriesTableSelect";
 import IndustriesTableImage from "./industriesRows/IndustriesTableImage";
 import IndustriesRowEdit from "./industriesRows/IndustriesRowEdit";
 import IndustriesGenericTB from "./industriesRows/IndustriesGenericTB";
-import ServiceSelect from "./industriesRows/ServicesTableSelect";
 
 export default {
   props: {},
@@ -218,7 +217,6 @@ export default {
     IndustriesSelect,
     IndustriesRowEdit,
     IndustriesGenericTB,
-    ServiceSelect
   },
   mounted() {
     this.getIndustries();
