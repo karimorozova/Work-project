@@ -28,6 +28,10 @@ const IndustriesSchema = new mongoose.Schema({
     rate: {
         type: Number,
         default: 0
+    },
+    package: {
+        type: Number,
+        default: 200,
     }
 });
 

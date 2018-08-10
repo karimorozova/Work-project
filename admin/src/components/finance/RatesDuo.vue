@@ -24,11 +24,11 @@
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="(filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All') && indus.rate > 0")
             td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
+              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
+              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.dropOption              
@@ -63,6 +63,13 @@
     .message
       p Please finish the current edition first!
       span.close(@click="closeEditionMessage") +
+  .error-message(v-if="showValidError")
+    .message
+      p Please finish the current edition first!
+      .message__info-list
+        li(v-for="error in validError")
+          span.info-item {{ error }}
+      span.close(@click="closeErrorMessage") +
 </template>
 
 <script>
@@ -92,17 +99,21 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
-      // services: [],
       fullInfo: [],
       changedRate: '',
       currentActive: 'none',
       notUnique: false,
       editing: false,
-      uniqueCheck: {source: "", target: "", industry: ""}
+      uniqueCheck: {source: "", target: "", industry: ""},
+      showValidError: false,
+      validError: []
     }
   },
 
   methods: {
+    closeErrorMessage() {
+      this.showValidError = false;
+    },
     closeUnique() {
       this.notUnique = false;
     },
@@ -122,8 +133,6 @@ export default {
         setTimeout(() => {
           const offsetBottom = data.offsetTop + data.offsetHeight*2;
           const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-          console.log(offsetBottom);
-          console.log(scrollBottom);
           if (offsetBottom > scrollBottom) {
             tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
           }
@@ -227,6 +236,15 @@ export default {
         }
       }
       if(iconIndex == 0) {
+        this.validError = [];
+        if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
+        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+        if(this.validError.length) {
+          this.showValidError = true;
+          this.changedRate = this.fullInfo[index].industry[0].rate;
+          return true;
+        }
         var exist = false;
         for(let ind in this.fullInfo) {
           if(ind != index) {
@@ -304,20 +322,22 @@ export default {
       this.$emit('refreshServices');
     },
     addNewRow() {
-      this.sourceSelect = ["All"],
-      this.targetSelect = ["All"],
-      this.industryFilter = [{name: "All"}],
+      this.sourceSelect = ["All"];
+      this.targetSelect = ["All"];
+      this.industryFilter = [{name: "All"}];
       this.fullInfo.push({
         title: this.serviceSelect.title,
-        sourceLanguage: {lang: "English"}, 
-        targetLanguage: {lang: ""}, 
-        industry: [{name: "All", rate: 0}], 
+        sourceLanguage: "", 
+        targetLanguage: "", 
+        industry: [{name: "All", rate: 0.1}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       });
-      setTimeout( () => {
+      this.currentActive = this.fullInfo.length-1;
+      this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
+      setTimeout(() => {
         this.handleScroll();
-      },100);
+      }, 0)
     },
     combinations() {
       for(let item of this.services) {
@@ -560,7 +580,7 @@ td {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 
-.unique-message, .edition-message {
+.unique-message, .edition-message, .error-message {
   position: absolute;
   border: 1px solid #ff876c;
   background-color: #FFF;
@@ -603,7 +623,7 @@ td {
   }
 }
 
-.unique-message {
+.unique-message, .error-message {
   height: 150px;
   margin-top: -75px; 
 }

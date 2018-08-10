@@ -14,7 +14,7 @@
               span Mono
               img(src="../../assets/images/Other/open.png" :class="{reverse: monoDrop}") 
             .rates-drop(v-if="monoDrop")
-              RatesMono(:services="services")
+              RatesMono(:services="services" @refreshServices="refreshServices")
         .duoRates(:class="{straightAngle: duoDrop}")
           .duoRates__open
             .select(@click="openDuo")

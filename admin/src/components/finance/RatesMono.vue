@@ -17,13 +17,13 @@
           th(v-for="head in tableHeader") {{ head.title }}
       tbody
         template(v-for="(info, index) in fullInfo" v-if="targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All'")
-          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
+          tr(v-for="indus in info.industry" v-if="(filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All') && indus.rate > 0")
             td.dropOption 
-              template(v-if='!info.targetLanguage.symbol || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
+              template(v-if='targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td(:class="{addShadow: !info.icons[1].active}")
-              input.rates(:value="info.package" @input="changePackage" :readonly="info.icons[1].active")
+              input.rates(:value="indus.package" @input="changePackage" :readonly="info.icons[1].active")
             td.dropOption              
               span(v-if="!indus.icon") {{ indus.name }}
               .dropOption__image
@@ -71,7 +71,7 @@ export default {
       fullInfo: [],
       changedRate: '',
       changedPackage: '',
-      currentActive: ''
+      currentActive: 'none'
     }
   },
 
@@ -88,10 +88,13 @@ export default {
     },
     scrollDrop(data) {
       if(data.drop) {
-        let element = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByTagName('tbody')[0];
         setTimeout(() => {
-          let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
+          const offsetBottom = data.offsetTop + data.offsetHeight*2;
+          const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+          if (offsetBottom > scrollBottom) {
+            tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
+          }
         }, 100)
       }
     },
@@ -118,7 +121,8 @@ export default {
         this.industrySelected.push({
           crud: true,
           name: 'All',
-          rate: 0.12
+          rate: 0.12,
+          package: 200
         })
       }
     },
@@ -166,16 +170,25 @@ export default {
       }
     },
     action(index, iconIndex) {
+      if(this.currentActive != "none") {
+        if(index != this.currentActive) {
+          this.editing = true;
+          return true;
+        }
+      }
       if(iconIndex == 0) {
         this.fullInfo[index].icons[0].active = false;
         this.fullInfo[index].icons[1].active = true;
         this.fullInfo[index].industry = [];
         for(let elem of this.industrySelected) {
           elem.rate = this.changedRate;
+          elem.package = this.changedPackage;
           this.fullInfo[index].industry.push(elem)
         };
-        this.$http.post('/service/rates', this.fullInfo[index])
+        this.$http.post('/service/rates-mono', this.fullInfo[index])
         .then(res => {
+          this.currentActive = "none";
+          this.refreshServices();
           console.log(res)
         })
         .catch(err => {
@@ -189,6 +202,7 @@ export default {
           this.industrySelected.push(elem)  
         }
         this.changedRate = this.fullInfo[index].industry[0].rate;
+        this.changedPackage = this.fullInfo[index].industry[0].package
         this.currentActive = index;
         for(let i in this.fullInfo) {
           if(i == index) {
@@ -203,19 +217,25 @@ export default {
 
       if(iconIndex == 2) {
         this.fullInfo.splice(index, 1);
+        this.refreshServices();
       }
+    },
+    refreshServices() {
+      this.$emit('refreshServices');
     },
     addNewRow() {
       this.fullInfo.push({
         targetlanguage: {lang: "English"}, 
-        package: 200, 
-        industry: [{name: "All", rate: 0}], 
+        industry: [{name: "All", rate: 0, package: 200}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
           {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
           {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
         ]
       });
+      this.currentActive = this.fullInfo.length-1;
+      this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
+      this.changedPackage = this.fullInfo[this.currentActive].industry[0].changedPackage;
       setTimeout( () => {
         this.handleScroll();
       },100);
@@ -228,7 +248,6 @@ export default {
             for(let elem of item.languageCombinations[i].industries) {
               this.fullInfo.push({
                 title: item.title,
-                package: item.languageCombinations[i].package,
                 targetLanguage: item.languageCombinations[i].target,
                 industry: [elem],
                 active: true,
@@ -292,7 +311,8 @@ export default {
   mounted() {
     this.combinations();
   }
-};
+}
+
 </script>
 
 <style lang="scss" scoped>

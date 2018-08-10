@@ -40,9 +40,21 @@ export default {
         }
     },
     methods: {
-        showLangs() {
+        showLangs(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr") {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
+            }
             this.droppedLang = !this.droppedLang;
-            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex})
+            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getLanguages() {
             await this.$http.get('api/languages')

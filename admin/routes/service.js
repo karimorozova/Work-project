@@ -114,6 +114,62 @@ router.post('/jobcost', async (req, res) => {
   res.send(updateProject);
 })
 
+router.post('/rates-mono', async (req, res) => {
+  var rate = await req.body;
+  let industries = await Industries.find();
+  let service = await Services.find({'title': rate.title});
+
+  for(let indus of rate.industry) {
+    for(let industry of industries) {
+      if(industry.name == indus.name) {
+        industry.rate = indus.rate;
+        industry.active = indus.active;
+      } else {
+        industry.active = false;
+      }
+    }
+  }
+
+  var exist = false;
+
+  rates = service[0].languageCombinations;
+  
+  for(let j = 0; j < rate.industry.length; j++) {
+    for(let i = 0; i < rates.length; i++) {
+      if(rate.targetLanguage.lang == rates[i].target.lang) {
+        exist = true;
+        rates[i].package = rate.package;
+        for(let elem of rates[i].industries) {
+          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
+            elem.rate = rate.industry[j].rate;
+            elem.active = rate.industry[j].active;
+          }
+        }
+      }
+    }
+    if(exist) {
+      break;
+    }
+  }
+  if(exist) {
+    let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+    res.send(result);
+  } else {
+    rates.push({
+      source: null,
+      target: rate.targetLanguage,
+      active: true,
+      industries: industries
+    });
+    await Services.update({'title': rate.title}, {'languageCombinations': rates}).then(response => {
+      res.send(response);
+    }).catch(err => {
+      console.log(err)
+    })
+  }
+
+})
+
 router.post('/rates', async (req, res) => {
   var rate = await req.body;
   var rates = [];
@@ -172,6 +228,9 @@ router.post('/rates', async (req, res) => {
 
 router.post('/delete-rate', async (req, res) => {
   var rate = await req.body;
+  if(!rate.sourceLanguage || !rate.targetLanguage) {
+    return true;
+  }
   var rates = [];
   let service = await Services.find({'title': rate.title});
   rates = service[0].languageCombinations;

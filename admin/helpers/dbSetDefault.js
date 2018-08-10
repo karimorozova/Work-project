@@ -176,13 +176,13 @@ async function serviceMonoLangs() {
       rate = 0.15
     }
     for(let industry of industries) {
-      industry.rate = rate
+      industry.rate = rate;
+      industry.package = 200;
     }
     if(!serv.languageCombinations.length) {
       for(let lang of languages) {
         if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
           serv.languageCombinations.push({
-            package: 200,
             target: lang,
             active: true,
             industries: industries

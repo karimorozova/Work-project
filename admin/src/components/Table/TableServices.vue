@@ -203,6 +203,7 @@ export default {
         if (x.title > y.title) return 1;
         if (x.title < y.title) return -1;
       });
+      this.$store.dispatch("servicesGetting", this.services);
     },
     checkFields(ind) {
       if (!this.services[ind].title.length) {
