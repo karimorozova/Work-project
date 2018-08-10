@@ -52,6 +52,7 @@
             router-view(:sliderBool="sliderBool"
               :clientLanguages="clientLanguages"
               @customerLangs='customerLangs'
+              @refreshServices='refreshServices'
               )
 </template>
 
@@ -296,6 +297,9 @@ export default {
       let services = result.body;
       services.sort((a, b) => {return a.sortIndex - b.sortIndex});
       this.$store.dispatch('servicesGetting', services);
+    },
+    refreshServices(data) {
+      this.getServices();
     }
   },
   beforeRouteUpdate (to, from, next) {

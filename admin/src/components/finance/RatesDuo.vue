@@ -22,7 +22,7 @@
           th(v-for="head in tableHeader") {{ head.title }}
       tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
+          tr(v-for="indus in info.industry" v-if="(filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All') && indus.rate > 0")
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -39,7 +39,7 @@
               .innerComponent(v-if="!info.icons[1].active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
             td.iconsField
@@ -263,6 +263,7 @@ export default {
             console.log(err)
           });
           this.currentActive = "none";
+          this.refreshServices();
         } else {
           this.notUnique = true;
         }
@@ -287,15 +288,27 @@ export default {
       }
 
       if(iconIndex == 2) {
-        this.fullInfo.splice(index, 1);
+        let deletedRate = this.fullInfo.splice(index, 1)[0];
+        this.$http.post('/service/delete-rate', deletedRate)
+        .then(res => {
+          this.refreshServices();
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        });
         this.currentActive = "none";
       }
+    },
+    refreshServices() {
+      this.$emit('refreshServices');
     },
     addNewRow() {
       this.sourceSelect = ["All"],
       this.targetSelect = ["All"],
       this.industryFilter = [{name: "All"}],
       this.fullInfo.push({
+        title: this.serviceSelect.title,
         sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
         industry: [{name: "All", rate: 0}], 
@@ -330,6 +343,10 @@ export default {
           item.crud = false
         }
       }
+      this.fullInfo = this.fullInfo.sort( (a, b) => {
+        if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
+        if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;        
+      })
     }
   },
   computed: {

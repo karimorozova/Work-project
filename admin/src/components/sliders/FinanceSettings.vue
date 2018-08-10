@@ -21,7 +21,7 @@
               span Duo
               img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
-              RatesDuo(:services="services")
+              RatesDuo(:services="services" @refreshServices="refreshServices")
 </template>
 
 <script>
@@ -39,6 +39,9 @@ export default {
     };
   },
   methods: {
+    refreshServices(data) {
+      this.$emit('refreshServices', data);
+    },
     openMono() {
       this.monoDrop = !this.monoDrop;
     },
