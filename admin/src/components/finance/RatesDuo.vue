@@ -14,15 +14,15 @@
       label Service
       ServiceDuoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
   .addButton
-    input(type="button" value="Add several languages")           
+    input(type="button" @click="addSevLangs" value="Add several languages")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
-      tbody
+      tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="(filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All') && indus.rate > 0")
+          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import CalculationUnite from "./ratesduoRows/CalculationUnite";
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceDuoSelect from "../ServiceDuoSelect";
@@ -106,11 +105,14 @@ export default {
       editing: false,
       uniqueCheck: {source: "", target: "", industry: ""},
       showValidError: false,
-      validError: []
+      validError: [],
     }
   },
 
   methods: {
+    addSevLangs() {
+      this.$emit('addSevLangs', this.fullInfo);
+    },
     closeErrorMessage() {
       this.showValidError = false;
     },
@@ -124,12 +126,12 @@ export default {
       this.changedRate = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByTagName('tbody')[0];
+      let element = document.getElementsByClassName('duo-tbody')[0];
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        var tbody = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByClassName('duo-tbody')[0];
         setTimeout(() => {
           const offsetBottom = data.offsetTop + data.offsetHeight*2;
           const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
@@ -307,7 +309,7 @@ export default {
 
       if(iconIndex == 2) {
         let deletedRate = this.fullInfo.splice(index, 1)[0];
-        this.$http.post('/service/delete-rate', deletedRate)
+        this.$http.post('/service/delete-duorate', deletedRate)
         .then(res => {
           this.refreshServices();
           console.log(res)
@@ -345,18 +347,20 @@ export default {
           item.crud = true
           for(let i = 0; i < item.languageCombinations.length; i++) {
             for(let elem of item.languageCombinations[i].industries) {
-              this.fullInfo.push({
-                title: item.title,
-                sourceLanguage: item.languageCombinations[i].source,
-                targetLanguage: item.languageCombinations[i].target,
-                industry: [elem],
-                active: true,
-                icons: [
-                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                ]
-              })
+              if(elem.rate > 0) {
+                this.fullInfo.push({
+                  title: item.title,
+                  sourceLanguage: item.languageCombinations[i].source,
+                  targetLanguage: item.languageCombinations[i].target,
+                  industry: [elem],
+                  active: true,
+                  icons: [
+                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                  ]
+                })
+              }
             }
           }
         } else {
@@ -408,10 +412,9 @@ export default {
     }
   },
   components: {
-    CalculationUnite,
     LanguagesSelect,
     IndustrySelect,
-    ServiceDuoSelect
+    ServiceDuoSelect,
   },
   created() {
     this.combinations();
@@ -632,4 +635,5 @@ td {
   height: 70px;
   margin-top: -35px;
 }
+
 </style>

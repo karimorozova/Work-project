@@ -170,6 +170,40 @@ router.post('/rates-mono', async (req, res) => {
 
 })
 
+router.post('/delete-monorate', async (req, res) => {
+  var rate = await req.body;
+  if(!rate.targetLanguage || !rate.industry[0].package) {
+    return true;
+  }
+  var rates = [];
+  let service = await Services.find({'title': rate.title});
+  rates = service[0].languageCombinations;
+  var findRate = "";
+
+  for(let j = 0; j < rate.industry.length; j++) {
+    for(let i = 0; i < rates.length; i++) {
+      if(rate.targetLanguage.lang == rates[i].target.lang) {
+        for(let elem of rates[i].industries) {
+          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
+            elem.rate = 0;
+            elem.active = false;
+          }
+        }
+        findRate = rates[i].industries.find(item => {
+          if(item.rate > 0) {
+            return item;
+          }
+        });
+        if(!findRate) {
+          rates.splice(i, 1);
+        }
+      }
+    }
+  }
+  let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+  res.send(result);
+})
+
 router.post('/rates', async (req, res) => {
   var rate = await req.body;
   var rates = [];
@@ -226,7 +260,7 @@ router.post('/rates', async (req, res) => {
   }
 })
 
-router.post('/delete-rate', async (req, res) => {
+router.post('/delete-duorate', async (req, res) => {
   var rate = await req.body;
   if(!rate.sourceLanguage || !rate.targetLanguage) {
     return true;
@@ -242,8 +276,8 @@ router.post('/delete-rate', async (req, res) => {
         rate.targetLanguage.lang == rates[i].target.lang) {
         for(let elem of rates[i].industries) {
           if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-            elem.rate = 0
-            elem.active = false
+            elem.rate = 0;
+            elem.active = false;
           }
         }
         findRate = rates[i].industries.find(item => {

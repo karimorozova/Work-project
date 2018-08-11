@@ -6,7 +6,7 @@
         .slider-col Rates
   .rates-block
     .title Rates
-    .rates 
+    .rates
       .quotesComponent
         .monoRates(:class="{straightAngle: monoDrop}")
           .monoRates__open 
@@ -21,12 +21,15 @@
               span Duo
               img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
-              RatesDuo(:services="services" @refreshServices="refreshServices")
+              RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
+      Addseverallangs(v-if="addSeveral")
 </template>
 
 <script>
 import RatesDuo from "../finance/RatesDuo";
 import RatesMono from "../finance/RatesMono";
+import Addseverallangs from "../finance/Addseverallangs";
+
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -36,11 +39,17 @@ export default {
     return {
       monoDrop: false,
       duoDrop: false,
+      addSeveral: false,
+      fullInfo: []
     };
   },
   methods: {
     refreshServices(data) {
       this.$emit('refreshServices', data);
+    },
+    addSevLangs(data) {
+      this.addSeveral = true;
+      this.fullInfo = data;
     },
     openMono() {
       this.monoDrop = !this.monoDrop;
@@ -56,7 +65,8 @@ export default {
   },
   components: {
     RatesMono,
-    RatesDuo
+    RatesDuo,
+    Addseverallangs
   },
   mounted() {
   }
@@ -83,6 +93,7 @@ export default {
   padding: 20px 10px;
   box-shadow: 0 0 15px #67573e9d;
   width: 886px;
+  position: relative;
 }
 
 .quotesComponent {
@@ -159,6 +170,7 @@ export default {
     }
   }
 }
+
 
 @font-face {
   font-family: MyriadPro;

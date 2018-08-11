@@ -15,9 +15,9 @@
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
-      tbody
+      tbody.mono-tbody
         template(v-for="(info, index) in fullInfo" v-if="targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All'")
-          tr(v-for="indus in info.industry" v-if="(filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All') && indus.rate > 0")
+          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.dropOption 
               template(v-if='targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -41,6 +41,26 @@
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
+  .unique-message(v-if="notUnique")
+    .message
+      p The combination you want to add already exists!
+      .message__info-list
+        li Target: 
+          span.info-item {{ uniqueCheck.target }}
+        li Industry: 
+          span.info-item {{ uniqueCheck.industry }}
+      span.close(@click="closeUnique") +
+  .edition-message(v-if="editing")
+    .message
+      p Please finish the current edition first!
+      span.close(@click="closeEditionMessage") +
+  .error-message(v-if="showValidError")
+    .message
+      p Please finish the current edition first!
+      .message__info-list
+        li(v-for="error in validError")
+          span.info-item {{ error }}
+      span.close(@click="closeErrorMessage") +
 </template>
 
 <script>
@@ -71,11 +91,25 @@ export default {
       fullInfo: [],
       changedRate: '',
       changedPackage: '',
-      currentActive: 'none'
+      currentActive: 'none',
+      notUnique: false,
+      editing: false,
+      uniqueCheck: {target: "", industry: ""},
+      showValidError: false,
+      validError: []
     }
   },
 
   methods: {
+    closeErrorMessage() {
+      this.showValidError = false;
+    },
+    closeUnique() {
+      this.notUnique = false;
+    },
+    closeEditionMessage() {
+      this.editing = false
+    },
     changeRate(event) {
       this.changedRate = +event.target.value
     },
@@ -83,12 +117,12 @@ export default {
       this.changedPackage = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByTagName('tbody')[0];
+      let element = document.getElementsByClassName('mono-tbody')[0];
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        var tbody = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByClassName('mono-tbody')[0];
         setTimeout(() => {
           const offsetBottom = data.offsetTop + data.offsetHeight*2;
           const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
@@ -177,23 +211,52 @@ export default {
         }
       }
       if(iconIndex == 0) {
-        this.fullInfo[index].icons[0].active = false;
-        this.fullInfo[index].icons[1].active = true;
-        this.fullInfo[index].industry = [];
-        for(let elem of this.industrySelected) {
-          elem.rate = this.changedRate;
-          elem.package = this.changedPackage;
-          this.fullInfo[index].industry.push(elem)
-        };
-        this.$http.post('/service/rates-mono', this.fullInfo[index])
-        .then(res => {
+        this.validError = [];
+        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+        if(this.validError.length) {
+          this.showValidError = true;
+          this.changedRate = this.fullInfo[index].industry[0].rate;
+          return true;
+        }
+        var exist = false;
+        for(let ind in this.fullInfo) {
+          if(ind != index) {
+            for(let indus of this.industrySelected) {
+            if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
+              this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
+                exist = true;
+                this.uniqueCheck = {
+                  target: this.fullInfo[index].targetLanguage.lang,
+                  industry: indus.name,
+                }
+                break;
+              }
+            }
+          }
+          if(exist) break;
+        }
+        if(!exist) {
+          this.fullInfo[index].icons[0].active = false;
+          this.fullInfo[index].icons[1].active = true;
+          this.fullInfo[index].industry = [];
+          for(let elem of this.industrySelected) {
+            elem.rate = this.changedRate;
+            elem.package = this.changedPackage;
+            this.fullInfo[index].industry.push(elem)
+          };
+          this.$http.post('/service/rates-mono', this.fullInfo[index])
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          });
           this.currentActive = "none";
           this.refreshServices();
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err)
-        })
+        } else {
+          this.notUnique = true;
+        }
       }
 
       if(iconIndex == 1) {
@@ -216,17 +279,28 @@ export default {
       }
 
       if(iconIndex == 2) {
-        this.fullInfo.splice(index, 1);
-        this.refreshServices();
+        let deletedRate = this.fullInfo.splice(index, 1)[0];
+        this.$http.post('/service/delete-monorate', deletedRate)
+        .then(res => {
+          this.refreshServices();
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        });
+        this.currentActive = "none";
       }
     },
     refreshServices() {
       this.$emit('refreshServices');
     },
     addNewRow() {
+      this.targetSelect = ["All"];
+      this.industryFilter = [{name: "All"}];
       this.fullInfo.push({
-        targetlanguage: {lang: "English"}, 
-        industry: [{name: "All", rate: 0, package: 200}], 
+        title: this.serviceSelect.title,
+        targetLanguage: "", 
+        industry: [{name: "All", rate: 0.1, package: 200}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
           {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
@@ -246,17 +320,19 @@ export default {
           item.crud = true
           for(let i = 0; i < item.languageCombinations.length; i++) {
             for(let elem of item.languageCombinations[i].industries) {
-              this.fullInfo.push({
-                title: item.title,
-                targetLanguage: item.languageCombinations[i].target,
-                industry: [elem],
-                active: true,
-                icons: [
-                  {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                ]
-              })
+              if(elem.rate > 0) {
+                this.fullInfo.push({
+                  title: item.title,
+                  targetLanguage: item.languageCombinations[i].target,
+                  industry: [elem],
+                  active: true,
+                  icons: [
+                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                  ]
+                })
+              }
             }
           }
         } else {
@@ -317,6 +393,7 @@ export default {
 
 <style lang="scss" scoped>
 .duoWrap {
+  position: relative;
   font-family: MyriadPro;
   min-width: 872px; 
 }
@@ -474,4 +551,58 @@ td {
 .addShadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
+
+.unique-message, .edition-message, .error-message {
+  position: absolute;
+  border: 1px solid #ff876c;
+  background-color: #FFF;
+  box-shadow: 0 0 15px #ff876c;
+  width: 300px;
+  top: 50%;
+  left: 50%;
+  margin-left: -150px;
+  padding: 0 15px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  .close {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    top: -2px;
+    right: -9px;
+    transform: rotate(45deg);
+    cursor: pointer;
+  }
+  .message {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    &__info-list {
+      li {
+        list-style: none;
+        .info-item {
+          color: #ff876c;
+          font-weight: 500;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  p {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.unique-message, .error-message {
+  height: 150px;
+  margin-top: -75px; 
+}
+
+.edition-message {
+  height: 70px;
+  margin-top: -35px;
+}
+
 </style>
