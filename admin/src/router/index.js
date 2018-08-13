@@ -16,6 +16,10 @@ import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import Accountinfo from '@/components/account/Accountinfo'
+import Allclients from '@/components/clients/Allclients'
+import ClientDetails from '@/components/clients/ClientDetails'
+import ContactDetails from '@/components/clients/ContactDetails'
+
 
 Vue.use(Router)
 

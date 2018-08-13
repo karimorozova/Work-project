@@ -199,13 +199,9 @@ async function serviceDuoLangs() {
   let services = await Services.find({"languageForm": "Duo"});
   let industries = await Industries.find();
   let rate = 0.1;
-  let englishLangs = [];
-
-  for(let language of languages) {
-    if(language.lang.indexOf("English") != -1) {
-      englishLangs.push(language);
-    }
-  }
+  let englishLang = languages.find(item => {
+    return item.symbol == "EN-GB"
+  });
 
   for(let serv of services) {
     if(serv.title == 'Proofing') {
@@ -219,25 +215,21 @@ async function serviceDuoLangs() {
     }
     if(!serv.languageCombinations.length) {
     for(let lang of languages) {
-      if(serv.languages[0].target.indexOf(lang.symbol) != -1) {
-        for(let eng of englishLangs) {
-          serv.languageCombinations.push({
-            source: eng,
-            target: lang,
-            active: true,
-            industries: industries
-          })
-        }
+      if(serv.languages[0].target.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
+        serv.languageCombinations.push({
+          source: englishLang,
+          target: lang,
+          active: true,
+          industries: industries
+        })
       }
-      if(serv.languages[0].source.indexOf(lang.symbol) != -1) {
-        for(let eng of englishLangs) {
-          serv.languageCombinations.push({
-            source: lang,
-            target: eng,
-            active: true,
-            industries: industries
-          })
-        }
+      if(serv.languages[0].source.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
+        serv.languageCombinations.push({
+          source: lang,
+          target: englishLang,
+          active: true,
+          industries: industries
+        })
       }
     }
     await Services.update({"title": serv.title}, serv);
@@ -262,8 +254,8 @@ function industries() {
 
 async function checkCollections() {
   await languages();
-  await services();
   await industries();
+  await services();
   await requests();
   await projects();
   await users();

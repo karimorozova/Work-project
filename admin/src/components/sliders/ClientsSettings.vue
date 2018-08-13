@@ -1,74 +1,29 @@
 <template lang="pug">
 .clients
-  .adminNavbar__slider.slider
+  .all-clients(v-if="allClients")
+    Allclients(@chosenClient="chosenClient")
+  .adminNavbar__slider.slider(v-if="sidebarShow")
     span CLIENTS
     .slider-inner
       .slider-col General Information
-  .clients__data
-    .title General Information
-    .gen-info
-      .gen-info__block
-        .block-item
-          label Company Name:
-          input(type="text" placeholder="Company Name" v-model="genInfo.companyName")
-        .block-item
-          label Website:
-          input(type="text" placeholder="Website" v-model="genInfo.website")
-        .block-item
-          label Industry:
-          ClientIndustrySelect(:selectedInd="genInfo.industry" @chosenInd="chosenInd")
-        .block-item
-          label Status:
-          ClientStatusSelect(:selectedStatus="genInfo.status" @chosenStatus="chosenStatus")
-      .gen-info__block
-        .block-item
-          label Contract:
-          .contract
-            .contract__upload
-              input.upload(type="file")
-            .contract__download
-              img(src="../../assets/images/Other/Download-icon.png")
-          label NDA:
-          .contract
-            .contract__upload
-              input.upload(type="file")
-            .contract__download
-              img(src="../../assets/images/Other/Download-icon.png")
-        .block-item
-          label Account Manager:
-          AMSelect(:selectedManager="genInfo.accountManager" @chosenManager="chosenAccManager")
-        .block-item
-          label Sales Manager:
-          AMSelect(:selectedManager="genInfo.salesManager" @chosenManager="chosenSalesManager")
-        .block-item
-          label Project Manager:
-          AMSelect(:selectedManager="genInfo.projectManager" @chosenManager="chosenProjManager")
-    .title Contact Details
-    .contact-details
-      ContactDetails
-    .title Rates    
-    .rates
-      ClientRates
-    .title Sales Information
-    .sales
-      ClientSalesInfo
-    .title Billing Informations
-    .billing
-      ClientBillInfo
+  .clients__data(v-if="clientData")
+    ClientDetails(@contactDetails="contactDetails" @cancel="clientCancel")
+  .clients__contact-details(v-if="contactShow")
+    ContactDetails(@cancel="contactCancel" :countries="countries")
 </template>
 
 <script>
-import ClientIndustrySelect from '../clients/ClientIndustrySelect';
-import ClientStatusSelect from '../clients/ClientStatusSelect';
-import AMSelect from '../clients/AMSelect';
+import Allclients from '../clients/Allclients';
+import ClientDetails from '../clients/ClientDetails';
 import ContactDetails from '../clients/ContactDetails';
-import ClientRates from '../clients/ClientRates';
-import ClientSalesInfo from '../clients/ClientSalesInfo';
-import ClientBillInfo from '../clients/ClientBillInfo';
 
 export default {
   data() {
     return {
+      allClients: true,
+      clientData: false,
+      sidebarShow: false,
+      contactShow: false,
       genInfo: {
         companyName: '',
         website: '',
@@ -78,35 +33,59 @@ export default {
         nda: '',
         accountManager: {},
         salesManager: {},
-        projectManager: {}
+        projectManager: {},
+        countries: []
       }
     };
   },
   methods: {
-    chosenInd(data) {
-      this.genInfo.industry = data;
+    clientCancel(data) {
+      this.clientData = false;
+      this.sidebarShow = false;
+      this.allClients = true;
     },
-    chosenStatus(data) {
-      this.genInfo.status = data;
+    contactCancel(data) {
+      this.clientData = true;
+      this.sidebarShow = true;
+      this.contactShow = false;
     },
-    chosenAccManager(data) {
-      this.genInfo.accountManager = data;
+    chosenClient(data) {
+      this.sidebarShow = true;
+      this.clientData = true;
+      this.allClients = false;
     },
-    chosenSalesManager(data) {
-      this.genInfo.salesManager = data;
+    contactDetails(data) {
+      this.clientData = false;
+      this.contactShow = true;
+      this.sidebarShow = false;
     },
-    chosenProjManager(data) {
-      this.genInfo.projectManager = data;
+    getCountries() {
+      this.$http.get('https://restcountries.eu/rest/v2/all')
+        .then(res => {
+          this.countries = res.body;
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    getTimezones() {
+      this.$http.get('https://maps.googleapis.com/maps/api/timezone/json?location=43.7182713,-79.3777061&timestamp=1331161200')
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
     }
   },
   components: {
-    ClientIndustrySelect,
-    ClientStatusSelect,
-    AMSelect,
-    ContactDetails,
-    ClientRates,
-    ClientSalesInfo,
-    ClientBillInfo
+    Allclients,
+    ClientDetails,
+    ContactDetails
+  },
+  mounted() {
+    this.getCountries();
+    this.getTimezones();
   }
 };
 </script>
@@ -114,12 +93,15 @@ export default {
 <style lang="scss" scoped>
 .clients {
   display: flex;
-  &__data {
+  .all-clients, &__data, &__contact-details {
     margin-top: 20px;
     margin-left: 20px;
   }
 }
-.gen-info, .contact-details, .rates, .sales, .billing {
+.title {
+  font-size: 22px;
+}
+.gen-info, .contacts-info, .rates, .sales, .billing {
   margin: 20px 10px 40px 10px;
   padding: 40px;
   box-shadow: 0 0 15px #67573e9d;
@@ -199,7 +181,6 @@ export default {
   min-height: 94vh;
   &__slider {
     height: 100%;
-    // transform: translate(-50%);
     background-color: #fff;
     width: 175px;
     box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
@@ -235,6 +216,27 @@ export default {
   .slider {
     transform: translate(-3%);
     background-color: #fff;
+  }
+}
+
+.buttons {
+  width: 99%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  &__button {
+    margin-left: 30px;
+    width: 138px;
+    height: 33px;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    background-color: #ff876c;
+    border: 1px solid #ff876c;
+    cursor: pointer;
+    outline: none;
   }
 }
 

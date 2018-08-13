@@ -86,7 +86,7 @@ export default {
   },
   data() {
     return {
-      sourceSelect: ["EN"],
+      sourceSelect: ["EN-GB"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],

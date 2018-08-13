@@ -1,18 +1,16 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.name")
+            template(v-if="selectedLeadsource")
                 .selected
-                    .industry-tooltip
-                        img(:src="selectedInd.icon")
-                        span.toolTip {{ selectedInd.name }}
-            template(v-if="!selectedInd.name") 
+                    span {{ selectedLeadsource }}
+            template(v-if="!selectedLeadsource") 
                 span.selected.no-industry Options
-            .arrowButton(@click="showInds")
-                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
-        .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
-                span {{ industry.name }}
+            .arrowButton(@click="showLeadsources")
+                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
+        .drop(v-if="dropped")
+            .drop__item(v-for="(leadsource, index) in leadsources" @click="changeLeadsource(index)" :class="{chosen: leadsource == selectedLeadsource}")
+                span {{ leadsource }}
 </template>
 
 <script>
@@ -20,54 +18,33 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedInd: {
-            type: Object
-        },
-        parentInd: {
-            type: Number
+        selectedLeadsource: {
+            type: String
         }
     },
     data() {
         return {
-            industries: [],
-            droppedInd: false,
+            leadsources: ["Internet", "Website", "Advertising", "Landing Pages", "Social Media", "Friend"],
+            dropped: false,
             errors: []
         }
     },
     methods: {
-        showInds() {
-            this.droppedInd = !this.droppedInd;
-        },
-        async getIndustries() {
-            await this.$http.get('api/industries')
-            .then(response => {
-                let sortedArray = response.data.filter(item => {
-                    if (item.name != 'More') {
-                        return item
-                    }
-                });
-                sortedArray.sort( (a,b) => {
-                    if(a.name < b.name) return -1;
-                    if(a.name > b.name) return 1;
-                });
-                this.industries = sortedArray;
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+        showLeadsources() {
+            this.dropped = !this.dropped;
         },
         outClick() {
-            this.droppedInd = false;
+            this.dropped = false;
         },
-        changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd})
+        changeLeadsource(index) {
+            this.$emit("chosenLeadsource", this.leadsources[index])
         }
     },
     directives: {
         ClickOutside
     },
     mounted () {
-        this.getIndustries()
+
     }
 }
 </script>
@@ -81,12 +58,6 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    .innerComponent & {
-        width: 182px;
-        border: none;
-        border-radius: 0;
-        box-shadow: inset 0 0 6px rgba(103, 87, 62, 0.75);
-    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -136,7 +107,6 @@ export default {
 .dropSelect {
     position: relative;
     .drop {
-        font-size: 14px;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;
@@ -167,33 +137,5 @@ export default {
         }
     }
 }
-.checkbox {
-    width: 13px;
-    height: 13px;
-    border: 1px solid #67573E;
-    margin-right: 3px;
-    .checked {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        &::before {
-            content: '';
-            position: absolute;
-            width: 5px;
-            border: 1px solid #67573E;
-            top: 6px;
-            left: 1px;
-            transform: rotate(45deg);
-        }
-        &::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            border: 1px solid #67573E;
-            top: 5px;
-            left: 3px;
-            transform: rotate(-58deg);
-        }
-    }
-}
+
 </style>
