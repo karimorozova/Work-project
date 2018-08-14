@@ -5,7 +5,7 @@
             .title__buttons
                 input.button(type="button" value="Save")
                 input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete")
+                input.button(type="button" value="Delete" @click="deleteContact")
         .details
             .details__item
                 .photo-wrap
@@ -50,34 +50,30 @@
                 input.non-personal(type="text" placeholder="Skype name")
             .details__item
                 label Country:
-                .dropSelect(v-click-outside="outCountries")
-                    .select.country-select
-                        template(v-if="countrySelected")
-                            .selected
-                                span {{ countrySelected }}
-                        template(v-if="!countrySelected")
-                            span.selected.no-gender Country
-                        .arrowButton(@click="openCountries")
-                            img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: countriesDropped}")
-                    .search-country(v-if="countriesDropped")
-                        input.search(type="text" v-model="countrySearch" placeholder="Search")
-                    .drop(v-if="countriesDropped")
-                        .drop__item.country-name(v-for="(country, ind) in foundCountries" @click="chooseCountry(ind)")
-                            span {{ country.name }}
+                CountriesSelect(:countrySelected="countrySelected" :countries="countries" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                input.non-personal(type="text")
+                TimezoneSelect(:timezoneSelected="timezoneSelected" :timezones="timezones" @chosenZone="chosenZone")
             .details__item
                 label Notes:
                 textarea.non-personal(type="text" placeholder="Type")
+        .delete-approve(v-if="approveShow")
+            p Are you sure you want to delete?
+            input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+            input.button(type="button" value="Delete")
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
+import CountriesSelect from './CountriesSelect';
+import TimezoneSelect from './TimezoneSelect';
 
 export default {
     props: {
         countries: {
+            type: Array
+        },
+        timezones: {
             type: Array
         }
     },
@@ -87,8 +83,8 @@ export default {
             genderDropped: false,
             genderSelected: "",
             countrySelected: "",
-            countriesDropped: false,
-            countrySearch: ""
+            timezoneSelected: "",
+            approveShow: false
         }
     },
     methods: {
@@ -112,28 +108,25 @@ export default {
         cancel() {
             this.$emit('cancel');
         },
-        chooseCountry(ind) {
-            this.countrySelected = this.foundCountries[ind].name;
+        cancelApprove() {
+            this.approveShow = false;
         },
-        openCountries() {
-            this.countriesDropped = !this.countriesDropped;
+        deleteContact() {
+            this.approveShow = true;            
         },
-        outCountries() {
-            this.countriesDropped = false;
-        }
+        chosenCountry(data) {
+            this.countrySelected = data;
+        },
+        chosenZone(data) {
+            this.timezoneSelected = data;
+        } 
     },
     computed: {
-        foundCountries() {
-            let result = this.countries;
-            if(this.countrySearch) {
-                result = result.filter(item => {
-                    if(item.name.toLowerCase().indexOf(this.countrySearch.toLowerCase()) != -1) {
-                        return item
-                    }
-                })
-            }
-            return result;
-        }
+        
+    },
+    components: {
+        CountriesSelect,
+        TimezoneSelect
     },
     directives: {
         ClickOutside
@@ -149,6 +142,7 @@ export default {
 .contact-wrap {
     width: 1066px;
     font-size: 14px;
+    position: relative;
     label {
         margin-bottom: 0;
     }
@@ -274,20 +268,7 @@ textarea.non-personal {
 
 .dropSelect {
     position: relative;
-    .search-country {
-        position: absolute;
-        width: 100%;
-        border: 1px solid #BFB09D;
-        z-index: 10;
-        .search {
-            width: 99%;
-            outline: none;
-            border: none;
-            padding: 5px 2px;
-        }
-    }
     .drop {
-        margin-top: 27px;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;
@@ -354,13 +335,27 @@ textarea.non-personal {
     }
 }
 
-.country-select {
-    width: 470px;
-    .selected {
-        width: 91%;
+.delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 20%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px #67573E;
+    background-color: #FFF;
+    z-index: 20;
+    p {
+        font-size: 21px;
+        width: 50%;
+        text-align: center;
     }
-    .arrowButton {
-        width: 9%;
+    .approve-block {
+        margin-bottom: 15px;
     }
 }
 

@@ -2,8 +2,8 @@
     .sales-info
         .lead-info
             label Lead Source:
-            .lead-info__data
-                span Adwords
+            .lead-info__menu
+                ClientLeadsourceSelect(:selectedLeadsource="leadsourceSelected" @chosenLeadsource="chosenLeadsource")
         .status-info
             label Sales comission status:
             .status-info__data    
@@ -11,8 +11,22 @@
 </template>
 
 <script>
+import ClientLeadsourceSelect from './ClientLeadsourceSelect';
+
 export default {
-    
+    data() {
+        return {
+            leadsourceSelected: ""
+        }
+    },
+    methods: {
+        chosenLeadsource(data) {
+            this.leadsourceSelected = data;
+        }
+    },
+    components: {
+        ClientLeadsourceSelect
+    }
 }
 </script>
 
@@ -41,6 +55,12 @@ export default {
 }
 .lead-info {
     margin-bottom: 30px;
+    &__menu {
+        display: flex;
+        justify-content: flex-start;
+        width: 40%;
+    }
+    
 }
 
 </style>

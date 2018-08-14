@@ -6,6 +6,8 @@ const Services = require('./services');
 const Reports = require('./reports');
 const Industries = require('./industries');
 const Ratesduo = require('./ratesduo');
+const Timezones = require('./timezones');
+const Clients = require('./clients');
 
 const Models = {
     Languages,
@@ -15,7 +17,9 @@ const Models = {
     Services,
     Reports,
     Industries,
-    Ratesduo
+    Ratesduo,
+    Timezones,
+    Clients
 };
 
 module.exports = Models;

@@ -18,7 +18,7 @@
                         label Lead Source
                         ClientLeadsourceSelect(:selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
                 .filters__block
-                    input.button(type="submit" value="Add client")            
+                    input.add-button(type="submit" value="Add client")            
             table
                 thead
                     tr
@@ -179,7 +179,7 @@ label {
     }
 }
 
-.button {
+.add-button {
     width: 190px;
     height: 26px;
     color: white;

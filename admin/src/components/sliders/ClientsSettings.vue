@@ -9,7 +9,7 @@
   .clients__data(v-if="clientData")
     ClientDetails(@contactDetails="contactDetails" @cancel="clientCancel")
   .clients__contact-details(v-if="contactShow")
-    ContactDetails(@cancel="contactCancel" :countries="countries")
+    ContactDetails(@cancel="contactCancel" :countries="countries" :timezones="timezones")
 </template>
 
 <script>
@@ -34,7 +34,8 @@ export default {
         accountManager: {},
         salesManager: {},
         projectManager: {},
-        countries: []
+        countries: [],
+        timezones: []
       }
     };
   },
@@ -69,9 +70,9 @@ export default {
         })
     },
     getTimezones() {
-      this.$http.get('https://maps.googleapis.com/maps/api/timezone/json?location=43.7182713,-79.3777061&timestamp=1331161200')
+      this.$http.get('/timezones')
       .then(res => {
-        console.log(res)
+        this.timezones = res.body;
       })
       .catch(err => {
         console.log(err)

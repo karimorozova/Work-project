@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const path = require('path');
 const HomeApi = require('../models/xtrf/home');
-const { User, Requests, Reports } = require('../models');
+const { User, Requests, Reports, Timezones } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
 const mongoose = require('mongoose');
@@ -38,6 +38,16 @@ router.get('/logout', (req, res, next) => {
         });
     }
 });
+
+router.get('/timezones', (req, res) => {
+    Timezones.find()
+        .then(timezones => {
+            res.send(timezones)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+})
 
 router.get('/users', (req, res) => {
     User.find()

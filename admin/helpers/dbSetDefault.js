@@ -5,8 +5,11 @@ const {
   User,
   Services,
   Industries,
-  Ratesduo
+  Ratesduo,
+  Timezones,
+  Clients
 } = require('../models');
+
 const {
   languagesDefault,
   requestsDefault,
@@ -14,7 +17,9 @@ const {
   usersDefault,
   servicesDefault,
   industriesDefault,
-  ratesduoDefault
+  ratesduoDefault,
+  timezonesDefault,
+  clientsDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
@@ -25,6 +30,119 @@ var instance = axios.create({
     'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj'
   }
 });
+
+
+function timeZones() {
+  return Timezones.find({})
+    .then(async timezones => {
+      if(!timezones.length) {
+        for(const time of timezonesDefault) {
+          await new Timezones({zone: time}).save().then((times) => {
+
+          }).catch(err => {
+            console.log(`Timezone ${time} hasn't been saved because of ${err.message}`)
+          })
+        }
+        console.log('Timezones are saved!')
+      }
+    })
+    .catch(err => {
+      console.log('Something is wrong' + err)
+    })
+}
+
+function clients() {
+    return Clients.find({})
+      .then(async clients => {
+        if(!clients.length) {
+          for(const client of clientsDefault) {
+            await new Clients(client).save().then(res => {
+              console.log(`Client ${client.name} saved!`)
+            }).catch(err => {
+              console.log('Cannot save clients' + err.message)
+            })
+          }
+        }
+      })
+      .catch(err => {
+        console.log("Something wrong with DB" + err.message)
+      })
+}
+
+async function clientLangs() {
+  let clients = await Clients.find();
+  let service = await Services.find({title: "Translation"});
+  let randomRates = [0.1, 0.12, 0.15];
+  let combs = service[0].languageCombinations;
+
+  for(let client of clients) {
+    let industry = await Industries.find({name: client.industry.name});
+    client.industry = industry[0];
+    for(let i = 0; i < 5; i++) {
+      client.languageCombinations.push({
+        source: combs[i].source,
+        target: combs[i].target,
+        service: service[0].title,
+        rate: randomRates[Math.floor(Math.random()*3)],
+        active: true
+      })
+    }
+    await Clients.update({name: client.name}, client)
+  }
+}
+
+// function clients() {
+//   return Clients.find({})
+//     .then(async clients => {
+//       if(!clients.length) {
+//         await instance.get('/customers').then(async (xtrfReq) => {
+//           let customerIds = xtrfReq.data;
+//           for(let elem of customerIds) {
+//             await instance.get(`/customers/${elem.id}`).then( async res => {
+//               let info = res.data;
+//               await new Clients({
+//                 name: info.name,
+//                 website: info.contact.websites[0],
+//                 status: info.status,
+//                 contract: "",
+//                 nda: "",
+//                 accountManager: "",
+//                 salesManager: "",
+//                 projectManager: "",
+//                 leadSource: "",
+//                 salesComission: "Passed threshold",
+//                 officialName: info.fullName,
+//                 contactName: "",
+//                 email: info.contact.emails.primary,
+//                 vat: "",
+//                 address: info.correspondenceAddress.addressLine1,
+//                 rates: {
+//                   mono: [],
+//                   duo: [] 
+//                 },
+//                 industry: {xtrfIds: info.industriesIds},
+//                 contacts: [
+//                   {projectManagerId: info.responsiblePersons.projectManagerId},
+//                   {salesPersonId: info.responsiblePersons.salesPersonId},
+//                   {accountManagerId: info.responsiblePersons.accountManagerId}
+//                 ]
+//               }).save().then(res => {
+//                 console.log(`Client with Id ${elem.id} has been saved`)
+//               }).catch(err => {
+//                 console.log('Error with client because of  ' + err.message)
+//               })
+//             }).catch(err => {
+//               console.log('Error on getting cutomer with specified ID')
+//             })
+//           }
+//         }).catch(err => {
+//           console.log('Error on getting clients from xtrf')
+//         })
+//       }
+//     }).catch(err => {
+//       console.log('Something wrong with DB')
+//     })
+// }
 
 function languages() {
   return Languages.find({})
@@ -37,7 +155,6 @@ function languages() {
             var addXtrfId = xtrfLangs.find(x => x.symbol == lang.symbol);
             lang.xtrf = addXtrfId.id;
           }
-          // let count = 1;
           for (const lang of languagesDefault) {
             await new Languages(lang).save().then((lang) => {
 
@@ -47,7 +164,6 @@ function languages() {
               });
           }
           console.log('Langs are saved!');
-          //resolve(response.data);
         }).catch(function (error) {
           console.log("error gettings xtrf langs");
         });
@@ -253,14 +369,18 @@ function industries() {
 }
 
 async function checkCollections() {
+  await timeZones();
+  await clients();
   await languages();
   await industries();
   await services();
+  await clientLangs();
   await requests();
   await projects();
   await users();
   await serviceMonoLangs();
   await serviceDuoLangs();
+  
 }
 
 module.exports = checkCollections();

@@ -1,5 +1,7 @@
 <template lang="pug">
     .details-table
+        .add-contact
+            input.add-button(type="button" value="Add new contact")
         table
             thead
                 tr
@@ -103,6 +105,14 @@ export default {
         }
     }
 }
+
+.add-contact {
+    display: flex;
+    width: 100%;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+}
+
 thead, tbody {
     width: 100%;
     display: block;
@@ -205,4 +215,18 @@ tr {
 .not-active {
     opacity: 0.5;
 }
+
+.add-button {
+    width: 190px;
+    height: 26px;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    background-color: #ff876c;
+    border: 1px solid #ff876c;
+    cursor: pointer;
+}
+
 </style>
