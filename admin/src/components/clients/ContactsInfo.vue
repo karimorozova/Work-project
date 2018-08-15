@@ -27,16 +27,16 @@
                             img(src="../../assets/images/white-arrow.png")                    
                     th
             tbody
-                tr(v-for="(contact, ind) in contacts" @click="contactDetails(ind)")  
-                    td(:class="{editing: !contact.icons[0].active}") 
-                        input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.fullName")
-                    td(:class="{editing: !contact.icons[0].active}") 
+                tr(v-for="(contact, ind) in client.contacts")  
+                    td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
+                        input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.name")
+                    td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
                         input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.email")
-                    td(:class="{editing: !contact.icons[0].active}") 
+                    td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
                         input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.position")
-                    td(:class="{editing: !contact.icons[0].active}") 
+                    td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
                         input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.notes")
-                    td(:class="{editing: !contact.icons[0].active}") 
+                    td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
                         .outer-check(@click="chooseLead(ind)")
                             .inner-check(type="radio" :class="{checked: contact.leadContact}")
                     td
@@ -47,45 +47,45 @@
 
 <script>
 export default {
+    props: {
+        client: {
+            type: Object
+        }
+    },
     data() {
         return {
-            contacts: [
-                {fullName: 'name1', email: 'email123@em.ail', position: 'Manager1', notes: '', leadContact: true, icons: [
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}    
-                ]},
-                {fullName: 'name2', email: 'email456@em.ail', position: 'Manager2', notes: '', leadContact: false, icons: [
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}    
-                ]}
-            ]
+            
         }
     },
     methods: {
         chooseLead(ind) {
-            if(!this.contacts[ind].icons[0].active) {
-                for(let cont of this.contacts) {
+            if(!this.client.contacts[ind].icons[0].active) {
+                for(let cont of this.client.contacts) {
                     cont.leadContact = false;
                 }
-                this.contacts[ind].leadContact = true;
+                this.client.contacts[ind].leadContact = true;
             }
         },
         action(ind, i) {
             if(i == 0) {
-                for(let cont of this.contacts) {
-                    cont.icons[i].active = true;
+                for(let cont of this.client.contacts) {
+                    cont.icons[0].active = true;
                 }
-                this.contacts[ind].icons[i].active = false;
+                this.client.contacts[ind].icons[0].active = false;
             }
             if(i == 1) {
-                this.contacts.splice(ind, 1);
+                this.client.contacts.splice(ind, 1);
             }
+            console.log(this.client.contacts[ind].icons[0].active);
         },
         contactDetails(ind) {
-            if(this.contacts[ind].icons[0].active) {
-                this.$emit('contactDetails', this.contacts[ind]);
+            if(this.client.contacts[ind].icons[0].active) {
+                this.$emit('contactDetails', this.client.contacts[ind]);
             }
         }
+    },
+    computed: {
+
     }
 }
 </script>

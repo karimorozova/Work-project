@@ -1,5 +1,5 @@
 <template lang="pug">
-.duoWrap
+.monoWrap
   .filters
     .filters__item.sourceMenu
       label Language
@@ -15,7 +15,7 @@
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
-      tbody
+      tbody.mono-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
             td.dropOption 
@@ -51,11 +51,15 @@ import IndustrySelect from "../IndustrySelect";
 import ServiceMonoSelect from "../ServiceMonoSelect";
 
 export default {
-  props: {},
+  props: {
+    client: {
+        type: Object
+    }
+  },
   data() {
     return {
       direction: 'mono',
-      sourceSelect: ["EN"],
+      sourceSelect: ["EN-GB"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
@@ -79,16 +83,18 @@ export default {
       this.changedRate = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByTagName('tbody')[0];
+      let element = document.getElementsByClassName('mono-tbody')[0];
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        let element = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByClassName('duo-tbody')[0];
         setTimeout(() => {
-          let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
-          // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
+          const offsetBottom = data.offsetTop + data.offsetHeight*2;
+          const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+          if (offsetBottom > scrollBottom) {
+            tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
+          }
         }, 100)
       }
     },
@@ -124,13 +130,8 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      // for(let i = 0; i < this.services.length; i++) {
-        // if(this.services[i].title == this.serviceSelect.title) {
-        //   this.services[i].crud = !this.services[i].crud;
-        // }
       this.fullInfo = [];
-      this.getServices();
-      // }
+      this.clientRates();
     },
     chosenSource(data) {
       if(this.sourceSelect[0] == 'All') {
@@ -249,22 +250,6 @@ export default {
         this.services.forEach(item => {
           if(item.title == this.serviceSelect.title) {
             item.crud = true
-            for(let i = 0; i < item.rates.length; i++) {
-              for(let elem of item.rates[i].industry) {
-                this.fullInfo.push({
-                  title: item.title,
-                  sourceLanguage: item.rates[i].source,
-                  targetLanguage: item.rates[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
-            }
           } else {
             item.crud = false
           }
@@ -290,6 +275,25 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
+    },
+    clientRates() {
+      this.fullInfo = [];
+      for(let comb of this.client.languageCombinations) {
+        let industry = JSON.stringify(this.client.industry);
+        industry = JSON.parse(industry);
+        industry.package = comb.package;
+        if(comb.service == this.serviceSelect.title) {
+          this.fullInfo.push({
+            targetLanguage: comb.target,
+            industry: [industry],
+            active: comb.active,
+            icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
+                {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+                {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+              ]
+          })
+        }
+      }
     }
   },
   computed: {
@@ -341,12 +345,14 @@ export default {
   },
   mounted() {
     this.getServices();
+    this.clientRates();
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.duoWrap {
+.monoWrap {
+  position: relative;
   font-family: MyriadPro;
   min-width: 850px; 
 }

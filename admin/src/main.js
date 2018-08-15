@@ -13,6 +13,7 @@ import 'normalize.css';
 import "./assets/scss/style.scss";
 import VueLodash from 'vue-lodash';
 
+export const bus = new Vue();
 
 // Vue.use(BootstrapVue);
 Vue.use(VueResource);

@@ -1,12 +1,12 @@
 <template lang="pug">
     .all-clients
-        .title All Clients
-        .clients-table
+        .title(v-if="!clientData") All Clients
+        .clients-table(v-if="!clientData")
             .filters
                 .filters__block
                     .filters-item
                         label Name
-                        input.filter-field(type="text" placeholder="Company Name")
+                        input.filter-field(type="text" placeholder="Company Name" v-model="filterName")
                     .filters-item
                         label Status
                         ClientStatusSelect(:selectedStatus="filterStatus" @chosenStatus="chosenStatus")
@@ -39,47 +39,50 @@
                                 span Lead Source                   
                         th
                 tbody
-                    tr(v-for="(client, ind) in clients" @click="clientDetails(ind)")  
-                        td(:class="{editing: !client.icons[0].active}") 
-                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.companyName")
-                        td(:class="{editing: !client.icons[0].active}") 
+                    tr(v-for="(client, ind) in allClients")  
+                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
+                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.name")
+                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.status")
-                        td(:class="{editing: !client.icons[0].active}") 
+                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.website")
-                        td.dropOption              
+                        td.dropOption(@click="clientDetails(ind)")              
                             span(v-if="!client.industry.icon") {{ client.industry.name }}
                             .dropOption__image
                                 img(v-if="client.industry.icon" :src="client.industry.icon")
                                 span.titleTooltip {{ client.industry.name }} 
                             .innerComponent(v-if="!client.icons[0].active")
                                 ClientIndustrySelect(:selectedInd="industrySelected" :parentInd="ind" @chosenInd="changeIndustry")
-                        td
+                        td(@click="clientDetails(ind)")
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.leadSource")                        
                         td
                             .crud-icons
                                 img(v-for="(but, i) in client.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
+        .clients__data(v-if="clientData")
+            ClientDetails(:client="client"
+                @cancel="clientCancel"
+                @chosenInd="changeInd"
+                @chosenStatus="changeStatus"
+                @chosenAccManager="changeAccManager"
+                @chosenSalesManager="changeSalesManager"
+                @chosenProjManager="changeProjManager")
 </template>
 
 <script>
 import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
+import ClientDetails from '../clients/ClientDetails';
+
+import { bus } from "../../main";
 
 export default {
     data() {
         return {
-            clients: [
-                {companyName: "sdfsdfsdfgsf", status: "Active", website: "www.ddd.com", industry: {name: "Finance", icon: ""}, leadSource: "Landing page", icons: [
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]},
-                {companyName: "bdbgbgbdfgb", status: "Inactive", website: "www.ddd.com", industry: {name:"Finance",icon:""}, leadSource: "Website", icons: [
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]},
-                {companyName: "tyjtjtyjtyjt", status: "Potential", website: "www.ddd.com", industry: {name:"Legal", icon:""}, leadSource: "Website", icons: [
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]}
-                
-            ],
+            client: {},
+            clients: [],
+            clientData: false,
+            filterName: "",
             filterStatus: "",
             filterIndustry: {},
             filterLeadsource: "",
@@ -87,9 +90,30 @@ export default {
         }
     },
     methods: {
+        changeInd(data) {
+            this.client.industry = data;
+        },
+       changeStatus(data) {
+            this.client.status = data;
+        },
+        changeAccManager(data) {
+            this.client.accountManager = data;
+        },
+        changeSalesManager(data) {
+            this.client.salesManager = data;
+        },
+        changeProjManager(data) {
+            this.client.projectManager = data;
+        },
+        clientCancel(data) {
+            this.clientData = false;
+            this.$emit('clientCancel');
+        },
         clientDetails(ind) {
-            if(this.clients[ind].icons[0].active) {
-                this.$emit('chosenClient', this.clients[ind]);
+            if(this.allClients[ind].icons[0].active) {
+                this.client = this.allClients[ind];
+                this.clientData = true;
+                this.$emit('chosenClient');
             }
         },
         chosenLeadsource(data) {
@@ -103,32 +127,77 @@ export default {
         },
         changeIndustry(data) {
             this.industrySelected = data.industry;
-            this.clients[data.index].industry = data.industry;
+            this.allClients[data.index].industry = data.industry;
         },
         chooseLead(ind) {
-            if(!this.clients[ind].icons[0].active) {
-                for(let client of this.clients) {
+            if(!this.allClients[ind].icons[0].active) {
+                for(let client of this.allClients) {
                     client.leadContact = false;
                 }
-                this.clients[ind].leadContact = true;
+                this.allClients[ind].leadContact = true;
             }
         },
         action(ind, i) {
             if(i == 0) {
-                for(let client of this.clients) {
-                    client.icons[i].active = true;
+                for(let client of this.allClients) {
+                    client.icons[0].active = true;
                 }
-                this.clients[ind].icons[i].active = false;
+                this.allClients[ind].icons[0].active = false;
             }
             if(i == 1) {
-                this.clients.splice(ind, 1);
+                this.allClients.splice(ind, 1);
             }
+        },
+        async getclients() {
+            let result = await this.$http.get('/clients');
+            for(let client of result.body) {
+                client.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
+                for(let cont of client.contacts) {
+                    cont.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                        {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
+                }
+                this.clients.push(client);
+            }
+        }
+    },
+    computed: {
+        allClients() {
+            let result = this.clients;
+            if(this.filterName) {
+                result = result.filter(item => {
+                    return item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) != -1;
+                })
+            }
+            if(this.filterStatus) {
+                result = result.filter(item => {
+                    return item.status == this.filterStatus;
+                })
+            }
+            if(this.filterIndustry.name) {
+                result = result.filter(item => {
+                    return item.industry.name == this.filterIndustry.name;
+                })
+            }
+            if(this.filterLeadsource) {
+                result = result.filter(item => {
+                    return item.leadSource == this.filterLeadsource;
+                })
+            }
+            return result;
         }
     },
     components: {
         ClientIndustrySelect,
         ClientStatusSelect,
-        ClientLeadsourceSelect
+        ClientLeadsourceSelect,
+        ClientDetails
+    },
+    created() {
+
+    },
+    mounted() {
+        this.getclients();
     }
 }
 </script>

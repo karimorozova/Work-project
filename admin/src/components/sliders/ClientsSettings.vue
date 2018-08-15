@@ -1,92 +1,37 @@
 <template lang="pug">
 .clients
-  .all-clients(v-if="allClients")
-    Allclients(@chosenClient="chosenClient")
   .adminNavbar__slider.slider(v-if="sidebarShow")
     span CLIENTS
     .slider-inner
       .slider-col General Information
-  .clients__data(v-if="clientData")
-    ClientDetails(@contactDetails="contactDetails" @cancel="clientCancel")
-  .clients__contact-details(v-if="contactShow")
-    ContactDetails(@cancel="contactCancel" :countries="countries" :timezones="timezones")
+  .all-clients(v-if="allClients")
+    Allclients(@chosenClient="chosenClient"
+      @clientCancel="clientCancel")
 </template>
 
 <script>
 import Allclients from '../clients/Allclients';
-import ClientDetails from '../clients/ClientDetails';
-import ContactDetails from '../clients/ContactDetails';
 
 export default {
   data() {
     return {
       allClients: true,
-      clientData: false,
       sidebarShow: false,
-      contactShow: false,
-      genInfo: {
-        companyName: '',
-        website: '',
-        industry: {},
-        status: '',
-        contract: '',
-        nda: '',
-        accountManager: {},
-        salesManager: {},
-        projectManager: {},
-        countries: [],
-        timezones: []
-      }
-    };
+    }
   },
   methods: {
     clientCancel(data) {
       this.clientData = false;
       this.sidebarShow = false;
-      this.allClients = true;
-    },
-    contactCancel(data) {
-      this.clientData = true;
-      this.sidebarShow = true;
-      this.contactShow = false;
     },
     chosenClient(data) {
       this.sidebarShow = true;
-      this.clientData = true;
-      this.allClients = false;
-    },
-    contactDetails(data) {
-      this.clientData = false;
-      this.contactShow = true;
-      this.sidebarShow = false;
-    },
-    getCountries() {
-      this.$http.get('https://restcountries.eu/rest/v2/all')
-        .then(res => {
-          this.countries = res.body;
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    },
-    getTimezones() {
-      this.$http.get('/timezones')
-      .then(res => {
-        this.timezones = res.body;
-      })
-      .catch(err => {
-        console.log(err)
-      })
     }
   },
   components: {
-    Allclients,
-    ClientDetails,
-    ContactDetails
+    Allclients
   },
   mounted() {
-    this.getCountries();
-    this.getTimezones();
   }
 };
 </script>

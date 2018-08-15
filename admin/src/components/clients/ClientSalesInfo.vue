@@ -3,25 +3,30 @@
         .lead-info
             label Lead Source:
             .lead-info__menu
-                ClientLeadsourceSelect(:selectedLeadsource="leadsourceSelected" @chosenLeadsource="chosenLeadsource")
+                ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
         .status-info
             label Sales comission status:
             .status-info__data    
-                span Passed threshold
+                span {{ client.salesComission }}
 </template>
 
 <script>
 import ClientLeadsourceSelect from './ClientLeadsourceSelect';
 
 export default {
+    props: {
+        client: {
+            type: Object
+        }
+    },
     data() {
         return {
-            leadsourceSelected: ""
+
         }
     },
     methods: {
         chosenLeadsource(data) {
-            this.leadsourceSelected = data;
+            this.client.leadSource = data;
         }
     },
     components: {

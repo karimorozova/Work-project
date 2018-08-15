@@ -6,14 +6,14 @@
                     span Mono
                     img(src="../../assets/images/Other/open.png" :class="{reverse: monoDrop}") 
                 .rates-drop(v-if="monoDrop")
-                    MonoClientRates
+                    MonoClientRates(:client="client")
         .duoRates(:class="{straightAngle: duoDrop}")
             .duoRates__open
                 .select(@click="openDuo")
                     span Duo
                     img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
                 .rates-drop(v-if="duoDrop")
-                    DuoClientRates
+                    DuoClientRates(:client="client" @updateClients="updateClients")
 </template>
 
 <script>
@@ -21,6 +21,11 @@ import DuoClientRates from "./DuoClientRates";
 import MonoClientRates from "./MonoClientRates";
 
 export default {
+    props: {
+        client: {
+            type: Object
+        }
+    },
     data() {
         return {
             monoDrop: false,
@@ -33,6 +38,9 @@ export default {
         },
         openDuo() {
             this.duoDrop = !this.duoDrop;
+        },
+        updateClients(data) {
+            this.$emit('updateClients')
         }
     },
     components: {

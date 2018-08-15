@@ -70,15 +70,12 @@ import TimezoneSelect from './TimezoneSelect';
 
 export default {
     props: {
-        countries: {
-            type: Array
-        },
-        timezones: {
-            type: Array
-        }
+        
     },
     data() {
         return {
+            countries: [],
+            timezones: [],
             imageExist: false,
             genderDropped: false,
             genderSelected: "",
@@ -119,7 +116,25 @@ export default {
         },
         chosenZone(data) {
             this.timezoneSelected = data;
-        } 
+        },
+        getCountries() {
+            this.$http.get('https://restcountries.eu/rest/v2/all')
+            .then(res => {
+                this.countries = res.body;
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        getTimezones() {
+            this.$http.get('/timezones')
+            .then(res => {
+                this.timezones = res.body;
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
     },
     computed: {
         
@@ -132,7 +147,8 @@ export default {
         ClickOutside
     },
     mounted() {
-        
+        this.getCountries();
+        this.getTimezones();
     }
 }
 </script>

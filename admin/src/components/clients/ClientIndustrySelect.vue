@@ -35,8 +35,21 @@ export default {
         }
     },
     methods: {
-        showInds() {
+        showInds(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr") {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
+            }
             this.droppedInd = !this.droppedInd;
+            this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
             await this.$http.get('api/industries')

@@ -20,7 +20,7 @@
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
-      tbody
+      tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.dropOption 
@@ -48,19 +48,39 @@
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
+  .edition-message(v-if="editing")
+    .message
+      p Please finish the current edition first!
+      span.close(@click="closeEditionMessage") +
+  .error-message(v-if="showValidError")
+    .message
+      p Please finish the current edition first!
+      .message__info-list
+        li(v-for="error in validError")
+          span.info-item {{ error }}
+      span.close(@click="closeErrorMessage") +
 </template>
 
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceDuoSelect from "../ServiceDuoSelect";
+import { bus } from "../../main";
+
 
 export default {
-  props: {},
+  props: {
+    client: {
+        type: Object
+    }
+  },
   data() {
     return {
+      editing: false,
+      showValidError: false,
+      validError: [],
       direction: 'duo',
-      sourceSelect: ["EN"],
+      sourceSelect: ["EN-GB"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
@@ -75,25 +95,33 @@ export default {
       fullInfo: [],
       services: [],
       changedRate: '',
-      currentActive: ''
+      currentActive: 'none'
     }
   },
 
   methods: {
+    closeEditionMessage() {
+      this.editing = false
+    },
+    closeErrorMessage() {
+      this.showValidError = false;
+    },
     changeRate(event) {
       this.changedRate = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByTagName('tbody')[0];
+      let element = document.getElementsByClassName('duo-tbody')[0];
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        let element = document.getElementsByTagName('tbody')[0];
+        var tbody = document.getElementsByClassName('duo-tbody')[0];
         setTimeout(() => {
-          let elem1 = document.getElementsByClassName('drop')[0];
-          elem1.scrollIntoView({behaviour: 'smooth', inline: 'start', block: 'start'});
-          // element.scrollTop = element.scrollTop + 50 //element.scrollHeight;
+          const offsetBottom = data.offsetTop + data.offsetHeight*2;
+          const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+          if (offsetBottom > scrollBottom) {
+            tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
+          }
         }, 100)
       }
     },
@@ -129,13 +157,8 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      // for(let i = 0; i < this.services.length; i++) {
-        // if(this.services[i].title == this.serviceSelect.title) {
-        //   this.services[i].crud = !this.services[i].crud;
-        // }
       this.fullInfo = [];
-      this.getServices();
-      // }
+      this.clientRates();
     },
     chosenSource(data) {
       if(this.sourceSelect[0] == 'All') {
@@ -192,7 +215,22 @@ export default {
       }
     },
     action(index, iconIndex) {
+      if(this.currentActive != "none") {
+        if(index != this.currentActive) {
+          this.editing = true;
+          return true;
+        }
+      }
       if(iconIndex == 0) {
+        this.validError = [];
+        if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
+        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+        if(this.validError.length) {
+          this.showValidError = true;
+          this.changedRate = this.fullInfo[index].industry[0].rate;
+          return true;
+        }
         this.fullInfo[index].icons[0].active = false;
         this.fullInfo[index].icons[1].active = true;
         this.fullInfo[index].industry = [];
@@ -200,13 +238,16 @@ export default {
           elem.rate = this.changedRate;
           this.fullInfo[index].industry.push(elem)
         };
-        this.$http.post('/service/rates', this.fullInfo[index])
+        this.fullInfo[index].form = "Duo";
+        this.fullInfo[index].client = this.client._id;
+        this.$http.post('/service/client-rates', this.fullInfo[index])
         .then(res => {
           console.log(res)
         })
         .catch(err => {
           console.log(err)
-        })
+        });
+        this.currentActive = "none";
       }
 
       if(iconIndex == 1) {
@@ -228,6 +269,7 @@ export default {
       }
 
       if(iconIndex == 2) {
+        let deletedRate = this.fullInfo.splice(index, 1)[0];
         this.fullInfo.splice(index, 1);
       }
     },
@@ -254,22 +296,6 @@ export default {
         this.services.forEach(item => {
           if(item.title == this.serviceSelect.title) {
             item.crud = true
-            for(let i = 0; i < item.languageCombinations.length; i++) {
-              for(let elem of item.languageCombinations[i].industries) {
-                this.fullInfo.push({
-                  title: item.title,
-                  sourceLanguage: item.languageCombinations[i].source,
-                  targetLanguage: item.languageCombinations[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
-            }
           } else {
             item.crud = false
           }
@@ -295,6 +321,27 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
+    },
+    clientRates() {
+      this.fullInfo = [];
+      for(let comb of this.client.languageCombinations) {
+        let industry = JSON.stringify(this.client.industry);
+        industry = JSON.parse(industry);
+        industry.rate = comb.rate;
+        if(comb.service == this.serviceSelect.title) {
+          this.fullInfo.push({
+            title: comb.service,
+            sourceLanguage: comb.source,
+            targetLanguage: comb.target,
+            industry: [industry],
+            active: comb.active,
+            icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
+                {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+                {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+              ]
+          })
+        }
+      }
     }
   },
   computed: {
@@ -346,12 +393,14 @@ export default {
   },
   mounted() {
     this.getServices();
+    this.clientRates();
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .duoWrap {
+  position: relative;
   font-family: MyriadPro;
   min-width: 850px; 
 }
@@ -508,5 +557,58 @@ td {
 }
 .addShadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+}
+
+.unique-message, .edition-message, .error-message {
+  position: absolute;
+  border: 1px solid #ff876c;
+  background-color: #FFF;
+  box-shadow: 0 0 15px #ff876c;
+  width: 300px;
+  top: 50%;
+  left: 50%;
+  margin-left: -150px;
+  padding: 0 15px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  .close {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    top: -2px;
+    right: -9px;
+    transform: rotate(45deg);
+    cursor: pointer;
+  }
+  .message {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    &__info-list {
+      li {
+        list-style: none;
+        .info-item {
+          color: #ff876c;
+          font-weight: 500;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  p {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.unique-message, .error-message {
+  height: 150px;
+  margin-top: -75px; 
+}
+
+.edition-message {
+  height: 70px;
+  margin-top: -35px;
 }
 </style>

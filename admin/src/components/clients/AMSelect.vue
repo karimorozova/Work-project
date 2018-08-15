@@ -1,16 +1,16 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            template(v-if="selectedManager.username")
+            template(v-if="selectedManager")
                 .selected
-                    span {{ selectedManager.username }}
-            template(v-if="!selectedManager.username") 
+                    span {{ selectedManager }}
+            template(v-if="!selectedManager") 
                 span.selected.no-manager Options
             .arrowButton(@click="showManagers")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{chosen: manager.username == selectedManager.username}")
-                span {{ manager.username }}
+            .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{chosen: manager == selectedManager}")
+                span {{ manager }}
 </template>
 
 <script>
@@ -19,7 +19,7 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedManager: {
-            type: Object
+            type: String
         }
     },
     data() {
@@ -42,7 +42,9 @@ export default {
         getManagers() {
             this.$http.get('../users')
             .then(res => {
-                this.managers = res.data
+                for(let man of res.data) {
+                    this.managers.push(man.username)
+                }
             })
             .catch(err => {
                 console.log("Erron on getting users: " + err)

@@ -1,63 +1,66 @@
 <template lang="pug">
     .clients-wrap
-        .buttons
-            input.button(type="button" value="Save")
-            input.button(type="button" value="Cancel" @click="cancel")
-            input.button(type="button" value="Delete" @click="deleteContact")
-        .title General Information
-        .gen-info
-            .gen-info__block
-                .block-item
-                    label Company Name:
-                    input(type="text" placeholder="Company Name" v-model="genInfo.companyName")
-                .block-item
-                    label Website:
-                    input(type="text" placeholder="Website" v-model="genInfo.website")
-                .block-item
-                    label Industry:
-                    ClientIndustrySelect(:selectedInd="genInfo.industry" @chosenInd="chosenInd")
-                .block-item
-                    label Status:
-                    ClientStatusSelect(:selectedStatus="genInfo.status" @chosenStatus="chosenStatus")
-            .gen-info__block
-                .block-item
-                    label Contract:
-                    .contract
-                        .contract__upload
-                            input.upload(type="file")
-                        .contract__download
-                            img(src="../../assets/images/Other/Download-icon.png")
-                    label NDA:
-                    .contract
-                        .contract__upload
-                            input.upload(type="file")
-                        .contract__download
-                            img(src="../../assets/images/Other/Download-icon.png")
-                .block-item
-                    label Account Manager:
-                    AMSelect(:selectedManager="genInfo.accountManager" @chosenManager="chosenAccManager")
-                .block-item
-                    label Sales Manager:
-                    AMSelect(:selectedManager="genInfo.salesManager" @chosenManager="chosenSalesManager")
-                .block-item
-                    label Project Manager:
-                    AMSelect(:selectedManager="genInfo.projectManager" @chosenManager="chosenProjManager")
-        .title Contact Details
-        .contacts-info
-            ContactsInfo(@contactDetails="contactDetails")
-        .title Rates    
-        .rates
-            ClientRates
-        .title Sales Information
-        .sales
-            ClientSalesInfo
-        .title Billing Informations
-        .billing
-            ClientBillInfo
-        .delete-approve(v-if="approveShow")
-            p Are you sure you want to delete?
-            input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-            input.button(type="button" value="Delete")  
+        .client-info(v-if="clientShow")
+            .buttons
+                input.button(type="button" value="Save")
+                input.button(type="button" value="Cancel" @click="cancel")
+                input.button(type="button" value="Delete" @click="deleteContact")
+            .title General Information
+            .gen-info
+                .gen-info__block
+                    .block-item
+                        label Company Name:
+                        input(type="text" placeholder="Company Name" v-model="client.name")
+                    .block-item
+                        label Website:
+                        input(type="text" placeholder="Website" v-model="client.website")
+                    .block-item
+                        label Industry:
+                        ClientIndustrySelect(:selectedInd="client.industry" @chosenInd="chosenInd")
+                    .block-item
+                        label Status:
+                        ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="chosenStatus")
+                .gen-info__block
+                    .block-item
+                        label Contract:
+                        .contract
+                            .contract__upload
+                                input.upload(type="file")
+                            .contract__download
+                                img(src="../../assets/images/Other/Download-icon.png")
+                        label NDA:
+                        .contract
+                            .contract__upload
+                                input.upload(type="file")
+                            .contract__download
+                                img(src="../../assets/images/Other/Download-icon.png")
+                    .block-item
+                        label Account Manager:
+                        AMSelect(:selectedManager="client.accountManager" @chosenManager="chosenAccManager")
+                    .block-item
+                        label Sales Manager:
+                        AMSelect(:selectedManager="client.salesManager" @chosenManager="chosenSalesManager")
+                    .block-item
+                        label Project Manager:
+                        AMSelect(:selectedManager="client.projectManager" @chosenManager="chosenProjManager")
+            .title Contact Details
+            .contacts-info
+                ContactsInfo(:client="client" @contactDetails="contactDetails")
+            .title Rates    
+            .rates
+                ClientRates(:client="client")
+            .title Sales Information
+            .sales
+                ClientSalesInfo(:client="client")
+            .title Billing Informations
+            .billing
+                ClientBillInfo(:client="client")
+            .delete-approve(v-if="approveShow")
+                p Are you sure you want to delete?
+                input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+                input.button(type="button" value="Delete")  
+        .contact-info(v-if="contactShow")
+            ContactDetails(@cancel="contactCancel")
 </template>
 
 <script>
@@ -68,51 +71,54 @@ import ContactsInfo from './ContactsInfo';
 import ClientRates from './ClientRates';
 import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
+import ContactDetails from '../clients/ContactDetails';
+
 
 export default {
+    props: {
+        client: {
+            type: Object
+        }
+    },
     data() {
         return {
-            genInfo: {
-                companyName: '',
-                website: '',
-                industry: {},
-                status: '',
-                contract: '',
-                nda: '',
-                accountManager: {},
-                salesManager: {},
-                projectManager: {},
-            },
-            approveShow: false
+            approveShow: false,
+            clientShow: true,
+            contactShow: false
         }
     },
     methods: {
         cancel() {
             this.$emit('cancel')
         },
+        contactCancel(data) {
+            this.clientShow = true;
+            this.contactShow = false;
+        },
         deleteContact() {
-            console.log('deleting.....')
             this.approveShow = true;
         },
         cancelApprove() {
             this.approveShow = false;
         },
         chosenInd(data) {
-            this.genInfo.industry = data.industry;
+            this.$emit('chosenInd', data.industry);
         },
         chosenStatus(data) {
-            this.genInfo.status = data;
+            this.$emit('chosenStatus', data);
         },
         chosenAccManager(data) {
-            this.genInfo.accountManager = data;
+            this.$emit('chosenAccManager', data);
         },
         chosenSalesManager(data) {
-            this.genInfo.salesManager = data;
+            this.$emit('chosenSalesManager', data);
         },
         chosenProjManager(data) {
-            this.genInfo.projectManager = data;
+            this.$emit('chosenProjManager', data);
         },
         contactDetails(data) {
+            this.clientShow = false;
+            this.contactShow = true;
             this.$emit('contactDetails', data)
         }
     },
@@ -123,7 +129,8 @@ export default {
     ContactsInfo,
     ClientRates,
     ClientSalesInfo,
-    ClientBillInfo
+    ClientBillInfo,
+    ContactDetails
   }
 }
 </script>

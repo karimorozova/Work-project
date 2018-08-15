@@ -3,32 +3,31 @@
         .names-info
             .names-info__item
                 label Official Company Name:
-                input(type="text" v-model="billInfo.officialName")
+                input(type="text" v-model="client.officialName")
             .names-info__item
                 label Contact Name:
-                input(type="text" v-model="billInfo.contactName")
+                input(type="text" v-model="client.contactName")
             .names-info__item
                 label Email:
-                input(type="text" v-model="billInfo.email")
+                input(type="text" v-model="client.email")
             .names-info__item
                 label VAT:
-                input(type="text" v-model="billInfo.vat")
+                input(type="text" v-model="client.vat")
         .address
             label Address
-            textarea(type="text" placeholder="Text here" v-model="billInfo.address")
+            textarea(type="text" placeholder="Text here" v-model="client.address")
 </template>
 
 <script>
 export default {
+    props: {
+        client: {
+            type: Object
+        }
+    },
     data() {
         return {
-            billInfo: {
-                officialName: 'Official Company Name',
-                contactName: 'Contact name',
-                email: 'Email',
-                vat: 'VAT',
-                address: ''
-            }
+        
         }
     }
 }

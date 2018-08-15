@@ -158,7 +158,8 @@ export default {
       }
     },
     async getCustomers() {
-      let result = await this.$http.get('api/customers');
+      let result = await this.$http.get('/clients');
+      // let result = await this.$http.get('api/customers');
       this.$store.dispatch('customersGetting', result.body);
     },
     async getXtmCustomers() {
