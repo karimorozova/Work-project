@@ -76,18 +76,22 @@ async function clientLangs() {
   let combs = service[0].languageCombinations;
 
   for(let client of clients) {
-    let industry = await Industries.find({name: client.industry.name});
-    client.industry = industry[0];
-    for(let i = 0; i < 5; i++) {
-      client.languageCombinations.push({
-        source: combs[i].source,
-        target: combs[i].target,
-        service: service[0].title,
-        rate: randomRates[Math.floor(Math.random()*3)],
-        active: true
-      })
+    if(!client.languageCombinations.length) {
+      let industry = await Industries.find({name: client.industry.name});
+      client.industry = industry[0];
+        for(let i = 0; i < 5; i++) {
+          client.languageCombinations.push({
+            source: combs[i].source,
+            target: combs[i].target,
+            service: service[0].title,
+            rate: randomRates[Math.floor(Math.random()*3)],
+            active: true
+          })
+        }
+      await Clients.update({name: client.name}, client)
+    } else {
+      break;
     }
-    await Clients.update({name: client.name}, client)
   }
 }
 

@@ -186,4 +186,8 @@ export default {
   }
 }
 
+input {
+  color: #67573E;
+}
+
 </style>

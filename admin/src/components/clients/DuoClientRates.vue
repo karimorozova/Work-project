@@ -240,7 +240,7 @@ export default {
         };
         this.fullInfo[index].form = "Duo";
         this.fullInfo[index].client = this.client._id;
-        this.$http.post('/service/client-rates', this.fullInfo[index])
+        this.$http.post('clientsapi/client-rates', this.fullInfo[index])
         .then(res => {
           console.log(res)
         })
@@ -611,4 +611,9 @@ td {
   height: 70px;
   margin-top: -35px;
 }
+
+input {
+  color: #67573E;
+}
+
 </style>

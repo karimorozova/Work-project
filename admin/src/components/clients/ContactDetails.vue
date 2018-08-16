@@ -3,7 +3,7 @@
         .title 
             span Contact Details
             .title__buttons
-                input.button(type="button" value="Save")
+                input.button(type="button" value="Save" @click="contactUpdate")
                 input.button(type="button" value="Cancel" @click="cancel")
                 input.button(type="button" value="Delete" @click="deleteContact")
         .details
@@ -16,47 +16,47 @@
                 .names-gender
                     .names-gender__item
                         label Name:
-                        input.personal(type="text" placeholder="Name")
+                        input.personal(type="text" placeholder="Name" v-model="client.contacts[ind].name")
                     .names-gender__item
                         label Surname:
-                        input.personal(type="text" placeholder="Surname")
+                        input.personal(type="text" placeholder="Surname" v-model="client.contacts[ind].surname")
                     .names-gender__item
                         label Email:
-                        input.personal(type="text" placeholder="email")
+                        input.personal(type="text" placeholder="email" v-model="client.contacts[ind].email")
                     .names-gender__item
                         label Gender:
                         .dropSelect(v-click-outside="outGenders")
                             .select
-                                template(v-if="genderSelected")
+                                template(v-if="client.contacts[ind].gender")
                                     .selected
-                                        span {{ genderSelected }}
-                                template(v-if="!genderSelected")
+                                        span {{ client.contacts[ind].gender }}
+                                template(v-if="!client.contacts[ind].gender")
                                     span.selected.no-gender Gender
                                 .arrowButton(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
-                                .drop__item(@click="() => genderSelected = 'Male'")
+                                .drop__item(@click="() => client.contacts[ind].gender = 'Male'")
                                     span Male
-                                .drop__item(@click="() => genderSelected = 'Female'")
+                                .drop__item(@click="() => client.contacts[ind].gender = 'Female'")
                                     span Female
             .details__item
                 label Position:
-                input.non-personal(type="text" placeholder="Position")
+                input.non-personal(type="text" placeholder="Position" v-model="client.contacts[ind].position")
             .details__item
                 label Phone:
-                input.non-personal(type="text" placeholder="Phone number")
+                input.non-personal(type="text" placeholder="Phone number" v-model="client.contacts[ind].phone")
             .details__item
                 label Skype:
-                input.non-personal(type="text" placeholder="Skype name")
+                input.non-personal(type="text" placeholder="Skype name" v-model="client.contacts[ind].skype")
             .details__item
                 label Country:
-                CountriesSelect(:countrySelected="countrySelected" :countries="countries" @chosenCountry="chosenCountry")
+                CountriesSelect(:countrySelected="client.contacts[ind].country" :countries="countries" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                TimezoneSelect(:timezoneSelected="timezoneSelected" :timezones="timezones" @chosenZone="chosenZone")
+                TimezoneSelect(:timezoneSelected="client.contacts[ind].timezone" :timezones="timezones" @chosenZone="chosenZone")
             .details__item
                 label Notes:
-                textarea.non-personal(type="text" placeholder="Type")
+                textarea.non-personal(type="text" placeholder="Type" v-model="client.contacts[ind].notes")
         .delete-approve(v-if="approveShow")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
@@ -70,7 +70,12 @@ import TimezoneSelect from './TimezoneSelect';
 
 export default {
     props: {
-        
+        client: {
+            type: Object
+        },
+        ind: {
+            type: Number
+        }
     },
     data() {
         return {
@@ -78,9 +83,6 @@ export default {
             timezones: [],
             imageExist: false,
             genderDropped: false,
-            genderSelected: "",
-            countrySelected: "",
-            timezoneSelected: "",
             approveShow: false
         }
     },
@@ -113,9 +115,14 @@ export default {
         },
         chosenCountry(data) {
             this.countrySelected = data;
+            this.client.contacts[this.ind].country = data;
         },
         chosenZone(data) {
             this.timezoneSelected = data;
+            this.client.contacts[this.ind].timezone = data;
+        },
+        contactUpdate() {
+            this.$emit('contactUpdate')
         },
         getCountries() {
             this.$http.get('https://restcountries.eu/rest/v2/all')
@@ -373,6 +380,10 @@ textarea.non-personal {
     .approve-block {
         margin-bottom: 15px;
     }
+}
+
+input {
+    color: #67573E;
 }
 
 </style>

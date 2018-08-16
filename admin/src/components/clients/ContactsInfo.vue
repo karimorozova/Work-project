@@ -76,11 +76,10 @@ export default {
             if(i == 1) {
                 this.client.contacts.splice(ind, 1);
             }
-            console.log(this.client.contacts[ind].icons[0].active);
         },
         contactDetails(ind) {
             if(this.client.contacts[ind].icons[0].active) {
-                this.$emit('contactDetails', this.client.contacts[ind]);
+                this.$emit('contactDetails', {contactIndex: ind});
             }
         }
     },
@@ -227,6 +226,10 @@ tr {
     background-color: #ff876c;
     border: 1px solid #ff876c;
     cursor: pointer;
+}
+
+input {
+    color: #67573E;
 }
 
 </style>

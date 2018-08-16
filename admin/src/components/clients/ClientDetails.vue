@@ -2,7 +2,7 @@
     .clients-wrap
         .client-info(v-if="clientShow")
             .buttons
-                input.button(type="button" value="Save")
+                input.button(type="button" value="Save" @click="updateClient")
                 input.button(type="button" value="Cancel" @click="cancel")
                 input.button(type="button" value="Delete" @click="deleteContact")
             .title General Information
@@ -60,7 +60,10 @@
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
                 input.button(type="button" value="Delete")  
         .contact-info(v-if="contactShow")
-            ContactDetails(@cancel="contactCancel")
+            ContactDetails(@cancel="contactCancel"
+                @contactUpdate="contactUpdate"
+                :client="client"
+                :ind="contactInd")
 </template>
 
 <script>
@@ -84,7 +87,8 @@ export default {
         return {
             approveShow: false,
             clientShow: true,
-            contactShow: false
+            contactShow: false,
+            contactInd: 0
         }
     },
     methods: {
@@ -94,6 +98,7 @@ export default {
         contactCancel(data) {
             this.clientShow = true;
             this.contactShow = false;
+            this.$emit('contactCancel');
         },
         deleteContact() {
             this.approveShow = true;
@@ -119,7 +124,22 @@ export default {
         contactDetails(data) {
             this.clientShow = false;
             this.contactShow = true;
-            this.$emit('contactDetails', data)
+            this.contactInd = data.contactIndex;
+        },
+        updateClient() {
+            this.$http.post('clientsapi/update-client', this.client)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+            this.$emit('refreshClients');
+        },
+        contactUpdate(data) {
+            this.updateClient();
+            this.clientShow = true;
+            this.contactShow = false;
         }
     },
     components: {
@@ -263,6 +283,10 @@ export default {
     .approve-block {
         margin-bottom: 15px;
     }
+}
+
+input {
+    color: #67573E;
 }
 
 </style>

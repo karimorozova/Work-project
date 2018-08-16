@@ -295,29 +295,5 @@ router.post('/delete-duorate', async (req, res) => {
   res.send(result);
 })
 
-router.post('/client-rates', async (req, res) => {
-  var rate = await req.body;
-  let id = rate.client;
-  let client = await Clients.find({"_id": id});
-  for(let comb of client[0].languageCombinations) {
-    if(comb.service == rate.title && comb.source.lang == rate.sourceLanguage.lang &&
-      comb.target.lang == rate.targetLanguage.lang) {
-        comb.rate = rate.industry[0].rate;
-    }
-  }
-  
-  await Clients.updateOne({"_id": id},{$unset: {languageCombinations: []}}).then(result => {
-    Clients.updateOne({"_id": id}, {$set: {languageCombinations: client[0].languageCombinations}}, {upsert: true})
-    .then(result => {
-      res.send('rates changed')
-    })
-    .catch(err => {
-      console.log(err)
-    })
-  })
-  .catch(err => {
-    console.log(err);
-  })
-})
 
 module.exports = router;

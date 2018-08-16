@@ -60,7 +60,9 @@
                                 img(v-for="(but, i) in client.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
         .clients__data(v-if="clientData")
             ClientDetails(:client="client"
+                @refreshClients="refreshClients"
                 @cancel="clientCancel"
+                @contactCancel="contactCancel"
                 @chosenInd="changeInd"
                 @chosenStatus="changeStatus"
                 @chosenAccManager="changeAccManager"
@@ -93,7 +95,7 @@ export default {
         changeInd(data) {
             this.client.industry = data;
         },
-       changeStatus(data) {
+        changeStatus(data) {
             this.client.status = data;
         },
         changeAccManager(data) {
@@ -107,7 +109,11 @@ export default {
         },
         clientCancel(data) {
             this.clientData = false;
+            this.refreshClients();
             this.$emit('clientCancel');
+        },
+        contactCancel(data) {
+            this.refreshClients();
         },
         clientDetails(ind) {
             if(this.allClients[ind].icons[0].active) {
@@ -148,7 +154,18 @@ export default {
                 this.allClients.splice(ind, 1);
             }
         },
+        async refreshClients(data) {
+            let result = await this.getclients();
+            let id = this.client._id;
+            this.client = '';
+            this.client = this.clients.find(item => {
+                if(item._id == id) {
+                    return item
+                }
+            })
+        },
         async getclients() {
+            this.clients = [];
             let result = await this.$http.get('/clients');
             for(let client of result.body) {
                 client.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
@@ -413,6 +430,10 @@ tr {
 
 .not-active {
     opacity: 0.5;
+}
+
+input {
+    color: #67573E;
 }
 
 </style>
