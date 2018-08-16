@@ -64,7 +64,7 @@
             .lang-source
               span.langTitle Source Language
               .selectLangs.source
-                span.inner-text.clarify(:class="{ color: sourceSelect.name != 'Select' }") {{ sourceSelect.name }}
+                span.inner-text.clarify(:class="{ color: sourceSelect.lang != 'Select' }") {{ sourceSelect.lang }}
                   .wrapper(@click.self='showSourceLang')
                   .icon(:class="{ reverse: sourceDrop }")
                     i.fa.fa-caret-down
@@ -72,21 +72,21 @@
                   .source__drop-list(v-for='language in sourceLanguages')
                     .pair(@click='changeSourceSelect(language)')
                       img(:src="'./'+language.icon")
-                      span.list-item(:class="{ active: language.name == sourceSelect.name }") {{ language.name }}
+                      span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
             .lang-target
               span.langTitle Target Language(s)
               .selectLangs.target
                 span.inner-text.clarify(:class="{ color: targetSelect.length != 0 }") 
-                  template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.name }};  
+                  template(v-if="targetSelect.length > 0" v-for="lang in targetSelect") {{ lang.lang }};  
                   template(v-if="targetSelect.length == 0") Select
                   .wrapper(v-on:click.self='showTargetLang')
                   .icon(:class="{ reverse: targetDrop }")
                     i.fa.fa-caret-down
                 .target__drop(v-if='targetDrop')
                   .target__drop-list(v-for='language in targetLanguages')
-                    .pair(v-if='(sourceSelect.name.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.name == "Select"' @click='changeTargetSelect(language)')
+                    .pair(v-if='(sourceSelect.lang.includes("English") && serviceSelect.languages[0].target.indexOf(language.symbol) != -1) || serviceSelect.title == "Select" || sourceSelect.lang == "Select"' @click='changeTargetSelect(language)')
                       img(:src="'./'+language.icon")
-                      span.list-item(:class="{ active: language.check }") {{ language.name }}
+                      span.list-item(:class="{ active: language.check }") {{ language.lang }}
           .number
             label PROJECT DETAILS
           .details
@@ -152,10 +152,10 @@
               span 2
               label LANGUAGE:
               p(v-if='serviceSelect.source') Source:
-                span.choice &nbsp; {{ sourceSelect.name }} <template v-if="!sourceSelect">Select</template>
+                span.choice &nbsp; {{ sourceSelect.lang }} <template v-if="!sourceSelect">Select</template>
               p Target: 
                 span.choice &nbsp; 
-                  template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.name }}; 
+                  template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.lang }}; 
                   template(v-if="targetSelect.length == 0") Select
             .orderInfo__summary-industry
               span 3
@@ -194,14 +194,11 @@ export default {
     thanks: {
       type: Boolean,
       default: false
-    },
-    clientLanguages: {
-      type: Array,
-      default: []
     }
   },
   data () {
     return {
+      clientLanguages: [],
       state: {
         highlighted: {
           days: [6, 0]
@@ -314,8 +311,12 @@ export default {
     },
     chooseCustomer(ind) {
       this.customerSelected = this.customers[ind];
-      this.getClientInfo(this.customers[ind].id);
-      this.$emit('customerLangs', this.customers[ind]);
+      this.clientLanguages = this.customers[ind].languageCombinations;
+      this.sourceSelect = {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'};
+      this.targetSelect = [];
+      this.templateSelect = {name: 'Select', id: 0};
+      this.workflowSelect = {name: 'Select', id: 2890};
+      this.customerDrop = false;
     },
     showCustomers() {
       this.customerDrop = !this.customerDrop;
@@ -395,7 +396,7 @@ export default {
     },
     changeSourceSelect(event) {
       this.toggleSource();
-      this.sourceSelect.name = event.name;
+      this.sourceSelect.lang = event.lang;
       this.targetlang = ["Select"];
       this.targetSelect.forEach(item => {
         item.check = false
@@ -486,9 +487,10 @@ export default {
         sendForm.append("typeOfRequest", typeOfRequest);        
         sendForm.append("projectName", this.request.projectName);
         sendForm.append("date", this.request.date);
+        sendForm.append("customer", this.request.customer);        
         sendForm.append("contactName", this.request.contactName);
         sendForm.append("contactEmail", this.request.contactEmail);
-        sendForm.append("service", JSON.stringify(serviceFull));
+        sendForm.append("service", this.request.service); //JSON.stringify(serviceFull));
         sendForm.append("industry", this.request.industry); 
         sendForm.append("status", "New");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
@@ -526,7 +528,6 @@ export default {
         // }
         //End Comment because of XTM testing
         ////////////////////////////////////
-
         const result = await this.$http.post('../xtm/request', sendForm);
         console.log(result);
         this.xtmProjects = result;
@@ -535,24 +536,37 @@ export default {
     getServices() {
       this.services = this.$store.state.services;
     },
-    getClientLanguages() {
-      this.clientLanguages = this.$store.state.clientLangs;
-    },
+    // getClientLanguages() {
+    //   this.clientLanguages = this.$store.state.clientLangs;
+    // },
     async checkForm(event) {
+      let xtmCustomers = this.$store.state.xtmCustomers;
+      let customer = xtmCustomers.find(item => {
+        return item.name == this.customerSelected.name; 
+      })
+      console.log(customer);
+      if(customer) {
+        this.customerSelected.xtmId = customer.id;
+      } else {
+        let id = await this.$http.get(`../xtm/newcustomer?name=${this.customerSelected.name}`);
+        this.customerSelected.xtmId = +id.body;
+        this.$emit('refreshXtmCustomers');
+      }
       this.request = {
+          customer: this.customerSelected._id,
           customerId: this.customerSelected.xtmId,
           projectName: this.projectName,
           date: this.deadlineSelect, 
-          contactName: 'testName',//this.$store.state.clientInfo.name, 
-          contactEmail: 'test@Email.com', //this.$store.state.clientInfo.email,
+          contactName: this.customerSelected.contactName,//this.$store.state.clientInfo.name, 
+          contactEmail: this.customerSelected.email, //this.$store.state.clientInfo.email,
           service: 'Translation', //this.$store.state.clientInfo.service, 
-          industry: 'General', //this.$store.state.clientInfo.industry, 
+          industry: this.customerSelected.industry.name, //this.$store.state.clientInfo.industry, 
           status: 'New',
           template: this.templateSelect.id,
           workflow: this.workflowSelect.id,
           sourceLanguage: this.sourceSelect, 
           targetLanguages: this.targetSelect, 
-          web: '', //this.$store.state.clientInfo.web,
+          web: this.customerSelected.website, //this.$store.state.clientInfo.web,
           skype: '', //this.$store.state.clientInfo.skype, 
           phone: '1212121212', //this.$store.state.clientInfo.phone, 
           companyName: this.customerSelected.name, //this.$store.state.clientInfo.companyName,
@@ -569,16 +583,14 @@ export default {
       if(!this.detailFiles.length) this. errors.push("File(s) required!");
             
       if(!this.errors.length){
-        this.sendForm();         
-        console.log("sent")
-        var requestType = "QUOTE";
-        if(!this.sendOption) requestType = "PROJECT";
-        this.$store.dispatch('loadOrderDetails', this.request);
-        this.$store.dispatch('files', this.detailFiles);
-        this.$store.dispatch('referFiles', this.refFiles);
-        this.$store.dispatch('requestType', requestType);                
-        this.$emit('thankYou', this.request.service);
-        // window.top.location.href = "https://www.pangea.global/thank-you"; 
+        let jobs = await this.sendForm();
+        // var requestType = "QUOTE";
+        // if(!this.sendOption) requestType = "PROJECT";
+        // this.$store.dispatch('loadOrderDetails', this.request);
+        // this.$store.dispatch('files', this.detailFiles);
+        // this.$store.dispatch('referFiles', this.refFiles);
+        // this.$store.dispatch('requestType', requestType);                
+        // this.$emit('thankYou', this.request.service);
       } else {
         this.showError();
         event.preventDefault();
@@ -600,15 +612,15 @@ export default {
         result = this.$store.state.customers;
       }
 
-      if(this.$store.state.xtmCustomers.length) {
-        for(let cust of this.$store.state.xtmCustomers) {
-          for(let elem of result) {
-            if(cust.name == elem.name) {
-              elem.xtmId = cust.id
-            }
-          }
-        }
-      }
+      // if(this.$store.state.xtmCustomers.length) {
+      //   for(let cust of this.$store.state.xtmCustomers) {
+      //     for(let elem of result) {
+      //       if(cust.name == elem.name) {
+      //         elem.xtmId = cust.id
+      //       }
+      //     }
+      //   }
+      // }
 
       result = result.filter(item => {
         if(item.name.toLowerCase().indexOf(this.searchCustomer.toLowerCase()) != -1) {
@@ -621,11 +633,12 @@ export default {
       let result = [];
       if(this.clientLanguages.length) {
         for(let i = 0; i < this.clientLanguages.length; i++) {
-          result.push({name: this.clientLanguages[i].sourceLanguage.name, lang: this.clientLanguages[i].sourceLanguage.name, symbol: this.clientLanguages[i].sourceLanguage.symbol, id: this.clientLanguages[i].sourceLanguage.id, xtrf: this.clientLanguages[i].sourceLanguage.id, check: false})   
+          this.clientLanguages[i].source.check = false;
+          result.push(this.clientLanguages[i].source) 
         }
       }
       result = result.filter((obj, pos, arr) => {
-        return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+        return arr.map( mapObj => mapObj.lang).indexOf(obj.lang) === pos;
       });
 
       if(this.languages.length) {
@@ -640,23 +653,24 @@ export default {
       }
 
       return result.sort((a, b) => {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
+        if (a.lang < b.lang) return -1;
+        if (a.lang > b.lang) return 1;
       });
     },
     targetLanguages() {
       let result = [];
       if(this.clientLanguages.length) {
         for(let i = 0; i < this.clientLanguages.length; i++) {
-          if (this.clientLanguages[i].sourceLanguage.name == this.sourceSelect.name)
-          result.push({name: this.clientLanguages[i].targetLanguage.name, lang: this.clientLanguages[i].targetLanguage.name, symbol: this.clientLanguages[i].targetLanguage.symbol, id: this.clientLanguages[i].targetLanguage.id, xtrf: this.clientLanguages[i].targetLanguage.id, check: false})   
+          if (this.clientLanguages[i].source.lang == this.sourceSelect.lang);
+          this.clientLanguages[i].target.check = false;
+          result.push(this.clientLanguages[i].target)   
         }
       }
       result = result.filter((obj, pos, arr) => {
-        return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+        return arr.map( mapObj => mapObj.lang).indexOf(obj.lang) === pos;
       });
       result = result.filter(item => {
-        return item.name != this.sourceSelect.name;
+        return item.lang != this.sourceSelect.lang;
       })
 
       if(this.languages.length) {
@@ -671,8 +685,8 @@ export default {
       }
 
       result.sort((a, b) => {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
+        if (a.lang < b.lang) return -1;
+        if (a.lang > b.lang) return 1;
       });
       
       return result;

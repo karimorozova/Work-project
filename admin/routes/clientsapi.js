@@ -16,6 +16,18 @@ const fileType = require('file-type');
 const http = require('http');
 const writeFile = require('write');
 
+router.get('/client', (req, res) => {
+    let id = req.query.id;
+    Clients.find({"_id": id})
+        .then(result => {
+            let client = result[0];
+            res.send(client)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+})
+
 router.post('/client-rates', async (req, res) => {
     var rate = req.body;
     let id = rate.client;

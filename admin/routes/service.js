@@ -90,28 +90,30 @@ router.post("/removeservices", async (req, res) => {
 router.post('/jobcost', async (req, res) => {
   var project = req.body;
   var jobs = req.body.jobs;
-  var service = JSON.parse(project.service);
+  var service = project.service;
 
-  let result = await Services.find({'title': service.title});
-  var rates = result[0].rates;
+  let result = await Services.find({'title': service});
+  var rates = result[0].languageCombinations;
       for(let i = 0; i < jobs.length; i++) {
         for(let j = 0; j < rates.length; j++) {
           if(jobs[i].sourceLanguage == rates[j].source.lang &&
             jobs[i].targetLanguage == rates[j].target.lang ) {
-              for(let elem of rates[j].industry) {
+              for(let elem of rates[j].industries) {
                 if(project.industry == elem.name) {
-                  jobs[i].cost = +jobs[i].wordcount * +elem.rate;
+                  jobs[i].cost = (+jobs[i].wordcount * +elem.rate).toFixed(2);
                 }
-                if(project.industry == 'General' && elem.name == 'All') {
-                  jobs[i].cost = +jobs[i].wordcount * +elem.rate;
-                }
+                // if(project.industry == 'General' && elem.name == 'All') {
+                //   jobs[i].cost = +jobs[i].wordcount * +elem.rate;
+                // }
               }
           }
         }
       }  
 
-  let updateProject = await Projects.update({projectId: project.projectId}, {'jobs': jobs});
-  res.send(updateProject);
+  Projects.update({"_id": project._id}, {$set: {'jobs': jobs}})
+  .then(result => {
+    res.send('updated');
+  });
 })
 
 router.post('/rates-mono', async (req, res) => {

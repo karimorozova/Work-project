@@ -46,6 +46,8 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     let xtmData = req.body;
     let sourceLanguage = JSON.parse(xtmData.sourceLanguage);
     let targetLanguages = JSON.parse(xtmData.targetLanguages);
+    project.sourceLanguage = sourceLanguage;
+    project.targetLanguages = targetLanguages;
     let templateId;
     let workflowId;
     if(xtmData.template) {
@@ -65,8 +67,6 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     }
 
     for(let i  = 0; i < targetLanguages.length; i++) {
-        // symbol = targetLanguages[i].symbol.split('-');
-        // target.push(symbol[0].toLowerCase() + '_' + symbol[1]);
         target.push(targetLanguages[i].xtm);
     }
     var ids = [];
@@ -130,7 +130,7 @@ router.get('/xtm-clientinfo', async (req, res) => {
 router.post('/saveproject', async (req, res) => {
     let project = req.body;
     let projectId = req.body.projectId;
-    Projects.update({projectId: projectId}, project)
+    Projects.update({"_id": project._id}, project)
     .then(result => {
         res.send(result)
     })
@@ -218,7 +218,7 @@ router.get('/projects-analysis', async (req, res) => {
 })
 
 router.get('/newcustomer', async (req, res) => {
-    var customerName = "TestSoapCustomer";
+    var customerName = req.query.name;
     var str = '<?xml version="1.0" encoding="UTF-8"?>' +
         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
     '<soapenv:Header/>' +
@@ -261,8 +261,12 @@ router.get('/newcustomer', async (req, res) => {
 
     xhr.onload = function (){
     var results = xhr.responseText;
-    console.log(results);
-    res.send('Soap request done!');
+    var id;
+    if(results.indexOf('<id>') != -1) {
+        results = results.split('<id>')[1];
+        id = results.split("</id>")[0];
+    }
+    res.send(id);
     }
 
     xhr.setRequestHeader('Content-Type', 'text/xml');

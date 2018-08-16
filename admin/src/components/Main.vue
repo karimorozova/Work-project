@@ -50,7 +50,7 @@
                 //- .logoImage
                 .balloons
             router-view(:sliderBool="sliderBool"
-              :clientLanguages="clientLanguages"
+              @refreshXtmCustomers="refreshXtmCustomers"
               @customerLangs='customerLangs'
               @refreshServices='refreshServices'
               )
@@ -165,6 +165,9 @@ export default {
     async getXtmCustomers() {
       let result = await this.$http.get('xtm/xtm-customers');
       this.$store.dispatch('xtmCustomersGetting', result.body);
+    },
+    refreshXtmCustomers(data) {
+      this.getXtmCustomers();
     },
     async getLanguages() {
       let result = await this.$http.get('api/languages');

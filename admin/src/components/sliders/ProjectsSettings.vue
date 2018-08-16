@@ -1,66 +1,46 @@
 <template lang="pug">
-.adminNavbar__slider.slider
+.projects-wrap
+  .adminNavbar__slider.slider
     span PROJECTS
     .slider-inner
-        .slider-col(@click="showLanguagesSettings" :class="{languagesBg: languagesBgBool}") TEST1
-        .slider-col(@click="showServicesSettings" :class="{languagesBg: servicesBgBool}") TEST2
-        .slider-col(@click="showIndustriesSettings" :class="{languagesBg: industiesBgBool}") TEST3
+      .slider-col TEST1
+      .slider-col TEST2
+      .slider-col TEST3
+  .projects-table
+    Allprojects
 </template>
 
 <script>
+import Allprojects from '../projects/Allprojects';
+
 export default {
   data() {
     return {
-      languagesSettingsVisible: false,
-      languagesBgBool: false,
-      servicesSettingsVisible: false,
-      servicesBgBool: false,
-      industiesSettingsVisible: false,
-      industiesBgBool: false
+      
     };
   },
   methods: {
-    showIndustriesSettings() {
-      this.industiesSettingsVisible = !this.industiesSettingsVisible;
-      this.industiesBgBool = !this.industiesBgBool;
-      if (this.languagesSettingsVisible || this.servicesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.servicesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.servicesBgBool = false;
-    },
-    showServicesSettings() {
-      this.servicesSettingsVisible = !this.servicesSettingsVisible;
-      this.servicesBgBool = !this.servicesBgBool;
-      if (this.languagesSettingsVisible || this.industiesSettingsVisible) {
-        this.languagesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-      this.languagesBgBool = false;
-      this.industiesBgBool = false;
-    },
-    showLanguagesSettings() {
-      this.languagesSettingsVisible = !this.languagesSettingsVisible;
-      this.languagesBgBool = !this.languagesBgBool;
-      this.servicesBgBool = false;
-      this.industiesBgBool = false;
-      if (this.servicesSettingsVisible || this.industiesSettingsVisible) {
-        this.servicesSettingsVisible = false;
-        this.industiesSettingsVisible = false;
-      }
-    }
+    
+  },
+  components: {
+    Allprojects
   }
 };
 </script>
 
 <style lang="scss" scoped>
+
+.projects-wrap {
+  min-height: 94vh;
+  display: flex;
+}
+
 .adminNavbar {
   position: relative;
   display: flex;
-  min-height: 94vh;
+  height: 100%;
   &__slider {
-    // transform: translate(-50%);
+    height: 100%;
     background-color: #fff;
     width: 175px;
     box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
