@@ -10,14 +10,16 @@
                     th Suggested deadline
                     th 
             tbody
-                tr(v-for="(project, ind) in projects" @click="showJobs(ind)")
+                tr(v-for="(project, ind) in allProjects" @click="showJobs(project._id)")
                     td {{ project.createdAt }}
                     td {{ project.projectId }}
                     td {{ project.projectName }}
                     td {{ project.status }}
                     td {{ project.date }}
-                    td 
-                        input.metrics(v-if="!project.jobs[0].wordcount" type="button" value="Get metrics and cost" @click="estimate(ind)")
+                    td
+                        .buttons
+                            button.metrics(:disabled="project.jobs[0].wordcount != ''" @click="estimate(ind)" :class="{disabled: project.jobs[0].wordcount}") Get metrics and cost
+                            button.mail(:disabled="project.status != 'Open'" @click="sendMail(ind)" :class="{disabled: project.status != 'Open'}") Send mail
         table.jobsTable(v-if="jobsShow")
             thead
                 tr
@@ -30,7 +32,9 @@
                     td {{ job.sourceLanguage }} >> {{ job.targetLanguage }}
                     td {{ job.status }}
                     td {{ job.wordcount }}
-                    td {{ job.cost }}
+                    td 
+                        span {{ job.cost }} 
+                            span(v-if="job.cost") &euro;
 </template>
 
 <script>
@@ -42,7 +46,6 @@ export default {
             projects: [],
             jobs: [],
             jobsShow: false
-            // project: {}
         }
     },
     methods: {
@@ -51,35 +54,38 @@ export default {
             this.projects = projectsArray.body;
         },
         async estimate(ind) {
-            let project = this.projects[ind];
+            let project = this.allProjects[ind];
             let words = await this.$http.get(`../xtm/xtmwords?projectId=${project.xtmId}`);
-            console.log(words);
             for(let job of project.jobs) {
                 job.wordcount = +words.body;
             }
-            let saveProject = await this.$http.post('../xtm/saveproject', project);
             let jobsCosts = await this.$http.post('../service/jobcost', project);
             let clientRates = await this.checkClient(ind);
             if(clientRates.length) {
+                console.log(clientRates);
                 for(let job of project.jobs) {
+                    console.log(job);
                     for(let elem of clientRates) {
                         if(job.targetLanguage == elem.target) {
-                            job.cost == job.wordcount*elem.rate;
+                            job.cost = parseFloat((job.wordcount*elem.rate).toFixed(2));
                         }
                     }
                 } 
             }
+            let saveProject = await this.$http.post('../xtm/saveproject', project);
+            // let final = await this.$http.post('../xtm/savejobs', {id: project._id, jobs: project.jobs});
             await this.getProjects();
+            this.showJobs(project._id);
         },
         async checkClient(ind) {
-            let id = this.projects[ind].customer;
+            let id = this.allProjects[ind].customer;
             let client = await this.$http.get(`../clientsapi/client?id=${id}`);
             let combinations = client.body.languageCombinations;
             let result = [];
             for(let comb of combinations) {
-                if(comb.active && comb.service == this.projects[ind].service && 
-                    comb.source.lang == this.projects[ind].sourceLanguage.lang) {
-                    for(let lang of this.projects[ind].targetLanguages) {
+                if(comb.active && comb.service == this.allProjects[ind].service && 
+                    comb.source.lang == this.allProjects[ind].sourceLanguage.lang) {
+                    for(let lang of this.allProjects[ind].targetLanguages) {
                         if(lang.lang == comb.target.lang) {
                             result.push({
                                 target: comb.target.lang,
@@ -91,9 +97,16 @@ export default {
             }
             return result;
         },
-        showJobs(ind) {
+        showJobs(id) {
             this.jobsShow = true;
-            this.jobs = this.projects[ind].jobs;
+            let project = this.allProjects.find(item => {
+                return item._id == id
+            });
+            this.jobs = project.jobs;
+        },
+        async sendMail(ind) {
+            console.log(this.allProjects[ind].customer);
+            let result = await this.$http.post('../clientsapi/mailtoclient', this.allProjects[ind]);
         },
         async edit(i) {
             let jobId = this.project.jobs[i].id;
@@ -110,6 +123,13 @@ export default {
         }
     },
     computed: {
+        allProjects() {
+            let result = [];
+            if(this.projects.length) {
+                result = this.projects;
+            }
+            return result;
+        },
         requestDate() {
             let result = '';
             if(this.project.createdAt) {
@@ -147,11 +167,33 @@ export default {
     }
 }
 
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
 .metrics {
-    margin: 10px;
+    width: 170px;
+    margin-right: 5px;
     padding: 3px;
     color: #FFF;
     background-color: green;
+    cursor: pointer;
+}
+
+.mail {
+    width: 100px;
+    padding: 3px;
+    color: #FFF;
+    background-color: green;
+    cursor: pointer;
+}
+
+.disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 </style>

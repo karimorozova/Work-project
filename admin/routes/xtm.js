@@ -140,6 +140,18 @@ router.post('/saveproject', async (req, res) => {
     })
 })
 
+router.post('/savejobs', async (req, res) => {
+    let jobs = req.body.jobs;
+    let projectId = req.body.id;
+    Projects.update({"_id": projectId}, {$set: {"jobs": jobs}})
+    .then(result => {
+        res.send(result)
+    })
+    .catch(err => {
+        console.log(err)
+        res.send('Something wrong...')
+    })
+})
 
 router.get('/newproject', async (req, res) => {
     unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')

@@ -100,7 +100,7 @@ router.post('/jobcost', async (req, res) => {
             jobs[i].targetLanguage == rates[j].target.lang ) {
               for(let elem of rates[j].industries) {
                 if(project.industry == elem.name) {
-                  jobs[i].cost = (+jobs[i].wordcount * +elem.rate).toFixed(2);
+                  jobs[i].cost = parseFloat((+jobs[i].wordcount * +elem.rate).toFixed(2));
                 }
                 // if(project.industry == 'General' && elem.name == 'All') {
                 //   jobs[i].cost = +jobs[i].wordcount * +elem.rate;
@@ -112,7 +112,7 @@ router.post('/jobcost', async (req, res) => {
 
   Projects.update({"_id": project._id}, {$set: {'jobs': jobs}})
   .then(result => {
-    res.send('updated');
+    res.send(result);
   });
 })
 

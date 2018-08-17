@@ -7,8 +7,7 @@ const querystring = require('querystring');
 const fs = require('fs');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
-const { sendMailClient } = require('../utils/mailhandlerclient');
-const { sendMailPortal } = require('../utils/mailhandlerportal')
+const { clientMail } = require('../utils/mailtoclients');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
@@ -26,6 +25,32 @@ router.get('/client', (req, res) => {
         .catch(err => {
             console.log(err)
         })
+})
+
+router.post('/mailtoclient', async (req, res) => {
+    let project = req.body;
+    let client = await Clients.find({"_id": project.customer});
+    clientMail(project, client[0]);
+})
+
+router.get('/acceptquote', async (req, res) => {
+    let mailDate = req.query.to;
+    let date = new Date().getTime();
+    let expiry = date - mailDate;
+    if(expiry > 60000) {
+        res.send("Sorry! The link is already expired.")
+    } else {
+        let projectId = req.query.project;
+        Projects.update({"_id": projectId}, {$set: {status: 'Accepted'}})
+        .then(result => {
+            res.send("Thank you!")
+        })
+        .catch(err => {
+            console.log(err);
+            res.send('Sorry. Acception failed! Try again later.')
+        })
+    }
+    
 })
 
 router.post('/client-rates', async (req, res) => {

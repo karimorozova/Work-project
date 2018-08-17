@@ -8,6 +8,31 @@ const middleware = {
             err.status = 401;
             return next(err);
         }
+    },
+
+    checkRoutes(url) {
+        let routesArray = [
+            '/register',
+            '/tasks-report',
+            '/login',
+            '/accountinfo',
+            '/dashboard',
+            '/recruitment',
+            '/vendors',
+            '/languages',
+            '/clients',
+            '/quotes',
+            '/projects',
+            '/finance',
+            '/reports',
+            '/translation-request'
+        ]
+        if(routesArray.indexOf(url) != -1) {
+            console.log(url)
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
