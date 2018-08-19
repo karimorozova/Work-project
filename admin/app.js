@@ -72,16 +72,8 @@ app.use(history({ verbose: true, index: '/' }));
 app.get("/", function(req, res, next) {
   if(checkRoutes(req.originalUrl)) {
     res.sendFile(__dirname + '/dist/index.html');
-    // next()
-  } else {
-    app.use("/", routes);
   }
 });
-
-// app.get('/projects', (req, res) => {
-//   console.log(req);
-//   res.sendFile(__dirname + '/dist/index.html')
-// });
 
 app.listen(port, () => {
   console.log(`Server is working on: ${port}`);

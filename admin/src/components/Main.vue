@@ -158,7 +158,7 @@ export default {
       }
     },
     async getCustomers() {
-      let result = await this.$http.get('/clients');
+      let result = await this.$http.get('/all-clients');
       // let result = await this.$http.get('api/customers');
       this.$store.dispatch('customersGetting', result.body);
     },

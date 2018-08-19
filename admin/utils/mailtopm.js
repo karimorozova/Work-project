@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 const mailhandler = {
-  clientMail(project, client) {
+  pmMail(project, client, user) {
     var acceptQuote = "";
     var declineQuote = "";
     var date = new Date().getTime();
@@ -41,9 +41,7 @@ const mailhandler = {
         pass: 'LetMeInNow!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
-    var msg = `<li>Hello dear ${client.contactName}</li>` + 
-              `<li>Click on ${acceptQuote} to accept a quote` + 
-              `<li>Click on ${declineQuote} to decline a quote`;
+    var msg = `<li>Hello dear ${user.firstName}</li>` + `<p>The Quote with Id ${project.projectId} was rejected ` + `by the client ${client.name}</p>`;
 
 //     var msg = `<table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
 //     <thead>
@@ -87,13 +85,14 @@ const mailhandler = {
     
     let mailOptions = {
       from: 'translation@pangea.global', // sender address
-      to: `${client.email}`, // pm@pangea.global list of receivers
+      to: `${user.email}`, // pm@pangea.global list of receivers
       subject: `Quote Details`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
+      transporter.close();
       if (error) {
         return console.log(error);
       }

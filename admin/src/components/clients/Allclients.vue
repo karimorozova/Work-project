@@ -18,7 +18,7 @@
                         label Lead Source
                         ClientLeadsourceSelect(:selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
                 .filters__block
-                    input.add-button(type="submit" value="Add client")            
+                    input.add-button(type="submit" value="Add client" @click="addClient")            
             table
                 thead
                     tr
@@ -60,9 +60,13 @@
                                 img(v-for="(but, i) in client.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
         .clients__data(v-if="clientData")
             ClientDetails(:client="client"
+                :newClient="newClient"
+                @clientDelete="clientDelete"
+                @newContact="addNewContact"
                 @refreshClients="refreshClients"
                 @cancel="clientCancel"
                 @contactCancel="contactCancel"
+                @deleteContact="deleteContact"
                 @chosenInd="changeInd"
                 @chosenStatus="changeStatus"
                 @chosenAccManager="changeAccManager"
@@ -81,6 +85,7 @@ import { bus } from "../../main";
 export default {
     data() {
         return {
+            newClient: false,
             client: {},
             clients: [],
             clientData: false,
@@ -119,8 +124,48 @@ export default {
             if(this.allClients[ind].icons[0].active) {
                 this.client = this.allClients[ind];
                 this.clientData = true;
+                this.newClient = false;
                 this.$emit('chosenClient');
             }
+        },
+        addClient() {
+            this.client = {
+                name: "",
+                officialName: "",
+                status: "",
+                website: "",
+                contract: "",
+                nda: "",
+                accountManager: "",
+                salesManager: "",
+                projectManager: "",
+                leadSource: "",
+                salesComission: "",
+                contactName: "",
+                email: "",
+                vat: "",
+                address: "",
+                languageCombinations: "",
+                industry: {},
+                contacts: []
+            };
+            this.clientData = true;
+            this.newClient = true;
+            this.$emit('chosenClient');
+        },
+        addNewContact(data) {
+            this.client.contacts.push(data.contact)
+        },
+        deleteContact(data) {
+            let id = this.client._id;
+            this.client.contacts.splice(data, 1);
+            this.$http.post('clientsapi/deleteContact', {id: id, contacts: this.client.contacts})
+            .then(res => {
+                console.log("contact deleted")
+            })
+            .catch(err => {
+                consol.elog(err)
+            })
         },
         chosenLeadsource(data) {
             this.filterLeadsource = data;
@@ -151,22 +196,53 @@ export default {
                 this.allClients[ind].icons[0].active = false;
             }
             if(i == 1) {
+                let id = this.allClients[ind]._id;
                 this.allClients.splice(ind, 1);
+                this.$http.post('clientsapi/deleteclient', {id: id})
+                .then(res => {
+                    console.log('deleted')
+                })
+                .catch(err => {
+                    console.log(err)
+                })
             }
+        },
+        clientDelete(data) {
+            let id = data._id;
+            this.$http.post('clientsapi/deleteclient', {id: id})
+            .then(res => {
+                console.log('deleted')
+            })
+            .catch(err => {
+                console.log(err)
+            })
+            this.clientData = false;
+            this.getclients();
         },
         async refreshClients(data) {
             let result = await this.getclients();
-            let id = this.client._id;
-            this.client = '';
-            this.client = this.clients.find(item => {
-                if(item._id == id) {
-                    return item
-                }
-            })
+            if(!this.newClient) {
+                let id = this.client._id;
+                this.client = '';
+                this.client = this.clients.find(item => {
+                    if(item._id == id) {
+                        return item
+                    }
+                })
+            } else {
+                let email = this.client.email;
+                this.client = '';
+                this.client = this.clients.find(item => {
+                    if(item.email == email) {
+                        return item
+                    }
+                })
+            }
+            
         },
         async getclients() {
             this.clients = [];
-            let result = await this.$http.get('/clients');
+            let result = await this.$http.get('/all-clients');
             for(let client of result.body) {
                 client.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
                     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
@@ -373,11 +449,6 @@ td {
 }
 tr {
     cursor: pointer;
-    &:last-child {
-        td {
-            border-bottom: none;
-        }
-    }
 }
 .head-title {
     display: flex;

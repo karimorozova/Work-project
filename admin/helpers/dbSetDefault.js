@@ -284,9 +284,9 @@ function services() {
 }
 
 async function serviceMonoLangs() {
-  let languages = await Languages.find();
+  let languages = await Languages.find({});
   let services = await Services.find({"languageForm": "Mono"});
-  let industries = await Industries.find();
+  let industries = await Industries.find({});
   let rate = 0.12;
   for(let serv of services) {
     if(serv.title == 'Blogging') {
@@ -315,9 +315,9 @@ async function serviceMonoLangs() {
 }
 
 async function serviceDuoLangs() {
-  let languages = await Languages.find();
+  let languages = await Languages.find({});
   let services = await Services.find({"languageForm": "Duo"});
-  let industries = await Industries.find();
+  let industries = await Industries.find({});
   let rate = 0.1;
   let englishLang = languages.find(item => {
     return item.symbol == "EN-GB"
@@ -384,7 +384,6 @@ async function checkCollections() {
   await users();
   await serviceMonoLangs();
   await serviceDuoLangs();
-  
 }
 
 module.exports = checkCollections();

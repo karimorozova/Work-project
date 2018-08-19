@@ -3,7 +3,7 @@
         .title 
             span Contact Details
             .title__buttons
-                input.button(type="button" value="Save" @click="contactUpdate")
+                input.button(type="button" value="Save" @click="contactSave")
                 input.button(type="button" value="Cancel" @click="cancel")
                 input.button(type="button" value="Delete" @click="deleteContact")
         .details
@@ -16,51 +16,51 @@
                 .names-gender
                     .names-gender__item
                         label Name:
-                        input.personal(type="text" placeholder="Name" v-model="client.contacts[ind].name")
+                        input.personal(type="text" placeholder="Name" v-model="contact.name")
                     .names-gender__item
                         label Surname:
-                        input.personal(type="text" placeholder="Surname" v-model="client.contacts[ind].surname")
+                        input.personal(type="text" placeholder="Surname" v-model="contact.surname")
                     .names-gender__item
                         label Email:
-                        input.personal(type="text" placeholder="email" v-model="client.contacts[ind].email")
+                        input.personal(type="text" placeholder="email" v-model="contact.email")
                     .names-gender__item
                         label Gender:
                         .dropSelect(v-click-outside="outGenders")
                             .select
-                                template(v-if="client.contacts[ind].gender")
+                                template(v-if="contact.gender")
                                     .selected
-                                        span {{ client.contacts[ind].gender }}
-                                template(v-if="!client.contacts[ind].gender")
+                                        span {{ contact.gender }}
+                                template(v-if="!contact.gender")
                                     span.selected.no-gender Gender
                                 .arrowButton(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
-                                .drop__item(@click="() => client.contacts[ind].gender = 'Male'")
+                                .drop__item(@click="() => contact.gender = 'Male'")
                                     span Male
-                                .drop__item(@click="() => client.contacts[ind].gender = 'Female'")
+                                .drop__item(@click="() => contact.gender = 'Female'")
                                     span Female
             .details__item
                 label Position:
-                input.non-personal(type="text" placeholder="Position" v-model="client.contacts[ind].position")
+                input.non-personal(type="text" placeholder="Position" v-model="contact.position")
             .details__item
                 label Phone:
-                input.non-personal(type="text" placeholder="Phone number" v-model="client.contacts[ind].phone")
+                input.non-personal(type="text" placeholder="Phone number" v-model="contact.phone")
             .details__item
                 label Skype:
-                input.non-personal(type="text" placeholder="Skype name" v-model="client.contacts[ind].skype")
+                input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
             .details__item
                 label Country:
-                CountriesSelect(:countrySelected="client.contacts[ind].country" :countries="countries" @chosenCountry="chosenCountry")
+                CountriesSelect(:countrySelected="contact.country" :countries="countries" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                TimezoneSelect(:timezoneSelected="client.contacts[ind].timezone" :timezones="timezones" @chosenZone="chosenZone")
+                TimezoneSelect(:timezoneSelected="contact.timezone" :timezones="timezones" @chosenZone="chosenZone")
             .details__item
                 label Notes:
-                textarea.non-personal(type="text" placeholder="Type" v-model="client.contacts[ind].notes")
+                textarea.non-personal(type="text" placeholder="Type" v-model="contact.notes")
         .delete-approve(v-if="approveShow")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-            input.button(type="button" value="Delete" @click="approveDelete")
+            input.button(type="button" value="Delete")
 </template>
 
 <script>
@@ -72,13 +72,29 @@ export default {
     props: {
         client: {
             type: Object
-        },
-        ind: {
-            type: Number
         }
     },
     data() {
         return {
+            contact: {
+                country: "",
+                timezone: "",
+                name: "",
+                surname: "",
+                email: "",
+                gender: "",
+                phone: "",
+                icons:[
+                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
+                    ]
+                ,
+                photo: "",
+                skype: "",
+                position: "",
+                notes: "",
+                leadContact: false
+            },
             countries: [],
             timezones: [],
             imageExist: false,
@@ -113,19 +129,16 @@ export default {
         deleteContact() {
             this.approveShow = true;            
         },
-        approveDelete() {
-            this.$emit('approveDelete', this.ind)
-        },
         chosenCountry(data) {
             this.countrySelected = data;
-            this.client.contacts[this.ind].country = data;
+            this.contact.country = data;
         },
         chosenZone(data) {
             this.timezoneSelected = data;
-            this.client.contacts[this.ind].timezone = data;
+            this.contact.timezone = data;
         },
-        contactUpdate() {
-            this.$emit('contactUpdate')
+        contactSave() {
+            this.$emit('contactSave', this.contact)
         },
         getCountries() {
             this.$http.get('https://restcountries.eu/rest/v2/all')
@@ -157,7 +170,6 @@ export default {
         ClickOutside
     },
     mounted() {
-        console.log(this.client.contacts);
         this.getCountries();
         this.getTimezones();
     }

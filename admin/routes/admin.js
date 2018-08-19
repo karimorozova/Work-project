@@ -49,7 +49,7 @@ router.get('/timezones', (req, res) => {
         })
 })
 
-router.get('/clients', (req, res) => {
+router.get('/all-clients', (req, res) => {
     Clients.find()
         .then(clients => {
             res.send(clients)
@@ -61,12 +61,16 @@ router.get('/clients', (req, res) => {
 
 router.get('/users', (req, res) => {
     User.find()
-        .then(users => {
-            res.send(users)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    .then(users => {
+        let names = [];
+        for(let user of users) {
+            names.push(user.username)
+        }
+        res.send(names)
+    })
+    .catch(err => {
+        console.log(err)
+    })
 })
 
 router.get('/requests', requiresLogin, (req, res) => {

@@ -42,9 +42,7 @@ export default {
         getManagers() {
             this.$http.get('../users')
             .then(res => {
-                for(let man of res.data) {
-                    this.managers.push(man.username)
-                }
+                this.managers = res.data;
             })
             .catch(err => {
                 console.log("Erron on getting users: " + err)

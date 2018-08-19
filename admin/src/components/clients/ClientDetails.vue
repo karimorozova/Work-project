@@ -45,25 +45,28 @@
                         AMSelect(:selectedManager="client.projectManager" @chosenManager="chosenProjManager")
             .title Contact Details
             .contacts-info
-                ContactsInfo(:client="client" @contactDetails="contactDetails")
+                ContactsInfo(:client="client" @contactDetails="contactDetails" @newContact="addNewContact")
             .title Rates    
             .rates
                 ClientRates(:client="client")
             .title Sales Information
             .sales
-                ClientSalesInfo(:client="client")
+                ClientSalesInfo(:client="client" @deleteContact="approveDelete")
             .title Billing Informations
             .billing
                 ClientBillInfo(:client="client")
             .delete-approve(v-if="approveShow")
                 p Are you sure you want to delete?
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-                input.button(type="button" value="Delete")  
+                input.button(type="button" value="Delete" @click="approveClientDelete")  
         .contact-info(v-if="contactShow")
-            ContactDetails(@cancel="contactCancel"
+            ContactDetails(v-if="!newContact" 
+                @cancel="contactCancel"
                 @contactUpdate="contactUpdate"
+                @approveDelete="approveDelete"
                 :client="client"
                 :ind="contactInd")
+            NewContactDetails(v-if="newContact" :client="client" @contactSave="contactSave")           
 </template>
 
 <script>
@@ -75,12 +78,16 @@ import ClientRates from './ClientRates';
 import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
 import ContactDetails from '../clients/ContactDetails';
+import NewContactDetails from '../clients/NewContactDetails';
 
 
 export default {
     props: {
         client: {
             type: Object
+        },
+        newClient: {
+            type: Boolean
         }
     },
     data() {
@@ -88,7 +95,8 @@ export default {
             approveShow: false,
             clientShow: true,
             contactShow: false,
-            contactInd: 0
+            contactInd: 0,
+            newContact: false
         }
     },
     methods: {
@@ -102,6 +110,11 @@ export default {
         },
         deleteContact() {
             this.approveShow = true;
+        },
+        approveDelete(data) {
+            this.clientShow = true;
+            this.contactShow = false;
+            this.$emit('deleteContact', data)
         },
         cancelApprove() {
             this.approveShow = false;
@@ -124,20 +137,49 @@ export default {
         contactDetails(data) {
             this.clientShow = false;
             this.contactShow = true;
+            this.newContact = false;
             this.contactInd = data.contactIndex;
         },
+        addNewContact(data) {
+            this.clientShow = false;
+            this.contactShow = true;
+            this.newContact = true;
+        },
         updateClient() {
-            this.$http.post('clientsapi/update-client', this.client)
-            .then(res => {
-                console.log(res)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-            this.$emit('refreshClients');
+            if(!this.newClient) {
+                this.$http.post('clientsapi/update-client', this.client)
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                this.$emit('refreshClients');
+            } else {
+                this.$http.post('clientsapi/new-client', this.client)
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                this.$emit('refreshClients');
+            }
+        },
+        approveClientDelete() {
+            if(this.newClient) {
+                this.cancel()
+            } else {
+                this.$emit('clientDelete', this.client)
+            }
         },
         contactUpdate(data) {
             this.updateClient();
+            this.clientShow = true;
+            this.contactShow = false;
+        },
+        contactSave(data) {
+            this.$emit('newContact', {contact: data});
             this.clientShow = true;
             this.contactShow = false;
         }
@@ -150,7 +192,8 @@ export default {
     ClientRates,
     ClientSalesInfo,
     ClientBillInfo,
-    ContactDetails
+    ContactDetails,
+    NewContactDetails
   }
 }
 </script>

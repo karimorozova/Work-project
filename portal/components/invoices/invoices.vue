@@ -2,36 +2,36 @@
     .invoices
         .invoices__title
             p Invoices
-        .invoices__main
-            p Coming soon ...
-        table.projectTable
-            thead
-                tr
-                    th Requested on
-                    th ProjectId
-                    th Project Name
-                    th Status
-                    th Suggested deadline
-            tbody
-                tr
-                    td {{ requestDate }}
-                    td {{ project.projectId }}
-                    td {{ project.projectName }}
-                    td {{ project.status }}
-                    td {{ deadline }}
-        table.jobsTable
-            thead
-                tr
-                    th Language Pair
-                    th Status
-                    th Wordcount
-                    th Cost
-            tbody
-                tr(v-for="(job, i) in project.jobs" @click="edit(i)")
-                    td {{ job.sourceLanguage }} >> {{ job.targetLanguage }}
-                    td {{ job.status }}
-                    td {{ job.wordcount }}
-                    td {{ job.cost }}
+        //- .invoices__main
+        //-     p Coming soon ...
+        //- table.projectTable
+        //-     thead
+        //-         tr
+        //-             th Requested on
+        //-             th ProjectId
+        //-             th Project Name
+        //-             th Status
+        //-             th Suggested deadline
+        //-     tbody
+        //-         tr
+        //-             td {{ requestDate }}
+        //-             td {{ project.projectId }}
+        //-             td {{ project.projectName }}
+        //-             td {{ project.status }}
+        //-             td {{ deadline }}
+        //- table.jobsTable
+        //-     thead
+        //-         tr
+        //-             th Language Pair
+        //-             th Status
+        //-             th Wordcount
+        //-             th Cost
+        //-     tbody
+        //-         tr(v-for="(job, i) in project.jobs" @click="edit(i)")
+        //-             td {{ job.sourceLanguage }} >> {{ job.targetLanguage }}
+        //-             td {{ job.status }}
+        //-             td {{ job.wordcount }}
+        //-             td {{ job.cost }}
 </template>
 
 <script>

@@ -271,16 +271,22 @@ export default {
       if(iconIndex == 2) {
         let deletedRate = this.fullInfo.splice(index, 1)[0];
         this.fullInfo.splice(index, 1);
+        this.currentActive = "none";
       }
     },
     addNewRow() {
+      this.sourceSelect = ["All"];
+      this.targetSelect = ["All"];
+      this.industryFilter = [{name: "All"}];
       this.fullInfo.push({
+        title: this.serviceSelect.title,
         sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
         industry: [{name: "All", rate: 0}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       });
+      this.currentActive = this.fullInfo.length - 1;
       setTimeout( () => {
         this.handleScroll();
       },100);

@@ -1,7 +1,7 @@
 <template lang="pug">
     .details-table
         .add-contact
-            input.add-button(type="button" value="Add new contact")
+            input.add-button(type="button" value="Add new contact" @click="addContact")
         table
             thead
                 tr
@@ -75,12 +75,16 @@ export default {
             }
             if(i == 1) {
                 this.client.contacts.splice(ind, 1);
+                this.$emit('deleteContact', ind);
             }
         },
         contactDetails(ind) {
             if(this.client.contacts[ind].icons[0].active) {
                 this.$emit('contactDetails', {contactIndex: ind});
             }
+        },
+        addContact() {
+            this.$emit('newContact');
         }
     },
     computed: {
