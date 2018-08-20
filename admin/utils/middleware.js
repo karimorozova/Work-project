@@ -6,7 +6,9 @@ const middleware = {
         } else {
             const err = new Error('You must be logged in to view this page.');
             err.status = 401;
-            return next(err);
+            res.status(401);
+            res.send(err.message);
+            // return next(err);
         }
     },
 

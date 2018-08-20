@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { requiresLogin } = require('../utils/middleware');
 
 const apiRouter = require('./api');
 const admin = require('./admin');
@@ -16,7 +17,7 @@ router.use('/portal', portalRouter);
 router.use('/industry', industryRouter);
 router.use('/service', serviceRouter);
 router.use('/xtm', xtmRouter);
-router.use('/clientsapi', clientsapiRouter);
+router.use('/clientsapi', requiresLogin, clientsapiRouter);
 
 
 module.exports = router;

@@ -105,7 +105,7 @@ export default {
                 url: "portal/clientinfo",
                 withCredentials: true
             });
-            console.log(result);
+            // console.log(result);
             this.companyName = result.data.name;
         },
         projectDetails(index) {

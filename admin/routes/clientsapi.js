@@ -28,6 +28,16 @@ router.get('/client', (req, res) => {
         })
 })
 
+router.get('/clients-every', (req,res) => {
+    Clients.find()
+    .then(clients => {
+        res.send(clients)
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 router.post('/mailtoclient', async (req, res) => {
     let project = req.body;
     let client = await Clients.find({"_id": project.customer});

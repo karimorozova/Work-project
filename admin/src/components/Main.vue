@@ -212,6 +212,10 @@ export default {
     },
     signOut() {
       this.$store.dispatch("logout");
+      this.$http.get('/logout')
+      .then(res => {
+        console.log(res)
+      });
       this.$router.push('/login');
     },
     switchInfo(index) {

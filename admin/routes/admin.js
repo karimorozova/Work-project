@@ -6,6 +6,7 @@ const { requiresLogin } = require('../utils/middleware');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
 const mongoose = require('mongoose');
 
+
 router.get('/', (req, res) => {
     res.sendFile(path.resolve() + '/dist/index.html');
 });
@@ -49,17 +50,17 @@ router.get('/timezones', (req, res) => {
         })
 })
 
-router.get('/all-clients', (req, res) => {
+router.get('/all-clients', requiresLogin, (req, res, next) => {
     Clients.find()
-        .then(clients => {
-            res.send(clients)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    .then(clients => {
+        res.send(clients)
+    })
+    .catch(err => {
+        console.log(err)
+    })
 })
 
-router.get('/users', (req, res) => {
+router.get('/users', requiresLogin, (req, res, next) => {
     User.find()
     .then(users => {
         let names = [];
@@ -73,7 +74,7 @@ router.get('/users', (req, res) => {
     })
 })
 
-router.get('/requests', requiresLogin, (req, res) => {
+router.get('/requests', requiresLogin, (req, res, next) => {
     Requests.find()
         .then(requests => {
             res.send(requests)
@@ -117,11 +118,6 @@ router.post('/login', (req, res, next) => {
         return next(err);
     }
 });
-
-router.get('/customer-info', async (req, res) => {
-    let customer = await HomeApi.customerInfo(req.query.customerId);
-    res.send(customer)
-})
 
 async function updateReports() {
     console.log("Begin test");

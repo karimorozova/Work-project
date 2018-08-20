@@ -241,15 +241,15 @@ export default {
   },
   methods: {
     thankProof(data) {
-      console.log(data);
+      // console.log(data);
       this.$emit('thankProof', data);
     },
     thankCopy(data){
-      console.log(data);
+      // console.log(data);
       this.$emit('thankCopy', data);
     },
     thankMark(data){
-      console.log(data);
+      // console.log(data);
       this.$emit('thankMark', data);
     },
     outsideLangs() {

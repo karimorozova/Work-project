@@ -448,10 +448,6 @@ export default {
     closeWarning() {
       this.error = false;
     },
-    async getClientInfo(customerId) {
-      let result = await this.$http.get(`../customer-info?customerId=${customerId}`);
-      console.log("client-info: " + result);
-    },
     clearForm() {
       this.customerSelected = {name: 'Select'};
       this.searchCustomer = '';

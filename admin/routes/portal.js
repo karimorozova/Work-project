@@ -1,4 +1,4 @@
-const { ClientApi } = require('../models/xtrf');
+const { ClientApi, HomeApi } = require('../models/xtrf');
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const { getSpecializations } = require('../models/xtrf/home');
 const router = require('express').Router();
@@ -19,6 +19,7 @@ router.post('/auth', async (req, res, next) => {
         var userdata = await (customer.getName());
         res.statusCode = 200;
         req.session.name = userdata.data.name;
+        req.session.jsessionId = jsessionId; 
         res.send(jsessionId);
     } else {
         let err = new Error('All fields required.');
@@ -33,6 +34,11 @@ router.get('/language-combinations', async (req, res) => {
     let result = await customer.languageComb(id);
     let languages = result.data;
     res.send(languages);
+})
+
+router.get('/customer-info', async (req, res) => {
+    let customer = await HomeApi.customerInfo(req.query.customerId);
+    res.send(customer)
 })
 
 router.get('/clientinfo', async (req, res) => {

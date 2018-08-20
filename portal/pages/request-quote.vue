@@ -7,7 +7,7 @@
         .mainWrapper
           .logo__image
             a(href="https://www.pangea.global/")
-              img(src='./../assets/images/logo.png')
+              img(src='./../assets/images/new-logo.png')
       .header
         .mainWrapper
           span Request a Quote
