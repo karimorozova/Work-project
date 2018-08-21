@@ -1,0 +1,350 @@
+<template lang="pug">
+    .vendor-wrap
+        .vendor-info(v-if="vendorShow")
+            .buttons
+                input.button(type="button" value="Save" @click="updateVendor")
+                input.button(type="button" value="Cancel" @click="cancel")
+                input.button(type="button" value="Delete" @click="deleteVendor")
+            .title General Information
+            .gen-info
+                .gen-info__block
+                    .photo-wrap
+                        input.photo-file(type="file" @change="previewPhoto")
+                        .photo-text(v-if="!imageExist")
+                            p upload your photo                          
+                        img.photo-image(v-if="imageExist")
+                    label Job title
+                .gen-info__block
+                    .block-item
+                        label First Name:
+                        input(type="text" placeholder="Company Name" v-model="vendor.name")
+                    .block-item
+                        label Surname:
+                        input(type="text" placeholder="Company Name" v-model="vendor.surname")
+                    .block-item
+                        label Email:
+                        input(type="text" placeholder="Website" v-model="vendor.email")
+                    .block-item
+                        label Phone:
+                        input(type="text" placeholder="Company Name" v-model="vendor.phone")
+                    .block-item
+                        label Time Zone:
+                        TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="chosenZone")
+                    .block-item
+                        label Native Language:
+                        NativeLanguageSelect(:selectedLang="[vendor.native]" @chosenLang="changeLang")
+                    .block-item
+                        label Gender:
+                        .dropSelect(v-click-outside="outGenders")
+                            .select
+                                template(v-if="vendor.gender")
+                                    .selected
+                                        span {{ vendor.gender }}
+                                template(v-if="!vendor.gender")
+                                    span.selected.no-gender Gender
+                                .arrowButton(@click="openGenders")
+                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
+                            .drop(v-if="genderDropped")
+                                .drop__item(@click="() => vendor.gender = 'Male'")
+                                    span Male
+                                .drop__item(@click="() => vendor.gender = 'Female'")
+                                    span Female
+                .gen-info__block
+                    .block-item
+                        label Company Name:
+                        input(type="text" placeholder="Company Name" v-model="vendor.companyName")
+                    .block-item
+                        label Website:
+                        input(type="text" placeholder="Company Name" v-model="vendor.website")
+                    .block-item
+                        label Skype:
+                        input(type="text" placeholder="Website" v-model="vendor.skype")
+                    .block-item
+                        label Linkedin:
+                        input(type="text" placeholder="Company Name" v-model="vendor.linkedin")
+                    .block-item
+                        label WhatsApp:
+                        input(type="text" placeholder="Website" v-model="vendor.whatsapp")
+                    .block-item
+                        label Vendor Status:
+                        VendorStatusSelect(:selectedStatus="vendor.status" @chosenStatus="chosenStatus")
+                    .block-item
+                        label Indstries:
+                        VendorIndustrySelect(:selectedInd="vendor.industry" @chosenInd="chosenInd")
+            .title Rates    
+            .rates
+                VendorRates(:vendor="vendor")
+</template>
+
+<script>
+import ClickOutside from "vue-click-outside";
+import VendorStatusSelect from "./VendorStatusSelect";
+import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
+import VendorIndustrySelect from "./VendorIndustrySelect";
+import NativeLanguageSelect from "./NativeLanguageSelect";
+import TimezoneSelect from "../clients/TimezoneSelect";
+import VendorRates from "./VendorRates";
+
+export default {
+    props: {
+        vendor: {
+            type: Object
+        }
+    },
+    data() {
+        return {
+            vendorShow: true,
+            imageExist: false,
+            timezones: [],
+            genderDropped: false
+        }
+    },
+    methods: {
+        previewPhoto() {
+            let input = document.getElementsByClassName('photo-file')[0];
+            if(input.files && input.files[0]) {
+                this.imageExist = true;
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementsByClassName('photo-image')[0].src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        },
+        updateVendor() {
+            console.log('updating vendor');
+        },
+        cancel() {
+            this.$emit('cancelVendor')
+        },
+        deleteVendor() {
+            console.log('Deleting this vendor')
+            this.$emit('cancelVendor')
+        },
+        openGenders() {
+            this.genderDropped = !this.genderDropped;
+        },
+        outGenders() {
+            this.genderDropped = false;
+        },
+        changeLang() {
+            console.log('changing language')
+        },
+        chosenZone() {
+            console.log('changing timezone')
+        },
+        chosenStatus() {
+            console.log('changing status')
+        },
+        chosenInd() {
+            console.log('changing industry')
+        },
+        getTimezones() {
+            this.$http.get('/timezones')
+            .then(res => {
+                this.timezones = res.body;
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+    },
+    mounted() {
+        this.getTimezones();
+    },
+    components: {
+        VendorLeadsourceSelect,
+        VendorStatusSelect,
+        VendorIndustrySelect,
+        NativeLanguageSelect,
+        TimezoneSelect,
+        VendorRates
+    },
+    directives: {
+        ClickOutside
+    },
+}
+</script>
+
+
+<style lang="scss" scoped>
+
+.vendor-wrap {
+    position: relative;
+}
+
+.title {
+    font-size: 22px;
+}
+.gen-info, .rates {
+    margin: 20px 10px 40px 10px;
+    padding: 20px;
+    box-shadow: 0 0 15px #67573e9d;
+    width: 860px;
+}
+.rates {
+    padding: 10px;
+    width: 860px;
+}
+.gen-info {
+    display: flex;
+    justify-content: space-between;
+    &__block {
+        width: 36%;
+        &:first-child {
+            width: 22%;
+        }
+    }
+    
+}
+.block-item {
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    label {
+        margin-bottom: 0;
+    }
+    input {
+        font-size: 14px;
+        color: #67573e;
+        border: 1px solid #67573e;
+        border-radius: 5px;
+        padding: 0 3px;
+        outline: none;
+        width: 185px;
+        height: 28px;
+    }
+    ::-webkit-input-placeholder {
+        padding: 10px 5px;
+        opacity: 0.5;
+    }
+}
+
+.dropSelect {
+    width: 191px;
+    position: relative;
+    .drop {
+        position: absolute;
+        width: 100%;
+        border: 1px solid #BFB09D;
+        max-height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        z-index: 6;
+        &__item {
+            padding: 5px 2px;
+            border-bottom: .5px solid #BFB09D;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.4s;
+            &:last-child {
+                border: none;
+            }
+            &:hover {
+                background-color: rgba(191, 176, 157, 0.5);
+            }
+        }
+        .chosen {
+            background-color: rgba(191, 176, 157, 0.5);
+        }
+    }
+    .select {
+        border: 1px solid #67573E;
+        border-radius: 5px;
+        width: 191px;
+        height: 28px;
+        display: flex;
+        justify-content: space-between;
+        overflow: hidden;
+        .selected {
+            border-right: 1px solid #BFB09D;
+            width: 84%;
+            padding: 0 5px;
+            font-size: 14px;
+            max-height: 28px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            overflow: auto;
+            position: relative;
+        }
+        .no-gender {
+            opacity: 0.5;
+        }
+        .arrowButton {
+            width: 18%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            img {
+                padding-right: 2px;
+            }
+            .reverseIcon {
+                transform: rotate(180deg);
+            }
+        }
+    }
+}
+
+.buttons {
+  width: 99%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.button {
+    margin-left: 30px;
+    width: 138px;
+    height: 33px;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    background-color: #ff876c;
+    border: 1px solid #ff876c;
+    cursor: pointer;
+    outline: none;
+}
+
+.photo-wrap {
+    width: 180px;
+    height: 157px;
+    border: 1px solid #67573E;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-file {
+    position: absolute;
+    top: -25px;
+    left: -100px;
+    height: 180px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    z-index: 5;
+}
+
+.photo-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    p {
+        font-size: 18px;
+        opacity: 0.5;
+        width: 50%;
+        text-align: center;
+    }
+}
+
+
+</style>

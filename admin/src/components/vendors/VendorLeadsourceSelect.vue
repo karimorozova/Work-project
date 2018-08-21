@@ -5,7 +5,7 @@
                 .selected
                     span {{ selectedLeadsource }}
             template(v-if="!selectedLeadsource") 
-                span.selected.no-industry Options
+                span.selected.no-lead Options
             .arrowButton(@click="showLeadsources")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
@@ -88,7 +88,7 @@ export default {
             }
         }
     }
-    .no-industry {
+    .no-lead {
         opacity: 0.5;
     }
     .arrowButton {

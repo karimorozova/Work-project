@@ -40,9 +40,13 @@ export default {
         },
         openTimezones() {
             this.timezonesDropped = !this.timezonesDropped;
+            if(!this.timezonesDropped) {
+                this.timezoneSearch = ""
+            }
         },
         outTimezones() {
             this.timezonesDropped = false;
+            this.timezoneSearch = ""
         }
     },
     computed: {
@@ -109,6 +113,9 @@ export default {
             background-color: rgba(191, 176, 157, 0.5);
         }
     }
+    .block-item & {
+        width: 193px;
+    }
 }
 
 .select {
@@ -130,6 +137,9 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .block-item & {
+            width: 82%;
+        }
     }
     .no-country {
         opacity: 0.5;
@@ -145,6 +155,12 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
+        .block-item & {
+            width: 18%;
+        }
+    }
+    .block-item & {
+        width: 193px;
     }
 }
 

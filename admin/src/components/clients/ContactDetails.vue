@@ -157,7 +157,6 @@ export default {
         ClickOutside
     },
     mounted() {
-        console.log(this.client.contacts);
         this.getCountries();
         this.getTimezones();
     }

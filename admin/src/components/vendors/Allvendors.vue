@@ -47,32 +47,44 @@
                     tr(v-for="(vendor, ind) in allVendors")  
                         td(@click="vendorDetails(ind)") 
                             span.vendorName {{ vendor.name }}
-                        td(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
-                            input.contact-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.status")
-                        td(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
+                        td.dropOption(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)")
+                            span(v-if="vendor.icons[1].active") {{ vendor.status }}
+                            .innerComponent(v-if="!vendor.icons[1].active")
+                                VendorStatusSelect(:selectedStatus="vendor.status" :parentInd="ind" @chosenStatus="changeStatus")
+                        td(@click="vendorDetails(ind)") 
                             input.langs-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.languageCombination")
-                        td(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
-                            input.langs-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.native")
+                        td.dropOption(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
+                            span(v-if="vendor.icons[1].active") {{ vendor.native }}
+                            .innerComponent(v-if="!vendor.icons[1].active")
+                                NativeLanguageSelect(:selectedLang="[vendor.native]" :parentIndex="ind" @chosenLang="changeLang")
                         td.dropOption(@click="vendorDetails(ind)")              
                             span(v-if="!vendor.industry.icon") {{ vendor.industry.name }}
                             .dropOption__image
                                 img(v-if="vendor.industry.icon" :src="vendor.industry.icon")
                                 span.titleTooltip {{ vendor.industry.name }} 
                             .innerComponent(v-if="!vendor.icons[1].active")
-                                VendorIndustrySelect(:selectedInd="industrySelected" :parentInd="ind" @chosenInd="changeIndustry")
-                        td(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
+                                VendorIndustrySelect(:selectedInd="vendor.industry" :parentInd="ind" @chosenInd="changeIndustry")
+                        td(@click="vendorDetails(ind)") 
                             input.vendorRates-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.basicRate")
-                        td(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
+                        td(@click="vendorDetails(ind)") 
                             input.vendorRates-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.tqi")                        
                         td
                             .crud-icons
                                 img(v-for="(but, i) in vendor.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
+        .vendor-data(v-if="vendorData")
+            Vendordetails(:vendor="vendor" @cancelVendor="cancelVendor")
+        .edit-error(v-if="editError")
+            p.edit-message Please, finish current editing first!
+                span.close-error(@click="closeEditError") +
 </template>
 
 <script>
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import VendorIndustrySelect from "./VendorIndustrySelect";
+import NativeLanguageSelect from "./NativeLanguageSelect";
+import Vendordetails from "./Vendordetails";
+
 export default {
     data() {
         return {
@@ -93,11 +105,14 @@ export default {
                     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
                 }
             ],
+            vendor: {},
             filterName: "",
             filterStatus: "",
             filterIndustry: {},
             filterLeadsource: "",
-            industrySelected: {}
+            currentActive: "none",
+            editError: false,
+            vendorData: false
         }
     },
     methods: {
@@ -105,10 +120,18 @@ export default {
             this.filterLeadsource = data;
         },
         chosenStatus(data) {
-            this.filterStatus = data;
+            this.filterStatus = data.status;
         },
         chosenInd(data) {
             this.filterIndustry = data.industry;
+        },
+        changeStatus(data) {
+            let vendor = this.allVendors[data.index];
+            for(let ven of this.vendors) {
+                if(vendor.name == ven.name) {
+                    ven.status = data.status
+                }
+            }
         },
         changeIndustry(data) {
             this.industrySelected = data.industry;
@@ -119,11 +142,47 @@ export default {
                 }
             }
         },
+        changeLang(data) {
+            this.langSelected = data.lang;
+            let vendor = this.allVendors[data.index];
+            for(let ven of this.vendors) {
+                if(vendor.name == ven.name) {
+                    ven.native = data.lang.lang
+                }
+            }
+        },
         vendorDetails(ind) {
-            console.log(this.allVendors[ind])
+            this.vendor = this.allVendors[ind];
+            this.vendorData = true;
+            this.filterName = "";
+            this.filterStatus = "";
+            this.filterIndustry = {};
+            this.filterLeadsource = "";
+            this.$emit('vendorDetails');
+        },
+        cancelVendor(data) {
+            this.vendor = {};
+            this.vendorData = false;
+            this.$emit('cancelVendor');
         },
         action(ind, i) {
+            if(this.currentActive != 'none' && this.currentActive != ind) {
+                this.editError = true;
+                return true;
+            }
+            if(i == 0) {
+                let vendor = this.allVendors[ind];
+                for(let ven of this.vendors) {
+                    if(vendor.name == ven.name) {
+                        ven = vendor
+                    }
+                }
+                this.allVendors[ind].icons[0].active = false;
+                this.allVendors[ind].icons[1].active = true;
+                this.currentActive = "none";
+            }
             if(i == 1) {
+                this.currentActive = ind;
                 for(let vendor of this.allVendors) {
                     vendor.icons[0].active = false;
                     vendor.icons[1].active = true;
@@ -133,16 +192,22 @@ export default {
             }
             if(i == 2) {
                 this.allVendors.splice(ind, 1);
+                this.currentActive = "none";
             }
         },
         addVendor() {
             console.log('Adding a new vendor...')
+        },
+        closeEditError() {
+            this.editError = false;
         }
     },
     components: {
         VendorLeadsourceSelect,
         VendorStatusSelect,
-        VendorIndustrySelect
+        VendorIndustrySelect,
+        NativeLanguageSelect,
+        Vendordetails
     },
     computed: {
         allVendors() {
@@ -176,6 +241,7 @@ export default {
 <style lang="scss" scoped>
 
 .vendors-wrap {
+    position: relative;
     margin-left: 20px;
     margin-top: 20px;
 }
@@ -402,6 +468,31 @@ tr {
 
 input {
     color: #67573E;
+}
+
+.edit-error {
+    font-weight: 700;
+    position: absolute;
+    padding: 10px;
+    top: 50%;
+    left: 50%;
+    margin-left: -130px;
+    border: 1px solid red;
+    width: 260px;
+    background-color: #FFF;
+    z-index: 20;
+    .edit-message {
+        position: relative;
+        font-size: 18px;
+        .close-error {
+            position: absolute;
+            top: -28px;
+            right: -4px;
+            transform: rotate(45deg);
+            font-size: 22px;
+            cursor: pointer;
+        }
+    }
 }
 
 </style>

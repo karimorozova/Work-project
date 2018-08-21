@@ -5,7 +5,7 @@
     .slider-inner
       .slider-col General Information
   .all-vendors(v-if="allVendors")
-    Allvendors
+    Allvendors(@vendorDetails="vendorDetailsShow" @cancelVendor="cancelVendor")
 </template>
 
 <script>
@@ -18,7 +18,12 @@ export default {
     }
   },
   methods: {
-   
+    vendorDetailsShow(data) {
+      this.sidebarShow = true;
+    },
+    cancelVendor(data) {
+      this.sidebarShow = false;
+    }
   },
   components: {
     Allvendors

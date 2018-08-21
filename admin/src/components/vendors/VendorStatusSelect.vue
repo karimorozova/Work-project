@@ -5,7 +5,7 @@
                 .selected
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
-                span.selected.no-industry Options
+                span.selected.no-status Options
             .arrowButton(@click="showStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
@@ -20,6 +20,9 @@ export default {
     props: {
         selectedStatus: {
             type: String
+        },
+        parentInd: {
+            type: Number
         }
     },
     data() {
@@ -37,7 +40,7 @@ export default {
             this.dropped = false;
         },
         changeStatus(index) {
-            this.$emit("chosenStatus", this.statuses[index])
+            this.$emit("chosenStatus", {status: this.statuses[index], index: this.parentInd})
         }
     },
     directives: {
@@ -69,27 +72,6 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        .industry-tooltip {
-            width: 40px;
-            max-height: 28px;
-            display: flex;
-            .toolTip {
-                position: absolute;
-                color: #ff876c;
-                font-size: 12px;
-                display: none;
-                left: 36px;
-                top: 8px;
-            }
-            &:hover {
-                .toolTip {
-                    display: inline-block;
-                }
-            }
-        }
-    }
-    .no-industry {
-        opacity: 0.5;
     }
     .arrowButton {
         width: 18%;
@@ -102,6 +84,20 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
+    }
+    .innerComponent & {
+        max-height: 24px;
+        width: 132px;
+        border: none;
+        border-radius: 0;
+        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+        .selected {
+            opacity: 1;
+            padding: 2px 5px;
+        }
+    }
+    .no-status {
+        opacity: 0.5;
     }
 }
 .dropSelect {
@@ -135,6 +131,9 @@ export default {
         .chosen {
             background-color: rgba(191, 176, 157, 0.5);
         }
+    }
+    .innerComponent & {
+        height: 100%;
     }
 }
 
