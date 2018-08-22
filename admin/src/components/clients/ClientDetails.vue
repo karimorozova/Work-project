@@ -302,6 +302,9 @@ export default {
     border: 1px solid #ff876c;
     cursor: pointer;
     outline: none;
+    .delete-approve & {
+        margin-left: 0;
+    }
 }
 
 .delete-approve {

@@ -7,7 +7,8 @@ const {
   Industries,
   Ratesduo,
   Timezones,
-  Clients
+  Clients,
+  Vendors
 } = require('../models');
 
 const {
@@ -19,7 +20,8 @@ const {
   industriesDefault,
   ratesduoDefault,
   timezonesDefault,
-  clientsDefault
+  clientsDefault,
+  vendorsDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
@@ -67,6 +69,24 @@ function clients() {
       .catch(err => {
         console.log("Something wrong with DB" + err.message)
       })
+}
+
+function vendors() {
+  return Vendors.find({})
+  .then(async vendors => {
+    if(!vendors.length) {
+      for(const vendor of vendorsDefault) {
+        await new Vendors(vendor).save().then(res => {
+          console.log(`Vendor ${vendor.firstName} saved!`)
+        }).catch(err => {
+          console.log('Cannot save vendors' + err.message)
+        })
+      }
+    }
+  })
+  .catch(err => {
+    console.log("Something wrong with DB" + err.message)
+  })
 }
 
 async function clientLangs() {
@@ -374,10 +394,11 @@ function industries() {
 
 async function checkCollections() {
   await timeZones();
-  await clients();
   await languages();
   await industries();
   await services();
+  await clients();
+  await vendors();
   await clientLangs();
   await requests();
   await projects();

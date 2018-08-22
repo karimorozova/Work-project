@@ -44,35 +44,35 @@
                                 span TQI                  
                         th
                 tbody
-                    tr(v-for="(vendor, ind) in allVendors")  
+                    tr(v-for="(vend, ind) in allVendors")  
                         td(@click="vendorDetails(ind)") 
-                            span.vendorName {{ vendor.name }}
-                        td.dropOption(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)")
-                            span(v-if="vendor.icons[1].active") {{ vendor.status }}
-                            .innerComponent(v-if="!vendor.icons[1].active")
-                                VendorStatusSelect(:selectedStatus="vendor.status" :parentInd="ind" @chosenStatus="changeStatus")
+                            span.vendorName {{ vend.firstName }} {{ vend.surname }}
+                        td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)")
+                            span(v-if="vend.icons[1].active") {{ vend.status }}
+                            .innerComponent(v-if="!vend.icons[1].active")
+                                VendorStatusSelect(:selectedStatus="vend.status" :parentInd="ind" @chosenStatus="changeStatus")
                         td(@click="vendorDetails(ind)") 
-                            input.langs-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.languageCombination")
-                        td.dropOption(:class="{editing: !vendor.icons[1].active}" @click="vendorDetails(ind)") 
-                            span(v-if="vendor.icons[1].active") {{ vendor.native }}
-                            .innerComponent(v-if="!vendor.icons[1].active")
-                                NativeLanguageSelect(:selectedLang="[vendor.native]" :parentIndex="ind" @chosenLang="changeLang")
+                            input.langs-info(type="text" :readonly="vend.icons[1].active" v-model="vend.languageCombination")
+                        td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
+                            span(v-if="vend.icons[1].active") {{ vend.native }}
+                            .innerComponent(v-if="!vend.icons[1].active")
+                                NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
                         td.dropOption(@click="vendorDetails(ind)")              
-                            span(v-if="!vendor.industry.icon") {{ vendor.industry.name }}
+                            span(v-if="!vend.industry.icon") {{ vend.industry.name }}
                             .dropOption__image
-                                img(v-if="vendor.industry.icon" :src="vendor.industry.icon")
-                                span.titleTooltip {{ vendor.industry.name }} 
-                            .innerComponent(v-if="!vendor.icons[1].active")
-                                VendorIndustrySelect(:selectedInd="vendor.industry" :parentInd="ind" @chosenInd="changeIndustry")
+                                img(v-if="vend.industry.icon" :src="vend.industry.icon")
+                                span.titleTooltip {{ vend.industry.name }} 
+                            .innerComponent(v-if="!vend.icons[1].active")
+                                VendorIndustrySelect(:selectedInd="vend.industry" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="vendorDetails(ind)") 
-                            input.vendorRates-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.basicRate")
+                            input.vendorRates-info(type="text" :readonly="vend.icons[1].active" v-model="vend.basicRate")
                         td(@click="vendorDetails(ind)") 
-                            input.vendorRates-info(type="text" :readonly="vendor.icons[1].active" v-model="vendor.tqi")                        
+                            input.vendorRates-info(type="text" :readonly="vend.icons[1].active" v-model="vend.tqi")                        
                         td
                             .crud-icons
-                                img(v-for="(but, i) in vendor.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
+                                img(v-for="(but, i) in vend.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
         .vendor-data(v-if="vendorData")
-            Vendordetails(:vendor="vendor" @cancelVendor="cancelVendor")
+            Vendordetails(:vendor="vendor" @cancelVendor="cancelVendor" @vendorDelete="vendorDelete")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +
@@ -89,21 +89,21 @@ export default {
     data() {
         return {
             vendors: [
-                {
-                    name: 'sdfsdfsd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                    basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                },
-                {
-                    name: 'bfgbfgd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                    basicRate: 0.1, tqi: "0-100", leadSource: "Website", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                },
-                {
-                    name: 'nerteberb', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                    basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                }
+                // {
+                //     name: 'sdfsdfsd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+                //     basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
+                // },
+                // {
+                //     name: 'bfgbfgd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+                //     basicRate: 0.1, tqi: "0-100", leadSource: "Website", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
+                // },
+                // {
+                //     name: 'nerteberb', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+                //     basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
+                // }
             ],
             vendor: {},
             filterName: "",
@@ -128,7 +128,7 @@ export default {
         changeStatus(data) {
             let vendor = this.allVendors[data.index];
             for(let ven of this.vendors) {
-                if(vendor.name == ven.name) {
+                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
                     ven.status = data.status
                 }
             }
@@ -137,7 +137,7 @@ export default {
             this.industrySelected = data.industry;
             let vendor = this.allVendors[data.index];
             for(let ven of this.vendors) {
-                if(vendor.name == ven.name) {
+                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
                     ven.industry = data.industry
                 }
             }
@@ -146,19 +146,31 @@ export default {
             this.langSelected = data.lang;
             let vendor = this.allVendors[data.index];
             for(let ven of this.vendors) {
-                if(vendor.name == ven.name) {
+                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
                     ven.native = data.lang.lang
                 }
             }
         },
+        vendorDelete(data) {
+            this.vendorData = false;
+            for(let ind in this.vendors) {
+                if(this.vendor.firstName == this.vendors[ind].firstName
+                    && this.vendor.surname == this.vendors[ind].surname) {
+                    this.vendors.splice(ind, 1)
+                }
+            }
+            this.vendor = {};
+        },
         vendorDetails(ind) {
-            this.vendor = this.allVendors[ind];
-            this.vendorData = true;
-            this.filterName = "";
-            this.filterStatus = "";
-            this.filterIndustry = {};
-            this.filterLeadsource = "";
-            this.$emit('vendorDetails');
+            if(this.allVendors[ind].icons[1].active) {
+                this.vendor = this.allVendors[ind];
+                this.vendorData = true;
+                this.filterName = "";
+                this.filterStatus = "";
+                this.filterIndustry = {};
+                this.filterLeadsource = "";
+                this.$emit('vendorDetails');
+            }
         },
         cancelVendor(data) {
             this.vendor = {};
@@ -173,7 +185,7 @@ export default {
             if(i == 0) {
                 let vendor = this.allVendors[ind];
                 for(let ven of this.vendors) {
-                    if(vendor.name == ven.name) {
+                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
                         ven = vendor
                     }
                 }
@@ -200,6 +212,15 @@ export default {
         },
         closeEditError() {
             this.editError = false;
+        },
+        async getVendors() {
+            this.vendors = [];
+            let result = await this.$http.get('/all-vendors');
+            for(let vendor of result.body) {
+                vendor.icons = [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
+                this.vendors.push(vendor);
+            }
         }
     },
     components: {
@@ -234,6 +255,9 @@ export default {
             }
             return result;
         }
+    },
+    mounted() {
+        this.getVendors()
     }
 }
 </script>

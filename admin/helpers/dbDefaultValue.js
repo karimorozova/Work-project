@@ -203,6 +203,12 @@ const clientsDefault = [
     }
 ];
 
+const vendorsDefault = [
+    {photo: "", firstName: "asda", surname: "gfglk", status: "Active", email: "asda@ddf.com", phone: "12345678", timezone: "(UTC-04:00) Asuncion", native: "Spanish (Spain)", gender: "Male", skype: "asdadWW", linkedin: "www.linkedin.com/asda", whatsapp: "+4343423423", basicRate: 0.1, tqi: "0-100", website: "ddd.com", companyName: "DDD Ltd", industry: {name: 'ICOs & Cryptocurrency', rate: 0,  icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}, languageCombinations: []},
+    {photo: "", firstName: "gffg", surname: "fdbdfb", status: "Active", email: "vdfvasda@bdff.com", phone: "12388968", timezone: "(UTC-04:30) Caracas", native: "English", gender: "Male", skype: "vssdvvwev", linkedin: "www.linkedin.com/fsdf", whatsapp: "+48678678576", basicRate: 0.12, tqi: "0-400", website: "bdfd.com", companyName: "TTT Ltd", industry: {name: 'Legal', rate: 0,  icon: '/static/industries/legal-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}, languageCombinations: []},
+    {photo: "", firstName: "asetert", surname: "bdbcvbe", status: "Inactive", email: "berberber@ytrtdf.com", phone: "15487678", timezone: "(UTC) Casablanca", native: "French (France)", gender: "Female", skype: "hjghjty", linkedin: "www.linkedin.com/fwefwe", whatsapp: "+97674845567", basicRate: 0.1, tqi: "0-300", website: "uuytt.com", companyName: "GTR Ltd", industry: {name: 'ICOs & Cryptocurrency', rate: 0,  icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}, languageCombinations: []}
+];
+
 const timezonesDefault = [
     "(UTC-12:00) International Date Line West",
     "(UTC-11:00) Coordinated Universal Time-11",
@@ -321,7 +327,8 @@ const defaultValue = {
     industriesDefault,
     ratesduoDefault,
     timezonesDefault,
-    clientsDefault
+    clientsDefault,
+    vendorsDefault
 };
 
 module.exports = defaultValue;

@@ -49,7 +49,7 @@ export default new Router({
           let tokenDate = new Date(tokenObject.timestamp).getTime();
           let date = new Date().getTime()
           if(tokenDate <= date) {
-            localStorage.removeItem("token")
+            localStorage.removeItem("token");
             next('/login')  
           } else {
             next()

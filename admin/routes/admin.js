@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const path = require('path');
 const HomeApi = require('../models/xtrf/home');
-const { User, Requests, Reports, Timezones, Clients } = require('../models');
+const { User, Requests, Reports, Timezones, Clients, Vendors } = require('../models');
 const { requiresLogin } = require('../utils/middleware');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
 const mongoose = require('mongoose');
@@ -60,6 +60,16 @@ router.get('/all-clients', requiresLogin, (req, res, next) => {
     })
 })
 
+router.get('/all-vendors', requiresLogin, (req, res, next) => {
+    Vendors.find()
+    .then(vendors => {
+        res.send(vendors)
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 router.get('/users', requiresLogin, (req, res, next) => {
     User.find()
     .then(users => {
@@ -84,7 +94,7 @@ router.get('/requests', requiresLogin, (req, res, next) => {
         })
 });
 
-router.get('/reps', (req, res) => {
+router.get('/reps', requiresLogin, (req, res) => {
     Reports.find()
         .then(requests => {
             res.send(requests)
@@ -94,7 +104,7 @@ router.get('/reps', (req, res) => {
         })
 });
 
-router.get('/reports-update',async (req, res) => {
+router.get('/reports-update', requiresLogin, async (req, res) => {
     const me = await updateReports();
     res.redirect("/tasks-report");
 });

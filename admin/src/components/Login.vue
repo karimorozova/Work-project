@@ -53,30 +53,26 @@ export default {
       })
       
     },
-    // sendForm() {
-    //   this.$http.post("/login", this.form).then(
-    //     response => {
-    //       document.cookie = "who=" + response.data + "; max-age=36000;"; // + "domain=.pangea.global";
-    //       this.isLogin = true;
-    //       window.location.href = "/";
-
-    //       /*
-    //       setTimeout(() => {
-    //         this.$router.push("/");
-    //       }, 1500); 
-    //       */
-    //     },
-    //     err => {
-    //       console.log("Errored : ");
-    //       console.log(err);
-    //     }
-    //   );
-    // },
+    destroySession() {
+      if(!localStorage.getItem("token")) {
+        this.$http.get('../logout')
+        .then(res => {
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      }
+    },
+    
     forget(){
       this.forgotLink = !this.forgotLink;
     } 
   },
   computed: {},
+  created() {
+    this.destroySession();
+  },
   mounted() {
     console.log(__WEBPACK__API_URL__)
   },

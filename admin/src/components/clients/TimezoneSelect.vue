@@ -82,6 +82,9 @@ export default {
             outline: none;
             border: none;
             padding: 5px 2px;
+            .block-item & {
+                width: 98%;
+            }
         }
     }
     .drop {
