@@ -89,6 +89,29 @@ function vendors() {
   })
 }
 
+async function vendorLangs() {
+  let vendors = await Vendors.find();
+  let service = await Services.find({title: "Translation"});
+  let combs = service[0].languageCombinations;
+  for(let vendor of vendors) {
+    let random = Math.round(Math.random()*50);
+    if(!vendor.languageCombinations.length) {
+      let industry = vendor.industry;
+      industry.rate = 0.04;
+      for(let i = random; i < random + 5; i++) {
+        vendor.languageCombinations.push({
+          source: combs[i].source,
+          target: combs[i].target,
+          service: service[0],
+          industry: [industry],
+          active: true
+        })
+      }
+      await Vendors.update({"_id": vendor._id}, vendor);
+    }
+  }
+}
+
 async function clientLangs() {
   let clients = await Clients.find();
   let service = await Services.find({title: "Translation"});
@@ -109,9 +132,7 @@ async function clientLangs() {
           })
         }
       await Clients.update({name: client.name}, client)
-    } else {
-      break;
-    }
+    } 
   }
 }
 
@@ -405,6 +426,7 @@ async function checkCollections() {
   await users();
   await serviceMonoLangs();
   await serviceDuoLangs();
+  vendorLangs();
 }
 
 module.exports = checkCollections();

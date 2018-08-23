@@ -278,6 +278,13 @@ export default {
     },
     vendorRates() {
       this.fullInfo = [];
+      for(let serv of this.services) {
+        if(serv.title == this.serviceSelect.title) {
+          serv.crud = true;
+        } else {
+          serv.crud = false;
+        }
+      }
       for(let comb of this.vendor.languageCombinations) {
         let industry = JSON.stringify(this.vendor.industry);
         industry = JSON.parse(industry);

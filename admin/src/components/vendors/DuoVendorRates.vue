@@ -80,7 +80,7 @@ export default {
       showValidError: false,
       validError: [],
       direction: 'duo',
-      sourceSelect: ["EN-GB"],
+      sourceSelect: ["All"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
@@ -330,22 +330,31 @@ export default {
     },
     vendorRates() {
       this.fullInfo = [];
+      for(let serv of this.services) {
+        if(serv.title == this.serviceSelect.title) {
+          serv.crud = true;
+        } else {
+          serv.crud = false;
+        }
+      }
       for(let comb of this.vendor.languageCombinations) {
-        let industry = JSON.stringify(this.vendor.industry);
-        industry = JSON.parse(industry);
-        industry.rate = comb.rate;
-        if(comb.service == this.serviceSelect.title) {
-          this.fullInfo.push({
-            title: comb.service,
-            sourceLanguage: comb.source,
-            targetLanguage: comb.target,
-            industry: [industry],
-            active: comb.active,
-            icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
-                {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-                {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-              ]
-          })
+        // let industry = JSON.stringify(this.vendor.industry);
+        // industry = JSON.parse(industry[0]);
+        // industry.rate = comb.rate;
+        if(comb.service.title == this.serviceSelect.title) {
+          for(let indus of comb.industry) {
+            this.fullInfo.push({
+              title: comb.service.title,
+              sourceLanguage: comb.source,
+              targetLanguage: comb.target,
+              industry: [indus],
+              active: comb.active,
+              icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
+                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                ]
+            })
+          }
         }
       }
     }
