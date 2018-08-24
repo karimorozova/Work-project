@@ -1,12 +1,12 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.name")
+            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
                 .selected
                     .industry-tooltip
-                        img(:src="selectedInd.icon")
-                        span.toolTip {{ selectedInd.name }}
-            template(v-if="!selectedInd.name") 
+                        img(:src="selectedInd[0].icon")
+                        span.toolTip {{ selectedInd[0].name }}
+            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
                 span.selected.no-industry Options
             .arrowButton(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
@@ -21,7 +21,7 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedInd: {
-            type: Object
+            type: Array
         },
         parentInd: {
             type: Number

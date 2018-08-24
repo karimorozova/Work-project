@@ -9,7 +9,7 @@
                         input.filter-field(type="text" placeholder="Vendor Name" v-model="filterName")
                     .filters-item
                         label Industry
-                        VendorIndustrySelect(:selectedInd="filterIndustry" @chosenInd="chosenInd")
+                        VendorIndustrySelect(:selectedInd="industryFilter" @chosenInd="chosenInd")
                     .filters-item
                         label Status
                         VendorStatusSelect(:selectedStatus="filterStatus" @chosenStatus="chosenStatus")
@@ -57,11 +57,11 @@
                             span(v-if="vend.icons[1].active") {{ vend.native }}
                             .innerComponent(v-if="!vend.icons[1].active")
                                 NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
-                        td.dropOption(@click="vendorDetails(ind)")              
-                            span(v-if="!vend.industry.icon") {{ vend.industry.name }}
+                        td.dropOption(@click="vendorDetails(ind)" v-for="indus in vend.industry" )              
+                            span(v-if="!indus.icon") {{ indus.name }}
                             .dropOption__image
-                                img(v-if="vend.industry.icon" :src="vend.industry.icon")
-                                span.titleTooltip {{ vend.industry.name }} 
+                                img(v-if="indus.icon" :src="indus.icon")
+                            //-     span.titleTooltip {{ vend.industry.name }} 
                             .innerComponent(v-if="!vend.icons[1].active")
                                 VendorIndustrySelect(:selectedInd="vend.industry" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="vendorDetails(ind)") 
@@ -108,7 +108,7 @@ export default {
             vendor: {},
             filterName: "",
             filterStatus: "",
-            filterIndustry: {},
+            industryFilter: [{name: "All"}],
             filterLeadsource: "",
             currentActive: "none",
             editError: false,
@@ -123,7 +123,7 @@ export default {
             this.filterStatus = data.status;
         },
         chosenInd(data) {
-            this.filterIndustry = data.industry;
+            this.industryFilter = [data.industry];
         },
         changeStatus(data) {
             let vendor = this.allVendors[data.index];
@@ -134,7 +134,6 @@ export default {
             }
         },
         changeIndustry(data) {
-            this.industrySelected = data.industry;
             let vendor = this.allVendors[data.index];
             for(let ven of this.vendors) {
                 if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
@@ -167,15 +166,15 @@ export default {
                 this.vendorData = true;
                 this.filterName = "";
                 this.filterStatus = "";
-                this.filterIndustry = {};
+                this.industryFilter = [{name: 'All'}];
                 this.filterLeadsource = "";
                 this.$emit('vendorDetails');
             }
         },
         cancelVendor(data) {
-            this.vendor = {};
             this.vendorData = false;
             this.$emit('cancelVendor');
+            this.vendor = {};
         },
         action(ind, i) {
             if(this.currentActive != 'none' && this.currentActive != ind) {
@@ -243,9 +242,18 @@ export default {
                     return item.status == this.filterStatus;
                 })
             }
-            if(this.filterIndustry.name) {
+            if(this.industryFilter[0].name != 'All') {
                 result = result.filter(item => {
-                    return item.industry.name == this.filterIndustry.name;
+                    let exist = false;
+                    for(let indus of item.industry) {
+                        if(indus.name == this.industryFilter[0].name) {
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if(exist) {
+                        return item
+                    }
                 })
             }
             if(this.filterLeadsource) {

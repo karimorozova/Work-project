@@ -9,6 +9,7 @@ const industryRouter = require('./industry');
 const serviceRouter = require('./service');
 const xtmRouter = require('./xtm');
 const clientsapiRouter = require('./clientsapi');
+const vendorsapiRouter = require('./vendorsapi');
 
 router.use('/', admin);
 router.use('/api', apiRouter);
@@ -18,6 +19,7 @@ router.use('/industry', industryRouter);
 router.use('/service', serviceRouter);
 router.use('/xtm', xtmRouter);
 router.use('/clientsapi', requiresLogin, clientsapiRouter);
+router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 
 
 module.exports = router;
