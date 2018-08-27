@@ -38,48 +38,6 @@ router.get('/vendors-every', (req,res) => {
     })
 })
 
-// router.post('/mailtoclient', async (req, res) => {
-//     let project = req.body;
-//     let client = await Clients.find({"_id": project.customer});
-//     clientMail(project, client[0]);
-// })
-
-// router.get('/acceptquote', async (req, res) => {
-//     let mailDate = req.query.to;
-//     let date = new Date().getTime();
-//     let expiry = date - mailDate;
-//     if(expiry > 60000) {
-//         res.send("Sorry! The link is already expired.")
-//     } else {
-//         let projectId = req.query.project;
-//         Projects.update({"_id": projectId}, {$set: {status: 'Accepted'}})
-//         .then(result => {
-//             res.send("Thank you!")
-//         })
-//         .catch(err => {
-//             console.log(err);
-//             res.send('Sorry. Acception failed! Try again later.')
-//         })
-//     }
-    
-// })
-
-// router.get('/declinequote', async (req, res) => {
-//     let mailDate = req.query.to;
-//     let date = new Date().getTime();
-//     let expiry = date - mailDate;
-//     if(expiry > 60000) {
-//         res.send("Sorry! The link is already expired.")
-//     } else {
-//         let projectId = req.query.project;
-//         let project = await Projects.find({"_id": projectId});
-//         let client = await Clients.find({"_id": project[0].customer});
-//         let user = await User.find({"username": client[0].projectManager})
-//         pmMail(project[0], client[0], user[0]);
-//         res.send("Thank you! We'll contact you if any changes.")
-//     } 
-// })
-
 router.post('/vendor-rates', async (req, res) => {
     var rate = req.body;
     let id = rate.vendor;

@@ -1,9 +1,10 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            span.selected(v-if="selectedLang.length == 1") {{ selectedLang[0] }}
+            span.selected(v-if="selectedLang.length == 1 && selectedLang[0].length") {{ selectedLang[0] }}
             .selected(v-if="selectedLang.length > 1") 
-                span(v-for="lang in selectedLang") {{ lang }}; 
+                span(v-for="lang in selectedLang") {{ lang }};
+            span.selected(v-if="!selectedLang[0].length") Options
             .arrowButton(@click="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
@@ -133,7 +134,7 @@ export default {
         border: none;
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
-        height: 100%;
+        height: 26px;
         border: 1px solid #BFB09D;
         .selected {
             opacity: 1;

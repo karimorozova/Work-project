@@ -45,25 +45,27 @@
                         th
                 tbody
                     tr(v-for="(vend, ind) in allVendors")  
-                        td(@click="vendorDetails(ind)") 
+                        td(@click="vendorDetails(ind)")
                             span.vendorName {{ vend.firstName }} {{ vend.surname }}
                         td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)")
                             span(v-if="vend.icons[1].active") {{ vend.status }}
                             .innerComponent(v-if="!vend.icons[1].active")
                                 VendorStatusSelect(:selectedStatus="vend.status" :parentInd="ind" @chosenStatus="changeStatus")
-                        td(@click="vendorDetails(ind)") 
-                            input.langs-info(type="text" :readonly="vend.icons[1].active" v-model="vend.languageCombination")
+                        td(@click="vendorDetails(ind)")
+                            .lang-combs
+                                span.langs-info(v-for="langs in vend.languageCombinations") {{ langs.source.symbol }} >> {{ langs.target.symbol }}, 
+                            //- input.langs-info(type="text" :readonly="vend.icons[1].active" v-model="vend.languageCombination")
                         td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
                             span(v-if="vend.icons[1].active") {{ vend.native }}
                             .innerComponent(v-if="!vend.icons[1].active")
                                 NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
-                        td.dropOption(@click="vendorDetails(ind)" v-for="indus in vend.industry" )              
-                            span(v-if="!indus.icon") {{ indus.name }}
+                        td.dropOption(@click="vendorDetails(ind)")              
+                            //- span(v-if="!indus.icon") {{ indus.name }}
                             .dropOption__image
-                                img(v-if="indus.icon" :src="indus.icon")
+                                img(v-for="indus in vend.industry" :src="indus.icon")
                             //-     span.titleTooltip {{ vend.industry.name }} 
                             .innerComponent(v-if="!vend.icons[1].active")
-                                VendorIndustrySelect(:selectedInd="vend.industry" :parentInd="ind" @chosenInd="changeIndustry")
+                                MultiVendorIndustrySelect(:selectedInd="industrySelected" :filteredIndustries="selectedIndNames" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="vendorDetails(ind)") 
                             input.vendorRates-info(type="text" :readonly="vend.icons[1].active" v-model="vend.basicRate")
                         td(@click="vendorDetails(ind)") 
@@ -72,18 +74,30 @@
                             .crud-icons
                                 img(v-for="(but, i) in vend.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
         .vendor-data(v-if="vendorData")
-            Vendordetails(:vendor="vendor" @cancelVendor="cancelVendor" @vendorDelete="vendorDelete")
+            Vendordetails(:vendor="vendor" 
+                @cancelVendor="cancelVendor" 
+                @vendorDelete="vendorDelete"
+                @changeLang="changeLang"
+                @changeZone="changeZone"
+                @changeStatus="changeStatus"
+                @changeInd="changeIndustry")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +
+        .delete-approve(v-if="deleteMessageShow")
+            p Are you sure you want to delete?
+            input.button.approve-block(type="button" value="Cancel" @click="cancelDelete")
+            input.button(type="button" value="Delete" @click="approveDelete(currentActive)")
 </template>
 
 <script>
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import VendorIndustrySelect from "./VendorIndustrySelect";
+import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import Vendordetails from "./Vendordetails";
+
 
 export default {
     data() {
@@ -106,13 +120,16 @@ export default {
                 // }
             ],
             vendor: {},
+            isNew: false,
             filterName: "",
             filterStatus: "",
             industryFilter: [{name: "All"}],
             filterLeadsource: "",
             currentActive: "none",
             editError: false,
-            vendorData: false
+            vendorData: false,
+            industrySelected: [],
+            deleteMessageShow: false
         }
     },
     methods: {
@@ -126,43 +143,106 @@ export default {
             this.industryFilter = [data.industry];
         },
         changeStatus(data) {
+            if(!this.vendorData) {
             let vendor = this.allVendors[data.index];
-            for(let ven of this.vendors) {
-                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
-                    ven.status = data.status
+                for(let ven of this.vendors) {
+                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
+                        ven.status = data.status
+                    }
                 }
+            } else {
+                this.vendor.status = data.status;
             }
+            
         },
         changeIndustry(data) {
-            let vendor = this.allVendors[data.index];
-            for(let ven of this.vendors) {
-                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
-                    ven.industry = data.industry
+            let exist = false;
+            for(let ind in this.industrySelected) {
+                if(this.industrySelected[ind].name == data.industry.name) {
+                    this.industrySelected.splice(ind, 1);
+                    exist = true;
                 }
+            }
+            if(!exist) {
+                this.industrySelected.push(data.industry);
+            }
+            if(!this.vendorData) {
+                let vendor = this.allVendors[data.index];
+                for(let ven of this.vendors) {
+                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname && !ven.icons[1].active) {
+                        ven.industry = this.industrySelected;
+                    }
+                }
+            } else {
+                this.vendor.industry = this.industrySelected;
             }
         },
         changeLang(data) {
             this.langSelected = data.lang;
-            let vendor = this.allVendors[data.index];
-            for(let ven of this.vendors) {
-                if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
-                    ven.native = data.lang.lang
+            if(!this.vendorData) {
+                let vendor = this.allVendors[data.index];
+                for(let ven of this.vendors) {
+                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
+                        ven.native = data.lang.lang
+                    }
                 }
+            } else {
+                this.vendor.native = data.lang.lang;
             }
         },
-        vendorDelete(data) {
+        changeZone(data) {
+            if(!this.vendorData) {
+                let vendor = this.allVendors[data.index];
+                for(let ven of this.vendors) {
+                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
+                        ven.timezone = data.zone
+                    }
+                }
+            } else {
+                this.vendor.timezone = data.zone;
+            }
+        },
+        async vendorDelete(data) {
             this.vendorData = false;
+            let id = this.vendor._id;
             for(let ind in this.vendors) {
                 if(this.vendor.firstName == this.vendors[ind].firstName
                     && this.vendor.surname == this.vendors[ind].surname) {
                     this.vendors.splice(ind, 1)
                 }
             }
+            await this.venDel(id);
+            this.$emit('cancelVendor');
             this.vendor = {};
         },
+        async approveDelete(ind) {
+            let vendorDel = this.allVendors.splice(ind, 1);
+            let id = vendorDel[0]._id;
+            this.currentActive = "none";
+            await this.venDel(id);
+            this.deleteMessageShow = false;
+        },
+        venDel(id) {
+            this.$http.post("../vendorsapi/deletevendor", {"id": id})
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        cancelDelete() {
+            this.deleteMessageShow = false;
+        }, 
         vendorDetails(ind) {
-            if(this.allVendors[ind].icons[1].active) {
-                this.vendor = this.allVendors[ind];
+            if(this.currentActive != "none") {
+                if(this.currentActive != ind) {
+                    this.editError = true;
+                }
+            } else {
+                this.isNew = false;
+                this.vendor = JSON.stringify(this.allVendors[ind]);
+                this.vendor = JSON.parse(this.vendor);
                 this.vendorData = true;
                 this.filterName = "";
                 this.filterStatus = "";
@@ -191,6 +271,23 @@ export default {
                 this.allVendors[ind].icons[0].active = false;
                 this.allVendors[ind].icons[1].active = true;
                 this.currentActive = "none";
+                if(vendor._id) {
+                    this.$http.post('../vendorsapi/update-vendor', vendor)
+                    .then(res => {
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+                } else {
+                    this.$http.post('../vendorsapi/new-vendor', vendor)
+                    .then(res => {
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+                }
             }
             if(i == 1) {
                 this.currentActive = ind;
@@ -200,14 +297,49 @@ export default {
                 }
                 this.allVendors[ind].icons[0].active = true;
                 this.allVendors[ind].icons[1].active = false;
+                this.industrySelected = this.allVendors[ind].industry;
             }
             if(i == 2) {
-                this.allVendors.splice(ind, 1);
-                this.currentActive = "none";
+                this.currentActive = ind;
+                this.deleteMessageShow = true;
             }
         },
         addVendor() {
-            console.log('Adding a new vendor...')
+            if(this.currentActive != "none") {
+                this.editError = true;
+            } else {
+                this.vendor = {
+                    basicRate: "",
+                    companyName: "",
+                    email: "",
+                    firstName: "",
+                    surname: "",
+                    gender: "",
+                    linkedin: "",
+                    native: "",
+                    phone: "",
+                    photo: "",
+                    skype: "",
+                    status: "",
+                    timezone: "",
+                    tqi: "",
+                    website: "",
+                    whatsapp: "",
+                    languageCombinations: [],
+                    industry: [],
+                    icons: [{name: 'save', active: false, icon: require('../../assets/images/Other/save-icon-qa-form.png')},
+                            {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                            {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
+                        ]
+                }
+                this.isNew = true;
+                this.vendorData = true;
+                this.filterName = "";
+                this.filterStatus = "";
+                this.industryFilter = [{name: 'All'}];
+                this.filterLeadsource = "";
+                this.$emit('vendorDetails');
+            }
         },
         closeEditError() {
             this.editError = false;
@@ -226,6 +358,7 @@ export default {
         VendorLeadsourceSelect,
         VendorStatusSelect,
         VendorIndustrySelect,
+        MultiVendorIndustrySelect,
         NativeLanguageSelect,
         Vendordetails
     },
@@ -260,6 +393,22 @@ export default {
                 result = result.filter(item => {
                     return item.leadSource == this.filterLeadsource;
                 })
+            }
+            return result;
+        },
+        selectedIndNames() {
+            let result = [];
+            for(let ind of this.industrySelected) {
+                result.push(ind.name);
+            }
+            return result;
+        },
+        oldNew() {
+            let result = false;
+            if(this.vendorData) {
+                if(this.isNew) {
+                    result = true
+                }
             }
             return result;
         }
@@ -393,6 +542,12 @@ td {
         color: #67573E;
     }
 }
+
+.lang-combs {
+    max-height: 26px;
+    overflow: auto;
+}
+
 .dropOption {
   position: relative;
   .innerComponent {
@@ -405,8 +560,10 @@ td {
     z-index: 5;
   }
   &__image {
+    display: flex;
+    align-items: center;
     max-height: 21px;
-    width: 30px;
+    // width: 30px;
     .titleTooltip {
       position: absolute;
       display: none;
@@ -525,6 +682,44 @@ input {
             cursor: pointer;
         }
     }
+}
+
+.delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 10%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px #67573E;
+    background-color: #FFF;
+    z-index: 20;
+    p {
+        font-size: 21px;
+        width: 50%;
+        text-align: center;
+    }
+    .approve-block {
+        margin-bottom: 15px;
+    }
+}
+
+.button {
+    width: 138px;
+    height: 33px;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+    background-color: #ff876c;
+    border: 1px solid #ff876c;
+    cursor: pointer;
+    outline: none;
 }
 
 </style>

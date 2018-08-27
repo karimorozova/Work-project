@@ -86,7 +86,6 @@ export default {
         }
     }
     .innerComponent & {
-        max-height: 24px;
         width: 132px;
         border: none;
         border-radius: 0;

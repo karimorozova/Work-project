@@ -70,7 +70,7 @@
                         VendorStatusSelect(:selectedStatus="vendor.status" @chosenStatus="chosenStatus")
                     .block-item
                         label Industries:
-                        VendorIndustrySelect(:selectedInd="vendor.industry" @chosenInd="chosenInd")
+                        MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             .title Rates    
             .rates
                 VendorRates(:vendor="vendor")
@@ -84,7 +84,7 @@
 import ClickOutside from "vue-click-outside";
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
-import VendorIndustrySelect from "./VendorIndustrySelect";
+import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import VendorRates from "./VendorRates";
@@ -138,17 +138,17 @@ export default {
         outGenders() {
             this.genderDropped = false;
         },
-        changeLang() {
-            this.$emit('changeLang', )
+        changeLang(data) {
+            this.$emit('changeLang', {lang: data.lang})
         },
-        chosenZone() {
-            console.log('changing timezone')
+        chosenZone(data) {
+            this.$emit('changeZone', {zone: data})
         },
-        chosenStatus() {
-            console.log('changing status')
+        chosenStatus(data) {
+            this.$emit('changeStatus', {status: data.status})
         },
-        chosenInd() {
-            console.log('changing industry')
+        chosenInd(data) {
+            this.$emit('changeInd', {industry: data.industry})
         },
         getTimezones() {
             this.$http.get('/timezones')
@@ -163,10 +163,21 @@ export default {
     mounted() {
         this.getTimezones();
     },
+    computed: {
+        selectedIndNames() {
+            let result = [];
+            if(this.vendor.industry.length) {
+                for(let ind of this.vendor.industry) {
+                    result.push(ind.name);
+                }
+            }
+            return result;
+        },
+    },
     components: {
         VendorLeadsourceSelect,
         VendorStatusSelect,
-        VendorIndustrySelect,
+        MultiVendorIndustrySelect,
         NativeLanguageSelect,
         TimezoneSelect,
         VendorRates
@@ -335,6 +346,10 @@ export default {
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
+    .photo-image {
+        max-width: 100%;
+        max-width: 100%;
+    }
 }
 
 .photo-file {
