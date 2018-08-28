@@ -22,7 +22,7 @@
           th(v-for="head in tableHeader") {{ head.title }}
       tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
+          tr(v-for="indus in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -223,9 +223,10 @@ export default {
       }
       if(iconIndex == 0) {
         this.validError = [];
+        let regex = /^[0-9.]+$/;
         if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
         if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
-        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+        if(!regex.test(this.changedRate)) this.validError.push("Please set the correct rate value!");
         if(this.validError.length) {
           this.showValidError = true;
           this.changedRate = this.fullInfo[index].industry[0].rate;
@@ -242,6 +243,7 @@ export default {
         this.fullInfo[index].vendor = this.vendor._id;
         this.$http.post('vendorsapi/vendor-rates', this.fullInfo[index])
         .then(res => {
+          this.$emit('ratesUpdate')
           console.log(res)
         })
         .catch(err => {
@@ -270,8 +272,17 @@ export default {
 
       if(iconIndex == 2) {
         let deletedRate = this.fullInfo.splice(index, 1)[0];
-        this.fullInfo.splice(index, 1);
         this.currentActive = "none";
+        deletedRate.form = "Duo";
+        deletedRate.vendor = this.vendor._id;
+        this.$http.post('vendorsapi/delete-duorate', deletedRate)
+        .then(res => {
+          this.$emit('ratesUpdate')
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        });
       }
     },
     addNewRow() {
@@ -279,10 +290,10 @@ export default {
       this.targetSelect = ["All"];
       this.industryFilter = [{name: "All"}];
       this.fullInfo.push({
-        title: this.serviceSelect.title,
-        sourceLanguage: {lang: "English"}, 
+        service: this.serviceSelect,
+        sourceLanguage: {lang: ""}, 
         targetLanguage: {lang: ""}, 
-        industry: [{name: "All", rate: 0}], 
+        industry: [{name: "All", rate: "-"}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       });
@@ -338,13 +349,10 @@ export default {
         }
       }
       for(let comb of this.vendor.languageCombinations) {
-        // let industry = JSON.stringify(this.vendor.industry);
-        // industry = JSON.parse(industry[0]);
-        // industry.rate = comb.rate;
         if(comb.service.title == this.serviceSelect.title) {
           for(let indus of comb.industry) {
             this.fullInfo.push({
-              title: comb.service.title,
+              service: comb.service,
               sourceLanguage: comb.source,
               targetLanguage: comb.target,
               industry: [indus],

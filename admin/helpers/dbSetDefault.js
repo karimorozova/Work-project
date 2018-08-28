@@ -95,7 +95,7 @@ async function vendorLangs() {
   let combs = service[0].languageCombinations;
   for(let vendor of vendors) {
     let random = Math.round(Math.random()*50);
-    if(!vendor.languageCombinations.length) {
+    if(!vendor.languageCombinations.length && !vendor._id) {
       let industries = JSON.stringify(vendor.industry);
       industries = JSON.parse(industries);
       for(let industry of industries) {

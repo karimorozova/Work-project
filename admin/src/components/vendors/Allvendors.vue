@@ -75,12 +75,18 @@
                                 img(v-for="(but, i) in vend.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
         .vendor-data(v-if="vendorData")
             Vendordetails(:vendor="vendor" 
+                :newVendorId="newVendorId"
                 @cancelVendor="cancelVendor" 
                 @vendorDelete="vendorDelete"
                 @changeLang="changeLang"
                 @changeZone="changeZone"
                 @changeStatus="changeStatus"
-                @changeInd="changeIndustry")
+                @changeInd="changeIndustry"
+                @saveVendor="saveVendor"
+                @ratesUpdate="ratesUpdate"
+                )
+            .save-success(v-if="saveSuccess")
+                p Information saved
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +
@@ -102,23 +108,7 @@ import Vendordetails from "./Vendordetails";
 export default {
     data() {
         return {
-            vendors: [
-                // {
-                //     name: 'sdfsdfsd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                //     basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                // },
-                // {
-                //     name: 'bfgbfgd', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                //     basicRate: 0.1, tqi: "0-100", leadSource: "Website", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                // },
-                // {
-                //     name: 'nerteberb', status: "Active", languageCombination: "EN-GB >> ES", native: "Spanish", industry: {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-                //     basicRate: 0.1, tqi: "0-100", leadSource: "Internet", icons: [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                //     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                // }
-            ],
+            vendors: [],
             vendor: {},
             isNew: false,
             filterName: "",
@@ -129,7 +119,8 @@ export default {
             editError: false,
             vendorData: false,
             industrySelected: [],
-            deleteMessageShow: false
+            deleteMessageShow: false,
+            saveSuccess: false
         }
     },
     methods: {
@@ -156,25 +147,34 @@ export default {
             
         },
         changeIndustry(data) {
-            let exist = false;
-            for(let ind in this.industrySelected) {
-                if(this.industrySelected[ind].name == data.industry.name) {
-                    this.industrySelected.splice(ind, 1);
-                    exist = true;
-                }
-            }
-            if(!exist) {
-                this.industrySelected.push(data.industry);
-            }
             if(!this.vendorData) {
+                let exist = false;
+                for(let ind in this.industrySelected) {
+                    if(this.industrySelected[ind].name == data.industry.name) {
+                        this.industrySelected.splice(ind, 1);
+                        exist = true;
+                    }
+                }
+                if(!exist) {
+                    this.industrySelected.push(data.industry);
+                }
                 let vendor = this.allVendors[data.index];
                 for(let ven of this.vendors) {
-                    if(vendor.firstName == ven.firstName && vendor.surname == ven.surname && !ven.icons[1].active) {
+                    if(vendor._id == ven._id && !ven.icons[1].active) {
                         ven.industry = this.industrySelected;
                     }
                 }
             } else {
-                this.vendor.industry = this.industrySelected;
+                let exist = false;
+                for(let ind in this.vendor.industry) {
+                    if(this.vendor.industry[ind].name == data.industry.name) {
+                        this.vendor.industry.splice(ind, 1);
+                        exist = true;
+                    }
+                }
+                if(!exist) {
+                    this.vendor.industry.push(data.industry);
+                }
             }
         },
         changeLang(data) {
@@ -200,6 +200,49 @@ export default {
                 }
             } else {
                 this.vendor.timezone = data.zone;
+            }
+        },
+        async ratesUpdate(data) {
+            await this.getVendors();
+            for(let ven of this.allVendors) {
+                if(ven._id == this.vendor._id) {
+                    this.vendor = ven;
+                }
+            }
+        },
+        saveVendor(data) {
+            if(this.isNew) {
+                this.$http.post("../vendorsapi/new-vendor", this.vendor)
+                .then(async res => {
+                    this.saveSuccess = true;
+                    setTimeout(() => {
+                        this.saveSuccess = false;
+                    }, 2000);
+                    let id = res.data._id;
+                    await this.getVendors();
+                    for(let ven of this.allVendors) {
+                        if(ven._id == id) {
+                            this.vendor = ven;
+                        }
+                    }
+                    this.isNew = false;
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            } else {
+                this.$http.post("../vendorsapi/update-vendor", this.vendor)
+                .then(res => {
+                    console.log(res);
+                    this.saveSuccess = true;
+                    setTimeout(() => {
+                        this.saveSuccess = false;
+                    }, 2000);
+                    this.getVendors();
+                })
+                .catch(err => {
+                    console.log(err)
+                })
             }
         },
         async vendorDelete(data) {
@@ -657,6 +700,21 @@ tr {
 
 input {
     color: #67573E;
+}
+
+.save-success {
+    position: absolute;
+    width: 270px;
+    height: 50px;
+    padding: 10px;
+    top: 50%;
+    left: 50%;
+    margin-left: -135px;
+    background-color: #DFF0D8;
+    color: #41763D;
+    font-weight: 600;
+    border: 1px solid #41763D;
+    border-radius: 5px;
 }
 
 .edit-error {

@@ -13,7 +13,7 @@
                 span Duo
                 img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
-                DuoVendorRates(:vendor="vendor" @updateClients="updateClients")
+                DuoVendorRates(:vendor="vendor" @updateClients="updateClients" @ratesUpdate="ratesUpdate")
 </template>
 
 <script>
@@ -41,6 +41,9 @@ export default {
         },
         updateClients(data) {
             this.$emit('updateClients')
+        },
+        ratesUpdate(data) {
+            this.$emit("ratesUpdate")
         }
     },
     components: {

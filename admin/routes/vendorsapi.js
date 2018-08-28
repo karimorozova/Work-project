@@ -28,13 +28,36 @@ router.get('/vendor', (req, res) => {
         })
 })
 
-router.get('/vendors-every', (req,res) => {
-    Vendors.find()
-    .then(vendors => {
-        res.send(vendors)
+router.post('/delete-duorate', async (req,res) => {
+    var rate = req.body;
+    let id = rate.vendor;
+    let vendor = await Vendors.find({"_id": id});
+    let allZero = [];
+    for(let i = 0; i < vendor[0].languageCombinations.length; i++) {
+        let comb = vendor[0].languageCombinations[i];
+        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
+            comb.target.lang == rate.targetLanguage.lang) {
+            for(let ind of comb.industry) {
+                for(let indus of rate.industry) {
+                    if(ind.name == indus.name) {
+                        ind.rate = 0;
+                    }
+                }
+                allZero.push(ind.rate);
+            }
+            let sum = allZero.reduce( (x,y) => x + y);
+            if(!sum) {
+                vendor[0].languageCombinations.splice(i, 1);
+                break;
+            }
+        }
+    }
+    Vendors.updateOne({"_id": id}, {$set: {languageCombinations: vendor[0].languageCombinations}})
+      .then(result => {
+        res.send('rate deleted')
     })
-    .catch(err => {
-        console.log(err)
+      .catch(err => {
+        console.log(err);
     })
 })
 
@@ -43,26 +66,36 @@ router.post('/vendor-rates', async (req, res) => {
     let id = rate.vendor;
     let vendor = await Vendors.find({"_id": id});
     for(let indus of rate.industry) {
-        for(let ind of vendor[0].industries) {
-            if(ind.name == indus.name) {
-                ind.rate == indus.rate;
+        for(let ind of vendor[0].industry) {
+            if(ind.name == indus.name || indus.name == "All") {
+                ind.rate = indus.rate;
             }
         }
     }
+    let industries = JSON.stringify(vendor[0].industry);
+    industries = JSON.parse(industries);
     let exist = false;
-    for(let comb of vendor[0].languageCombinations) {
-      if(comb.service == rate.title && comb.source.lang == rate.sourceLanguage.lang &&
-        comb.target.lang == rate.targetLanguage.lang) {
-          comb.rate = rate.industry[0].rate;
-          exist = true;
-      }
+    if(vendor[0].languageCombinations.length) {
+        for(let comb of vendor[0].languageCombinations) {
+            if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
+                comb.target.lang == rate.targetLanguage.lang) {
+                for(let ind of comb.industry) {
+                    for(let indus of rate.industry) {
+                        if(ind.name == indus.name || indus.name == "All") {
+                            comb.industry = industries;
+                        }
+                    }
+                }
+                exist = true;
+            }
+        }
     }
-    if(!exist) {
+    if(!exist || !vendor[0].languageCombinations.length) {
         vendor[0].languageCombinations.push({
             source: rate.sourceLanguage,
             target: rate.targetLanguage,
-            service: rate.title,
-            rate: rate.industry[0].rate,
+            service: rate.service,
+            industry: industries,
             active: true
         })
     }
@@ -79,7 +112,7 @@ router.post('/new-vendor', async (req, res) => {
     let vendor = req.body;
     Vendors.create(vendor)
     .then(result => {
-        res.send('New vendor saved')
+        res.send(result)
     })
     .catch(err => {
         console.log(err)

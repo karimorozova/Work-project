@@ -73,11 +73,11 @@
                         MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             .title Rates    
             .rates
-                VendorRates(:vendor="vendor")
+                VendorRates(:vendor="vendor" @ratesUpdate="ratesUpdate")
             .delete-approve(v-if="approveShow")
                 p Are you sure you want to delete?
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-                input.button(type="button" value="Delete" @click="approveVendorDelete")  
+                input.button(type="button" value="Delete" @click="approveVendorDelete")
 </template>
 
 <script>
@@ -123,7 +123,10 @@ export default {
             }
         },
         updateVendor() {
-            console.log('updating vendor');
+            this.$emit('saveVendor');
+        },
+        ratesUpdate(data) {
+            this.$emit('ratesUpdate');
         },
         cancel() {
             this.$emit('cancelVendor')
@@ -148,7 +151,7 @@ export default {
             this.$emit('changeStatus', {status: data.status})
         },
         chosenInd(data) {
-            this.$emit('changeInd', {industry: data.industry})
+            this.$emit('changeInd', {industry: data.industry, filter: this.selectedIndNames})
         },
         getTimezones() {
             this.$http.get('/timezones')
@@ -204,10 +207,7 @@ export default {
     box-shadow: 0 0 15px #67573e9d;
     width: 860px;
 }
-.rates {
-    padding: 10px;
-    width: 860px;
-}
+
 .gen-info {
     display: flex;
     justify-content: space-between;
@@ -348,7 +348,7 @@ export default {
     margin-bottom: 20px;
     .photo-image {
         max-width: 100%;
-        max-width: 100%;
+        max-height: 100%;
     }
 }
 
