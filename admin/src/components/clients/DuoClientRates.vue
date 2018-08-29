@@ -14,7 +14,7 @@
       label Service
       ServiceDuoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ" :direction="direction")
   .addButton
-    input(type="button" value="Add several languages")           
+    input(type="button" value="Add several languages" @click="addSevLangs")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
@@ -100,6 +100,9 @@ export default {
   },
 
   methods: {
+    addSevLangs() {
+      this.$emit('addSevLangs')
+    },
     closeEditionMessage() {
       this.editing = false
     },

@@ -16,6 +16,32 @@ const fileType = require('file-type');
 const http = require('http');
 const writeFile = require('write');
 
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './dist/uploads/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+});
+
+var upload = multer({
+    storage: storage
+});
+
+
+function moveFile(oldFile, vendorId) {
+
+var newFile = './dist/static/vendors/' + vendorId + '/' + oldFile.filename;
+
+mv(oldFile.path, newFile, {
+        mkdirp: true
+    }, function (err) {
+});
+
+return oldFile.filename;
+}
+
 router.get('/vendor', (req, res) => {
     let id = req.query.id;
     Vendors.find({"_id": id})
@@ -108,26 +134,35 @@ router.post('/vendor-rates', async (req, res) => {
     })
 })
 
-router.post('/new-vendor', async (req, res) => {
-    let vendor = req.body;
-    Vendors.create(vendor)
-    .then(result => {
-        res.send(result)
-    })
-    .catch(err => {
-        console.log(err)
-    })
+router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {
+    let vendor = JSON.parse(req.body.vendor);
+    const photoFile = req.files["photo"];
+    let saveVendor = await Vendors.create(vendor);
+    let id = saveVendor.id;
+    if(photoFile) {
+        moveFile(photoFile[0], id)
+        vendor.photo = `/static/vendors/${id}/${photoFile[0].filename}`;
+    }
+    let updateVendor = await Vendors.update({"_id": id}, vendor);
+    res.send({id: id})
+    // Vendors.create(vendor)
+    // .then(result => {
+    //     res.send(result)
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    // })
 })
 
-router.post('/update-vendor', async (req, res) => {
-    let vendor = req.body;
-    Vendors.update({"_id": vendor._id}, vendor)
-    .then(result => {
-        res.send('Vendor updated')
-    })
-    .catch(err => {
-        console.log(err)
-    })
+router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {
+    let vendor = JSON.parse(req.body.vendor);
+    const photoFile = req.files["photo"];
+    if(photoFile) {
+        moveFile(photoFile[0], vendor._id);
+        vendor.photo = `/static/vendors/${vendor._id}/${photoFile[0].filename}`;
+    }
+    let saveVendor = await Vendors.update({"_id": vendor._id}, vendor);
+    res.send('Vendor info updated')
 })
 
 router.post('/deletevendor', async (req, res) => {

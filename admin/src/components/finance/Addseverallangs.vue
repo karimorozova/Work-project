@@ -1,5 +1,5 @@
 <template lang="pug">
-.addSeveral-wrap
+.addSeveral-wrap(v-click-outside="closeSeveral")
     .add-several
         .add-several__language
             .title
@@ -66,6 +66,9 @@ export default {
         toBack() {
             console.log('Start adding combinations...');
             this.$emit('toBack');
+        },
+        closeSeveral() {
+            this.$emit('closeSeveral')
         },
         toChosenSource() {
             for(let lang of this.source.all) {
@@ -156,7 +159,7 @@ export default {
             }
         },
         changeIndustry(data) {
-            if(this.selectedInd[0].name == 'All') {
+            if(this.selectedInd[0].name == 'Select' || this.selectedInd[0].name == 'All') {
                 this.selectedInd.splice(0, 1, data.industry)
             } else {
                 let hasIndustry = false;

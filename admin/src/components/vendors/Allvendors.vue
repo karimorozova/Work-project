@@ -84,9 +84,11 @@
                 @changeInd="changeIndustry"
                 @saveVendor="saveVendor"
                 @ratesUpdate="ratesUpdate"
+                @addSevLangs="addSevLangs"
                 )
             .save-success(v-if="saveSuccess")
                 p Information saved
+        Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +
@@ -97,12 +99,14 @@
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import VendorIndustrySelect from "./VendorIndustrySelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import Vendordetails from "./Vendordetails";
+import Addseverallangs from "../finance/Addseverallangs";
 
 
 export default {
@@ -120,10 +124,17 @@ export default {
             vendorData: false,
             industrySelected: [],
             deleteMessageShow: false,
-            saveSuccess: false
+            saveSuccess: false,
+            addSeveral: false
         }
     },
     methods: {
+        addSevLangs(data) {
+            this.addSeveral = true;
+        },
+        closeSevLangs(data) {
+            this.addSeveral = false
+        },
         chosenLeadsource(data) {
             this.filterLeadsource = data;
         },
@@ -212,13 +223,16 @@ export default {
         },
         saveVendor(data) {
             if(this.isNew) {
-                this.$http.post("../vendorsapi/new-vendor", this.vendor)
+                let sendData = new FormData();
+                sendData.append('vendor', JSON.stringify(this.vendor));
+                sendData.append('photo', data.file);
+                this.$http.post("../vendorsapi/new-vendor", sendData)
                 .then(async res => {
                     this.saveSuccess = true;
                     setTimeout(() => {
                         this.saveSuccess = false;
                     }, 2000);
-                    let id = res.data._id;
+                    let id = res.data.id;
                     await this.getVendors();
                     for(let ven of this.allVendors) {
                         if(ven._id == id) {
@@ -231,7 +245,10 @@ export default {
                     console.log(err)
                 })
             } else {
-                this.$http.post("../vendorsapi/update-vendor", this.vendor)
+                let sendData = new FormData();
+                sendData.append('vendor', JSON.stringify(this.vendor));
+                sendData.append('photo', data.file)
+                this.$http.post("../vendorsapi/update-vendor", sendData)
                 .then(res => {
                     console.log(res);
                     this.saveSuccess = true;
@@ -315,7 +332,9 @@ export default {
                 this.allVendors[ind].icons[1].active = true;
                 this.currentActive = "none";
                 if(vendor._id) {
-                    this.$http.post('../vendorsapi/update-vendor', vendor)
+                    let sendData = new FormData();
+                    sendData.append('vendor', JSON.stringify(vendor));
+                    this.$http.post('../vendorsapi/update-vendor', sendData)
                     .then(res => {
                         console.log(res);
                     })
@@ -323,7 +342,9 @@ export default {
                         console.log(err)
                     })
                 } else {
-                    this.$http.post('../vendorsapi/new-vendor', vendor)
+                    let sendData = new FormData();
+                    sendData.append('vendor', JSON.stringify(vendor));
+                    this.$http.post('../vendorsapi/new-vendor', sendData)
                     .then(res => {
                         console.log(res);
                     })
@@ -403,7 +424,8 @@ export default {
         VendorIndustrySelect,
         MultiVendorIndustrySelect,
         NativeLanguageSelect,
-        Vendordetails
+        Vendordetails,
+        Addseverallangs
     },
     computed: {
         allVendors() {
@@ -458,6 +480,9 @@ export default {
     },
     mounted() {
         this.getVendors()
+    },
+    directives: {
+        ClickOutside
     }
 }
 </script>

@@ -48,7 +48,7 @@
                 ContactsInfo(:client="client" @contactDetails="contactDetails" @newContact="addNewContact")
             .title Rates    
             .rates
-                ClientRates(:client="client")
+                ClientRates(:client="client" @addSevLangs="addSevLangs")
             .title Sales Information
             .sales
                 ClientSalesInfo(:client="client" @deleteContact="approveDelete")
@@ -100,6 +100,9 @@ export default {
         }
     },
     methods: {
+        addSevLangs(data) {
+            this.$emit('addSevLangs')
+        },
         cancel() {
             this.$emit('cancel')
         },

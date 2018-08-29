@@ -13,7 +13,10 @@
                 span Duo
                 img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
-                DuoVendorRates(:vendor="vendor" @updateClients="updateClients" @ratesUpdate="ratesUpdate")
+                DuoVendorRates(:vendor="vendor" 
+                    @updateClients="updateClients" 
+                    @ratesUpdate="ratesUpdate"
+                    @addSevLangs="addSevLangs")
 </template>
 
 <script>
@@ -33,6 +36,9 @@ export default {
         }
     },
     methods: {
+        addSevLangs(data) {
+            this.$emit('addSevLangs')
+        },
         openMono() {
             this.monoDrop = !this.monoDrop;
         },

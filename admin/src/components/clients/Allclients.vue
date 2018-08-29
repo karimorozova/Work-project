@@ -71,7 +71,9 @@
                 @chosenStatus="changeStatus"
                 @chosenAccManager="changeAccManager"
                 @chosenSalesManager="changeSalesManager"
-                @chosenProjManager="changeProjManager")
+                @chosenProjManager="changeProjManager"
+                @addSevLangs="addSevLangs")
+        Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
 </template>
 
 <script>
@@ -79,6 +81,7 @@ import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import ClientDetails from '../clients/ClientDetails';
+import Addseverallangs from "../finance/Addseverallangs";
 
 import { bus } from "../../main";
 
@@ -93,10 +96,18 @@ export default {
             filterStatus: "",
             filterIndustry: {},
             filterLeadsource: "",
-            industrySelected: {}
+            industrySelected: {},
+            addSeveral: false
         }
     },
     methods: {
+        addSevLangs(data) {
+            console.log('several')
+            this.addSeveral = true
+        },
+        closeSevLangs(data) {
+            this.addSeveral = false
+        },
         changeInd(data) {
             this.client.industry = data;
         },
@@ -284,7 +295,8 @@ export default {
         ClientIndustrySelect,
         ClientStatusSelect,
         ClientLeadsourceSelect,
-        ClientDetails
+        ClientDetails,
+        Addseverallangs
     },
     created() {
 
@@ -300,6 +312,7 @@ export default {
 .all-clients {
     margin-top: 20px;
     margin-left: 20px;
+    position: relative;
 }
 
 .title {

@@ -8,11 +8,14 @@
             .title General Information
             .gen-info
                 .gen-info__block
-                    .photo-wrap
+                    .photo-wrap(v-if="!vendor.photo")
                         input.photo-file(type="file" @change="previewPhoto")
                         .photo-text(v-if="!imageExist")
                             p upload your photo                          
                         img.photo-image(v-if="imageExist")
+                    .photo-wrap(v-if="vendor.photo")
+                        input.photo-file(type="file" @change="previewPhoto")                       
+                        img.photo-image(:src="vendor.photo")
                     label.job-title Job title
                 .gen-info__block
                     .block-item
@@ -73,7 +76,9 @@
                         MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             .title Rates    
             .rates
-                VendorRates(:vendor="vendor" @ratesUpdate="ratesUpdate")
+                VendorRates(:vendor="vendor" 
+                    @ratesUpdate="ratesUpdate"
+                    @addSevLangs="addSevLangs")
             .delete-approve(v-if="approveShow")
                 p Are you sure you want to delete?
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
@@ -101,10 +106,14 @@ export default {
             imageExist: false,
             timezones: [],
             genderDropped: false,
-            approveShow: false
+            approveShow: false,
+            photoFile: []
         }
     },
     methods: {
+        addSevLangs(data) {
+            this.$emit('addSevLangs')
+        },
         deleteVendor() {
             this.approveShow = true;
         },
@@ -114,6 +123,7 @@ export default {
         previewPhoto() {
             let input = document.getElementsByClassName('photo-file')[0];
             if(input.files && input.files[0]) {
+                this.photoFile = input.files;
                 this.imageExist = true;
                 let reader = new FileReader();
                 reader.onload = (e) => {
@@ -123,7 +133,7 @@ export default {
             }
         },
         updateVendor() {
-            this.$emit('saveVendor');
+            this.$emit('saveVendor', {file: this.photoFile[0]});
         },
         ratesUpdate(data) {
             this.$emit('ratesUpdate');

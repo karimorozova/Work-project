@@ -22,7 +22,7 @@
               img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
               RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
-      Addseverallangs(v-if="addSeveral")
+      Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
 </template>
 
 <script>
@@ -50,6 +50,9 @@ export default {
     addSevLangs(data) {
       this.addSeveral = true;
       this.fullInfo = data;
+    },
+    closeSevLangs(data) {
+      this.addSeveral = false;
     },
     openMono() {
       this.monoDrop = !this.monoDrop;
