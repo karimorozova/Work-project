@@ -4,60 +4,216 @@
         .add-several__language
             .title
                 span Source language
-            .list
+            .languages
+                .list
+                    .list__item(v-for="(language, i) in source.all" @click="sourceTo(i)" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
-                    img(src="../../assets/images/right.png")
+                    img(src="../../assets/images/right.png" @click="toChosenSource")
                 .arrows__left
-                    img(src="../../assets/images/left.png")
-            .list
+                    img(src="../../assets/images/left.png" @click="toAllSource") 
+            .languages
+                .list
+                    .list__item(v-for="(language, i) in source.chosen" @click="sourceBack(i)" :class="{chosen: language.check}") {{ language.lang }}
         .add-several__language
             .title
-                span Target language
-            .list
+                span.title-target Target language
+            .languages
+                .list
+                    .list__item(v-for="(language, i) in target.all" @click="targetTo(i)" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
-                    img(src="../../assets/images/right.png")
+                    img(src="../../assets/images/right.png" @click="toChosenTarget")
                 .arrows__left
-                    img(src="../../assets/images/left.png")
-            .list
-        .add-several__service-industry
-            .title.service-title
-                span Service 
-            .dropSelect(v-click-outside="outClick")
-                .select
-                    span.selected.no-industry Options
-                    .arrowButton
-                        img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
-                .drop(v-if="dropped")
-                    .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
-                        span {{ status }}
-            .title
+                    img(src="../../assets/images/left.png" @click="toAllTarget")
+            .languages    
+                .list
+                    .list__item(v-for="(language, i) in target.chosen" @click="targetBack(i)" :class="{chosen: language.check}") {{ language.lang }}
+        .add-several__service-industry                 
+            .services
+                span.services__title Service
+                .services__innerComponent
+                    ServiceDuoSelect(:selectedServ="selectedServ")
+            .industries
                 span Industry
-            .dropSelect(v-click-outside="outClick")
-                .select
-                    span.selected.no-industry Options
-                    .arrowButton
-                        img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
-                .drop(v-if="dropped")
-                    .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
-                        span {{ status }}
+                .industries__innerComponent
+                    IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry")
         .add-several__service-rates
         .submit-button
             input.submit-button__button(type="submit" @submit.prevent="toBack" value="Submit")
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
+import ServiceDuoSelect from "../ServiceDuoSelect";
+import IndustrySelect from "../IndustrySelect";
+
 export default {
     data() {
         return {
-
+            languages: [],
+            source: {
+                all: [], chosen: []
+            },
+            target: {
+                all: [], chosen: []
+            },
+            selectedInd: [{name: 'Select'}],
+            selectedServ: {title: 'Select'},
         }
     },
     methods: {
         toBack() {
+            console.log('Start adding combinations...');
             this.$emit('toBack');
+        },
+        toChosenSource() {
+            for(let lang of this.source.all) {
+                if(lang.check) {
+                    this.source.chosen.push(lang)
+                }
+            }
+            this.source.all = this.source.all.filter(item => {
+                return !item.check;
+            })
+            this.source.chosen.forEach(item => {
+                item.check = false
+            })
+            this.source.chosen.sort((a, b) => {
+                if(a.lang < b.lang) return -1;
+                if(a.lang > b.lang) return 1;
+            })
+        },
+        toAllSource() {
+            for(let lang of this.source.chosen) {
+                if(lang.check) {
+                    this.source.all.push(lang)
+                }
+            }
+            this.source.chosen = this.source.chosen.filter(item => {
+                return !item.check;
+            })
+            this.source.all.forEach(item => {
+                item.check = false
+            })
+            this.source.all.sort((a, b) => {
+                if(a.lang < b.lang) return -1;
+                if(a.lang > b.lang) return 1;
+            })
+        },
+        toChosenTarget() {
+            for(let lang of this.target.all) {
+                if(lang.check) {
+                    this.target.chosen.push(lang)
+                }
+            }
+            this.target.all = this.target.all.filter(item => {
+                return !item.check;
+            })
+            this.target.chosen.forEach(item => {
+                item.check = false
+            })
+            this.target.chosen.sort((a, b) => {
+                if(a.lang < b.lang) return -1;
+                if(a.lang > b.lang) return 1;
+            })
+        },
+        toAllTarget() {
+            for(let lang of this.target.chosen) {
+                if(lang.check) {
+                    this.target.all.push(lang)
+                }
+            }
+            this.target.chosen = this.target.chosen.filter(item => {
+                return !item.check;
+            })
+            this.target.all.forEach(item => {
+                item.check = false
+            })
+            this.target.all.sort((a, b) => {
+                if(a.lang < b.lang) return -1;
+                if(a.lang > b.lang) return 1;
+            })
+        },
+        sourceTo(i) {
+            if(this.source.all.length) {
+                this.source.all[i].check = !this.source.all[i].check;
+            }
+        },
+        sourceBack(i) {
+            if(this.source.chosen.length) {
+                this.source.chosen[i].check = !this.source.chosen[i].check;
+            }
+        },
+        targetTo(i) {
+            if(this.target.all.length) {
+                this.target.all[i].check = !this.target.all[i].check;
+            }
+        },
+        targetBack(i) {
+            if(this.target.chosen.length) {
+                this.target.chosen[i].check = !this.target.chosen[i].check;
+            }
+        },
+        changeIndustry(data) {
+            if(this.selectedInd[0].name == 'All') {
+                this.selectedInd.splice(0, 1, data.industry)
+            } else {
+                let hasIndustry = false;
+                for(let i in this.selectedInd) {
+                if(this.selectedInd[i].name == data.industry.name) {
+                    this.selectedInd.splice(i, 1);
+                    hasIndustry = true;
+                }
+                }
+                if(!hasIndustry) {
+                this.selectedInd.push(data.industry);
+                }
+            }
+            if(!this.selectedInd.length || data.industry.name == 'All') {
+                this.selectedInd = [];
+                this.selectedInd.push({
+                crud: true,
+                name: 'All'
+                })
+            }
+        },
+        getLanguages() {
+            this.$http.get('../api/languages')
+            .then(res => {
+                this.languages = res.data.sort( (a, b) => {
+                    if(a.lang < b.lang) return -1;
+                    if(a.lang > b.lang) return 1;
+                });
+                for(let lang of this.languages) {
+                    lang.check = false;
+                }
+                let langs = JSON.stringify(this.languages);
+                this.source.all = JSON.parse(langs);
+                this.target.all = JSON.parse(langs);
+            })
         }
+    },
+    computed: {
+        checkedIndustries() {
+            let result = [];
+            if(this.selectedInd.length) {
+                for(let elem of this.selectedInd) {
+                    result.push(elem.name);
+                }
+            }
+            return result;
+        }
+    },
+    components: {
+        ServiceDuoSelect,
+        IndustrySelect
+    },
+    directives: {
+        ClickOutside
+    },
+    mounted() {
+        this.getLanguages();
     }
 }
 </script>
@@ -74,6 +230,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 14px;
 }
 
 .add-several {
@@ -86,26 +243,82 @@ export default {
     border-radius: 3px;
     background-color: #FFF;
     width: 690px;
-    &__language, &__service-industry {
+    &__language {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 30px;
-        .service-title {
-            width: 100px;
-            margin-right: 18px;
-            display: flex;
-            justify-content: center;
-        }
+    }
+    &__service-industry {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
     }
 }
 
-.list {
+.title-target {
+    padding-right: 3px; 
+}
+
+.services, .industries {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    margin-bottom: 30px;
+    &__innerComponent {
+        width: 192px;
+        margin-left: 20px;
+    }
+}
+
+.services {
+    justify-content: space-between;
+    &__title {
+        margin-left: 40px;
+    }
+}
+
+.industries {
+    justify-content: flex-end;
+}
+
+.languages {
     height: 187px;
     width: 191px;
     border: 1px solid #67573E;
     border-radius: 10px;
+    overflow: hidden;
+}
+
+.list {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 5px 0;
+    &__item {
+        font-size: 14px;
+        padding: 3px 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        &:hover {
+            background-color: #DFD7CD;
+        }
+    }
+    .chosen {
+        background-color: #DFD7CD;
+    }
+    // ::-webkit-scrollbar {
+    //     width: 16px;
+    // }
+    // ::-webkit-scrollbar-thumb {
+    //     background-color: #67573E;
+    //     border: 4px solid transparent;
+    //     border-radius: 15px;
+    //     background-clip: content-box;
+    // }
 }
 
 .arrows {
@@ -117,6 +330,10 @@ export default {
     &__left, &__right {
         img {
             cursor: pointer;
+            border-radius: 50%;
+            &:active {
+                background-color: #DFD7CD;
+            }
         }
     }
 }
@@ -132,7 +349,7 @@ export default {
     &__button {
         background-color: #ff876c;
         color: white;
-        font-size: 18px;
+        font-size: 16px;
         width: 164px;
         height: 40px;
         display: flex;

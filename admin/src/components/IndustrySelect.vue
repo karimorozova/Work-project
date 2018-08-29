@@ -1,11 +1,11 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
+            template(v-if="selectedInd.length && selectedInd[0].name != 'All' && selectedInd[0].name != 'Select'")
                 .selected
                     img(v-for="name in selectedInd" :src="name.icon") 
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All'") 
-                span.selected All
+            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' || selectedInd[0].name == 'Select'") 
+                span.selected {{ selectedInd[0].name }}
             .arrowButton(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
