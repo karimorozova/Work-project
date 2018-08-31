@@ -19,7 +19,7 @@
                 .icon(:class="{reverse: customerDrop}")
                   i.fa.fa-caret-down
                 .customer-search(v-if="customerDrop")
-                  input.searchField(type="text" placeholder="Search" v-model="searchCustomer" :value="searchCustomer")
+                  input.searchField(type="text" placeholder="Search" v-model="searchCustomer")
               .menu-drop(v-if="customerDrop")
                 .menu-drop__list(v-for="(customer, index) in customers")
                   span.list-item(@click="chooseCustomer(index)") {{ customer.name }}

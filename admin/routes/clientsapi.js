@@ -5,6 +5,7 @@ const FormData = require('form-data');
 const unirest = require('unirest');
 const querystring = require('querystring');
 const fs = require('fs');
+const fse = require('fs-extra');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { clientMail } = require('../utils/mailtoclients');
@@ -15,6 +16,45 @@ const reqq = require('request');
 const fileType = require('file-type');
 const http = require('http');
 const writeFile = require('write');
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './dist/uploads/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+});
+
+var upload = multer({
+    storage: storage,
+    limits: {fieldSize: 25 * 1024 * 1024}
+});
+
+
+function movePhoto(oldFile, clientId, contact) {
+
+var newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
+
+mv(oldFile.path, newFile, {
+        mkdirp: true
+    }, function (err) {
+});
+
+return oldFile.filename;
+}
+
+function moveNdaCont(oldFile, clientId, ndaCont) {
+
+var newFile = './dist/clientsDocs/' + clientId + `/${ndaCont}/` + oldFile.filename;
+
+mv(oldFile.path, newFile, {
+        mkdirp: true
+    }, function (err) {
+});
+
+return oldFile.filename;
+}
 
 router.get('/client', (req, res) => {
     let id = req.query.id;
@@ -110,32 +150,96 @@ router.post('/client-rates', async (req, res) => {
     })
 })
 
-router.post('/new-client', async (req, res) => {
-    let client = req.body;
-    Clients.create(client)
+// router.post('/new-client', upload.any(), async (req, res) => {
+//     let client = JSON.parse(req.body.client);
+//     let result = await Clients.create(client);
+//     console.log(result.id);
+// })
+
+router.post('/update-client', upload.any(), async (req, res) => {
+    let client = JSON.parse(req.body.client);
+    let clientId;
+    if(!client._id) {
+        let result = await Clients.create(client);
+        clientId = result.id;
+    } else {
+        clientId = client._id;
+    }
+    const contacts = client.contacts;
+    const photoFiles = req.files.filter(item =>{
+        return item.fieldname == 'photos'
+    });
+
+    if(photoFiles.length) {
+        for(let photo of photoFiles) {
+            for(let contact of contacts) {
+                if(contact.file && photo.filename == contact.file) {
+                    if(contact.photo) {
+                        fs.unlink('./dist' + contact.photo, (err) => {
+                            console.log(err)
+                        })
+                    }
+                    movePhoto(photo, clientId, contact);
+                    contact.photo = `/clientsDocs/${clientId}/contacts/${contact.name}-${contact.surname}${photo.filename}`;
+                    contact.file = null;
+                }
+            }
+        }
+        client.contacts = contacts;
+    }
+
+    let contract = req.files.find(item => {
+        return item.fieldname == 'contract'
+    })
+    if(contract) {
+        if(client.contract) {
+            fs.unlink('./dist' + client.contract, (err) => {
+                console.log(err)
+            })
+        }
+        moveNdaCont(contract, clientId, "contract");
+        client.contract = '/clientsDocs/' + clientId + '/contract/' + contract.filename;
+    }
+
+    let nda = req.files.find(item => {
+        return item.fieldname == 'nda'
+    })
+    if(nda) {
+        if(client.nda) {
+            fs.unlink('./dist' + client.nda, (err) => {
+                console.log(err)
+            })
+        }
+        moveNdaCont(nda, clientId, "nda");
+        client.nda = '/clientsDocs/' + clientId + '/nda/' + nda.filename;
+    }
+
+    Clients.update({"_id": clientId}, client)
     .then(result => {
-        res.send('New client saved')
+        res.send({id: clientId})
     })
     .catch(err => {
         console.log(err)
     })
 })
 
-router.post('/update-client', async (req, res) => {
-    let client = req.body;
-    Clients.update({"_id": client._id}, client)
-    .then(result => {
-        res.send('Client updated')
-    })
-    .catch(err => {
-        console.log(err)
-    })
+router.get('/get-contract', async (req, res) => {
+    let path = req.query.path;
+    res.send(`http://localhost:3001${path}`);
+})
+
+router.get('/get-nda', async (req, res) => {
+    let path = req.query.path;
+    res.send(`http://localhost:3001${path}`);
 })
 
 router.post('/deleteclient', async (req, res) => {
+    fse.remove('./dist/clientsDocs/' + req.body.id, (err) => {
+        console.log(err)
+    })
     Clients.deleteOne({"_id": req.body.id})
     .then(result => {
-        console.log(result)
+        console.log(result);
         res.send('Deleted')
     })
     .catch(err => {

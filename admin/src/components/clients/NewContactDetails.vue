@@ -8,11 +8,14 @@
                 input.button(type="button" value="Delete" @click="deleteContact")
         .details
             .details__item
-                .photo-wrap
+                .photo-wrap(v-if="!contact.photo")
                     input.photo-file(type="file" @change="previewPhoto")
                     .photo-text(v-if="!imageExist")
                         p upload your photo                          
-                    img.photo-image(v-if="imageExist")    
+                    img.photo-image(v-if="imageExist")
+                .photo-wrap(v-if="contact.photo")
+                    input.photo-file(type="file" @change="previewPhoto")                       
+                    img.photo-image(:src="contact.photo")    
                 .names-gender
                     .names-gender__item
                         label Name:
@@ -72,6 +75,9 @@ export default {
     props: {
         client: {
             type: Object
+        },
+        ind: {
+            type: Number
         }
     },
     data() {
@@ -99,13 +105,16 @@ export default {
             timezones: [],
             imageExist: false,
             genderDropped: false,
-            approveShow: false
+            approveShow: false,
+            photoFile: []
         }
     },
     methods: {
         previewPhoto() {
             let input = document.getElementsByClassName('photo-file')[0];
             if(input.files && input.files[0]) {
+                this.contact.file = input.files[0].name;
+                this.photoFile = input.files;
                 this.imageExist = true;
                 let reader = new FileReader();
                 reader.onload = (e) => {
@@ -138,7 +147,7 @@ export default {
             this.contact.timezone = data;
         },
         contactSave() {
-            this.$emit('contactSave', this.contact)
+            this.$emit('contactSave', {contact: this.contact, file: this.photoFile[0], ind: this.ind})
         },
         getCountries() {
             this.$http.get('https://restcountries.eu/rest/v2/all')
@@ -238,6 +247,12 @@ export default {
             border: 1px solid #67573E;
             position: relative;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            .photo-image {
+                max-height: 100%;
+                max-width: 100%;
+            }
         }
     }
 }

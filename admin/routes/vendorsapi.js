@@ -26,13 +26,14 @@ var storage = multer.diskStorage({
 });
 
 var upload = multer({
-    storage: storage
+    storage: storage,
+    limits: {fieldSize: 25 * 1024 * 1024}
 });
 
 
 function moveFile(oldFile, vendorId) {
 
-var newFile = './dist/static/vendors/' + vendorId + '/' + oldFile.filename;
+var newFile = './dist/vendorsDocs/' + vendorId + '/' + oldFile.filename;
 
 mv(oldFile.path, newFile, {
         mkdirp: true
@@ -141,17 +142,10 @@ router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) 
     let id = saveVendor.id;
     if(photoFile) {
         moveFile(photoFile[0], id)
-        vendor.photo = `/static/vendors/${id}/${photoFile[0].filename}`;
+        vendor.photo = `/vendorsDocs/${id}/${photoFile[0].filename}`;
     }
     let updateVendor = await Vendors.update({"_id": id}, vendor);
     res.send({id: id})
-    // Vendors.create(vendor)
-    // .then(result => {
-    //     res.send(result)
-    // })
-    // .catch(err => {
-    //     console.log(err)
-    // })
 })
 
 router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {
@@ -159,7 +153,7 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
     const photoFile = req.files["photo"];
     if(photoFile) {
         moveFile(photoFile[0], vendor._id);
-        vendor.photo = `/static/vendors/${vendor._id}/${photoFile[0].filename}`;
+        vendor.photo = `/vendorsDocs/${vendor._id}/${photoFile[0].filename}`;
     }
     let saveVendor = await Vendors.update({"_id": vendor._id}, vendor);
     res.send('Vendor info updated')

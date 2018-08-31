@@ -25,15 +25,15 @@
                         label Contract:
                         .contract
                             .contract__upload
-                                input.upload(type="file")
+                                input.upload(type="file" @change="contractLoad")
                             .contract__download
-                                img(src="../../assets/images/Other/Download-icon.png")
+                                img(v-if="client.contract" src="../../assets/images/Other/Download-icon.png" @click="contractDownload")
                         label NDA:
-                        .contract
-                            .contract__upload
-                                input.upload(type="file")
-                            .contract__download
-                                img(src="../../assets/images/Other/Download-icon.png")
+                        .nda
+                            .nda__upload
+                                input.upload(type="file" @change="ndaLoad")
+                            .nda__download
+                                img(v-if="client.nda" src="../../assets/images/Other/Download-icon.png" @click="ndaDownload")
                     .block-item
                         label Account Manager:
                         AMSelect(:selectedManager="client.accountManager" @chosenManager="chosenAccManager")
@@ -66,7 +66,11 @@
                 @approveDelete="approveDelete"
                 :client="client"
                 :ind="contactInd")
-            NewContactDetails(v-if="newContact" :client="client" @contactSave="contactSave")           
+            NewContactDetails(v-if="newContact" 
+                :client="client" 
+                :ind="client.contacts.length" 
+                @contactSave="contactSave"
+                @cancel="contactCancel")           
 </template>
 
 <script>
@@ -96,10 +100,50 @@ export default {
             clientShow: true,
             contactShow: false,
             contactInd: 0,
-            newContact: false
+            newContact: false,
+            contractFile: [],
+            ndaFile: [],
+            contactsPhotos: []
         }
     },
     methods: {
+        contractLoad(e) {
+            if(e.target.files && e.target.files[0]) {
+                this.contractFile = e.target.files;
+            }
+            console.log(this.contractFile);
+        },
+        ndaLoad(e) {
+            if(e.target.files && e.target.files[0]) {
+                this.ndaFile = e.target.files;
+            }
+            console.log(this.ndaFile);
+        },
+        contractDownload() {
+            this.$http.get(`../clientsapi/get-contract?path=${this.client.contract}`)
+            .then(res => {
+                console.log(res.data);
+                let file = res.data;
+                let link = document.createElement('a');
+                link.href = file;
+                link.click();
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        ndaDownload() {
+            this.$http.get(`../clientsapi/get-nda?path=${this.client.nda}`)
+            .then(res => {
+                let file = res.data;
+                let link = document.createElement('a');
+                link.href = file;
+                link.click();
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
         addSevLangs(data) {
             this.$emit('addSevLangs')
         },
@@ -109,7 +153,7 @@ export default {
         contactCancel(data) {
             this.clientShow = true;
             this.contactShow = false;
-            this.$emit('contactCancel');
+            this.$emit('contactCancel', {id: this.client._id});
         },
         deleteContact() {
             this.approveShow = true;
@@ -149,25 +193,26 @@ export default {
             this.newContact = true;
         },
         updateClient() {
-            if(!this.newClient) {
-                this.$http.post('clientsapi/update-client', this.client)
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-                this.$emit('refreshClients');
-            } else {
-                this.$http.post('clientsapi/new-client', this.client)
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-                this.$emit('refreshClients');
+            let sendData = new FormData();
+            sendData.append('client', JSON.stringify(this.client));
+            // sendData.append('ind', data.ind);
+            for(let i = 0; i < this.contactsPhotos.length; i++) {
+                sendData.append('photos', this.contactsPhotos[i]);
             }
+            for(let i = 0; i < this.contractFile.length; i++) {
+                sendData.append('contract', this.contractFile[i]);
+            }
+            for(let i = 0; i < this.ndaFile.length; i++) {
+                sendData.append('nda', this.ndaFile[i]);
+            }
+            this.$http.post('clientsapi/update-client', sendData)
+            .then(res => {
+                console.log(res);
+                this.$emit('refreshClients', {clientId: res.data.id});
+            })
+            .catch(err => {
+                console.log(err)
+            })            
         },
         approveClientDelete() {
             if(this.newClient) {
@@ -177,12 +222,14 @@ export default {
             }
         },
         contactUpdate(data) {
-            this.updateClient();
+            this.contactsPhotos.push(data.file);
+            // this.updateClient(data);
             this.clientShow = true;
             this.contactShow = false;
         },
         contactSave(data) {
-            this.$emit('newContact', {contact: data});
+            this.contactsPhotos.push(data.file);
+            this.$emit('newContact', {contact: data.contact});
             this.clientShow = true;
             this.contactShow = false;
         }
@@ -251,7 +298,7 @@ export default {
         opacity: 0.5;
     }
 }
-.contract {
+.contract, .nda {
     display: flex;
     align-items: center;
     width: 22%;

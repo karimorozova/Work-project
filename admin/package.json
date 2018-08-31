@@ -21,6 +21,7 @@
     "file-saver": "^1.3.8",
     "file-type": "^8.0.0",
     "form-data": "^2.3.2",
+    "fs-extra": "^7.0.0",
     "html-entities": "^1.2.1",
     "html-word-count": "^2.0.0",
     "moment": "^2.21.0",

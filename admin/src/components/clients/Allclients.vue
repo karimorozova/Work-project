@@ -129,7 +129,9 @@ export default {
             this.$emit('clientCancel');
         },
         contactCancel(data) {
-            this.refreshClients();
+            // if(!this.newClient) {
+            //     this.refreshClients();
+            // }
         },
         clientDetails(ind) {
             if(this.allClients[ind].icons[0].active) {
@@ -156,7 +158,7 @@ export default {
                 email: "",
                 vat: "",
                 address: "",
-                languageCombinations: "",
+                languageCombinations: [],
                 industry: {},
                 contacts: []
             };
@@ -222,34 +224,24 @@ export default {
             let id = data._id;
             this.$http.post('clientsapi/deleteclient', {id: id})
             .then(res => {
-                console.log('deleted')
+                console.log('deleted');
             })
             .catch(err => {
                 console.log(err)
             })
             this.clientData = false;
             this.getclients();
+            this.$emit('clientCancel');
         },
         async refreshClients(data) {
             let result = await this.getclients();
-            if(!this.newClient) {
-                let id = this.client._id;
-                this.client = '';
+            if(data && data.clientId) {
                 this.client = this.clients.find(item => {
-                    if(item._id == id) {
-                        return item
-                    }
-                })
-            } else {
-                let email = this.client.email;
-                this.client = '';
-                this.client = this.clients.find(item => {
-                    if(item.email == email) {
+                    if(item._id == data.clientId) {
                         return item
                     }
                 })
             }
-            
         },
         async getclients() {
             this.clients = [];
