@@ -9,6 +9,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
+const { vendorMail } = require('../utils/mailtovendor');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
@@ -53,6 +54,15 @@ router.get('/vendor', (req, res) => {
         .catch(err => {
             console.log(err)
         })
+})
+
+router.post('/mailtovendors', async (req, res) => {
+    let vendors = req.body;
+    for(let vend of vendors) {
+        let vendor = await Vendors.find({"_id": vend._id});
+        let sent = await vendorMail(vendor[0]);    
+    }
+    res.send('All messages were sent')
 })
 
 router.post('/delete-duorate', async (req,res) => {

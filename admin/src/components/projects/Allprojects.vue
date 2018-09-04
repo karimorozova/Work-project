@@ -19,7 +19,7 @@
                     td
                         .buttons
                             button.metrics(:disabled="project.jobs[0].wordcount != ''" @click="estimate(ind)" :class="{disabled: project.jobs[0].wordcount}") Get metrics and cost
-                            button.mail(:disabled="project.status != 'Open'" @click="sendMail(ind)" :class="{disabled: project.status != 'Open'}") Send mail
+                            button.mail(:disabled="project.status != 'Open'" @click="sendMail(ind)" :class="{disabled: project.status != 'Open'}") Send e-mail
         table.jobsTable(v-if="jobsShow")
             thead
                 tr
@@ -36,10 +36,11 @@
                         span {{ job.cost }} 
                             span(v-if="job.cost") &euro;
         .vendors-select
-            label Vendors
+            label.vendors-select__title Vendors
             Vendorselect(:selectedVendors="selectedVendors"
                 :filteredVendors="filteredVendors"
                 @changeVend="changeVend")
+            button.mail(@click="vendorsMail") Send e-mail(s)
 </template>
 
 <script>
@@ -129,8 +130,10 @@ export default {
             this.jobs = project.jobs;
         },
         async sendMail(ind) {
-            console.log(this.allProjects[ind].customer);
             let result = await this.$http.post('../clientsapi/mailtoclient', this.allProjects[ind]);
+        },
+        async vendorsMail() {
+            let result = await this.$http.post('../vendorsapi/mailtovendors', JSON.stringify(this.selectedVendors));
         },
         async edit(i) {
             let jobId = this.project.jobs[i].id;
@@ -205,6 +208,18 @@ export default {
     }
 }
 
+.vendors-select {
+    display: flex;
+    align-items: center;
+    &__title {
+        margin-bottom: 0;
+        margin-right: 10px;
+    }
+    .mail {
+        margin-left: 10px;
+    }
+}
+
 .buttons {
     display: flex;
     align-items: center;
@@ -222,7 +237,7 @@ export default {
 }
 
 .mail {
-    width: 100px;
+    width: 110px;
     padding: 3px;
     color: #FFF;
     background-color: green;

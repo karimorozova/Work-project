@@ -20,9 +20,8 @@ const ProjectsSchema = new mongoose.Schema({
     default: Date.now
   },
   date: {
-    type: String,
-    default: '',
-    trim: true
+    type: Date,
+    default: Date.now
   },
   industry: {
     type: String,

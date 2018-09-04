@@ -246,11 +246,26 @@ function requests() {
 }
 
 function projects() {
-  Projects.find({})
-    .then(projects => {
+  return Projects.find({})
+    .then( async (projects) => {
       if (!projects.length) {
         for (const proj of projectsDefault) {
-          new Projects(proj).save()
+          var languages = await Languages.find({});
+          var customer = await Clients.find({});
+          proj.customer = customer[0]._id;
+          for(let lang of languages) {
+            var language = JSON.stringify(lang);
+            if(lang.lang == proj.sourceLanguage.lang) {
+              proj.sourceLanguage = JSON.parse(language);
+            }
+            for(let ind in proj.targetLanguages) {
+              if(lang.lang == proj.targetLanguages[ind].lang) {
+                proj.targetLanguages[ind] = JSON.parse(language);
+                console.log(proj.targetLanguages[ind]);
+              }
+            }
+          }
+          await new Projects(proj).save()
             .then((res) => {
               //console.log(`Project: with name ${proj.projectId} was save!`)
             })
@@ -258,12 +273,16 @@ function projects() {
               console.log(`Project: with id ${proj.projectId} wasn't save. Because of ${err.message}`)
             });
         }
-
       }
     })
     .catch(err => {
       console.log(err)
     })
+}
+
+async function projectFill() {
+  let languages = await Languages.find({});
+
 }
 
 function users() {
@@ -430,6 +449,7 @@ async function checkCollections() {
   await serviceDuoLangs();
   await clientLangs();
   await vendorLangs();
+  await projectFill();
 }
 
 module.exports = checkCollections();
