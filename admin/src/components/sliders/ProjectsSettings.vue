@@ -22,8 +22,12 @@ export default {
   methods: {
     
   },
+  computed: {
+    
+  },
   components: {
-    Allprojects
+    Allprojects,
+    
   }
 };
 </script>

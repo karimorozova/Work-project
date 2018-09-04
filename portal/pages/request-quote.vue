@@ -40,7 +40,7 @@
                 .wrapper(v-on:click.self='showSourceLang')
                 .icon(:class="{ reverse: sourceDrop }")
                   i.fas.fa-caret-down
-              .source__drop(v-if='sourceDrop')
+              .source__drop(v-if='sourceDrop' :style="{'max-height': maxSourceHeight + 'px'}")
                 .source__drop-list(v-for='language in sourceLangsArray')
                   .pair(@click='changeSourceSelect(language)')
                     //- img(:src="'/flags/' + language.symbol + '.png'")
@@ -61,7 +61,7 @@
                 .wrapper(v-on:click.self='showTargetLang')
                 .icon(:class="{ reverse: targetDrop }")
                   i.fas.fa-caret-down
-              .target__drop(v-if='targetDrop')
+              .target__drop(v-if='targetDrop' :style="{'max-height': maxTargetHeight + 'px'}")
                 .target__drop-list(v-for='language in targetLangsArray')
                   .pair(@click='changeTargetSelect(language)')
                     //- img(:src="'/flags/' + language.symbol  + '.png'")
@@ -837,6 +837,20 @@ export default {
       }
       
       return this.languages;
+    },
+    maxSourceHeight() {
+      let height = 465;
+      if(this.sourceLangsArray.length < 45) {
+        height = 250;
+      }
+      return height;
+    },
+    maxTargetHeight() {
+      let height = 465;
+      if(this.targetLangsArray.length < 45) {
+        height = 258;
+      }
+      return height;
     },
     sourceLangsArray() {
       let result = this.languages;

@@ -423,13 +423,13 @@ async function checkCollections() {
   await services();
   await clients();
   await vendors();
-  await clientLangs();
   await requests();
   await projects();
   await users();
   await serviceMonoLangs();
   await serviceDuoLangs();
-  vendorLangs();
+  await clientLangs();
+  await vendorLangs();
 }
 
 module.exports = checkCollections();

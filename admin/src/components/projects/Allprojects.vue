@@ -35,20 +35,44 @@
                     td 
                         span {{ job.cost }} 
                             span(v-if="job.cost") &euro;
+        .vendors-select
+            label Vendors
+            Vendorselect(:selectedVendors="selectedVendors"
+                :filteredVendors="filteredVendors"
+                @changeVend="changeVend")
 </template>
 
 <script>
 import moment from "moment";
+import Vendorselect from './Vendorselect';
 
 export default {
     data() {
         return {
             projects: [],
             jobs: [],
-            jobsShow: false
+            jobsShow: false,
+            selectedVendors: [{name: 'All'}],
         }
     },
     methods: {
+        changeVend(data) {
+            if(this.selectedVendors[0].name == 'All') {
+                this.selectedVendors = [];
+                this.selectedVendors.push(data.vendor);
+            } else {
+                if(this.filteredVendors.indexOf(data.vendor._id) != -1) {
+                    this.selectedVendors = this.selectedVendors.filter(item => {
+                        return item._id != data.vendor._id
+                    })
+                } else {
+                    this.selectedVendors.push(data.vendor);                    
+                }
+            }
+            if(!this.selectedVendors.length) {
+                this.selectedVendors = [{name: "All"}]
+            }
+        },
         async getProjects() {
             let projectsArray = await this.$http.get('../api/allprojects');
             this.projects = projectsArray.body;
@@ -143,10 +167,24 @@ export default {
                 result = moment(this.project.date).format('DD-MM-YYYY');
             }
             return result;
+        },
+        filteredVendors() {
+            let result = [];
+            if(this.selectedVendors[0].name == 'All') {
+                result = ["All"]
+            } else {
+                for(let ven of this.selectedVendors) {
+                    result.push(ven._id)
+                }
+            }
+            return result;
         }
     },
     mounted() {
         this.getProjects();
+    },
+    components: {
+        Vendorselect
     }
 }
 </script>
