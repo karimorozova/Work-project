@@ -35,12 +35,14 @@
                     td 
                         span {{ job.cost }} 
                             span(v-if="job.cost") &euro;
-        .vendors-select
+        .vendors-select(v-if="jobsShow")
             label.vendors-select__title Vendors
             Vendorselect(:selectedVendors="selectedVendors"
                 :filteredVendors="filteredVendors"
                 @changeVend="changeVend")
             button.mail(@click="vendorsMail") Send e-mail(s)
+        .hide-jobs(v-if="jobsShow")
+            button.hide-jobs__but(@click="hideJobs") Hide jobs
 </template>
 
 <script>
@@ -57,6 +59,9 @@ export default {
         }
     },
     methods: {
+        hideJobs() {
+            this.jobsShow = false;
+        },
         changeVend(data) {
             if(this.selectedVendors[0].name == 'All') {
                 this.selectedVendors = [];
@@ -136,11 +141,11 @@ export default {
             let result = await this.$http.post('../vendorsapi/mailtovendors', JSON.stringify(this.selectedVendors));
         },
         async edit(i) {
-            let jobId = this.project.jobs[i].id;
-            this.$axios.$get(`../xtm/editor?jobId=${jobId}`)
+            let jobId = this.jobs[i].id;
+            this.$http.get(`../xtm/editor?jobId=${jobId}`)
             .then(res => {
                 let link = document.createElement('a');
-                link.href = res;
+                link.href = res.data;
                 link.target = '_blank';
                 link.click();
             })
@@ -247,6 +252,26 @@ export default {
 .disabled {
     opacity: 0.4;
     cursor: default;
+}
+
+.hide-jobs {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    &__but {
+        width: 110px;
+        padding: 3px;
+        color: white;
+        background-color: #F5876E;
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px #67573E;
+        &:active {
+            box-shadow: 0 0 5px #67573E;
+        }
+    }
 }
 
 </style>
