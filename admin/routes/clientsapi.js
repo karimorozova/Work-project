@@ -82,6 +82,8 @@ router.post('/mailtoclient', async (req, res) => {
     let project = req.body;
     let client = await Clients.find({"_id": project.customer});
     clientMail(project, client[0]);
+    console.log('email to client');
+    res.send('An email to Cilent sent!')
 })
 
 router.get('/acceptquote', async (req, res) => {
@@ -89,16 +91,19 @@ router.get('/acceptquote', async (req, res) => {
     let date = new Date().getTime();
     let expiry = date - mailDate;
     if(expiry > 60000) {
-        res.send("Sorry! The link is already expired.")
+        res.set('Content-Type', 'text/html');
+        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
     } else {
         let projectId = req.query.project;
         Projects.update({"_id": projectId}, {$set: {status: 'Accepted'}})
         .then(result => {
+            res.set('Content-Type', 'text/html')
             res.send("Thank you!")
         })
         .catch(err => {
             console.log(err);
-            res.send('Sorry. Acception failed! Try again later.')
+            res.set('Content-Type', 'text/html')
+            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
         })
     }
     
@@ -109,14 +114,16 @@ router.get('/declinequote', async (req, res) => {
     let date = new Date().getTime();
     let expiry = date - mailDate;
     if(expiry > 60000) {
-        res.send("Sorry! The link is already expired.")
+        res.set('Content-Type', 'text/html')
+        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
     } else {
         let projectId = req.query.project;
         let project = await Projects.find({"_id": projectId});
         let client = await Clients.find({"_id": project[0].customer});
         let user = await User.find({"username": client[0].projectManager})
         pmMail(project[0], client[0], user[0]);
-        res.send("Thank you! We'll contact you if any changes.")
+        res.set('Content-Type', 'text/html')
+        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
     } 
 })
 

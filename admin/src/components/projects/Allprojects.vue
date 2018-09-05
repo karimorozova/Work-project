@@ -11,11 +11,11 @@
                     th 
             tbody
                 tr(v-for="(project, ind) in allProjects" @click="showJobs(project._id)")
-                    td {{ project.createdAt }}
+                    td {{ project.createdAt.split('T')[0].split('-').reverse().join('-') }}
                     td {{ project.projectId }}
                     td {{ project.projectName }}
                     td {{ project.status }}
-                    td {{ project.date }}
+                    td {{ project.date.split('T')[0].split('-').reverse().join('-') }}
                     td
                         .buttons
                             button.metrics(:disabled="project.jobs[0].wordcount != ''" @click="estimate(ind)" :class="{disabled: project.jobs[0].wordcount}") Get metrics and cost
