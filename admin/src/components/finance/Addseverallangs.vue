@@ -33,22 +33,33 @@
             .services
                 span.services__title Service
                 .services__innerComponent
-                    ServiceDuoSelect(:selectedServ="selectedServ")
+                    ServiceMultiDuoSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
             .industries
                 span Industry
                 .industries__innerComponent
-                    IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry")
-        .add-several__service-rates
+                    IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
+        .add-several__service-rates(v-if="selectedServ[0].title != 'Select' && selectedServ[0].title != 'All'")
+            .chosen-services(v-for="serv in selectedServ")
+                span.chosen-services__title {{ serv.title }}:
+                input.chosen-services__rate(type="text" v-model="serv.rate") 
         .submit-button
             input.submit-button__button(type="submit" @submit.prevent="toBack" value="Submit")
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
-import ServiceDuoSelect from "../ServiceDuoSelect";
+import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
 import IndustrySelect from "../IndustrySelect";
 
 export default {
+    props: {
+        origin: {
+            type: String
+        },
+        who: {
+            type: Object
+        }
+    },
     data() {
         return {
             languages: [],
@@ -59,7 +70,7 @@ export default {
                 all: [], chosen: []
             },
             selectedInd: [{name: 'Select'}],
-            selectedServ: {title: 'Select'},
+            selectedServ: [{title: 'Select'}],
         }
     },
     methods: {
@@ -181,6 +192,29 @@ export default {
                 })
             }
         },
+        changeService(data) {
+            if(this.selectedServ[0].title == 'Select' || this.selectedServ[0].title == 'All') {
+                this.selectedServ.splice(0, 1, data.service)
+            } else {
+                let hasService = false;
+                for(let i in this.selectedServ) {
+                if(this.selectedServ[i].title == data.service.title) {
+                    this.selectedServ.splice(i, 1);
+                    hasService = true;
+                }
+                }
+                if(!hasService) {
+                this.selectedServ.push(data.service);
+                }
+            }
+            if(!this.selectedServ.length || data.service.title == 'All') {
+                this.selectedServ = [];
+                this.selectedServ.push({
+                crud: true,
+                title: 'Select'
+                })
+            }
+        },
         getLanguages() {
             this.$http.get('../api/languages')
             .then(res => {
@@ -206,10 +240,19 @@ export default {
                 }
             }
             return result;
+        },
+        checkedServices() {
+            let result = [];
+            if(this.selectedServ.length) {
+                for(let elem of this.selectedServ) {
+                    result.push(elem.title);
+                }
+            }
+            return result;
         }
     },
     components: {
-        ServiceDuoSelect,
+        ServiceMultiDuoSelect,
         IndustrySelect
     },
     directives: {
@@ -258,6 +301,16 @@ export default {
         display: flex;
         justify-content: space-between;
     }
+    &__service-rates {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-left: 70px;
+        padding-top: 30px;
+        margin-left: 10px;
+        border-top:1px solid #67573E;
+    }
 }
 
 .title-target {
@@ -272,6 +325,23 @@ export default {
     &__innerComponent {
         width: 192px;
         margin-left: 20px;
+    }
+}
+
+.chosen-services {
+    width: 45%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    &__rate {
+        margin-right: 5px;
+        width: 181px;
+        height: 29px;
+        border-radius: 5px;
+        border: 1px solid #67573E;
+        outline: none;
+        padding: 0 5px;
     }
 }
 
@@ -296,7 +366,7 @@ export default {
 
 .list {
     width: 100%;
-    height: 100%;
+    height: 95%;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -364,6 +434,9 @@ export default {
         box-shadow: 0 5px 10px rgba(103, 87, 62, 0.6);
         margin-top: 15px;
         cursor: pointer;
+        &:active {
+            box-shadow: 0 0 5px rgba(103, 87, 62, 0.6);
+        }
     }
 }
 

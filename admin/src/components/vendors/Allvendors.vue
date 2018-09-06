@@ -88,7 +88,7 @@
                 )
             .save-success(v-if="saveSuccess")
                 p Information saved
-        Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
+        Addseverallangs(v-if="addSeveral" :origin="'vendor'" :who="vendor" @closeSeveral="closeSevLangs")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +
@@ -613,7 +613,7 @@ td {
 
 .lang-combs {
     max-height: 26px;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 .dropOption {

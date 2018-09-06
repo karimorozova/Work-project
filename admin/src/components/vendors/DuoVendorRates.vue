@@ -37,7 +37,12 @@
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
               .innerComponent(v-if="!info.icons[1].active")
-                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
+                IndustrySelect(:parentIndex="index" 
+                  :selectedInd="industrySelected" 
+                  :filteredIndustries="infoIndustries"
+                  :who="vendor"
+                  @chosenInd="changeIndustry" 
+                  @scrollDrop="scrollDrop")
             td
               input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 

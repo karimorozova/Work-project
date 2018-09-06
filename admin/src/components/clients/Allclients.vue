@@ -73,7 +73,7 @@
                 @chosenSalesManager="changeSalesManager"
                 @chosenProjManager="changeProjManager"
                 @addSevLangs="addSevLangs")
-        Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
+        Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs" :who="client" :origin="'client'")
 </template>
 
 <script>

@@ -75,7 +75,16 @@ function vendors() {
   return Vendors.find({})
   .then(async vendors => {
     if(!vendors.length) {
-      for(const vendor of vendorsDefault) {
+      for(let vendor of vendorsDefault) {
+        let industries = await Industries.find({});
+        for(let industry of industries) {
+          for(let ind in vendor.industry) {
+            if(industry.name == vendor.industry[ind].name) {
+              console.log(industry);
+              vendor.industry[ind] = industry;
+            }
+          }
+        }
         await new Vendors(vendor).save().then(res => {
           console.log(`Vendor ${vendor.firstName} saved!`)
         }).catch(err => {

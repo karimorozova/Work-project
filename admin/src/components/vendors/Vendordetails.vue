@@ -74,8 +74,8 @@
                     .block-item
                         label Industries:
                         MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-            .title Rates    
-            .rates
+            .title(v-if="vendor._id") Rates    
+            .rates(v-if="vendor._id")
                 VendorRates(:vendor="vendor" 
                     @ratesUpdate="ratesUpdate"
                     @addSevLangs="addSevLangs")

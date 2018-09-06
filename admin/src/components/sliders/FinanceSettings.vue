@@ -22,7 +22,7 @@
               img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
               RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
-      Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs")
+      Addseverallangs(v-if="addSeveral" @closeSeveral="closeSevLangs" :origin="'rates'")
 </template>
 
 <script>

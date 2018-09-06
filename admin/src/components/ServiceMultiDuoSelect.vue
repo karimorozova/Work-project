@@ -1,29 +1,30 @@
 <template lang="pug">
     .dropSelect(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All' && selectedInd[0].name != 'Select'")
+            template(v-if="selectedServ.length && selectedServ[0].title != 'All' && selectedServ[0].title != 'Select'")
                 .selected
-                    img(v-for="name in selectedInd" :src="name.icon") 
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' || selectedInd[0].name == 'Select'") 
-                span.selected {{ selectedInd[0].name }}
-            .arrowButton(@click="showInds")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
-        .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)")
+                    span(v-for="serv in selectedServ") {{ serv.title }}; 
+            template(v-if="!selectedServ.length || selectedServ[0].title == 'All' || selectedServ[0].title == 'Select'") 
+                span.selected {{ selectedServ[0].title }}
+            .arrowButton(@click="showServs")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
+        .drop(v-if="droppedServ")
+            .drop__item(v-for="(service, index) in services" @click="changeServ(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
-                span {{ industry.name }}
+                    .checkbox__check(:class="{checked: filteredServices.indexOf(service.title) != -1}")
+                span {{ service.title }}
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        selectedInd: {
+        selectedServ: {
             type: Array
         },
-        filteredIndustries: {
+        filteredServices: {
             type: Array,
         },
         parentIndex: {
@@ -36,13 +37,13 @@ export default {
     },
     data() {
         return {
-            industries: [],
-            droppedInd: false,
-            errors: []
+            droppedServ: false,
+            errors: [],
+            services: []
         }
     },
     methods: {
-        showInds(event) {
+        showServs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
                 if(item.localName == "tr") {
@@ -55,46 +56,43 @@ export default {
                 top = tr.offsetTop;
                 height = tr.offsetHeight;
             }
-            this.droppedInd = !this.droppedInd;
-            this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
+            this.droppedServ = !this.droppedServ;
+            this.$emit('scrollDrop', {drop: this.droppedServ, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
-        async getIndustries() {
-            if(!this.who) {
-                await this.$http.get('api/industries')
-                .then(response => {
-                    let sortedArray = response.data.filter(item => {
-                        if (item.name != 'More') {
+        getServices() {
+            this.services = this.veuxServices;
+            this.services.sort( (a,b) => {
+                if(a.title < b.title) return -1;
+                if(a.title > b.title) return 1;
+            });
+            this.services = this.services.filter(item => {
+                if(item.languageForm == 'Duo') {
+                    if(item.title == 'Translation' ||
+                        item.title == 'Proofing' || 
+                        item.title == 'QA and Testing') {
                             return item
-                        }
-                    });
-                    sortedArray.sort( (a,b) => {
-                        if(a.name < b.name) return -1;
-                        if(a.name > b.name) return 1;
-                    });
-                    this.industries = sortedArray;
-                    this.industries.unshift({name: "All"})
-                })
-                .catch(e => {
-                    this.errors.push(e)
-                })
-            } else {
-                this.industries = this.who.industry;
-                this.industries.unshift({name: "All"})
-            }
-            
+                    }
+                }
+                
+            })
         },
         outClick() {
-            this.droppedInd = false;
+            this.droppedServ = false;
         },
-        changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentIndex})
+        changeServ(index) {
+            this.$emit("chosenServ", {service: this.services[index], index: this.parentIndex})
         }
     },
+    computed: {
+        ...mapGetters({
+            veuxServices: "getVeuxServices"
+        }) 
+    }, 
     directives: {
         ClickOutside
     },
     mounted () {
-        this.getIndustries()
+        this.getServices()
     }
 }
 </script>
