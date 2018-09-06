@@ -58,6 +58,14 @@ function clients() {
       .then(async clients => {
         if(!clients.length) {
           for(const client of clientsDefault) {
+            let industries = await Industries.find({});
+            for(let industry of industries) {
+              for(let ind in client.industry) {
+                if(industry.name == client.industry[ind].name) {
+                  client.industry[ind] = industry;
+                }
+              }
+            }
             await new Clients(client).save().then(res => {
               console.log(`Client ${client.name} saved!`)
             }).catch(err => {
@@ -71,6 +79,33 @@ function clients() {
       })
 }
 
+async function clientLangs() {
+  let clients = await Clients.find();
+  let service = await Services.find({title: "Translation"});
+  let randomRates = [0.1, 0.12, 0.15];
+  let combs = service[0].languageCombinations;
+
+  for(let client of clients) {
+    if(!client.languageCombinations.length) {
+      let industry = await Industries.find({name: client.industry[0].name});
+      industry = JSON.stringify(industry);
+      client.industry = JSON.parse(industry);
+        for(let i = 0; i < 5; i++) {
+          let indus =  JSON.parse(industry);
+          indus[0].rate = randomRates[Math.floor(Math.random()*3)];
+          client.languageCombinations.push({
+            source: combs[i].source,
+            target: combs[i].target,
+            service: service[0].title,
+            industry: indus,
+            active: true
+          })
+        }
+      await Clients.update({name: client.name}, client)
+    } 
+  }
+}
+
 function vendors() {
   return Vendors.find({})
   .then(async vendors => {
@@ -80,7 +115,6 @@ function vendors() {
         for(let industry of industries) {
           for(let ind in vendor.industry) {
             if(industry.name == vendor.industry[ind].name) {
-              console.log(industry);
               vendor.industry[ind] = industry;
             }
           }
@@ -124,29 +158,6 @@ async function vendorLangs() {
   }
 }
 
-async function clientLangs() {
-  let clients = await Clients.find();
-  let service = await Services.find({title: "Translation"});
-  let randomRates = [0.1, 0.12, 0.15];
-  let combs = service[0].languageCombinations;
-
-  for(let client of clients) {
-    if(!client.languageCombinations.length) {
-      let industry = await Industries.find({name: client.industry.name});
-      client.industry = industry[0];
-        for(let i = 0; i < 5; i++) {
-          client.languageCombinations.push({
-            source: combs[i].source,
-            target: combs[i].target,
-            service: service[0].title,
-            rate: randomRates[Math.floor(Math.random()*3)],
-            active: true
-          })
-        }
-      await Clients.update({name: client.name}, client)
-    } 
-  }
-}
 
 // function clients() {
 //   return Clients.find({})

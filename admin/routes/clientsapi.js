@@ -131,20 +131,37 @@ router.post('/client-rates', async (req, res) => {
     var rate = req.body;
     let id = rate.client;
     let client = await Clients.find({"_id": id});
-    let exist = false;
-    for(let comb of client[0].languageCombinations) {
-      if(comb.service == rate.title && comb.source.lang == rate.sourceLanguage.lang &&
-        comb.target.lang == rate.targetLanguage.lang) {
-          comb.rate = rate.industry[0].rate;
-          exist = true;
-      }
+    for(let indus of rate.industry) {
+        for(let ind of client[0].industry) {
+            if(ind.name == indus.name || indus.name == "All") {
+                ind.rate = indus.rate;
+            }
+        }
     }
-    if(!exist) {
+    let industries = JSON.stringify(vendor[0].industry);
+    industries = JSON.parse(industries);
+    let exist = false;
+    if(client[0].languageCombinations.length) {
+        for(let comb of client[0].languageCombinations) {
+        if(comb.service == rate.title && comb.source.lang == rate.sourceLanguage.lang &&
+            comb.target.lang == rate.targetLanguage.lang) {
+                for(let ind of comb.industry) {
+                    for(let indus of rate.industry) {
+                        if(ind.name == indus.name || indus.name == "All") {
+                            comb.industry = industries;
+                        }
+                    }
+                }
+                exist = true;
+            }
+        }
+    }
+    if(!exist || !client[0].languageCombinations.length) {
         client[0].languageCombinations.push({
             source: rate.sourceLanguage,
             target: rate.targetLanguage,
             service: rate.title,
-            rate: rate.industry[0].rate,
+            industry: industries,
             active: true
         })
     }

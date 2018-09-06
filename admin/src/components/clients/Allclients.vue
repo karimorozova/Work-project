@@ -13,7 +13,7 @@
                 .filters__block
                     .filters-item
                         label Industry
-                        ClientIndustrySelect(:selectedInd="filterIndustry" @chosenInd="chosenInd")
+                        ClientIndustrySelect(:selectedInd="industryFilter" @chosenInd="chosenInd")
                     .filters-item
                         label Lead Source
                         ClientLeadsourceSelect(:selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
@@ -47,12 +47,12 @@
                         td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.website")
                         td.dropOption(@click="clientDetails(ind)")              
-                            span(v-if="!client.industry.icon") {{ client.industry.name }}
+                            //- span(v-if="!client.industry.icon") {{ client.industry.name }}
                             .dropOption__image
-                                img(v-if="client.industry.icon" :src="client.industry.icon")
-                                span.titleTooltip {{ client.industry.name }} 
+                                img(v-for="indus in client.industry" :src="indus.icon")
+                                //- span.titleTooltip {{ client.industry.name }} 
                             .innerComponent(v-if="!client.icons[0].active")
-                                ClientIndustrySelect(:selectedInd="industrySelected" :parentInd="ind" @chosenInd="changeIndustry")
+                                MultiClientIndustrySelect(:selectedInd="industrySelected" :filteredIndustries="selectedIndNames" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="clientDetails(ind)")
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.leadSource")                        
                         td
@@ -67,7 +67,7 @@
                 @cancel="clientCancel"
                 @contactCancel="contactCancel"
                 @deleteContact="deleteContact"
-                @chosenInd="changeInd"
+                @chosenInd="changeIndustry"
                 @chosenStatus="changeStatus"
                 @chosenAccManager="changeAccManager"
                 @chosenSalesManager="changeSalesManager"
@@ -78,6 +78,7 @@
 
 <script>
 import ClientIndustrySelect from '../clients/ClientIndustrySelect';
+import MultiClientIndustrySelect from '../clients/MultiClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import ClientDetails from '../clients/ClientDetails';
@@ -94,9 +95,9 @@ export default {
             clientData: false,
             filterName: "",
             filterStatus: "",
-            filterIndustry: {},
+            industryFilter: [{name: 'All'}],
             filterLeadsource: "",
-            industrySelected: {},
+            industrySelected: [],
             addSeveral: false
         }
     },
@@ -159,7 +160,7 @@ export default {
                 vat: "",
                 address: "",
                 languageCombinations: [],
-                industry: {},
+                industry: [],
                 contacts: []
             };
             this.clientData = true;
@@ -187,11 +188,38 @@ export default {
             this.filterStatus = data;
         },
         chosenInd(data) {
-            this.filterIndustry = data.industry;
+            this.industryFilter = [data.industry];
         },
         changeIndustry(data) {
-            this.industrySelected = data.industry;
-            this.allClients[data.index].industry = data.industry;
+            if(!this.clientData) {
+                let exist = false;
+                for(let ind in this.industrySelected) {
+                    if(this.industrySelected[ind].name == data.industry.name) {
+                        this.industrySelected.splice(ind, 1);
+                        exist = true;
+                    }
+                }
+                if(!exist) {
+                    this.industrySelected.push(data.industry);
+                }
+                let client = this.allClients[data.index];
+                for(let cli of this.clients) {
+                    if(client._id == cli._id && !cli.icons[1].active) {
+                        cli.industry = this.industrySelected;
+                    }
+                }
+            } else {
+                let exist = false;
+                for(let ind in this.client.industry) {
+                    if(this.client.industry[ind].name == data.industry.name) {
+                        this.client.industry.splice(ind, 1);
+                        exist = true;
+                    }
+                }
+                if(!exist) {
+                    this.client.industry.push(data.industry);
+                }
+            }
         },
         chooseLead(ind) {
             if(!this.allClients[ind].icons[0].active) {
@@ -270,9 +298,18 @@ export default {
                     return item.status == this.filterStatus;
                 })
             }
-            if(this.filterIndustry.name) {
+            if(this.industryFilter[0].name != 'All') {
                 result = result.filter(item => {
-                    return item.industry.name == this.filterIndustry.name;
+                    let exist = false;
+                    for(let indus of item.industry) {
+                        if(indus.name == this.industryFilter[0].name) {
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if(exist) {
+                        return item
+                    }
                 })
             }
             if(this.filterLeadsource) {
@@ -281,10 +318,18 @@ export default {
                 })
             }
             return result;
-        }
+        },
+        selectedIndNames() {
+            let result = [];
+            for(let ind of this.industrySelected) {
+                result.push(ind.name);
+            }
+            return result;
+        },
     },
     components: {
         ClientIndustrySelect,
+        MultiClientIndustrySelect,
         ClientStatusSelect,
         ClientLeadsourceSelect,
         ClientDetails,
@@ -435,8 +480,10 @@ td {
     z-index: 5;
   }
   &__image {
+    display: flex;
+    align-items: center;
     max-height: 21px;
-    width: 30px;
+    // width: 30px;
     .titleTooltip {
       position: absolute;
       display: none;

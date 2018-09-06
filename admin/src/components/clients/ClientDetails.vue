@@ -16,7 +16,7 @@
                         input(type="text" placeholder="Website" v-model="client.website")
                     .block-item
                         label Industry:
-                        ClientIndustrySelect(:selectedInd="client.industry" @chosenInd="chosenInd")
+                        MultiClientIndustrySelect(:selectedInd="client.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                     .block-item
                         label Status:
                         ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="chosenStatus")
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import ClientIndustrySelect from './ClientIndustrySelect';
+import MultiClientIndustrySelect from './MultiClientIndustrySelect';
 import ClientStatusSelect from './ClientStatusSelect';
 import AMSelect from './AMSelect';
 import ContactsInfo from './ContactsInfo';
@@ -167,7 +167,7 @@ export default {
             this.approveShow = false;
         },
         chosenInd(data) {
-            this.$emit('chosenInd', data.industry);
+            this.$emit('chosenInd', {industry: data.industry, filter: this.selectedIndNames});
         },
         chosenStatus(data) {
             this.$emit('chosenStatus', data);
@@ -234,8 +234,19 @@ export default {
             this.contactShow = false;
         }
     },
+    computed: {
+        selectedIndNames() {
+            let result = [];
+            if(this.client.industry.length) {
+                for(let ind of this.client.industry) {
+                    result.push(ind.name);
+                }
+            }
+            return result;
+        },
+    },
     components: {
-    ClientIndustrySelect,
+    MultiClientIndustrySelect,
     ClientStatusSelect,
     AMSelect,
     ContactsInfo,

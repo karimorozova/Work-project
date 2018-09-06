@@ -81,8 +81,8 @@ const ClientSchema = new mongoose.Schema({
         default: []
     },
     industry: {
-        type: Object,
-        default: {}
+        type: Array,
+        default: []
     },
     contacts: {
         type: Array,

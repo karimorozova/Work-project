@@ -37,7 +37,7 @@
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
               .innerComponent(v-if="!info.icons[1].active")
-                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
+                IndustrySelect(:parentIndex="index" :who="client" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
               input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 
@@ -334,21 +334,20 @@ export default {
     clientRates() {
       this.fullInfo = [];
       for(let comb of this.client.languageCombinations) {
-        let industry = JSON.stringify(this.client.industry);
-        industry = JSON.parse(industry);
-        industry.rate = comb.rate;
         if(comb.service == this.serviceSelect.title) {
-          this.fullInfo.push({
-            title: comb.service,
-            sourceLanguage: comb.source,
-            targetLanguage: comb.target,
-            industry: [industry],
-            active: comb.active,
-            icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
-                {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-                {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-              ]
-          })
+          for(let indus of comb.industry) {
+            this.fullInfo.push({
+              title: comb.service,
+              sourceLanguage: comb.source,
+              targetLanguage: comb.target,
+              industry: [indus],
+              active: comb.active,
+              icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
+                  {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+                  {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+                ]
+            })
+          }
         }
       }
     }

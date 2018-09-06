@@ -3,15 +3,17 @@
         .select
             template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
                 .selected
-                    .industry-tooltip
-                        img(:src="selectedInd[0].icon")
-                        span.toolTip {{ selectedInd[0].name }}
+                    .industry-tooltip(v-for="item in selectedInd")
+                        img(:src="item.icon")
+                        //- span.toolTip {{ selectedInd[0].name }}
             template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
                 span.selected.no-industry Options
             .arrowButton(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
             .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+                .checkbox
+                    .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
                 span {{ industry.name }}
 </template>
 
@@ -22,6 +24,9 @@ export default {
     props: {
         selectedInd: {
             type: Array
+        },
+        filteredIndustries: {
+            type: Array,
         },
         parentInd: {
             type: Number

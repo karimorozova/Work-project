@@ -78,13 +78,15 @@ export default {
                     this.errors.push(e)
                 })
             } else {
-                this.industries = this.who.industry;
+                let industries = JSON.stringify(this.who.industry);
+                industries = JSON.parse(industries);
+                this.industries = industries;
                 this.industries.unshift({name: "All"})
             }
-            
         },
         outClick() {
             this.droppedInd = false;
+            this.industries = [];
         },
         changeInd(index) {
             this.$emit("chosenInd", {industry: this.industries[index], index: this.parentIndex})
