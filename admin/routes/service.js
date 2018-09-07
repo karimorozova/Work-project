@@ -262,6 +262,54 @@ router.post('/rates', async (req, res) => {
   }
 })
 
+router.post('/several-langs', async (req, res) => {
+  let langCombs = req.body;
+  let industries = await Industries.find();
+  industries = JSON.stringify(industries);
+  let services = await Services.find({languageForm: "Duo"});
+  for(let comb of langCombs) {
+    let service = services.find(item => {
+      return item.title == comb.service
+    });
+    let exist = false;
+    for(let servComb of service.languageCombinations) {
+      if(comb.source.lang == servComb.source.lang && comb.target.lang == servComb.target.lang) {
+        for(let indus of servComb.industries) {
+          for(let ind of comb.industry) {
+            if(indus.name == ind.name) {
+              indus.rate = ind.rate
+            }
+          }
+        }
+        exist = true;
+      }
+    }
+    if(!exist) {
+      let industry = JSON.parse(industries);
+      for(let indus of industry) {
+        for(let ind of comb.industry) {
+          if(indus.name == ind.name) {
+            indus.rate = ind.rate;
+            indus.active = true;
+          } else {
+            indus.active = false;
+          }
+        }
+      }
+      service.languageCombinations.push({
+        source: comb.source,
+        target: comb.target,
+        industries: industry,
+        active: true
+      })
+      let result = await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
+    } else {
+      let result = await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
+    }
+  }
+  res.send('Several langs added..')
+})
+
 router.post('/delete-duorate', async (req, res) => {
   var rate = await req.body;
   if(!rate.sourceLanguage || !rate.targetLanguage) {

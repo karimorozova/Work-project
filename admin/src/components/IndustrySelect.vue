@@ -86,7 +86,6 @@ export default {
         },
         outClick() {
             this.droppedInd = false;
-            this.industries = [];
         },
         changeInd(index) {
             this.$emit("chosenInd", {industry: this.industries[index], index: this.parentIndex})

@@ -138,7 +138,7 @@ router.post('/client-rates', async (req, res) => {
             }
         }
     }
-    let industries = JSON.stringify(vendor[0].industry);
+    let industries = JSON.stringify(client[0].industry);
     industries = JSON.parse(industries);
     let exist = false;
     if(client[0].languageCombinations.length) {

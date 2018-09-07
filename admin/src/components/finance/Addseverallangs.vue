@@ -43,7 +43,7 @@
                 span.chosen-services__title {{ serv.title }}:
                 input.chosen-services__rate(type="text" v-model="serv.rate") 
         .submit-button
-            input.submit-button__button(type="submit" @submit.prevent="toBack" value="Submit")
+            input.submit-button__button(type="button" @click="checkErrors" value="Submit")
 </template>
 
 <script>
@@ -71,12 +71,62 @@ export default {
             },
             selectedInd: [{name: 'Select'}],
             selectedServ: [{title: 'Select'}],
+            errors: []
         }
     },
     methods: {
-        toBack() {
-            console.log('Start adding combinations...');
-            this.$emit('toBack');
+        checkErrors() {
+            this.errors = [];
+            if(this.selectedInd[0].name == 'Select') this.errors.push('Choose industry');
+            if(this.selectedServ[0].title == 'Select') this.errors.push('Choose service');
+            if(!this.source.chosen.length) this.errors.push('Choose source languages');
+            if(!this.target.chosen.length) this.errors.push('Choose target languages');
+            if(this.selectedServ.length) {
+                for(let serv of this.selectedServ) {
+                    if(+serv.rate <= 0 || !serv.rate) {
+                        this.errors.push(`Enter correct rate value for service ${serv.title}`)
+                    }
+                }
+            }
+            console.log(this.errors);
+            if(this.errors.length) {
+                return true;
+            } else {
+                this.langsAddition();
+            }
+        },
+        langsAddition() {
+            let languageCombinations = [];
+            for(let sourLang of this.source.chosen) {
+                for(let targLang of this.target.chosen) {
+                    if(sourLang.lang != targLang.lang) {
+                        for(let serv of this.selectedServ) {
+                            let indus = JSON.stringify(this.selectedInd);
+                            indus = JSON.parse(indus);
+                            for(let ind in indus) {
+                                indus[ind].rate = +serv.rate;
+                            }
+                            languageCombinations.push({
+                                source: sourLang,
+                                target: targLang,
+                                service: serv.title,
+                                industry: indus,
+                                active:true
+                            })
+                        }
+                    }
+                }
+            }
+            if(this.origin == 'rates') {
+                this.$http.post('../service/several-langs', JSON.stringify(languageCombinations))
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            this.closeSeveral();
         },
         closeSeveral() {
             this.$emit('closeSeveral')
