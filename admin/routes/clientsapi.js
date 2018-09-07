@@ -174,6 +174,39 @@ router.post('/client-rates', async (req, res) => {
     })
 })
 
+router.post('/delete-duorate', async (req, res) => {
+    var rate = req.body;
+    let id = rate.client;
+    let client = await Clients.find({"_id": id});
+    let allZero = [];
+    for(let i = 0; i < client[0].languageCombinations.length; i++) {
+        let comb = client[0].languageCombinations[i];
+        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
+            comb.target.lang == rate.targetLanguage.lang) {
+            for(let ind of comb.industry) {
+                for(let indus of rate.industry) {
+                    if(ind.name == indus.name) {
+                        ind.rate = 0;
+                    }
+                }
+                allZero.push(ind.rate);
+            }
+            let sum = allZero.reduce( (x,y) => x + y);
+            if(!sum) {
+                client[0].languageCombinations.splice(i, 1);
+                break;
+            }
+        }
+    }
+    Clients.updateOne({"_id": id}, {$set: {languageCombinations: client[0].languageCombinations}})
+      .then(result => {
+        res.send('rate deleted')
+    })
+      .catch(err => {
+        console.log(err);
+    })
+})
+
 // router.post('/new-client', upload.any(), async (req, res) => {
 //     let client = JSON.parse(req.body.client);
 //     let result = await Clients.create(client);

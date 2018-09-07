@@ -126,6 +126,17 @@ export default {
                     console.log(err)
                 })
             }
+            if(this.origin == 'vendor') {
+                let id = this.who._id;
+                this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id})
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            this.$emit('refreshServices');
             this.closeSeveral();
         },
         closeSeveral() {

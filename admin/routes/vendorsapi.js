@@ -145,6 +145,12 @@ router.post('/vendor-rates', async (req, res) => {
     })
 })
 
+router.post('/several-langs', async (req, res) => {
+    let vendorId = req.body.vendor;
+    let langCombs = JSON.parse(req.body.langs);
+    let vendor = await Vendors.find({"_id": vendorId});
+})
+
 router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {
     let vendor = JSON.parse(req.body.vendor);
     const photoFile = req.files["photo"];

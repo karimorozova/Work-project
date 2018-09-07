@@ -22,7 +22,7 @@
           th(v-for="head in tableHeader") {{ head.title }}
       tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="indus in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
+          tr(v-for="(indus, indusInd) in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
             td.dropOption 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
               .innerComponent(v-if="!info.icons[1].active")
@@ -49,7 +49,7 @@
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
             td.iconsField
               template(v-for="(icon, iconIndex) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
+                img.crudIcon(:src="icon.image" @click="action(index, iconIndex, indusInd)" :class="{activeIcon: icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -222,7 +222,7 @@ export default {
         })
       }
     },
-    action(index, iconIndex) {
+    action(index, iconIndex, indusInd) {
       if(this.currentActive != "none") {
         if(index != this.currentActive) {
           this.editing = true;
@@ -279,7 +279,16 @@ export default {
       }
 
       if(iconIndex == 2) {
-        let deletedRate = this.fullInfo.splice(index, 1)[0];
+        let deletedRate = {
+          active: this.fullInfo[index].active,
+          form: this.fullInfo[index].form,
+          industry: [this.fullInfo[index].industry[indusInd]],
+          service: this.fullInfo[index].service,
+          sourceLanguage: this.fullInfo[index].sourceLanguage,
+          targetLanguage: this.fullInfo[index].targetLanguage,
+          vendor: this.fullInfo[index].vendor,
+        }
+        console.log(deletedRate);
         this.currentActive = "none";
         deletedRate.form = "Duo";
         deletedRate.vendor = this.vendor._id;
@@ -291,6 +300,7 @@ export default {
         .catch(err => {
           console.log(err)
         });
+        this.fullInfo[index].industry.splice(indusInd, 1);
       }
     },
     addNewRow() {
