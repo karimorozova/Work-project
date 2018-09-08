@@ -292,6 +292,7 @@ router.post('/several-langs', async (req, res) => {
             indus.rate = ind.rate;
             indus.active = true;
           } else {
+            indus.rate = 0;
             indus.active = false;
           }
         }
