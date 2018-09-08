@@ -96,7 +96,7 @@ async function clientLangs() {
           client.languageCombinations.push({
             source: combs[i].source,
             target: combs[i].target,
-            service: service[0].title,
+            service: service[0],
             industry: indus,
             active: true
           })

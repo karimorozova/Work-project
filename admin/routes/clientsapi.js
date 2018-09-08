@@ -143,7 +143,7 @@ router.post('/client-rates', async (req, res) => {
     let exist = false;
     if(client[0].languageCombinations.length) {
         for(let comb of client[0].languageCombinations) {
-        if(comb.service == rate.title && comb.source.lang == rate.sourceLanguage.lang &&
+        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
             comb.target.lang == rate.targetLanguage.lang) {
                 for(let ind of comb.industry) {
                     for(let indus of rate.industry) {
@@ -160,7 +160,7 @@ router.post('/client-rates', async (req, res) => {
         client[0].languageCombinations.push({
             source: rate.sourceLanguage,
             target: rate.targetLanguage,
-            service: rate.title,
+            service: rate.service,
             industry: industries,
             active: true
         })

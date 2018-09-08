@@ -226,9 +226,10 @@ export default {
       }
       if(iconIndex == 0) {
         this.validError = [];
+        let regex = /^[0-9.]+$/;
         if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
         if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
-        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+        if(!regex.test(this.changedRate)) this.validError.push("Please set the correct rate value!");
         if(this.validError.length) {
           this.showValidError = true;
           this.changedRate = this.fullInfo[index].industry[0].rate;
@@ -304,7 +305,7 @@ export default {
         service: this.serviceSelect,
         sourceLanguage: {lang: "English"}, 
         targetLanguage: {lang: ""}, 
-        industry: [{name: "All", rate: 0}], 
+        industry: [{name: "All", rate: "-"}], 
         active: true, 
         icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
       });
@@ -360,7 +361,7 @@ export default {
         }
       }
       for(let comb of this.client.languageCombinations) {
-        if(comb.service == this.serviceSelect.title) {
+        if(comb.service.title == this.serviceSelect.title) {
           for(let indus of comb.industry) {
             this.fullInfo.push({
               service: comb.service,
