@@ -149,6 +149,34 @@ router.post('/several-langs', async (req, res) => {
     let vendorId = req.body.vendor;
     let langCombs = JSON.parse(req.body.langs);
     let vendor = await Vendors.find({"_id": vendorId});
+    for(let comb of langCombs) {
+        let langPairExist = false;
+        for(let venComb of vendor[0].languageCombinations) {
+            if(comb.source.lang == venComb.source.lang && comb.target.lang == venComb.target.lang
+                && comb.service.title == venComb.service.title) {
+                for(let indus of comb.industry) {
+                    let industryExist = false;
+                    for(let ind of venComb.industry) {
+                        if(ind.name == indus.name) {
+                            ind.rate = indus.rate;
+                            industryExist = true;
+                        }
+                    }
+                    if(!industryExist) {
+                        venComb.industry.push(indus);
+                    }
+                }
+                langPairExist = true;                
+            }
+        }
+        if(!langPairExist) {
+            vendor[0].languageCombinations.push(comb);
+            let result = await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendor[0].languageCombinations}})
+        } else {
+            let result = await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendor[0].languageCombinations}})
+        }
+    }
+    res.send('Several langs added..')
 })
 
 router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {

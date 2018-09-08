@@ -269,7 +269,7 @@ router.post('/several-langs', async (req, res) => {
   let services = await Services.find({languageForm: "Duo"});
   for(let comb of langCombs) {
     let service = services.find(item => {
-      return item.title == comb.service
+      return item.title == comb.service.title
     });
     let exist = false;
     for(let servComb of service.languageCombinations) {

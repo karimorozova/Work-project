@@ -109,7 +109,7 @@ export default {
                             languageCombinations.push({
                                 source: sourLang,
                                 target: targLang,
-                                service: serv.title,
+                                service: serv,
                                 industry: indus,
                                 active:true
                             })
