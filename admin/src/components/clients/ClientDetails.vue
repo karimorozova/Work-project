@@ -48,7 +48,9 @@
                 ContactsInfo(:client="client" @contactDetails="contactDetails" @newContact="addNewContact")
             .title(v-if="client._id") Rates    
             .rates(v-if="client._id")
-                ClientRates(:client="client" @addSevLangs="addSevLangs")
+                ClientRates(:client="client" 
+                    @addSevLangs="addSevLangs"
+                    @ratesUpdate="ratesUpdate")
             .title Sales Information
             .sales
                 ClientSalesInfo(:client="client" @deleteContact="approveDelete")
@@ -191,6 +193,9 @@ export default {
             this.clientShow = false;
             this.contactShow = true;
             this.newContact = true;
+        },
+        ratesUpdate(data) {
+            this.$emit('refreshClients', data);
         },
         updateClient() {
             let sendData = new FormData();

@@ -14,7 +14,7 @@
                     img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
                 .rates-drop(v-if="duoDrop")
                     DuoClientRates(:client="client" 
-                        @updateClients="updateClients"
+                        @ratesUpdate="ratesUpdate"
                         @addSevLangs="addSevLangs")
 </template>
 
@@ -44,8 +44,8 @@ export default {
         openDuo() {
             this.duoDrop = !this.duoDrop;
         },
-        updateClients(data) {
-            this.$emit('updateClients')
+        ratesUpdate(data) {
+            this.$emit('ratesUpdate', data);
         }
     },
     components: {

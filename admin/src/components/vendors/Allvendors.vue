@@ -88,7 +88,11 @@
                 )
             .save-success(v-if="saveSuccess")
                 p Information saved
-        Addseverallangs(v-if="addSeveral" :origin="'vendor'" :who="vendor" @closeSeveral="closeSevLangs")
+        Addseverallangs(v-if="addSeveral"
+            :origin="'vendor'" 
+            :who="vendor" 
+            @closeSeveral="closeSevLangs"
+            @refreshServices="ratesUpdate")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
                 span.close-error(@click="closeEditError") +

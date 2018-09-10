@@ -136,6 +136,16 @@ export default {
                     console.log(err)
                 })
             }
+            if(this.origin == 'client') {
+                let id = this.who._id;
+                this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id})
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }
             this.$emit('refreshServices');
             this.closeSeveral();
         },

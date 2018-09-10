@@ -246,7 +246,8 @@ export default {
         this.fullInfo[index].client = this.client._id;
         this.$http.post('clientsapi/client-rates', this.fullInfo[index])
         .then(res => {
-          console.log(res)
+          console.log(res);
+          this.$emit('ratesUpdate', {clientId: this.client._id})
         })
         .catch(err => {
           console.log(err)
@@ -280,7 +281,7 @@ export default {
           service: this.fullInfo[index].service,
           sourceLanguage: this.fullInfo[index].sourceLanguage,
           targetLanguage: this.fullInfo[index].targetLanguage,
-          vendor: this.fullInfo[index].vendor,
+          client: this.fullInfo[index].client,
         }
         console.log(deletedRate);
         this.currentActive = "none";
@@ -288,7 +289,7 @@ export default {
         deletedRate.client = this.client._id;
         this.$http.post('clientsapi/delete-duorate', deletedRate)
         .then(res => {
-          this.$emit('ratesUpdate')
+          this.$emit('ratesUpdate', {clientId: this.client._id})
           console.log(res)
         })
         .catch(err => {

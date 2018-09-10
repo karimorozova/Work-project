@@ -71,10 +71,9 @@ router.post('/delete-duorate', async (req,res) => {
     let vendor = await Vendors.find({"_id": id});
     let allZero = [];
     for(let i = 0; i < vendor[0].languageCombinations.length; i++) {
-        let comb = vendor[0].languageCombinations[i];
-        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
-            comb.target.lang == rate.targetLanguage.lang) {
-            for(let ind of comb.industry) {
+        if(vendor[0].languageCombinations[i].service.title == rate.service.title && vendor[0].languageCombinations[i].source.lang == rate.sourceLanguage.lang &&
+            vendor[0].languageCombinations[i].target.lang == rate.targetLanguage.lang) {
+            for(let ind of vendor[0].languageCombinations[i].industry) {
                 for(let indus of rate.industry) {
                     if(ind.name == indus.name) {
                         ind.rate = 0;

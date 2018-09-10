@@ -174,16 +174,49 @@ router.post('/client-rates', async (req, res) => {
     })
 })
 
+router.post('/several-langs', async (req, res) => {
+    let clientId = req.body.client;
+    let langCombs = JSON.parse(req.body.langs);
+    let client = await Clients.find({"_id": clientId});
+    for(let comb of langCombs) {
+        let langPairExist = false;
+        for(let clientComb of client[0].languageCombinations) {
+            if(comb.source.lang == clientComb.source.lang && comb.target.lang == clientComb.target.lang
+                && comb.service.title == clientComb.service.title) {
+                for(let indus of comb.industry) {
+                    let industryExist = false;
+                    for(let ind of clientComb.industry) {
+                        if(ind.name == indus.name) {
+                            ind.rate = indus.rate;
+                            industryExist = true;
+                        }
+                    }
+                    if(!industryExist) {
+                        clientComb.industry.push(indus);
+                    }
+                }
+                langPairExist = true;                
+            }
+        }
+        if(!langPairExist) {
+            client[0].languageCombinations.push(comb);
+            let result = await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client[0].languageCombinations}})
+        } else {
+            let result = await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client[0].languageCombinations}})
+        }
+    }
+    res.send('Several langs added..')
+})
+
 router.post('/delete-duorate', async (req, res) => {
     var rate = req.body;
     let id = rate.client;
     let client = await Clients.find({"_id": id});
     let allZero = [];
     for(let i = 0; i < client[0].languageCombinations.length; i++) {
-        let comb = client[0].languageCombinations[i];
-        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
-            comb.target.lang == rate.targetLanguage.lang) {
-            for(let ind of comb.industry) {
+        if(client[0].languageCombinations[i].service.title == rate.service.title && client[0].languageCombinations[i].source.lang == rate.sourceLanguage.lang &&
+            client[0].languageCombinations[i].target.lang == rate.targetLanguage.lang) {
+            for(let ind of client[0].languageCombinations[i].industry) {
                 for(let indus of rate.industry) {
                     if(ind.name == indus.name) {
                         ind.rate = 0;
