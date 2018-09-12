@@ -15,7 +15,7 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -32,6 +32,9 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            getAllLanguages: 'getAllLanguages'
+        }),
         showLangs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
@@ -72,7 +75,7 @@ export default {
         ClickOutside
     },
     created() {
-        this.$store.dispatch('getAllLanguages');
+        this.getAllLanguages();
     },
     mounted() {
     }

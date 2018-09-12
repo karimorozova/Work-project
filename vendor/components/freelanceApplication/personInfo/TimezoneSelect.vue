@@ -15,7 +15,7 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -30,6 +30,9 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            getAllTimezones: 'getAllTimezones'
+        }),
         chooseZone(index) {
             this.$emit('chooseZone', {zone: this.foundZones[index].zone});
         },
@@ -61,7 +64,7 @@ export default {
         }
     },
     created() {
-        this.$store.dispatch('getAllTimezones');
+        this.getAllTimezones();
     },
     directives: {
         ClickOutside
