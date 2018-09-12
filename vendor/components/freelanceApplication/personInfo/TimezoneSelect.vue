@@ -1,31 +1,26 @@
 <template lang="pug">
     .timezones-list
+        .title Time-zone:
         .dropSelect(v-click-outside="outTimezones")
-            .select
-                template(v-if="timezoneSelected")
-                    .selected
-                        span {{ timezoneSelected }}
-                template(v-if="!timezoneSelected")
-                    span.selected.no-country Timezone
-                .arrowButton(@click="openTimezones")
-                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: timezonesDropped}")
-            .search-zone(v-if="timezonesDropped")
-                input.search(type="text" v-model="timezoneSearch" placeholder="Search")
+            .select(@click="openTimezones")
+                span.selected(v-if="timezoneSelected") {{ timezoneSelected.split(" ")[0] }}
+                span.selected.no-country(v-else) Select
+                .arrowButton
+                    img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: timezonesDropped}")
+            input.search(v-if="timezonesDropped" type="text" v-model="timezoneSearch" placeholder="Search")
             .drop(v-if="timezonesDropped")
-                .drop__item(v-for="(timezone, ind) in foundZones" @click="chooseZone(ind)")
+                .drop__item(v-for="(timezone, index) in foundZones" @click="chooseZone(index)" :class="{'active-zone': timezoneSelected == timezone.zone}")
                     span {{ timezone.zone }}
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters } from "vuex";
 
 export default {
     props: {
         timezoneSelected: {
             type: String
-        },
-        timezones: {
-            type: Array
         }
     },
     data() {
@@ -35,8 +30,8 @@ export default {
         }
     },
     methods: {
-        chooseZone(ind) {
-            this.$emit('chosenZone', this.foundZones[ind].zone);
+        chooseZone(index) {
+            this.$emit('chooseZone', {zone: this.foundZones[index].zone});
         },
         openTimezones() {
             this.timezonesDropped = !this.timezonesDropped;
@@ -50,6 +45,9 @@ export default {
         }
     },
     computed: {
+        ...mapGetters({
+            timezones: 'getTimezones'
+        }),
         foundZones() {
             let result = this.timezones;
             if(this.timezoneSearch) {
@@ -62,6 +60,9 @@ export default {
             return result;
         }
     },
+    created() {
+        this.$store.dispatch('getAllTimezones');
+    },
     directives: {
         ClickOutside
     }
@@ -70,29 +71,33 @@ export default {
 
 <style lang="scss" scoped>
 
+.title {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
 .dropSelect {
     position: relative;
-    .search-zone {
-        position: absolute;
+    width: 214px;
+    border: 1px solid #67573E;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
+    .search {
+        z-index: 50;
         width: 100%;
-        border: 1px solid #BFB09D;
-        z-index: 10;
-        .search {
-            width: 99%;
-            outline: none;
-            border: none;
-            padding: 5px 2px;
-            .block-item & {
-                width: 98%;
-            }
-        }
+        padding: 5px 3px;
+        color: #67573E;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
+        border: 1px solid rgba(125, 138, 180, 0.466);
+        border-right: none;
     }
     .drop {
-        margin-top: 27px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
-        max-height: 150px;
+        max-height: 100px;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
@@ -100,6 +105,7 @@ export default {
         background-color: white;
         z-index: 6;
         &__item {
+            height: 37px;
             padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
@@ -112,43 +118,36 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
-        .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
+        .active-zone {
+            background-color: rgba(102, 86, 61, 0.7);
+            color: #FFF;
         }
-    }
-    .block-item & {
-        width: 193px;
     }
 }
 
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
-    width: 470px;
-    height: 28px;
+    border-radius: 15px;
+    width: 100%;
+    height: 40px;
     display: flex;
     justify-content: space-between;
-    overflow: hidden;
+    cursor: pointer;
     .selected {
-        border-right: 1px solid #BFB09D;
-        width: 91%;
-        padding: 0 5px;
+        width: 75%;
+        padding: 3px 10px;
         font-size: 14px;
-        max-height: 28px;
+        max-height: 40px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        .block-item & {
-            width: 82%;
-        }
     }
     .no-country {
         opacity: 0.5;
     }
     .arrowButton {
-        width: 9%;
+        width: 25%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -158,12 +157,6 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
-        .block-item & {
-            width: 18%;
-        }
-    }
-    .block-item & {
-        width: 193px;
     }
 }
 

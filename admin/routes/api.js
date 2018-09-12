@@ -11,7 +11,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { sendMailPortal } = require('../utils/mailhandlerportal')
-const { Requests, Projects, Languages, Services, Industries } = require('../models');
+const { Requests, Projects, Languages, Services, Industries, Timezones } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
 const fileType = require('file-type');
@@ -278,15 +278,6 @@ router.get('/services', async (req, res) => {
       console.log(err)
       res.send('Something wrong with DB')
   }
-  // Services.find()
-  //   .then(results => {
-  //     res.send(results)
-  //   })
-  //   .catch(err => {
-  //     console.log(err)
-  //     res.statusCode(500);
-  //     res.send('Something wrong with DB')
-  //   })
 });
 
 router.get('/industries', (req, res) => {
@@ -298,6 +289,16 @@ router.get('/industries', (req, res) => {
     res.send('Something wrong with DB');
   });
 });
+
+router.get('/timezones', (req, res) => {
+  Timezones.find()
+    .then(timezones => {
+        res.send(timezones)
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
 
 router.get('/customers', async (req, res) => {
   let customers = await HomeApi.getAllCustomers();

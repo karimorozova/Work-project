@@ -86,6 +86,56 @@ export default {
     margin-bottom: 5px;
 }
 
+.dropSelect {
+    position: relative;
+    width: 214px;
+    border: 1px solid #67573E;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
+    .drop {
+        font-size: 14px;
+        width: 100%;
+        max-height: 100px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        z-index: 6;
+        &__item {
+            display: flex;
+            align-items: center;
+            padding: 12px 4px;
+            border-bottom: .5px solid #BFB09D;
+            cursor: pointer;
+            transition: all 0.4s;
+            &:last-child {
+                border: none;
+            }
+            &:hover {
+                background-color: rgba(191, 176, 157, 0.363);
+            }
+        }
+        .active-lang {
+            background-color: rgba(102, 86, 61, 0.7);
+            color: #FFF;
+        }
+    }
+    .search {
+        z-index: 50;
+        width: 100%;
+        padding: 5px 3px;
+        color: #67573E;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
+        border: 1px solid rgba(125, 138, 180, 0.466);
+        border-right: none;
+    }
+}
+
 .select {
     border-radius: 15px;
     width: 100%;
@@ -118,55 +168,6 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
-    }
-}
-.dropSelect {
-    position: relative;
-    width: 214px;
-    border: 1px solid #67573E;
-    border-radius: 15px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
-    .drop {
-        font-size: 14px;
-        width: 100%;
-        max-height: 100px;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        background-color: white;
-        z-index: 15;
-        &__item {
-            display: flex;
-            align-items: center;
-            padding: 12px 4px;
-            border-bottom: .5px solid #BFB09D;
-            cursor: pointer;
-            transition: all 0.4s;
-            &:last-child {
-                border: none;
-            }
-            &:hover {
-                background-color: rgba(191, 176, 157, 0.363);
-            }
-        }
-        .active-lang {
-            background-color: rgba(102, 86, 61, 0.7);
-            color: #FFF;
-        }
-    }
-    .search {
-        z-index: 50;
-        width: 100%;
-        padding: 5px 3px;
-        color: #67573E;
-        outline: none;
-        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
-        border: 1px solid rgba(125, 138, 180, 0.466);
-        border-right: none;
     }
 }
 

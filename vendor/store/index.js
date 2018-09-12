@@ -7,11 +7,15 @@ Vue.use(Vuex);
 
 const state = {
     languages: [],
+    timezones: []
 };
 
 const mutations = {
     allLangs(state, payload) {
         state.languages = payload
+    },
+    allTimezones(state, payload) {
+        state.timezones = payload
     }
 };
 

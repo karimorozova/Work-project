@@ -24,6 +24,10 @@
                     @chooseLang="setMotherTongue"
                 )
             .info-block__item
+                TimezoneSelect(
+                    :timezoneSelected="selectedTimezone"
+                    @chooseZone="chooseTimezone"
+                )
         .info-block
             .info-block__item
             .info-block__item
@@ -31,20 +35,26 @@
 
 <script>
 import NativeLanguageSelect from "./personInfo/NativeLanguageSelect"
+import TimezoneSelect from "./personInfo/TimezoneSelect"
 
 export default {
     data() {
         return {
             selectedTongue: {},
+            selectedTimezone: ""
         }
     },
     methods: {
         setMotherTongue(data) {
             this.selectedTongue = data.lang;
+        },
+        chooseTimezone(data) {
+            this.selectedTimezone = data.zone;
         }
     },
     components: {
-        NativeLanguageSelect
+        NativeLanguageSelect,
+        TimezoneSelect
     }
 }
 </script>
@@ -81,12 +91,13 @@ export default {
 .info-block {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
+    align-items: center;
+    margin-bottom: 40px;
     &__item {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 150px;
+        height: 160px;
     }
 }
 
