@@ -19,7 +19,10 @@
                     span.item-contacts__example example@example.com
         .info-block
             .info-block__item
-                NativeLanguageSelect
+                NativeLanguageSelect(
+                    :selectedLang="selectedTongue"
+                    @chooseLang="setMotherTongue"
+                )
             .info-block__item
         .info-block
             .info-block__item
@@ -32,11 +35,13 @@ import NativeLanguageSelect from "./personInfo/NativeLanguageSelect"
 export default {
     data() {
         return {
-
+            selectedTongue: {},
         }
     },
     methods: {
-
+        setMotherTongue(data) {
+            this.selectedTongue = data.lang;
+        }
     },
     components: {
         NativeLanguageSelect
@@ -99,6 +104,7 @@ export default {
         border: 1px solid #67573E;
         border-radius: 15px;
         color: #67573E;
+        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
     }
     &__example {
         position: absolute;

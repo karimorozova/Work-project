@@ -2,14 +2,14 @@
     .native-language
         .title Mother tongue:
         .dropSelect(v-click-outside="outClick")
-            .select
-                span.selected(v-if="selectedLang") {{ selectedLang.lang }}
+            .select(@click="showLangs")
+                span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
                 span.selected(v-else) Select
-                .arrowButton(@click="showLangs")
+                .arrowButton
                     img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: droppedLang}")
             input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
             .drop(v-if="droppedLang")
-                .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
+                .drop__item(v-for="(language, index) in filteredLangs" @click="chooseLang(index)" :class="{'active-lang': selectedLang.lang == language.lang}")
                     span {{ language.lang }}
 </template>
 
@@ -20,7 +20,7 @@ import { mapGetters } from "vuex";
 export default {
     props: {
         selectedLang: {
-            type: Array
+            type: Object
         }
     },
     data() {
@@ -48,14 +48,6 @@ export default {
             this.droppedLang = !this.droppedLang;
             this.$emit('scrollDrop', {drop: this.droppedLang, offsetTop: top, offsetHeight: height})
         },
-        async getLanguages() {
-            let result = await this.$axios.$get('api/languages')
-            let sortedArray = result;
-            this.languages = sortedArray.sort( (a,b) => {
-                if(a.lang < b.lang) return -1;
-                if(a.lang > b.lang) return 1;
-            });
-        },
         outClick() {
             this.droppedLang = false;
         },
@@ -64,9 +56,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('getLangs'),
+        ...mapGetters({
+            allLanguages: 'getLangs',
+        }),
         filteredLangs() {
-            let result = this.languages.filter(item => {
+            let result = this.allLanguages.filter(item => {
                 if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
                     return item
                 }
@@ -77,9 +71,10 @@ export default {
     directives: {
         ClickOutside
     },
-    mounted () {
-        this.getLanguages();
-        console.log(this.$store.state.languages);
+    created() {
+        this.$store.dispatch('getAllLanguages');
+    },
+    mounted() {
     }
 }
 </script>
@@ -92,26 +87,28 @@ export default {
 }
 
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 15px;
     width: 100%;
-    height: 28px;
+    height: 40px;
     display: flex;
     justify-content: space-between;
+    cursor: pointer;
     .selected {
-        border-right: 1px solid #BFB09D;
-        width: 82%;
-        padding: 3px 5px;
+        width: 75%;
+        padding: 3px 10px;
         font-size: 14px;
         opacity: 0.7;
-        max-height: 28px;
+        max-height: 40px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
     }
+    .chosen-lang {
+        opacity: 1;
+    }
     .arrowButton {
-        width: 18%;
+        width: 25%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -122,37 +119,30 @@ export default {
             transform: rotate(180deg);
         }
     }
-    .innerComponent & {
-        border: none;
-        border-radius: 0;
-        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
-        height: 26px;
-        border: 1px solid #BFB09D;
-        .selected {
-            opacity: 1;
-            padding: 2px 5px;
-        }
-    }
 }
 .dropSelect {
     position: relative;
+    width: 214px;
+    border: 1px solid #67573E;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
     .drop {
         font-size: 14px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
-        max-height: 150px;
+        max-height: 100px;
         overflow-y: scroll;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 15;
-        padding-top: 29px;
         &__item {
             display: flex;
             align-items: center;
-            padding: 12px 2px;
+            padding: 12px 4px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -160,34 +150,23 @@ export default {
                 border: none;
             }
             &:hover {
-                // padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.363);
             }
         }
-        .innerComponent & {
-            max-height: 118px;
-            padding-top: 28px;
-            span {
-                width: 88%;
-            }
+        .active-lang {
+            background-color: rgba(102, 86, 61, 0.7);
+            color: #FFF;
         }
     }
-    .innerComponent & {
-        height: 100%;
-    }
     .search {
-        position: absolute;
         z-index: 50;
-        width: 90%;
+        width: 100%;
         padding: 5px 3px;
         color: #67573E;
         outline: none;
         box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
-        .innerComponent & {
-            width: 88%;
-        }
     }
 }
 
