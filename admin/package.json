@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "API_URL='http://localhost:3001' node build/dev-server.js",
     "start": "node build/dev-server.js",
-    "build": "set API_URL='https://admin.pangea.global' node build/build.js",
-    "watch": "set API_URL='http://localhost:3001' && node build/watch.js"
+    "build": "API_URL='https://admin.pangea.global' node build/build.js",
+    "watch": "API_URL='http://localhost:3001' node build/watch.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
