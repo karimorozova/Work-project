@@ -72,6 +72,10 @@ export default {
   props: {
     client: {
         type: Object
+    },
+    sevLangs: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -283,7 +287,6 @@ export default {
           targetLanguage: this.fullInfo[index].targetLanguage,
           client: this.fullInfo[index].client,
         }
-        console.log(deletedRate);
         this.currentActive = "none";
         deletedRate.form = "Duo";
         deletedRate.client = this.client._id;
@@ -353,6 +356,7 @@ export default {
       })
     },
     clientRates() {
+      console.log("getting client rates...");
       this.fullInfo = [];
       for(let serv of this.services) {
         if(serv.title == this.serviceSelect.title) {

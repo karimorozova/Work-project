@@ -8,7 +8,6 @@ const middleware = {
             err.status = 401;
             res.status(401);
             res.send(err.message);
-            // return next(err);
         }
     },
 
@@ -17,7 +16,7 @@ const middleware = {
             '/register',
             '/tasks-report',
             '/login',
-            '/accountinfo',
+            '/account-info',
             '/dashboard',
             '/recruitment',
             '/vendors',
@@ -30,7 +29,6 @@ const middleware = {
             '/translation-request'
         ]
         if(routesArray.indexOf(url) != -1) {
-            console.log(url)
             return true;
         } else {
             return false;

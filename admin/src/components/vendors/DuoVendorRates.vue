@@ -288,7 +288,6 @@ export default {
           targetLanguage: this.fullInfo[index].targetLanguage,
           vendor: this.fullInfo[index].vendor,
         }
-        console.log(deletedRate);
         this.currentActive = "none";
         deletedRate.form = "Duo";
         deletedRate.vendor = this.vendor._id;

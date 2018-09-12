@@ -43,7 +43,6 @@ export default {
       monoDrop: false,
       duoDrop: false,
       addSeveral: false,
-      fullInfo: []
     };
   },
   methods: {
@@ -52,7 +51,7 @@ export default {
     },
     addSevLangs(data) {
       this.addSeveral = true;
-      this.fullInfo = data;
+      this.$emit('refreshServices', data);
     },
     closeSevLangs(data) {
       this.addSeveral = false;

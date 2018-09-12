@@ -2,7 +2,7 @@
     .clientsportalWrapper
         .clientsTop
             .clientsTop__clientName
-                h2.clientsPortal {{ vendortPortal }}
+                h2.clientsPortal
             .clientsTop__searchBlock
                 .searchWrapper
                     img.search(src="../assets/images/search.png")

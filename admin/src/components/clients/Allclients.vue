@@ -61,6 +61,7 @@
         .clients__data(v-if="clientData")
             ClientDetails(:client="client"
                 :newClient="newClient"
+                :addSeveral="addSeveral"
                 @clientDelete="clientDelete"
                 @newContact="addNewContact"
                 @refreshClients="refreshClients"
@@ -107,7 +108,6 @@ export default {
     },
     methods: {
         addSevLangs(data) {
-            console.log('several')
             this.addSeveral = true
         },
         closeSevLangs(data) {
@@ -271,6 +271,7 @@ export default {
                 this.client = this.clients.find(item => {
                     if(item._id == data.clientId) {
                         return item
+                        console.log(item)
                     }
                 })
             }
@@ -338,9 +339,6 @@ export default {
         ClientLeadsourceSelect,
         ClientDetails,
         Addseverallangs
-    },
-    created() {
-
     },
     mounted() {
         this.getclients();

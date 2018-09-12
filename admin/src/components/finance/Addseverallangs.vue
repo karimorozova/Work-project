@@ -95,7 +95,7 @@ export default {
                 this.langsAddition();
             }
         },
-        langsAddition() {
+        async langsAddition() {
             let languageCombinations = [];
             for(let sourLang of this.source.chosen) {
                 for(let targLang of this.target.chosen) {
@@ -118,35 +118,19 @@ export default {
                 }
             }
             if(this.origin == 'rates') {
-                this.$http.post('../service/several-langs', JSON.stringify(languageCombinations))
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+                let result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
+                this.$emit('refreshServices');
             }
             if(this.origin == 'vendor') {
                 let id = this.who._id;
-                this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id})
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+                let vendorClient = this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
+                this.$emit('refreshServices', {vendorId: id});
             }
             if(this.origin == 'client') {
                 let id = this.who._id;
-                this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id})
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+                let clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
+                this.$emit('refreshServices', {clientId: id});
             }
-            this.$emit('refreshServices');
             this.closeSeveral();
         },
         closeSeveral() {

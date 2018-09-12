@@ -48,7 +48,7 @@
                 ContactsInfo(:client="client" @contactDetails="contactDetails" @newContact="addNewContact")
             .title(v-if="client._id") Rates    
             .rates(v-if="client._id")
-                ClientRates(:client="client" 
+                ClientRates(:client="client"
                     @addSevLangs="addSevLangs"
                     @ratesUpdate="ratesUpdate")
             .title Sales Information

@@ -48,6 +48,9 @@ export default {
             this.$emit('ratesUpdate', data);
         }
     },
+    computed: {
+        
+    },
     components: {
         DuoClientRates,
         MonoClientRates

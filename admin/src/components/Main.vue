@@ -12,7 +12,7 @@
                       img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
                   .clients-top__dropdown
                     .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='gotoRequestForm(ind)') {{ proj.title }}
+                      .additional__listItem(target="_newtab" v-for='(proj, projIndex) in newProject' @click='gotoRequestPage(projIndex)') {{ proj.title }}
                 .dropdown-wrapper
                   .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/andmin-button-icon.png" )
@@ -43,9 +43,8 @@
                 ul.navbar__menu
                   li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
-                      img(v-if="!note.active" :src="note.imgWhite")
-                      img(v-else :src="note.imgBrown")
-                    .title(:class="{showTitle: true}")
+                      img(:src="note.imgBrown")
+                    .title
                       span {{ note.title }}
                 .balloons
             router-view(:sliderBool="sliderBool"
@@ -68,55 +67,46 @@ export default {
       navbarList: [
         {
           title: "DASHBOARD",
-          imgWhite: require("../assets/images/CATEGORIES/dashboard.png"),
           imgBrown: require("../assets/images/CATEGORIES/dashboard-brown.png"),
           active: true
         },
         {
           title: "RECRUITMENT",
-          imgWhite: require("../assets/images/CATEGORIES/recruitment-white.png"),
           imgBrown: require("../assets/images/CATEGORIES/recruitment.png"),
           active: false
         },
         {
           title: "VENDORS",
-          imgWhite: require("../assets/images/CATEGORIES/vendors white.png"),
           imgBrown: require("../assets/images/CATEGORIES/vendors.png"),
           active: false
         },
         {
           title: "LANGUAGES",
-          imgWhite: require("../assets/images/CATEGORIES/languages white.png"),
           imgBrown: require("../assets/images/CATEGORIES/languages.png"),
           active: false
         },
         {
           title: "CLIENTS",
-          imgWhite: require("../assets/images/CATEGORIES/clients white.png"),
           imgBrown: require("../assets/images/CATEGORIES/clients.png"),
           active: false
         },
         {
           title: "QUOTES",
-          imgWhite: require("../assets/images/CATEGORIES/quotes white.png"),
           imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
           active: false
         },
         {
           title: "PROJECTS",
-          imgWhite: require("../assets/images/CATEGORIES/projects.png"),
           imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
           active: false
         },
         {
           title: "FINANCE",
-          imgWhite: require("../assets/images/CATEGORIES/finance white.png"),
           imgBrown: require("../assets/images/CATEGORIES/finance.png"),
           active: false
         },
         {
           title: "REPORTS",
-          imgWhite: require("../assets/images/CATEGORIES/report white.png"),
           imgBrown: require("../assets/images/CATEGORIES/report.png"),
           active: false
         }
@@ -168,7 +158,7 @@ export default {
       let allLangs = result.body;
       this.$store.dispatch('allLanguages', allLangs);
     },
-    gotoRequestForm(index) {
+    gotoRequestPage(index) {
       if (index == 0) {
         this.$router.push('translation-request');
       }
@@ -586,18 +576,24 @@ export default {
           }
         }
         .title {
-          transition: all 0.4s;
-          opacity: 0;
+          transition: all 0.3s;
           color: #fff;
         }
-        .showTitle {
-          opacity: 1;
+        .image {
+          img {
+            filter: brightness(300%);
+          }
         }
       }
       .active {
         background-color: white;
         .title {
           color: #978d7e;
+        }
+        .image {
+          img {
+            filter: none;
+          }
         }
       }
     }
