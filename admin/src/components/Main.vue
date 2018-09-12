@@ -1,57 +1,56 @@
 <template lang="pug">
-    .admminportalWrapper2
-        .adminTop
-            .adminTop__adminName 
+    .adminportal-wrapper
+        .admin-top
+            .admin-top__admin-name 
                 h2.adminPortal ADMIN PORTAL
-            .adminTop__searchBlock
+            .admin-top__search-block
                 .create-project
                   .sel_project_block
                     .sel_project_block__proj
                       span New Project
-                    .sel_project_block__imgWrapper(@click="showDropdown")
+                    .sel_project_block__img-wrapper(@click="showDropdown")
                       img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
-                  .clientsTop__dropdown
+                  .clients-top__dropdown
                     .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
-                .dropdownWrapper
+                      .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='gotoRequestForm(ind)') {{ proj.title }}
+                .dropdown-wrapper
                   .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/andmin-button-icon.png" )
                     span.spwrap settings
-                .womanWrapper
-                  img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
-                  .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
-                    .accountBlock
-                      .accountBlock__info
+                .woman-wrapper
+                  img.woman-wrapper__photo(src="../assets/images/client-icon_image.png")
+                  .account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
+                    .account-block
+                      .account-block__info
                         .icon
                           img(src="../assets/images/man.png")
-                        .personal_data
-                          .name {{ user.name }}
-                          .email {{ user.email }}
-                      .accountBlock__myaccount(@click="showAccountInfo")
+                        .personal__data
+                          .personal__data_name {{ user.name }}
+                          .personal__data_email {{ user.email }}
+                      .account-block__myaccount(@click="showAccountInfo")
                         .human_icon
                           img(src="../assets/images/man.png")
                         .my_account My Account
-                      .accountBlock__exit(@click="signOut")
+                      .account-block__exit(@click="signOut")
                         .icon_exit
                           img(src="../assets/images/sign-out.png")
                         .sign_out Sign Out
-                .chevronWrapper
+                .chevron-wrapper
                   .chevron(@click="showAccountMenu")
-        .adminMainWrapper
-            .adminNavbar
-              .adminNavbar__sideBar
-                ul.navbar__ulist
-                  li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
+        .admin-main-wrapper
+            .admin-navbar
+              .admin-navbar__sidebar
+                ul.navbar__menu
+                  li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
                     .image
-                      img(v-if="!note.active" :src="note.imgWhite") 
+                      img(v-if="!note.active" :src="note.imgWhite")
                       img(v-else :src="note.imgBrown")
                     .title(:class="{showTitle: true}")
                       span {{ note.title }}
-                //- .logoImage
                 .balloons
             router-view(:sliderBool="sliderBool"
               @refreshXtmCustomers="refreshXtmCustomers"
-              @customerLangs='customerLangs'
+              @getCustomerLangs='getCustomerLangs'
               @refreshServices='refreshServices'
               )
 </template>
@@ -81,8 +80,8 @@ export default {
         },
         {
           title: "VENDORS",
-          imgWhite: require("../assets/images/CATEGORIES/vendors white.jpg"),
-          imgBrown: require("../assets/images/CATEGORIES/vendors.jpg"),
+          imgWhite: require("../assets/images/CATEGORIES/vendors white.png"),
+          imgBrown: require("../assets/images/CATEGORIES/vendors.png"),
           active: false
         },
         {
@@ -94,13 +93,13 @@ export default {
         {
           title: "CLIENTS",
           imgWhite: require("../assets/images/CATEGORIES/clients white.png"),
-          imgBrown: require("../assets/images/CATEGORIES/clients.jpg"),
+          imgBrown: require("../assets/images/CATEGORIES/clients.png"),
           active: false
         },
         {
           title: "QUOTES",
-          imgWhite: require("../assets/images/CATEGORIES/quotes white.jpg"),
-          imgBrown: require("../assets/images/CATEGORIES/quotes.jpg"),
+          imgWhite: require("../assets/images/CATEGORIES/quotes white.png"),
+          imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
           active: false
         },
         {
@@ -111,14 +110,14 @@ export default {
         },
         {
           title: "FINANCE",
-          imgWhite: require("../assets/images/CATEGORIES/finance white.jpg"),
-          imgBrown: require("../assets/images/CATEGORIES/finance.jpg"),
+          imgWhite: require("../assets/images/CATEGORIES/finance white.png"),
+          imgBrown: require("../assets/images/CATEGORIES/finance.png"),
           active: false
         },
         {
           title: "REPORTS",
           imgWhite: require("../assets/images/CATEGORIES/report white.png"),
-          imgBrown: require("../assets/images/CATEGORIES/report.jpg"),
+          imgBrown: require("../assets/images/CATEGORIES/report.png"),
           active: false
         }
       ],
@@ -139,15 +138,11 @@ export default {
     };
   },
   methods: {
-    async customerLangs(data) {
-      console.log(data);
+    async getCustomerLangs(data) {
       let person = await this.$http.get(`api/person?customerId=${data.id}`);
       let personEmail = person.body.email;
-      console.log(personEmail);
       let token = await this.$http.post('api/get-token', {email: personEmail});
-      console.log(token.body);
       let sessionId = await this.$http.post('api/token-session', {token: token});
-      console.log('session: ' + sessionId.body);
       document.cookie = "ses=" + sessionId.body + "; " + "maxAge=60;" 
       let result = await this.$http.get(`portal/language-combinations?customerId=${data.id}`);
       this.$store.dispatch('gettingClientLangs', result.body);
@@ -159,7 +154,6 @@ export default {
     },
     async getCustomers() {
       let result = await this.$http.get('/all-clients');
-      // let result = await this.$http.get('api/customers');
       this.$store.dispatch('customersGetting', result.body);
     },
     async getXtmCustomers() {
@@ -174,7 +168,7 @@ export default {
       let allLangs = result.body;
       this.$store.dispatch('allLanguages', allLangs);
     },
-    dataForRequest(index) {
+    gotoRequestForm(index) {
       if (index == 0) {
         this.$router.push('translation-request');
       }
@@ -218,7 +212,7 @@ export default {
       });
       this.$router.push('/login');
     },
-    switchInfo(index) {
+    switchSection(index) {
       this.navbarList.forEach((item, i) => {
         if (i == index) {
           item.active = true;
@@ -227,75 +221,41 @@ export default {
         }
       })
 
-        if (index == 0) {
-          if(window.location.toString().indexOf('dashboard') == -1) {
-            this.$router.push('dashboard')
-          }
-          this.sliderBool = false;
-          this.path = "Dashboard";
-        }
-
-        if (index == 1) {
-          if(window.location.toString().indexOf('recruitment') == -1) {
-            this.$router.push('recruitment')
-          }
-          this.path = "Reqruitment";
-        }
-
-        if (index == 2) {
-          if(window.location.toString().indexOf('vendors') == -1) {
-            this.$router.push('vendors')
-          }
-          this.path = "Vendors";
-        }
-
-        if (index == 3) {
-          if(window.location.toString().indexOf('languages') == -1) {
-            this.$router.push('languages')
-          }
-          this.path = "Languages";
-        }
-
-        if (index == 4) {
-          if(window.location.toString().indexOf('clients') == -1) {
-            this.$router.push('clients')
-          }
-          this.path = "Clients";
-        }
-
-        if (index == 5) {
-          if(window.location.toString().indexOf('quotes') == -1) {
-            this.$router.push('quotes')
-          }
-          this.path = "Quotes";
-        }
-
-        if (index == 6) {
-          if(window.location.toString().indexOf('projects') == -1) {
-            this.$router.push('projects')
-          }
-          this.path = "Projects";
-        }
-
-        if (index == 7) {
-          if(window.location.toString().indexOf('finance') == -1) {
-            this.$router.push('finance')
-          }
-          this.path = "Finance";
-        }
-
-        if (index == 8) {
-          if(window.location.toString().indexOf('reports') == -1) {
-            this.$router.push('reports')
-          }
-          this.path = "Reports";
-        }
+      switch(index) {
+        case 0:
+          this.$router.push('dashboard');
+          break;
+        case 1:
+          this.$router.push('recruitment');
+          break;
+        case 2:
+          this.$router.push('vendors');
+          break;
+        case 3:
+          this.$router.push('languages');
+          break;
+        case 4:
+          this.$router.push('clients');
+          break;
+        case 5:
+          this.$router.push('quotes');
+          break;
+        case 6:
+          this.$router.push('projects');
+          break;
+        case 7:
+          this.$router.push('finance');
+          break;
+        case 8:
+          this.$router.push('reports');
+          break;
+      }
     },    
     showAccountMenu() {
       this.accountMenuVisible = !this.accountMenuVisible;
     },
     showAccountInfo() {
-      this.$router.push('accountinfo');
+      this.$router.push('account-info');
     },
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
@@ -324,26 +284,22 @@ export default {
     this.getXtmCustomers();
     this.getLanguages();
   },
-  components: {
-  },
   directives: {
     ClickOutside
-  },
-  computed: { 
   }  
 };
 </script>
 
 <style lang="scss" scoped>
 
-.adminTop {
+.admin-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: #67573e;
   position: relative;
   height: 6vh;
-  &__adminName {
+  &__admin-name {
     width: 35%;
     display: flex;
     justify-content: flex-start;
@@ -361,13 +317,13 @@ export default {
       font-weight: 700;
     }
   }
-  &__searchBlock {
+  &__search-block {
     width: 35%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
 
-    .dropdownWrapper {
+    .dropdown-wrapper {
       height: 34px;
       width: 36px;
       display: flex;
@@ -419,7 +375,7 @@ export default {
           }
         }
 
-        &__imgWrapper {
+        &__img-wrapper {
           display: flex;
           img {
             height: 14px;
@@ -434,7 +390,7 @@ export default {
       }
     }
 
-    .womanWrapper {
+    .woman-wrapper {
       margin: 0 3px 7px 15px;
       border-radius: 30px;
       width: 33px;
@@ -447,8 +403,8 @@ export default {
         padding-right: 1px;
       }
 
-      .accountMenuWrapper {
-        .accountBlock {
+      .account-menu-wrapper {
+        .account-block {
           width: 192px;
           height: 124px;
           background-color: #fff;
@@ -473,7 +429,7 @@ export default {
               }
             }
 
-            .personal_data {
+            .personal__data {
               color: #67573e;
               display: flex;
               flex-direction: column;
@@ -482,11 +438,11 @@ export default {
               padding-top: 2%;
               margin-right: 14%;
 
-              .name {
+              &_name {
                 font-size: 12px;
               }
 
-              .email {
+              &_email {
                 font-size: 11px;
               }
             }
@@ -540,7 +496,7 @@ export default {
       }
     }
 
-    .chevronWrapper {
+    .chevron-wrapper {
       width: 140px;
       .chevron {
         position: relative;
@@ -582,19 +538,19 @@ export default {
   }
 }
 
-.adminMainWrapper {
+.admin-main-wrapper {
   display: flex;
   height: 100%;
   position: relative;
   &__inner {
     width: 90%;
   }
-  .adminNavbar {
+  .admin-navbar {
     font-family: MyriadPro;
     position: relative;
     display: flex;
     min-height: 94vh;
-    &__sideBar {
+    &__sidebar {
       padding: 35px 0;
       background-color: #998e7e;
       width: 150px;
@@ -606,7 +562,7 @@ export default {
       transition: all 0.5s;
       z-index: 2;
     }
-    .navbar__ulist {
+    .navbar__menu {
       list-style: none;
       font-size: 15px;
       font-weight: bold;
@@ -645,19 +601,6 @@ export default {
         }
       }
     }
-
-    // .logoImage {
-    //   transition: all 0.4s;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    //   background-image: url("../assets/images/logo_white.png");
-    //   background-size: contain;
-    //   background-repeat: no-repeat;
-    //   width: 175px;
-    //   height: 59px;
-    //   padding-bottom: 61px;
-    // }
 
     .balloons {
       transition: all 0.4s;
@@ -717,7 +660,7 @@ export default {
       }
     }
 
-    &__imgWrapper {
+    &__img-wrapper {
       display: flex;
       height: 33px;
       width: 48px;
@@ -734,7 +677,7 @@ export default {
     }
   }
 
-  .clientsTop__dropdown {
+  .clients-top__dropdown {
     z-index: -1;
     position: absolute;
     right: 47px;

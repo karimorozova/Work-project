@@ -44,25 +44,25 @@ export default new Router({
       component: Main,
       props: true,
       beforeEnter: (to, from, next) => {
-        if(localStorage.getItem("token")) {
-          let tokenObject = JSON.parse(localStorage.getItem("token"));
-          let tokenDate = new Date(tokenObject.timestamp).getTime();
-          let date = new Date().getTime()
+        const token = localStorage.getItem("token");
+        if(token) {
+          const tokenObject = JSON.parse(token);
+          const tokenDate = new Date(tokenObject.timestamp).getTime();
+          const date = new Date().getTime()
           if(tokenDate <= date) {
             localStorage.removeItem("token");
             next('/login')  
           } else {
             next()
           }
-        next()
         } else {
           next('/login')
         }
       },
       children: [
         {
-          path: 'accountinfo',
-          name: 'accountinfo',
+          path: 'account-info',
+          name: 'account-info',
           component: Accountinfo
         },
         {
