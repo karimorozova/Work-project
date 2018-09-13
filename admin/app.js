@@ -10,7 +10,7 @@ const port = config.server.port;
 const db = mongoose.connection;
 const checkCollections = require("./helpers/dbSetDefault");
 const { LanguagesModel, RequestSchema } = require("./models");
-const { checkRoutes } = require("./middleware/middleware");
+const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
 
 // TODO : check origins from localhost only
