@@ -2,7 +2,7 @@
     .native-language
         .native-language__title {{ label }}
         .drop-select(v-click-outside="outClick")
-            .select(@click="showLangs")
+            .select(@click="toggleLangs")
                 span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
                 span.selected(v-else) {{ placeholder }}
                 .arrow-button
@@ -50,7 +50,7 @@ export default {
         ...mapActions({
             getAllLanguages: 'getAllLanguages'
         }),
-        showLangs(event) {
+        toggleLangs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
                 if(item.localName == "tr") {

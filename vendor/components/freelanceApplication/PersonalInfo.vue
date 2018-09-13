@@ -61,7 +61,7 @@
             .row__item
                 SelectPosition(
                     :selectedPositions="selectedPositions"
-                    @choosePosition="addPosition"
+                    @choosePosition="choosePosition"
                 )
 
 </template>
@@ -101,14 +101,13 @@ export default {
         uploadCvFile({files}) {
             this.cvFiles = files;
         },
-        addPosition({position}) {
+        choosePosition({position}) {
+            const elementPosition = this.selectedPositions.indexOf(position);
             if(position == "Other") {
-                if(this.selectedPositions.indexOf(position) == -1) {
-                    this.selectedPositions = ["Other"];
-                    return
+                if(elementPosition == -1) {
+                    return this.selectedPositions = ["Other"];
                 } else {
-                    this.selectedPositions = [];
-                    return
+                    return this.selectedPositions = [];
                 }
             } else {
                 for(let index in this.selectedPositions) {
@@ -116,20 +115,11 @@ export default {
                         this.selectedPositions.splice(index, 1)
                     }
                 }
-                let isExist = false;
-                if(this.selectedPositions.indexOf(position) != -1) {
-                    isExist = true;
+                if(elementPosition === -1){
+                    return this.selectedPositions.push(position);
                 }
-                if(isExist) {
-                    for(let index in this.selectedPositions) {
-                        if(this.selectedPositions[index] == position) {
-                            this.selectedPositions.splice(index, 1)
-                        }
-                    }
-                } else {
-                    this.selectedPositions.push(position);
-                }
-            } 
+                this.selectedPositions.splice(elementPosition, 1)
+            }
         }
     },
     components: {

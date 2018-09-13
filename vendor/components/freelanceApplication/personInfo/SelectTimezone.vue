@@ -2,7 +2,7 @@
     .timezones-list
         .timezones-list__label Time-zone:
         .drop-select(v-click-outside="outTimezones")
-            .select(@click="openTimezones")
+            .select(@click="toggleTimezones")
                 span.selected(v-if="timezoneSelected") {{ timezoneSelected.split(" ")[0] }}
                 span.selected.no-country(v-else) Select
                 .arrow-button
@@ -36,7 +36,7 @@ export default {
         chooseZone(index) {
             this.$emit('chooseZone', {zone: this.foundZones[index].zone});
         },
-        openTimezones() {
+        toggleTimezones() {
             this.timezonesDropped = !this.timezonesDropped;
             if(!this.timezonesDropped) {
                 this.timezoneSearch = ""

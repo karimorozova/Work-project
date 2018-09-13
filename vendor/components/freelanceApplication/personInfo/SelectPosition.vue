@@ -2,7 +2,7 @@
 .position
     .position__label Position:
     .drop-select(v-click-outside="outPositions")
-        .select(@click="openPositions")
+        .select(@click="togglePositions")
             span.selected(v-if="selectedPositions.length") {{ selectedPositions.join('; ') }}
             span.selected.no-position(v-if="!selectedPositions.length") Select
             .arrow-button
@@ -34,7 +34,7 @@ export default {
         outPositions() {
             this.posDropped = false;
         },
-        openPositions() {
+        togglePositions() {
             this.posDropped = !this.posDropped;
         },
         choosePosition(index) {
