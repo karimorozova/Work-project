@@ -63,9 +63,7 @@ const routes = require("./routes");
 app.use("/", routes);
 
 app.use(history({ verbose: true, index: '/' }));
-app.get("/", (req, res, next) => {
-  checkRoutes(req, res, next, __dirname)
-});
+app.use(checkRoutes);
 
 app.listen(port, () => {
   console.log(`Server is working on: ${port}`);

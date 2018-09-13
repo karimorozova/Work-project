@@ -1,4 +1,5 @@
 
+const path = require("path");
 const middleware = {
     requiresLogin(req, res, next) {
         if (req.session && req.session.userId) {
@@ -11,7 +12,7 @@ const middleware = {
         }
     },
 
-    checkRoutes(req, res, next, dir) {
+    checkRoutes(req, res, next) {
         let routesArray = [
             '/register',
             '/tasks-report',
@@ -29,7 +30,7 @@ const middleware = {
             '/translation-request'
         ]
         if(routesArray.indexOf(req.originalUrl) != -1) {
-            res.sendFile(dir + '/dist/index.html')
+            res.sendFile(path.resolve('./dist/index.html'))
         } else {
             next();
         }
