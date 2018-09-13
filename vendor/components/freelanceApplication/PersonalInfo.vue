@@ -1,84 +1,120 @@
 <template lang="pug">
-    .personal-wrap
-        .main-title PERSONAL INFORMAITON
-        .info-block
-            .info-block__item
-                .item-initials
-                    .item-initials__title Name:
-                    input.item-initials__text-field(type="text")
-                .item-initials
-                    .item-initials__title Surname:
-                    input.item-initials__text-field(type="text")
-            .info-block__item
-                .item-contacts
-                    .item-contacts__title Phone Number:
-                    input.item-contacts__text-field(type="text")
-                .item-contacts
-                    .item-contacts__title Email:
-                    input.item-contacts__text-field(type="text")
-                    span.item-contacts__example example@example.com
-        .info-block
-            .info-block__item
-                NativeLanguageSelect(
+    .personal
+        .personal__main-title PERSONAL INFORMAITON
+        .row
+            .row__item.init-contact
+                .personal-initials
+                    .personal-initials__label Name:
+                    input.personal-initials__input(type="text")
+                .personal-initials
+                    .personal-initials__label Surname:
+                    input.personal-initials__input(type="text")
+            .row__item.init-contact
+                .personal-contacts
+                    .personal-contacts__label Phone Number:
+                    input.personal-contacts__input(type="text")
+                .personal-contacts
+                    .personal-contacts__label Email:
+                    input.personal-contacts__input(type="text")
+                    span.personal-contacts__example example@example.com
+        .row
+            .row__item
+                SelectLanguage(
+                    label="Mother tongue"
+                    placeholder="Select"
                     :selectedLang="selectedTongue"
                     @chooseLang="setMotherTongue"
                 )
-            .info-block__item
-                TimezoneSelect(
+            .row__item
+                SelectTimezone(
                     :timezoneSelected="selectedTimezone"
                     @chooseZone="chooseTimezone"
                 )
-        .info-block
-            .info-block__item
-            .info-block__item
+        .personal__label Language pairs:
+        .row.lang-pairs(v-for="(pair, index) in selectedLangPairs")
+            .row__item
+                SelectLanguage(
+                    :parentIndex="index"
+                    placeholder="Select language"
+                    :selectedLang="pair.source"
+                    @chooseLang="setSourceLang"
+                )
+            img.row__rotated-image(src="../../assets/images/arrow_open.png")
+            .row__item
+                SelectLanguage(
+                    :parentIndex="index"
+                    placeholder="Select language"
+                    :selectedLang="pair.target"
+                    @chooseLang="setTargetLang"
+                )
+        .row
+            .row__add-pair(@click="addLanguagePair")
+                span.plus +
+
 </template>
 
 <script>
-import NativeLanguageSelect from "./personInfo/NativeLanguageSelect"
-import TimezoneSelect from "./personInfo/TimezoneSelect"
+import SelectLanguage from "./personInfo/SelectLanguage"
+import SelectTimezone from "./personInfo/SelectTimezone"
 
 export default {
     data() {
         return {
             selectedTongue: {},
-            selectedTimezone: ""
+            selectedLangPairs: [{ source: {}, target: {} }],
+            selectedTimezone: "",
         }
     },
     methods: {
         setMotherTongue(data) {
             this.selectedTongue = data.lang;
         },
+        setSourceLang(data) {
+            this.selectedLangPairs[data.index].source = data.lang;
+        },
+        setTargetLang(data) {
+            this.selectedLangPairs[data.index].target = data.lang;
+        },
         chooseTimezone(data) {
             this.selectedTimezone = data.zone;
+        },
+        addLanguagePair() {
+            this.selectedLangPairs.push({
+                source: {}, target: {}
+            })
         }
     },
     components: {
-        NativeLanguageSelect,
-        TimezoneSelect
+        SelectLanguage,
+        SelectTimezone
     }
 }
 </script>
 
 <style lang="scss" scoped>
 
-.personal-wrap {
+.personal {
     display: flex;
     flex-direction: column;
     width: 100%;
+    &__label {
+        font-size: 12px;
+        margin-top: 40px;
+    }
 }
 
-.main-title {
+.personal__main-title {
     font-size: 24px;
     position: relative;
     margin-bottom: 20px;
-    &::before {
+    &:before {
         content: "1";
         position: absolute;
         left: -20px;
         bottom: -2px;
         font-size: 28px;
     }
-    &::after {
+    &:after {
         content: "*";
         position: absolute;
         top: -3px;
@@ -88,26 +124,53 @@ export default {
     }
 }
 
-.info-block {
+.row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
+    position: relative;
     &__item {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        position: relative;
+        width: 40%;
+    }
+    .init-contact {
         height: 160px;
+    }
+    &__rotated-image {
+        transform: rotate(-90deg);
+        position: absolute;
+        top: 20px;
+        left: 50%;
+    }
+    &__add-pair {
+        margin-top: 10px;
+        border: 1px solid #66563D;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.8;
+        cursor: pointer;
     }
 }
 
-.item-initials, .item-contacts {
+.lang-pairs{
+    margin-bottom: 50px;
+}
+
+.personal-initials, .personal-contacts {
     position: relative;
-    &__title {
+    &__label {
         font-size: 12px;
         margin-bottom: 5px;
     }
-    &__text-field {
+    &__input {
         padding: 5px;
         width: 204px;
         height: 30px;
@@ -124,6 +187,10 @@ export default {
         font-size: 12px;
         opacity: 0.5;;
     }
+}
+
+.plus {
+    font-size: 28px;
 }
 
 </style>

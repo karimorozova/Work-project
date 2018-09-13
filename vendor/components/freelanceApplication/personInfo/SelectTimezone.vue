@@ -1,7 +1,7 @@
 <template lang="pug">
     .timezones-list
         .title Time-zone:
-        .dropSelect(v-click-outside="outTimezones")
+        .drop-select(v-click-outside="outTimezones")
             .select(@click="openTimezones")
                 span.selected(v-if="timezoneSelected") {{ timezoneSelected.split(" ")[0] }}
                 span.selected.no-country(v-else) Select
@@ -79,8 +79,9 @@ export default {
     margin-bottom: 5px;
 }
 
-.dropSelect {
-    position: relative;
+.drop-select {
+    position: absolute;
+    top: 20px;
     width: 214px;
     border: 1px solid #67573E;
     border-radius: 15px;

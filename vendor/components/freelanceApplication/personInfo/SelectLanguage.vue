@@ -1,10 +1,10 @@
 <template lang="pug">
     .native-language
-        .title Mother tongue:
-        .dropSelect(v-click-outside="outClick")
+        .title {{ label }}
+        .drop-select(v-click-outside="outClick")
             .select(@click="showLangs")
                 span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
-                span.selected(v-else) Select
+                span.selected(v-else) {{ placeholder }}
                 .arrowButton
                     img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: droppedLang}")
             input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
@@ -21,6 +21,17 @@ export default {
     props: {
         selectedLang: {
             type: Object
+        },
+        label: {
+            type: String,
+            default: ""
+        },
+        placeholder: {
+            type: String,
+            default: ""
+        },
+        parentIndex: {
+            type: Number
         }
     },
     data() {
@@ -55,7 +66,7 @@ export default {
             this.droppedLang = false;
         },
         chooseLang(index) {
-            this.$emit("chooseLang", {lang: this.filteredLangs[index]})
+            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex})
         }
     },
     computed: {
@@ -89,8 +100,8 @@ export default {
     margin-bottom: 5px;
 }
 
-.dropSelect {
-    position: relative;
+.drop-select {
+    position: absolute;
     width: 214px;
     border: 1px solid #67573E;
     border-radius: 15px;
