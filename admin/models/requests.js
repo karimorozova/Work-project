@@ -120,7 +120,7 @@ RequestSchema.methods.targetArray = function targetArray() {
 
 RequestSchema.methods.sourceLangName = function sourceLangName() {
   return {
-    "name": `${this.sourceLanguage.lang}`
+    "name": this.sourceLanguage.lang
   };
 }
 
