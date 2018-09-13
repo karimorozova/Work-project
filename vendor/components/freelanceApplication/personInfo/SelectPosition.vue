@@ -93,10 +93,6 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
-        .active-zone {
-            background-color: rgba(102, 86, 61, 0.7);
-            color: #FFF;
-        }
     }
 }
 

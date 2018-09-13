@@ -102,19 +102,34 @@ export default {
             this.cvFiles = files;
         },
         addPosition({position}) {
-            let isExist = false;
-            if(this.selectedPositions.indexOf(position) != -1) {
-                isExist = true;
-            }
-            if(isExist) {
+            if(position == "Other") {
+                if(this.selectedPositions.indexOf(position) == -1) {
+                    this.selectedPositions = ["Other"];
+                    return
+                } else {
+                    this.selectedPositions = [];
+                    return
+                }
+            } else {
                 for(let index in this.selectedPositions) {
-                    if(this.selectedPositions[index] == position) {
+                    if(this.selectedPositions[index] == "Other") {
                         this.selectedPositions.splice(index, 1)
                     }
                 }
-            } else {
-                this.selectedPositions.push(position);
-            }
+                let isExist = false;
+                if(this.selectedPositions.indexOf(position) != -1) {
+                    isExist = true;
+                }
+                if(isExist) {
+                    for(let index in this.selectedPositions) {
+                        if(this.selectedPositions[index] == position) {
+                            this.selectedPositions.splice(index, 1)
+                        }
+                    }
+                } else {
+                    this.selectedPositions.push(position);
+                }
+            } 
         }
     },
     components: {
