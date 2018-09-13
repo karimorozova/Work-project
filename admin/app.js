@@ -10,7 +10,7 @@ const port = config.server.port;
 const db = mongoose.connection;
 const checkCollections = require("./helpers/dbSetDefault");
 const { LanguagesModel, RequestSchema } = require("./models");
-const { checkRoutes } = require("./utils/middleware");
+const { checkRoutes } = require("./middleware/middleware");
 const history = require('connect-history-api-fallback');
 
 // TODO : check origins from localhost only
@@ -41,12 +41,6 @@ app.use(bodyParser.json({limit: '50mb', extended: true}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 
-// app.use(history({ verbose: true, index: '/' }));
-// app.get("/", function(req, res, next) {
-//   next();
-// });
-// app.get('/*', (req, res) => res.sendFile('index.html', { root: './dist' }));
-
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -69,10 +63,8 @@ const routes = require("./routes");
 app.use("/", routes);
 
 app.use(history({ verbose: true, index: '/' }));
-app.get("/", function(req, res, next) {
-  if(checkRoutes(req.originalUrl)) {
-    res.sendFile(__dirname + '/dist/index.html');
-  }
+app.get("/", (req, res, next) => {
+  checkRoutes(req, res, next, __dirname)
 });
 
 app.listen(port, () => {

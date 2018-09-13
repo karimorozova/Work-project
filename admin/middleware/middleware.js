@@ -11,7 +11,7 @@ const middleware = {
         }
     },
 
-    checkRoutes(url) {
+    checkRoutes(req, res, next, dir) {
         let routesArray = [
             '/register',
             '/tasks-report',
@@ -28,10 +28,10 @@ const middleware = {
             '/reports',
             '/translation-request'
         ]
-        if(routesArray.indexOf(url) != -1) {
-            return true;
+        if(routesArray.indexOf(req.originalUrl) != -1) {
+            res.sendFile(dir + '/dist/index.html')
         } else {
-            return false;
+            next();
         }
     }
 }

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const path = require('path');
 const HomeApi = require('../models/xtrf/home');
 const { User, Requests, Reports, Timezones, Clients, Vendors } = require('../models');
-const { requiresLogin } = require('../utils/middleware');
+const { requiresLogin } = require('../middleware/middleware');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
 const mongoose = require('mongoose');
 
