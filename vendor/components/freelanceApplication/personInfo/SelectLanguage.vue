@@ -1,6 +1,6 @@
 <template lang="pug">
     .native-language
-        .title {{ label }}
+        .native-language__title {{ label }}
         .drop-select(v-click-outside="outClick")
             .select(@click="showLangs")
                 span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
@@ -21,6 +21,10 @@ export default {
     props: {
         selectedLang: {
             type: Object
+        },
+        refersTo: {
+            type: String,
+            default: ""
         },
         label: {
             type: String,
@@ -66,7 +70,7 @@ export default {
             this.droppedLang = false;
         },
         chooseLang(index) {
-            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex})
+            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex, refersTo: this.refersTo})
         }
     },
     computed: {
@@ -95,7 +99,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.title {
+.native-language__title {
     font-size: 12px;
     margin-bottom: 5px;
 }

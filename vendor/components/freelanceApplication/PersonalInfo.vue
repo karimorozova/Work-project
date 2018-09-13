@@ -34,28 +34,37 @@
         .row.lang-pairs(v-for="(pair, index) in selectedLangPairs")
             .row__item
                 SelectLanguage(
+                    refersTo="source"
                     :parentIndex="index"
                     placeholder="Select language"
                     :selectedLang="pair.source"
-                    @chooseLang="setSourceLang"
+                    @chooseLang="setPairLanguage"
                 )
-            img.row__rotated-image(src="../../assets/images/arrow_open.png")
+            img.row__image(src="../../assets/images/arrow_open.png")
             .row__item
                 SelectLanguage(
+                    refersTo="target"
                     :parentIndex="index"
                     placeholder="Select language"
                     :selectedLang="pair.target"
-                    @chooseLang="setTargetLang"
+                    @chooseLang="setPairLanguage"
                 )
-        .row
+        .row.add-button
             .row__add-pair(@click="addLanguagePair")
                 span.plus +
+        .row
+            .row__item
+                UploadFileButton(
+                    label="CV"
+                    @uploadedFile="uploadCvFile"
+                )
 
 </template>
 
 <script>
 import SelectLanguage from "./personInfo/SelectLanguage"
 import SelectTimezone from "./personInfo/SelectTimezone"
+import UploadFileButton from "./personInfo/UploadFileButton"
 
 export default {
     data() {
@@ -63,30 +72,32 @@ export default {
             selectedTongue: {},
             selectedLangPairs: [{ source: {}, target: {} }],
             selectedTimezone: "",
+            cvFiles: []
         }
     },
     methods: {
-        setMotherTongue(data) {
-            this.selectedTongue = data.lang;
+        setMotherTongue({lang}) {
+            this.selectedTongue = lang;
         },
-        setSourceLang(data) {
-            this.selectedLangPairs[data.index].source = data.lang;
+        setPairLanguage({lang, index, refersTo}) {
+            this.selectedLangPairs[index][refersTo] = lang;
         },
-        setTargetLang(data) {
-            this.selectedLangPairs[data.index].target = data.lang;
-        },
-        chooseTimezone(data) {
-            this.selectedTimezone = data.zone;
+        chooseTimezone({zone}) {
+            this.selectedTimezone = zone;
         },
         addLanguagePair() {
             this.selectedLangPairs.push({
                 source: {}, target: {}
             })
+        },
+        uploadCvFile({files}) {
+            this.cvFiles = files;
         }
     },
     components: {
         SelectLanguage,
-        SelectTimezone
+        SelectTimezone,
+        UploadFileButton
     }
 }
 </script>
@@ -135,16 +146,16 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         position: relative;
-        width: 40%;
+        width: 42%;
     }
     .init-contact {
         height: 160px;
     }
-    &__rotated-image {
+    &__image {
         transform: rotate(-90deg);
         position: absolute;
         top: 20px;
-        left: 50%;
+        left: 49%;
     }
     &__add-pair {
         margin-top: 10px;
@@ -162,6 +173,10 @@ export default {
 
 .lang-pairs{
     margin-bottom: 50px;
+}
+
+.add-button {
+    margin-bottom: 20px;
 }
 
 .personal-initials, .personal-contacts {
