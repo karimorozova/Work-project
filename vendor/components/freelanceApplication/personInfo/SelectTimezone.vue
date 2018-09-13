@@ -1,11 +1,11 @@
 <template lang="pug">
     .timezones-list
-        .title Time-zone:
+        .timezones-list__label Time-zone:
         .drop-select(v-click-outside="outTimezones")
             .select(@click="openTimezones")
                 span.selected(v-if="timezoneSelected") {{ timezoneSelected.split(" ")[0] }}
                 span.selected.no-country(v-else) Select
-                .arrowButton
+                .arrow-button
                     img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: timezonesDropped}")
             input.search(v-if="timezonesDropped" type="text" v-model="timezoneSearch" placeholder="Search")
             .drop(v-if="timezonesDropped")
@@ -74,7 +74,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.title {
+.timezones-list__label {
     font-size: 12px;
     margin-bottom: 5px;
 }
@@ -150,7 +150,7 @@ export default {
     .no-country {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 25%;
         display: flex;
         justify-content: center;

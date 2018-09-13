@@ -58,13 +58,20 @@
                     label="CV"
                     @uploadedFile="uploadCvFile"
                 )
+            .row__item
+                SelectPosition(
+                    :selectedPositions="selectedPositions"
+                    @choosePosition="addPosition"
+                )
 
 </template>
 
 <script>
-import SelectLanguage from "./personInfo/SelectLanguage"
-import SelectTimezone from "./personInfo/SelectTimezone"
-import UploadFileButton from "./personInfo/UploadFileButton"
+import SelectLanguage from "./personInfo/SelectLanguage";
+import SelectTimezone from "./personInfo/SelectTimezone";
+import UploadFileButton from "./personInfo/UploadFileButton";
+import SelectPosition from "./personInfo/SelectPosition";
+
 
 export default {
     data() {
@@ -72,7 +79,8 @@ export default {
             selectedTongue: {},
             selectedLangPairs: [{ source: {}, target: {} }],
             selectedTimezone: "",
-            cvFiles: []
+            cvFiles: [],
+            selectedPositions: []
         }
     },
     methods: {
@@ -92,12 +100,28 @@ export default {
         },
         uploadCvFile({files}) {
             this.cvFiles = files;
+        },
+        addPosition({position}) {
+            let isExist = false;
+            if(this.selectedPositions.indexOf(position) != -1) {
+                isExist = true;
+            }
+            if(isExist) {
+                for(let index in this.selectedPositions) {
+                    if(this.selectedPositions[index] == position) {
+                        this.selectedPositions.splice(index, 1)
+                    }
+                }
+            } else {
+                this.selectedPositions.push(position);
+            }
         }
     },
     components: {
         SelectLanguage,
         SelectTimezone,
-        UploadFileButton
+        UploadFileButton,
+        SelectPosition
     }
 }
 </script>

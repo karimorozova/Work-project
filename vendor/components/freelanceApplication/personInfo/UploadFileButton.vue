@@ -52,7 +52,7 @@ export default {
         z-index: 1;
         position: relative;
         color: #fff;
-        font-size: 14px;
+        font-size: 15px;
         font-family: MyriadPro;
         text-align: center;
     }
@@ -72,6 +72,7 @@ export default {
     }
     &__comment {
         font-size: 12px;
+        opacity: 0.6;
     }
 }
 </style>

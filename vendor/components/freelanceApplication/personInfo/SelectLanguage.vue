@@ -5,7 +5,7 @@
             .select(@click="showLangs")
                 span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
                 span.selected(v-else) {{ placeholder }}
-                .arrowButton
+                .arrow-button
                     img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: droppedLang}")
             input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
             .drop(v-if="droppedLang")
@@ -175,7 +175,7 @@ export default {
     .chosen-lang {
         opacity: 1;
     }
-    .arrowButton {
+    .arrow-button {
         width: 25%;
         display: flex;
         justify-content: center;
