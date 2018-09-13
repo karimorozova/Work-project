@@ -7,6 +7,7 @@
         .application__section.personal-info
             PersonalInfo
         .application__section.education
+            Education
         .application__section.translation-experience
         .application__section.competence
         .application__section.domain-experience
@@ -15,6 +16,8 @@
 
 <script>
 import PersonalInfo from "../components/freelanceApplication/PersonalInfo";
+import Education from "../components/freelanceApplication/Education";
+
 
 export default {
     data() {
@@ -26,7 +29,8 @@ export default {
 
     },
     components: {
-        PersonalInfo
+        PersonalInfo,
+        Education
     }
 }
 </script>
