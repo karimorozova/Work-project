@@ -1,7 +1,7 @@
 <template lang="pug">
 .translation-exp
     .translation-exp__main-title TRANSLATION EXPERIENCE
-    span.comment Do you have any translation experience? Please select one of the following:
+    span.translation-exp__comment Do you have any translation experience? Please select one of the following:
     .translation-exp__options
         SelectTransExp(
             :selectedExperience="selectedExperience"
@@ -61,7 +61,7 @@ export default {
         flex-direction: column;
         position: relative;
     }
-    .comment, &__label {
+    &__comment, &__label {
         font-size: 12px;
     }
 }

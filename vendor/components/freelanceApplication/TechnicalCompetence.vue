@@ -1,7 +1,7 @@
 <template lang="pug">
 .technical
     .technical__main-title TECHNICAl COMPETENCE
-    span.comment Are you willing to translate online?
+    span.technical__comment Are you willing to translate online?
     .technical__options
         SelectSingleComp(
             label="Internet access"
@@ -10,7 +10,7 @@
             :competences="competences.internet"
             @chooseCompetence="chooseCompetence"
         )
-    span.comment Do you have any CAT experience?
+    span.technical__comment Do you have any CAT experience?
     .technical__options
         SelectSingleComp(
             label="Computer-Assisted Translation experience"
@@ -19,7 +19,7 @@
             :competences="competences.cat"
             @chooseCompetence="chooseCompetence"
         )
-    span.comment Do you have experience with any of the below? Check all that apply.
+    span.technical__comment Do you have experience with any of the below? Check all that apply.
     .technical__options
         SelectMultiComp(
             label="Software experience"
@@ -102,7 +102,7 @@ export default {
         flex-direction: column;
         position: relative;
     }
-    .comment, &__label {
+    &__comment, &__label {
         font-size: 12px;
     }
 }
