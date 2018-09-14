@@ -1,38 +1,38 @@
 <template lang="pug">
 .technical
-    .technical__main-title TECHNICAl COMPETENCE
-    span.technical__comment Are you willing to translate online?
+    .technical__main-title TECHNICAL COMPETENCE
+    span.technical__comment.asterisk Are you willing to translate online?
     .technical__options
-        SelectSingleComp(
-            label="Internet access"
+        span.technical__label Internet access:
+        SelectSingle(
             refersTo="internet"
-            :selectedCompetence="selectedCompetence.internet"
-            :competences="competences.internet"
-            @chooseCompetence="chooseCompetence"
+            :selectedOption="selectedCompetence.internet"
+            :options="competences.internet"
+            @chooseOption="chooseCompetence"
         )
     span.technical__comment Do you have any CAT experience?
     .technical__options
-        SelectSingleComp(
-            label="Computer-Assisted Translation experience"
+        span.technical__label Computer-Assisted Translation experience:
+        SelectSingle(
             refersTo="cat"
-            :selectedCompetence="selectedCompetence.cat"
-            :competences="competences.cat"
-            @chooseCompetence="chooseCompetence"
+            :selectedOption="selectedCompetence.cat"
+            :options="competences.cat"
+            @chooseOption="chooseCompetence"
         )
     span.technical__comment Do you have experience with any of the below? Check all that apply.
     .technical__options
-        SelectMultiComp(
-            label="Software experience"
+        span.technical__label Software experience
+        SelectMulti(
             refersTo="software"
-            :selectedCompetence="selectedCompetence.software"
-            :competences="competences.software"
-            @chooseCompetence="chooseCompetence"
+            :selectedOptions="selectedCompetence.software"
+            :options="competences.software"
+            @chooseOptions="chooseCompetence"
         )
 </template>
 
 <script>
-import SelectSingleComp from "./technicalComp/SelectSingleComp";
-import SelectMultiComp from "./technicalComp/SelectMultiComp";
+import SelectSingle from "./dropdowns/SelectSingle";
+import SelectMulti from "./dropdowns/SelectMulti";
 
 export default {
     data() {
@@ -50,21 +50,21 @@ export default {
         }
     },
     methods: {
-        chooseCompetence({comp, refersTo}) {
+        chooseCompetence({option, refersTo}) {
             if(refersTo != "software") {
-                this.selectedCompetence[refersTo] = comp;
+                this.selectedCompetence[refersTo] = option;
             } else {
-                const elementPosition = this.selectedCompetence.software.indexOf(comp);
+                const elementPosition = this.selectedCompetence.software.indexOf(option);
                 if(elementPosition != -1) {
                     return this.selectedCompetence.software.splice(elementPosition, 1)
                 }
-                this.selectedCompetence.software.push(comp)
+                this.selectedCompetence.software.push(option)
             }
         }
     },
     components: {
-        SelectSingleComp,
-        SelectMultiComp
+        SelectSingle,
+        SelectMulti
     }
 }
 </script>
@@ -86,14 +86,6 @@ export default {
             bottom: -2px;
             font-size: 28px;
         }
-        &:after {
-            content: "*";
-            position: absolute;
-            top: -3px;
-            right: 230px;
-            color: red;
-            font-size: 18px;
-        }
     }
     &__options {
         margin-top: 20px;
@@ -101,8 +93,23 @@ export default {
         display: flex;
         flex-direction: column;
         position: relative;
+        &:last-child {
+            margin-bottom: 50px;
+        }
     }
     &__comment, &__label {
+        font-size: 12px;
+    }
+}
+
+.asterisk {
+    position: relative;
+    &:after {
+        content: "*";
+        position: absolute;
+        top: -2px;
+        left: 34%;
+        color: red;
         font-size: 12px;
     }
 }

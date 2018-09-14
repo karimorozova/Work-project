@@ -13,6 +13,7 @@
         .application__section.competence
             TechnicalCompetence
         .application__section.domain-experience
+            DomainExp
         .application__section.other
 </template>
 
@@ -21,6 +22,7 @@ import PersonalInfo from "../components/freelanceApplication/PersonalInfo";
 import Education from "../components/freelanceApplication/Education";
 import TranslationExp from "../components/freelanceApplication/TranslationExp";
 import TechnicalCompetence from "../components/freelanceApplication/TechnicalCompetence";
+import DomainExp from "../components/freelanceApplication/DomainExp";
 
 export default {
     data() {
@@ -35,7 +37,8 @@ export default {
         PersonalInfo,
         Education,
         TranslationExp,
-        TechnicalCompetence
+        TechnicalCompetence,
+        DomainExp
     }
 }
 </script>

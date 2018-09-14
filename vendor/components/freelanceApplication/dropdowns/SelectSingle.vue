@@ -1,17 +1,13 @@
 <template lang="pug">
-.select-comp
-    .select-comp__label {{ label }}:
-    .drop-select(v-click-outside="outCompetences")
-        .select(@click="toggleCompetences")
-            span.selected(v-if="selectedCompetence.length") {{ selectedCompetence.join('; ') }}
-            span.selected.no-choice(v-if="!selectedCompetence.length") Select
+    .drop-select(v-click-outside="outOptions")
+        .select(@click="toggleOptions")
+            span.selected(v-if="selectedOption") {{ selectedOption }}
+            span.selected.no-choice(v-if="!selectedOption") Select
             .arrow-button
-                img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: compDropped}")
-        .drop(v-if="compDropped")
-            .drop__item(v-for="(competence, index) in competences" @click="chooseCompetence(index)")
-                .checkbox
-                    .checkbox__check(:class="{checked: selectedCompetence.indexOf(competence) != -1}")
-                span {{ competence }}
+                img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: isDropped}")
+        .drop(v-if="isDropped")
+            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: selectedOption == option}")
+                span {{ option }}
 </template>
 
 <script>
@@ -19,14 +15,11 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedCompetence: {
-            type: Array
-        },
-        competences: {
-            type: Array
-        },
-        label: {
+        selectedOption: {
             type: String
+        },
+        options: {
+            type: Array
         },
         refersTo: {
             type: String
@@ -34,18 +27,18 @@ export default {
     },
     data() {
         return {
-            compDropped: false
+            isDropped: false
         }
     },
     methods: {
-        outCompetences() {
-            this.compDropped = false;
+        outOptions() {
+            this.isDropped = false;
         },
-        toggleCompetences() {
-            this.compDropped = !this.compDropped;
+        toggleOptions() {
+            this.isDropped = !this.isDropped;
         },
-        chooseCompetence(index) {
-            this.$emit("chooseCompetence", {comp: this.competences[index], refersTo: this.refersTo})
+        chooseOption(index) {
+            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo})
         }
     },
     directives: {
@@ -101,7 +94,7 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
-        .active-comp {
+        .active {
             background-color: rgba(102, 86, 61, 0.7);
             color: #FFF;
         }
@@ -139,37 +132,6 @@ export default {
         }
         .reverseIcon {
             transform: rotate(180deg);
-        }
-    }
-}
-
-.checkbox {
-    width: 13px;
-    height: 13px;
-    border: 1px solid #67573E;
-    margin-right: 3px;
-    margin-left: 5px;
-    .checked {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        &::before {
-            content: '';
-            position: absolute;
-            width: 5px;
-            border: 1px solid #67573E;
-            top: 6px;
-            left: 1px;
-            transform: rotate(45deg);
-        }
-        &::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            border: 1px solid #67573E;
-            top: 5px;
-            left: 3px;
-            transform: rotate(-58deg);
         }
     }
 }
