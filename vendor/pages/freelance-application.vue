@@ -11,6 +11,7 @@
         .application__section.translation-experience
             TranslationExp
         .application__section.competence
+            TechnicalCompetence
         .application__section.domain-experience
         .application__section.other
 </template>
@@ -19,6 +20,7 @@
 import PersonalInfo from "../components/freelanceApplication/PersonalInfo";
 import Education from "../components/freelanceApplication/Education";
 import TranslationExp from "../components/freelanceApplication/TranslationExp";
+import TechnicalCompetence from "../components/freelanceApplication/TechnicalCompetence";
 
 export default {
     data() {
@@ -32,7 +34,8 @@ export default {
     components: {
         PersonalInfo,
         Education,
-        TranslationExp
+        TranslationExp,
+        TechnicalCompetence
     }
 }
 </script>
@@ -69,6 +72,9 @@ export default {
     }
 }
 
+.translation-experience {
+    margin-bottom: 50px;
+}
 
 @font-face {
     font-family: MyriadPro;
