@@ -3,8 +3,9 @@
     .domain__main-title DOMAIN EXPERIENCE
     span.domain__comment Do you have experience in the following industries (not necessarily as a translator)? <br> Check all that apply.
     .domain__options
+        span.domain__label Industries:
         SelectMulti(
-            :selectedOptions="selectedDomains"
+            :selectedOptions="selectedIndustries"
             :options="industries"
             @chooseOptions="chooseIndustries"
         )
@@ -16,7 +17,7 @@ import SelectMulti from "./dropdowns/SelectMulti";
 export default {
     data() {
         return {
-            selectedDomains: [],
+            selectedIndustries: [],
             industries: [
                 "Finance (Forex/Trading/Binary Options/Cryptocurrency)",
                 "Poker",
@@ -29,11 +30,11 @@ export default {
     },
     methods: {
         chooseIndustries({option}) {
-            const elementPosition = this.selectedDomains.indexOf(option);
+            const elementPosition = this.selectedIndustries.indexOf(option);
             if(elementPosition != -1) {
-                return this.selectedDomains.splice(elementPosition, 1)
+                return this.selectedIndustries.splice(elementPosition, 1)
             }
-            this.selectedDomains.push(option);
+            this.selectedIndustries.push(option);
         }
     },
     components: {
