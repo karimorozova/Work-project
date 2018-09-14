@@ -9,6 +9,7 @@
         .application__section.education
             Education
         .application__section.translation-experience
+            TranslationExp
         .application__section.competence
         .application__section.domain-experience
         .application__section.other
@@ -17,7 +18,7 @@
 <script>
 import PersonalInfo from "../components/freelanceApplication/PersonalInfo";
 import Education from "../components/freelanceApplication/Education";
-
+import TranslationExp from "../components/freelanceApplication/TranslationExp";
 
 export default {
     data() {
@@ -30,7 +31,8 @@ export default {
     },
     components: {
         PersonalInfo,
-        Education
+        Education,
+        TranslationExp
     }
 }
 </script>
