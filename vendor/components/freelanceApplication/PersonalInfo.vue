@@ -69,7 +69,7 @@
 <script>
 import SelectLanguage from "./personInfo/SelectLanguage";
 import SelectTimezone from "./personInfo/SelectTimezone";
-import UploadFileButton from "./personInfo/UploadFileButton";
+import UploadFileButton from "./buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 
 
@@ -223,6 +223,9 @@ export default {
         border-radius: 15px;
         color: #67573E;
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
+        &:focus {
+            box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
+        }
     }
     &__example {
         position: absolute;

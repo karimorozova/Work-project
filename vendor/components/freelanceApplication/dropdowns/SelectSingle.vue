@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions")
+    .drop-select(v-click-outside="outOptions" :class="{zIndex: isDropped}")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") Select
@@ -98,7 +98,14 @@ export default {
             background-color: rgba(102, 86, 61, 0.7);
             color: #FFF;
         }
+        .test-options & {
+            max-height: 60px;
+        }
     }
+}
+
+.zIndex {
+    z-index: 1;
 }
 
 .select {
