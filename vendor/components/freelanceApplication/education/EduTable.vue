@@ -1,20 +1,21 @@
 <template lang="pug">
-.education-table
-    table.education-table__table
-        slot(name="header")
-            slot(name="headDeck")
-        slot(name="tableBody")
-            slot(name="row")
-                slot(name="rowDeck")
+.table
+    .table__thead
+        .table__cell(v-for="field of fields") {{ field.label }}
+    .table__tbody
+        template
+            .table__row(v-for="row of tableData")
+                .table__cell
+                    slot(v-for="field of fields" :style="{width: field.width}") {{ row[field.key] }}
 </template>
 
 <script>
 export default {
     props: {
-        heads: {
+        fields: {
             type: Array
         },
-        informations: {
+        tableData: {
             type: Array
         }
     },
@@ -30,9 +31,12 @@ export default {
 
 <style lang="scss" scoped>
 
-.education-table__table {
+.table__table {
     border-collapse: collapse;
     font-size: 14px;
+}
+.table__thead, .table__row {
+    display: flex;
 }
 
 </style>

@@ -2,15 +2,11 @@
     .education
         .education__main-title EDUCATION
         span.education__comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
-        EduTable(:heads="heads" :informations="informations")
-            thead(slot="header")
-                th(slot="headDeck" v-for="head in heads") {{ head }}
-            tbody(slot="tableBody")
-                tr(slot="row" v-for="info in informations")
-                    td(slot="rowDeck") {{ info.level }}
-                    td(slot="rowDeck") {{ info.field }}
-                    td(slot="rowDeck") {{ info.instruction }}
-                    td(slot="rowDeck") {{ info.grade }}
+        EduTable(:fields="fields" 
+            :tableData="tableData"
+            )
+
+            
 </template>
 
 <script>
@@ -19,7 +15,15 @@ import EduTable from "./education/EduTable";
 export default {
     data() {
         return {
-            heads: ["Study level", "Field", "Instruction", "Overall Grade"],
+            fields: [
+                {label: "Number", key: "number", width: "60%"},
+                {label: "Name", key: "name", width: "40%"},
+            ],
+            tableData: [
+                {number: 1, name: "Vasya"},
+                {number: 2, name: "Petya"},
+                {number: 3, name: "Kolya"},
+            ],
             informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
         }
     },
