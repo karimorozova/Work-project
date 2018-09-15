@@ -16,6 +16,9 @@
             DomainExp
         .application__section.other
             Other
+        .application__agree-submit
+            AgreeAndSubmit
+        .application__popUp
 </template>
 
 <script>
@@ -25,6 +28,7 @@ import TranslationExp from "../components/freelanceApplication/TranslationExp";
 import TechnicalCompetence from "../components/freelanceApplication/TechnicalCompetence";
 import DomainExp from "../components/freelanceApplication/DomainExp";
 import Other from "../components/freelanceApplication/Other";
+import AgreeAndSubmit from "../components/freelanceApplication/AgreeAndSubmit";
 
 export default {
     data() {
@@ -41,7 +45,8 @@ export default {
         TranslationExp,
         TechnicalCompetence,
         DomainExp,
-        Other
+        Other,
+        AgreeAndSubmit
     }
 }
 </script>
