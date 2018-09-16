@@ -102,24 +102,14 @@ export default {
             this.cvFiles = files;
         },
         choosePosition({position}) {
-            const elementPosition = this.selectedPositions.indexOf(position);
-            if(position == "Other") {
-                if(elementPosition == -1) {
-                    return this.selectedPositions = ["Other"];
-                } else {
-                    return this.selectedPositions = [];
-                }
-            } else {
-                for(let index in this.selectedPositions) {
-                    if(this.selectedPositions[index] == "Other") {
-                        this.selectedPositions.splice(index, 1)
-                    }
-                }
-                if(elementPosition === -1){
-                    return this.selectedPositions.push(position);
-                }
-                this.selectedPositions.splice(elementPosition, 1)
+            if(position === "Other") {
+                this.$emit("setOtherChoice", {refersTo: 'position'})
             }
+            const elementPosition = this.selectedPositions.indexOf(position);
+            if(elementPosition === -1){
+                return this.selectedPositions.push(position);
+            }
+            this.selectedPositions.splice(elementPosition, 1)
         }
     },
     components: {

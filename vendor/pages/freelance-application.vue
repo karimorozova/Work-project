@@ -5,22 +5,30 @@
             span.title FREELANCE APPLICATION
             span.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
         .application__section.personal-info
-            PersonalInfo
+            PersonalInfo(
+                @setOtherChoice="setOtherChoice"
+            )
         .application__section.education
             Education
         .application__section.translation-experience
             TranslationExp
         .application__section.competence
-            TechnicalCompetence
+            TechnicalCompetence(
+                @setOtherChoice="setOtherChoice"
+            )
         .application__section.domain-experience
-            DomainExp
+            DomainExp(
+                @setOtherChoice="setOtherChoice"
+            )
         .application__section.other
             Other
         .application__agree-submit
             AgreeAndSubmit
-    .popUp
+    .popUp(v-if="otherChoiceVisibile")
         OtherChoice(
-            :label="label"
+            :label="otherChoicelabel"
+            @cancelChanges="cancelOtherChoice"
+            @saveChanges="saveOtherChoice"
         )
 </template>
 
@@ -38,11 +46,37 @@ export default {
     data() {
         return {
             otherChoiceVisibile: false,
-            label: "Please specify"
+            otherChoicelabel: ""
         }
     },
     methods: {
-
+        setOtherChoice({refersTo}) {
+            this.otherChoiceVisibile = true;
+            let defaultText = "Please specify ";
+            switch (refersTo) {
+                case "position":
+                    this.otherChoicelabel = defaultText + "position title";
+                    break;
+                case "cat":
+                    this.otherChoicelabel = defaultText + "CAT tool";
+                    break;
+                case "dtp":
+                    this.otherChoicelabel = defaultText + "DTP software";
+                    break;
+                case "software":
+                    this.otherChoicelabel = defaultText + "software";
+                    break;
+                case "industries":
+                    this.otherChoicelabel = defaultText + "industries";
+                    break
+            }
+        },
+        cancelOtherChoice(data) {
+            this.otherChoiceVisibile = false;
+        },
+        saveOtherChoice({choice}) {
+            this.otherChoiceVisibile = false;
+        }
     },
     components: {
         PersonalInfo,
@@ -100,6 +134,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 50;
 }
 
 .translation-experience {

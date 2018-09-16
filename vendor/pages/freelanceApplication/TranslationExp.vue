@@ -3,28 +3,32 @@
     .translation-exp__main-title TRANSLATION EXPERIENCE
     span.translation-exp__comment Do you have any translation experience? Please select one of the following:
     .translation-exp__options
-        SelectTransExp(
-            :selectedExperience="selectedExperience"
-            @chooseExperience="chooseExperience"
+        span.translation-exp__label Years of experience:
+        SelectSingle(
+            refersTo="internet"
+            :selectedOption="selectedExperience"
+            :options="experiences"
+            @chooseOption="chooseExperience"
         )
 </template>
 
 <script>
-import SelectTransExp from "./translationExp/SelectTransExp";
+import SelectSingle from "../../components/dropdowns/SelectSingle";
 
 export default {
     data() {
         return {
-            selectedExperience: ""
+            selectedExperience: "",
+            experiences: ["No professional experience", "2-4 years", "5+ years"]
         }
     },
     methods: {
-        chooseExperience({exp}) {
-            this.selectedExperience = exp;
+        chooseExperience({option}) {
+            this.selectedExperience = option;
         }
     },
     components: {
-        SelectTransExp
+        SelectSingle
     }
 }
 </script>

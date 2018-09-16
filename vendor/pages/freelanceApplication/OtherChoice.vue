@@ -28,11 +28,11 @@ export default {
         }
     },
     methods: {
-        cancelChanges() {
-
+        cancelChanges({value}) {
+            this.$emit("cancelChanges")
         },
-        saveChanges() {
-
+        saveChanges({value}) {
+            this.$emit("saveChanges", {choice: this.inputText})
         }
     },
     components: {

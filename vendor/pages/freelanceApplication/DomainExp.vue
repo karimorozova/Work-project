@@ -30,6 +30,9 @@ export default {
     },
     methods: {
         chooseIndustries({option}) {
+            if(option === "Other") {
+                this.$emit("setOtherChoice", {refersTo: "industries"})
+            }
             const elementPosition = this.selectedIndustries.indexOf(option);
             if(elementPosition != -1) {
                 return this.selectedIndustries.splice(elementPosition, 1)

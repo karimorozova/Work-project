@@ -52,8 +52,17 @@ export default {
     methods: {
         chooseCompetence({option, refersTo}) {
             if(refersTo != "software") {
+                if(option === "Yes" && refersTo === "cat") {
+                    this.$emit("setOtherChoice", {refersTo: "cat"})
+                }
                 this.selectedCompetence[refersTo] = option;
             } else {
+                if(option === "DTP software") {
+                    this.$emit("setOtherChoice", {refersTo: "dtp"})
+                }
+                if(option === "Other software") {
+                    this.$emit("setOtherChoice", {refersTo: "software"})
+                }
                 const elementPosition = this.selectedCompetence.software.indexOf(option);
                 if(elementPosition != -1) {
                     return this.selectedCompetence.software.splice(elementPosition, 1)
