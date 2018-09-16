@@ -18,22 +18,27 @@
             Other
         .application__agree-submit
             AgreeAndSubmit
-        .application__popUp
+    .popUp
+        OtherChoice(
+            :label="label"
+        )
 </template>
 
 <script>
-import PersonalInfo from "../components/freelanceApplication/PersonalInfo";
-import Education from "../components/freelanceApplication/Education";
-import TranslationExp from "../components/freelanceApplication/TranslationExp";
-import TechnicalCompetence from "../components/freelanceApplication/TechnicalCompetence";
-import DomainExp from "../components/freelanceApplication/DomainExp";
-import Other from "../components/freelanceApplication/Other";
-import AgreeAndSubmit from "../components/freelanceApplication/AgreeAndSubmit";
+import PersonalInfo from "./freelanceApplication/PersonalInfo";
+import Education from "./freelanceApplication/Education";
+import TranslationExp from "./freelanceApplication/TranslationExp";
+import TechnicalCompetence from "./freelanceApplication/TechnicalCompetence";
+import DomainExp from "./freelanceApplication/DomainExp";
+import Other from "./freelanceApplication/Other";
+import AgreeAndSubmit from "./freelanceApplication/AgreeAndSubmit";
+import OtherChoice from "./freelanceApplication/OtherChoice";
 
 export default {
     data() {
         return {
-
+            otherChoiceVisibile: false,
+            label: "Please specify"
         }
     },
     methods: {
@@ -46,7 +51,8 @@ export default {
         TechnicalCompetence,
         DomainExp,
         Other,
-        AgreeAndSubmit
+        AgreeAndSubmit,
+        OtherChoice
     }
 }
 </script>
@@ -58,6 +64,7 @@ export default {
     align-items: center;
     font-family: MyriadPro;
     color: #67573E;
+    position: relative;
 }
 .application {
     width: 510px;
@@ -81,6 +88,18 @@ export default {
         display: flex;
         margin-top: 40px;
     }
+}
+
+.popUp {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .translation-experience {

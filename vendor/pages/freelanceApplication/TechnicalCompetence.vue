@@ -31,8 +31,8 @@
 </template>
 
 <script>
-import SelectSingle from "./dropdowns/SelectSingle";
-import SelectMulti from "./dropdowns/SelectMulti";
+import SelectSingle from "../../components/dropdowns/SelectSingle";
+import SelectMulti from "../../components/dropdowns/SelectMulti";
 
 export default {
     data() {

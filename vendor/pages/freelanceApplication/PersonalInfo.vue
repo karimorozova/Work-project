@@ -69,7 +69,7 @@
 <script>
 import SelectLanguage from "./personInfo/SelectLanguage";
 import SelectTimezone from "./personInfo/SelectTimezone";
-import UploadFileButton from "./buttons/UploadFileButton";
+import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 
 

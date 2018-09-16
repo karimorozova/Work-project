@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import SelectMulti from "./dropdowns/SelectMulti";
+import SelectMulti from "../../components/dropdowns/SelectMulti";
 
 export default {
     data() {

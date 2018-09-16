@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import SelectSingle from "./dropdowns/SelectSingle";
-import UploadFileButton from "./buttons/UploadFileButton";
+import SelectSingle from "../../components/dropdowns/SelectSingle";
+import UploadFileButton from "../../components/buttons/UploadFileButton";
 
 export default {
     data() {
