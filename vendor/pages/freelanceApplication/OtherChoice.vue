@@ -3,18 +3,18 @@
     span.other-choice__label {{ label }}:
     input.other-choice__input(type="text" v-model="inputText")
     .other-choice__buttons
-        SaveCancelDel(
+        Button(
             value="Cancel"
             @makeAction="cancelChanges"
         )
-        SaveCancelDel(
+        Button(
             value="Save"
             @makeAction="saveChanges"
         )
 </template>
 
 <script>
-import SaveCancelDel from "../../components/buttons/SaveCancelDel"
+import Button from "../../components/buttons/Button"
 
 export default {
     props: {
@@ -36,7 +36,7 @@ export default {
         }
     },
     components: {
-        SaveCancelDel
+        Button
     }
 }
 </script>

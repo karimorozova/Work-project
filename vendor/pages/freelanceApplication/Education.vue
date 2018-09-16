@@ -5,24 +5,35 @@
         EduTable(:fields="fields" 
             :tableData="tableData"
             )
+            template(v-for="field of fields")
+                SelectSingle(v-if="field.key == 1"
+                    :slot="field.key"
+                    :selectedOption="selectedOption"
+                    :options="options"
+                )
 
             
 </template>
 
 <script>
 import EduTable from "./education/EduTable";
+import SelectSingle from "@/components/dropdowns/SelectSingle" 
 
 export default {
     data() {
         return {
+            options: ["asd", "afdaf", "fgbrev"],
+            selectedOption: "",
             fields: [
-                {label: "Number", key: "number", width: "60%"},
-                {label: "Name", key: "name", width: "40%"},
+                {label: "Study Level", key: 1, width: "25%"},
+                {label: "Field", key: 2, width: "25%"},
+                {label: "Institution", key: 3, width: "30%"},
+                {label: "Overall Grade", key: 4, width: "20%"},
             ],
             tableData: [
-                {number: 1, name: "Vasya"},
-                {number: 2, name: "Petya"},
-                {number: 3, name: "Kolya"},
+                {1: "iod o idjs fos", 2: "Vasya", 3: "asdads", 4: "dfbdfbr"},
+                {1: "iod o idjs fos", 2: "Petya", 3: "asdads", 4: "dfbdfbr"},
+                {1: "iod o idjs fos", 2: "Kolya", 3: "asdads", 4: "dfbdfbr"},
             ],
             informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
         }
@@ -31,7 +42,8 @@ export default {
 
     },
     components: {
-        EduTable
+        EduTable,
+        SelectSingle
     }
 }
 </script>
@@ -56,23 +68,5 @@ export default {
     }
 }
 
-.education-table {
-    &__table {
-        td {
-            border: 1px solid #66563D;
-            padding: 5px;
-        }
-        th {
-            border-right: 1px solid #FFF;
-            background-color: #66563D;
-            color: #FFF;
-            padding: 5px;
-            font-weight: 400;
-            &:last-child {
-                border-right: 1px solid #66563D;
-            }
-        }
-    }
-}
 
 </style>

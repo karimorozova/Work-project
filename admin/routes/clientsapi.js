@@ -1,21 +1,11 @@
 const router = require('express').Router();
 const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-const unirest = require('unirest');
-const querystring = require('querystring');
 const fs = require('fs');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { sendMail } = require('../utils/mailhandler');
 const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
-const { quote, project } = require('../models/xtrf');
-const reqq = require('request');
-const fileType = require('file-type');
-const http = require('http');
-const writeFile = require('write');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -239,12 +229,6 @@ router.post('/delete-duorate', async (req, res) => {
         console.log(err);
     })
 })
-
-// router.post('/new-client', upload.any(), async (req, res) => {
-//     let client = JSON.parse(req.body.client);
-//     let result = await Clients.create(client);
-//     console.log(result.id);
-// })
 
 router.post('/update-client', upload.any(), async (req, res) => {
     let client = JSON.parse(req.body.client);

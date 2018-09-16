@@ -1,9 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const axios = require('axios');
-const FormData = require('form-data');
 const unirest = require('unirest');
-const querystring = require('querystring');
 const HomeApi = require('../models/xtrf/home');
 const ClientApi = require('../models/xtrf/client');
 const fs = require('fs');
@@ -14,8 +12,6 @@ const { sendMailPortal } = require('../utils/mailhandlerportal')
 const { Requests, Projects, Languages, Services, Industries, Timezones } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
-const fileType = require('file-type');
-const http = require('http');
 const writeFile = require('write');
 
 var storage = multer.diskStorage({
