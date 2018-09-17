@@ -1,5 +1,6 @@
 <template lang="pug">
 .application-wrap
+    Header
     form.application
         .application__header 
             span.title FREELANCE APPLICATION
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+import Header from "./freelanceApplication/Header";
 import PersonalInfo from "./freelanceApplication/PersonalInfo";
 import Education from "./freelanceApplication/Education";
 import TranslationExp from "./freelanceApplication/TranslationExp";
@@ -80,7 +82,7 @@ export default {
                     break
             }
         },
-        cancelOtherChoice(data) {
+        cancelOtherChoice() {
             this.otherChoiceVisibile = false;
         },
         saveOtherChoice({choice}) {
@@ -94,6 +96,7 @@ export default {
     })
     },
     components: {
+        Header,
         PersonalInfo,
         Education,
         TranslationExp,
@@ -107,8 +110,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .application-wrap {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     font-family: MyriadPro;
@@ -116,7 +121,7 @@ export default {
     position: relative;
 }
 .application {
-    width: 510px;
+    width: 27%;
     padding: 30px 50px;
     border: 1px solid #67573E;
     display: flex;
