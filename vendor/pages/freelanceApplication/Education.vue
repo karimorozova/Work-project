@@ -5,19 +5,19 @@
         EduTable(:fields="fields" 
             :tableData="tableData"
             )
-            template(v-for="field of fields")
+            template(slot="field.key" slot-scope="{ field, row }")
                 SelectSingle(v-if="field.key == 1"
-                    :slot="field.key"
-                    :selectedOption="selectedOption"
+                    :selectedOption="row[field.key]"
                     :options="options"
-                )
-
-            
+                    :activeObject="row"
+                    @chooseOption="chooseOption"
+                    )
+                template(v-if="field.key != 1") {{ row[field.key] }}  
 </template>
 
 <script>
 import EduTable from "./education/EduTable";
-import SelectSingle from "@/components/dropdowns/SelectSingle" 
+import SelectSingle from "@/components/dropdowns/tableDrops/SelectSingle" 
 
 export default {
     data() {
@@ -31,15 +31,17 @@ export default {
                 {label: "Overall Grade", key: 4, width: "20%"},
             ],
             tableData: [
-                {1: "iod o idjs fos", 2: "Vasya", 3: "asdads", 4: "dfbdfbr"},
-                {1: "iod o idjs fos", 2: "Petya", 3: "asdads", 4: "dfbdfbr"},
-                {1: "iod o idjs fos", 2: "Kolya", 3: "asdads", 4: "dfbdfbr"},
+                {1: "", 2: "Vasya", 3: "asdads", 4: "dfbdfbr"},
+                {1: "", 2: "Petya", 3: "asdads", 4: "dfbdfbr"},
+                {1: "", 2: "Kolya", 3: "asdads", 4: "dfbdfbr"},
             ],
             informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
         }
     },
     methods: {
-
+        chooseOption({option, activeObject}) {
+            activeObject[1] = option;
+        }
     },
     components: {
         EduTable,

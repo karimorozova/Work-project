@@ -8,7 +8,7 @@
     .table__tbody
         .table__row(v-for="row of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
-                slot(:name="field.key") {{ row[field.key] }}
+                slot(name="field.key" :field="field" :row="row")
 </template>
 
 <script>
@@ -46,6 +46,7 @@ export default {
     &__tbody {
     overflow-y: scroll;
     max-height: 90px;
+    // height: 150px;
     }
     &__thead-cell {
         font-size: 12px;
