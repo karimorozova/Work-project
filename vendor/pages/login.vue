@@ -67,7 +67,7 @@ body {
     .login__logo {
       display: flex;
       justify-content: center;
-      margin-bottom: 2%;
+      margin-bottom: 10px;
       img {
         width: 269px;
         height: 76px;
@@ -83,11 +83,11 @@ body {
     flex-direction: column;
     align-items: center;
     .login__warning {
-      margin-bottom: -3%;
-      padding-top: 1%;
+      margin-bottom: 5px;
+      padding-top: 5px;
       .login__warning-message {
         color: #ff0000;
-        padding-left: 7.3%;
+        padding-left: 20px;
       }
     }
 
@@ -102,7 +102,7 @@ body {
       width: 97%;
       font-size: 20px;
       color: #66563d;
-      padding-left: 3%;
+      padding-left: 10px;
       border-radius: 8px;
       border: 2px solid #dedede;
       &::-webkit-input-placeholder {
@@ -133,12 +133,12 @@ body {
       &-input {
         width: 13px;
         height: 13px;
-        margin-left: 7%;
+        margin-left: 30px;
       }
       &-label {
         font-size: 15px;
         color: #2d2d2d;
-        margin-left: 2%;
+        margin-left: 5px;
       }
     }
     .login__button {
