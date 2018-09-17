@@ -6,6 +6,7 @@
             span.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
         .application__section.personal-info
             PersonalInfo(
+                @setValue="setPersonInfo"
                 @setOtherChoice="setOtherChoice"
             )
         .application__section.education
@@ -23,7 +24,9 @@
         .application__section.other
             Other
         .application__agree-submit
-            AgreeAndSubmit
+            AgreeAndSubmit(
+                @sumbitForm="sumbitForm"
+            )
     .popUp(v-if="otherChoiceVisibile")
         OtherChoice(
             :label="otherChoicelabel"
@@ -41,15 +44,21 @@ import DomainExp from "./freelanceApplication/DomainExp";
 import Other from "./freelanceApplication/Other";
 import AgreeAndSubmit from "./freelanceApplication/AgreeAndSubmit";
 import OtherChoice from "./freelanceApplication/OtherChoice";
+import { mapActions } from "vuex";
 
 export default {
     data() {
         return {
             otherChoiceVisibile: false,
-            otherChoicelabel: ""
+            otherChoicelabel: "",
+            person: {}
         }
     },
     methods: {
+        setPersonInfo({property, value}) {
+            console.log(property + " " + value);
+            this.person[property] = value;
+        },
         setOtherChoice({refersTo}) {
             this.otherChoiceVisibile = true;
             let defaultText = "Please specify ";
@@ -76,7 +85,13 @@ export default {
         },
         saveOtherChoice({choice}) {
             this.otherChoiceVisibile = false;
-        }
+        },
+        sumbitForm(data) {
+            this.saveForm(this.person);
+        },
+    ...mapActions({
+        saveForm: 'setApplicationForm'
+    })
     },
     components: {
         PersonalInfo,

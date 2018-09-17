@@ -5,17 +5,17 @@
             .row__item.init-contact
                 .personal-initials
                     .personal-initials__label Name:
-                    input.personal-initials__input(type="text")
+                    input.personal-initials__input(type="text" name="name" @change="setInfoValue")
                 .personal-initials
                     .personal-initials__label Surname:
-                    input.personal-initials__input(type="text")
+                    input.personal-initials__input(type="text" name="surname" @change="setInfoValue")
             .row__item.init-contact
                 .personal-contacts
                     .personal-contacts__label Phone Number:
-                    input.personal-contacts__input(type="text")
+                    input.personal-contacts__input(type="text" name="phone" @change="setInfoValue")
                 .personal-contacts
                     .personal-contacts__label Email:
-                    input.personal-contacts__input(type="text")
+                    input.personal-contacts__input(type="text" name="email" @change="setInfoValue")
                     span.personal-contacts__example example@example.com
         .row
             .row__item
@@ -80,7 +80,7 @@ export default {
             selectedLangPairs: [{ source: {}, target: {} }],
             selectedTimezone: "",
             cvFiles: [],
-            selectedPositions: []
+            selectedPositions: [],
         }
     },
     methods: {
@@ -110,6 +110,11 @@ export default {
                 return this.selectedPositions.push(position);
             }
             this.selectedPositions.splice(elementPosition, 1)
+        },
+        setInfoValue(event) {
+            const value = event.target.value;
+            const name = event.target.name
+            this.$emit('setValue', {property: name, value: value})
         }
     },
     components: {

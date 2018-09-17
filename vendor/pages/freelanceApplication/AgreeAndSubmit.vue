@@ -34,6 +34,11 @@ export default {
             this.errors = [];
             let captchaValidation = await grecaptcha.getResponse();
             if(captchaValidation.length === 0) this.errors.push("captcha required");
+            if(this.errors.length) {
+                alert("Captcha needed")
+            } else {
+                this.$emit("sumbitForm")
+            }
         }
     }
 }
