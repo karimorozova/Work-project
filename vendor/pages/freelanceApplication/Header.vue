@@ -19,9 +19,11 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 30px;
     &__logo {
         width: 27%;
         padding-right: 100px;
+        margin: 10px 0;
         display: flex;
         justify-content: flex-start;
     }
