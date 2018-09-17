@@ -4,7 +4,7 @@
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
             span.selected.no-choice(v-if="!selectedOptions.length") Select
             .arrow-button
-                img(src="../../assets/images/arrow_open.png" :class="{reverseIcon: isDropped}")
+                img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
             .drop__item(v-for="(option, index) in options" @click="chooseOptions(index)")
                 .checkbox
@@ -124,7 +124,7 @@ export default {
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-icon {
             transform: rotate(180deg);
         }
     }

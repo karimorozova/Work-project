@@ -6,7 +6,7 @@
                 span.selected.chosen-lang(v-if="selectedLang.lang") {{ selectedLang.lang }}
                 span.selected(v-else) {{ placeholder }}
                 .arrow-button
-                    img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: droppedLang}")
+                    img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': droppedLang}")
             input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
             .drop(v-if="droppedLang")
                 .drop__item(v-for="(language, index) in filteredLangs" @click="chooseLang(index)" :class="{'active-lang': selectedLang.lang == language.lang}")
@@ -183,7 +183,7 @@ export default {
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-icon {
             transform: rotate(180deg);
         }
     }

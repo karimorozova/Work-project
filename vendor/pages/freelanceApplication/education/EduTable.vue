@@ -3,7 +3,7 @@
     .table__thead
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
-                slot(name="th" :field="field") {{ field.label }}
+                slot(name="th") {{ field.label }}
             .table__empty-cell(style="width: 17px;")
     .table__tbody
         .table__row(v-for="row of tableData")

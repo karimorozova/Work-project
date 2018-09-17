@@ -1,23 +1,21 @@
 <template lang="pug">
-  .loginMain
-    .loginWrapper(v-if="forgotLink")
-      .imageWrapper
+  .login
+    .login__main(v-if="forgotLink")
+      .login__logo
         img(src="../assets/images/login_logo.png")
-      .loginForm
-        .labelWrapper
-          label.warningMessage(v-if="isLoginWarning") Check your email or password
-        .h2Wrapper
-          input.email(v-model='form.logemail' placeholder='Email' :class="{addShadow: form.logemail}")
-        .h2Wrapper
-          input.password(type="password" v-model='form.logpassword' placeholder='Password' :class="{addShadow: form.logpassword}")
-        .checkboxWrapper
-          input.checkboxWrapper__input(type="checkbox")
-          label.checkboxWrapper__label Remember me
-        .buttonWrapper
-          button(@click='sendForm' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
+      .login__form
+        .login__warning
+          label.login__warning-message(v-if="isLoginWarning") Check your email or password
+        .login__email
+          input.login__input(v-model='form.logemail' placeholder='Email' :class="{'add-shadow': form.logemail}")
+        .login__password
+          input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'add-shadow': form.logpassword}")
+        .login__checkbox
+          input.login__checkbox-input(type="checkbox")
+          label.login__checkbox-label Remember me
+        button.login__button(@click='sendForm' v-model='form.logemail, form.logpassword' :class="{'button-backgr': form.logemail && form.logpassword}") Sign In
           h2(v-if='isLogin') You are logged in!
-        .formFooter
-          span.firstLabel(@click="forget") Forgot Your Password?
+        span.login__forgot(@click="forget") Forgot Your Password?
     passwordrestore(v-else)
 </template>
 <script>
@@ -32,25 +30,12 @@ export default {
       },
       isLogin: false,
       isLoginWarning: false,
-      // isLoginWarning: true
       forgotLink: true
       };
   },
   methods: {
     sendForm() {
-      // this.$axios.post("portal/auth", this.form).then(
-      //   response => {
-      //     document.cookie = "ses=" + response.data + `;max-age=36000`;
-      //     console.log(response);
-      //     this.isLogin = true;
-      //     window.location.replace("http://localhost:3000/");
-      /*  },
-        err => {
-          alert("Bad credentials");
-          console.log("Errored : ");
-          console.log(err);
-        }
-      );*/
+
     },
     forget(){
       this.forgotLink = !this.forgotLink;
@@ -69,17 +54,17 @@ body {
   background-image: url("/assets/images/image-background.jpg");
 }
 
-.loginWrapper {
-    position: absolute;
-    margin-left: -250px;
-    left: 50%;
-    top: 50%;
-    margin-top: -266px;
-    width: 436px;
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 95vh;
+}
 
+.login__main {
+    width: 23%;
     border-radius: 26px;
-
-    .imageWrapper {
+    .login__logo {
       display: flex;
       justify-content: center;
       margin-bottom: 2%;
@@ -89,30 +74,32 @@ body {
       }
     }
 
-  .loginForm {
-    padding: 1%;
-    margin: 0 auto;
-    width: 436px;
+  .login__form {
+    padding: 10px;
+    width: 100%;
     background-color: #fff;
-
-    .labelWrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    .login__warning {
       margin-bottom: -3%;
       padding-top: 1%;
-      .warningMessage {
+      .login__warning-message {
         color: #ff0000;
         padding-left: 7.3%;
       }
     }
 
-    .h2Wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .login__email, .login__password {
+      width: 85%;
+      margin: 10px 0;
     }
 
-    input {
+    .login__input {
+      margin-top: 20px;
       height: 41px;
-      width: 356px;
+      width: 97%;
       font-size: 20px;
       color: #66563d;
       padding-left: 3%;
@@ -133,79 +120,48 @@ body {
       }
     }
 
-    .addShadow {
+    .add-shadow {
       box-shadow: 0 0 10px #66563d;
     }
 
-    .email {
-      margin-top: 5.5%;
-      margin-bottom: 5.5%;
-    }
-
-    .password {
-      margin-top: 0;
-      margin-bottom: 2.5%;
-    }
-
-    .checkboxWrapper {
+    .login__checkbox {
+      width: 100%;
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
-      .checkboxWrapper__input {
+      align-items: center;
+      &-input {
         width: 13px;
         height: 13px;
         margin-left: 7%;
       }
-      .checkboxWrapper__label {
+      &-label {
         font-size: 15px;
         color: #2d2d2d;
         margin-left: 2%;
       }
     }
-
-    .buttonWrapper {
-      display: flex;
-      justify-content: center;
-      margin: 2% 0 0.2% 0;
-      padding-bottom: 3%;
-      button {
-        width: 142px;
-        height: 35px;
-        border-radius: 8px;
-        font-size: 20px;
-        background-color: #84ca8e;
-        color: #66563d;
-        opacity: 0.22;
-      }
-      .changeButtonView {
-        opacity: 1;
-        color: #fff;
-      }
-    }
-
-    .formFooter {
-      display: flex;
-      justify-content: space-between;
+    .login__button {
+      width: 142px;
+      height: 35px;
+      border-radius: 8px;
       font-size: 20px;
-      .firstLabel {
-        color: #4280d3;
-        padding-left: 6%;
-        margin-bottom: 4%;
-        cursor: pointer;
-      }
+      background-color: #84ca8e;
+      color: #66563d;
+      opacity: 0.22;
+    }
+    .button-backgr {
+      opacity: 1;
+      color: #fff;
+    }
+    .login__forgot {
+      color: #4280d3;
+      font-size: 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      align-self: flex-start;
+      padding-left: 30px;
     }
   }
-
-  @media (max-width: 625px) {
-    width: 450px;
-  }
-  @media (max-width: 560px) {
-    width: 350px;
-  }
-  @media (max-width: 374px) {
-    width: 300px;
-  }
-
-  border-radius: 26px;
 }
 </style>

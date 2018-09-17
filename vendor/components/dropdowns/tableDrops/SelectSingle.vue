@@ -1,10 +1,10 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{zIndex: isDropped}")
+    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") Select
             .arrow-button
-                img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: isDropped}")
+                img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
             .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: selectedOption == option}")
                 span {{ option }}
@@ -102,7 +102,7 @@ export default {
     }
 }
 
-.zIndex {
+.z-index {
     z-index: 1;
 }
 
@@ -136,7 +136,7 @@ export default {
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-icon {
             transform: rotate(180deg);
         }
     }

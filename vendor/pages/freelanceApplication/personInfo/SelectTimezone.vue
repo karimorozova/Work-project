@@ -6,7 +6,7 @@
                 span.selected(v-if="timezoneSelected") {{ timezoneSelected.split(" ")[0] }}
                 span.selected.no-country(v-else) Select
                 .arrow-button
-                    img(src="../../../assets/images/arrow_open.png" :class="{reverseIcon: timezonesDropped}")
+                    img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': timezonesDropped}")
             input.search(v-if="timezonesDropped" type="text" v-model="timezoneSearch" placeholder="Search")
             .drop(v-if="timezonesDropped")
                 .drop__item(v-for="(timezone, index) in foundZones" @click="chooseZone(index)" :class="{'active-zone': timezoneSelected == timezone.zone}")
@@ -158,7 +158,7 @@ export default {
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-icon {
             transform: rotate(180deg);
         }
     }
