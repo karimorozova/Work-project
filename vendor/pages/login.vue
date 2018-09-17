@@ -97,12 +97,14 @@ body {
     }
 
     .login__input {
+      box-sizing: border-box;
       margin-top: 20px;
       height: 41px;
-      width: 97%;
+      width: 100%;
       font-size: 20px;
       color: #66563d;
       padding-left: 10px;
+      padding-right: 10px;
       border-radius: 8px;
       border: 2px solid #dedede;
       &::-webkit-input-placeholder {

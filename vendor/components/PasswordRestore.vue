@@ -34,11 +34,13 @@ export default {
     }
   }
   &__input {
+    box-sizing: border-box;
     height: 41px;
-    width: 85%;
+    width: 100%;
     font-size: 20px;
     color: #66563d;
     padding-left: 10px;
+    padding-right: 10px;
     border-radius: 8px;
     border: 2px solid #dedede;
     margin: 20px;
