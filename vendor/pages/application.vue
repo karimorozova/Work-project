@@ -86,7 +86,7 @@ export default {
         saveOtherChoice({choice}) {
             this.otherChoiceVisibile = false;
         },
-        sumbitForm(data) {
+        sumbitForm() {
             this.saveForm(this.person);
         },
     ...mapActions({

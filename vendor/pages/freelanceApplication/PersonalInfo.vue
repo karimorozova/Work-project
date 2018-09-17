@@ -111,9 +111,7 @@ export default {
             }
             this.selectedPositions.splice(elementPosition, 1)
         },
-        setInfoValue(event) {
-            const value = event.target.value;
-            const name = event.target.name
+        setInfoValue({target: {value, name}}) {
             this.$emit('setValue', {property: name, value: value})
         }
     },
