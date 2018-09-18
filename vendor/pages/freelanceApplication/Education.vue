@@ -76,6 +76,7 @@ export default {
     &__input {
         box-sizing: border-box; 
         border: none;
+        outline: none;
         width: 99%;
         color: #67573E;
     }

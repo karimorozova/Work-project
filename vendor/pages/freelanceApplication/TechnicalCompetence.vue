@@ -28,11 +28,19 @@
             :options="competences.software"
             @chooseOptions="chooseCompetence"
         )
+    OtherChoice(
+        v-if="otherChoiceVisibile"
+        :label="otherChoicelabel"
+        :refersTo="otherChoiceRef"
+        @cancelChanges="cancelOtherChoice"
+        @saveChanges="saveOtherChoice"
+    )
 </template>
 
 <script>
 import SelectSingle from "../../components/dropdowns/SelectSingle";
 import SelectMulti from "../../components/dropdowns/SelectMulti";
+import OtherChoice from "./OtherChoice";
 
 export default {
     data() {
@@ -46,35 +54,64 @@ export default {
                 internet: ["Yes", "No", "Limited online availability"],
                 cat: ["Yes", "No", "Very little"],
                 software: ["HTML", "Microsoft Excel", "DTP software", "Other software"]
-            }
+            },
+            otherChoiceVisibile: false,
+            otherChoicelabel: "",
+            otherChoiceRef: ""
         }
     },
     methods: {
         chooseCompetence({option, refersTo}) {
             if(refersTo != "software") {
                 if(option === "Yes" && refersTo === "cat") {
-                    this.$emit("setOtherChoice", {refersTo: "cat"})
+                    this.otherChoiceVisibile = true;
+                    this.otherChoiceRef = "cat"
+                    this.otherChoicelabel = "Please specify CAT tool"
+                    this.$emit("showOtherChoice")
                 }
                 this.selectedCompetence[refersTo] = option;
             } else {
                 if(option === "DTP software") {
-                    this.$emit("setOtherChoice", {refersTo: "dtp"})
+                    this.otherChoiceVisibile = true;
+                    this.otherChoiceRef = "dtp"
+                    this.otherChoicelabel = "Please specify DTP software"
+                    this.$emit("showOtherChoice")
                 }
                 if(option === "Other software") {
-                    this.$emit("setOtherChoice", {refersTo: "software"})
+                    this.otherChoiceVisibile = true;
+                    this.otherChoiceRef = "software"
+                    this.otherChoicelabel = "Please specify software"
+                    this.$emit("showOtherChoice")
                 }
                 const elementPosition = this.selectedCompetence.software.indexOf(option);
                 if(elementPosition != -1) {
-                    return this.selectedCompetence.software.splice(elementPosition, 1)
+                    this.selectedCompetence.software.splice(elementPosition, 1)
+                } else {
+                    this.selectedCompetence.software.push(option);
                 }
-                this.selectedCompetence.software.push(option)
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence})
-        }
+        },
+        cancelOtherChoice() {
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice")
+        },
+        saveOtherChoice({refersTo, choice}) {
+            if(refersTo === "cat") {
+                this.selectedCompetence.cat = choice;
+            } else {
+                let position = (refersTo === "dtp") ? this.selectedCompetence.software.indexOf("DTP software"): this.selectedCompetence.software.indexOf("Other software") 
+                this.selectedCompetence.software.splice(position, 1, choice);
+            }
+            this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence});
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice");
+        },
     },
     components: {
         SelectSingle,
-        SelectMulti
+        SelectMulti,
+        OtherChoice
     }
 }
 </script>

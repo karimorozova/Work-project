@@ -12,7 +12,8 @@
                 @setValue="setPersonInfo"
                 @setLangPair="setLangPair"
                 @uploadCvFiles="uploadingFiles"
-                @setOtherChoice="setOtherChoice"
+                @showOtherChoice="showOtherChoice"
+                @closeOtherChoice="closeOtherChoice"
             )
         .application__section.education
             Education(
@@ -25,12 +26,14 @@
         .application__section.competence
             TechnicalCompetence(
                 @setValue="setPersonInfo"
-                @setOtherChoice="setOtherChoice"
+                @showOtherChoice="showOtherChoice"
+                @closeOtherChoice="closeOtherChoice"
             )
         .application__section.domain-experience
             DomainExp(
                 @setValue="setPersonInfo"
-                @setOtherChoice="setOtherChoice"
+                @showOtherChoice="showOtherChoice"
+                @closeOtherChoice="closeOtherChoice"
             )
         .application__section.other
             Other(
@@ -42,12 +45,7 @@
                 @sumbitForm="sumbitForm"
             )
     Footer
-    .popUp(v-if="otherChoiceVisibile")
-        OtherChoice(
-            :label="otherChoicelabel"
-            @cancelChanges="cancelOtherChoice"
-            @saveChanges="saveOtherChoice"
-        )
+    .other-choice(v-if="otherChoiceVisibile")
 </template>
 
 <script>
@@ -68,6 +66,7 @@ export default {
         return {
             otherChoiceVisibile: false,
             otherChoicelabel: "",
+            otherChoiceRef: "",
             person: {},
             langPairs: []
         }
@@ -85,31 +84,10 @@ export default {
         uploadingFiles({property, files}) {
             this.person[property] = files;
         },
-        setOtherChoice({refersTo}) {
+        showOtherChoice() {
             this.otherChoiceVisibile = true;
-            let defaultText = "Please specify ";
-            switch (refersTo) {
-                case "position":
-                    this.otherChoicelabel = defaultText + "position title";
-                    break;
-                case "cat":
-                    this.otherChoicelabel = defaultText + "CAT tool";
-                    break;
-                case "dtp":
-                    this.otherChoicelabel = defaultText + "DTP software";
-                    break;
-                case "software":
-                    this.otherChoicelabel = defaultText + "software";
-                    break;
-                case "industries":
-                    this.otherChoicelabel = defaultText + "industries";
-                    break
-            }
         },
-        cancelOtherChoice() {
-            this.otherChoiceVisibile = false;
-        },
-        saveOtherChoice({choice}) {
+        closeOtherChoice() {
             this.otherChoiceVisibile = false;
         },
         sumbitForm({confirmed}) {
@@ -172,7 +150,7 @@ export default {
     }
 }
 
-.popUp {
+.other-choice {
     position: absolute;
     top: 0;
     bottom: 0;

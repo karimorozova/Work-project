@@ -9,10 +9,17 @@
             :options="industries"
             @chooseOptions="chooseIndustries"
         )
+    OtherChoice(
+        v-if="otherChoiceVisibile"
+        :label="otherChoicelabel"
+        @cancelChanges="cancelOtherChoice"
+        @saveChanges="saveOtherChoice"
+    )
 </template>
 
 <script>
 import SelectMulti from "../../components/dropdowns/SelectMulti";
+import OtherChoice from "./OtherChoice";
 
 export default {
     data() {
@@ -25,13 +32,17 @@ export default {
                 "Sports Betting",
                 "Video Games",
                 "Other"
-            ]
+            ],
+            otherChoiceVisibile: false,
+            otherChoicelabel: "",
         }
     },
     methods: {
         chooseIndustries({option}) {
             if(option === "Other") {
-                this.$emit("setOtherChoice", {refersTo: "industries"})
+                this.otherChoiceVisibile = true;
+                this.otherChoicelabel = "Please specify industries"
+                this.$emit("showOtherChoice")
             }
             const elementPosition = this.selectedIndustries.indexOf(option);
             if(elementPosition != -1) {
@@ -39,10 +50,22 @@ export default {
             }
             this.selectedIndustries.push(option);
             this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
+        },
+        cancelOtherChoice() {
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice")
+        },
+        saveOtherChoice({referTo, choice}) {
+            const position = this.selectedIndustries.indexOf("Other");
+            this.selectedIndustries.splice(position, 1, choice);
+            this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice")
         }
     },
     components: {
-        SelectMulti
+        SelectMulti,
+        OtherChoice
     }
 }
 </script>

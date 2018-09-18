@@ -1,69 +1,74 @@
 <template lang="pug">
-    .personal
-        .personal__main-title PERSONAL INFORMAITON
-        .row
-            .row__item.init-contact
-                .personal-initials
-                    .personal-initials__label Name:
-                    input.personal-initials__input(type="text" name="name" @change="setInfoValue")
-                .personal-initials
-                    .personal-initials__label Surname:
-                    input.personal-initials__input(type="text" name="surname" @change="setInfoValue")
-            .row__item.init-contact
-                .personal-contacts
-                    .personal-contacts__label Phone Number:
-                    input.personal-contacts__input(type="text" name="phone" @change="setInfoValue")
-                .personal-contacts
-                    .personal-contacts__label Email:
-                    input.personal-contacts__input(type="text" name="email" @change="setInfoValue")
-                    span.personal-contacts__example example@example.com
-        .row
-            .row__item
-                SelectLanguage(
-                    label="Mother tongue"
-                    placeholder="Select"
-                    :selectedLang="selectedTongue"
-                    @chooseLang="setMotherTongue"
-                )
-            .row__item
-                SelectTimezone(
-                    :timezoneSelected="selectedTimezone"
-                    @chooseZone="chooseTimezone"
-                )
-        .personal__label Language pairs:
-        .row.lang-pairs(v-for="(pair, index) in selectedLangPairs")
-            .row__item
-                SelectLanguage(
-                    refersTo="source"
-                    :parentIndex="index"
-                    placeholder="Select language"
-                    :selectedLang="pair.source"
-                    @chooseLang="setPairLanguage"
-                )
-            img.row__image(src="../../assets/images/arrow_open.png")
-            .row__item
-                SelectLanguage(
-                    refersTo="target"
-                    :parentIndex="index"
-                    placeholder="Select language"
-                    :selectedLang="pair.target"
-                    @chooseLang="setPairLanguage"
-                )
-        .row.add-button
-            .row__add-pair(@click="addLanguagePair")
-                span.plus +
-        .row
-            .row__item
-                UploadFileButton(
-                    label="CV"
-                    @uploadedFile="uploadCvFile"
-                )
-            .row__item
-                SelectPosition(
-                    :selectedPositions="selectedPositions"
-                    @choosePosition="choosePosition"
-                )
-
+.personal
+    .personal__main-title PERSONAL INFORMAITON
+    .row
+        .row__item.init-contact
+            .personal-initials
+                .personal-initials__label Name:
+                input.personal-initials__input(type="text" name="name" @change="setInfoValue")
+            .personal-initials
+                .personal-initials__label Surname:
+                input.personal-initials__input(type="text" name="surname" @change="setInfoValue")
+        .row__item.init-contact
+            .personal-contacts
+                .personal-contacts__label Phone Number:
+                input.personal-contacts__input(type="text" name="phone" @change="setInfoValue")
+            .personal-contacts
+                .personal-contacts__label Email:
+                input.personal-contacts__input(type="text" name="email" @change="setInfoValue")
+                span.personal-contacts__example example@example.com
+    .row
+        .row__item
+            SelectLanguage(
+                label="Mother tongue"
+                placeholder="Select"
+                :selectedLang="selectedTongue"
+                @chooseLang="setMotherTongue"
+            )
+        .row__item
+            SelectTimezone(
+                :timezoneSelected="selectedTimezone"
+                @chooseZone="chooseTimezone"
+            )
+    .personal__label Language pairs:
+    .row.lang-pairs(v-for="(pair, index) in selectedLangPairs")
+        .row__item
+            SelectLanguage(
+                refersTo="source"
+                :parentIndex="index"
+                placeholder="Select language"
+                :selectedLang="pair.source"
+                @chooseLang="setPairLanguage"
+            )
+        img.row__image(src="../../assets/images/arrow_open.png")
+        .row__item
+            SelectLanguage(
+                refersTo="target"
+                :parentIndex="index"
+                placeholder="Select language"
+                :selectedLang="pair.target"
+                @chooseLang="setPairLanguage"
+            )
+    .row.add-button
+        .row__add-pair(@click="addLanguagePair")
+            span.plus +
+    .row
+        .row__item
+            UploadFileButton(
+                label="CV"
+                @uploadedFile="uploadCvFile"
+            )
+        .row__item
+            SelectPosition(
+                :selectedPositions="selectedPositions"
+                @choosePosition="choosePosition"
+            )
+    OtherChoice(
+        v-if="otherChoiceVisibile"
+        :label="otherChoicelabel"
+        @cancelChanges="cancelOtherChoice"
+        @saveChanges="saveOtherChoice"
+    )
 </template>
 
 <script>
@@ -71,7 +76,7 @@ import SelectLanguage from "./personInfo/SelectLanguage";
 import SelectTimezone from "./personInfo/SelectTimezone";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
-
+import OtherChoice from "./OtherChoice";
 
 export default {
     data() {
@@ -81,6 +86,8 @@ export default {
             selectedTimezone: "",
             cvFiles: [],
             selectedPositions: [],
+            otherChoiceVisibile: false,
+            otherChoicelabel: "",
         }
     },
     methods: {
@@ -113,23 +120,39 @@ export default {
         },
         choosePosition({position}) {
             if(position === "Other") {
-                this.$emit("setOtherChoice", {refersTo: 'position'})
+                this.otherChoiceVisibile = true;
+                this.otherChoicelabel = "Please specify position title"
+                this.$emit("showOtherChoice")
             }
             const elementPosition = this.selectedPositions.indexOf(position);
             if(elementPosition === -1){
-                return this.selectedPositions.push(position);
+                this.selectedPositions.push(position);
+            } else {
+                this.selectedPositions.splice(elementPosition, 1);
             }
-            this.selectedPositions.splice(elementPosition, 1)
+            this.$emit("setValue", {property: 'position', value: this.selectedPositions});
         },
         setInfoValue({target: {value, name}}) {
             this.$emit("setValue", {property: name, value: value})
+        },
+        cancelOtherChoice() {
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice")
+        },
+        saveOtherChoice({referTo, choice}) {
+            const position = this.selectedPositions.indexOf("Other");
+            this.selectedPositions.splice(position, 1, choice);
+            this.$emit("setValue", {property: 'position', value: this.selectedPositions});
+            this.otherChoiceVisibile = false;
+            this.$emit("closeOtherChoice")
         }
     },
     components: {
         SelectLanguage,
         SelectTimezone,
         UploadFileButton,
-        SelectPosition
+        SelectPosition,
+        OtherChoice
     }
 }
 </script>

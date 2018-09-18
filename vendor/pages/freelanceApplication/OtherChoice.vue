@@ -20,6 +20,9 @@ export default {
     props: {
         label: {
             type: String
+        },
+        refersTo: {
+            type: String
         }
     },
     data() {
@@ -32,7 +35,7 @@ export default {
             this.$emit("cancelChanges")
         },
         saveChanges({value}) {
-            this.$emit("saveChanges", {choice: this.inputText})
+            this.$emit("saveChanges", {refersTo: this.refersTo, choice: this.inputText})
         }
     },
     components: {
@@ -53,9 +56,9 @@ export default {
     padding: 30px 0 20px;
     box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
     position:fixed;
-    z-index: 10;
+    z-index: 100;
     background-color: #FFF;
-    top: calc(50% - 150px); // half of width
+    top: calc(50% - 150px);
     left: calc(50% - 165px);
     &__label {
         font-size: 21px;
