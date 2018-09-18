@@ -4,11 +4,11 @@
         .navbar-item
             ul.navbar-item__list
                 li.navbar-item__li(v-for="link in linksArray.firstRow")
-                    a.navbar-item__link(:href='link.link') {{ link.title }}
+                    a.navbar-item__link(:href='link.url') {{ link.title }}
         .navbar-item
             ul.navbar-item__list
                 li.navbar-item__li(v-for="link in linksArray.secondRow")
-                    a.navbar-item__link(:href='link.link') {{ link.title }}
+                    a.navbar-item__link(:href='link.url') {{ link.title }}
     .footer__legal
         p.footer__legal-text YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
         p.footer__legal-text office : +35725252150
@@ -18,7 +18,7 @@
     .footer__social
         ul.footer__social-list
             li.footer__social-li(v-for="social in socialsArray")
-                a.footer__social-link(:href="social.socialLink")
+                a.footer__social-link(:href="social.url")
                     img.footer__social-image(:src="social.image")
 </template>
 
@@ -29,25 +29,25 @@ export default {
             linksArray: {
                 firstRow:
                 [
-                    {link: 'https://www.pangea.global', title: 'Home'},
-                    {link: 'https://www.pangea.global/career', title: 'Careers'},
-                    {link: 'https://www.pangea.global/faq', title: 'FAQ'},
-                    {link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
+                    {url: 'https://www.pangea.global', title: 'Home'},
+                    {url: 'https://www.pangea.global/career', title: 'Careers'},
+                    {url: 'https://www.pangea.global/faq', title: 'FAQ'},
+                    {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
                 ],
                 secondRow: [
-                    {link: 'https://www.pangea.global/contact', title: 'Contact Us'},
-                    {link: 'https://www.pangea.global/blog', title: 'Blog'},
-                    {link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
+                    {url: 'https://www.pangea.global/contact', title: 'Contact Us'},
+                    {url: 'https://www.pangea.global/blog', title: 'Blog'},
+                    {url: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
                 ]
             },
             socialsArray: [
-                {socialLink: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')},
-                {socialLink: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')},
-                {socialLink: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')},
-                {socialLink: 'https://plus.google.com/116520029165216678356', image: require('../assets/images/social/google +.png')},
-                {socialLink: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')},
-                {socialLink: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')},
-                {socialLink: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')}
+                {url: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')},
+                {url: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')},
+                {url: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')},
+                {url: 'https://plus.google.com/116520029165216678356', image: require('../assets/images/social/google +.png')},
+                {url: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')},
+                {url: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')},
+                {url: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')}
             ]
         }
     }
