@@ -7,7 +7,7 @@ const state = {
     phone: "",
     email: "",
     motherTongue: "",
-    timeZone: "",
+    timezone: "",
     languagePairs: [],
     cvFiles: [],
     position: [],

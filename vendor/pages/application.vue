@@ -10,6 +10,8 @@
         .application__section.personal-info
             PersonalInfo(
                 @setValue="setPersonInfo"
+                @setLangPair="setLangPair"
+                @uploadCvFiles="uploadingCvFiles"
                 @setOtherChoice="setOtherChoice"
             )
         .application__section.education
@@ -57,13 +59,23 @@ export default {
         return {
             otherChoiceVisibile: false,
             otherChoicelabel: "",
-            person: {}
+            person: {},
+            langPairs: []
         }
     },
     methods: {
         setPersonInfo({property, value}) {
-            console.log(property + " " + value);
             this.person[property] = value;
+        },
+        setLangPair({langPairs}) {
+            this.langPairs = langPairs.filter((obj, pos, arr) => {
+                return arr.map(mapObj => mapObj.source + mapObj.target).indexOf(obj.source+obj.target) === pos
+            })
+            console.log(this.langPairs);
+            this.person.languagePairs = this.langPairs
+        },
+        uploadingCvFiles({files}) {
+            this.person.cvFiles = files;
         },
         setOtherChoice({refersTo}) {
             this.otherChoiceVisibile = true;

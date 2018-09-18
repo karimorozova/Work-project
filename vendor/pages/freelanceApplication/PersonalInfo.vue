@@ -86,12 +86,21 @@ export default {
     methods: {
         setMotherTongue({lang}) {
             this.selectedTongue = lang;
+            this.$emit("setValue", {property: 'motherTongue', value: lang._id})
         },
         setPairLanguage({lang, index, refersTo}) {
             this.selectedLangPairs[index][refersTo] = lang;
+            const { source, target } = this.selectedLangPairs[index];
+            if(source._id && target._id) {
+                const langPairs = this.selectedLangPairs.map(item => {
+                    return {source: item.source._id, target: item.target._id}
+                })
+                this.$emit("setLangPair", {langPairs: langPairs})
+            }
         },
         chooseTimezone({zone}) {
             this.selectedTimezone = zone;
+            this.$emit("setValue", {property: 'timezone', value: zone})
         },
         addLanguagePair() {
             this.selectedLangPairs.push({
@@ -100,6 +109,7 @@ export default {
         },
         uploadCvFile({files}) {
             this.cvFiles = files;
+            this.$emit("uploadCvFiles", {files: this.cvFiles})
         },
         choosePosition({position}) {
             if(position === "Other") {
@@ -112,7 +122,7 @@ export default {
             this.selectedPositions.splice(elementPosition, 1)
         },
         setInfoValue({target: {value, name}}) {
-            this.$emit('setValue', {property: name, value: value})
+            this.$emit("setValue", {property: name, value: value})
         }
     },
     components: {
