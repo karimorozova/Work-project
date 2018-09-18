@@ -95,9 +95,9 @@ export default {
         sumbitForm() {
             this.saveForm(this.person);
         },
-    ...mapActions({
-        saveForm: 'setApplicationForm'
-    })
+        ...mapActions({
+            saveForm: 'setApplicationForm'
+        })
     },
     components: {
         Header,

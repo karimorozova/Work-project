@@ -3,11 +3,11 @@
     .footer__navbar
         .navbar-item
             ul.navbar-item__list
-                li.navbar-item__li(v-for="link in linksArray[0]")
+                li.navbar-item__li(v-for="link in linksArray.firstRow")
                     a.navbar-item__link(:href='link.link') {{ link.title }}
         .navbar-item
             ul.navbar-item__list
-                li.navbar-item__li(v-for="link in linksArray[1]")
+                li.navbar-item__li(v-for="link in linksArray.secondRow")
                     a.navbar-item__link(:href='link.link') {{ link.title }}
     .footer__legal
         p.footer__legal-text YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
@@ -26,19 +26,20 @@
 export default {
     data() {
         return {
-            linksArray: [
+            linksArray: {
+                firstRow:
                 [
                     {link: 'https://www.pangea.global', title: 'Home'},
                     {link: 'https://www.pangea.global/career', title: 'Careers'},
                     {link: 'https://www.pangea.global/faq', title: 'FAQ'},
                     {link: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
                 ],
-                [
+                secondRow: [
                     {link: 'https://www.pangea.global/contact', title: 'Contact Us'},
                     {link: 'https://www.pangea.global/blog', title: 'Blog'},
                     {link: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
                 ]
-            ],
+            },
             socialsArray: [
                 {socialLink: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')},
                 {socialLink: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')},
