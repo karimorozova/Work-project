@@ -1,12 +1,12 @@
 <template lang="pug">
 .navbar
-    .navbar__item
+    .navbar__block
         ul.navbar__list
-            li.navbar__li(v-for="link in linksArray.firstRow" :class="{'no-border-mobile': link.title === 'Privacy Policy'}")
+            li.navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border-mobile': link.title === 'Privacy Policy'}")
                 a.navbar__link(:href='link.url') {{ link.title }}
-    .navbar__item
+    .navbar__block
         ul.navbar__list
-            li.navbar__li(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Rewards Program'}")
+            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Rewards Program'}")
                 a.navbar__link(:href='link.url') {{ link.title }}    
 </template>
 
@@ -58,7 +58,7 @@ export default {
             }
         }
     }
-    &__li {
+    &__item {
         display: inline;
         padding: 0 4px;
         text-shadow: 0 3px 5px black;

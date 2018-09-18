@@ -1,7 +1,7 @@
 <template lang="pug">
 .social
     ul.social__list
-        li.social__li(v-for="social in socialsArray")
+        li.social__item(v-for="social in socialsArray")
             a.social__link(:href="social.url")
                 img.social__image(:src="social.image")
 </template>
@@ -35,7 +35,7 @@ export default {
     &__list {
         padding-left: 0;
     }
-    &__li {
+    &__item {
         display: inline;
         list-style: none;
     }
