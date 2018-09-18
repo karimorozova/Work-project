@@ -1,14 +1,20 @@
 <template lang="pug">
 .header
     .header__logo
-        img.header__image(src="@/assets/images/new-logo.png")
+        a.header__link(href="https://www.pangea.global/")
+            img.header__image(src="../assets/images/new-logo.png")
     .header__background
-        span.header__text Application Form
+        span.header__text {{ headerText }}
 </template>
 
 <script>
+
 export default {
-    
+    props: {
+        headerText: {
+            type: String
+        }
+    }    
 }
 </script>
 
@@ -19,11 +25,10 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 30px;
     &__logo {
         width: 27%;
         padding-right: 100px;
-        margin: 10px 0;
+        margin: 5px 0;
         display: flex;
         justify-content: flex-start;
     }
@@ -32,7 +37,7 @@ export default {
 .header__background {
     width: 100%;
     height: 273px;
-    background-image: url('../../assets/images/header2.jpg');
+    background-image: url('../assets/images/header2.jpg');
     background-size: cover;
     display: flex;
     flex-direction: column;

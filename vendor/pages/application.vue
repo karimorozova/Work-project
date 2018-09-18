@@ -1,6 +1,8 @@
 <template lang="pug">
 .application-wrap
-    Header
+    Header(
+        headerText="Application Form"
+    )
     form.application
         .application__header 
             span.title FREELANCE APPLICATION
@@ -28,6 +30,7 @@
             AgreeAndSubmit(
                 @sumbitForm="sumbitForm"
             )
+    Footer
     .popUp(v-if="otherChoiceVisibile")
         OtherChoice(
             :label="otherChoicelabel"
@@ -37,7 +40,7 @@
 </template>
 
 <script>
-import Header from "./freelanceApplication/Header";
+import Header from "@/components/Header";
 import PersonalInfo from "./freelanceApplication/PersonalInfo";
 import Education from "./freelanceApplication/Education";
 import TranslationExp from "./freelanceApplication/TranslationExp";
@@ -46,6 +49,7 @@ import DomainExp from "./freelanceApplication/DomainExp";
 import Other from "./freelanceApplication/Other";
 import AgreeAndSubmit from "./freelanceApplication/AgreeAndSubmit";
 import OtherChoice from "./freelanceApplication/OtherChoice";
+import Footer from "@/components/Footer";
 import { mapActions } from "vuex";
 
 export default {
@@ -104,7 +108,8 @@ export default {
         DomainExp,
         Other,
         AgreeAndSubmit,
-        OtherChoice
+        OtherChoice,
+        Footer
     }
 }
 </script>
@@ -121,6 +126,8 @@ export default {
     position: relative;
 }
 .application {
+    margin-top: 40px;
+    margin-bottom: 40px;
     width: 27%;
     padding: 30px 50px;
     border: 1px solid #67573E;
