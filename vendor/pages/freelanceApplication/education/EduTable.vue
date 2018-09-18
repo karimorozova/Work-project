@@ -6,9 +6,9 @@
                 slot(name="th") {{ field.label }}
             .table__empty-cell(style="width: 17px;")
     .table__tbody
-        .table__row(v-for="row of tableData")
+        .table__row(v-for="(row, index) of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
-                slot(name="field.key" :field="field" :row="row")
+                slot(:name="field.key" :row="row" :index="index")
 </template>
 
 <script>
