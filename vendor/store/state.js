@@ -19,9 +19,12 @@ const state = {
       software: []
     },
     industries: [],
-    other: {
-      availability: ""
-    }
+    availability: "",
+    testAgree: "",
+    rate: "",
+    coverLetter: "",
+    coverLetterFiles: [],
+    confirmed: ""
   }
 };
 export default state

@@ -11,23 +11,32 @@
             PersonalInfo(
                 @setValue="setPersonInfo"
                 @setLangPair="setLangPair"
-                @uploadCvFiles="uploadingCvFiles"
+                @uploadCvFiles="uploadingFiles"
                 @setOtherChoice="setOtherChoice"
             )
         .application__section.education
-            Education
+            Education(
+                @setValue="setPersonInfo"
+            )
         .application__section.translation-experience
-            TranslationExp
+            TranslationExp(
+                @setValue="setPersonInfo"
+            )
         .application__section.competence
             TechnicalCompetence(
+                @setValue="setPersonInfo"
                 @setOtherChoice="setOtherChoice"
             )
         .application__section.domain-experience
             DomainExp(
+                @setValue="setPersonInfo"
                 @setOtherChoice="setOtherChoice"
             )
         .application__section.other
-            Other
+            Other(
+                @setValue="setPersonInfo"
+                @uploadCoverLetter="uploadingFiles"
+            )
         .application__agree-submit
             AgreeAndSubmit(
                 @sumbitForm="sumbitForm"
@@ -71,11 +80,10 @@ export default {
             this.langPairs = langPairs.filter((obj, pos, arr) => {
                 return arr.map(mapObj => mapObj.source + mapObj.target).indexOf(obj.source+obj.target) === pos
             })
-            console.log(this.langPairs);
             this.person.languagePairs = this.langPairs
         },
-        uploadingCvFiles({files}) {
-            this.person.cvFiles = files;
+        uploadingFiles({property, files}) {
+            this.person[property] = files;
         },
         setOtherChoice({refersTo}) {
             this.otherChoiceVisibile = true;
@@ -104,7 +112,8 @@ export default {
         saveOtherChoice({choice}) {
             this.otherChoiceVisibile = false;
         },
-        sumbitForm() {
+        sumbitForm({confirmed}) {
+            this.person.confirmed = confirmed;
             this.saveForm(this.person);
         },
         ...mapActions({

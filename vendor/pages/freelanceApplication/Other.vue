@@ -13,8 +13,8 @@
     .other__options.test-options
         span.other__label Options:
         SelectSingle(
-            :selectedOption="selectedTestAnswer"
-            refersTo="selectedTestAnswer"
+            :selectedOption="testAgree"
+            refersTo="testAgree"
             :options="testAnswers"
             @chooseOption="chooseOption"
         )
@@ -23,7 +23,7 @@
         input.other__input(type="text")
     .other__options.cover-letter
         span.other__label Cover Letter: (please write or upload it below)
-        textarea.other__text-area(rows=4)
+        textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
     .other__options
         UploadFileButton(
             label="Files"
@@ -39,18 +39,25 @@ export default {
     data() {
         return {
             selectedAvailability: "",
-            selectedTestAnswer: "",
+            testAgree: "",
             availabilityOptions: ["Full-time", "Part-time", "Limited"],
             testAnswers: ["Yes", "No"],
+            coverLetter: "",
             cvFiles: []
         }
     },
     methods: {
         chooseOption({option, refersTo}) {
             this[refersTo] = option;
+            let prop = (refersTo === "testAgree") ? "testAgree": "availability";
+            this.$emit("setValue", {property: prop, value: option})
+        },
+        setCoverLetter() {
+            this.$emit("setValue", {property: 'coverLetter', value: this.coverLetter})
         },
         uploadCvFile({files}) {
             this.cvFiles = files;
+            this.$emit("uploadCoverLetter", {property: 'coverLetterFiles', files: this.cvFiles});
         }
     },
     components: {

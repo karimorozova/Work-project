@@ -5,14 +5,15 @@
         EduTable(:fields="fields" 
             :tableData="tableData"
             )
-            template(slot="field.key" slot-scope="{ field, row }")
+            template(slot="field.key" slot-scope="{ field, row }" )
                 SelectSingle(v-if="field.key == 1"
                     :selectedOption="row[field.key]"
                     :options="options"
                     :activeObject="row"
                     @chooseOption="chooseOption"
                     )
-                template(v-if="field.key != 1") {{ row[field.key] }}  
+                template(v-if="field.key != 1")
+                    input.education__input(@change="setEducation" type="text" v-model="row[field.key]")  
 </template>
 
 <script>
@@ -41,6 +42,10 @@ export default {
     methods: {
         chooseOption({option, activeObject}) {
             activeObject[1] = option;
+            this.$emit("setValue", {property: 'education', value: this.tableData})
+        },
+        setEducation() {
+            this.$emit("setValue", {property: 'education', value: this.tableData})
         }
     },
     components: {
@@ -67,6 +72,12 @@ export default {
     }
     &__comment {
         font-size: 12px;
+    }
+    &__input {
+        box-sizing: border-box; 
+        border: none;
+        width: 99%;
+        color: #67573E;
     }
 }
 

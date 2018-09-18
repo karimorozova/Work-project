@@ -37,7 +37,7 @@ export default {
             if(this.errors.length) {
                 alert("Captcha needed")
             } else {
-                this.$emit("sumbitForm")
+                this.$emit("sumbitForm", {confirmed: this.isAgree})
             }
         }
     }

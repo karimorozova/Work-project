@@ -109,7 +109,7 @@ export default {
         },
         uploadCvFile({files}) {
             this.cvFiles = files;
-            this.$emit("uploadCvFiles", {files: this.cvFiles})
+            this.$emit("uploadCvFiles", {property: 'cvFiles', files: this.cvFiles})
         },
         choosePosition({position}) {
             if(position === "Other") {

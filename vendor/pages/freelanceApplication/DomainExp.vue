@@ -38,6 +38,7 @@ export default {
                 return this.selectedIndustries.splice(elementPosition, 1)
             }
             this.selectedIndustries.push(option);
+            this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
         }
     },
     components: {

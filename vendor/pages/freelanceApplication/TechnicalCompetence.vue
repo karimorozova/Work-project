@@ -69,6 +69,7 @@ export default {
                 }
                 this.selectedCompetence.software.push(option)
             }
+            this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence})
         }
     },
     components: {
