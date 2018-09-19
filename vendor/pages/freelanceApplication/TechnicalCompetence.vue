@@ -1,7 +1,8 @@
 <template lang="pug">
 .technical
     .technical__main-title TECHNICAL COMPETENCE
-    span.technical__comment.asterisk Are you willing to translate online?
+    span.technical__comment Are you willing to translate online?
+        span.technical__asterisk *
     .technical__options
         span.technical__label Internet access:
         SelectSingle(
@@ -43,6 +44,12 @@ import SelectMulti from "../../components/dropdowns/SelectMulti";
 import OtherChoice from "./OtherChoice";
 
 export default {
+    props: {
+        otherChoiceVisibile: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             selectedCompetence: {
@@ -55,7 +62,6 @@ export default {
                 cat: ["Yes", "No", "Very little"],
                 software: ["HTML", "Microsoft Excel", "DTP software", "Other software"]
             },
-            otherChoiceVisibile: false,
             otherChoicelabel: "",
             otherChoiceRef: ""
         }
@@ -64,24 +70,21 @@ export default {
         chooseCompetence({option, refersTo}) {
             if(refersTo != "software") {
                 if(option === "Yes" && refersTo === "cat") {
-                    this.otherChoiceVisibile = true;
                     this.otherChoiceRef = "cat"
                     this.otherChoicelabel = "Please specify CAT tool"
-                    this.$emit("showOtherChoice")
+                    this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
                 }
                 this.selectedCompetence[refersTo] = option;
             } else {
-                if(option === "DTP software") {
-                    this.otherChoiceVisibile = true;
+                if(option === "DTP software" && this.selectedCompetence.software.indexOf("DTP software") === -1) {
                     this.otherChoiceRef = "dtp"
                     this.otherChoicelabel = "Please specify DTP software"
-                    this.$emit("showOtherChoice")
+                    this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
                 }
-                if(option === "Other software") {
-                    this.otherChoiceVisibile = true;
+                if(option === "Other software" && this.selectedCompetence.software.indexOf("Other software") === -1) {
                     this.otherChoiceRef = "software"
                     this.otherChoicelabel = "Please specify software"
-                    this.$emit("showOtherChoice")
+                    this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
                 }
                 const elementPosition = this.selectedCompetence.software.indexOf(option);
                 if(elementPosition != -1) {
@@ -93,8 +96,7 @@ export default {
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence})
         },
         cancelOtherChoice() {
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice")
+            this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'})
         },
         saveOtherChoice({refersTo, choice}) {
             if(refersTo === "cat") {
@@ -104,8 +106,7 @@ export default {
                 this.selectedCompetence.software.splice(position, 1, choice);
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence});
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice");
+            this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'});
         },
     },
     components: {
@@ -134,6 +135,13 @@ export default {
             font-size: 28px;
         }
     }
+    &__asterisk {
+        position: absolute;
+        padding-left: 4px;
+        top: -2px;
+        font-size: 12px;
+        color: red;
+    }
     &__options {
         margin-top: 20px;
         margin-bottom: 80px;
@@ -146,6 +154,9 @@ export default {
     }
     &__comment, &__label {
         font-size: 12px;
+    }
+    &__comment {
+        position: relative;
     }
 }
 

@@ -1,21 +1,22 @@
 <template lang="pug">
 .personal
     .personal__main-title PERSONAL INFORMAITON
+        span.personal__asterisk *
     .row
         .row__item.init-contact
             .personal-initials
                 .personal-initials__label Name:
                 input.personal-initials__input(type="text" name="name" @change="setInfoValue")
             .personal-initials
-                .personal-initials__label Surname:
-                input.personal-initials__input(type="text" name="surname" @change="setInfoValue")
+                .personal-initials__label Email:
+                input.personal-initials__input(type="text" name="email" @change="setInfoValue")
         .row__item.init-contact
+            .personal-contacts
+                .personal-contacts__label Surname:
+                input.personal-contacts__input(type="text" name="surname" @change="setInfoValue")
             .personal-contacts
                 .personal-contacts__label Phone Number:
                 input.personal-contacts__input(type="text" name="phone" @change="setInfoValue")
-            .personal-contacts
-                .personal-contacts__label Email:
-                input.personal-contacts__input(type="text" name="email" @change="setInfoValue")
                 span.personal-contacts__example example@example.com
     .row
         .row__item
@@ -49,9 +50,7 @@
                 :selectedLang="pair.target"
                 @chooseLang="setPairLanguage"
             )
-    .row.add-button
-        .row__add-pair(@click="addLanguagePair")
-            span.plus +
+    Add(@addElement="addLanguagePair")
     .row
         .row__item
             UploadFileButton(
@@ -61,6 +60,7 @@
         .row__item
             SelectPosition(
                 :selectedPositions="selectedPositions"
+                :otherChoice="otherChoice"
                 @choosePosition="choosePosition"
             )
     OtherChoice(
@@ -77,8 +77,15 @@ import SelectTimezone from "./personInfo/SelectTimezone";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 import OtherChoice from "./OtherChoice";
+import Add from "@/components/buttons/Add" 
 
 export default {
+    props: {
+        otherChoiceVisibile: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             selectedTongue: {},
@@ -86,7 +93,7 @@ export default {
             selectedTimezone: "",
             cvFiles: [],
             selectedPositions: [],
-            otherChoiceVisibile: false,
+            otherChoice: "",
             otherChoicelabel: "",
         }
     },
@@ -119,10 +126,10 @@ export default {
             this.$emit("uploadCvFiles", {property: 'cvFiles', files: this.cvFiles})
         },
         choosePosition({position}) {
-            if(position === "Other") {
-                this.otherChoiceVisibile = true;
-                this.otherChoicelabel = "Please specify position title"
-                this.$emit("showOtherChoice")
+            if(position === "Other" && this.selectedPositions.indexOf("Other") === -1) {
+                this.otherChoicelabel = "Please specify position title";
+                this.$emit("showOtherChoice", {variable: 'otherPositionVisibile'})
+                return;
             }
             const elementPosition = this.selectedPositions.indexOf(position);
             if(elementPosition === -1){
@@ -136,15 +143,14 @@ export default {
             this.$emit("setValue", {property: name, value: value})
         },
         cancelOtherChoice() {
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice")
+            this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         },
         saveOtherChoice({referTo, choice}) {
             const position = this.selectedPositions.indexOf("Other");
-            this.selectedPositions.splice(position, 1, choice);
+            this.otherChoice = "Other - " + choice;
+            this.selectedPositions.splice(position, 1, this.otherChoice);
             this.$emit("setValue", {property: 'position', value: this.selectedPositions});
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice")
+            this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         }
     },
     components: {
@@ -152,7 +158,8 @@ export default {
         SelectTimezone,
         UploadFileButton,
         SelectPosition,
-        OtherChoice
+        OtherChoice,
+        Add
     }
 }
 </script>
@@ -167,6 +174,13 @@ export default {
         font-size: 12px;
         margin-top: 40px;
     }
+    &__asterisk {
+        position: absolute;
+        padding-left: 6px;
+        top: -2px;
+        font-size: 16px;
+        color: red;
+    }
 }
 
 .personal__main-title {
@@ -179,14 +193,6 @@ export default {
         left: -20px;
         bottom: -2px;
         font-size: 28px;
-    }
-    &:after {
-        content: "*";
-        position: absolute;
-        top: -3px;
-        right: 240px;
-        color: red;
-        font-size: 18px;
     }
 }
 
@@ -201,7 +207,7 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         position: relative;
-        width: 42%;
+        width: 45%;
     }
     .init-contact {
         height: 160px;
@@ -242,7 +248,7 @@ export default {
     }
     &__input {
         padding: 5px;
-        width: 204px;
+        width: 278px;
         height: 30px;
         outline: none;
         border: 1px solid #67573E;

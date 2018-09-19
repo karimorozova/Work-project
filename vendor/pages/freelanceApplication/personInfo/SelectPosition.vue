@@ -58,7 +58,7 @@ export default {
 .drop-select {
     position: absolute;
     top: -25px;;
-    width: 214px;
+    width: 288px;
     border: 1px solid #67573E;
     border-radius: 15px;
     overflow: hidden;
@@ -104,7 +104,7 @@ export default {
     justify-content: space-between;
     cursor: pointer;
     .selected {
-        width: 75%;
+        width: 80%;
         padding: 3px 10px;
         font-size: 14px;
         max-height: 40px;
@@ -118,7 +118,7 @@ export default {
         opacity: 0.5;
     }
     .arrow-button {
-        width: 25%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

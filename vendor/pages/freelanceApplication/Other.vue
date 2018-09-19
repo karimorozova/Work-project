@@ -2,7 +2,8 @@
 .other
     .other__main-title OTHER
     .other__options
-        span.other__label.asterisk Availability:
+        span.other__label Availability:
+            span.other__asterisk *
         SelectSingle(
             :selectedOption="selectedAvailability"
             refersTo="selectedAvailability"
@@ -10,6 +11,7 @@
             @chooseOption="chooseOption"
         )
     span.other__comment Are you willing to take a translation test (300 words)?
+        span.other__asterisk *
     .other__options.test-options
         span.other__label Options:
         SelectSingle(
@@ -84,6 +86,13 @@ export default {
             font-size: 28px;
         }
     }
+    &__asterisk {
+        position: absolute;
+        padding-left: 4px;
+        top: -2px;
+        font-size: 12px;
+        color: red;
+    }
     &__options{
         margin-top: 20px;
         margin-bottom: 80px;
@@ -96,14 +105,6 @@ export default {
     }
     &__comment {
         position: relative;
-        &:after {
-            content: "*";
-            position: absolute;
-            top: -2px;
-            right: 240px;
-            color: red;
-            font-size: 12px;
-        }
     }
     &__input {
         width: 52%;

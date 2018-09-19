@@ -1,6 +1,7 @@
 <template lang="pug">
 .translation-exp
     .translation-exp__main-title TRANSLATION EXPERIENCE
+        span.translation-exp__asterisk *
     span.translation-exp__comment Do you have any translation experience? Please select one of the following:
     .translation-exp__options
         span.translation-exp__label Years of experience:
@@ -51,14 +52,13 @@ export default {
             bottom: -2px;
             font-size: 28px;
         }
-        &:after {
-            content: "*";
-            position: absolute;
-            top: -3px;
-            right: 230px;
-            color: red;
-            font-size: 18px;
-        }
+    }
+    &__asterisk {
+        position: absolute;
+        padding-left: 6px;
+        top: -2px;
+        font-size: 16px;
+        color: red;
     }
     &__options {
         margin-top: 20px;

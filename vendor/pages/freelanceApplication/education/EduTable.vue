@@ -4,7 +4,7 @@
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(name="th") {{ field.label }}
-            .table__empty-cell(style="width: 17px;")
+            .table__empty-cell
     .table__tbody
         .table__row(v-for="(row, index) of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
@@ -36,7 +36,6 @@ export default {
 .table {
     width: 100%;
     border: 1px solid #67563D;
-    border-radius: 10px;
     overflow: hidden;
     &__thead {
         border-bottom: 0.5px solid #67563D;
@@ -45,29 +44,25 @@ export default {
     }
     &__tbody {
     overflow-y: scroll;
-    max-height: 90px;
-    // height: 150px;
+    height: 97px;
     }
     &__thead-cell {
         font-size: 12px;
-        padding: 5px 0 5px 8px;
+        padding: 5px 0 5px 6px;
         border-right: 0.5px solid #FFF;
     }
     &__tbody-cell {
         font-size: 12px;
-        padding: 5px 0 5px 8px;
+        padding: 2px 0 5px 5px;
         border-right: 0.5px solid #67563D;
         position: relative;
     }
     &__empty-cell {
-        border-bottom: 1px solid #67563D;
+        width: 16px;
     }
     &__row {
         display: flex;
         border-bottom: 0.5px solid #67563D;
-        &:last-child {
-            border: none;
-        }
     }
 }
 

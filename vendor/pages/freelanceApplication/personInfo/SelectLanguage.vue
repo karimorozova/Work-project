@@ -68,9 +68,11 @@ export default {
         },
         outClick() {
             this.droppedLang = false;
+            this.searchLang = "";
         },
         chooseLang(index) {
-            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex, refersTo: this.refersTo})
+            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex, refersTo: this.refersTo});
+            this.outClick();
         }
     },
     computed: {
@@ -106,7 +108,7 @@ export default {
 
 .drop-select {
     position: absolute;
-    width: 214px;
+    width: 288px;
     border: 1px solid #67573E;
     border-radius: 15px;
     overflow: hidden;
@@ -162,7 +164,7 @@ export default {
     justify-content: space-between;
     cursor: pointer;
     .selected {
-        width: 75%;
+        width: 80%;
         padding: 3px 10px;
         font-size: 14px;
         opacity: 0.7;
@@ -176,7 +178,7 @@ export default {
         opacity: 1;
     }
     .arrow-button {
-        width: 25%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

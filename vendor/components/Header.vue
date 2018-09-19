@@ -26,7 +26,7 @@ export default {
     flex-direction: column;
     align-items: center;
     &__logo {
-        width: 27%;
+        width: 34%;
         padding-right: 100px;
         margin: 5px 0;
         display: flex;
@@ -48,7 +48,7 @@ export default {
 }
 
 .header__text {
-    width: 27%;
+    width: 34%;
     padding-right: 100px;
     color: #665741;
     font-size: 56px;

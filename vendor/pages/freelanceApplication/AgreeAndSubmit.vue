@@ -9,7 +9,7 @@
     .terms-agree__captcha
         span.terms-agree__captcha-comment Please, confirm that you are not a robot   
         .terms-agree__google
-            .g-recaptcha(data-sitekey="6LfHMFEUAAAAAJrIpd_0BOsfWqS04aLnEaT3NVOZ"
+            .g-recaptcha(data-sitekey="6LfMCXEUAAAAAPVdf_Ej5r0E744vsX3r-TxOc7Ed"
             style= {"transform": "scale(0.77)",
                 "-webkit-transform": "scale(0.77)",
                 "transform-origin": "150px 0",
@@ -117,7 +117,7 @@ export default {
         border: none;
         outline: none;
         height: 40px;
-        width: 80px;
+        width: 170px;
         border-radius: 10px;
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         cursor: pointer;

@@ -1,9 +1,9 @@
 <template lang="pug">
     .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
-        .select(@click="toggleOptions")
+        .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") Select
-            .arrow-button
+            .arrow-button(@click="toggleOptions")
                 img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
             .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: selectedOption == option}")
@@ -41,7 +41,8 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo, activeObject: this.activeObject})
+            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo, activeObject: this.activeObject});
+            this.outOptions();
         }
     },
     directives: {
@@ -68,7 +69,7 @@ export default {
     display: flex;
     flex-direction: column;
     .drop {
-        width: 98%;
+        width: 99%;
         max-height: 100px;
         overflow-y: auto;
         overflow-x: hidden;
@@ -109,10 +110,8 @@ export default {
 .select {
     border-radius: 15px;
     width: 100%;
-    // height: 40px;
     display: flex;
     justify-content: space-between;
-    cursor: pointer;
     .selected {
         width: 77%;
         padding: 3px 10px;
@@ -133,6 +132,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }

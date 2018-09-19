@@ -17,17 +17,19 @@
         template(slot="insitute"  slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.insitute")
         template(slot="grade"  slot-scope="{ row }")
-            input.education__input(@change="setEducation" type="text" v-model="row.grade")  
+            input.education__input(@change="setEducation" type="text" v-model="row.grade")
+    Add(@addElement="addEducation")
 </template>
 
 <script>
 import EduTable from "./education/EduTable";
 import SelectSingle from "@/components/dropdowns/tableDrops/SelectSingle" 
+import Add from "@/components/buttons/Add" 
 
 export default {
     data() {
         return {
-            options: ["asd", "afdaf", "fgbrev"],
+            options: ["Diploma", "BA", "MA/MSc", "PhD", "Course"],
             selectedOption: "",
             fields: [
                 {label: "Study Level", key: "study", width: "25%"},
@@ -36,9 +38,7 @@ export default {
                 {label: "Overall Grade", key: "grade", width: "20%"},
             ],
             tableData: [
-                {study: "", field: "Vasya", insitute: "asdads", grade: "dfbdfbr"},
-                {study: "", field: "Petya", insitute: "asdads", grade: "dfbdfbr"},
-                {study: "", field: "Kolya", insitute: "asdads", grade: "dfbdfbr"},
+                {study: "", field: "", insitute: "", grade: ""}
             ],
             informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
         }
@@ -51,11 +51,17 @@ export default {
         },
         setEducation() {
             this.$emit("setValue", {property: 'education', value: this.tableData})
+        },
+        addEducation() {
+            this.tableData.push({
+                study: "", field: "", insitute: "", grade: ""
+                })
         }
     },
     components: {
         EduTable,
-        SelectSingle
+        SelectSingle,
+        Add
     }
 }
 </script>
@@ -63,6 +69,7 @@ export default {
 <style lang="scss" scoped>
 
 .education {
+    width: 100%;
     &__main-title {
         font-size: 24px;
         position: relative;

@@ -1,6 +1,7 @@
 <template lang="pug">
 .domain
     .domain__main-title DOMAIN EXPERIENCE
+        span.domain__asterisk *
     span.domain__comment Do you have experience in the following industries (not necessarily as a translator)? <br> Check all that apply.
     .domain__options
         span.domain__label Industries:
@@ -22,6 +23,12 @@ import SelectMulti from "../../components/dropdowns/SelectMulti";
 import OtherChoice from "./OtherChoice";
 
 export default {
+    props: {
+        otherChoiceVisibile: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             selectedIndustries: [],
@@ -33,16 +40,14 @@ export default {
                 "Video Games",
                 "Other"
             ],
-            otherChoiceVisibile: false,
             otherChoicelabel: "",
         }
     },
     methods: {
         chooseIndustries({option}) {
-            if(option === "Other") {
-                this.otherChoiceVisibile = true;
+            if(option === "Other" && this.selectedIndustries.indexOf("Other") === -1) {
                 this.otherChoicelabel = "Please specify industries"
-                this.$emit("showOtherChoice")
+                this.$emit("showOtherChoice", {variable: 'otherIndustryVisibile'})
             }
             const elementPosition = this.selectedIndustries.indexOf(option);
             if(elementPosition != -1) {
@@ -52,15 +57,13 @@ export default {
             this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
         },
         cancelOtherChoice() {
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice")
+            this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
         },
         saveOtherChoice({referTo, choice}) {
             const position = this.selectedIndustries.indexOf("Other");
-            this.selectedIndustries.splice(position, 1, choice);
+            this.selectedIndustries.splice(position, 1, "Other - " + choice);
             this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
-            this.otherChoiceVisibile = false;
-            this.$emit("closeOtherChoice")
+            this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
         }
     },
     components: {
@@ -87,14 +90,13 @@ export default {
             bottom: -2px;
             font-size: 28px;
         }
-        &:after {
-            content: "*";
-            position: absolute;
-            top: -3px;
-            right: 283px;
-            color: red;
-            font-size: 18px;
-        }
+    }
+    &__asterisk {
+        position: absolute;
+        padding-left: 6px;
+        top: -2px;
+        font-size: 16px;
+        color: red;
     }
     &__options {
         margin-top: 20px;

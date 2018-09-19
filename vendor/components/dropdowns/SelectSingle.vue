@@ -38,7 +38,8 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo})
+            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo});
+            this.outOptions();
         }
     },
     directives: {

@@ -25,6 +25,10 @@ export default {
         },
         refersTo: {
             type: String
+        },
+        otherChoice: {
+            type: String,
+            default: ""
         }
     },
     data() {

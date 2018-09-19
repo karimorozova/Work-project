@@ -9,6 +9,7 @@
             span.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
         .application__section.personal-info
             PersonalInfo(
+                :otherChoiceVisibile="otherPositionVisibile"
                 @setValue="setPersonInfo"
                 @setLangPair="setLangPair"
                 @uploadCvFiles="uploadingFiles"
@@ -25,12 +26,14 @@
             )
         .application__section.competence
             TechnicalCompetence(
+                :otherChoiceVisibile="otherTechVisibile"
                 @setValue="setPersonInfo"
                 @showOtherChoice="showOtherChoice"
                 @closeOtherChoice="closeOtherChoice"
             )
         .application__section.domain-experience
             DomainExp(
+                :otherChoiceVisibile="otherIndustryVisibile"
                 @setValue="setPersonInfo"
                 @showOtherChoice="showOtherChoice"
                 @closeOtherChoice="closeOtherChoice"
@@ -65,7 +68,9 @@ export default {
     data() {
         return {
             otherChoiceVisibile: false,
-            otherChoicelabel: "",
+            otherIndustryVisibile: false,
+            otherTechVisibile: false,
+            otherPositionVisibile: false,
             otherChoiceRef: "",
             person: {},
             langPairs: []
@@ -84,15 +89,18 @@ export default {
         uploadingFiles({property, files}) {
             this.person[property] = files;
         },
-        showOtherChoice() {
+        showOtherChoice({variable}) {
+            this[variable] = true;
             this.otherChoiceVisibile = true;
         },
-        closeOtherChoice() {
+        closeOtherChoice({variable}) {
+            this[variable] = false;
             this.otherChoiceVisibile = false;
         },
         sumbitForm({confirmed}) {
             this.person.confirmed = confirmed;
             this.saveForm(this.person);
+            window.top.location.href = "https://www.pangea.global/thank-you";
         },
         ...mapActions({
             saveForm: 'setApplicationForm'
@@ -127,9 +135,10 @@ export default {
 .application {
     margin-top: 40px;
     margin-bottom: 40px;
-    width: 27%;
+    width: 33.5%;
     padding: 30px 50px;
     border: 1px solid #67573E;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     &__header {
