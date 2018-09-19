@@ -8,7 +8,7 @@
         .drop(v-if="isDropped")
             .drop__item(v-for="(option, index) in options" @click="chooseOptions(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: selectedOptions.indexOf(option) != -1}")
+                    .checkbox__check(:class="{checked: activeClass(option)}")
                 span {{ option }}
 </template>
 
@@ -29,6 +29,14 @@ export default {
         otherChoice: {
             type: String,
             default: ""
+        },
+        otherDtpChoice: {
+            type: String,
+            default: ""
+        },
+        otherSoftwareChoice: {
+            type: String,
+            default: ""
         }
     },
     data() {
@@ -45,6 +53,12 @@ export default {
         },
         chooseOptions(index) {
             this.$emit("chooseOptions", {option: this.options[index], refersTo: this.refersTo})
+        },
+        activeClass(elem) {
+            return (this.selectedOptions.indexOf(elem) != -1 ||
+                this.otherChoice.indexOf(elem) != -1 ||
+                this.otherDtpChoice.indexOf(elem) != -1 || 
+                this.otherSoftwareChoice.indexOf(elem) != -1)
         }
     },
     directives: {

@@ -157,6 +157,9 @@ export default {
         display: flex;
         margin-top: 40px;
     }
+    .education, .other {
+        margin-top: 10px;
+    }
 }
 
 .other-choice {

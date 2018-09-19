@@ -6,7 +6,7 @@
             .arrow-button
                 img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: selectedOption == option}")
+            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ option }}
 </template>
 
@@ -40,6 +40,12 @@ export default {
         chooseOption(index) {
             this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo});
             this.outOptions();
+        },
+        activeClass(elem) {
+            if(this.selectedOption == elem && elem != "Yes") return true;
+            if(elem == "Yes" && this.selectedOption && 
+            this.options.indexOf(this.selectedOption) === -1) return true;
+            return false;
         }
     },
     directives: {

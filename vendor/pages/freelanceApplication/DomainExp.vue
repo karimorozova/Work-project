@@ -7,6 +7,7 @@
         span.domain__label Industries:
         SelectMulti(
             :selectedOptions="selectedIndustries"
+            :otherChoice="otherChoice"
             :options="industries"
             @chooseOptions="chooseIndustries"
         )
@@ -40,11 +41,23 @@ export default {
                 "Video Games",
                 "Other"
             ],
+            otherChoice: "",
             otherChoicelabel: "",
         }
     },
     methods: {
         chooseIndustries({option}) {
+            if(option === "Other") {
+                if(this.selectedIndustries.indexOf(this.otherChoice) === -1) {
+                    this.otherChoicelabel = "Please specify industries"
+                    this.$emit("showOtherChoice", {variable: 'otherIndustryVisibile'})
+                } else {
+                    const pos = this.selectedIndustries.indexOf(this.otherChoice);
+                    this.selectedIndustries.splice(pos, 1);
+                    this.otherChoice = "";
+                }
+                return
+            }
             if(option === "Other" && this.selectedIndustries.indexOf("Other") === -1) {
                 this.otherChoicelabel = "Please specify industries"
                 this.$emit("showOtherChoice", {variable: 'otherIndustryVisibile'})
@@ -60,8 +73,8 @@ export default {
             this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
         },
         saveOtherChoice({referTo, choice}) {
-            const position = this.selectedIndustries.indexOf("Other");
-            this.selectedIndustries.splice(position, 1, "Other - " + choice);
+            this.otherChoice = "Other - " + choice;
+            this.selectedIndustries.push(this.otherChoice);
             this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
             this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
         }

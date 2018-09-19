@@ -126,10 +126,16 @@ export default {
             this.$emit("uploadCvFiles", {property: 'cvFiles', files: this.cvFiles})
         },
         choosePosition({position}) {
-            if(position === "Other" && this.selectedPositions.indexOf("Other") === -1) {
-                this.otherChoicelabel = "Please specify position title";
-                this.$emit("showOtherChoice", {variable: 'otherPositionVisibile'})
-                return;
+            if(position === "Other") {
+                if(this.selectedPositions.indexOf(this.otherChoice) === -1) {
+                    this.otherChoicelabel = "Please specify position title";
+                    this.$emit("showOtherChoice", {variable: 'otherPositionVisibile'})
+                } else {
+                    const pos = this.selectedPositions.indexOf(this.otherChoice);
+                    this.selectedPositions.splice(pos, 1);
+                    this.otherChoice = "";
+                }
+                return
             }
             const elementPosition = this.selectedPositions.indexOf(position);
             if(elementPosition === -1){
@@ -146,9 +152,8 @@ export default {
             this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         },
         saveOtherChoice({referTo, choice}) {
-            const position = this.selectedPositions.indexOf("Other");
             this.otherChoice = "Other - " + choice;
-            this.selectedPositions.splice(position, 1, this.otherChoice);
+            this.selectedPositions.push(this.otherChoice);
             this.$emit("setValue", {property: 'position', value: this.selectedPositions});
             this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         }

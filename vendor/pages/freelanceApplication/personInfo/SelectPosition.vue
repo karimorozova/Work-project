@@ -10,7 +10,7 @@
         .drop(v-if="posDropped")
             .drop__item(v-for="(position, index) in positions" @click="choosePosition(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: selectedPositions.indexOf(position) != -1}")
+                    .checkbox__check(:class="{checked: activeClass(position)}")
                 span {{ position }}
 
 </template>
@@ -22,6 +22,10 @@ export default {
     props: {
         selectedPositions: {
             type: Array
+        },
+        otherChoice: {
+            type: String,
+            default: ""
         }
     },
     data() {
@@ -39,6 +43,10 @@ export default {
         },
         choosePosition(index) {
             this.$emit('choosePosition', {position: this.positions[index]})
+        },
+        activeClass(elem) {
+            return (this.selectedPositions.indexOf(elem) != -1 || 
+                this.otherChoice.indexOf(elem) != -1)
         }
     },
     directives: {

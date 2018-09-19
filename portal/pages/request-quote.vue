@@ -293,9 +293,9 @@ var sbjs = require('sourcebuster');
 export default {
   name: 'pang-form',
   head: {
-    script: [
-      { src: './hotjar.js' }
-    ]
+    // script: [
+    //   { src: './hotjar.js' }
+    // ]
   },
   data () {
     return {

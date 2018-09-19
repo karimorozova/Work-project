@@ -26,6 +26,8 @@
         SelectMulti(
             refersTo="software"
             :selectedOptions="selectedCompetence.software"
+            :otherSoftwareChoice="otherSoftwareChoice"
+            :otherDtpChoice="otherDtpChoice"
             :options="competences.software"
             @chooseOptions="chooseCompetence"
         )
@@ -62,6 +64,8 @@ export default {
                 cat: ["Yes", "No", "Very little"],
                 software: ["HTML", "Microsoft Excel", "DTP software", "Other software"]
             },
+            otherDtpChoice: "",
+            otherSoftwareChoice: "",
             otherChoicelabel: "",
             otherChoiceRef: ""
         }
@@ -73,18 +77,18 @@ export default {
                     this.otherChoiceRef = "cat"
                     this.otherChoicelabel = "Please specify CAT tool"
                     this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
+                    return
                 }
                 this.selectedCompetence[refersTo] = option;
             } else {
-                if(option === "DTP software" && this.selectedCompetence.software.indexOf("DTP software") === -1) {
-                    this.otherChoiceRef = "dtp"
-                    this.otherChoicelabel = "Please specify DTP software"
-                    this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
+                this.otherChoiceRef = "software"
+                if(option === "DTP software") {
+                    this.specifySoftware(option, "dtp", 'otherDtpChoice');
+                    return
                 }
-                if(option === "Other software" && this.selectedCompetence.software.indexOf("Other software") === -1) {
-                    this.otherChoiceRef = "software"
-                    this.otherChoicelabel = "Please specify software"
-                    this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
+                if(option === "Other software") {
+                    this.specifySoftware(option.split(' ')[1], "software", 'otherSoftwareChoice');
+                    return
                 }
                 const elementPosition = this.selectedCompetence.software.indexOf(option);
                 if(elementPosition != -1) {
@@ -95,15 +99,34 @@ export default {
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence})
         },
+        specifySoftware(opt, ref, choice) {
+            const position = this.selectedCompetence.software.indexOf(this[choice]);
+            if(position === -1) {
+                this.otherChoiceRef = ref;
+                this.otherChoicelabel = "Please specify " + opt;
+                this.$emit("showOtherChoice", {variable: 'otherTechVisibile'});
+            } else {
+                const pos = this.selectedCompetence.software.indexOf(this[choice]);
+                this.selectedCompetence.software.splice(pos, 1);
+                this[choice] = "";
+            }
+        },
         cancelOtherChoice() {
-            this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'})
+            this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'});
         },
         saveOtherChoice({refersTo, choice}) {
             if(refersTo === "cat") {
                 this.selectedCompetence.cat = choice;
             } else {
-                let position = (refersTo === "dtp") ? this.selectedCompetence.software.indexOf("DTP software"): this.selectedCompetence.software.indexOf("Other software") 
-                this.selectedCompetence.software.splice(position, 1, choice);
+                let otherChoice = "";
+                if(refersTo === "dtp") {
+                    this.otherDtpChoice = "DTP software - " + choice;
+                    otherChoice = this.otherDtpChoice;
+                } else {
+                    this.otherSoftwareChoice = "Other software - " + choice;
+                    otherChoice = this.otherSoftwareChoice;
+                }
+                this.selectedCompetence.software.push(otherChoice);
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence});
             this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'});
