@@ -20,6 +20,11 @@
 
 <script>
 export default {
+    props: {
+        person: {
+            type: Object
+        }
+    },
     data() {
         return {
             isAgree: false,
@@ -32,13 +37,29 @@ export default {
         },
         async checkForm() {
             this.errors = [];
+            if(!this.person.name) this.errors.push("Please enter your name.");
+            if(!this.person.surname) this.errors.push("Please enter your surname.");
+            if(!this.person.email) this.errors.push("Please enter your email.");
+            if(!this.person.phone) this.errors.push("Please enter your phone number.");
+            if(!this.person.motherTongue) this.errors.push("Please select your mother tongue.");
+            if(!this.person.timezone) this.errors.push("Please select your timezone.");
+            if(!this.person.motherTongue) this.errors.push("Please set your mother tongue.");
+            if(this.person.languagePairs && !this.person.languagePairs.length) this.errors.push("Please set at least one language pair.");
+            if(this.person.cvFiles && !this.person.cvFiles.length) this.errors.push("Please upload CV file.");
+            if(!this.person.position) this.errors.push("Please select position(s).");
+            if(!this.person.translationExp) this.errors.push("Please select years of experience.");
+            if(!this.person.internet) this.errors.push("Please select internet access.");
+            if(!this.person.industries) this.errors.push("Please select industries.");
+            if(!this.person.availability) this.errors.push("Please select availability.");
+            if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
             let captchaValidation = await grecaptcha.getResponse();
-            if(captchaValidation.length === 0) this.errors.push("captcha required");
+            if(captchaValidation.length === 0) this.errors.push("Please confirm that you are not a robot.");
             if(this.errors.length) {
-                alert("Captcha needed")
+                this.$emit("formValidationFail", {errors: this.errors})
             } else {
                 this.$emit("sumbitForm", {confirmed: this.isAgree})
             }
+
         }
     }
 }

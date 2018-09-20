@@ -1,9 +1,9 @@
 <template lang="pug">
-.application-wrap
+.application
     Header(
         headerText="Application Form"
     )
-    form.application
+    form.application__form
         .application__header 
             span.title FREELANCE APPLICATION
             span.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
@@ -45,13 +45,22 @@
             )
         .application__agree-submit
             AgreeAndSubmit(
+                :person="person"
+                @formValidationFail="formValidationFail"
                 @sumbitForm="sumbitForm"
             )
     Footer
-    .other-choice(v-if="otherChoiceVisibile")
+    .application__other-choice(v-if="otherChoiceVisibile")
+    ErrorsAlert(
+        v-if="errorsExist"
+        :errors="errors"
+        @closeErrors="closeErrors"
+    )
+        
 </template>
 
 <script>
+import axios from "axios";
 import Header from "@/components/Header";
 import PersonalInfo from "./freelanceApplication/PersonalInfo";
 import Education from "./freelanceApplication/Education";
@@ -62,6 +71,7 @@ import Other from "./freelanceApplication/Other";
 import AgreeAndSubmit from "./freelanceApplication/AgreeAndSubmit";
 import OtherChoice from "./freelanceApplication/OtherChoice";
 import Footer from "@/components/Footer";
+import ErrorsAlert from "@/components/ErrorsAlert";
 import { mapActions } from "vuex";
 
 export default {
@@ -73,7 +83,8 @@ export default {
             otherPositionVisibile: false,
             otherChoiceRef: "",
             person: {},
-            langPairs: []
+            langPairs: [],
+            errorsExist: false
         }
     },
     methods: {
@@ -97,10 +108,18 @@ export default {
             this[variable] = false;
             this.otherChoiceVisibile = false;
         },
-        sumbitForm({confirmed}) {
+        formValidationFail({errors}) {
+            this.errors = errors;
+            return this.errorsExist = this.errors.length ? true: false
+        },
+        closeErrors() {
+            this.errorsExist = false;
+        },
+        async sumbitForm({confirmed}) {
             this.person.confirmed = confirmed;
             this.saveForm(this.person);
-            window.top.location.href = "https://www.pangea.global/thank-you";
+            await this.$axios.post("/vendors/application/send-form", this.person);
+            // window.top.location.href = "https://www.pangea.global/thank-you";
         },
         ...mapActions({
             saveForm: 'setApplicationForm'
@@ -116,14 +135,15 @@ export default {
         Other,
         AgreeAndSubmit,
         OtherChoice,
-        Footer
+        Footer,
+        ErrorsAlert
     }
 }
 </script>
 
 <style lang="scss" scoped>
 
-.application-wrap {
+.application {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -131,16 +151,16 @@ export default {
     font-family: MyriadPro;
     color: #67573E;
     position: relative;
-}
-.application {
-    margin-top: 40px;
-    margin-bottom: 40px;
-    width: 33.5%;
-    padding: 30px 50px;
-    border: 1px solid #67573E;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
+    &__form {
+        margin-top: 40px;
+        margin-bottom: 40px;
+        width: 33.5%;
+        padding: 30px 50px;
+        border: 1px solid #67573E;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+    }
     &__header {
         display: flex;
         flex-direction: column;
@@ -160,9 +180,11 @@ export default {
     .education, .other {
         margin-top: 10px;
     }
+    .translation-experience {
+        margin-bottom: 50px;
+    }
 }
-
-.other-choice {
+.application__other-choice {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -173,10 +195,6 @@ export default {
     align-items: center;
     justify-content: center;
     z-index: 50;
-}
-
-.translation-experience {
-    margin-bottom: 50px;
 }
 
 @font-face {

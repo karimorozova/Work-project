@@ -3,7 +3,8 @@ const { requiresLogin } = require('../middleware/index');
 
 const apiRouter = require('./api');
 const admin = require('./admin');
-const vendorRouter = require('./vendor');
+const vendorRouter = require('./vendors/vendor');
+const vendorApplicationRouter = require('./vendors/application');
 const portalRouter = require('./portal');
 const industryRouter = require('./industry');
 const serviceRouter = require('./service');
@@ -20,6 +21,6 @@ router.use('/service', serviceRouter);
 router.use('/xtm', xtmRouter);
 router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
-
+router.use('/vendors/application', vendorApplicationRouter)
 
 module.exports = router;

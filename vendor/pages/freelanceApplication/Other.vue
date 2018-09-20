@@ -22,7 +22,7 @@
         )
     .other__options.rate-value
         span.other__label Please state your translation rate (Euro)
-        input.other__input(type="text")
+        input.other__input(type="text" v-model="rate" @change="setRate")
     .other__options.cover-letter
         span.other__label Cover Letter: (please write or upload it below)
         textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
@@ -45,7 +45,8 @@ export default {
             availabilityOptions: ["Full-time", "Part-time", "Limited"],
             testAnswers: ["Yes", "No"],
             coverLetter: "",
-            cvFiles: []
+            cvFiles: [],
+            rate: ""
         }
     },
     methods: {
@@ -60,6 +61,14 @@ export default {
         uploadCvFile({files}) {
             this.cvFiles = files;
             this.$emit("uploadCoverLetter", {property: 'coverLetterFiles', files: this.cvFiles});
+        },
+        setRate() {
+            let regex = /^[0-9.]+$/;
+            if(!regex.test(this.changedRate)) {
+                this.$emit("error")
+            } else {
+                this.$emit("setValue", {property: "rate", value: this.rate})
+            }
         }
     },
     components: {
@@ -111,6 +120,7 @@ export default {
         z-index: 0;
         padding: 12px 10px;
         border: 1px solid #66563D;
+        color: #66563D;
         border-radius: 15px;
         outline: none;
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
@@ -125,7 +135,9 @@ export default {
         border-radius: 15px;
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         margin-top: 10px;
+        color: #66563D;
         outline: none;
+        font-family: MyriadPro;
         &:focus {
             box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
         }
