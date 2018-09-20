@@ -1,11 +1,11 @@
-const { transporter } = require("../services/index");
+const { transporter } = require("../services");
 const mailhandler = {
     applicationMail(person) {
         let msg = "Email form application form."
         let mailOptions = {
             from: 'translation@pangea.global', // sender address
             to: 'daniyal@wellyes.ru', // pm@pangea.global list of receivers
-            subject: 'Quote Details', // Subject line
+            subject: 'Application', // Subject line
             text: "plain text", // plain text body
             html: "<b>" + msg + "</b>" // html body
           };

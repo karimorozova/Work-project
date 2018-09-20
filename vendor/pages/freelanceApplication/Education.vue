@@ -18,7 +18,8 @@
             input.education__input(@change="setEducation" type="text" v-model="row.insitute")
         template(slot="grade"  slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.grade")
-    Add(@addElement="addEducation")
+    .education__button
+        Add(@addElement="addEducation")
 </template>
 
 <script>
@@ -91,6 +92,9 @@ export default {
         outline: none;
         width: 99%;
         color: #67573E;
+    }
+    &__button {
+        margin-top: 10px;
     }
 }
 

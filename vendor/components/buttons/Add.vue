@@ -1,13 +1,13 @@
 <template lang="pug">
-.add-button(@click="addElement")
+.add-button(@click="makeAction")
     span.add-button__sign +
 </template>
 
 <script>
 export default {
     methods: {
-        addElement() {
-            this.$emit("addElement");
+        makeAction() {
+            this.$emit("makeAction");
         }
     }
 }
@@ -16,7 +16,6 @@ export default {
 <style lang="scss" scoped>
 
 .add-button {
-    margin-top: 10px;
     border: 1px solid #66563D;
     border-radius: 50%;
     width: 25px;

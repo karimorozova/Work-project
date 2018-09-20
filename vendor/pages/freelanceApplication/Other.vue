@@ -23,6 +23,7 @@
     .other__options.rate-value
         span.other__label Please state your translation rate (Euro)
         input.other__input(type="text" v-model="rate" @change="setRate")
+        .other__error(v-if="rateIsIncorrect") Please enter the correct rate using only numbers "0-9" and a " . "
     .other__options.cover-letter
         span.other__label Cover Letter: (please write or upload it below)
         textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
@@ -46,7 +47,7 @@ export default {
             testAnswers: ["Yes", "No"],
             coverLetter: "",
             cvFiles: [],
-            rate: ""
+            rate: "",
         }
     },
     methods: {
@@ -63,12 +64,18 @@ export default {
             this.$emit("uploadCoverLetter", {property: 'coverLetterFiles', files: this.cvFiles});
         },
         setRate() {
-            let regex = /^[0-9.]+$/;
-            if(!regex.test(this.changedRate)) {
-                this.$emit("error")
-            } else {
+            if(!this.rateIsIncorrect) {
                 this.$emit("setValue", {property: "rate", value: this.rate})
             }
+        }
+    },
+    computed: {
+        rateIsIncorrect() {
+            let regex = /^[0-9.]+$/;
+            if(this.rate && !regex.test(this.rate)) {
+                return true
+            }
+            return false
         }
     },
     components: {
@@ -141,6 +148,13 @@ export default {
         &:focus {
             box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
         }
+    }
+    &__error {
+        position: absolute;
+        font-size: 14px;
+        color: #FF876C;
+        top: -19px;
+        right: -4px;
     }
     .rate-value {
         flex-direction: row;

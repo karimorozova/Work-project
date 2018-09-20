@@ -32,25 +32,10 @@
                 @chooseZone="chooseTimezone"
             )
     .personal__label Language pairs:
-    .row.lang-pairs(v-for="(pair, index) in selectedLangPairs")
-        .row__item
-            SelectLanguage(
-                refersTo="source"
-                :parentIndex="index"
-                placeholder="Select language"
-                :selectedLang="pair.source"
-                @chooseLang="setPairLanguage"
-            )
-        img.row__image(src="../../assets/images/arrow_open.png")
-        .row__item
-            SelectLanguage(
-                refersTo="target"
-                :parentIndex="index"
-                placeholder="Select language"
-                :selectedLang="pair.target"
-                @chooseLang="setPairLanguage"
-            )
-    Add(@addElement="addLanguagePair")
+    .row
+        LanguagePairs(
+            @setLangPair="setLangPair"
+        )
     .row
         .row__item
             UploadFileButton(
@@ -72,6 +57,7 @@
 </template>
 
 <script>
+import LanguagePairs from "./personInfo/LanguagePairs";
 import SelectLanguage from "./personInfo/SelectLanguage";
 import SelectTimezone from "./personInfo/SelectTimezone";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
@@ -102,24 +88,12 @@ export default {
             this.selectedTongue = lang;
             this.$emit("setValue", {property: 'motherTongue', value: lang._id})
         },
-        setPairLanguage({lang, index, refersTo}) {
-            this.selectedLangPairs[index][refersTo] = lang;
-            const { source, target } = this.selectedLangPairs[index];
-            if(source._id && target._id) {
-                const langPairs = this.selectedLangPairs.map(item => {
-                    return {source: item.source._id, target: item.target._id}
-                })
-                this.$emit("setLangPair", {langPairs: langPairs})
-            }
+        setLangPair({langPairs}) {
+            this.$emit("setLangPair", {langPairs: langPairs});
         },
         chooseTimezone({zone}) {
             this.selectedTimezone = zone;
             this.$emit("setValue", {property: 'timezone', value: zone})
-        },
-        addLanguagePair() {
-            this.selectedLangPairs.push({
-                source: {}, target: {}
-            })
         },
         uploadCvFile({files}) {
             this.cvFiles = files;
@@ -159,6 +133,7 @@ export default {
         }
     },
     components: {
+        LanguagePairs,
         SelectLanguage,
         SelectTimezone,
         UploadFileButton,
@@ -212,17 +187,17 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         position: relative;
-        width: 45%;
+        width: 42%;
     }
     .init-contact {
         height: 160px;
     }
-    &__image {
-        transform: rotate(-90deg);
-        position: absolute;
-        top: 20px;
-        left: 49%;
-    }
+    // &__image {
+    //     transform: rotate(-90deg);
+    //     position: absolute;
+    //     top: 20px;
+    //     left: 49%;
+    // }
     &__add-pair {
         margin-top: 10px;
         border: 1px solid #66563D;
@@ -237,9 +212,27 @@ export default {
     }
 }
 
-.lang-pairs{
-    margin-bottom: 50px;
-}
+// .language-pairs {
+//     display: flex;
+//     flex-direction: column;
+//     width: 100%;
+//     border: 1px solid #66563D;
+//     border-radius: 15px;
+//     justify-content: center;
+//     padding: 10px 0;
+//     &__button {
+//         margin-left: 20px;
+//     }
+// }
+
+// .lang-pairs{
+//     box-sizing: border-box;
+//     display: flex;
+//     justify-content: space-around;
+//     width: 100%;
+//     margin-bottom: 40px;
+//     position: relative;
+// }
 
 .add-button {
     margin-bottom: 20px;
@@ -253,7 +246,7 @@ export default {
     }
     &__input {
         padding: 5px;
-        width: 278px;
+        width: 258px;
         height: 30px;
         outline: none;
         border: 1px solid #67573E;
