@@ -116,7 +116,7 @@ export default {
         },
         saveOtherChoice({refersTo, choice}) {
             if(refersTo === "cat") {
-                this.selectedCompetence.cat = choice;
+                this.selectedCompetence.cat = "Yes - " + choice;
             } else {
                 let otherChoice = "";
                 if(refersTo === "dtp") {

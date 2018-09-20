@@ -119,7 +119,7 @@ export default {
             this.person.confirmed = confirmed;
             this.saveForm(this.person);
             await this.$axios.post("/vendors/application/send-form", this.person);
-            // window.top.location.href = "https://www.pangea.global/thank-you";
+            window.top.location.href = "https://www.pangea.global/thank-you";
         },
         ...mapActions({
             saveForm: 'setApplicationForm'
