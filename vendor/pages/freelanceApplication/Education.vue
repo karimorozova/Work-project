@@ -19,7 +19,8 @@
         template(slot="grade"  slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.grade")
     .education__button
-        Add(@addElement="addEducation")
+        Add(@makeAction="addEducation")
+        .education__button-label Add more Education information
 </template>
 
 <script>
@@ -95,6 +96,13 @@ export default {
     }
     &__button {
         margin-top: 10px;
+        opacity: 0.7;
+        display: flex;
+        align-items: center;
+    }
+    &__button-label {
+        font-size: 12px;
+        margin-left: 5px;
     }
 }
 

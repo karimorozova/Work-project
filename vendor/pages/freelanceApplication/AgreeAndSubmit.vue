@@ -48,7 +48,7 @@ export default {
             if(this.person.cvFiles && !this.person.cvFiles.length) this.errors.push("Please upload CV file.");
             if(!this.person.position) this.errors.push("Please select position(s).");
             if(!this.person.translationExp) this.errors.push("Please select years of experience.");
-            if(!this.person.internet) this.errors.push("Please select internet access.");
+            if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
             if(!this.person.industries) this.errors.push("Please select industries.");
             if(!this.person.availability) this.errors.push("Please select availability.");
             if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
