@@ -1,7 +1,7 @@
-const transporter = require("./mailTransporter");
+const mailTransporter = require("./mailTransporter");
 
 const Services = {
-    transporter
+    mailTransporter
 }
 
 module.exports = Services
