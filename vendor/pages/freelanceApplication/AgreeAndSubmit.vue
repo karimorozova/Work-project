@@ -59,7 +59,6 @@ export default {
             } else {
                 this.$emit("sumbitForm", {confirmed: this.isAgree})
             }
-
         }
     }
 }

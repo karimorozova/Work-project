@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   modules: [
-    '@nuxtjs/axios',
+    '@nuxtjs/axios'
   ],
   axios: {
     // API url
@@ -11,7 +11,7 @@ module.exports = {
     baseURL: 'http://localhost:3001'
   },
   head: {
-    title: 'Translate request',
+    title: 'Pangea',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0 ' },
@@ -47,5 +47,8 @@ module.exports = {
         })
       }
     }
-  }
+  },
+  router: {
+    base: '/'
+  },
 }

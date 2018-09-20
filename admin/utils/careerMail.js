@@ -1,5 +1,4 @@
-const transporter = require("../services/mailer");
-
+const { transporter } = require("../services/index");
 const mailhandler = {
     applicationMail(person) {
         let msg = "Email form application form."
@@ -11,14 +10,13 @@ const mailhandler = {
             html: "<b>" + msg + "</b>" // html body
           };
       
-          transporter.sendMail(mailOptions, (error, info) => {
+        transporter.sendMail(mailOptions, (error, info) => {
             transporter.close();
             if (error) {
-              return console.log(error);
+                return console.log(error);
             }
-            console.log('Message sent: %s', info.messageId);
-      
-          });
+        console.log('Message sent: %s', info.messageId);
+        });
     }
 }
 
