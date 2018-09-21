@@ -1,12 +1,12 @@
 const mv = require('mv');
 
-const moveFile = (oldFile, id, folder) => {
-    var newFile = `./dist/${folder}/${id}/${oldFile.filename}`;
+const moveFile = (oldFile, path) => {
+    var newFile = `./dist/${path}`;
     mv(oldFile.path, newFile, {
       mkdirp: true
     }, (err) => {
     });
-    return oldFile.filename;
+    return newFile;
 } 
 
 module.exports = moveFile;

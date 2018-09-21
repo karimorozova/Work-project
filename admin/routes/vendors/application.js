@@ -21,11 +21,17 @@ router.post("/send-form", upload.any(), async (req, res) => {
     if(cvFiles) {
         person.cvFiles = [];
         for(let cv of cvFiles) {
-            await moveFile(cv, '12345', 'application');
-            person.cvFiles.push(`./dist/application/12345/${cv.fileName}`)
+            try {
+                let path = `application/12345/${cv.filename}`;
+                let filePath = moveFile(cv, path);
+                person.cvFiles.push(filePath);
+            } catch(err) {
+                console.log("Cannot move file: " + err)
+            }
         }
     }
-    await sendEmail(person, "This works well.");
+    console.log(person.cvFiles);
+    sendEmail(person, "This works well.");
     res.send("Sent");
 })
 
