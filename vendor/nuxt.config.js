@@ -6,9 +6,7 @@ module.exports = {
     '@nuxtjs/axios'
   ],
   axios: {
-    // API url
-    // baseURL: 'https://admin.pangea.global'
-    baseURL: 'http://localhost:3001'
+    baseURL: process.env.API_url
   },
   head: {
     title: 'Pangea',

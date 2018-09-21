@@ -2,6 +2,7 @@ const router = require("express").Router();
 const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
 const sendEmail = require("../../utils/mailTemplate");
+const applicationMessage = require("../../utils/emailMessages");
 const { Vendors } = require("../../models");
 
 router.post("/send-form", upload.any(), async (req, res) => {
@@ -13,25 +14,51 @@ router.post("/send-form", upload.any(), async (req, res) => {
             person[newKey] = JSON.parse(person[key]);
         }
     }
-    person.to = person.email;
+    let vendor;
+    try {
+        vendor = await Vendors.create(person);
+    } catch(err) {
+        console.log("Error on creating new Vendor: " + err);
+    }
+    person.to = "daniyal@wellyes.ru";
     person.subject = "Application";
-    let cvFiles = req.files.filter(item => {
+    const cvFiles = req.files.filter(item => {
         return item.fieldname == "cvFile"
     })
+    const coverLetterFiles = req.files.filter(item => {
+        return item.fieldname == "coverLetterFile"
+    })
     if(cvFiles) {
+        let counter = 1
         person.cvFiles = [];
         for(let cv of cvFiles) {
-            try {
-                let path = `application/12345/${cv.filename}`;
+                let nameArr = cv.filename.split('.');
+                let newFileName = `cvFile${counter}.${nameArr[nameArr.length-1]}`;
+                let path = `./dist/application/${vendor.id}/${newFileName}`;
                 let filePath = moveFile(cv, path);
                 person.cvFiles.push(filePath);
-            } catch(err) {
-                console.log("Cannot move file: " + err)
-            }
+                counter++;
         }
     }
-    console.log(person.cvFiles);
-    sendEmail(person, "This works well.");
+    if(coverLetterFiles) {
+        let counter = 1
+        person.coverLetterFiles = [];
+        for(let cv of coverLetterFiles) {
+                let nameArr = cv.filename.split('.');
+                let newFileName = `cvFile${counter}.${nameArr[nameArr.length-1]}`;
+                let path = `./dist/application/${vendor.id}/${newFileName}`;
+                let filePath = moveFile(cv, path);
+                person.coverLetterFiles.push(filePath);
+                counter++;
+        }
+    }
+    try {
+        await Vendors.updateOne({"_id": vendor.id}, {$set: {cvFiles: person.cvFiles, coverLetterFiles: person.coverLetterFiles}});
+    } catch(err) {
+        console.log("Error on updating Vendor: " + err)
+    }
+    let message = applicationMessage(person);
+    sendEmail(person, message);
     res.send("Sent");
 })
 

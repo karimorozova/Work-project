@@ -192,12 +192,6 @@ export default {
     .init-contact {
         height: 160px;
     }
-    // &__image {
-    //     transform: rotate(-90deg);
-    //     position: absolute;
-    //     top: 20px;
-    //     left: 49%;
-    // }
     &__add-pair {
         margin-top: 10px;
         border: 1px solid #66563D;
@@ -211,29 +205,6 @@ export default {
         cursor: pointer;
     }
 }
-
-// .language-pairs {
-//     display: flex;
-//     flex-direction: column;
-//     width: 100%;
-//     border: 1px solid #66563D;
-//     border-radius: 15px;
-//     justify-content: center;
-//     padding: 10px 0;
-//     &__button {
-//         margin-left: 20px;
-//     }
-// }
-
-// .lang-pairs{
-//     box-sizing: border-box;
-//     display: flex;
-//     justify-content: space-around;
-//     width: 100%;
-//     margin-bottom: 40px;
-//     position: relative;
-// }
-
 .add-button {
     margin-bottom: 20px;
 }

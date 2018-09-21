@@ -118,8 +118,22 @@ export default {
         async sumbitForm({confirmed}) {
             this.person.confirmed = confirmed;
             this.saveForm(this.person);
-            await this.$axios.post("/vendors/application/send-form", this.person);
-            window.top.location.href = "https://www.pangea.global/thank-you";
+            let sendData = new FormData();
+            for(let file of this.person.cvFiles) {
+                sendData.append('cvFile', file)
+            };
+            for(let file of this.person.coverLetterFiles) {
+                sendData.append('coverLetterFile', file)
+            };
+            for(let key in this.person) {
+                if(typeof this.person[key] === "string") {
+                    sendData.append(key, this.person[key])
+                } else {
+                    sendData.append(`parsing-${key}`, JSON.stringify(this.person[key]))
+                }
+            }
+            await this.$axios.post("/vendors/application/send-form", sendData);
+            // window.top.location.href = "https://www.pangea.global/thank-you";
         },
         ...mapActions({
             saveForm: 'setApplicationForm'

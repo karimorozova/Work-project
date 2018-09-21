@@ -88,6 +88,18 @@ const VendorSchema = new mongoose.Schema({
     industry: {
         type: Array,
         default: []
+    },
+    languagePairs: {
+        type: Array,
+        default: []
+    },
+    position: {
+        type: Array,
+        default: []
+    },
+    test: {
+        type: Boolean,
+        default: false
     }
 });
 

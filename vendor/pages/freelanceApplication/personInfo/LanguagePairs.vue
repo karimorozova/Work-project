@@ -24,7 +24,7 @@
                 Add(
                     @makeAction="(e) => deleteElement(e, index)"
                 )
-            span.language-pairs__button-label Delete
+            span.language-pairs__button-label_opacity Delete
     transition(name="slide-fade")
         .language-pairs__button(v-if="showAddButton") 
             Add(
@@ -95,9 +95,6 @@ export default {
 .slide-fade-enter-active {
   transition: all .3s;
 }
-.slide-fade-leave-active {
-//   transition: all 0.1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateY(10px);
   opacity: 0;
@@ -145,6 +142,10 @@ export default {
         justify-content: center;
         align-items: center;
     }
+    &__button-label_opacity {
+        opacity: 0;
+        transition: all 0.2s;
+    }
     &__delete {
         margin-top: 12px;
         display: flex;
@@ -153,6 +154,11 @@ export default {
         width: 3%;
         font-size: 12px;
         opacity: 0.7;
+        &:hover {
+            .language-pairs__button-label_opacity {
+                opacity: 0.7;
+            }
+        }
     }
 }
 

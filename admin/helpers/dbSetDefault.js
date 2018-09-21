@@ -158,60 +158,6 @@ async function vendorLangs() {
   }
 }
 
-
-// function clients() {
-//   return Clients.find({})
-//     .then(async clients => {
-//       if(!clients.length) {
-//         await instance.get('/customers').then(async (xtrfReq) => {
-//           let customerIds = xtrfReq.data;
-//           for(let elem of customerIds) {
-//             await instance.get(`/customers/${elem.id}`).then( async res => {
-//               let info = res.data;
-//               await new Clients({
-//                 name: info.name,
-//                 website: info.contact.websites[0],
-//                 status: info.status,
-//                 contract: "",
-//                 nda: "",
-//                 accountManager: "",
-//                 salesManager: "",
-//                 projectManager: "",
-//                 leadSource: "",
-//                 salesComission: "Passed threshold",
-//                 officialName: info.fullName,
-//                 contactName: "",
-//                 email: info.contact.emails.primary,
-//                 vat: "",
-//                 address: info.correspondenceAddress.addressLine1,
-//                 rates: {
-//                   mono: [],
-//                   duo: [] 
-//                 },
-//                 industry: {xtrfIds: info.industriesIds},
-//                 contacts: [
-//                   {projectManagerId: info.responsiblePersons.projectManagerId},
-//                   {salesPersonId: info.responsiblePersons.salesPersonId},
-//                   {accountManagerId: info.responsiblePersons.accountManagerId}
-//                 ]
-//               }).save().then(res => {
-//                 console.log(`Client with Id ${elem.id} has been saved`)
-//               }).catch(err => {
-//                 console.log('Error with client because of  ' + err.message)
-//               })
-//             }).catch(err => {
-//               console.log('Error on getting cutomer with specified ID')
-//             })
-//           }
-//         }).catch(err => {
-//           console.log('Error on getting clients from xtrf')
-//         })
-//       }
-//     }).catch(err => {
-//       console.log('Something wrong with DB')
-//     })
-// }
-
 function languages() {
   return Languages.find({})
     .then(async languages => {
