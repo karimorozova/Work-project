@@ -7,20 +7,24 @@
             TextInput(
                 label="Name"
                 name="name"
+                @setValue="setInfoValue"
             )
             TextInput(
                 label="Email"
                 name="email"
+                @setValue="setInfoValue"
             )
         .personal__item.init-contact
             TextInput(
                 label="Surname"
                 name="surname"
+                @setValue="setInfoValue"
             )
             TextInput(
                 label="Phone Number"
                 name="phone"
                 example="example@example.com"
+                @setValue="setInfoValue"
             )
     .personal__info-block
         .personal__item
@@ -128,8 +132,8 @@ export default {
             }
             this.$emit("setValue", {property: 'position', value: this.selectedPositions});
         },
-        setInfoValue({target: {value, name}}) {
-            this.$emit("setValue", {property: name, value: value})
+        setInfoValue({property, value}) {
+            this.$emit("setValue", {property: property, value: value})
         },
         cancelOtherChoice() {
             this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
