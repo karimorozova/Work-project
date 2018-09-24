@@ -54,12 +54,11 @@ export default {
             if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
             let captchaValidation = await grecaptcha.getResponse();
             if(captchaValidation.length === 0) this.errors.push("Please confirm that you are not a robot.");
-            // if(this.errors.length) {
-            //     this.$emit("formValidationFail", {errors: this.errors})
-            // } else {
-            //     this.$emit("sumbitForm", {confirmed: this.isAgree})
-            // }
-            this.$emit("sumbitForm", {confirmed: this.isAgree})
+            if(this.errors.length) {
+                this.$emit("formValidationFail", {errors: this.errors})
+            } else {
+                this.$emit("sumbitForm", {confirmed: this.isAgree})
+            }
         }
     }
 }

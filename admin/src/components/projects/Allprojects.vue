@@ -111,6 +111,7 @@ export default {
             let id = this.allProjects[ind].customer;
             let client = await this.$http.get(`../clientsapi/client?id=${id}`);
             let combinations = client.body.languageCombinations;
+            console.log(combinations);
             let result = [];
             for(let comb of combinations) {
                 if(comb.active && comb.service == this.allProjects[ind].service && 
@@ -125,6 +126,7 @@ export default {
                     }
                 }
             }
+            console.log("result: " + result);
             return result;
         },
         showJobs(id) {

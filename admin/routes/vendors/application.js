@@ -3,7 +3,7 @@ const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
 const sendEmail = require("../../utils/mailTemplate");
 const applicationMessage = require("../../utils/emailMessages");
-const { Vendors } = require("../../models");
+const { Vendors, Languages } = require("../../models");
 
 router.post("/send-form", upload.any(), async (req, res) => {
     let person = {...req.body};
@@ -20,8 +20,17 @@ router.post("/send-form", upload.any(), async (req, res) => {
     } catch(err) {
         console.log("Error on creating new Vendor: " + err);
     }
-    person.to = "daniyal@wellyes.ru";
+    person.to = "career@pangea.global";
     person.subject = "Application";
+    let languagePairs = [];
+    for(let lang of person.languagePairs) {
+        let source = await Languages.find({"_id": lang.source});
+        let target = await Languages.find({"_id": lang.target});
+        languagePairs.push({source: source[0].symbol, target: target[0].symbol})
+    }
+    let motherTongue = await Languages.find({"_id": person.motherTongue});
+    person.motherTongue = motherTongue[0].lang;
+    person.languagePairs = languagePairs;
     const cvFiles = req.files.filter(item => {
         return item.fieldname == "cvFile"
     })
@@ -45,7 +54,7 @@ router.post("/send-form", upload.any(), async (req, res) => {
         person.coverLetterFiles = [];
         for(let cv of coverLetterFiles) {
                 let nameArr = cv.filename.split('.');
-                let newFileName = `cvFile${counter}.${nameArr[nameArr.length-1]}`;
+                let newFileName = `coverLetterFile${counter}.${nameArr[nameArr.length-1]}`;
                 let path = `./dist/application/${vendor.id}/${newFileName}`;
                 let filePath = moveFile(cv, path);
                 person.coverLetterFiles.push(filePath);

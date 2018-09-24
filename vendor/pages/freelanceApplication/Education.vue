@@ -15,7 +15,7 @@
         template(slot="field" slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.field")
         template(slot="insitute"  slot-scope="{ row }")
-            input.education__input(@change="setEducation" type="text" v-model="row.insitute")
+            input.education__input(@change="setEducation" type="text" v-model="row.institute")
         template(slot="grade"  slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.grade")
     .education__button
@@ -40,14 +40,13 @@ export default {
                 {label: "Overall Grade", key: "grade", width: "20%"},
             ],
             tableData: [
-                {study: "", field: "", insitute: "", grade: ""}
+                {study: "", field: "", institute: "", grade: ""}
             ],
             informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
         }
     },
     methods: {
         chooseOption({option, activeObject}, index) {
-            console.log(option, index);
             this.tableData[index].study = option;
             this.$emit("setValue", {property: 'education', value: this.tableData})
         },
@@ -56,7 +55,7 @@ export default {
         },
         addEducation() {
             this.tableData.push({
-                study: "", field: "", insitute: "", grade: ""
+                study: "", field: "", institute: "", grade: ""
                 })
         }
     },

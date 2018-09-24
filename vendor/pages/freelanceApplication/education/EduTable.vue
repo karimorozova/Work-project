@@ -56,6 +56,9 @@ export default {
         padding: 2px 0 5px 5px;
         border-right: 0.5px solid #67563D;
         position: relative;
+        &:focus-within {
+            box-shadow: inset 0 0 5px #67563D;
+        }
     }
     &__empty-cell {
         width: 16px;

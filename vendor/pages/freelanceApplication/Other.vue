@@ -25,18 +25,26 @@
         input.other__input(type="text" v-model="rate" @change="setRate")
         .other__error(v-if="isRateIncorrect") Please enter the correct rate using only numbers "0-9" and a " . "
     .other__options.cover-letter
-        span.other__label Cover Letter: (please write or upload it below)
-        textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
-    .other__options
-        UploadFileButton(
-            label="Files"
-            @uploadedFile="uploadCvFile"
+        .other__letter-text
+            span.other__label Cover Letter: (please write or upload it below)
+            textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
+        span.other__label and/or
+        .other__files
+            UploadFileButton(
+                label="Cover Letter"
+                @uploadedFile="uploadCvFile"
+            )
+    .other__files-list
+        FilesList(
+            :files="cvFiles"
         )
+        
 </template>
 
 <script>
 import SelectSingle from "../../components/dropdowns/SelectSingle";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
+import FilesList from "@/components/FilesList";
 
 export default {
     data() {
@@ -77,7 +85,8 @@ export default {
     },
     components: {
         SelectSingle,
-        UploadFileButton
+        UploadFileButton,
+        FilesList
     }
 }
 </script>
@@ -153,6 +162,17 @@ export default {
         top: -19px;
         right: -4px;
     }
+    &__letter-text {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+    }
+    &__files-list {
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: flex-end;
+
+    }
     .rate-value {
         flex-direction: row;
         justify-content: space-between;
@@ -160,7 +180,10 @@ export default {
         margin-bottom: 40px;
     }
     .cover-letter {
-        margin-bottom: 20px;
+        margin-bottom: 40px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 }
 

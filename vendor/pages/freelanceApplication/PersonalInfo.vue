@@ -48,6 +48,9 @@
                 :otherChoice="otherChoice"
                 @choosePosition="choosePosition"
             )
+    FilesList(v-if="cvFiles.length"
+        :files="cvFiles"
+        )
     OtherChoice(
         v-if="otherChoiceVisibile"
         :label="otherChoicelabel"
@@ -63,7 +66,8 @@ import SelectTimezone from "./personInfo/SelectTimezone";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 import OtherChoice from "./OtherChoice";
-import Add from "@/components/buttons/Add" 
+import Add from "@/components/buttons/Add" ;
+import FilesList from "@/components/FilesList";
 
 export default {
     props: {
@@ -139,7 +143,8 @@ export default {
         UploadFileButton,
         SelectPosition,
         OtherChoice,
-        Add
+        Add,
+        FilesList
     }
 }
 </script>
