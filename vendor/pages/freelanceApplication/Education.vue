@@ -2,14 +2,17 @@
 .education
     .education__main-title EDUCATION
     span.education__comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
-    EduTable(:fields="fields" 
+    EduTable(
+        :fields="fields" 
         :tableData="tableData"
+        :tbodyHasScroll="tbodyHasScroll"
         )
         template(slot="study" slot-scope="{ row, index }")
             SelectSingle(
                 :selectedOption="row.study"
                 :options="options"
                 :activeObject="row"
+                @toggleDropMenu="(e) => toggleDropMenu(e)"
                 @chooseOption="(e) => chooseOption(e, index)"
                 )
         template(slot="field" slot-scope="{ row }")
@@ -42,7 +45,8 @@ export default {
             tableData: [
                 {study: "", field: "", institute: "", grade: ""}
             ],
-            informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}]
+            informations: [{level: "PHD", field: "Translation with Languages", instruction: "University of Harvard", grade: "98/100"}],
+            isDropped: false
         }
     },
     methods: {
@@ -57,6 +61,18 @@ export default {
             this.tableData.push({
                 study: "", field: "", institute: "", grade: ""
                 })
+        },
+        toggleDropMenu(e) {
+            console.log("Hello");
+            // this.isDropped = isDropped;
+        }
+    },
+    computed: {
+        tbodyHasScroll() {
+            if(process.browser && this.tableData.length > 3 || this.isDropped) {
+                let tbody = document.getElementsByClassName("table__tbody")[0];
+                return tbody.scrollHeight > tbody.clientHeight;
+            }
         }
     },
     components: {

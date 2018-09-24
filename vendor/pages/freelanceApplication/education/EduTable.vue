@@ -2,9 +2,8 @@
 .table
     .table__thead
         .table__row
-            .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
-                slot(name="th") {{ field.label }}
-            .table__empty-cell
+            .table__thead-cell(v-for="field of fields" :style="{width: field.width}") {{ field.label }}
+            .table__empty-cell(v-if="tbodyHasScroll")
     .table__tbody
         .table__row(v-for="(row, index) of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
@@ -19,6 +18,9 @@ export default {
         },
         tableData: {
             type: Array
+        },
+        tbodyHasScroll: {
+            type: Boolean
         }
     },
     data() {
@@ -26,6 +28,8 @@ export default {
         }
     },
     methods: {
+    },
+    computed: {
 
     }
 }
@@ -43,7 +47,7 @@ export default {
         color: #FFF;
     }
     &__tbody {
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 97px;
     }
     &__thead-cell {

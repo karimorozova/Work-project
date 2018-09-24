@@ -2,47 +2,51 @@
 .personal
     .personal__main-title PERSONAL INFORMAITON
         span.personal__asterisk *
-    .row
-        .row__item.init-contact
-            .personal-initials
-                .personal-initials__label Name:
-                input.personal-initials__input(type="text" name="name" @change="setInfoValue")
-            .personal-initials
-                .personal-initials__label Email:
-                input.personal-initials__input(type="text" name="email" @change="setInfoValue")
-        .row__item.init-contact
-            .personal-contacts
-                .personal-contacts__label Surname:
-                input.personal-contacts__input(type="text" name="surname" @change="setInfoValue")
-            .personal-contacts
-                .personal-contacts__label Phone Number:
-                input.personal-contacts__input(type="text" name="phone" @change="setInfoValue")
-                span.personal-contacts__example example@example.com
-    .row
-        .row__item
+    .personal__info-block
+        .personal__item.init-contact
+            TextInput(
+                label="Name"
+                name="name"
+            )
+            TextInput(
+                label="Email"
+                name="email"
+            )
+        .personal__item.init-contact
+            TextInput(
+                label="Surname"
+                name="surname"
+            )
+            TextInput(
+                label="Phone Number"
+                name="phone"
+                example="example@example.com"
+            )
+    .personal__info-block
+        .personal__item
             SelectLanguage(
                 label="Mother tongue"
                 placeholder="Select"
                 :selectedLang="selectedTongue"
                 @chooseLang="setMotherTongue"
             )
-        .row__item
+        .personal__item
             SelectTimezone(
                 :timezoneSelected="selectedTimezone"
                 @chooseZone="chooseTimezone"
             )
     .personal__label Language pairs:
-    .row
+    .personal__info-block
         LanguagePairs(
             @setLangPair="setLangPair"
         )
-    .row
-        .row__item
+    .personal__info-block
+        .personal__item
             UploadFileButton(
                 label="CV"
                 @uploadedFile="uploadCvFile"
             )
-        .row__item
+        .personal__item
             SelectPosition(
                 :selectedPositions="selectedPositions"
                 :otherChoice="otherChoice"
@@ -67,6 +71,7 @@ import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 import OtherChoice from "./OtherChoice";
 import Add from "@/components/buttons/Add" ;
+import TextInput from "@/components/TextInput";
 import FilesList from "@/components/FilesList";
 
 export default {
@@ -144,6 +149,7 @@ export default {
         SelectPosition,
         OtherChoice,
         Add,
+        TextInput,
         FilesList
     }
 }
@@ -166,6 +172,13 @@ export default {
         font-size: 16px;
         color: red;
     }
+    &__item {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        width: 42%;
+    }
 }
 
 .personal__main-title {
@@ -181,19 +194,12 @@ export default {
     }
 }
 
-.row {
+.personal__info-block {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
     position: relative;
-    &__item {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-        width: 42%;
-    }
     .init-contact {
         height: 160px;
     }
@@ -219,26 +225,6 @@ export default {
     &__label {
         font-size: 12px;
         margin-bottom: 5px;
-    }
-    &__input {
-        padding: 5px;
-        width: 258px;
-        height: 30px;
-        outline: none;
-        border: 1px solid #67573E;
-        border-radius: 15px;
-        color: #67573E;
-        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
-        &:focus {
-            box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
-        }
-    }
-    &__example {
-        position: absolute;
-        left: 0;
-        bottom: -24px;
-        font-size: 12px;
-        opacity: 0.5;;
     }
 }
 
