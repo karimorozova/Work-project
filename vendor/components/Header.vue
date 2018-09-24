@@ -31,6 +31,18 @@ export default {
         margin: 5px 0;
         display: flex;
         justify-content: flex-start;
+        @media (max-width: 1440px) {
+        width: 40%;
+        }
+        @media (max-width: 1440px) {
+            width: 50%;
+        }
+        @media (max-width: 1024px) {
+            width: 60%;
+        }
+        @media (max-width: 768px) {
+            width: 80%;
+        }
     }
 }
 
@@ -59,5 +71,17 @@ export default {
         1px -1px 0 #fff,
         -1px 1px 0 #fff,
         1px 1px 0 #fff;
+    @media (max-width: 1440px) {
+        width: 40%;
+    }
+    @media (max-width: 1440px) {
+        width: 50%;
+    }
+    @media (max-width: 1024px) {
+        width: 60%;
+    }
+    @media (max-width: 768px) {
+        width: 80%;
+    }
 }
 </style>

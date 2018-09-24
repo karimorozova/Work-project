@@ -116,11 +116,9 @@ export default {
         width: 100%;
     }
     &__button {
-        width: 20%;
         margin-top: 15px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         margin-left: 20px;
         opacity: 0.7;
         font-size: 12px;
@@ -141,6 +139,9 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    &__button-label {
+        margin-left: 5px;
     }
     &__button-label_opacity {
         opacity: 0;

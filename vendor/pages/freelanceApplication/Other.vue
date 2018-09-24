@@ -34,7 +34,7 @@
                 label="Cover Letter"
                 @uploadedFile="uploadCvFile"
             )
-    .other__files-list
+    .other__files-list(v-if="cvFiles.length")
         FilesList(
             :files="cvFiles"
         )
@@ -166,12 +166,21 @@ export default {
         display: flex;
         flex-direction: column;
         width: 60%;
+        @media (max-width: 768px) {
+            width: 100%;
+            margin-bottom: 20px;
+        }
     }
     &__files-list {
         margin-bottom: 40px;
         display: flex;
         justify-content: flex-end;
 
+    }
+    &__files {
+        @media (max-width: 1280px) {
+            margin-top: 10px;
+        }
     }
     .rate-value {
         flex-direction: row;
@@ -184,6 +193,9 @@ export default {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
     }
 }
 

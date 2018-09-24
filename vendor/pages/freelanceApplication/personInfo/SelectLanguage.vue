@@ -118,6 +118,12 @@ export default {
     box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
     .language-pairs & {
         width: 255px;
+        @media (max-width: 1600px) {
+            width: 98%;
+        }
+    }
+    @media (max-width: 1600px) {
+        width: 100%;
     }
     .drop {
         font-size: 14px;

@@ -90,6 +90,9 @@ export default {
     display: flex;
     flex-direction: column;
     box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
+    @media (max-width: 1600px) {
+        width: 100%;
+    }
     .search {
         z-index: 50;
         width: 100%;

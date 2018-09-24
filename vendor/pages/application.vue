@@ -174,6 +174,18 @@ export default {
         border-radius: 15px;
         display: flex;
         flex-direction: column;
+        @media (max-width: 1440px) {
+            width: 40%;
+        }
+        @media (max-width: 1440px) {
+            width: 50%;
+        }
+        @media (max-width: 1024px) {
+            width: 60%;
+        }
+        @media (max-width: 768px) {
+            width: 80%;
+        }
     }
     &__header {
         display: flex;
