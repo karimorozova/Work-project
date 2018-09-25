@@ -71,7 +71,7 @@ export default {
     display: flex;
     flex-direction: column;
     .drop {
-        width: 99%;
+        width: 98%;
         max-height: 100px;
         overflow-y: auto;
         overflow-x: hidden;

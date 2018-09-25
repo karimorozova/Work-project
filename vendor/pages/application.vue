@@ -122,9 +122,11 @@ export default {
             for(let file of this.person.cvFiles) {
                 sendData.append('cvFile', file)
             };
-            for(let file of this.person.coverLetterFiles) {
-                sendData.append('coverLetterFile', file)
-            };
+            if(this.person.coverLetterFiles) {
+                for(let file of this.person.coverLetterFiles) {
+                    sendData.append('coverLetterFile', file)
+                };
+            }
             for(let key in this.person) {
                 if(typeof this.person[key] === "string") {
                     sendData.append(key, this.person[key])

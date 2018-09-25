@@ -2,7 +2,7 @@
 .upload-file
     span.upload-file__label {{ label }}
     .upload-file__button
-        .upload-file__button-text Upload files(s)
+        .upload-file__button-text Upload file(s)
         input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
     span.upload-file__comment Drag &amp; Drop
 </template>

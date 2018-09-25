@@ -3,8 +3,8 @@
     .terms-agree__term
         .terms-agree__checkbox(@click="toggleTermsAgree")
             .terms-agree__check(:class="{checked: isAgree}")
-        .terms-agree__text I confirm that the information given in this form is true, complete and accurate and I agree <br v-if="brUse">
-            | to provide evidence and/or references for the aforementioned expertise and qualifications <br v-if="brUse">
+        span.terms-agree__text I confirm that the information given in this form is true, complete and accurate and 
+            | I agree to provide evidence and/or references for the aforementioned expertise and qualifications
             | if required.
     .terms-agree__captcha
         span.terms-agree__captcha-comment Please, confirm that you are not a robot   
@@ -60,14 +60,6 @@ export default {
                 this.$emit("sumbitForm", {confirmed: this.isAgree})
             }
         }
-    },
-    computed: {
-        brUse() {
-            if(process.browser) {
-                let body = document.getElementsByTagName("body")[0];
-                return body.offsetWidth > 450
-            }
-        }
     }
 }
 </script>
@@ -75,15 +67,19 @@ export default {
 <style lang="scss" scoped>
 
 .terms-agree {
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 80%;
     &__term {
         display: flex;
     }
     &__text {
         font-size: 12px;
         margin-left: 3px;
+        width: 90%;
+        text-align: justify;
         @media (max-width: 450px) {
             width: 87%;
         }

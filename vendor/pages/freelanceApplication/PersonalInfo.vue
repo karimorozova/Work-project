@@ -12,6 +12,7 @@
             TextInput(
                 :label="emailMediaValue.label"
                 :name="emailMediaValue.name"
+                example="example@example.com"
                 @setValue="setInfoValue"
             )
         .personal__item.personal_contacts-height
@@ -23,7 +24,6 @@
             TextInput(
                 label="Phone Number"
                 name="phone"
-                example="example@example.com"
                 @setValue="setInfoValue"
             )
     .personal__info-block.personal_height

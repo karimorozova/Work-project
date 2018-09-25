@@ -26,7 +26,7 @@
         .other__error(v-if="isRateIncorrect") Please enter the correct rate using only numbers "0-9" and a " . "
     .other__options.cover-letter
         .other__letter-text
-            span.other__label Cover Letter: (please write or upload it below)
+            span.other__label Cover Letter:
             textarea.other__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
         span.other__label and/or
         .other__files
