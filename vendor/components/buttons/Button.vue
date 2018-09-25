@@ -40,6 +40,12 @@ export default {
             box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
         }
     }
+    .other-choice & {
+        margin: 7px;
+        @media (max-width: 450px) {
+            margin: 5px;
+        }
+    }
 }
 
 </style>

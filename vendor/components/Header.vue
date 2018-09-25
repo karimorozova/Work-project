@@ -43,6 +43,13 @@ export default {
         @media (max-width: 768px) {
             width: 80%;
         }
+        @media (max-width: 450px) {
+            padding-right: 0;
+            width: 67%;
+        }
+        @media (max-width: 370px) {
+            width: 80%;
+        }
     }
 }
 
@@ -57,6 +64,9 @@ export default {
     padding: 20px 0;
     display: flex;
     justify-content: center;
+    @media (max-width: 768px) {
+        height: 111px;
+    }
 }
 
 .header__text {
@@ -82,6 +92,10 @@ export default {
     }
     @media (max-width: 768px) {
         width: 80%;
+    }
+    @media (max-width: 450px) {
+        padding-right: 0;
+        font-size: 44px;
     }
 }
 </style>

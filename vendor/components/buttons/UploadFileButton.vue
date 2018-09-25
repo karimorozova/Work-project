@@ -50,6 +50,9 @@ export default {
         &:active {
             box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
         }
+        @media (max-width: 450px) {
+            width: 100px;
+        }
     }
     &__button-text {
         z-index: 1;
@@ -76,6 +79,11 @@ export default {
     &__comment {
         font-size: 12px;
         opacity: 0.6;
+    }
+    .personal__item & {
+        @media (max-width: 450px) {
+            margin-top: 40px;
+        }
     }
 }
 </style>

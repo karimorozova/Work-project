@@ -28,6 +28,25 @@ export default {
     &__sign {
         font-size: 29px;
     }
+    .language-pairs__delete & {
+        @media (max-width: 450px) {
+            position: absolute;
+            right: -173px;
+            top: -265px;
+        }
+        @media (max-width: 380px) {
+            right: -154px;
+            top: -247px;
+        }
+        @media (max-width: 360px) {
+            right: -145px;
+            top: -237px;
+        }
+        @media (max-width: 320px) {
+            right: -122px;
+            top: -215px;
+        }
+    }
 }
 
 </style>

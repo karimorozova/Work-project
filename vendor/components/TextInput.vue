@@ -51,13 +51,25 @@ export default {
         @media (max-width: 1600px) {
             width: 96%;
         }
+        .personal_contacts-height & {
+            @media (max-width: 450px) {
+                margin-bottom: 15px;
+                width: 97%;
+            }
+        }
+        
     }
     &__example {
         position: absolute;
         left: 0;
         bottom: -24px;
         font-size: 12px;
-        opacity: 0.5;;
+        opacity: 0.5;
+        .personal_contacts-height & {
+            @media (max-width: 450px) {
+                display: none;
+            }
+        }
     }
 }
 

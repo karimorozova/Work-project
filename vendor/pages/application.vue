@@ -133,7 +133,7 @@ export default {
                 }
             }
             await this.$axios.post("/vendors/application/send-form", sendData);
-            window.top.location.href = "https://www.pangea.global/thank-you";
+            window.top.location.href = "https://www.pangea.global/thank-you-vendor";
         },
         ...mapActions({
             saveForm: 'setApplicationForm'
@@ -185,6 +185,10 @@ export default {
         }
         @media (max-width: 768px) {
             width: 80%;
+        }
+        @media (max-width: 450px) {
+            padding: 30px;
+            margin: 10px 0;
         }
     }
     &__header {

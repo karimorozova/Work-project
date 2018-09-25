@@ -102,6 +102,12 @@ export default {
             left: -20px;
             bottom: -2px;
             font-size: 28px;
+            @media (max-width: 320px) {
+                font-size: 24px;
+            }
+        }
+        @media (max-width: 320px) {
+            font-size: 20px;
         }
     }
     &__asterisk {

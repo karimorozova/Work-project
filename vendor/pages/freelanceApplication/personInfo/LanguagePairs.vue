@@ -114,6 +114,10 @@ export default {
         justify-content: space-around;
         padding: 0 10px 0 10px;
         width: 100%;
+        @media (max-width: 450px) {
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
     }
     &__button {
         margin-top: 15px;
@@ -132,6 +136,9 @@ export default {
         margin-bottom: 40px;
         position: relative;
         transition: all 0.3s;
+        @media (max-width: 450px) {
+            width: 89%;
+        }
     }
     &__image {
         transform: rotate(-90deg);
@@ -139,6 +146,11 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        @media (max-width: 450px) {
+            width: 89%;
+            transform: rotate(0);
+            margin-top: 10px;
+        }
     }
     &__button-label {
         margin-left: 5px;
@@ -146,6 +158,9 @@ export default {
     &__button-label_opacity {
         opacity: 0;
         transition: all 0.2s;
+        @media (max-width: 450px) {
+            display: none;
+        }
     }
     &__delete {
         margin-top: 12px;

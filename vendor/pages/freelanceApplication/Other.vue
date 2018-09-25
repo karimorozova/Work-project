@@ -106,6 +106,12 @@ export default {
             left: -20px;
             bottom: -2px;
             font-size: 28px;
+            @media (max-width: 320px) {
+                font-size: 24px;
+            }
+        }
+        @media (max-width: 320px) {
+            font-size: 20px;
         }
     }
     &__asterisk {
@@ -140,6 +146,9 @@ export default {
         &:focus {
             box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
         }
+        @media (max-width: 450px) {
+            width: 30%;
+        }
     }
     &__text-area {
         padding: 10px;
@@ -161,6 +170,9 @@ export default {
         color: #FF876C;
         top: -19px;
         right: -4px;
+        @media (max-width: 450px) {
+            font-size: 11px;
+        }
     }
     &__letter-text {
         display: flex;

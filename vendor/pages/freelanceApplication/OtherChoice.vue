@@ -60,6 +60,10 @@ export default {
     background-color: #FFF;
     top: calc(50% - 150px);
     left: calc(50% - 165px);
+    @media (max-width: 450px) {
+        width: 290px;
+        left: calc(50% - 145px);
+    }
     &__label {
         font-size: 21px;
         margin-bottom: 5px;
@@ -74,6 +78,12 @@ export default {
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         &:focus {
             box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
+        }
+    }
+    &__buttons {
+        display: flex;
+        @media (max-width: 450px) {
+            flex-direction: column;
         }
     }
 }

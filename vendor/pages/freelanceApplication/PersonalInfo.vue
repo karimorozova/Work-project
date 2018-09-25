@@ -1,23 +1,23 @@
 <template lang="pug">
 .personal
-    .personal__main-title PERSONAL INFORMAITON
+    .personal__main-title PERSONAL INFORMATION
         span.personal__asterisk *
-    .personal__info-block
-        .personal__item.init-contact
+    .personal__info-block.personal_margin
+        .personal__item.personal_contacts-height
             TextInput(
                 label="Name"
                 name="name"
                 @setValue="setInfoValue"
             )
             TextInput(
-                label="Email"
-                name="email"
+                :label="emailMediaValue.label"
+                :name="emailMediaValue.name"
                 @setValue="setInfoValue"
             )
-        .personal__item.init-contact
+        .personal__item.personal_contacts-height
             TextInput(
-                label="Surname"
-                name="surname"
+                :label="surnameMediaValue.label"
+                :name="surnameMediaValue.name"
                 @setValue="setInfoValue"
             )
             TextInput(
@@ -26,7 +26,7 @@
                 example="example@example.com"
                 @setValue="setInfoValue"
             )
-    .personal__info-block
+    .personal__info-block.personal_height
         .personal__item
             SelectLanguage(
                 label="Mother tongue"
@@ -44,7 +44,7 @@
         LanguagePairs(
             @setLangPair="setLangPair"
         )
-    .personal__info-block
+    .personal__info-block.personal_flex-reverse
         .personal__item
             UploadFileButton(
                 label="CV"
@@ -145,6 +145,36 @@ export default {
             this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         }
     },
+    computed: {
+        emailMediaValue() {
+            let values = {
+                label: "Email",
+                name: "email"
+            }
+            if(process.browser) {
+                let body = document.getElementsByTagName("body")[0];
+                if(body.offsetWidth <= 450) {
+                    values.label = "Surname";
+                    values.name = "surname";
+                }
+            }
+            return values;
+        },
+        surnameMediaValue() {
+            let values = {
+                label: "Surname",
+                name: "surname"
+            }
+            if(process.browser) {
+                let body = document.getElementsByTagName("body")[0];
+                if(body.offsetWidth <= 450) {
+                    values.label = "Email";
+                    values.name = "email";
+                }
+            }
+            return values;
+        },
+    },
     components: {
         LanguagePairs,
         SelectLanguage,
@@ -182,6 +212,18 @@ export default {
         justify-content: space-between;
         position: relative;
         width: 42%;
+        @media (max-width: 450px) {
+            justify-content: center;
+            width: 100%;
+        }
+    }
+    &_contacts-height {
+        height: 160px;
+    }
+    &_height {
+        @media (max-width: 450px) {
+            height: 95px;
+        }
     }
 }
 
@@ -195,6 +237,12 @@ export default {
         left: -20px;
         bottom: -2px;
         font-size: 28px;
+        @media (max-width: 320px) {
+            font-size: 24px;
+        }
+    }
+    @media (max-width: 320px) {
+        font-size: 20px;
     }
 }
 
@@ -204,9 +252,6 @@ export default {
     align-items: center;
     margin-bottom: 40px;
     position: relative;
-    .init-contact {
-        height: 160px;
-    }
     &__add-pair {
         margin-top: 10px;
         border: 1px solid #66563D;
@@ -219,7 +264,24 @@ export default {
         opacity: 0.8;
         cursor: pointer;
     }
+    @media (max-width: 450px) {
+        flex-direction: column;
+    }
 }
+
+.personal_margin {
+    @media (max-width: 450px) {
+        margin-bottom: 0;
+    }
+}
+
+.personal_flex-reverse {
+    @media (max-width: 450px) {
+        flex-direction: column-reverse;
+        margin-top: 40px;
+    }
+}
+
 .add-button {
     margin-bottom: 20px;
 }

@@ -12,7 +12,7 @@
                 :selectedOption="row.study"
                 :options="options"
                 :activeObject="row"
-                @toggleDropMenu="(e) => toggleDropMenu(e)"
+                @toggleDropMenu="toggleDropMenu"
                 @chooseOption="(e) => chooseOption(e, index)"
                 )
         template(slot="field" slot-scope="{ row }")
@@ -62,16 +62,18 @@ export default {
                 study: "", field: "", institute: "", grade: ""
                 })
         },
-        toggleDropMenu(e) {
-            console.log("Hello");
-            // this.isDropped = isDropped;
+        toggleDropMenu({isDropped}) {
+            this.isDropped = isDropped;
         }
     },
     computed: {
         tbodyHasScroll() {
             if(process.browser && this.tableData.length > 3 || this.isDropped) {
-                let tbody = document.getElementsByClassName("table__tbody")[0];
-                return tbody.scrollHeight > tbody.clientHeight;
+                let body = document.getElementsByTagName("body")[0];
+                if(body.offsetWidth > 1024) {
+                    let tbody = document.getElementsByClassName("table__tbody")[0];
+                    return tbody.scrollHeight >= tbody.clientHeight;
+                }
             }
         }
     },
@@ -97,7 +99,13 @@ export default {
             left: -20px;
             bottom: -2px;
             font-size: 28px;
-        }   
+            @media (max-width: 320px) {
+                font-size: 24px;
+            }
+        }
+        @media (max-width: 320px) {
+            font-size: 20px;
+        }
     }
     &__comment {
         font-size: 12px;

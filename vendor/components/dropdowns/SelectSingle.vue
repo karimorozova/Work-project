@@ -33,11 +33,9 @@ export default {
     methods: {
         outOptions() {
             this.isDropped = false;
-            this.$emit("toggleDropMenu", {isDropped: this.isDropped});
         },
         toggleOptions() {
             this.isDropped = !this.isDropped;
-            this.$emit("toggleDropMenu", {isDropped: this.isDropped});
         },
         chooseOption(index) {
             this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo});
