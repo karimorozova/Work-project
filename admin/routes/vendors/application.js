@@ -62,7 +62,7 @@ router.post("/send-form", upload.any(), async (req, res) => {
         console.log(err);
     }
     try {
-        await Vendors.updateOne({"_id": vendor.id}, {$set: {status: "Potential", cvFiles: person.cvFiles, coverLetterFiles: person.coverLetterFiles}});
+        await Vendors.updateOne({"_id": vendor.id}, {$set: {status: "Potential"}});
     } catch(err) {
         console.log("Error on updating Vendor: " + err)
     }
