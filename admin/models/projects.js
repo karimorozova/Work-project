@@ -32,6 +32,11 @@ const ProjectsSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
+  totalCost: {
+    type: String,
+    default: '',
+    trim: true
+  },
   customer: {
     type: String,
     default: '',

@@ -512,6 +512,9 @@ td {
         display: block;
       }
     }
+    img {
+      max-width: 21px;
+    }
   }
 }
 .addShadow {

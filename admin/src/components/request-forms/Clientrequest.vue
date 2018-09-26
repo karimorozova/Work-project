@@ -524,6 +524,7 @@ export default {
         ////////////////////////////////////
         const result = await this.$http.post('../xtm/request', sendForm);
         this.xtmProjects = result;
+        this.$router.push('pm-area');
         this.clearForm();
     },
     getServices() {

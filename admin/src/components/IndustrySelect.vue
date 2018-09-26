@@ -119,6 +119,9 @@ export default {
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
+        img {
+            max-width: 21px;
+        }
     }
     .arrowButton {
         width: 18%;

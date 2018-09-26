@@ -485,7 +485,6 @@ td {
     display: flex;
     align-items: center;
     max-height: 21px;
-    // width: 30px;
     .titleTooltip {
       position: absolute;
       display: none;
@@ -498,6 +497,9 @@ td {
       .titleTooltip {
         display: block;
       }
+    }
+    img {
+        max-width: 21px;
     }
   }
 }

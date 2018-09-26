@@ -120,6 +120,10 @@ export default {
             width: 40px;
             max-height: 28px;
             display: flex;
+            img {
+                max-width: 21px;
+                max-height: 21px;
+            }
             .toolTip {
                 position: absolute;
                 color: #ff876c;

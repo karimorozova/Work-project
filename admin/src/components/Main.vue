@@ -90,13 +90,13 @@ export default {
           imgBrown: require("../assets/images/CATEGORIES/clients.png"),
           active: false
         },
+        // {
+        //   title: "QUOTES",
+        //   imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
+        //   active: false
+        // },
         {
-          title: "QUOTES",
-          imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
-          active: false
-        },
-        {
-          title: "PROJECTS",
+          title: "PM AREA",
           imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
           active: false
         },
@@ -228,15 +228,12 @@ export default {
           this.$router.push('clients');
           break;
         case 5:
-          this.$router.push('quotes');
+          this.$router.push('pm-area');
           break;
         case 6:
-          this.$router.push('projects');
-          break;
-        case 7:
           this.$router.push('finance');
           break;
-        case 8:
+        case 7:
           this.$router.push('reports');
           break;
       }
