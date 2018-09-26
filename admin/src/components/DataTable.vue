@@ -41,6 +41,13 @@ export default {
     height: 150px;
         .table__row {
             margin-bottom: 3px;
+            cursor: pointer;
+            &:nth-of-type(odd) {
+                background-color: #f4f0ee;
+            }
+            &:hover {
+                background-color: #ddd3c8;
+            }
         }
     }
     &__thead-cell {
@@ -70,13 +77,6 @@ export default {
     }
     &__row {
         display: flex;
-        cursor: pointer;
-        &:nth-of-type(even) {
-            background-color: #f4f0ee;
-        }
-        &:hover {
-            background-color: #ddd3c8;
-        }
     }
 }
 
