@@ -364,7 +364,6 @@ export default {
       for(var i = 0; i < event.target.files.length; i++){
         this.detailFiles.push(event.target.files[i]);
       }      
-      console.log(this.detailFiles);
     },
     detailRemove(event) {   
       this.detailFiles.splice(this.detailFiles.indexOf(event),1)
@@ -505,7 +504,6 @@ export default {
 
         // sendForm.append("jsession", this.$store.state.session);
         for(var i = 0; i < this.detailFiles.length; i++){
-          console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
@@ -525,7 +523,6 @@ export default {
         //End Comment because of XTM testing
         ////////////////////////////////////
         const result = await this.$http.post('../xtm/request', sendForm);
-        console.log(result);
         this.xtmProjects = result;
         this.clearForm();
     },
@@ -540,7 +537,6 @@ export default {
       let customer = xtmCustomers.find(item => {
         return item.name == this.customerSelected.name; 
       })
-      console.log(customer);
       if(customer) {
         this.customerSelected.xtmId = customer.id;
       } else {
@@ -556,7 +552,7 @@ export default {
           contactName: this.customerSelected.contactName,//this.$store.state.clientInfo.name, 
           contactEmail: this.customerSelected.email, //this.$store.state.clientInfo.email,
           service: 'Translation', //this.$store.state.clientInfo.service, 
-          industry: this.customerSelected.industry.name, //this.$store.state.clientInfo.industry, 
+          industry: this.customerSelected.industry[0].name, //this.$store.state.clientInfo.industry, 
           status: 'New',
           template: this.templateSelect.id,
           workflow: this.workflowSelect.id,

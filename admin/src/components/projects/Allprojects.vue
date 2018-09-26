@@ -85,48 +85,50 @@ export default {
         },
         async estimate(ind) {
             let project = this.allProjects[ind];
-            let words = await this.$http.get(`../xtm/xtmwords?projectId=${project.xtmId}`);
+            let metrics = await this.$http.get(`../xtm/metrics?projectId=${project.xtmId}`);
+            console.log(metrics);
+            const coreMetrics = metrics.body[0].coreMetrics;
+            const words = coreMetrics.totalWords;
             for(let job of project.jobs) {
-                job.wordcount = +words.body;
+                job.wordcount = +words;
             }
             let jobsCosts = await this.$http.post('../service/jobcost', project);
-            let clientRates = await this.checkClient(ind);
+            let clientRates = await this.checkClientRates(ind);
             if(clientRates.length) {
-                console.log(clientRates);
                 for(let job of project.jobs) {
-                    console.log(job);
                     for(let elem of clientRates) {
                         if(job.targetLanguage == elem.target) {
                             job.cost = parseFloat((job.wordcount*elem.rate).toFixed(2));
                         }
                     }
-                } 
+                }
+                let saveJobs = await this.$http.post('../xtm/savejobs', {id: project._id, jobs: project.jobs});
             }
-            let saveProject = await this.$http.post('../xtm/saveproject', project);
-            // let final = await this.$http.post('../xtm/savejobs', {id: project._id, jobs: project.jobs});
             await this.getProjects();
             this.showJobs(project._id);
         },
-        async checkClient(ind) {
+        async checkClientRates(ind) {
             let id = this.allProjects[ind].customer;
             let client = await this.$http.get(`../clientsapi/client?id=${id}`);
             let combinations = client.body.languageCombinations;
-            console.log(combinations);
             let result = [];
             for(let comb of combinations) {
-                if(comb.active && comb.service == this.allProjects[ind].service && 
+                if(comb.active && comb.service.title == this.allProjects[ind].service && 
                     comb.source.lang == this.allProjects[ind].sourceLanguage.lang) {
                     for(let lang of this.allProjects[ind].targetLanguages) {
                         if(lang.lang == comb.target.lang) {
-                            result.push({
-                                target: comb.target.lang,
-                                rate: comb.rate
-                            })
+                            for(let industry of comb.industry) {
+                                if(industry.name === this.allProjects[ind].industry) {
+                                    result.push({
+                                        target: comb.target.lang,
+                                        rate: industry.rate
+                                    })
+                                }    
+                            }
                         }
                     }
                 }
             }
-            console.log("result: " + result);
             return result;
         },
         showJobs(id) {

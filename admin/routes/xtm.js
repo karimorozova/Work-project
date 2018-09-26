@@ -163,7 +163,6 @@ router.get('/newproject', async (req, res) => {
         .field('targetLanguages', 'en_GB')
         .field('workflowId', 2890)
         .end( (response) => {
-            // console.log(response.body);
         res.send('Done')
         })
 })
@@ -174,7 +173,6 @@ router.get('/metrics', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -184,7 +182,6 @@ router.get('/status', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            // console.log(response.body);
         res.send(response.body)
         })
 })
@@ -194,17 +191,15 @@ router.get('/estimates', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            // console.log(response.body);
         res.send(response.body)
         })
 })
 
 router.get('/jobs-metrics', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/metrics/jobs?jobIds=13087')
+    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/13288/metrics/jobs?jobIds=13294')
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
         res.send(response.body)
         })
 })
@@ -214,7 +209,6 @@ router.get('/customer-projects', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            console.log(response.body);
         res.send(response.body)
         })
 })
@@ -224,7 +218,6 @@ router.get('/projects-analysis', async (req, res) => {
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {
-            // console.log(response.body);
         res.send(response.body)
         })
 })
