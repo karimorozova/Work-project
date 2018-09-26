@@ -10,8 +10,7 @@ import RecruitmentSettings from '@/components/sliders/RecruitmentSettings'
 import VendorsSettings from '@/components/sliders/VendorsSettings'
 import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ClientsSettings from '@/components/sliders/ClientsSettings'
-import QuotesSettings from '@/components/sliders/QuotesSettings'
-import ProjectsSettings from '@/components/sliders/ProjectsSettings'
+import PmArea from '@/components/sliders/PmArea'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
@@ -92,14 +91,9 @@ export default new Router({
           component: ClientsSettings
         },
         {
-          path: 'quotes',
-          name: 'quotes',
-          component: QuotesSettings
-        },
-        {
-          path: 'projects',
-          name: 'projects',
-          component: ProjectsSettings
+          path: 'pm-area',
+          name: 'pm-area',
+          component: PmArea
         },
         {
           path: 'finance',

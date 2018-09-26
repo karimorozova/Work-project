@@ -1,66 +1,49 @@
 <template lang="pug">
     .all-projects
-        table.projectTable
-            thead
-                tr
-                    th Requested on
-                    th ProjectId
-                    th Project Name
-                    th Status
-                    th Suggested deadline
-                    th 
-            tbody
-                tr(v-for="(project, ind) in allProjects" @click="showJobs(project._id)")
-                    td {{ project.createdAt.split('T')[0].split('-').reverse().join('-') }}
-                    td {{ project.projectId }}
-                    td {{ project.projectName }}
-                    td {{ project.status }}
-                    td {{ project.date.split('T')[0].split('-').reverse().join('-') }}
-                    td
-                        .buttons
-                            button.metrics(:disabled="project.jobs[0].wordcount != ''" @click="estimate(ind)" :class="{disabled: project.jobs[0].wordcount}") Get metrics and cost
-                            button.mail(:disabled="project.status != 'Open'" @click="sendMail(ind)" :class="{disabled: project.status != 'Open'}") Send e-mail
-        table.jobsTable(v-if="jobsShow")
-            thead
-                tr
-                    th Language Pair
-                    th Status
-                    th Wordcount
-                    th Cost
-            tbody
-                tr(v-for="(job, i) in jobs" @click="edit(i)")
-                    td {{ job.sourceLanguage }} >> {{ job.targetLanguage }}
-                    td {{ job.status }}
-                    td {{ job.wordcount }}
-                    td 
-                        span {{ job.cost }} 
-                            span(v-if="job.cost") &euro;
+        .all-projects__title All Projects
+        .all-projects__table
+            ProjectsTable(
+                :allProjects="allProjects"
+                @selectProject="selectProject"
+            )
+        .all-projects__project(v-if="showProjectDetails")
+            ProjectInfo(
+                :project="chosenProject"
+            )
         .vendors-select(v-if="jobsShow")
             label.vendors-select__title Vendors
             Vendorselect(:selectedVendors="selectedVendors"
                 :filteredVendors="filteredVendors"
                 @changeVend="changeVend")
             button.mail(@click="vendorsMail") Send e-mail(s)
-        .hide-jobs(v-if="jobsShow")
-            button.hide-jobs__but(@click="hideJobs") Hide jobs
+        .all-projects__hide-details(v-if="showProjectDetails")
+            button.all-projects__but(@click="hideDetails") Hide details
 </template>
 
 <script>
 import moment from "moment";
-import Vendorselect from './Vendorselect';
+import Vendorselect from "./Vendorselect";
+import ProjectsTable from "./ProjectsTable"
+import ProjectInfo from "./ProjectInfo"
 
 export default {
     data() {
         return {
             projects: [],
             jobs: [],
+            chosenProject: {},
+            showProjectDetails: false,
             jobsShow: false,
             selectedVendors: [{name: 'All'}],
         }
     },
     methods: {
-        hideJobs() {
-            this.jobsShow = false;
+        selectProject({project}) {
+            this.chosenProject = project;
+            this.showProjectDetails = true;
+        },
+        hideDetails() {
+            this.showProjectDetails = false;
         },
         changeVend(data) {
             if(this.selectedVendors[0].name == 'All') {
@@ -82,11 +65,11 @@ export default {
         async getProjects() {
             let projectsArray = await this.$http.get('../api/allprojects');
             this.projects = projectsArray.body;
+            this.tableData
         },
         async estimate(ind) {
             let project = this.allProjects[ind];
             let metrics = await this.$http.get(`../xtm/metrics?projectId=${project.xtmId}`);
-            console.log(metrics);
             const coreMetrics = metrics.body[0].coreMetrics;
             const words = coreMetrics.totalWords;
             for(let job of project.jobs) {
@@ -196,7 +179,9 @@ export default {
         this.getProjects();
     },
     components: {
-        Vendorselect
+        Vendorselect,
+        ProjectsTable,
+        ProjectInfo
     }
 }
 </script>
@@ -204,16 +189,31 @@ export default {
 <style lang="scss" scoped>
 
 .all-projects {
-  margin: 20px;
-}
-
-.projectTable, .jobsTable {
-    border: 1px solid #67573E;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+    margin: 20px;
     width: 900px;
-    th, td {
-        border:1px solid #67573E;
+    &__title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    &__hide-details {
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+    &__but {
+        width: 110px;
+        padding: 3px;
+        color: white;
+        background-color: #F5876E;
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px #67573E;
+        &:active {
+            box-shadow: 0 0 5px #67573E;
+        }
     }
 }
 
@@ -256,26 +256,6 @@ export default {
 .disabled {
     opacity: 0.4;
     cursor: default;
-}
-
-.hide-jobs {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    &__but {
-        width: 110px;
-        padding: 3px;
-        color: white;
-        background-color: #F5876E;
-        border: none;
-        outline: none;
-        border-radius: 10px;
-        cursor: pointer;
-        box-shadow: 0 3px 10px #67573E;
-        &:active {
-            box-shadow: 0 0 5px #67573E;
-        }
-    }
 }
 
 </style>
