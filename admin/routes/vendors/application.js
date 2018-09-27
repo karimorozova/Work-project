@@ -25,8 +25,8 @@ router.post("/send-form", upload.any(), async (req, res) => {
             let target = await Languages.find({"_id": lang.target});
             languagePairs.push({source: source[0].symbol, target: target[0].symbol})
         }
-        let motherTongue = await Languages.find({"_id": person.motherTongue});
-        person.motherTongue = motherTongue[0].lang;
+        let motherTongue = await Languages.find({"_id": person.native});
+        person.native = motherTongue[0].lang;
         person.languagePairs = languagePairs;
         const cvFiles = req.files.filter(item => {
             return item.fieldname == "cvFile"
@@ -67,7 +67,11 @@ router.post("/send-form", upload.any(), async (req, res) => {
         console.log("Error on updating Vendor: " + err)
     }
     let message = applicationMessage(person);
-    sendEmail(person, message);
+    try {
+        await sendEmail(person, message);
+    } catch(err) {
+        console.log(err)
+    }
     res.send("Sent");
 })
 

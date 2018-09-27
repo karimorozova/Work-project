@@ -47,11 +47,11 @@ function applicationMessage(obj) {
     <h2 class="head-title" style="font-size:18px;align-self:center;" >New Application Request</h1>
         <div class="personal">
             <ul>
-                <li style="margin-bottom:5px;" >Name: ${obj.name}</li>
+                <li style="margin-bottom:5px;" >Name: ${obj.firstName}</li>
                 <li style="margin-bottom:5px;" >Surname: ${obj.surname}</li>
                 <li style="margin-bottom:5px;" >Email: ${obj.email}</li>
                 <li style="margin-bottom:5px;" >Phone Number: ${obj.phone}</li>
-                <li style="margin-bottom:5px;" >Mother tongue: ${obj.motherTongue}</li>
+                <li style="margin-bottom:5px;" >Mother tongue: ${obj.native}</li>
                 <li style="margin-bottom:5px;" >Time-zone: ${obj.timezone}</li>
                 <li style="margin-bottom:5px;" >Language Pairs: ${languagePairs}</li>
                 <li style="margin-bottom:5px;" >CV: ${cvFiles}</li>

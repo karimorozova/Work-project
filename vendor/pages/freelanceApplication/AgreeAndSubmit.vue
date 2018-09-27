@@ -37,13 +37,12 @@ export default {
         },
         async checkForm() {
             this.errors = [];
-            if(!this.person.name) this.errors.push("Please enter your name.");
+            if(!this.person.firstName) this.errors.push("Please enter your name.");
             if(!this.person.surname) this.errors.push("Please enter your surname.");
             if(!this.person.email) this.errors.push("Please enter your email.");
             if(!this.person.phone) this.errors.push("Please enter your phone number.");
-            if(!this.person.motherTongue) this.errors.push("Please select your mother tongue.");
+            if(!this.person.native) this.errors.push("Please select your mother tongue.");
             if(!this.person.timezone) this.errors.push("Please select your timezone.");
-            if(!this.person.motherTongue) this.errors.push("Please set your mother tongue.");
             if(this.person.languagePairs && !this.person.languagePairs.length) this.errors.push("Please set at least one language pair.");
             if(this.person.cvFiles && !this.person.cvFiles.length) this.errors.push("Please upload CV file.");
             if(!this.person.position) this.errors.push("Please select position(s).");
