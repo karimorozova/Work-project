@@ -68,8 +68,6 @@ export default {
         async estimate(ind) {
             let project = this.allProjects[ind];
             let metrics = await this.$http.get(`../xtm/metrics?projectId=${project.xtmId}`);
-            console.log(metrics.body[0].coreMetrics);
-            return;
             project.metrics = {
                 iceMatch: metrics.body[0].coreMetrics.exactMatchWords,
                 fuzzyMatch95: metrics.body[0].coreMetrics.fuzzyForwardC1Words,
