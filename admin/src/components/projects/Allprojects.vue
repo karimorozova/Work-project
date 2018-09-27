@@ -1,7 +1,9 @@
 <template lang="pug">
     .all-projects
         .all-projects__title All Projects
-        .all-projects__table
+            span.all-projects__arrows(v-if="showProjectDetails") >>
+            span.all-projects__full-path(v-if="showProjectDetails") {{ chosenProject.projectName }}
+        .all-projects__table(v-if="!showProjectDetails")
             ProjectsTable(
                 :allProjects="allProjects"
                 @selectProject="selectProject"
@@ -9,22 +11,24 @@
         .all-projects__project(v-if="showProjectDetails")
             ProjectInfo(
                 :project="chosenProject"
+                @refreshProjects="refreshProjects"
             )
-        .vendors-select(v-if="jobsShow")
-            label.vendors-select__title Vendors
-            Vendorselect(:selectedVendors="selectedVendors"
-                :filteredVendors="filteredVendors"
-                @changeVend="changeVend")
-            button.mail(@click="vendorsMail") Send e-mail(s)
+        //- .vendors-select(v-if="showProjectDetails")
+        //-     label.vendors-select__title Vendors
+        //-     Vendorselect(:selectedVendors="selectedVendors"
+        //-         :filteredVendors="filteredVendors"
+        //-         @changeVend="changeVend")
+        //-     button.mail(@click="vendorsMail") Send e-mail(s)
         .all-projects__hide-details(v-if="showProjectDetails")
-            button.all-projects__but(@click="hideDetails") Hide details
+            button.all-projects__but(@click="back") Back to projects
 </template>
 
 <script>
 import moment from "moment";
 import Vendorselect from "./Vendorselect";
-import ProjectsTable from "./ProjectsTable"
-import ProjectInfo from "./ProjectInfo"
+import ProjectsTable from "./ProjectsTable";
+import ProjectInfo from "./ProjectInfo";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     data() {
@@ -38,11 +42,14 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            getStoreProjects: "setAllProjects"
+        }),
         selectProject({project}) {
             this.chosenProject = project;
             this.showProjectDetails = true;
         },
-        hideDetails() {
+        back() {
             this.showProjectDetails = false;
         },
         changeVend(data) {
@@ -62,57 +69,13 @@ export default {
                 this.selectedVendors = [{name: "All"}]
             }
         },
+        refreshProjects() {
+            this.getProjects();
+        },
         async getProjects() {
             let projectsArray = await this.$http.get('../api/allprojects');
             this.projects = projectsArray.body;
-            this.tableData
-        },
-        async estimate(ind) {
-            let project = this.allProjects[ind];
-            let metrics = await this.$http.get(`../xtm/metrics?projectId=${project.xtmId}`);
-            const coreMetrics = metrics.body[0].coreMetrics;
-            const words = coreMetrics.totalWords;
-            for(let job of project.jobs) {
-                job.wordcount = +words;
-            }
-            let jobsCosts = await this.$http.post('../service/jobcost', project);
-            let clientRates = await this.checkClientRates(ind);
-            if(clientRates.length) {
-                for(let job of project.jobs) {
-                    for(let elem of clientRates) {
-                        if(job.targetLanguage == elem.target) {
-                            job.cost = parseFloat((job.wordcount*elem.rate).toFixed(2));
-                        }
-                    }
-                }
-                let saveJobs = await this.$http.post('../xtm/savejobs', {id: project._id, jobs: project.jobs});
-            }
-            await this.getProjects();
-            this.showJobs(project._id);
-        },
-        async checkClientRates(ind) {
-            let id = this.allProjects[ind].customer;
-            let client = await this.$http.get(`../clientsapi/client?id=${id}`);
-            let combinations = client.body.languageCombinations;
-            let result = [];
-            for(let comb of combinations) {
-                if(comb.active && comb.service.title == this.allProjects[ind].service && 
-                    comb.source.lang == this.allProjects[ind].sourceLanguage.lang) {
-                    for(let lang of this.allProjects[ind].targetLanguages) {
-                        if(lang.lang == comb.target.lang) {
-                            for(let industry of comb.industry) {
-                                if(industry.name === this.allProjects[ind].industry) {
-                                    result.push({
-                                        target: comb.target.lang,
-                                        rate: industry.rate
-                                    })
-                                }    
-                            }
-                        }
-                    }
-                }
-            }
-            return result;
+            this.getStoreProjects(projectsArray.body);
         },
         showJobs(id) {
             this.jobsShow = true;
@@ -142,13 +105,16 @@ export default {
         }
     },
     computed: {
-        allProjects() {
-            let result = [];
-            if(this.projects.length) {
-                result = this.projects;
-            }
-            return result;
-        },
+        ...mapGetters({
+            allProjects: "getAllProjects"
+        }),
+        // allProjects() {
+        //     let result = [];
+        //     if(this.projects.length) {
+        //         result = this.projects;
+        //     }
+        //     return result;
+        // },
         requestDate() {
             let result = '';
             if(this.project.createdAt) {
@@ -202,7 +168,7 @@ export default {
         justify-content: flex-end;
     }
     &__but {
-        width: 110px;
+        width: 160px;
         padding: 3px;
         color: white;
         background-color: #F5876E;
@@ -214,6 +180,9 @@ export default {
         &:active {
             box-shadow: 0 0 5px #67573E;
         }
+    }
+    &__arrows {
+        margin: 0 15px;
     }
 }
 

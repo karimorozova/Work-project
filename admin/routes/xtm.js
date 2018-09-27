@@ -143,7 +143,8 @@ router.post('/saveproject', async (req, res) => {
 router.post('/savejobs', async (req, res) => {
     let jobs = req.body.jobs;
     let projectId = req.body.id;
-    Projects.update({"_id": projectId}, {$set: {"jobs": jobs}})
+    let metrics = req.body.metrics;
+    Projects.update({"_id": projectId}, {$set: {"jobs": jobs, "metrics": metrics}})
     .then(result => {
         res.send(result)
     })

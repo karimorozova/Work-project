@@ -8,8 +8,7 @@ module.exports = {
 
   axios: {
     // API url
-    // baseURL: 'https://admin.pangea.global'
-    baseURL: 'http://localhost:3001/'
+    baseURL: process.env.API_URL
   },
   head: {
     title: 'Translate request',

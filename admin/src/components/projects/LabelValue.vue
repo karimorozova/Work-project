@@ -22,6 +22,16 @@ export default {
     margin-bottom: 10px;
     &__label {
         opacity: 0.67;
+        .descriptors & {
+            margin-bottom: 8px;
+        }
+    }
+    .descriptors & {
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
 }
 </style>

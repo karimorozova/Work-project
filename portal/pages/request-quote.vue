@@ -256,11 +256,15 @@
             li(v-for="link in linksArray[1]")
               a(:href='link.link') {{ link.title }}
       .legalInfo
-        p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
-        p.linfo office : +35725252150
-        p.linfo Reg. No. HE362046  VAT. No. 10362046H
-        p.linfo © 2016 
-          span.pangeaFooterSpan Pangea Translation Services (Cyprus) LTD
+        .legalInfo__item
+          a.cookies-link(href="http://www.aboutcookies.org/" target="_blank") Use cookies
+          p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
+          p.linfo office : +35725252150
+          p.linfo Reg. No. HE362046  VAT. No. 10362046H
+          p.linfo © 2016 
+            span.pangeaFooterSpan Pangea Translation Services (Cyprus) LTD
+        .legalInfo__item
+          img(border="0" src="https://twb.translationcenter.org/workspace/display-badge/index/id/61931/Volunteer_Translator.jpg" alt="English to French & English to Arabic & English to Chinese volunteer translator")
       .socialLinks
         ul.socials
           li(v-for="social in socialsArray")

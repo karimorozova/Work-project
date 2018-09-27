@@ -37,6 +37,10 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  metrics: {
+    type: Object,
+    default: null
+  },
   customer: {
     type: String,
     default: '',

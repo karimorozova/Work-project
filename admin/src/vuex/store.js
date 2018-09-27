@@ -6,13 +6,13 @@ import * as getters from './getters';
 Vue.use(Vuex);
 
 const state = {
-    count: 0,
     services: [],
     customers: [],
     xtmCustomers: [],
     languages: [],
     clientLangs: [],
     duoRates: [],
+    projects: [],
     isLoggedIn: !!localStorage.getItem("token")
 };
 
@@ -27,11 +27,11 @@ const mutations = {
     LOGOUT(state) {
         state.isLoggedIn = false;
     },
-    INCREMENT_COUNTER(state){
-        state.count++
-    },
     servicesFill(state, payload) {
         state.services = payload
+    },
+    allProjects(state, payload) {
+        state.projects = payload;
     },
     allCustomers(state, payload) {
         state.customers = payload

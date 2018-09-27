@@ -109,8 +109,10 @@ router.post('/jobcost', async (req, res) => {
           }
         }
       }  
-
-  Projects.update({"_id": project._id}, {$set: {'jobs': jobs}})
+  const totalCost = jobs.reduce((init, cur) => {
+    return init + cur.cost;
+  }, 0)
+  Projects.update({"_id": project._id}, {$set: {'jobs': jobs, 'totalCost': totalCost}})
   .then(result => {
     res.send(result);
   });

@@ -6,7 +6,7 @@ module.exports = {
     '@nuxtjs/axios'
   ],
   axios: {
-    baseURL: process.env.API_url
+    baseURL: process.env.API_URL
   },
   head: {
     title: 'Pangea',

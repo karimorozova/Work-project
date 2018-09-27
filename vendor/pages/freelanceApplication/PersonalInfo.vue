@@ -6,7 +6,7 @@
         .personal__item.personal_contacts-height
             TextInput(
                 label="Name"
-                name="name"
+                name="firstName"
                 @setValue="setInfoValue"
             )
             TextInput(
@@ -99,7 +99,7 @@ export default {
     methods: {
         setMotherTongue({lang}) {
             this.selectedTongue = lang;
-            this.$emit("setValue", {property: 'motherTongue', value: lang._id})
+            this.$emit("setValue", {property: 'native', value: lang._id})
         },
         setLangPair({langPairs}) {
             this.$emit("setLangPair", {langPairs: langPairs});

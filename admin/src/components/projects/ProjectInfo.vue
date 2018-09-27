@@ -11,14 +11,21 @@
                     LabelValue(label="Status" :value="project.status")
                     LabelValue(label="Total Cost" :value="project.totalCost")
             .project-info__jobs
+                Jobs(
+                    :allJobs="project.jobs"
+                )
         .project-info__descriptors
-        
+            JobDescriptors(
+                :project="project"
+            )
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import Vendorselect from "./Vendorselect";
 import LabelValue from "./LabelValue";
+import Jobs from "./Jobs"
+import JobDescriptors from "./JobDescriptors"
 
 export default {
     props: {
@@ -34,14 +41,16 @@ export default {
     components: {
         Vendorselect,
         DataTable,
-        LabelValue
+        LabelValue,
+        Jobs,
+        JobDescriptors
     }
 }
 </script>
 
 <style lang="scss" scoped>
 .project-info {
-    width: 90%;
+    position: relative;
     display: flex;
     flex-direction: column;
     border: 1px solid #938676;
@@ -67,6 +76,9 @@ export default {
         flex-direction: column;
     }
     &__descriptors {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border-left: 1px solid #938676;
         background-color: #F4F0ee;
         width: 30%;

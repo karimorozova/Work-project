@@ -4,6 +4,7 @@
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.label" :field="field")
+                slot(name="hasScroll")
     .table__tbody
         .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
@@ -38,7 +39,8 @@ export default {
         margin-bottom: 5px;
     }
     &__tbody {
-    height: 150px;
+    height: 200px;
+    overflow: auto;
         .table__row {
             margin-bottom: 3px;
             cursor: pointer;

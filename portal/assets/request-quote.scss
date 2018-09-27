@@ -1280,10 +1280,10 @@ body {
   .footer {
     font-family: 'Open Sans';
     background-color: #665741;
-    height: 218px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     }
 
   .linkList {
@@ -1346,10 +1346,28 @@ body {
   }
 
   .legalInfo {
+    width: 600px;
+    margin-top: 10px;
     font-family: 'Open Sans';
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
+    @media (max-width: 450px) {
+      flex-direction: column;
+      margin-top: 0;
+    }
+    .cookies-link {
+      font-size: 14px;
+      color: #FFF;
+    }
+    &__item {
+      &:first-child {
+        @media (max-width: 450px) {
+            margin-bottom: 15px;
+            text-align: center;
+        }            
+    }
+    }
   }
 
   p.linfo {

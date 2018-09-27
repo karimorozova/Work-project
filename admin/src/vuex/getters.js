@@ -3,3 +3,4 @@ export const isLoggedIn = state => state.isLoggedIn;
 export const getVeuxServices  = state => state.services;
 export const getClients = state => state.customers;
 export const getRatesDuo = state => state.duoRates;
+export const getAllProjects = state => state.projects;
