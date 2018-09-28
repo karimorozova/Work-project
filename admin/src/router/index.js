@@ -15,6 +15,7 @@ import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import Accountinfo from '@/components/account/Accountinfo'
+import CreateProject from '@/components/pmArea/CreateProject'
 
 Vue.use(Router)
 
@@ -93,7 +94,14 @@ export default new Router({
         {
           path: 'pm-area',
           name: 'pm-area',
-          component: PmArea
+          component: PmArea,
+          children: [
+            {
+              path: 'create-project',
+              name: 'create-project',
+              component: CreateProject
+            }
+          ]
         },
         {
           path: 'finance',

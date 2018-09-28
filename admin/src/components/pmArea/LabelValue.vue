@@ -1,7 +1,8 @@
 <template lang="pug">
 .pair
-    span.pair__label {{ label }}: 
-    span.pair__value {{ value }}
+    span.pair__label {{ label }}:
+    slot 
+        span.pair__value {{ value }}
 </template>
 
 <script>
@@ -19,11 +20,13 @@ export default {
 
 <style lang="scss" scoped>
 .pair {
-    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     &__label {
-        opacity: 0.67;
         .descriptors & {
             margin-bottom: 8px;
+            opacity: 0.67;
         }
     }
     .descriptors & {
@@ -32,6 +35,10 @@ export default {
         justify-content: center;
         align-items: center;
         flex-direction: column;
+    }
+    .create-project__textarea & {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 </style>

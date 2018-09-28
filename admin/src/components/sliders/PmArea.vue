@@ -1,26 +1,31 @@
 <template lang="pug">
 .projects-wrap
-  .adminNavbar__slider.slider
+  .admin-navbar__slider.slider(v-if="!isCreating")
     span PROJECTS
     .slider-inner
       .slider-col TEST1
       .slider-col TEST2
       .slider-col TEST3
-  .projects-table
+  .projects-table(v-if="!isCreating")
     Allprojects
+  router-view(
+    @projectCreating="projectCreating"
+  )
 </template>
 
 <script>
-import Allprojects from '../projects/Allprojects';
+import Allprojects from '../pmArea/Allprojects';
 
 export default {
   data() {
     return {
-      
+      isCreating: false
     };
   },
   methods: {
-    
+    projectCreating() {
+      this.isCreating = true;
+    }
   },
   computed: {
     
@@ -37,9 +42,10 @@ export default {
 .projects-wrap {
   min-height: 94vh;
   display: flex;
+  width: 100%;
 }
 
-.adminNavbar {
+.admin-navbar {
   position: relative;
   display: flex;
   height: 100%;

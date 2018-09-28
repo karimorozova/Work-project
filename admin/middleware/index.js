@@ -29,11 +29,14 @@ const middleware = {
             '/reports',
             '/translation-request'
         ]
-        if(routesArray.indexOf(req.originalUrl) != -1) {
-            res.sendFile(path.resolve('./dist/index.html'))
-        } else {
-            next();
+        for(let route of routesArray) {
+            let length = route.length;
+            if(req.originalUrl.slice(0, length) === route) {
+                res.sendFile(path.resolve('./dist/index.html'));
+                return;
+            }
         }
+        next();
     }
 }
 

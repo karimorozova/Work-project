@@ -59,8 +59,8 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            if(!this.who) {
-                await this.$http.get('api/industries')
+            if(!this.who.industry) {
+                await this.$http.get('/api/industries')
                 .then(response => {
                     let sortedArray = response.data.filter(item => {
                         if (item.name != 'More') {
@@ -121,6 +121,7 @@ export default {
         overflow: auto;
         img {
             max-width: 21px;
+            max-height: 21px;
         }
     }
     .arrowButton {
@@ -175,10 +176,6 @@ export default {
                 border: none;
             }
             &:hover {
-                // span {
-                //     transition: all 0.3s;
-                //     padding-left: 5px;
-                // }
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }

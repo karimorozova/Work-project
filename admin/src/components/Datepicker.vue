@@ -11,7 +11,7 @@
       <!-- Input -->
       <input
         :type="inline ? 'hidden' : 'text'"
-        :class="[ inputClass, { 'form-control' : bootstrapStyling } ]"
+        :class="inputClass"
         :name="name"
         :ref="refName"
         :id="id"
@@ -144,7 +144,6 @@ export default {
     calendarButton: Boolean,
     calendarButtonIcon: String,
     calendarButtonIconContent: String,
-    bootstrapStyling: Boolean,
     initialView: String,
     disabledPicker: Boolean,
     required: Boolean,
@@ -1071,5 +1070,12 @@ export default {
 
 .vdp-datepicker__calendar .cell.notCurrentMonth {
   color: rgba(0, 0, 0, 0.2);
+}
+
+.datepicker-custom {
+  border-radius: 5px;
+  border: 1px solid #68573E;
+  height: 28px;
+  color: #68573E;
 }
 </style>

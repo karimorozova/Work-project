@@ -46,6 +46,11 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  projectManager: {
+    type: String,
+    default: '',
+    trim: true
+  },
   service: {
     type: String,
     default: '',

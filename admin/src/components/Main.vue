@@ -95,9 +95,14 @@ export default {
         //   imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
         //   active: false
         // },
+        // {
+        //   title: "PROJECTS",
+        //   imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
+        //   active: false
+        // },
         {
           title: "PM AREA",
-          imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
+          imgBrown: require("../assets/images/CATEGORIES/pm-brown.png"),
           active: false
         },
         {
@@ -160,7 +165,7 @@ export default {
     },
     gotoRequestPage(index) {
       if (index == 0) {
-        this.$router.push('translation-request');
+        this.$router.push({name: 'create-project'});
       }
       this.hideAdditional();
     },
@@ -213,28 +218,28 @@ export default {
 
       switch(index) {
         case 0:
-          this.$router.push('dashboard');
+          this.$router.push('/dashboard');
           break;
         case 1:
-          this.$router.push('recruitment');
+          this.$router.push('/recruitment');
           break;
         case 2:
-          this.$router.push('vendors');
+          this.$router.push('/vendors');
           break;
         case 3:
-          this.$router.push('languages');
+          this.$router.push('/languages');
           break;
         case 4:
-          this.$router.push('clients');
+          this.$router.push('/clients');
           break;
         case 5:
-          this.$router.push('pm-area');
+          this.$router.push('/pm-area');
           break;
         case 6:
-          this.$router.push('finance');
+          this.$router.push('/finance');
           break;
         case 7:
-          this.$router.push('reports');
+          this.$router.push('/reports');
           break;
       }
     },    
@@ -248,8 +253,8 @@ export default {
       this.dropdownVisible = !this.dropdownVisible;
     },
     async getServices() {
-      const result = await this.$http.get('api/services');
-      let services = result.body;
+      const result = await this.$http.get('/api/services');
+      const services = result.body;
       services.sort((a, b) => {return a.sortIndex - b.sortIndex});
       this.$store.dispatch('servicesGetting', services);
     },
@@ -629,7 +634,7 @@ export default {
     margin-right: 150px;
     width: 239px;
     width: 33%;
-    background-color: #f5876e;
+    background-color: #D15F45;
     border-radius: 14px;
     width: 100%;
     height: 34px;
@@ -673,7 +678,7 @@ export default {
   .clients-top__dropdown {
     z-index: -1;
     position: absolute;
-    right: 47px;
+    right: 50px;
     top: 22px;
 
     .additional {
@@ -682,7 +687,7 @@ export default {
       color: #67573e;
       background-color: #fff;
       font-size: 16px;
-      width: 188px;
+      width: 185px;
 
       &__listItem,
       {
