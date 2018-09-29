@@ -39,7 +39,7 @@ const ProjectsSchema = new mongoose.Schema({
   },
   metrics: {
     type: Object,
-    default: null
+    default: {}
   },
   customer: {
     type: String,
@@ -63,7 +63,7 @@ const ProjectsSchema = new mongoose.Schema({
   },
   sourceLanguage: {
     type: Object,
-    default: null,
+    default: {},
     trim: true
   },
   targetLanguages: {

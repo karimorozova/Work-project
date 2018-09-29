@@ -2,32 +2,32 @@
 .create-project
     .create-project__project-template
         SelectSingle(
-            :selectedOption="selectedTemplate"
+            :selectedOption="newProject.template"
             :options="templates"
             placeholder="Project Template"
-            refersTo="selectedTemplate"
+            refersTo="template"
             @chooseOption="setValue"
         )
     .create-project__all-info
         .create-project__info-row
-            input.create-project__name(type="text" v-model="projectName" placeholder="Project Name")
+            input.create-project__name(type="text" v-model="newProject.projectName" placeholder="Project Name")
             .create-project__date
                 LabelValue(label="Start Date and Time")
-                    Datepicker(inputClass="datepicker-custom" ref="start")
+                    Datepicker(v-model="newProject.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
                 img.create-project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .create-project__date
                 LabelValue(label="Deadline")
-                    Datepicker(inputClass="datepicker-custom" ref="deadline")
+                    Datepicker(v-model="newProject.date" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.create-project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
         .create-project__info-row
             .create-project__client
                 LabelValue(label="Client Name")
                     .create-project__drop-menu
                         SelectSingle(
-                            :selectedOption="selectedClient.name"
+                            :selectedOption="newProject.customer.name"
                             :options="allClients"
                             placeholder="Name"
-                            refersTo="selectedClient"
+                            refersTo="customer"
                             @chooseOption="setValue"
                         )
             .create-project__industry
@@ -38,16 +38,16 @@
                             :options="industriesList"
                             @chooseOptions="addIndustry"
                         )
-            .create-project__projectId
+            .create-project__id
                 LabelValue(label="Project ID")
-                    input.create-project__input-text(type="text" v-model="projectId" placeholder="Project ID")
+                    input.create-project__input-text(type="text" v-model="newProject.projectId" placeholder="Project ID")
         .create-project__info-row
             .create-project__textarea
                 LabelValue(label="Project Brief")
-                    textarea.create-project__brief(type="text" rows="10" v-model="brief")
+                    textarea.create-project__text(type="text" rows="10" v-model="newProject.brief")
             .create-project__textarea
                 LabelValue(label="Internal Notes")
-                    textarea.create-project__notes(type="text" rows="10" v-model="notes")
+                    textarea.create-project__text(type="text" rows="10" v-model="newProject.notes")
         .create-project__button
             Button(
                 value="Create Project"
@@ -61,28 +61,50 @@ import SelectMulti from "../SelectMulti";
 import Datepicker from "../Datepicker";
 import LabelValue from "./LabelValue";
 import Button from "../Button";
+import moment from "moment";
 import { mapGetters } from "vuex";
 
 export default {
     data() {
         return {
-            selectedTemplate: "",
+            newProject: {
+                projectId: "",
+                template: "",
+                projectName: "",
+                customer: {name: ""},
+                brief: "",
+                notes: "",
+                industry: [],
+                createdAt: "",
+                date: "",
+            },
             templates: [
                 "template 1",
                 "template 2",
                 "template 3",
             ],
-            projectName: "",
-            selectedClient: {name: ""},
             selectedIndustries: [],
-            brief: "",
-            notes: "",
-            industries: []
+            industries: [],
+            disabled: {
+                to: moment().add(-1, 'day').endOf('day').toDate()
+            },
+            highlighted: {
+                days: [6, 0]
+            },
+            startDate: "",
+            deadline: "",
         }
     },
     methods: {
+        customFormatter(date) {
+            return moment(date).format('DD MM YYYY, h:mm:ss');
+        },
         setValue({option, refersTo}) {
-            this[refersTo] = option;
+            this.newProject[refersTo] = option;
+            if(refersTo === 'customer' && this.newProject.customer.industry.length == 1) {
+                this.selectedIndustries = [this.newProject.customer.industry[0]];
+                this.newProject.industry = this.newProject.customer.industry[0];
+            }
         },
         projectCreating() {
             this.$emit("projectCreating");
@@ -94,9 +116,17 @@ export default {
             } else {
                 this.selectedIndustries.splice(position, 1)
             }
+            this.newProject.industry = this.selectedIndustries.map(item => {
+                return item._id
+            })
         },
-        createProject() {
-            console.log("Project created!")
+        async createProject() {
+            this.newProject.dateFormatted = moment(this.newProject.createdAt).format('YYYY MM DD');
+            const project = await this.$http.post("/pm-manage/new-project", this.newProject);
+            this.newProject = project.body;
+            this.newProject.customer = this.allClients.find(item => {
+                return item._id === this.newProject.customer;
+            });
         },
         async getIndusrties() {
             const industries = await this.$http.get('/api/industries');
@@ -119,7 +149,7 @@ export default {
             })
         },
         industriesList() {
-            return this.selectedClient.name ? this.selectedClient.industry : this.industries
+            return this.newProject.customer.name ? this.newProject.customer.industry : this.industries
         }
     },
     components: {
@@ -171,7 +201,10 @@ export default {
         border-radius: 5px;
         color: #68573E;
         border: 1px solid #68573E;
-        
+        outline: none;
+        &:focus {
+            box-shadow: 0 0 5px #68573E;
+        }
     }
     &__date {
         width: 33%;
@@ -186,7 +219,7 @@ export default {
     &__industry {
         width: 27%;
     }
-    &__projectId {
+    &__id {
         width: 25%;
     }
     &__drop-menu {
@@ -210,7 +243,7 @@ export default {
     &__textarea {
         width: 43%;
     }
-    &__brief, &__notes {
+    &__text {
         width: 100%;
         margin-top: 10px;
         border-radius: 10px;

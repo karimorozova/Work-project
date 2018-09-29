@@ -45,7 +45,7 @@
                   class="next"
                   v-bind:class="{ 'disabled' : isRtl ? previousMonthDisabled(pageTimestamp) : nextMonthDisabled(pageTimestamp) }">&gt;</span>
           </header>
-          <div :class="isRtl ? 'flex-rtl' : ''">
+          <div class="custom-fonts" :class="isRtl ? 'flex-rtl' : ''">
             <span class="cell day-header" v-for="d in daysOfWeek" :key="d.timestamp">{{ d }}</span>
             <span class="cell day"
                 v-for="day in days"
@@ -1077,5 +1077,21 @@ export default {
   border: 1px solid #68573E;
   height: 28px;
   color: #68573E;
+  padding-left: 5px;
+}
+
+.calendar-custom {
+  width: 220px;
+  left: -21px;
+}
+.calendar-custom .cell {
+  height: 30px;
+	line-height: 30px;
+}
+.custom-fonts .cell.day {
+  font-size: 14px;
+}
+.custom-fonts .cell.day-header {
+  font-size: 12px;
 }
 </style>

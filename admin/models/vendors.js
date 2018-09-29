@@ -100,6 +100,10 @@ const VendorSchema = new mongoose.Schema({
     test: {
         type: Boolean,
         default: false
+    },
+    password: {
+        type: String,
+        default: '',
     }
 });
 
