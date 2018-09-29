@@ -1,55 +1,55 @@
 <template lang="pug">
-.create-project
-    .create-project__project-template
+.project-info
+    .project-info__project-template
         SelectSingle(
-            :selectedOption="newProject.template"
+            :selectedOption="project.template"
             :options="templates"
             placeholder="Project Template"
             refersTo="template"
             @chooseOption="setValue"
         )
-    .create-project__all-info
-        .create-project__info-row
-            input.create-project__name(type="text" v-model="newProject.projectName" placeholder="Project Name")
-            .create-project__date
+    .project-info__all-info
+        .project-info__info-row
+            input.project-info__name(type="text" v-model="project.projectName" placeholder="Project Name")
+            .project-info__date
                 LabelValue(label="Start Date and Time")
-                    Datepicker(v-model="newProject.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
-                img.create-project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
-            .create-project__date
+                    Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
+                img.project-info__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
+            .project-info__date
                 LabelValue(label="Deadline")
-                    Datepicker(v-model="newProject.date" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
-                img.create-project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
-        .create-project__info-row
-            .create-project__client
+                    Datepicker(v-model="project.date" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                img.project-info__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
+        .project-info__info-row
+            .project-info__client
                 LabelValue(label="Client Name")
-                    .create-project__drop-menu
+                    .project-info__drop-menu
                         SelectSingle(
-                            :selectedOption="newProject.customer.name"
+                            :selectedOption="project.customer.name"
                             :options="allClients"
                             placeholder="Name"
                             refersTo="customer"
                             @chooseOption="setValue"
                         )
-            .create-project__industry
+            .project-info__industry
                 LabelValue(label="Industry")
-                    .create-project__drop-menu
+                    .project-info__drop-menu
                         SelectMulti(
                             :selectedOptions="industryNames"
                             :options="industriesList"
                             @chooseOptions="addIndustry"
                         )
-            .create-project__id
+            .project-info__id
                 LabelValue(label="Project ID")
-                    input.create-project__input-text(type="text" v-model="newProject.projectId" placeholder="Project ID")
-        .create-project__info-row
-            .create-project__textarea
+                    input.project-info__input-text(type="text" v-model="project.projectId" placeholder="Project ID")
+        .project-info__info-row
+            .project-info__textarea
                 LabelValue(label="Project Brief")
-                    textarea.create-project__text(type="text" rows="10" v-model="newProject.brief")
-            .create-project__textarea
+                    textarea.project-info__text(type="text" rows="10" v-model="project.brief")
+            .project-info__textarea
                 LabelValue(label="Internal Notes")
-                    textarea.create-project__text(type="text" rows="10" v-model="newProject.notes")
-        .create-project__button
-            Button(
+                    textarea.project-info__text(type="text" rows="10" v-model="project.notes")
+        .project-info__button
+            Button(v-if="!project.projectId"
                 value="Create Project"
                 @clicked="createProject"
             )
@@ -65,19 +65,13 @@ import moment from "moment";
 import { mapGetters } from "vuex";
 
 export default {
+    props: {
+        project: {
+            type: Object,
+        }
+    },
     data() {
         return {
-            newProject: {
-                projectId: "",
-                template: "",
-                projectName: "",
-                customer: {name: ""},
-                brief: "",
-                notes: "",
-                industry: [],
-                createdAt: "",
-                date: "",
-            },
             templates: [
                 "template 1",
                 "template 2",
@@ -100,10 +94,9 @@ export default {
             return moment(date).format('DD MM YYYY, h:mm:ss');
         },
         setValue({option, refersTo}) {
-            this.newProject[refersTo] = option;
-            if(refersTo === 'customer' && this.newProject.customer.industry.length == 1) {
-                this.selectedIndustries = [this.newProject.customer.industry[0]];
-                this.newProject.industry = this.newProject.customer.industry[0];
+            this.$emit('setValue', {option: option, refersTo: refersTo});
+            if(refersTo === 'customer' && this.project.customer.industry.length == 1) {
+                this.selectedIndustries = [this.project.customer.industry[0]]
             }
         },
         projectCreating() {
@@ -116,19 +109,17 @@ export default {
             } else {
                 this.selectedIndustries.splice(position, 1)
             }
-            this.newProject.industry = this.selectedIndustries.map(item => {
-                return item._id
-            })
         },
         async createProject() {
-            this.newProject.dateFormatted = moment(this.newProject.createdAt).format('YYYY MM DD');
-            const project = await this.$http.post("/pm-manage/new-project", this.newProject);
-            this.newProject = project.body;
-            this.newProject.customer = this.allClients.find(item => {
-                return item._id === this.newProject.customer;
+            this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
+            this.project.industry = this.selectedIndustries.map(item => {
+                return item._id
             });
+            const newProject = await this.$http.post("/pm-manage/new-project", this.project);
+            const customer = this.project.customer;
+            this.$emit('projectCreated', {project: newProject.body, customer: customer});            
         },
-        async getIndusrties() {
+        async getIndustries() {
             const industries = await this.$http.get('/api/industries');
             this.industries = industries.body;
         },
@@ -149,7 +140,7 @@ export default {
             })
         },
         industriesList() {
-            return this.newProject.customer.name ? this.newProject.customer.industry : this.industries
+            return this.project.customer.name ? this.project.customer.industry : this.industries
         }
     },
     components: {
@@ -161,13 +152,16 @@ export default {
     },
     mounted() {
         this.projectCreating();
-        this.getIndusrties();
+        this.getIndustries();
+    },
+    destroyed() {
+        this.$emit('projectDetailsClosed')
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.create-project {
+.project-info {
     padding: 40px;
     width: 60%;
     display: flex;

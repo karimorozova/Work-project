@@ -75,6 +75,10 @@ const ProjectsSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  notes: {
+    type: String,
+    default: ''
+  },
   detailFiles: {
     type: Array,
     default: [],

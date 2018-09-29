@@ -1,92 +1,89 @@
 <template lang="pug">
-.projects-wrap
-  .admin-navbar__slider.slider(v-if="!isCreating")
-    span PROJECTS
-    .slider-inner
-      .slider-col TEST1
-      .slider-col TEST2
-      .slider-col TEST3
-  .projects-table(v-if="!isCreating")
+.pm-area
+  Sidebar(v-if="!isCreating" 
+    title="PM-AREA" 
+    :links="sidebarLinks")
+  .pm-area__projects-table(v-if="!isCreating")
     Allprojects
   router-view(
     @projectCreating="projectCreating"
+    @setValue="setValue"
+    @projectCreated="projectCreated"
+    @projectDetailsClosed="projectDetailsClosed"
+    :project="chosenProject"
   )
 </template>
 
 <script>
+import Sidebar from '../Sidebar';
 import Allprojects from '../pmArea/Allprojects';
 
 export default {
   data() {
     return {
-      isCreating: false
+      isCreating: false,
+      chosenProject: {
+        projectId: "",
+        template: "",
+        projectName: "",
+        customer: {name: ""},
+        brief: "",
+        notes: "",
+        industry: [],
+        createdAt: "",
+        date: "",
+      },
+      sidebarLinks: ['Open Projects']
     };
   },
   methods: {
     projectCreating() {
       this.isCreating = true;
+      this.chosenProject = {
+        projectId: "",
+        template: "",
+        projectName: "",
+        customer: {name: ""},
+        brief: "",
+        notes: "",
+        industry: [],
+        createdAt: "",
+        date: "",
+      }
+    },
+    projectDetailsClosed() {
+      this.isCreating = false;
+    },
+    projectCreated({project, customer}) {
+      this.chosenProject = project;
+      this.chosenProject.customer = customer;
+    },
+    setValue({option, refersTo}) {
+      this.chosenProject[refersTo] = option;
+      if(refersTo === 'customer' && this.chosenProject.customer.industry.length == 1) {
+        this.chosenProject.industry = this.chosenProject.customer.industry[0];
+      }
     }
   },
   computed: {
     
   },
   components: {
-    Allprojects,
-    
+    Sidebar,
+    Allprojects    
   }
 };
 </script>
 
 <style lang="scss" scoped>
 
-.projects-wrap {
+.pm-area {
   min-height: 94vh;
   display: flex;
   width: 100%;
-}
-
-.admin-navbar {
-  position: relative;
-  display: flex;
-  height: 100%;
-  &__slider {
-    height: 100%;
-    background-color: #fff;
-    width: 175px;
-    box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
-    display: flex;
-    flex-direction: column;
-    font-family: MyriadPro;
-    color: #67573e;
-    font-size: 22px;
-    transition: all 1s;
-    span {
-      display: flex;
-      justify-content: center;
-      padding: 44px 0;
-      font-weight: 700;
-    }
-
-    .slider-inner {
-      display: flex;
-      flex-direction: column;
-
-      .slider-col {
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid #c4beb6;
-        border-bottom: 1px solid #c4beb6;
-        padding: 5px 0;
-        cursor: pointer;
-        &:nth-child(2) {
-          border: none;
-        }
-      }
-    }
-  }
-  .slider {
-    transform: translate(-3%);
-    background-color: #fff;
+  &__project-details {
+    width: 60%;
   }
 }
+
 </style>
