@@ -36,13 +36,11 @@ export default {
     &__thead {
         background-color: #938676;
         color: #FFF;
-        margin-bottom: 5px;
     }
     &__tbody {
     height: 200px;
     overflow: auto;
         .table__row {
-            margin-bottom: 3px;
             cursor: pointer;
             &:nth-of-type(odd) {
                 background-color: #f4f0ee;

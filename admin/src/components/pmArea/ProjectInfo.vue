@@ -2,48 +2,97 @@
 .project-info
     .project-info__title Project Details
     .project-info__all-info
-        .project-info__project-details
-            .project-info__details
-                .project-info__data-item
-                    LabelValue(label="Project Name" :value="project.projectName")
-                    LabelValue(label="Project ID" :value="project.projectId")
-                .project-info__data-item
-                    LabelValue(label="Status" :value="project.status")
-                    LabelValue(label="Total Cost" :value="project.totalCost")
-            .project-info__jobs
-                Jobs(
-                    :allJobs="project.jobs"
+        Project(:project="currentProject")
+        ProjectShortDetails(:project="currentProject" @setStatus="setStatus")
+    .project-info__tasks
+        .project-info__tasks-title Tasks and Steps
+        .project-info__tasks-row
+            .project-info__drop-menu
+                SelectSingle(:selectedOption="sourceLanguage" :options="languages")
+            .project-info__drop-menu            
+                SelectMulti(:selectedOptions="targetLanguages" :options="languages")
+            .project-info__drop-menu           
+                SelectSingle(:selectedOption="service" :options="services")
+        .project-info__tasks-row
+            .project-info__drop-menu
+                SelectSingle(
+                    :selectedOption="currentProject.template"
+                    :options="templates"
+                    placeholder="Project Template"
+                    refersTo="template"
+                    @chooseOption="setValue"
                 )
-        .project-info__descriptors
-            JobDescriptors(
-                :project="project"
-            )
+            .project-info__upload-file
+                UploadFileButton(text="Source Files" @uploadFiles="uploadFiles")
+            .project-info__upload-file
+                UploadFileButton(text="Reference Files" @uploadFiles="uploadFiles")
+        Tasks(
+            :allTasks="currentProject.jobs"
+        )
 </template>
 
 <script>
-import DataTable from "../DataTable";
-import Vendorselect from "./Vendorselect";
+import SelectSingle from "../SelectSingle";
+import SelectMulti from "../SelectMulti";
+import UploadFileButton from "../UploadFileButton";
 import LabelValue from "./LabelValue";
-import Jobs from "./Jobs"
-import JobDescriptors from "./JobDescriptors"
+import Project from "./Project";
+import ProjectShortDetails from "./ProjectShortDetails";
+import Tasks from "./Tasks";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     props: {
-        project: {
-            type: Object
-        }
+        
     },
     data() {
         return {
-
+            templates: [
+                "template 1",
+                "template 2",
+                "template 3",
+            ],
+            sourceLanguage: "",
+            targetLanguages: [],
+            service: "",
+            statuses: ["Accepted", "Draft", "Open", "Ready"]
         }
     },
+    methods: {
+        ...mapActions({
+            setProjectValue: "setProjectValue",
+            storeProject: "setCurrentProject"
+        }),
+        setStatus({option}) {
+           this.setProjectValue({value: option, prop: "status"}) 
+        },
+        setValue({option, refersTo}) {
+            this.setProjectValue({value: option, prop: refersTo})
+        },
+        uploadFiles({files}) {
+            console.log(files);
+        }
+    },
+    computed: {
+        ...mapGetters({
+            currentProject: 'getCurrentProject',
+            languages: "getAllLanguages",
+            services: "getVuexServices"
+        })
+    },
     components: {
-        Vendorselect,
-        DataTable,
+        SelectSingle,
+        SelectMulti,
+        UploadFileButton,
         LabelValue,
-        Jobs,
-        JobDescriptors
+        Project,
+        ProjectShortDetails,
+        Tasks
+    },
+    mounted() {
+        if(!this.currentProject._id) {
+            this.$router.replace({name: "pm-projects"})
+        }
     }
 }
 </script>
@@ -51,37 +100,39 @@ export default {
 <style lang="scss" scoped>
 .project-info {
     position: relative;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    border: 1px solid #938676;
     &__title {
-        padding: 20px;
-        border-bottom: 1px solid #938676;
+        padding: 20px 0 0 40px;
         font-size: 20px;
     }
     &__all-info {
-        display: flex;
-    }
-    &__project-details {
-        width: 70%;
-        padding: 20px;
-    }
-    &__details {
         width: 100%;
         display: flex;
-        justify-content: space-around;
+        align-items: flex-start;
+    }    
+    &__drop-menu {
+        position: relative;
+        height: 28px;
+        width: 191px;
     }
-    &__data-item {
-        display: flex;
-        flex-direction: column;
+    &__tasks {
+        box-sizing: border-box;
+        width: 60%;
+        padding: 20px;
+        margin-left: 20px;
+        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
     }
-    &__descriptors {
+    &__tasks-title {
+        font-size: 18px; 
+        margin-bottom: 15px;
+    }
+    &__tasks-row {
+        margin-bottom: 20px;
+        width: 70%;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        border-left: 1px solid #938676;
-        background-color: #F4F0ee;
-        width: 30%;
+        justify-content: space-between;
     }
 }
 </style>

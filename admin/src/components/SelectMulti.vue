@@ -112,14 +112,14 @@ export default {
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
             }
-            .project-info & {
+            .project & {
                 padding: 5px;
             }
         }
         .domain__options & {
             max-height: 170px;
         }
-        .project-info & {
+        .project & {
             max-height: 180px;
         }
     }

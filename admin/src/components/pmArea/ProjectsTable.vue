@@ -60,9 +60,9 @@ export default {
     },
     methods: {
         async onRowClicked({index}) {
-            if(!this.allProjects[index].metrics) {
-                await this.estimate(index);
-            }
+            // if(!this.allProjects[index].metrics) {
+            //     await this.estimate(index);
+            // }
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
         async estimate(ind) {

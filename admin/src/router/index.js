@@ -10,12 +10,14 @@ import RecruitmentSettings from '@/components/sliders/RecruitmentSettings'
 import VendorsSettings from '@/components/sliders/VendorsSettings'
 import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ClientsSettings from '@/components/sliders/ClientsSettings'
-import PmArea from '@/components/sliders/PmArea'
+import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import Accountinfo from '@/components/account/Accountinfo'
+import Projects from '@/components/pmArea/Projects'
 import CreateProject from '@/components/pmArea/CreateProject'
+
 
 Vue.use(Router)
 
@@ -92,16 +94,19 @@ export default new Router({
           component: ClientsSettings
         },
         {
-          path: 'pm-area',
-          name: 'pm-area',
-          component: PmArea,
-          children: [
-            {
-              path: 'create-project',
-              name: 'create-project',
-              component: CreateProject
-            }
-          ]
+          path: 'pm-projects',
+          name: 'pm-projects',
+          component: Projects
+        },
+        {
+          path: 'pm-project-details',
+          name: 'pm-project-details',
+          component: ProjectInfo
+        },
+        {
+          path: 'pm-create-project',
+          name: 'pm-create-project',
+          component: CreateProject
         },
         {
           path: 'finance',

@@ -12,6 +12,7 @@
             ProjectInfo(
                 :project="chosenProject"
                 @refreshProjects="refreshProjects"
+                @setProjectDefault="setProjectDefault"
             )
         //- .vendors-select(v-if="showProjectDetails")
         //-     label.vendors-select__title Vendors
@@ -43,11 +44,19 @@ export default {
     },
     methods: {
         ...mapActions({
-            getStoreProjects: "setAllProjects"
+            getStoreProjects: "setAllProjects",
+            storeProject: "setCurrentProject"
         }),
         selectProject({project}) {
             this.chosenProject = project;
-            this.showProjectDetails = true;
+            this.chosenProject.customer = this.allCustomers.find(item => {
+                return item._id = project.customer; 
+            })
+            this.storeProject(this.chosenProject);
+            this.$router.push({name: 'pm-project-details'});
+        },
+        setProjectDefault() {
+            this.$emit('setProjectDefault');
         },
         back() {
             this.showProjectDetails = false;
@@ -106,15 +115,9 @@ export default {
     },
     computed: {
         ...mapGetters({
-            allProjects: "getAllProjects"
+            allProjects: "getAllProjects",
+            allCustomers: "getClients"
         }),
-        // allProjects() {
-        //     let result = [];
-        //     if(this.projects.length) {
-        //         result = this.projects;
-        //     }
-        //     return result;
-        // },
         requestDate() {
             let result = '';
             if(this.project.createdAt) {
@@ -147,7 +150,7 @@ export default {
     components: {
         Vendorselect,
         ProjectsTable,
-        ProjectInfo
+        ProjectInfo,
     }
 }
 </script>

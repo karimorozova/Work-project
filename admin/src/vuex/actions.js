@@ -6,6 +6,8 @@ export const allLanguages = ({ commit }, payload) => commit('allLangs', payload)
 export const xtmCustomersGetting = ({ commit }, payload) => commit('allXtmCustomers', payload);
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
+export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
+export const setProjectValue = ({ commit }, payload) => commit('storeProjectValue', payload);
 export const login = ({ commit }, creds) => {
     commit("LOGIN");
     return new Promise(resolve => {

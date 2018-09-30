@@ -36,7 +36,7 @@ export default {
         align-items: center;
         flex-direction: column;
     }
-    .create-project__textarea & {
+    .project__textarea & {
         flex-direction: column;
         align-items: flex-start;
     }

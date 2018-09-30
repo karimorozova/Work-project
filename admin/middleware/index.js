@@ -24,7 +24,9 @@ const middleware = {
             '/languages',
             '/clients',
             '/quotes',
-            '/pm-area',
+            '/pm-create-project',
+            '/pm-projects',
+            '/pm-project-details',
             '/finance',
             '/reports',
             '/translation-request'

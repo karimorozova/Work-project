@@ -13,6 +13,7 @@ const state = {
     clientLangs: [],
     duoRates: [],
     projects: [],
+    currentProject: {},
     isLoggedIn: !!localStorage.getItem("token")
 };
 
@@ -47,6 +48,12 @@ const mutations = {
     },
     duoRatesFill(state, payload) {
         state.duoRates = payload
+    },
+    storeCurrentProject(state, payload) {
+        state.currentProject = payload
+    },
+    storeProjectValue(state, payload) {
+        state.currentProject[payload.prop] = payload.value;
     }
 };
 

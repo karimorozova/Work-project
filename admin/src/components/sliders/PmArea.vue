@@ -1,27 +1,35 @@
 <template lang="pug">
 .pm-area
-  Sidebar(v-if="!isCreating" 
-    title="PM-AREA" 
-    :links="sidebarLinks")
-  .pm-area__projects-table(v-if="!isCreating")
-    Allprojects
-  router-view(
-    @projectCreating="projectCreating"
-    @setValue="setValue"
-    @projectCreated="projectCreated"
-    @projectDetailsClosed="projectDetailsClosed"
-    :project="chosenProject"
-  )
+  router-view
+  //- Sidebar(v-if="!detailsShow" 
+  //-   title="PM-AREA" 
+  //-   :links="sidebarLinks")
+  //- .pm-area__projects-table(v-if="!detailsShow")
+  //-   Allprojects(
+  //-     @selectProject="selectProject"
+  //-     @setProjectDefault="setProjectDefault"
+  //-   )
+  //- router-view(
+  //-   @showProjectInfo="showProjectInfo"
+  //-   @setValue="setValue"
+  //-   @projectCreated="projectCreated"
+  //-   @projectDetailsClosed="projectDetailsClosed"
+  //-   :project="chosenProject"
+  //- )
+  //- .pm-area__project-details(v-if="detailsShow && chosenProject.projectId")
+  //-   ProjectDetails()
 </template>
 
 <script>
 import Sidebar from '../Sidebar';
 import Allprojects from '../pmArea/Allprojects';
+import ProjectInfo from "../pmArea/ProjectInfo";
+import ProjectDetails from '../pmArea/ProjectDetails';
 
 export default {
   data() {
     return {
-      isCreating: false,
+      detailsShow: false,
       chosenProject: {
         projectId: "",
         template: "",
@@ -37,8 +45,13 @@ export default {
     };
   },
   methods: {
-    projectCreating() {
-      this.isCreating = true;
+    showProjectInfo() {
+      this.detailsShow = true;
+    },
+    projectDetailsClosed() {
+      this.detailsShow = false;
+    },
+    setProjectDefault() {
       this.chosenProject = {
         projectId: "",
         template: "",
@@ -51,9 +64,6 @@ export default {
         date: "",
       }
     },
-    projectDetailsClosed() {
-      this.isCreating = false;
-    },
     projectCreated({project, customer}) {
       this.chosenProject = project;
       this.chosenProject.customer = customer;
@@ -63,6 +73,11 @@ export default {
       if(refersTo === 'customer' && this.chosenProject.customer.industry.length == 1) {
         this.chosenProject.industry = this.chosenProject.customer.industry[0];
       }
+    },
+    selectProject({project}) {
+      // this.$router.push({name: "project"});
+      this.detailsShow = true;
+      this.chosenProject = project;
     }
   },
   computed: {
@@ -70,7 +85,9 @@ export default {
   },
   components: {
     Sidebar,
-    Allprojects    
+    Allprojects,
+    ProjectInfo,
+    ProjectDetails
   }
 };
 </script>
@@ -82,7 +99,7 @@ export default {
   display: flex;
   width: 100%;
   &__project-details {
-    width: 60%;
+    width: 20%;
   }
 }
 

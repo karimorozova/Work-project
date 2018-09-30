@@ -4,7 +4,7 @@
             .admin-top__admin-name 
                 h2.adminPortal ADMIN PORTAL
             .admin-top__search-block
-                .create-project
+                .new-request
                   .sel_project_block
                     .sel_project_block__proj
                       span New Project
@@ -165,18 +165,27 @@ export default {
     },
     gotoRequestPage(index) {
       if (index == 0) {
-        this.$router.push({name: 'create-project'});
+        this.$router.push({name: 'pm-create-project'});
+        this.navbarList.forEach(item => {
+          item.active = (item.title === 'PM AREA') ? true: false
+        })
       }
       this.hideAdditional();
     },
     mainPageRender() {
-      for(let elem of this.navbarList) {
-        if(window.location.toString().indexOf(elem.title.toLowerCase()) != -1) {
-          let path = '/' + elem.title.toLowerCase()
-          this.$router.push(path);
-          elem.active = true;
-        } else {
-          elem.active = false
+      if(window.location.toString().indexOf('pm-') != -1) {
+        this.navbarList.forEach(item => {
+          item.active = (item.title === 'PM AREA') ? true: false
+        })
+      } else {
+        for(let elem of this.navbarList) {
+          if(window.location.toString().indexOf(elem.title.toLowerCase()) != -1) {
+            let path = '/' + elem.title.toLowerCase()
+            this.$router.push(path);
+            elem.active = true;
+          } else {
+            elem.active = false
+          }
         }
       }
     },
@@ -233,7 +242,7 @@ export default {
           this.$router.push('/clients');
           break;
         case 5:
-          this.$router.push('/pm-area');
+          this.$router.push('/pm-projects');
           break;
         case 6:
           this.$router.push('/finance');
@@ -624,7 +633,7 @@ export default {
   src: url("../assets/fonts/MyriadPro-Bold.otf");
 }
 
-.create-project {
+.new-request {
   height: 34px;
   width: 239px;
   margin-right: 83px;
