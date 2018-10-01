@@ -61,8 +61,9 @@ export default {
         }
         .project-info & {
             width: 186px;
-            height: 28px;
+            height: 30px;
             padding: 0;
+            margin-bottom: 0;
         }
     }
     &__button-text {
@@ -73,7 +74,7 @@ export default {
         font-family: MyriadPro;
         text-align: center;
         .project-info & {
-            padding-top: 5px;
+            padding-top: 7px;
         }
     }
     &__input {
@@ -93,11 +94,6 @@ export default {
     &__comment {
         font-size: 12px;
         opacity: 0.6;
-    }
-    .personal__item & {
-        @media (max-width: 450px) {
-            margin-top: 40px;
-        }
     }
 }
 </style>

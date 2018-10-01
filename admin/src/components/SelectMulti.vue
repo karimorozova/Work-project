@@ -2,7 +2,7 @@
     .drop-select(v-click-outside="outOptions")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
-            span.selected.no-choice(v-if="!selectedOptions.length") Select
+            span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
             .arrow-button
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
@@ -93,7 +93,7 @@ export default {
         display: flex;
         flex-direction: column;
         background-color: white;
-        z-index: 6;
+        z-index: 10;
         &__item {
             display: flex;
             align-items: center;
@@ -115,12 +115,19 @@ export default {
             .project & {
                 padding: 5px;
             }
+            .project-info__tasks & {
+                padding: 12px 0;
+            }
         }
         .domain__options & {
             max-height: 170px;
         }
         .project & {
             max-height: 180px;
+        }
+        .project-info__tasks & {
+            max-height: 170px;
+            border-top: 1px solid #67573E;    
         }
     }
 }

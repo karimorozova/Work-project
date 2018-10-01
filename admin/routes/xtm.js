@@ -91,9 +91,9 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
                 file: detFile
             });
         }
-        project.xtmId = await proj.body.projectId;
-        await ids.push(proj.body.jobs[0].jobId);
-        await project.jobs.push({id: proj.body.jobs[0].jobId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
+        project.xtmId = proj.body.projectId;
+        ids.push(proj.body.jobs[0].jobId);
+        project.jobs.push({id: proj.body.jobs[0].jobId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
         if(target.length - i == 1) {
             await project.save();
             let finalArray = await ids;

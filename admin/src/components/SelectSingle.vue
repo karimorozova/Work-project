@@ -89,12 +89,9 @@ export default {
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        background-color: white;
-        z-index: 6;
+        background-color: #FFF;
+        z-index: 10;
         &__item {
-            display: flex;
-            align-items: center;
-            height: 37px;
             padding: 7px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
@@ -116,6 +113,10 @@ export default {
         }
         .test-options & {
             max-height: 60px;
+        }
+        .project-info__tasks & {
+            max-height: 170px;
+            border-top: 1px solid #67573E;    
         }
     }
 }

@@ -37,6 +37,7 @@
                             :selectedOptions="industryNames"
                             :options="industriesList"
                             @chooseOptions="addIndustry"
+                            placeholder="Industry"
                         )
             .project__id
                 LabelValue(label="Project ID")

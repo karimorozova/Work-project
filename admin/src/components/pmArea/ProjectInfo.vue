@@ -6,26 +6,48 @@
         ProjectShortDetails(:project="currentProject" @setStatus="setStatus")
     .project-info__tasks
         .project-info__tasks-title Tasks and Steps
-        .project-info__tasks-row
-            .project-info__drop-menu
-                SelectSingle(:selectedOption="sourceLanguage" :options="languages")
-            .project-info__drop-menu            
-                SelectMulti(:selectedOptions="targetLanguages" :options="languages")
-            .project-info__drop-menu           
-                SelectSingle(:selectedOption="service" :options="services")
-        .project-info__tasks-row
-            .project-info__drop-menu
-                SelectSingle(
-                    :selectedOption="currentProject.template"
-                    :options="templates"
-                    placeholder="Project Template"
-                    refersTo="template"
-                    @chooseOption="setValue"
-                )
-            .project-info__upload-file
-                UploadFileButton(text="Source Files" @uploadFiles="uploadFiles")
-            .project-info__upload-file
-                UploadFileButton(text="Reference Files" @uploadFiles="uploadFiles")
+        .project-info__input-data-row
+            .project-info__tasks-col
+                .project-info__drop-menu
+                    SelectSingle(
+                        :selectedOption="sourceLanguage" 
+                        :options="allLangs" 
+                        placeholder="Source Language"
+                        refersTo="sourceLanguage"
+                        @chooseOption="setValue"
+                    )
+                .project-info__drop-menu
+                    SelectSingle(
+                        :selectedOption="template"
+                        :options="allTemplates"
+                        placeholder="Template"
+                        refersTo="template"
+                        @chooseOption="setValue"
+                    )
+            .project-info__tasks-col
+                .project-info__drop-menu            
+                    SelectMulti(
+                        :selectedOptions="targetLangs"
+                        :options="allLangs" 
+                        placeholder="Target Language"
+                        @chooseOptions="setTargets"
+                    )
+                .project-info__drop-menu           
+                    SelectSingle(
+                        :selectedOption="service" 
+                        :options="allServices" 
+                        placeholder="Service"
+                        refersTo="service"
+                        @chooseOption="setValue"
+                    )     
+            .project-info__tasks-col
+                .project-info__upload-file
+                    UploadFileButton(text="Source Files" @uploadFiles="uploadDetailFiles")
+                .project-info__upload-file
+                    UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")
+            .project-info__tasks-col       
+                .project-info__add-tasks
+                    Button(value="Add tasks" @clicked="addTasks")
         Tasks(
             :allTasks="currentProject.jobs"
         )
@@ -35,6 +57,7 @@
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
 import UploadFileButton from "../UploadFileButton";
+import Button from "../Button";
 import LabelValue from "./LabelValue";
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
@@ -48,14 +71,17 @@ export default {
     data() {
         return {
             templates: [
-                "template 1",
-                "template 2",
-                "template 3",
+                {name: 'Excel segment limit', id: 'XLSwithLimit'},
+                {name: 'Multilingual Excel', id: 'multiexcel'},
+                {name: 'Standard processing', id: '247336FD'},        
             ],
+            template: "",
             sourceLanguage: "",
             targetLanguages: [],
             service: "",
-            statuses: ["Accepted", "Draft", "Open", "Ready"]
+            statuses: ["Accepted", "Draft", "Open", "Ready"],
+            detailFiles: [],
+            refFiles: [] 
         }
     },
     methods: {
@@ -67,10 +93,24 @@ export default {
            this.setProjectValue({value: option, prop: "status"}) 
         },
         setValue({option, refersTo}) {
-            this.setProjectValue({value: option, prop: refersTo})
+            this[refersTo] = option;
         },
-        uploadFiles({files}) {
-            console.log(files);
+        setTargets({option}) {
+            const lang = this.languages.find(item => {
+                return item.lang === option;
+            }) 
+            const position = this.targetLangs.indexOf(lang.lang);
+            if(position != -1) {
+                this.targetLanguages.splice(position, 1)
+            } else {
+                this.targetLanguages.push(lang);
+            }
+        },
+        uploadDetailFiles({files}) {
+            this.detailFiles = files;
+        },
+        uploadRefFiles({files}) {
+            this.refFiles = files;
         }
     },
     computed: {
@@ -78,12 +118,33 @@ export default {
             currentProject: 'getCurrentProject',
             languages: "getAllLanguages",
             services: "getVuexServices"
-        })
+        }),
+        allLangs() {
+            return this.languages.map(item => {
+                return item.lang
+            })
+        },
+        allServices() {
+            return this.services.map(item => {
+                return item.title
+            })
+        },
+        allTemplates() {
+            return this.templates.map(item => {
+                return item.name
+            })
+        },
+        targetLangs() {
+            return this.targetLanguages.map(item => {
+                return item.lang
+            })
+        }
     },
     components: {
         SelectSingle,
         SelectMulti,
         UploadFileButton,
+        Button,
         LabelValue,
         Project,
         ProjectShortDetails,
@@ -128,11 +189,24 @@ export default {
         font-size: 18px; 
         margin-bottom: 15px;
     }
-    &__tasks-row {
+    &__input-data-row {
         margin-bottom: 20px;
-        width: 70%;
+        width: 100%;
         display: flex;
         justify-content: space-between;
+    }
+    &__tasks-col {
+        width: 25%;
+        height: 78px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    &__add-tasks {
+        display: flex;
+        height: 78px;
+        align-items: flex-end;
     }
 }
 </style>
