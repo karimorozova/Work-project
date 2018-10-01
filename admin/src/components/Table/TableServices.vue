@@ -48,6 +48,7 @@
 <script>
 import CalculationUnite from "./servicesRows/CalculationUnite";
 import LanguageForm from "./servicesRows/LanguageForm";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {},
@@ -204,6 +205,7 @@ export default {
         if (x.title < y.title) return -1;
       });
       this.$store.dispatch("servicesGetting", this.services);
+      this.loadingToggle(false);
     },
     checkFields(ind) {
       if (!this.services[ind].title.length) {
@@ -217,7 +219,10 @@ export default {
     ok() {
       this.showEmptyWarning = false;
       this.errors.splice(0, 1);
-    }
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
 
   computed: {},
@@ -226,6 +231,7 @@ export default {
     LanguageForm
   },
   mounted() {
+    this.loadingToggle(true);
     this.getServices();
   }
 };

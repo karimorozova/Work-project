@@ -60,7 +60,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedServ, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         getServices() {
-            this.services = this.veuxServices;
+            this.services = this.vuexServices;
             this.services.sort( (a,b) => {
                 if(a.title < b.title) return -1;
                 if(a.title > b.title) return 1;
@@ -85,7 +85,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            veuxServices: "getVeuxServices"
+            vuexServices: "getVuexServices"
         }) 
     }, 
     directives: {

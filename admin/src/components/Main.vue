@@ -1,5 +1,6 @@
 <template lang="pug">
     .adminportal-wrapper
+        Loading(v-if="isLoading")
         .admin-top
             .admin-top__admin-name 
                 h2.adminPortal ADMIN PORTAL
@@ -56,6 +57,8 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
+import Loading from "./Loading";
 
 export default {
   data() {
@@ -194,7 +197,7 @@ export default {
     },
     showSlider() {
       if(window.location.toString().indexOf('dashboard') == -1) {
-        this.$router.push('dashboard')
+        this.$router.push('/dashboard')
       }
       for(let elem of this.navbarList) {
         if(elem.title == 'DASHBOARD') {
@@ -228,6 +231,7 @@ export default {
       switch(index) {
         case 0:
           this.$router.push('/dashboard');
+          this.sliderBool = false;
           break;
         case 1:
           this.$router.push('/recruitment');
@@ -269,7 +273,18 @@ export default {
     },
     refreshServices(data) {
       this.getServices();
-    }
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
+  },
+  computed: {
+    ...mapGetters({
+      isLoading: "loading"
+    })
+  },
+  components: {
+    Loading
   },
   beforeRouteUpdate (to, from, next) {
     if(localStorage.getItem('token')) {
@@ -278,12 +293,14 @@ export default {
       next('/login')
     }
   },
-  mounted() {
+  async mounted() {
+    this.loadingToggle(true);
     this.mainPageRender();
-    this.getServices();
-    this.getCustomers();
-    this.getXtmCustomers();
-    this.getLanguages();
+    await this.getServices();
+    await this.getCustomers();
+    await this.getXtmCustomers();
+    await this.getLanguages();
+    this.loadingToggle(false);
   },
   directives: {
     ClickOutside

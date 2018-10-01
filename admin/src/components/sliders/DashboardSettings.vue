@@ -107,6 +107,9 @@ export default {
     sliderBool(){
       this.slidebarVisible = this.sliderBool;
     }
+  },
+  mounted() {
+    console.log('mounted');
   }
 };
 </script>

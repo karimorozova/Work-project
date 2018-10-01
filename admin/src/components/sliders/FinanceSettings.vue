@@ -61,11 +61,14 @@ export default {
     },
     openDuo() {
       this.duoDrop = !this.duoDrop;
-    }
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   computed: {
     ...mapGetters({
-      services: "getVeuxServices"
+      services: "getVuexServices",
     }) 
   },
   components: {

@@ -1,5 +1,6 @@
 export const getCount = state => state.count;
 export const isLoggedIn = state => state.isLoggedIn;
+export const loading = state => state.isLoading 
 export const getVuexServices = state => state.services;
 export const getAllLanguages = state => state.languages; 
 export const getClients = state => state.customers;

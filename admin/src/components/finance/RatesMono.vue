@@ -67,6 +67,7 @@
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceMonoSelect from "../ServiceMonoSelect";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
@@ -339,7 +340,11 @@ export default {
           item.crud = false
         }
       }
-    }
+      this.loadingToggle(false);
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   computed: {
     filterIndustry() {
@@ -384,8 +389,9 @@ export default {
     IndustrySelect,
     ServiceMonoSelect
   },
-  mounted() {
-    this.combinations();
+  created() {
+   this.loadingToggle(true);
+   this.combinations();
   }
 }
 

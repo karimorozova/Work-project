@@ -59,7 +59,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            if(!this.who.industry) {
+            if(!this.who) {
                 await this.$http.get('/api/industries')
                 .then(response => {
                     let sortedArray = response.data.filter(item => {

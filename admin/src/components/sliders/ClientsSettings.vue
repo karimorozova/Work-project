@@ -11,6 +11,7 @@
 
 <script>
 import Allclients from '../clients/Allclients';
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
@@ -26,12 +27,16 @@ export default {
     },
     chosenClient(data) {
       this.sidebarShow = true;
-    }
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   components: {
     Allclients
   },
   mounted() {
+    this.loadingToggle(true);
   }
 };
 </script>

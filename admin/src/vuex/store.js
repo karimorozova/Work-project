@@ -14,7 +14,8 @@ const state = {
     duoRates: [],
     projects: [],
     currentProject: {},
-    isLoggedIn: !!localStorage.getItem("token")
+    isLoggedIn: !!localStorage.getItem("token"),
+    isLoading: false
 };
 
 const mutations = {
@@ -27,6 +28,9 @@ const mutations = {
     },
     LOGOUT(state) {
         state.isLoggedIn = false;
+    },
+    loadingValue(state, payload) {
+        state.isLoading = payload;
     },
     servicesFill(state, payload) {
         state.services = payload

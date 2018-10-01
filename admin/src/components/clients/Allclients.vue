@@ -88,7 +88,7 @@ import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import ClientDetails from '../clients/ClientDetails';
 import Addseverallangs from "../finance/Addseverallangs";
-
+import { mapGetters, mapActions } from "vuex";
 import { bus } from "../../main";
 
 export default {
@@ -288,7 +288,11 @@ export default {
                 }
                 this.clients.push(client);
             }
-        }
+            this.loadingToggle(false);
+        },
+        ...mapActions({
+            loadingToggle: "loadingToggle"
+        })
     },
     computed: {
         allClients() {

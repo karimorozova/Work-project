@@ -76,6 +76,7 @@
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceDuoSelect from "../ServiceDuoSelect";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
@@ -370,8 +371,12 @@ export default {
       this.fullInfo = this.fullInfo.sort( (a, b) => {
         if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
         if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;        
-      })
-    }
+      });
+      this.loadingToggle(false);
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   computed: {
     filterIndustry() {
@@ -417,6 +422,7 @@ export default {
     ServiceDuoSelect,
   },
   created() {
+    this.loadingToggle(true);
     this.combinations();
   }
 };
