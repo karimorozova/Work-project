@@ -111,7 +111,7 @@ import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import Vendordetails from "./Vendordetails";
 import Addseverallangs from "../finance/Addseverallangs";
-
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -420,7 +420,11 @@ export default {
                     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
                 this.vendors.push(vendor);
             }
-        }
+            this.loadingToggle(false);
+        },
+        ...mapActions({
+            loadingToggle: "loadingToggle"
+        })
     },
     components: {
         VendorLeadsourceSelect,

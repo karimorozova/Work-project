@@ -10,6 +10,8 @@
 
 <script>
 import Allvendors from '../vendors/Allvendors'
+import { mapGetters, mapActions } from "vuex";
+
 export default {
   data() {
     return {
@@ -23,10 +25,16 @@ export default {
     },
     cancelVendor(data) {
       this.sidebarShow = false;
-    }
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   components: {
     Allvendors
+  },
+  mounted() {
+    this.loadingToggle(true);
   }
 };
 </script>

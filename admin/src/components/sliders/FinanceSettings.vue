@@ -32,7 +32,6 @@
 import RatesDuo from "../finance/RatesDuo";
 import RatesMono from "../finance/RatesMono";
 import Addseverallangs from "../finance/Addseverallangs";
-
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -57,9 +56,15 @@ export default {
       this.addSeveral = false;
     },
     openMono() {
+      if(!this.monoDrop) {
+        this.loadingToggle(true);
+      }
       this.monoDrop = !this.monoDrop;
     },
     openDuo() {
+      if(!this.duoDrop) {
+        this.loadingToggle(true);
+      }
       this.duoDrop = !this.duoDrop;
     },
     ...mapActions({

@@ -2,17 +2,23 @@
   #app
     //-  a.b-log-out(href='/logout') Log out
     //-  a.b-log-in(href='/login') Log in
+    Loading(v-if="isLoading")
     router-view
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import Loading from "./components/Loading"
 export default {
   name: 'app',
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn'
+      isLoggedIn: 'isLoggedIn',
+      isLoading: 'loading'
     })
+  },
+  components: {
+    Loading
   }
 }
 </script>

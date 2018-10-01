@@ -1,6 +1,6 @@
 <template lang="pug">
     .adminportal-wrapper
-        Loading(v-if="isLoading")
+        //- Loading(v-if="isLoading")
         .admin-top
             .admin-top__admin-name 
                 h2.adminPortal ADMIN PORTAL

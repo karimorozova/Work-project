@@ -348,5 +348,37 @@ router.post('/delete-duorate', async (req, res) => {
   res.send(result);
 })
 
+router.get('/parsed-rates', async (req, res) => {
+  try{
+    const service = await Services.find({"title": req.query.title, "languageForm": req.query.form});
+    const rates = [];
+    for(let i = 0; i < service[0].languageCombinations.length; i++) {
+      for(let elem of service[0].languageCombinations[i].industries) {
+        if(elem.rate > 0) {
+          if(req.query.form === "Duo") {
+            rates.push({
+              title: service[0].title,
+              sourceLanguage: service[0].languageCombinations[i].source,
+              targetLanguage: service[0].languageCombinations[i].target,
+              industry: [elem],
+              active: true
+            })
+          } else {
+            rates.push({
+              title: service[0].title,
+              targetLanguage: service[0].languageCombinations[i].target,
+              industry: [elem],
+              active: true
+            })
+          }
+        }
+      }
+    }
+    res.send(rates);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Something went wrong!')
+  }
+})
 
 module.exports = router;

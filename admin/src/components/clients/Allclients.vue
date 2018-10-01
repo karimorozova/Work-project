@@ -271,7 +271,6 @@ export default {
                 this.client = this.clients.find(item => {
                     if(item._id == data.clientId) {
                         return item
-                        console.log(item)
                     }
                 })
             }

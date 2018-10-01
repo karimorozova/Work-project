@@ -315,31 +315,19 @@ export default {
         this.handleScroll();
       },100);
     },
-    combinations() {
-      for(let item of this.services) {
-        if(item.languageForm == 'Mono' && item.title == this.serviceSelect.title) {
-          item.crud = true
-          for(let i = 0; i < item.languageCombinations.length; i++) {
-            for(let elem of item.languageCombinations[i].industries) {
-              if(elem.rate > 0) {
-                this.fullInfo.push({
-                  title: item.title,
-                  targetLanguage: item.languageCombinations[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
-            }
-          }
-        } else {
-          item.crud = false
-        }
-      }
+    async combinations() {
+      const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Mono`)
+      this.fullInfo = result.body;
+      this.fullInfo.forEach(item => {
+        item.icons = [
+          {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        ]
+      })
+      this.services.forEach(item => {
+        item.crud = item.title === this.serviceSelect.title
+      })
       this.loadingToggle(false);
     },
     ...mapActions({
@@ -389,8 +377,7 @@ export default {
     IndustrySelect,
     ServiceMonoSelect
   },
-  created() {
-   this.loadingToggle(true);
+  mounted() {
    this.combinations();
   }
 }

@@ -174,6 +174,7 @@ export default {
     },
     chosenServ(data) {
       this.serviceSelect = data;
+      this.loadingToggle(true);
       this.fullInfo = [];
       this.combinations();
     },
@@ -342,36 +343,19 @@ export default {
         this.handleScroll();
       }, 0)
     },
-    combinations() {
-      for(let item of this.services) {
-        if(item.languageForm == 'Duo' && item.title == this.serviceSelect.title) {
-          item.crud = true
-          for(let i = 0; i < item.languageCombinations.length; i++) {
-            for(let elem of item.languageCombinations[i].industries) {
-              if(elem.rate > 0) {
-                this.fullInfo.push({
-                  title: item.title,
-                  sourceLanguage: item.languageCombinations[i].source,
-                  targetLanguage: item.languageCombinations[i].target,
-                  industry: [elem],
-                  active: true,
-                  icons: [
-                    {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                    {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-                    {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-                  ]
-                })
-              }
-            }
-          }
-        } else {
-          item.crud = false
-        }
-      }
-      this.fullInfo = this.fullInfo.sort( (a, b) => {
-        if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
-        if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;        
-      });
+    async combinations() {
+      const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
+      this.fullInfo = result.body;
+      this.fullInfo.forEach(item => {
+        item.icons = [
+          {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        ]
+      })
+      this.services.forEach(item => {
+        item.crud = item.title === this.serviceSelect.title;
+      })
       this.loadingToggle(false);
     },
     ...mapActions({
@@ -421,8 +405,7 @@ export default {
     IndustrySelect,
     ServiceDuoSelect,
   },
-  created() {
-    this.loadingToggle(true);
+  mounted() {
     this.combinations();
   }
 };
