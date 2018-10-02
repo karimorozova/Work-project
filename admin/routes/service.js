@@ -377,7 +377,7 @@ router.get('/parsed-rates', async (req, res) => {
     res.send(rates);
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something went wrong!')
+    res.status(500).send('Something went wrong!' + err)
   }
 })
 

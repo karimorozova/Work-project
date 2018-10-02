@@ -37,6 +37,7 @@
 
 <script>
 import DataTable from "../DataTable";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {

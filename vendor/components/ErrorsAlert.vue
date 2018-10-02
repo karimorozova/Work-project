@@ -77,7 +77,7 @@ export default {
         flex-direction: column;
     }
     &__item {
-        color: #FF876C;
+        color: #D15F45;
     }
 }
 

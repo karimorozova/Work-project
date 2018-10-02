@@ -75,14 +75,14 @@
         }
         .choice {
           margin-top: 5px;
-          color: #FF876C;
+          color: #D15F45;
           font-family: MyriadPro;
         }
         &-languages {
           p {
             .choice {
               font-size: 16px;
-              color: #FF876C;
+              color: #D15F45;
             }
           }
         }
@@ -90,7 +90,7 @@
           p {
             .choice {
               font-size: 16px;
-              color: #FF876C;
+              color: #D15F45;
             }
           }
         }       
@@ -122,14 +122,14 @@
         position: fixed;;
         top: 38px;
         right: -27px;
-        border: 1px solid #FF876C;
+        border: 1px solid #D15F45;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
         padding: 5px;
         transform: rotate(-90deg);
         -webkit-transform-origin: 1; 
         z-index: 10;
-        background: #FF876C;
+        background: #D15F45;
         color: white;
         cursor: pointer;
       }
@@ -705,7 +705,7 @@
             padding: 10px;
             border-radius: 10px;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-            background-color: #FF876C;
+            background-color: #D15F45;
             &:hover {
             box-shadow: 0 0px 15px rgba(0, 0, 0, 0.4);     
             }
@@ -937,7 +937,7 @@
         margin-bottom: 5px;
       }
       input {
-            background-color: #FF876C;
+            background-color: #D15F45;
             color: white;
             width: 164px;
             height: 40px;
@@ -1052,7 +1052,7 @@
     }
   
     .active {
-      color: #FF876C;
+      color: #D15F45;
     }
   
     @font-face {

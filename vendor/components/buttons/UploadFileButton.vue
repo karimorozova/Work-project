@@ -43,7 +43,7 @@ export default {
         margin-bottom: 5px;
         border-radius: 10px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #FF876C;
+        background-color: #D15F45;
         &:hover {
             box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);     
         }

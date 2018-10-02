@@ -11,6 +11,7 @@ const state = {
     xtmCustomers: [],
     languages: [],
     clientLangs: [],
+    vendors: [],
     duoRates: [],
     projects: [],
     currentProject: {},
@@ -43,6 +44,9 @@ const mutations = {
     },
     allXtmCustomers(state, payload) {
         state.xtmCustomers = payload
+    },
+    allVendors(state, payload) {
+        state.vendors = payload
     },
     allLangs(state, payload) {
         state.languages = payload

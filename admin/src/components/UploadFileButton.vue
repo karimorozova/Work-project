@@ -29,7 +29,7 @@ export default {
     methods: {
         uploadFile(event) {
             this.files.push(event.target.files[0]);
-            this.$emit("uploadedFile", {files: this.files})
+            this.$emit("uploadFiles", {files: this.files})
         }
     }
 }

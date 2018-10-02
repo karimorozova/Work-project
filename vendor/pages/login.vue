@@ -2,7 +2,7 @@
   .login
     .login__main(v-if="forgotLink")
       .login__logo
-        img(src="../assets/images/login_logo.png")
+        img(src="../assets/images/new-logo.png")
       .login__form
         .login__warning
           label.login__warning-message(v-if="isLoginWarning") Check your email or password

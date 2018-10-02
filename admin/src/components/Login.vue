@@ -2,7 +2,7 @@
   .loginMain
     .loginWrapper(v-if="forgotLink")
       .imageWrapper
-        img(src="../assets/images/login_logo.png")
+        img(src="../assets/images/new-logo.png")
       .loginForm
         .labelWrapper
           label.warningMessage(v-if="isLoginWarning") Check your email or password

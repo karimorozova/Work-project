@@ -50,6 +50,7 @@
                     Button(value="Add tasks" @clicked="addTasks")
         Tasks(
             :allTasks="currentProject.jobs"
+            :vendors="allVendors"
         )
 </template>
 
@@ -80,14 +81,16 @@ export default {
             targetLanguages: [],
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
-            detailFiles: [],
+            sourceFiles: [],
             refFiles: [] 
         }
     },
     methods: {
         ...mapActions({
             setProjectValue: "setProjectValue",
-            storeProject: "setCurrentProject"
+            storeProject: "setCurrentProject",
+            vendorsSetting: "vendorsSetting",
+            loadingToggle: 'loadingToggle'
         }),
         setStatus({option}) {
            this.setProjectValue({value: option, prop: "status"}) 
@@ -107,17 +110,60 @@ export default {
             }
         },
         uploadDetailFiles({files}) {
-            this.detailFiles = files;
+            this.sourceFiles = files;
         },
         uploadRefFiles({files}) {
             this.refFiles = files;
-        }
+        },
+        async addTasks() {
+            const xtmCustomer = this.xtmCustomers.find(item => {
+                return item.name === this.currentProject.customer.name
+            });
+            const template = this.template ? this.templates.find(item => {
+                    return item.name === this.template
+                }) : {id: ""}
+            const source = this.languages.find(item => {
+                return item.lang === this.sourceLanguage;
+            })
+            let form = new FormData();
+            form.append('customerId', xtmCustomer.id);
+            form.append('template', template.id);
+            form.append('source', JSON.stringify(source));
+            form.append('targets', JSON.stringify(this.targetLanguages));
+            form.append('projectId', this.currentProject._id);
+            form.append('projectName', this.currentProject.projectName);
+            if(this.sourceFiles.length) {
+                for(let file of this.sourceFiles) {
+                    form.append('sourceFiles', file)
+                }
+            }
+            if(this.refFiles.length) {
+                for(let file of this.refFiles) {
+                    form.append('refFiles', file)
+                }
+            }
+            this.loadingToggle(true);
+            const tasks = await this.$http.post('/xtm/add-tasks', form);
+            const updatedProject = await this.$http.get(`/xtm/project-metrics?projectId=${this.currentProject._id}`)
+            await this.storeProject(updatedProject.body);
+            this.$emit("tasksAdded", {id: this.currentProject._id});
+            this.loadingToggle(false);
+        },
+        async getVendors() {
+            if(!this.allVendors.length) {
+                const result = await this.$http.get('/all-vendors');
+                this.vendorsSetting(result.body);
+            }
+            this.loadingToggle(false);
+        } 
     },
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             languages: "getAllLanguages",
-            services: "getVuexServices"
+            services: "getVuexServices",
+            xtmCustomers: "getXtmCustomers",
+            allVendors: "getVendors"
         }),
         allLangs() {
             return this.languages.map(item => {
@@ -151,6 +197,7 @@ export default {
         Tasks
     },
     mounted() {
+        this.getVendors();
         if(!this.currentProject._id) {
             this.$router.replace({name: "pm-projects"})
         }

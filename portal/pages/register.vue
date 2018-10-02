@@ -2,7 +2,7 @@
 .registerMain
   .registerWrapper
     .imageWrapper
-      img(src="../assets/images/login_logo.png")
+      img(src="../assets/images/new-logo.png")
     .registerForm
       .labelWrapper
         label.warningMessage(v-if="isRegisterWarning") Check your details

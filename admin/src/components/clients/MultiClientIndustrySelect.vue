@@ -126,7 +126,7 @@ export default {
             }
             .toolTip {
                 position: absolute;
-                color: #ff876c;
+                color: #D15F45;
                 font-size: 12px;
                 display: none;
                 left: 36px;

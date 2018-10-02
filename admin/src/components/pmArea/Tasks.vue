@@ -35,7 +35,13 @@
             template(slot="language" slot-scope="{ row }")
                 span.jobs__job-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="vendor" slot-scope="{ row }")
-                span.jobs__job-data {{ row.vendor }}
+                Vendorselect(
+                    :vendors="vendors"
+                    :selectedVendors="selectedVendors"
+                    :filteredVendors="vendorsIds"
+                    @changeVend="setVendor"
+                )
+                //- span.jobs__job-data {{ row.vendor }}
             template(slot="start" slot-scope="{ row }")
                 span.jobs__job-data {{ row.status }}
             template(slot="deadline" slot-scope="{ row }")
@@ -53,11 +59,15 @@
 </template>
 
 <script>
-import DataTable from "../DataTable"
+import DataTable from "../DataTable";
+import Vendorselect from "./Vendorselect";
 
 export default {
     props: {
         allTasks: {
+            type: Array
+        },
+        vendors: {
             type: Array
         }
     },
@@ -75,16 +85,31 @@ export default {
                 {label: "Receivables", key: "receivables", width: "11%"},
                 {label: "Payable", key: "payable", width: "9%"},
                 {label: "Margin", key: "margin", width: "9%"},
-            ]
+            ],
+            selectedVendors: []
         }
     },
     methods: {
         onRowClicked({index}) {
             this.$emit("getMetrics")
+        },
+        setVendor({vendor}) {
+            const position = this.vendorsIds.indexOf(vendor._id);
+            if(position != -1) {
+
+            }
+        }
+    },
+    computed: {
+        vendorsIds() {
+            return this.selectedVendors.map(item => {
+                return item._id
+            })
         }
     },
     components: {
-        DataTable
+        DataTable,
+        Vendorselect
     }    
 }
 </script>

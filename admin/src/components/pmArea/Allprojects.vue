@@ -13,13 +13,9 @@
                 :project="chosenProject"
                 @refreshProjects="refreshProjects"
                 @setProjectDefault="setProjectDefault"
+                @tasksAdded="tasksAdded"
+                :vendors="allVendors"
             )
-        //- .vendors-select(v-if="showProjectDetails")
-        //-     label.vendors-select__title Vendors
-        //-     Vendorselect(:selectedVendors="selectedVendors"
-        //-         :filteredVendors="filteredVendors"
-        //-         @changeVend="changeVend")
-        //-     button.mail(@click="vendorsMail") Send e-mail(s)
         .all-projects__hide-details(v-if="showProjectDetails")
             button.all-projects__but(@click="back") Back to projects
 </template>
@@ -44,8 +40,9 @@ export default {
     },
     methods: {
         ...mapActions({
-            getStoreProjects: "setAllProjects",
-            storeProject: "setCurrentProject"
+            setStoreProjects: "setAllProjects",
+            storeProject: "setCurrentProject",
+            loadingToggle: "loadingToggle",
         }),
         selectProject({project}) {
             this.chosenProject = project;
@@ -57,6 +54,12 @@ export default {
         },
         setProjectDefault() {
             this.$emit('setProjectDefault');
+        },
+        async tasksAdded({id}) {
+            await this.getProjects();
+            this.chosenProject = this.allProjects.find(item => {
+                return item._id === id
+            })
         },
         back() {
             this.showProjectDetails = false;
@@ -84,7 +87,7 @@ export default {
         async getProjects() {
             let projectsArray = await this.$http.get('../api/allprojects');
             this.projects = projectsArray.body;
-            this.getStoreProjects(projectsArray.body);
+            this.setStoreProjects(projectsArray.body);
         },
         showJobs(id) {
             this.jobsShow = true;
@@ -116,7 +119,7 @@ export default {
     computed: {
         ...mapGetters({
             allProjects: "getAllProjects",
-            allCustomers: "getClients"
+            allCustomers: "getClients",
         }),
         requestDate() {
             let result = '';
@@ -174,7 +177,7 @@ export default {
         width: 160px;
         padding: 3px;
         color: white;
-        background-color: #F5876E;
+        background-color: #D15F45;
         border: none;
         outline: none;
         border-radius: 10px;

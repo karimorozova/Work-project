@@ -251,7 +251,7 @@ export default {
 }
 .itemData {
   font-size: 14px;
-  color: #ff876c;
+  color: #D15F45;
 }
 .itemDataExSm {
   font-size: 12px;

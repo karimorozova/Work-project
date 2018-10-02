@@ -476,7 +476,7 @@ export default {
         width: 114px;
         height: 40px;
         border-radius: 12px;
-        background-color: #ff876c;
+        background-color: #D15F45;
         -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
         box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
         font-size: 14px;

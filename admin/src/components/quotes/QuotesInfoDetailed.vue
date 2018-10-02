@@ -423,7 +423,7 @@ export default {
     background-color: #84ca8e;
   }
   .reject {
-    background-color: #f5876e;
+    background-color: #D15F45;
   }
 }
 </style>

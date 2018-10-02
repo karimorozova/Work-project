@@ -26,11 +26,13 @@ export default {
         },
         filteredVendors: {
             type: Array
+        },
+        vendors: {
+            type: Array
         }
     },
     data() {
         return {
-            vendors: [],
             droppedVend: false,
             errors: []
         }
@@ -45,18 +47,8 @@ export default {
         changeVend(ind) {
             this.$emit('changeVend', {vendor: this.vendors[ind]})
         },
-        getVendors() {
-            this.$http.get('../all-vendors')
-            .then(res => {
-                this.vendors = res.data;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        }
     },
     mounted() {
-        this.getVendors();
     },
     directives: {
         ClickOutside
@@ -69,7 +61,7 @@ export default {
 .select {
     border: 1px solid #67573E;
     border-radius: 5px;
-    width: 291px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -91,7 +83,7 @@ export default {
             display: flex;
             .toolTip {
                 position: absolute;
-                color: #ff876c;
+                color: #D15F45;
                 font-size: 12px;
                 display: none;
                 left: 36px;
@@ -122,7 +114,7 @@ export default {
 }
 .dropSelect {
     position: relative;
-    width: 291px;
+    width: 100%;
     .drop {
         font-size: 14px;
         position: absolute;

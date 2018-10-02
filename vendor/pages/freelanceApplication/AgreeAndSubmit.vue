@@ -139,7 +139,7 @@ export default {
         margin-top: 10px;
         color: #FFF;
         font-size: 14px;
-        background-color: #FF876C;
+        background-color: #D15F45;
         border: none;
         outline: none;
         height: 40px;

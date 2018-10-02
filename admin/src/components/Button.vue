@@ -30,7 +30,7 @@ export default {
         border-radius: 10px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
         background-color: #D15F45;
-        border: 1px solid #ff876c;
+        border: 1px solid #D15F45;
         cursor: pointer;
         outline: none;
         &:hover {

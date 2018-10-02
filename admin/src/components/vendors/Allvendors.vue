@@ -420,10 +420,14 @@ export default {
                     {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
                 this.vendors.push(vendor);
             }
+            if(!this.vuexVendors.length) {
+                this.vendorsSetting(result.body);
+            }
             this.loadingToggle(false);
         },
         ...mapActions({
-            loadingToggle: "loadingToggle"
+            loadingToggle: "loadingToggle",
+            vendorsSetting: "vendorsSetting"
         })
     },
     components: {
@@ -484,7 +488,10 @@ export default {
                 }
             }
             return result;
-        }
+        },
+        ...mapGetters({
+            vuexVendors: "getVendors"
+        })
     },
     mounted() {
         this.getVendors()
@@ -546,8 +553,8 @@ label {
     border-radius: 10px;
     -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
     box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #ff876c;
-    border: 1px solid #ff876c;
+    background-color: #D15F45;
+    border: 1px solid #D15F45;
     cursor: pointer;
 }
 
@@ -642,7 +649,7 @@ td {
     .titleTooltip {
       position: absolute;
       display: none;
-      color: #ff876c;
+      color: #D15F45;
       font-size: 12px;
       top: 8px;
       left: 35px;
@@ -809,8 +816,8 @@ input {
     border-radius: 10px;
     -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
     box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #ff876c;
-    border: 1px solid #ff876c;
+    background-color: #D15F45;
+    border: 1px solid #D15F45;
     cursor: pointer;
     outline: none;
 }

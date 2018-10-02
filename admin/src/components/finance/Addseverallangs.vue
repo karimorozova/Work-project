@@ -475,7 +475,7 @@ export default {
 
 .submit-button {
     &__button {
-        background-color: #ff876c;
+        background-color: #D15F45;
         color: white;
         font-size: 16px;
         width: 164px;

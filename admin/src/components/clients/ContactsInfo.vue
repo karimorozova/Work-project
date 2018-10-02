@@ -227,8 +227,8 @@ tr {
     border-radius: 10px;
     -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
     box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #ff876c;
-    border: 1px solid #ff876c;
+    background-color: #D15F45;
+    border: 1px solid #D15F45;
     cursor: pointer;
 }
 

@@ -109,7 +109,6 @@ export default {
     }
   },
   mounted() {
-    console.log('mounted');
   }
 };
 </script>
@@ -175,7 +174,7 @@ export default {
         color: #fff;
         font-size: 15px;
         box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
-        background-color: #f5876e;
+        background-color: #D15F45;
         border-radius: 18px;
         border: none;
         width: 180px;

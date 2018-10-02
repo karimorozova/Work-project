@@ -369,7 +369,7 @@ export default {
         margin-right: 150px;
         width: 239px;
         width: 33%;
-        background-color: #f5876e;
+        background-color: #D15F45;
         border-radius: 14px;
         width: 100%;
         height: 34px;

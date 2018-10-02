@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const incrementCounter = ({ commit }) => commit('INCREMENT_COUNTER');
 export const loadingToggle = ({ commit }, payload) => commit('loadingValue', payload);
 export const servicesGetting = ({ commit }, payload) => commit('servicesFill', payload);
@@ -9,6 +11,7 @@ export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', p
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
 export const setProjectValue = ({ commit }, payload) => commit('storeProjectValue', payload);
+export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);  
 export const login = ({ commit }, creds) => {
     commit("LOGIN");
     return new Promise(resolve => {
