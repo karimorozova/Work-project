@@ -91,7 +91,7 @@ export default {
     },
     methods: {
         onRowClicked({index}) {
-            this.$emit("clickOnJob")
+            this.$emit("onRowClicked", {index: index})
         },
         setVendor({vendor}) {
             const position = this.vendorsIds.indexOf(vendor._id);

@@ -199,8 +199,8 @@ export default {
                     }
                 }
             }
-            project.metrics = true;
-            await this.$http.post('/xtm/saveproject', project);
+            project.isMetricsExist = true;
+            await this.$http.post('/xtm/update-project', {id: project._id, jobs: project.jobs, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
             this.$emit("refreshProjects");
             await this.storeProject(project);
             this.loadingToggle(false);
@@ -242,7 +242,7 @@ export default {
             })
         },
         metricsButton() {
-            return this.currentProject.metrics ? "Refresh metrics" : "Get metrics"
+            return this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
         }
     },
     components: {

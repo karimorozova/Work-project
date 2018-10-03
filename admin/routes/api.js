@@ -9,7 +9,7 @@ const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
 const { sendMailClient } = require('../utils/mailhandlerclient');
 const { sendMailPortal } = require('../utils/mailhandlerportal')
-const { Requests, Projects, Languages, Services, Industries, Timezones } = require('../models');
+const { Requests, Projects, Languages, Services, Industries, Timezones, User, Clients } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const reqq = require('request');
 const writeFile = require('write');
@@ -84,7 +84,7 @@ router.get('/wordcount', async (req, res) => {
 
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
-
+  try {
   const request = new Requests(req.body);
   var projectName = "";
   if (request.projectName) {
@@ -106,10 +106,6 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
      \nDesign: ${JSON.stringify(obj.design)}
      \nSeo: ${JSON.stringify(obj.seo)}
      \nCTA: ${obj.cta}`)
-      .then(() => {
-        console.log('file been written');
-
-      }).catch(err => console.log(err));
   }
 
   const detailFiles = req.files["detailFiles"];
@@ -118,43 +114,41 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
   request.targetLanguages = JSON.parse(req.body.targetLanguages);
   request.service = JSON.parse(req.body.service);
-  try {
-    await request.save();
-    if (detailFiles) {
-      for (var i = 0; i < detailFiles.length; i += 1) {
-        request.detailFiles.push(moveFile(detailFiles[i], request.id));
-      }
+  
+  await request.save();
+  if (detailFiles) {
+    for (var i = 0; i < detailFiles.length; i += 1) {
+      request.detailFiles.push(moveFile(detailFiles[i], request.id));
     }
-    if (refFiles) {
-      for (var i = 0; i < refFiles.length; i += 1) {
-        request.refFiles.push(moveFile(refFiles[i], request.id))
-      }
+  }
+  if (refFiles) {
+    for (var i = 0; i < refFiles.length; i += 1) {
+      request.refFiles.push(moveFile(refFiles[i], request.id))
     }
-
-    await request.save();
-    if (projectName) {
-      sendMailPortal(request);
-      quote(request);
-    } else {
-      sendMail(request);
-    }
-    sendMailClient(request);
-    // quote(request);
-
-    console.log("Saved");
-
-  } catch (err) {
-    console.log(err);
   }
 
+  await request.save();
+  if (projectName) {
+    sendMailPortal(request);
+    quote(request);
+  } else {
+    sendMail(request);
+  }
+  sendMailClient(request);
+  // quote(request);
+
+  console.log("Saved");
   res.send({
     message: "request was added"
   });
-
+  } catch (err) {
+      console.log(err);
+      res.status(500).send("Something went wrong while adding request " + err)
+    }
 });
 
 router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
-
+  try {
   const request = new Requests(req.body);
   var projectName = "";
   if (request.projectName) {
@@ -163,6 +157,7 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
   if (req.body.genBrief) {
     var obj = JSON.parse(req.body.genBrief);
+    
     await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
      \nDescription: ${obj.briefDescr};
      \nTargeted Audience: ${obj.briefAudience}; 
@@ -175,10 +170,6 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
      \nDesign: ${JSON.stringify(obj.design)}
      \nSeo: ${JSON.stringify(obj.seo)}
      \nCTA: ${obj.cta}`)
-      .then(() => {
-        console.log('file been written');
-
-      }).catch(err => console.log(err));
   }
 
   const detailFiles = req.files["detailFiles"];
@@ -187,62 +178,73 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
   request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
   request.targetLanguages = JSON.parse(req.body.targetLanguages);
   request.service = JSON.parse(req.body.service)
-  try {
-    await request.save();
-    if (detailFiles) {
-      for (var i = 0; i < detailFiles.length; i += 1) {
-        request.detailFiles.push(moveFile(detailFiles[i], request.id));
-      }
-    }
-    if (refFiles) {
-      for (var i = 0; i < refFiles.length; i += 1) {
-        request.refFiles.push(moveFile(refFiles[i], request.id))
-      }
-    }
 
-    await request.save();
-    if (projectName) {
-      sendMailPortal(request)
-    } else {
-      sendMail(request);
+  await request.save();
+  if (detailFiles) {
+    for (var i = 0; i < detailFiles.length; i += 1) {
+      request.detailFiles.push(moveFile(detailFiles[i], request.id));
     }
-    sendMailClient(request);
-    project(request);
-
-    console.log("Saved");
-
-  } catch (err) {
-    console.log(err);
+  }
+  if (refFiles) {
+    for (var i = 0; i < refFiles.length; i += 1) {
+      request.refFiles.push(moveFile(refFiles[i], request.id))
+    }
   }
 
+  await request.save();
+  if (projectName) {
+    sendMailPortal(request)
+  } else {
+    sendMail(request);
+  }
+  sendMailClient(request);
+  project(request);
+
+  console.log("Saved");
+  
   res.send({
     message: "request was added"
   });
-
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Something went wrong while adding request " + err)
+  }
 });
 
-router.get('/allprojects', (req, res) => {
-  Projects.find()
-    .then(result => {
-      res.send(result)
-    })
-    .catch(err => {
+router.get('/allprojects', async (req, res) => {
+  try {
+    const projects = await Projects.find({});
+    for(let project of projects) {
+      if(project.projectManager) {
+        project.projectManager = await User.findOne({"_id": project.projectManager}, {firstName: 1, lastName: 1});
+      }
+      if(project.customer) {
+        project.customer = await Clients.findOne({"_id": project.customer}, {name: 1});
+      }
+      if(project.service) {
+        project.service = await Services.findOne({"_id": project.service}, {title: 1}); 
+      };
+      if(project.industry) {
+        project.industry = await Industries.findOne({"_id": project.industry}, {name: 1, icon: 1});
+      }
+    }
+    res.send(projects)
+  } catch(err) {
       console.log(err);
-      res.statusCode(500);
-      res.send('Something wrong with DB!')
-    })
+      res.status(500);
+      res.send('Something wrong with DB while getting projects! ' + err)
+    }
 })
 
-router.get('/languages', (req, res) => {
-  Languages.find()
-    .then(results => {
-      res.send(results)
-    })
-    .catch(err => {
+router.get('/languages', async (req, res) => {
+  try {
+    const languages = await Languages.find({});
+    res.send(languages)
+  } catch(err) {
       console.log(err)
-      res.statusCode(500);
-      res.send('Something wrong with DB')
-    })
+      res.status(500);
+      res.send('Something wrong with DB ' + err)
+    }
 });
 
 router.get('/services', async (req, res) => {
@@ -272,39 +274,53 @@ router.get('/services', async (req, res) => {
     res.send(services);
   } catch(err) {
       console.log(err)
-      res.send('Something wrong with DB')
+      res.statusCode(500);
+      res.send('Something wrong with DB ' + err);
   }
 });
 
-router.get('/industries', (req, res) => {
-  Industries.find().then(results => {
-    res.send(results)
-  }).catch(err => {
+router.get('/industries', async (req, res) => {
+  try {
+  const industries = await Industries.find({});
+    res.send(industries)
+  } catch(err) {
     console.log(err);
     res.statusCode(500);
-    res.send('Something wrong with DB');
-  });
+    res.send('Something wrong with DB ' + err);
+  }
 });
 
-router.get('/timezones', (req, res) => {
-  Timezones.find()
-    .then(timezones => {
-        res.send(timezones)
-    })
-    .catch(err => {
-        console.log(err)
-    })
+router.get('/timezones', async (req, res) => {
+  try {  
+    const timezones = await Timezones.find({});
+    res.send(timezones)
+  } catch(err) {
+      console.log(err);
+      res.status(500);
+      res.send('Something wrong with DB ' + err);
+  }
 })
 
 router.get('/customers', async (req, res) => {
-  let customers = await HomeApi.getAllCustomers();
-  res.send(customers)
+  try{
+    let customers = await HomeApi.getAllCustomers();
+    res.send(customers)
+  } catch(err) {
+    console.log(err);
+    res.statusCode(500);
+    res.send('Something wrong with DB ' + err);
+  }
 })
 
 router.get('/person', async (req, res) => {
-  let person = await HomeApi.getPerson(req.query.customerId);
-  let email = {'email': person};
-  res.send(email);
+  try{
+    let person = await HomeApi.getPerson(req.query.customerId);
+    let email = {'email': person};
+    res.send(email);
+  } catch(err) {
+    res.statusCode(500);
+    res.send('Something wrong with DB ' + err);
+  }
 })
 
 router.post('/get-token', async (req, res) => {
@@ -331,47 +347,43 @@ router.post('/token-session', async (req, res) => {
 router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {
   const flag = req.files["flag"];
   var langID = req.body.dbIndex;
-  let languageIcon = await Languages.find({'_id': langID});
-  var existIcon = languageIcon[0].icon;
-  let old = './dist' + languageIcon[0].icon;
-  let date = new Date().getTime();
-  if (flag) {
-    fs.unlinkSync(old, (err) => {
-      console.log('old file removed');
-    });
-    moveLangIcon(flag[0], date);
-    existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
-  }
-  var objForUpdate = {
-    lang: req.body.languageName,
-    symbol: req.body.languageSymbol,
-    iso1: req.body.languageIso1,
-    iso2: req.body.languageIso2,
-    active: req.body.languageActive,
-    icon: existIcon
-  };
-  Languages.update({"_id": langID}, objForUpdate).then(result => {
+  try {
+    let languageIcon = await Languages.find({'_id': langID});
+    var existIcon = languageIcon[0].icon;
+    let old = './dist' + languageIcon[0].icon;
+    let date = new Date().getTime();
+    if (flag) {
+      fs.unlinkSync(old, (err) => {
+        console.log('old file removed');
+      });
+      moveLangIcon(flag[0], date);
+      existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
+    }
+    var objForUpdate = {
+      lang: req.body.languageName,
+      symbol: req.body.languageSymbol,
+      iso1: req.body.languageIso1,
+      iso2: req.body.languageIso2,
+      active: req.body.languageActive,
+      icon: existIcon
+    };
+    const result = await Languages.update({"_id": langID}, objForUpdate);
     res.send(result);
-  }).catch(err => {
+  } catch(err) {
     console.log(err);
-    res.send('Something went wrong :(');
-  });
+    res.status(500).send('Something went wrong while Language saving ' + err);
+  }
 });
 
 router.post("/removelanguages", async(req, res) => {
-  var langID = req.body.languageRem;
-  Languages.deleteOne({"_id": langID})
-  .then(result => {
+  const langID = req.body.languageRem;
+  try {
+    await Languages.deleteOne({"_id": langID})
     res.send('Removed')
-  })
-  .catch(err => {
+  } catch(err) {
     console.log(err);
-    res.send('Something is wrong...')
-  });
+    res.status(500).send('Something is wrong with Language removing ' + err)
+  }
 });
-
-router.get("/startproject", (req, res) => {
-  console.log(req.body)
-})
 
 module.exports = router;

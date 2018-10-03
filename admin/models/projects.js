@@ -19,7 +19,7 @@ const ProjectsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  date: {
+  deadline: {
     type: Date,
     default: Date.now
   },
@@ -41,7 +41,7 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  metrics: {
+  isMetricsExist: {
     type: Boolean,
     default: false
   },
@@ -74,6 +74,18 @@ const ProjectsSchema = new mongoose.Schema({
     type: Array,
     default: [],
     trim: true
+  },
+  receivables: {
+    type: String,
+    default: ''
+  },
+  payables: {
+    type: String,
+    default: ''
+  },
+  roi: {
+    type: String,
+    default: ''
   },
   brief: {
     type: String,

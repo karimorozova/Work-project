@@ -90,7 +90,7 @@ export default {
     },
     methods: {
         onRowClicked({index}) {
-            this.$emit("clickOnTask")
+            this.$emit("onRowClicked", {index: index})
         },
         setVendor({vendor}) {
             const position = this.vendorsIds.indexOf(vendor._id);

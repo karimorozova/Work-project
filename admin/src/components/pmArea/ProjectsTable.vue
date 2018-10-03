@@ -27,8 +27,8 @@
             span {{ row.projectName }}
         template(slot="status" slot-scope="{ row }")
             span {{ row.status }}
-        template(slot="date" slot-scope="{ row }")
-            span {{ row.date.split('T')[0].split('-').reverse().join('-') }}              
+        template(slot="deadline" slot-scope="{ row }")
+            span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
         template(slot="totalCost" slot-scope="{ row }")
             span {{ row.totalCost }}              
         template(slot="download" slot-scope="{ row }")
@@ -52,7 +52,7 @@ export default {
                 {label: "Project ID", key: "projectId", width: "15%"},
                 {label: "Project Name", key: "projectName", width: "26%"},
                 {label: "Status", key: "status", width: "13%"},
-                {label: "Deadline", key: "date", width: "13%"},
+                {label: "Deadline", key: "deadline", width: "13%"},
                 {label: "Total Cost", key: "totalCost", width: "10%"},
                 {label: "", key: "download", width: "10%"},
                 // {label: "scroll", key: "scroll", width: "16px"},
@@ -68,22 +68,6 @@ export default {
         },
         async estimate(ind) {
             let project = this.allProjects[ind];
-            let metrics = await this.$http.get(`../xtm/metrics?projectId=${project.xtmId}`);
-            project.metrics = {
-                iceMatch: metrics.body[0].coreMetrics.exactMatchWords,
-                fuzzyMatch95: metrics.body[0].coreMetrics.fuzzyForwardC1Words,
-                fuzzyMatch85: metrics.body[0].coreMetrics.fuzzyForwardC2Words,
-                fuzzyMatch75: metrics.body[0].coreMetrics.fuzzyForwardC3Words,
-                fuzzyRepeat95: metrics.body[0].coreMetrics.fuzzyMatchC1Words,
-                fuzzyRepeat85: metrics.body[0].coreMetrics.fuzzyMatchC2Words,
-                fuzzyRepeat75: metrics.body[0].coreMetrics.fuzzyMatchC3Words,
-                repeat: metrics.body[0].coreMetrics.leveragedInheritedWords,
-                leveragedMatch: metrics.body[0].coreMetrics.leveragedTmWords,
-                machineTranslation: metrics.body[0].coreMetrics.machineTranslationWords,
-                nonTranslatable: metrics.body[0].coreMetrics.numericWords,
-                totalWords: metrics.body[0].coreMetrics.totalWords
-            };
-            const words = project.metrics.totalWords;
             for(let job of project.jobs) {
                 job.wordcount = +words;
             }
