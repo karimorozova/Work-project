@@ -38,8 +38,9 @@ export default {
         color: #FFF;
     }
     &__tbody {
-    height: 200px;
-    overflow: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
         .table__row {
             cursor: pointer;
             &:nth-of-type(odd) {

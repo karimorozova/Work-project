@@ -48,11 +48,22 @@
             .project-info__tasks-col       
                 .project-info__add-tasks
                     Button(value="Add tasks" @clicked="addTasks")
-        Tasks(
-            :allTasks="currentProject.jobs"
+        .project-info__data-type(v-if="currentProject.jobs.length")
+            SelectSingle(
+                :selectedOption="presentedData" 
+                :options="dataTypes"
+                refersTo="presentedData"
+                @chooseOption="setValue"
+            )
+        Jobs(v-if="presentedData === 'Jobs'"
+            :allJobs="currentProject.jobs"
             :vendors="allVendors"
-            @getMetrics="getMetrics"
         )
+        Tasks(v-if="presentedData === 'Tasks'"
+            :allTasks="currentProject.tasks"
+            :vendors="allVendors"
+        )
+        Button(v-if="currentProject.jobs.length" :value="metricsButton" @clicked="getMetrics")
 </template>
 
 <script>
@@ -63,6 +74,7 @@ import Button from "../Button";
 import LabelValue from "./LabelValue";
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
+import Jobs from "./Jobs";
 import Tasks from "./Tasks";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -83,7 +95,9 @@ export default {
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
             sourceFiles: [],
-            refFiles: [] 
+            refFiles: [],
+            presentedData: "Jobs",
+            dataTypes: ["Jobs", "Tasks"]
         }
     },
     methods: {
@@ -153,13 +167,40 @@ export default {
             this.loadingToggle(true);
             let project = JSON.stringify(this.currentProject);
             project = JSON.parse(project);
-            for(let task of project.jobs) {
-                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
-                task.metrics = metrics.body.metrics;
-                task.progress = metrics.body.progress;
-                task.wordcount = metrics.body.metrics.totalWords;
+            for(let job of project.jobs) {
+                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${job.projectId}`);
+                job.metrics = metrics.body.metrics;
+                job.wordcount = metrics.body.metrics.totalWords;
+                for(const key in metrics.body.progress) {
+                    const existedTask = project.tasks.find(item => {
+                        return item.jobId === job.id && item.step === key
+                    })
+                    if(!existedTask) {
+                        project.tasks.push({
+                            jobId: job.id,
+                            step: key,
+                            source: job.sourceLanguage,
+                            target: job.targetLanguage,
+                            vendor: "",
+                            start: "",
+                            deadline: "",
+                            progress: metrics.body.progress[key],
+                            status: "",
+                            receivables: "",
+                            payable: "",
+                            margin: ""
+                        })
+                    } else {
+                        for(const task of project.tasks) {
+                            if(task.jobId === job.id) {
+                                task.progress = metrics.body.progress[task.step];
+                            }
+                        }
+                    }
+                }
             }
-            await this.$http.post('/xtm/savejobs', {id: project._id, jobs: project.jobs});
+            project.metrics = true;
+            await this.$http.post('/xtm/saveproject', project);
             this.$emit("refreshProjects");
             await this.storeProject(project);
             this.loadingToggle(false);
@@ -199,6 +240,9 @@ export default {
             return this.targetLanguages.map(item => {
                 return item.lang
             })
+        },
+        metricsButton() {
+            return this.currentProject.metrics ? "Refresh metrics" : "Get metrics"
         }
     },
     components: {
@@ -209,6 +253,7 @@ export default {
         LabelValue,
         Project,
         ProjectShortDetails,
+        Jobs,
         Tasks
     },
     mounted() {
@@ -269,6 +314,15 @@ export default {
         display: flex;
         height: 78px;
         align-items: flex-end;
+    }
+    &__data-type {
+        position: relative;
+        margin-bottom: 15px;
+        height: 28px;
+        border-top: 0.5px solid #68573E;
+        padding-top: 15px;
+        display: flex;
+        justify-content: flex-end;
     }
 }
 </style>

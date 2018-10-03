@@ -3,7 +3,7 @@
     .jobs__table
         DataTable(
             :fields="fields"
-            :tableData="allTasks"
+            :tableData="allJobs"
             @onRowClicked="onRowClicked"
         )
             template(slot="check" slot-scope="{ field }")
@@ -31,9 +31,9 @@
             template(slot="check" slot-scope="{ row }")
                 input.jobs__job-data(type="checkbox") 
             template(slot="step" slot-scope="{ row }")
-                span.jobs__job-data {{ row.step }}
+                span.jobs__job-data {{ step }}
             template(slot="language" slot-scope="{ row }")
-                span.jobs__job-data {{ row.source }} >> {{ row.target }}
+                span.jobs__job-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="vendor" slot-scope="{ row }")
                 Vendorselect(
                     :vendors="vendors"
@@ -41,20 +41,21 @@
                     :filteredVendors="vendorsIds"
                     @changeVend="setVendor"
                 )
+                //- span.jobs__job-data {{ row.vendor }}
             template(slot="start" slot-scope="{ row }")
-                span.jobs__job-data {{ row.start }}
+                span.jobs__job-data {{ row.status }}
             template(slot="deadline" slot-scope="{ row }")
-                span.jobs__job-data {{ row.deadline }}
+                span.jobs__job-data {{ row.wordcount }}
             template(slot="progress" slot-scope="{ row }")
-                span.jobs__job-data {{ progress(row.progress) }}
+                span.jobs__job-data {{ row.cost }}
             template(slot="status" slot-scope="{ row }")
                 span.jobs__job-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
-                span.jobs__job-data {{ row.receivables }}
+                span.jobs__job-data {{ row.wordcount }}
             template(slot="payable" slot-scope="{ row }")
-                span.jobs__job-data {{ row.payable }}
+                span.jobs__job-data {{ row.cost }}
             template(slot="margin" slot-scope="{ row }")
-                span.jobs__job-data {{ row.margin }}
+                span.jobs__job-data {{ row.cost }}
 </template>
 
 <script>
@@ -63,7 +64,7 @@ import Vendorselect from "./Vendorselect";
 
 export default {
     props: {
-        allTasks: {
+        allJobs: {
             type: Array
         },
         vendors: {
@@ -90,16 +91,13 @@ export default {
     },
     methods: {
         onRowClicked({index}) {
-            this.$emit("clickOnTask")
+            this.$emit("clickOnJob")
         },
         setVendor({vendor}) {
             const position = this.vendorsIds.indexOf(vendor._id);
             if(position != -1) {
 
             }
-        },
-        progress(prog) {
-            return (prog.wordsDone/prog.wordsTotal)*100;
         }
     },
     computed: {

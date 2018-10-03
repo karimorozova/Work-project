@@ -14,7 +14,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     tasksInfo.targets = JSON.parse(tasksInfo.targets);
     const sourceFiles = req.files["sourceFiles"];
     const refFiles = req.files["refFiles"];
-    const translationFile = sourceFiles ? moveFile(sourceFiles[0], `./dist/reqfiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename}`) : "";
+    const translationFile = sourceFiles ? moveFile(sourceFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename}`) : "";
     let template = tasksInfo.template ? tasksInfo.template : '247336FD';
     let workflow = tasksInfo.workflow ? tasksInfo.workflow : 2890;
     let customerId = tasksInfo.customerId ? +tasksInfo.customerId : 23;
@@ -70,6 +70,7 @@ router.get('/project-metrics', async (req, res) => {
         const progress = {};
         for(const key in metrics.metricsProgress) {
             progress[key] = {
+                wordsTotal: metrics.metricsProgress[key].totalWordCount,
                 wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
                 wordsDone: metrics.metricsProgress[key].wordsDone,
                 wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,
@@ -177,23 +178,21 @@ router.get('/xtm-clientinfo', async (req, res) => {
 })
 
 router.post('/saveproject', async (req, res) => {
-    let project = req.body;
-    let projectId = req.body.projectId;
-    Projects.update({"_id": project._id}, project)
-    .then(result => {
-        res.send(result)
-    })
-    .catch(err => {
-        console.log(err)
-        res.send('Something wrong...')
-    })
+    const project = { ...req.body };
+    try {
+        const savedProject = await Projects.updateOne({"_id": project._id}, project);
+        res.send('Project saved!');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Something wrong with project saving... ' + err);
+    }
 })
 
 router.post('/savejobs', async (req, res) => {
     const jobs = req.body.jobs;
     const projectId = req.body.id;
     try {
-        await Projects.updateOne({"_id": projectId}, {$set: {"jobs": jobs}});
+        await Projects.updateOne({"_id": projectId}, {$set: {"jobs": jobs, metrics: true}});
         res.send("Jobs saved")
     }
     catch(err) {

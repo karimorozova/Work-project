@@ -32,14 +32,18 @@ const ProjectsSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
+  tasks: {
+    type: Array,
+    default: []
+  },
   totalCost: {
     type: String,
     default: '',
     trim: true
   },
   metrics: {
-    type: Object,
-    default: {}
+    type: Boolean,
+    default: false
   },
   customer: {
     type: String,
