@@ -44,51 +44,40 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     }
 })
 
-router.get('/project-metrics', async (req, res) => {
-    let project = await Projects.findOne({"_id": req.query.projectId});
-    let updatedProject = {};
-    try {
-        for(let i = 0; i < project.jobs.length; i++) {
-            const id = project.jobs[i].projectId;
-            unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${id}/metrics`)
-            .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
-            'Content-Type': 'application/json'})
-            .end(async (response) => {
-                const metrics = response.body[0].jobsMetrics[0];
-                const jobMetrics = {
-                    iceMatch: metrics.coreMetrics.iceMatchWords,
-                    fuzzyMatch75: metrics.coreMetrics.lowFuzzyMatchWords,
-                    fuzzyMatch85: metrics.coreMetrics.mediumFuzzyMatchWords,
-                    fuzzyMatch95: metrics.coreMetrics.highFuzzyMatchWords,
-                    repeat: metrics.coreMetrics.repeatsWords,
-                    leveragedMatch: metrics.coreMetrics.leveragedWords,
-                    fuzzyRepeats75: metrics.coreMetrics.lowFuzzyRepeatsWords,
-                    fuzzyRepeats85: metrics.coreMetrics.mediumFuzzyRepeatsWords,
-                    fuzzyRepeats95: metrics.coreMetrics.highFuzzyRepeatsWords,
-                    nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
-                    totalWords: metrics.coreMetrics.totalWords,
-                }     
-                const progress = {};
-                for(const key in metrics.metricsProgress) {
-                    progress[key] = {
-                        wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
-                        wordsDone: metrics.metricsProgress[key].wordsDone,
-                        wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,
-                        wordsToBeCorrected: metrics.metricsProgress[key].wordsToBeCorrected,
-                    }
-                }
-                project.jobs[i].metrics = jobMetrics;
-                project.jobs[i].progress = progress;
-                project.jobs[i].wordcount = jobMetrics.totalWords;
-                await Projects.updateOne({"_id": req.query.projectId}, {$set: {jobs: project.jobs}});
-            })
-            updatedProject = await Projects.findOne({"_id": req.query.projectId});
+router.get('/project-metrics', async (req, res) => {      
+    unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${req.query.projectId}/metrics`)
+    .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    'Content-Type': 'application/json'})
+    .end(response => {
+        if(response.error) {
+            console.log(response.error);
+            res.status(500).send("Error on getting metrics " + response.error)
         }
-        res.send(updatedProject);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting metrics " + err)
-    }
+        const metrics = response.body[0].jobsMetrics[0];
+        const jobMetrics = {
+            iceMatch: metrics.coreMetrics.iceMatchWords,
+            fuzzyMatch75: metrics.coreMetrics.lowFuzzyMatchWords,
+            fuzzyMatch85: metrics.coreMetrics.mediumFuzzyMatchWords,
+            fuzzyMatch95: metrics.coreMetrics.highFuzzyMatchWords,
+            repeat: metrics.coreMetrics.repeatsWords,
+            leveragedMatch: metrics.coreMetrics.leveragedWords,
+            fuzzyRepeats75: metrics.coreMetrics.lowFuzzyRepeatsWords,
+            fuzzyRepeats85: metrics.coreMetrics.mediumFuzzyRepeatsWords,
+            fuzzyRepeats95: metrics.coreMetrics.highFuzzyRepeatsWords,
+            nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
+            totalWords: metrics.coreMetrics.totalWords,
+        }     
+        const progress = {};
+        for(const key in metrics.metricsProgress) {
+            progress[key] = {
+                wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
+                wordsDone: metrics.metricsProgress[key].wordsDone,
+                wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,
+                wordsToBeCorrected: metrics.metricsProgress[key].wordsToBeCorrected,
+            }
+        }
+        res.send({metrics: jobMetrics, progress: progress});
+    })
 })
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
@@ -201,17 +190,16 @@ router.post('/saveproject', async (req, res) => {
 })
 
 router.post('/savejobs', async (req, res) => {
-    let jobs = req.body.jobs;
-    let projectId = req.body.id;
-    let metrics = req.body.metrics;
-    Projects.update({"_id": projectId}, {$set: {"jobs": jobs, "metrics": metrics}})
-    .then(result => {
-        res.send(result)
-    })
-    .catch(err => {
+    const jobs = req.body.jobs;
+    const projectId = req.body.id;
+    try {
+        await Projects.updateOne({"_id": projectId}, {$set: {"jobs": jobs}});
+        res.send("Jobs saved")
+    }
+    catch(err) {
         console.log(err)
-        res.send('Something wrong...')
-    })
+        res.status(500).send('Error on Jobs saving ' + err)
+    }
 })
 
 router.get('/newproject', async (req, res) => {
@@ -258,7 +246,7 @@ router.get('/estimates', async (req, res) => {
 })
 
 router.get('/jobs-metrics', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/14655/metrics/jobs?jobIds=14661')
+    unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${req.query.projectId}/metrics/jobs?jobIds=${req.query.jobId}`)
         .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
         'Content-Type': 'application/json'})
         .end( (response) => {

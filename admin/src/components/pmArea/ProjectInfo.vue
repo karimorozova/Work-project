@@ -51,6 +51,7 @@
         Tasks(
             :allTasks="currentProject.jobs"
             :vendors="allVendors"
+            @getMetrics="getMetrics"
         )
 </template>
 
@@ -143,10 +144,24 @@ export default {
                 }
             }
             this.loadingToggle(true);
-            const tasks = await this.$http.post('/xtm/add-tasks', form);
-            const updatedProject = await this.$http.get(`/xtm/project-metrics?projectId=${this.currentProject._id}`)
+            const updatedProject = await this.$http.post('/xtm/add-tasks', form);
             await this.storeProject(updatedProject.body);
             this.$emit("tasksAdded", {id: this.currentProject._id});
+            this.loadingToggle(false);
+        },
+        async getMetrics() {
+            this.loadingToggle(true);
+            let project = JSON.stringify(this.currentProject);
+            project = JSON.parse(project);
+            for(let task of project.jobs) {
+                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
+                task.metrics = metrics.body.metrics;
+                task.progress = metrics.body.progress;
+                task.wordcount = metrics.body.metrics.totalWords;
+            }
+            await this.$http.post('/xtm/savejobs', {id: project._id, jobs: project.jobs});
+            this.$emit("refreshProjects");
+            await this.storeProject(project);
             this.loadingToggle(false);
         },
         async getVendors() {

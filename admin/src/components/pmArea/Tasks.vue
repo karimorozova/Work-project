@@ -31,7 +31,7 @@
             template(slot="check" slot-scope="{ row }")
                 input.jobs__job-data(type="checkbox") 
             template(slot="step" slot-scope="{ row }")
-                span.jobs__job-data {{ row.status }}
+                span.jobs__job-data {{ step }}
             template(slot="language" slot-scope="{ row }")
                 span.jobs__job-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="vendor" slot-scope="{ row }")
