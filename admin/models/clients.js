@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const ClientSchema = new mongoose.Schema({
     name: { 
@@ -80,10 +81,9 @@ const ClientSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    industry: {
-        type: Array,
-        default: []
-    },
+    industry: [
+        {type: Schema.Types.ObjectId, ref: 'Industries',}
+    ],
     contacts: {
         type: Array,
         default: []

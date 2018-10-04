@@ -80,8 +80,8 @@ function clients() {
 }
 
 async function clientLangs() {
-  let clients = await Clients.find();
-  let service = await Services.find({title: "Translation"});
+  let clients = await Clients.find().populate('industry');
+  let service = await Services.findOne({title: "Translation"}).populate('languageCombinations.source').populate('languageCombinations.target');
   let randomRates = [0.1, 0.12, 0.15];
   let combs = service[0].languageCombinations;
 
@@ -96,12 +96,12 @@ async function clientLangs() {
           client.languageCombinations.push({
             source: combs[i].source,
             target: combs[i].target,
-            service: service[0],
+            service: service,
             industry: indus,
             active: true
           })
         }
-      await Clients.update({name: client.name}, client)
+      await Clients.updateOne({name: client.name}, client)
     } 
   }
 }
@@ -134,7 +134,7 @@ function vendors() {
 
 async function vendorLangs() {
   let vendors = await Vendors.find();
-  let service = await Services.find({title: "Translation"});
+  let service = await Services.find({title: "Translation"}).populate('languageCombinations.source').populate('languageCombinations.target');
   let combs = service[0].languageCombinations;
   for(let vendor of vendors) {
     let random = Math.round(Math.random()*50);
@@ -217,7 +217,7 @@ function projects() {
       if (!projects.length) {
         for (const proj of projectsDefault) {
           var languages = await Languages.find({});
-          var customer = await Clients.find({});
+          var customer = await Clients.find({}).populate('industry');
           proj.customer = customer[0]._id;
           for(let lang of languages) {
             var language = JSON.stringify(lang);
@@ -314,7 +314,7 @@ function services() {
 
 async function serviceMonoLangs() {
   let languages = await Languages.find({});
-  let services = await Services.find({"languageForm": "Mono"});
+  let services = await Services.find({"languageForm": "Mono"}).populate('languageCombinations.source').populate('languageCombinations.target');
   let industries = await Industries.find({});
   let rate = 0.12;
   for(let serv of services) {
@@ -345,7 +345,7 @@ async function serviceMonoLangs() {
 
 async function serviceDuoLangs() {
   let languages = await Languages.find({});
-  let services = await Services.find({"languageForm": "Duo"});
+  let services = await Services.find({"languageForm": "Duo"}).populate('languageCombinations.source').populate('languageCombinations.target');
   let industries = await Industries.find({});
   let rate = 0.1;
   let englishLang = languages.find(item => {

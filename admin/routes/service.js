@@ -1,20 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-const unirest = require('unirest');
-const querystring = require('querystring');
-const fs = require('fs');
 const mv = require('mv');
-const { sendMail } = require('../utils/mailhandler');
-const { sendMailClient } = require('../utils/mailhandlerclient');
-const { sendMailPortal } = require('../utils/mailhandlerportal')
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
-const { quote, project } = require('../models/xtrf');
-const reqq = require('request');
-const fileType = require('file-type');
-const http = require('http');
-const writeFile = require('write');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -92,7 +79,7 @@ router.post('/jobcost', async (req, res) => {
   var jobs = req.body.jobs;
   var service = project.service;
 
-  let result = await Services.find({'title': service});
+  let result = await Services.find({'title': service}).populate('languageCombinations.source').populate('languageCombinations.target');
   var rates = result[0].languageCombinations;
       for(let i = 0; i < jobs.length; i++) {
         for(let j = 0; j < rates.length; j++) {
@@ -121,7 +108,7 @@ router.post('/jobcost', async (req, res) => {
 router.post('/rates-mono', async (req, res) => {
   var rate = await req.body;
   let industries = await Industries.find();
-  let service = await Services.find({'title': rate.title});
+  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
 
   for(let indus of rate.industry) {
     for(let industry of industries) {
@@ -180,7 +167,7 @@ router.post('/delete-monorate', async (req, res) => {
     return true;
   }
   var rates = [];
-  let service = await Services.find({'title': rate.title});
+  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
   rates = service[0].languageCombinations;
   var findRate = "";
 
@@ -212,7 +199,7 @@ router.post('/rates', async (req, res) => {
   var rate = await req.body;
   var rates = [];
   let industries = await Industries.find();
-  let service = await Services.find({'title': rate.title});
+  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
 
   for(let indus of rate.industry) {
     for(let industry of industries) {
@@ -268,7 +255,7 @@ router.post('/several-langs', async (req, res) => {
   let langCombs = req.body;
   let industries = await Industries.find();
   industries = JSON.stringify(industries);
-  let services = await Services.find({languageForm: "Duo"});
+  let services = await Services.find({languageForm: "Duo"}).populate('languageCombinations.source').populate('languageCombinations.target');
   for(let comb of langCombs) {
     let service = services.find(item => {
       return item.title == comb.service.title
@@ -319,7 +306,7 @@ router.post('/delete-duorate', async (req, res) => {
     return true;
   }
   var rates = [];
-  let service = await Services.find({'title': rate.title});
+  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
   rates = service[0].languageCombinations;
   var findRate = "";
 

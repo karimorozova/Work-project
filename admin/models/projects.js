@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const ProjectsSchema = new mongoose.Schema({
   projectId: {
@@ -24,9 +25,7 @@ const ProjectsSchema = new mongoose.Schema({
     default: Date.now
   },
   industry: {
-    type: String,
-    default: '',
-    trim: true
+    type: Schema.Types.ObjectId, ref: 'Industries',
   },
   jobs: {
     type: Array,
@@ -46,9 +45,7 @@ const ProjectsSchema = new mongoose.Schema({
     default: false
   },
   customer: {
-    type: String,
-    default: '',
-    trim: true
+    type: Schema.Types.ObjectId, ref: 'Clients',
   },
   projectManager: {
     type: String,
@@ -56,9 +53,7 @@ const ProjectsSchema = new mongoose.Schema({
     trim: true
   },
   service: {
-    type: String,
-    default: '',
-    trim: true
+    type: Schema.Types.ObjectId, ref: 'Services',
   },
   status: {
     type: String,

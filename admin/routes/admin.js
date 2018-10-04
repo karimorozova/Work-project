@@ -40,58 +40,48 @@ router.get('/logout', (req, res, next) => {
     }
 });
 
-router.get('/timezones', (req, res) => {
-    Timezones.find()
-        .then(timezones => {
-            res.send(timezones)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+router.get('/all-clients', requiresLogin, async (req, res, next) => {
+    try {
+        const clients = await Clients.find().populate('industry');
+        res.send(clients);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on gettin Clients from DB " + err);
+    }
 })
 
-router.get('/all-clients', requiresLogin, (req, res, next) => {
-    Clients.find()
-    .then(clients => {
-        res.send(clients)
-    })
-    .catch(err => {
-        console.log(err)
-    })
-})
-
-router.get('/all-vendors', requiresLogin, (req, res, next) => {
-    Vendors.find()
-    .then(vendors => {
+router.get('/all-vendors', requiresLogin, async (req, res, next) => {
+    try {
+        const vendors = await Vendors.find();
         res.send(vendors)
-    })
-    .catch(err => {
-        console.log(err)
-    })
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on gettin Vendors from DB " + err);
+    }
 })
 
-router.get('/users', requiresLogin, (req, res, next) => {
-    User.find()
-    .then(users => {
+router.get('/users', requiresLogin, async (req, res, next) => {
+    try {
+        const users = await User.find();
         let names = [];
         for(let user of users) {
             names.push(user.username)
         }
         res.send(names)
-    })
-    .catch(err => {
-        console.log(err)
-    })
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on gettin Users from DB " + err);
+    }
 })
 
-router.get('/requests', requiresLogin, (req, res, next) => {
-    Requests.find()
-        .then(requests => {
-            res.send(requests)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+router.get('/requests', requiresLogin, async (req, res, next) => {
+    try {
+        const requests = await Requests.find();
+        res.send(requests)
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on gettin Requests from DB " + err);
+    }
 });
 
 router.get('/reps', requiresLogin, (req, res) => {
@@ -105,8 +95,13 @@ router.get('/reps', requiresLogin, (req, res) => {
 });
 
 router.get('/reports-update', requiresLogin, async (req, res) => {
-    const me = await updateReports();
-    res.redirect("/tasks-report");
+    try {
+        const me = await updateReports();
+        res.redirect("/tasks-report");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on updating Reports " + err);
+    }
 });
 
 router.post('/login', (req, res, next) => {
