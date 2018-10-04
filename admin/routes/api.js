@@ -353,10 +353,13 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
     let old = './dist' + languageIcon[0].icon;
     let date = new Date().getTime();
     if (flag) {
-      fs.unlinkSync(old, (err) => {
+      await fs.unlink(old, (err) => {
+        if(err) {
+          console.log("Error on file deleting " + err)
+        }
         console.log('old file removed');
       });
-      moveLangIcon(flag[0], date);
+      await moveLangIcon(flag[0], date);
       existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
     }
     var objForUpdate = {

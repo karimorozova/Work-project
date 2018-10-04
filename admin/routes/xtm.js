@@ -14,7 +14,10 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     tasksInfo.targets = JSON.parse(tasksInfo.targets);
     const sourceFiles = req.files["sourceFiles"];
     const refFiles = req.files["refFiles"];
-    const translationFile = sourceFiles ? moveFile(sourceFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename}`) : "";
+    let translationFile = "";
+    if(sourceFiles) {
+        translationFile = await moveFile(sourceFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename}`)
+    }
     let template = tasksInfo.template ? tasksInfo.template : '247336FD';
     let workflow = tasksInfo.workflow ? tasksInfo.workflow : 2890;
     let customerId = tasksInfo.customerId ? +tasksInfo.customerId : 23;
