@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const ServicesSchema = new mongoose.Schema({
     sortIndex: {
@@ -39,10 +39,22 @@ const ServicesSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    languageCombinations: {
-        type: Array,
-        default: []
-    },
+    languageCombinations: [{
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        active: {
+            type: Boolean,
+            default: true
+        },
+        industries: {
+            type: Array,
+            default: []
+        }
+    }],
     xtrf: {
         type: String,
         default: '',

@@ -249,32 +249,11 @@ router.get('/languages', async (req, res) => {
 
 router.get('/services', async (req, res) => {
   try {
-  let allLangs = await Languages.find();  
-  let services = await Services.find();
-
-  for(let serv of services) {
-    for(let combination of serv.languageCombinations) {
-      for(let lang of allLangs) {
-        if(serv.languageForm == 'Duo') {
-          if(combination.source._id === lang._id) {
-            combination.source.lang = lang.lang;
-            combination.source.icon = lang.icon;
-            combination.source.active = lang.active;
-          }
-        }
-        if(combination.target._id === lang._id) {
-          combination.target.lang = lang.lang;
-          combination.target.icon = lang.icon;
-          combination.target.active = lang.active;
-        }
-      }
-    }
-    await Services.update({title: serv.title}, serv)
-  }
+  const services = await Services.find().populate('languageCombinations.source').populate('languageCombinations.target');
     res.send(services);
   } catch(err) {
       console.log(err)
-      res.statusCode(500);
+      res.status(500);
       res.send('Something wrong with DB ' + err);
   }
 });
@@ -285,7 +264,7 @@ router.get('/industries', async (req, res) => {
     res.send(industries)
   } catch(err) {
     console.log(err);
-    res.statusCode(500);
+    res.status(500);
     res.send('Something wrong with DB ' + err);
   }
 });

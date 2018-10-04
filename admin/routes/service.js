@@ -350,7 +350,7 @@ router.post('/delete-duorate', async (req, res) => {
 
 router.get('/parsed-rates', async (req, res) => {
   try{
-    const service = await Services.find({"title": req.query.title, "languageForm": req.query.form});
+    const service = await Services.find({"title": req.query.title, "languageForm": req.query.form}).populate('languageCombinations.source').populate('languageCombinations.target');
     const rates = [];
     for(let i = 0; i < service[0].languageCombinations.length; i++) {
       for(let elem of service[0].languageCombinations[i].industries) {

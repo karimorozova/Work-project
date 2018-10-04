@@ -332,7 +332,7 @@ async function serviceMonoLangs() {
       for(let lang of languages) {
         if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
           serv.languageCombinations.push({
-            target: lang,
+            target: lang._id,
             active: true,
             industries: industries
           })
@@ -366,16 +366,16 @@ async function serviceDuoLangs() {
     for(let lang of languages) {
       if(serv.languages[0].target.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
         serv.languageCombinations.push({
-          source: englishLang,
-          target: lang,
+          source: englishLang._id,
+          target: lang._id,
           active: true,
           industries: industries
         })
       }
       if(serv.languages[0].source.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
         serv.languageCombinations.push({
-          source: lang,
-          target: englishLang,
+          source: lang._id,
+          target: englishLang._id,
           active: true,
           industries: industries
         })
