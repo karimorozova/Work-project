@@ -249,7 +249,10 @@ router.get('/languages', async (req, res) => {
 
 router.get('/services', async (req, res) => {
   try {
-  const services = await Services.find().populate('languageCombinations.source').populate('languageCombinations.target');
+  const services = await Services.find()
+        .populate('languageCombinations.source')
+        .populate('languageCombinations.target')
+        .populate('languageCombinations.industries.industry');
     res.send(services);
   } catch(err) {
       console.log(err)

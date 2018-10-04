@@ -50,10 +50,18 @@ const ServicesSchema = new mongoose.Schema({
             type: Boolean,
             default: true
         },
-        industries: {
-            type: Array,
-            default: []
-        }
+        industries: [{
+            industry: {
+                type: Schema.Types.ObjectId, ref: 'Industries',
+            },
+            rate: {
+                type: Number,
+                default: 0
+            },
+            package: {
+                type: Number
+            }
+        }]
     }],
     xtrf: {
         type: String,

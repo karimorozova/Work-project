@@ -81,9 +81,12 @@ function clients() {
 
 async function clientLangs() {
   let clients = await Clients.find().populate('industry');
-  let service = await Services.findOne({title: "Translation"}).populate('languageCombinations.source').populate('languageCombinations.target');
+  let service = await Services.findOne({title: "Translation"})
+          .populate('languageCombinations.source')
+          .populate('languageCombinations.target')
+          .populate('languageCombinations.industries.industry');
   let randomRates = [0.1, 0.12, 0.15];
-  let combs = service[0].languageCombinations;
+  let combs = service.languageCombinations;
 
   for(let client of clients) {
     if(!client.languageCombinations.length) {
@@ -314,7 +317,7 @@ function services() {
 
 async function serviceMonoLangs() {
   let languages = await Languages.find({});
-  let services = await Services.find({"languageForm": "Mono"}).populate('languageCombinations.source').populate('languageCombinations.target');
+  let services = await Services.find({"languageForm": "Mono"});
   let industries = await Industries.find({});
   let rate = 0.12;
   for(let serv of services) {
@@ -324,28 +327,27 @@ async function serviceMonoLangs() {
     if(serv.title == 'SEO Writing') {
       rate = 0.15
     }
-    for(let industry of industries) {
-      industry.rate = rate;
-      industry.package = 200;
-    }
+    const addIndustries = industries.map(item => {
+      return {industry: item._id, rate: rate, package: 200}
+    })
     if(!serv.languageCombinations.length) {
       for(let lang of languages) {
         if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
           serv.languageCombinations.push({
             target: lang._id,
             active: true,
-            industries: industries
+            industries: addIndustries
           })
         }
       }
-      await Services.update({"title": serv.title}, serv);
+      await Services.updateOne({"title": serv.title}, serv);
     }
   }
 }
 
 async function serviceDuoLangs() {
   let languages = await Languages.find({});
-  let services = await Services.find({"languageForm": "Duo"}).populate('languageCombinations.source').populate('languageCombinations.target');
+  let services = await Services.find({"languageForm": "Duo"});
   let industries = await Industries.find({});
   let rate = 0.1;
   let englishLang = languages.find(item => {
@@ -359,9 +361,9 @@ async function serviceDuoLangs() {
     if(serv.title == 'QA and Testing') {
       rate = 0.05
     }
-    for(let industry of industries) {
-      industry.rate = rate
-    }
+    const addIndustries = industries.map(item => {
+      return {industry: item._id, rate: rate}
+    })
     if(!serv.languageCombinations.length) {
     for(let lang of languages) {
       if(serv.languages[0].target.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
@@ -369,7 +371,7 @@ async function serviceDuoLangs() {
           source: englishLang._id,
           target: lang._id,
           active: true,
-          industries: industries
+          industries: addIndustries
         })
       }
       if(serv.languages[0].source.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
@@ -377,7 +379,7 @@ async function serviceDuoLangs() {
           source: lang._id,
           target: englishLang._id,
           active: true,
-          industries: industries
+          industries: addIndustries
         })
       }
     }

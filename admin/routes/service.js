@@ -337,24 +337,28 @@ router.post('/delete-duorate', async (req, res) => {
 
 router.get('/parsed-rates', async (req, res) => {
   try{
-    const service = await Services.find({"title": req.query.title, "languageForm": req.query.form}).populate('languageCombinations.source').populate('languageCombinations.target');
-    const rates = [];
-    for(let i = 0; i < service[0].languageCombinations.length; i++) {
-      for(let elem of service[0].languageCombinations[i].industries) {
+    let service = await Services.findOne({"title": req.query.title, "languageForm": req.query.form})
+          .populate('languageCombinations.source')
+          .populate('languageCombinations.target')
+          .populate('languageCombinations.industries.industry');
+    let rates = [];
+    for(let i = 0; i < service.languageCombinations.length; i++) {
+      for(let elem of service.languageCombinations[i].industries) {
         if(elem.rate > 0) {
+          elem.industry.rate = elem.rate;
           if(req.query.form === "Duo") {
             rates.push({
-              title: service[0].title,
-              sourceLanguage: service[0].languageCombinations[i].source,
-              targetLanguage: service[0].languageCombinations[i].target,
-              industry: [elem],
+              title: service.title,
+              sourceLanguage: service.languageCombinations[i].source,
+              targetLanguage: service.languageCombinations[i].target,
+              industry: [elem.industry],
               active: true
             })
           } else {
             rates.push({
-              title: service[0].title,
-              targetLanguage: service[0].languageCombinations[i].target,
-              industry: [elem],
+              title: service.title,
+              targetLanguage: service.languageCombinations[i].target,
+              industry: [elem.industry],
               active: true
             })
           }
