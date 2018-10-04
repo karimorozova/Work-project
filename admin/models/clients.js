@@ -77,12 +77,32 @@ const ClientSchema = new mongoose.Schema({
         default: '',
         trim : true 
     },
-    languageCombinations: {
-        type: Array,
-        default: []
-    },
+    languageCombinations: [{
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        service: {
+            type: Schema.Types.ObjectId, ref: 'Services'
+        },
+        industry: [{
+            industry: {
+                type: Schema.Types.ObjectId, ref: 'Industries',
+            },
+            rate: {
+                type: Number,
+                default: 0
+            },
+            active: {
+                type: Boolean,
+                default: true
+            }
+        }]
+    }],
     industry: [
-        {type: Schema.Types.ObjectId, ref: 'Industries',}
+        {type: Schema.Types.ObjectId, ref: 'Industries'}
     ],
     contacts: {
         type: Array,

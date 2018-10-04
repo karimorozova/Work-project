@@ -42,7 +42,12 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/all-clients', requiresLogin, async (req, res, next) => {
     try {
-        const clients = await Clients.find().populate('industry');
+        const clients = await Clients.find()
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         res.send(clients);
     } catch(err) {
         console.log(err);
@@ -52,7 +57,15 @@ router.get('/all-clients', requiresLogin, async (req, res, next) => {
 
 router.get('/all-vendors', requiresLogin, async (req, res, next) => {
     try {
-        const vendors = await Vendors.find();
+        const vendors = await Vendors.find()
+                .populate('industry')
+                .populate('native')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languagePairs.source')
+                .populate('languagePairs.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         res.send(vendors)
     } catch(err) {
         console.log(err);

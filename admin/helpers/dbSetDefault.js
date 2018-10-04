@@ -62,7 +62,7 @@ function clients() {
             for(let industry of industries) {
               for(let ind in client.industry) {
                 if(industry.name == client.industry[ind].name) {
-                  client.industry[ind] = industry;
+                  client.industry[ind] = industry._id;
                 }
               }
             }
@@ -83,25 +83,21 @@ async function clientLangs() {
   let clients = await Clients.find().populate('industry');
   let service = await Services.findOne({title: "Translation"})
           .populate('languageCombinations.source')
-          .populate('languageCombinations.target')
-          .populate('languageCombinations.industries.industry');
+          .populate('languageCombinations.target');
+
   let randomRates = [0.1, 0.12, 0.15];
   let combs = service.languageCombinations;
 
   for(let client of clients) {
     if(!client.languageCombinations.length) {
-      let industry = await Industries.find({name: client.industry[0].name});
-      industry = JSON.stringify(industry);
-      client.industry = JSON.parse(industry);
+      let industry = {industry: client.industry[0]._id, active: true};
         for(let i = 0; i < 5; i++) {
-          let indus =  JSON.parse(industry);
-          indus[0].rate = randomRates[Math.floor(Math.random()*3)];
+          industry.rate = randomRates[Math.floor(Math.random()*3)];
           client.languageCombinations.push({
-            source: combs[i].source,
-            target: combs[i].target,
-            service: service,
-            industry: indus,
-            active: true
+            source: combs[i].source._id,
+            target: combs[i].target._id,
+            service: service._id,
+            industry: industry,
           })
         }
       await Clients.updateOne({name: client.name}, client)
@@ -114,11 +110,13 @@ function vendors() {
   .then(async vendors => {
     if(!vendors.length) {
       for(let vendor of vendorsDefault) {
-        let industries = await Industries.find({});
+        const industries = await Industries.find({});
+        const language = await Languages.findOne({"lang": vendor.native});
+        vendor.native = language._id;
         for(let industry of industries) {
           for(let ind in vendor.industry) {
             if(industry.name == vendor.industry[ind].name) {
-              vendor.industry[ind] = industry;
+              vendor.industry[ind] = industry._id;
             }
           }
         }
@@ -136,24 +134,21 @@ function vendors() {
 }
 
 async function vendorLangs() {
-  let vendors = await Vendors.find();
-  let service = await Services.find({title: "Translation"}).populate('languageCombinations.source').populate('languageCombinations.target');
-  let combs = service[0].languageCombinations;
+  let vendors = await Vendors.find().populate('industry');
+  let service = await Services.findOne({title: "Translation"})
+        .populate('languageCombinations.source')
+        .populate('languageCombinations.target');
+  let combs = service.languageCombinations;
   for(let vendor of vendors) {
     let random = Math.round(Math.random()*50);
     if(!vendor.languageCombinations.length && !vendor._id) {
-      let industries = JSON.stringify(vendor.industry);
-      industries = JSON.parse(industries);
-      for(let industry of industries) {
-        industry.rate = 0.04;
-      };
+      let industries = {industry: vendor.industry[0]._id, rate: 0.04, active: true};
       for(let i = random; i < random + 5; i++) {
         vendor.languageCombinations.push({
-          source: combs[i].source,
-          target: combs[i].target,
-          service: service[0],
+          source: combs[i].source._id,
+          target: combs[i].target._id,
+          service: service._id,
           industry: industries,
-          active: true
         })
       }
       await Vendors.update({"_id": vendor._id}, vendor);
@@ -247,11 +242,6 @@ function projects() {
     .catch(err => {
       console.log(err)
     })
-}
-
-async function projectFill() {
-  let languages = await Languages.find({});
-
 }
 
 function users() {
@@ -414,7 +404,6 @@ async function checkCollections() {
   await serviceDuoLangs();
   await clientLangs();
   await vendorLangs();
-  await projectFill();
 }
 
 module.exports = checkCollections();

@@ -49,7 +49,12 @@ return oldFile.filename;
 router.get('/client', async (req, res) => {
     let id = req.query.id;
     try {
-        const client = await Clients.findOne({"_id": id}).populate('industry');
+        const client = await Clients.findOne({"_id": id})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         res.send(client);
     }  catch(err) {
             console.log(err);
@@ -59,7 +64,12 @@ router.get('/client', async (req, res) => {
 
 router.get('/clients-every', async (req,res) => {
     try {
-        const clients = await Clients.find({}).populate('industry');
+        const clients = await Clients.find({})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         res.send(clients);
     }  catch(err) {
             console.log(err);
@@ -70,7 +80,12 @@ router.get('/clients-every', async (req,res) => {
 router.post('/mailtoclient', async (req, res) => {
     const project = req.body;
     try {
-        const client = await Clients.findOne({"_id": project.customer}).populate('industry');
+        const client = await Clients.findOne({"_id": project.customer})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         await clientMail(project, client);
         console.log('email to client');
         res.send('An email to Cilent sent!')
@@ -112,8 +127,8 @@ router.get('/declinequote', async (req, res) => {
         } else {
             const projectId = req.query.project;
             const project = await Projects.findOne({"_id": projectId});
-            const client = await Clients.findOne({"_id": project[0].customer});
-            const user = await User.findOne({"username": client[0].projectManager});
+            const client = await Clients.findOne({"_id": project.customer});
+            const user = await User.findOne({"username": client.projectManager});
             pmMail(project, client, user);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
@@ -125,23 +140,71 @@ router.get('/declinequote', async (req, res) => {
     }
 })
 
+router.get('/get-rates', async (req, res) => {
+    const clientId = req.query.id;
+    const service = req.query.service;
+    const form = req.query.form;
+    try {
+        const client = await Clients.findOne({"_id": clientId})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
+        let rates = [];
+        for(let comb of client.languageCombinations) {
+            if(comb.service.title === service) {
+                for(let elem of comb.industry) {
+                    elem.industry.active = elem.active;
+                    elem.industry.rate = elem.rate;
+                    if(form === "Duo") {
+                        rates.push({
+                            service: comb.service,
+                            sourceLanguage: comb.source,
+                            targetLanguage: comb.target,
+                            industry: [elem.industry]
+                        })
+                    } else {
+                        elem.industry.package = elem.package;
+                        rates.push({
+                            service: comb.service,
+                            targetLanguage: comb.target,
+                            industry: [elem.industry]
+                        })
+                    }
+                    
+                }
+            }
+        }
+        res.send(rates);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on getting Client rates ' + err);
+    }
+})
+
 router.post('/client-rates', async (req, res) => {
     let rate = req.body;
     const id = rate.client;
     try {
-        let client = await Clients.findOne({"_id": id}).populate('industry');
+        let client = await Clients.findOne({"_id": id})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         for(let indus of rate.industry) {
-            for(let ind of client[0].industry) {
+            for(let ind of client.industry) {
                 if(ind.name == indus.name || indus.name == "All") {
                     ind.rate = indus.rate;
                 }
             }
         }
-        let industries = JSON.stringify(client[0].industry);
+        let industries = JSON.stringify(client.industry);
         industries = JSON.parse(industries);
         let exist = false;
-        if(client[0].languageCombinations.length) {
-            for(let comb of client[0].languageCombinations) {
+        if(client.languageCombinations.length) {
+            for(let comb of client.languageCombinations) {
             if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
                 comb.target.lang == rate.targetLanguage.lang) {
                     for(let ind of comb.industry) {
@@ -176,7 +239,12 @@ router.post('/several-langs', async (req, res) => {
     const clientId = req.body.client;
     let langCombs = JSON.parse(req.body.langs);
     try {
-        let client = await Clients.findOne({"_id": clientId}).populate('industry');
+        let client = await Clients.findOne({"_id": clientId})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         for(let comb of langCombs) {
             let langPairExist = false;
             for(let clientComb of client.languageCombinations) {
@@ -215,7 +283,12 @@ router.post('/delete-duorate', async (req, res) => {
     var rate = req.body;
     const id = rate.client;
     try {
-        let client = await Clients.findOne({"_id": id}).populate('industry');
+        let client = await Clients.findOne({"_id": id})
+                .populate('industry')
+                .populate('languageCombinations.source')
+                .populate('languageCombinations.target')
+                .populate('languageCombinations.service')
+                .populate('languageCombinations.industry.industry');
         let allZero = [];
         for(let i = 0; i < client.languageCombinations.length; i++) {
             if(client.languageCombinations[i].service.title == rate.service.title && client[0].languageCombinations[i].source.lang == rate.sourceLanguage.lang &&

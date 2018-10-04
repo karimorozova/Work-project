@@ -56,7 +56,7 @@
                                 span.langs-info(v-for="langs in vend.languageCombinations") {{ langs.source.symbol }} >> {{ langs.target.symbol }}, 
                             //- input.langs-info(type="text" :readonly="vend.icons[1].active" v-model="vend.languageCombination")
                         td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
-                            span(v-if="vend.icons[1].active") {{ vend.native }}
+                            span(v-if="vend.icons[1].active") {{ vend.native.lang }}
                             .innerComponent(v-if="!vend.icons[1].active")
                                 NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
                         td.dropOption(@click="vendorDetails(ind)")              

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const VendorSchema = new mongoose.Schema({
     photo: {
@@ -42,9 +43,7 @@ const VendorSchema = new mongoose.Schema({
         trim : true 
     },
     native: { 
-        type : String, 
-        default : '', 
-        trim : true 
+        type : Schema.Types.ObjectId, ref: 'Language' 
     },
     gender: {
         type: String,
@@ -81,18 +80,41 @@ const VendorSchema = new mongoose.Schema({
         default: '',
         trim : true 
     },
-    languageCombinations: {
-        type: Array,
-        default: []
-    },
-    industry: {
-        type: Array,
-        default: []
-    },
-    languagePairs: {
-        type: Array,
-        default: []
-    },
+    languageCombinations: [{
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        service: {
+            type: Schema.Types.ObjectId, ref: 'Services'
+        },
+        industry: [{
+            industry: {
+                type: Schema.Types.ObjectId, ref: 'Industries',
+            },
+            rate: {
+                type: Number,
+                default: 0
+            },
+            active: {
+                type: Boolean,
+                default: true
+            }
+        }]
+    }],
+    industry: [
+        {type: Schema.Types.ObjectId, ref: 'Industries'}
+    ],
+    languagePairs: [{
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        } ,
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        }
+    }],
     position: {
         type: Array,
         default: []

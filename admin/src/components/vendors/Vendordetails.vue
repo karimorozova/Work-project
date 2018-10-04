@@ -35,7 +35,7 @@
                         TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="chosenZone")
                     .block-item
                         label Native Language:
-                        NativeLanguageSelect(:selectedLang="[vendor.native]" @chosenLang="changeLang")
+                        NativeLanguageSelect(:selectedLang="[vendor.native.lang]" @chosenLang="changeLang")
                     .block-item
                         label Gender:
                         .dropSelect(v-click-outside="outGenders")

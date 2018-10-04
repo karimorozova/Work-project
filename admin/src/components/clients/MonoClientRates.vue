@@ -34,7 +34,7 @@
               .innerComponent(v-if="!info.icons[1].active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
             td.iconsField
@@ -49,6 +49,7 @@
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSingleSelect from "../ServiceSingleSelect";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
@@ -72,7 +73,6 @@ export default {
         { title: "" }
       ],
       fullInfo: [],
-      services: [],
       changedRate: '',
       currentActive: ''
     }
@@ -239,64 +239,36 @@ export default {
         this.handleScroll();
       },100);
     },
-    getServices() {
-      this.$http.get("api/services")
-      .then(res => {
-        this.services = res.data.filter(item => {
-          if(item.languageForm == "Mono") {
-            return item;
-          }
-        });
-        this.services.forEach(item => {
-          if(item.title == this.serviceSelect.title) {
-            item.crud = true
-          } else {
-            item.crud = false
-          }
-        })
-      })
-      .catch(err => console.log(err))
-    },
-    getLanguages() {
-      this.$http.get('api/languages')
-      .then(response => {
-        let sortedArray = response.body;
-        sortedArray.sort( (a,b) => {
-          if(a.lang < b.lang) return -1;
-          if(a.lang > b.lang) return 1;
-        });
-      this.languages = sortedArray;
-        for(let i = 0; i < sortedArray.length; i++) {
-          if(sortedArray[i].lang == 'English') {
-            this.sourceSelect = sortedArray[i];
-          }
-        }
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
-    },
-    clientRates() {
+    async clientRates() {
+      this.loadingToggle(true);
       this.fullInfo = [];
-      for(let comb of this.client.languageCombinations) {
-        let industry = JSON.stringify(this.client.industry);
-        industry = JSON.parse(industry);
-        industry.package = comb.package;
-        if(comb.service == this.serviceSelect.title) {
-          this.fullInfo.push({
-            targetLanguage: comb.target,
-            industry: [industry],
-            active: comb.active,
-            icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
-                {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-                {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-              ]
-          })
-        }
-      }
-    }
+      const rates = await this.$http.get(`/clientsapi/get-rates?form=Mono&service=${this.serviceSelect.title}&id=${this.client._id}`);
+      this.fullInfo = rates.body;
+      this.fullInfo.forEach(item => {
+        item.icons = [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
+            {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+            {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+          ]
+      });
+      this.loadingToggle(false);
+    },
+    ...mapActions({
+      loadingToggle: "loadingToggle"
+    })
   },
   computed: {
+    ...mapGetters({
+      vuexServices: "getVuexServices"
+    }),
+    services() {
+      let result = this.vuexServices.filter(item => {
+        return item.languageForm === "Mono"
+      }).map(item => {
+        item.crud = this.serviceSelect.title === item.title;
+        return item;
+      });
+      return result;
+    },
     filterIndustry() {
       let result = [];
       if(this.industryFilter.length) {
@@ -344,7 +316,6 @@ export default {
     ServiceSingleSelect
   },
   mounted() {
-    this.getServices();
     this.clientRates();
   }
 };
