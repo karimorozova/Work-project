@@ -9,7 +9,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceMonoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")           
+      ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Mono" @chosenServ="chosenServ")           
   .tableData
     table.duoFinance(:style="{width: tableWidth}")
       thead
@@ -32,7 +32,7 @@
               .innerComponent(v-if="!info.icons[1].active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="info.active" v-model="info.active" :disabled="info.icons[1].active")
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
             td(:class="{addShadow: !info.icons[1].active}") 
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
             td.iconsField
@@ -66,8 +66,9 @@
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceMonoSelect from "../ServiceMonoSelect";
+import ServiceSingleSelect from "../ServiceSingleSelect";
 import { mapGetters, mapActions } from "vuex";
+import { loadingToggle } from '../../vuex/actions';
 
 export default {
   props: {
@@ -162,9 +163,12 @@ export default {
       }
     },
     chosenServ(data) {
-      this.serviceSelect = data;
-      this.fullInfo = [];
-      this.combinations();
+      if(this.serviceSelect.title != data.title) {
+        this.loadingToggle(true);
+        this.serviceSelect = data;
+        this.fullInfo = [];
+        this.combinations();
+      }
     },
     chosenTarget(data) {
       if(this.targetSelect[0] == 'All') {
@@ -375,7 +379,7 @@ export default {
   components: {
     LanguagesSelect,
     IndustrySelect,
-    ServiceMonoSelect
+    ServiceSingleSelect
   },
   mounted() {
    this.combinations();

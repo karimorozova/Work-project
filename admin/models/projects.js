@@ -45,15 +45,13 @@ const ProjectsSchema = new mongoose.Schema({
     default: false
   },
   customer: {
-    type: Schema.Types.ObjectId, ref: 'Clients',
+    type: Schema.Types.ObjectId, ref: 'Clients'
   },
   projectManager: {
-    type: String,
-    default: '',
-    trim: true
+    type: Schema.Types.ObjectId, ref: 'User'
   },
   service: {
-    type: Schema.Types.ObjectId, ref: 'Services',
+    type: Schema.Types.ObjectId, ref: 'Services'
   },
   status: {
     type: String,

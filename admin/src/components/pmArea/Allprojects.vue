@@ -162,7 +162,7 @@ export default {
 
 .all-projects {
     margin: 20px;
-    width: 900px;
+    width: 1205px;
     &__title {
         font-size: 20px;
         margin-bottom: 20px;

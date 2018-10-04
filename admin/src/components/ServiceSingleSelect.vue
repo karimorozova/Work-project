@@ -5,7 +5,7 @@
             .arrowButton(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
-            span.drop__item(v-for="(service, index) in services" @click="changeServ(index)") {{ service.title }}
+            span.drop__item(v-for="(service, index) in filteredServices" @click="changeServ(index)") {{ service.title }}
 </template>
 
 <script>
@@ -16,6 +16,9 @@ export default {
     props: {
         selectedServ: {
             type: Object
+        },
+        langForm: {
+            type: String
         }
     },
     data() {
@@ -29,40 +32,41 @@ export default {
         showServs() {
             this.droppedServ = !this.droppedServ;
         },
-        getServices() {
-            this.services = this.vuexServices;
-            this.services.sort( (a,b) => {
-                if(a.title < b.title) return -1;
-                if(a.title > b.title) return 1;
-            });
-            this.services = this.services.filter(item => {
-                if(item.languageForm == 'Duo') {
-                    if(item.title == 'Translation' ||
-                        item.title == 'Proofing' || 
-                        item.title == 'QA and Testing') {
-                            return item
-                    }
-                }
-                
-            })
-        },
         outClick() {
             this.droppedServ = false;
         },
         changeServ(index) {
-            this.$emit("chosenServ", this.services[index])
+            this.$emit("chosenServ", this.filteredServices[index])
+            this.droppedServ = false;
         }
     },
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices"
-        }) 
+        }),
+        filteredServices() {
+            let result = this.vuexServices.sort((a,b) => {
+                if(a.title < b.title) return -1;
+                if(a.title > b.title) return 1;
+            });
+            if(this.langForm) {
+                result = this.vuexServices.filter(item => {
+                    if(this.langForm === 'Duo') {
+                        return item.title === 'Translation' ||
+                            item.title === 'Proofing' || 
+                            item.title === 'QA and Testing'
+                    } else {
+                        return item.languageForm === this.langForm
+                    }
+                })
+            }
+            return result;
+        },
     },  
     directives: {
         ClickOutside
     },
     mounted () {
-        this.getServices()
     }
 }
 </script>

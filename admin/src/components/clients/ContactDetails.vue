@@ -143,7 +143,7 @@ export default {
             })
         },
         getTimezones() {
-            this.$http.get('/timezones')
+            this.$http.get('/api/timezones')
             .then(res => {
                 this.timezones = res.body;
             })

@@ -46,10 +46,6 @@ const ServicesSchema = new mongoose.Schema({
         target: {
             type: Schema.Types.ObjectId, ref: 'Language'
         },
-        active: {
-            type: Boolean,
-            default: true
-        },
         industries: [{
             industry: {
                 type: Schema.Types.ObjectId, ref: 'Industries',
@@ -60,6 +56,10 @@ const ServicesSchema = new mongoose.Schema({
             },
             package: {
                 type: Number
+            },
+            active: {
+                type: Boolean,
+                default: true
             }
         }]
     }],

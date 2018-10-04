@@ -328,14 +328,13 @@ async function serviceMonoLangs() {
       rate = 0.15
     }
     const addIndustries = industries.map(item => {
-      return {industry: item._id, rate: rate, package: 200}
+      return {industry: item._id, rate: rate, package: 200, active: true}
     })
     if(!serv.languageCombinations.length) {
       for(let lang of languages) {
         if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
           serv.languageCombinations.push({
             target: lang._id,
-            active: true,
             industries: addIndustries
           })
         }
@@ -362,7 +361,7 @@ async function serviceDuoLangs() {
       rate = 0.05
     }
     const addIndustries = industries.map(item => {
-      return {industry: item._id, rate: rate}
+      return {industry: item._id, rate: rate, active: true}
     })
     if(!serv.languageCombinations.length) {
     for(let lang of languages) {
@@ -370,7 +369,6 @@ async function serviceDuoLangs() {
         serv.languageCombinations.push({
           source: englishLang._id,
           target: lang._id,
-          active: true,
           industries: addIndustries
         })
       }
@@ -378,7 +376,6 @@ async function serviceDuoLangs() {
         serv.languageCombinations.push({
           source: lang._id,
           target: englishLang._id,
-          active: true,
           industries: addIndustries
         })
       }

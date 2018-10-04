@@ -346,20 +346,19 @@ router.get('/parsed-rates', async (req, res) => {
       for(let elem of service.languageCombinations[i].industries) {
         if(elem.rate > 0) {
           elem.industry.rate = elem.rate;
+          elem.industry.active = elem.active;
           if(req.query.form === "Duo") {
             rates.push({
               title: service.title,
               sourceLanguage: service.languageCombinations[i].source,
               targetLanguage: service.languageCombinations[i].target,
               industry: [elem.industry],
-              active: true
             })
           } else {
             rates.push({
               title: service.title,
               targetLanguage: service.languageCombinations[i].target,
               industry: [elem.industry],
-              active: true
             })
           }
         }

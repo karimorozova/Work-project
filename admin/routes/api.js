@@ -213,21 +213,11 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
 router.get('/allprojects', async (req, res) => {
   try {
-    const projects = await Projects.find({});
-    for(let project of projects) {
-      if(project.projectManager) {
-        project.projectManager = await User.findOne({"_id": project.projectManager}, {firstName: 1, lastName: 1});
-      }
-      if(project.customer) {
-        project.customer = await Clients.findOne({"_id": project.customer}, {name: 1});
-      }
-      if(project.service) {
-        project.service = await Services.findOne({"_id": project.service}, {title: 1}); 
-      };
-      if(project.industry) {
-        project.industry = await Industries.findOne({"_id": project.industry}, {name: 1, icon: 1});
-      }
-    }
+    const projects = await Projects.find({})
+        .populate('customer')
+        .populate('industry')
+        .populate('service')
+        .populate('projectManager', ['firstName', 'lastName']);
     res.send(projects)
   } catch(err) {
       console.log(err);

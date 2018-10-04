@@ -12,7 +12,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
     .filters__item.serviceMenu
       label Service
-      ServiceDuoSelect(:selectedServ="serviceSelect" @chosenServ="chosenServ")
+      ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="chosenServ")
   .addButton
     input(type="button" @click="addSevLangs" value="Add several languages")           
   .tableData
@@ -75,7 +75,7 @@
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceDuoSelect from "../ServiceDuoSelect";
+import ServiceSingleSelect from "../ServiceSingleSelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -173,10 +173,12 @@ export default {
       }
     },
     chosenServ(data) {
-      this.serviceSelect = data;
-      this.loadingToggle(true);
-      this.fullInfo = [];
-      this.combinations();
+      if(this.serviceSelect.title != data.title) {
+        this.serviceSelect = data;
+        this.loadingToggle(true);
+        this.fullInfo = [];
+        this.combinations();
+      }
     },
     chosenSource(data) {
       if(this.sourceSelect[0] == 'All') {
@@ -403,7 +405,7 @@ export default {
   components: {
     LanguagesSelect,
     IndustrySelect,
-    ServiceDuoSelect,
+    ServiceSingleSelect,
   },
   mounted() {
     this.combinations();

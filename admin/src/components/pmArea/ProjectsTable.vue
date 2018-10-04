@@ -5,34 +5,55 @@
         :tableData="allProjects"
         @onRowClicked="onRowClicked"
     )
-        template(slot="Request On" slot-scope="{ field }") 
+        template(slot="ID" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-                img.projects-table__icon(src="../../assets/images/white-arrow.png") 
-        template(slot="Project ID" slot-scope="{ field }")
+        template(slot="Client Name" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
         template(slot="Project Name" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
+        template(slot="Languages" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
         template(slot="Status" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
+        template(slot="Receivables" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
+        template(slot="Payables" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
+        template(slot="ROI" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
+        template(slot="Start date" slot-scope="{ field }") 
             span.projects-table__label {{ field.label }}
         template(slot="Deadline" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Total Cost" slot-scope="{ field }")
+        template(slot="Project Manager" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
+        template(slot="Edit" slot-scope="{ field }")
+            span.projects-table__label
         //- template(slot="scroll" slot-scope="{ field }" v-if="needScroll")
-        template(slot="createdAt" slot-scope="{ row }") 
-            span {{ row.createdAt.split('T')[0].split('-').reverse().join('-') }}
         template(slot="projectId" slot-scope="{ row }")
             span {{ row.projectId }}
+        template(slot="clientName" slot-scope="{ row }")
+            span {{ clientName(row.customer) }}
         template(slot="projectName" slot-scope="{ row }")
             span {{ row.projectName }}
+        template(slot="languages" slot-scope="{ row }")
+            span {{ projectLangs(row.jobs) }}
         template(slot="status" slot-scope="{ row }")
             span {{ row.status }}
+        template(slot="receivables" slot-scope="{ row }")
+            span {{ row.receivables }}
+        template(slot="payables" slot-scope="{ row }")
+            span {{ row.payables }}
+        template(slot="roi" slot-scope="{ row }")
+            span {{ row.roi }}
+        template(slot="createdAt" slot-scope="{ row }") 
+            span {{ row.createdAt.split('T')[0].split('-').reverse().join('-') }}
         template(slot="deadline" slot-scope="{ row }")
             span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
-        template(slot="totalCost" slot-scope="{ row }")
-            span {{ row.totalCost }}              
-        template(slot="download" slot-scope="{ row }")
-            span sign
+        template(slot="projectManager" slot-scope="{ row }")
+            span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}              
+        template(slot="edit" slot-scope="{ row }")
+            span edit
 </template>
 
 <script>
@@ -48,22 +69,24 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Request On", key: "createdAt", width: "13%"},
-                {label: "Project ID", key: "projectId", width: "15%"},
-                {label: "Project Name", key: "projectName", width: "26%"},
-                {label: "Status", key: "status", width: "13%"},
-                {label: "Deadline", key: "deadline", width: "13%"},
-                {label: "Total Cost", key: "totalCost", width: "10%"},
-                {label: "", key: "download", width: "10%"},
+                {label: "ID", key: "projectId", width: "10%"},
+                {label: "Client Name", key: "clientName", width: "11%"},
+                {label: "Project Name", key: "projectName", width: "12%"},
+                {label: "Languages", key: "languages", width: "12%"},
+                {label: "Status", key: "status", width: "8%"},
+                {label: "Receivables", key: "receivables", width: "7%"},
+                {label: "Payables", key: "payables", width: "6%"},
+                {label: "ROI", key: "roi", width: "6%"},
+                {label: "Start date", key: "createdAt", width: "7%"},
+                {label: "Deadline", key: "deadline", width: "7%"},
+                {label: "Project Manager", key: "projectManager", width: "11%"},
+                {label: "Edit", key: "edit", width: "3%"},
                 // {label: "scroll", key: "scroll", width: "16px"},
             ],
         }
     },
     methods: {
         async onRowClicked({index}) {
-            // if(!this.allProjects[index].metrics) {
-            //     await this.estimate(index);
-            // }
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
         async estimate(ind) {
@@ -109,6 +132,14 @@ export default {
             }
             return result;
         },
+        clientName(elem) {
+            return elem.name;
+        },
+        projectLangs(arr) {
+            return arr.reduce((init, cur) => {
+                return init + cur.sourceLanguage + ' >> ' + cur.targetLanguage + '; '
+            }, "")
+        }
     },
     computed: {
         needScroll() {

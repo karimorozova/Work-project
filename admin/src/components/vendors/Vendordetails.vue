@@ -164,7 +164,7 @@ export default {
             this.$emit('changeInd', {industry: data.industry, filter: this.selectedIndNames})
         },
         getTimezones() {
-            this.$http.get('/timezones')
+            this.$http.get('/api/timezones')
             .then(res => {
                 this.timezones = res.body;
             })
