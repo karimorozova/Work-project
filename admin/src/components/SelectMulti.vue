@@ -94,6 +94,7 @@ export default {
         flex-direction: column;
         background-color: white;
         z-index: 10;
+        border-top: 1px solid #67573E;  
         &__item {
             display: flex;
             align-items: center;
@@ -115,8 +116,11 @@ export default {
             .project & {
                 padding: 5px;
             }
-            .project-info__tasks & {
+            .project-info__tasks &, .filters & {
                 padding: 12px 0;
+            }
+            .filters & {
+                font-size: 12px;
             }
         }
         .domain__options & {
@@ -127,8 +131,13 @@ export default {
         }
         .project-info__tasks & {
             max-height: 170px;
-            border-top: 1px solid #67573E;    
         }
+        .filters & {
+            max-height: 200px;
+        }
+    }
+    .filters & {
+        width: 100%;
     }
 }
 
@@ -149,6 +158,9 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .filters & {
+            width: 76%;
+        }
     }
     .no-choice {
         opacity: 0.5;
@@ -164,6 +176,9 @@ export default {
         }
         .reverse-icon {
             transform: rotate(180deg);
+        }
+        .filters & {
+            width: 24%;
         }
     }
 }
@@ -196,6 +211,9 @@ export default {
             left: 3px;
             transform: rotate(-58deg);
         }
+    }
+    .filters & {
+        margin-left: 3px;
     }
 }
 

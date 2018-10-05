@@ -1,11 +1,20 @@
 <template lang="pug">
     .all-projects
-        .all-projects__title All Projects
-            span.all-projects__arrows(v-if="showProjectDetails") >>
-            span.all-projects__full-path(v-if="showProjectDetails") {{ chosenProject.projectName }}
+        .all-projects__filters
+            ProjectFilters(
+                :clientName="clientFilter"
+                :sourceLangs="sourceFilter"
+                :targetLangs="targetFilter"
+                :status="statusFilter"
+                :projectManager="managerFilter"
+                :managers="managers"
+                @langFilterSplice="langFilterSplice"
+                @langFilterPush="langFilterPush"
+                @setFilter="setFilter"
+            )
         .all-projects__table(v-if="!showProjectDetails")
             ProjectsTable(
-                :allProjects="allProjects"
+                :allProjects="filteredProjects"
                 @selectProject="selectProject"
             )
         .all-projects__project(v-if="showProjectDetails")
@@ -25,12 +34,21 @@ import moment from "moment";
 import Vendorselect from "./Vendorselect";
 import ProjectsTable from "./ProjectsTable";
 import ProjectInfo from "./ProjectInfo";
+import ProjectFilters from "./ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
     data() {
         return {
+            clientFilter: "",
+            sourceFilter: [],
+            targetFilter: [],
+            statusFilter: "",
+            managerFilter: "",
+            startFilter: "",
+            deadlineFilter: "",
             projects: [],
+            managers: [],
             jobs: [],
             chosenProject: {},
             showProjectDetails: false,
@@ -44,6 +62,15 @@ export default {
             storeProject: "setCurrentProject",
             loadingToggle: "loadingToggle",
         }),
+        setFilter({option, refersTo}) {
+            this[refersTo] = option;
+        },
+        langFilterSplice({from, position}) {
+            this[from].splice(position, 1);
+        },
+        langFilterPush({to, lang}) {
+            this[to].push(lang.symbol);
+        },
         selectProject({project}) {
             this.chosenProject = project;
             this.chosenProject.customer = this.allCustomers.find(item => {
@@ -85,7 +112,7 @@ export default {
             this.getProjects();
         },
         async getProjects() {
-            let projectsArray = await this.$http.get('../api/allprojects');
+            let projectsArray = await this.$http.get('/api/allprojects');
             this.projects = projectsArray.body;
             this.setStoreProjects(projectsArray.body);
         },
@@ -97,44 +124,34 @@ export default {
             this.jobs = project.jobs;
         },
         async sendMail(ind) {
-            let result = await this.$http.post('../clientsapi/mailtoclient', this.allProjects[ind]);
+            let result = await this.$http.post('/clientsapi/mailtoclient', this.allProjects[ind]);
         },
         async vendorsMail() {
-            let result = await this.$http.post('../vendorsapi/mailtovendors', JSON.stringify(this.selectedVendors));
+            let result = await this.$http.post('/vendorsapi/mailtovendors', JSON.stringify(this.selectedVendors));
         },
-        async edit(i) {
-            let jobId = this.jobs[i].id;
-            this.$http.get(`../xtm/editor?jobId=${jobId}`)
-            .then(res => {
-                let link = document.createElement('a');
-                link.href = res.data;
-                link.target = '_blank';
-                link.click();
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        }
+        async getManagers() {
+            const managers = await this.$http.get("/pm-manage/all-managers");
+            this.managers = managers.body;
+        },
+        // async edit(i) {
+        //     let jobId = this.jobs[i].id;
+        //     this.$http.get(`../xtm/editor?jobId=${jobId}`)
+        //     .then(res => {
+        //         let link = document.createElement('a');
+        //         link.href = res.data;
+        //         link.target = '_blank';
+        //         link.click();
+        //     })
+        //     .catch(err => {
+        //         console.log(err)
+        //     })
+        // }
     },
     computed: {
         ...mapGetters({
             allProjects: "getAllProjects",
             allCustomers: "getClients",
         }),
-        requestDate() {
-            let result = '';
-            if(this.project.createdAt) {
-                result = moment(this.project.createdAt).format('DD-MM-YYYY');
-            }
-            return result;
-        },
-        deadline() {
-            let result = '';
-            if(this.project.date) {
-                result = moment(this.project.date).format('DD-MM-YYYY');
-            }
-            return result;
-        },
         filteredVendors() {
             let result = [];
             if(this.selectedVendors[0].name == 'All') {
@@ -145,15 +162,60 @@ export default {
                 }
             }
             return result;
+        },
+        filteredProjects() {
+            let result = this.allProjects;
+            if(this.statusFilter) {
+                result = result.filter(item => {
+                    return item.status === this.statusFilter;
+                })
+            }
+            if(this.managerFilter) {
+                result = result.filter(item => {
+                    return item.projectManager.firstName + ' ' + item.projectManager.lastName === this.managerFilter
+                })
+            }
+            if(this.clientFilter) {
+                result = result.filter(item => {
+                    return item.customer.name.toLowerCase().indexOf(this.clientFilter) !=-1
+                })
+            }
+            if(this.startFilter) {
+                result = result.filter(item => {
+                    return new Date(item.createdAt) >= this.startFilter
+                })
+            }
+            if(this.startFilter) {
+                result = result.filter(item => {
+                    return new Date(item.deadline) >= this.deadlineFilter
+                })
+            }
+            if(this.sourceFilter.length) {
+                result = result.filter(item => {
+                    return this.sourceFilter.indexOf(item.jobs[0].sourceLanguage) != -1;
+                })
+            }
+            if(this.targetFilter.length) {
+                result = result.filter(item => {
+                    for(const job of item.jobs) {
+                        if (this.targetFilter.indexOf(job.targetLanguage) != -1) {
+                            return item;
+                        }
+                    }
+                })
+            }
+            return result;
         }
     },
     mounted() {
         this.getProjects();
+        this.getManagers();
     },
     components: {
         Vendorselect,
         ProjectsTable,
         ProjectInfo,
+        ProjectFilters
     }
 }
 </script>
@@ -161,12 +223,10 @@ export default {
 <style lang="scss" scoped>
 
 .all-projects {
-    margin: 20px;
+    margin: 50px 20px 20px 20px;
     width: 1205px;
-    &__title {
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
+    box-shadow: 0 0 10px #68573E;
+    padding: 15px;
     &__hide-details {
         margin-top: 20px;
         width: 100%;

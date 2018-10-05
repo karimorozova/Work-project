@@ -2,8 +2,9 @@
     .dropSelect(v-click-outside="outClick")
         .select
             span.selected(v-if="selectedLang.length == 1") {{ selectedLang[0] }}
+            span.selected(v-if="!selectedLang.length") Select
             .selected(v-if="selectedLang.length > 1") 
-                span(v-for="lang in selectedLang") {{ lang }}; 
+                span(v-for="lang in selectedLang") {{ lang }};  
             .arrowButton(@click="showLangs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
@@ -105,6 +106,10 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    .filters & {
+        border: 1px solid #67573E;
+        height: 28px;
+    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -116,12 +121,21 @@ export default {
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
+        .filters & {
+            border-right: none;
+            width: 76%;
+            height: 23px;
+        }
     }
     .arrowButton {
         width: 18%;
         display: flex;
         justify-content: center;
         align-items: center;
+        .filters & {
+            border-left: 1px solid #68573E;
+            width: 24%;
+        }
         img {
             padding-right: 2px;
         }
@@ -146,6 +160,10 @@ export default {
 }
 .dropSelect {
     position: relative;
+    .filters & {
+        position: absolute;
+        width: 100%;
+    }
     .drop {
         font-size: 14px;
         position: absolute;
@@ -170,8 +188,10 @@ export default {
                 border: none;
             }
             &:hover {
-                // padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.363);
+            }
+            .filters & {
+                font-size: 12px;
             }
         }
         .innerComponent & {
@@ -195,7 +215,7 @@ export default {
         box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
-        .innerComponent & {
+        .innerComponent &, .filters & {
             width: 88%;
         }
     }

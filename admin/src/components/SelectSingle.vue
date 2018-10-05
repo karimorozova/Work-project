@@ -90,6 +90,7 @@ export default {
         display: flex;
         flex-direction: column;
         background-color: #FFF;
+        border-top: 1px solid #67573E;    
         z-index: 10;
         &__item {
             padding: 7px;
@@ -116,8 +117,13 @@ export default {
         }
         .project-info__tasks & {
             max-height: 170px;
-            border-top: 1px solid #67573E;    
         }
+        .filters & {
+            max-height: 220px;
+        }
+    }
+    .filters & {
+        width: 100%;
     }
 }
 
@@ -142,6 +148,9 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .filters_short-menu & {
+            width: 72%;
+        }
     }
     .no-choice {
         opacity: 0.5;
@@ -157,6 +166,9 @@ export default {
         }
         .reverse-icon {
             transform: rotate(180deg);
+        }
+        .filters_short-menu & {
+            width: 28%;
         }
     }
 }

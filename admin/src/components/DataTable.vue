@@ -4,7 +4,7 @@
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.label" :field="field")
-                slot(name="hasScroll")
+            .table__scroll-cell(v-if="hasScroll")
     .table__tbody
         .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
@@ -19,6 +19,9 @@ export default {
         },
         tableData: {
             type: Array
+        },
+        hasScroll: {
+            type: Boolean
         }
     },
     methods: {
@@ -38,7 +41,7 @@ export default {
         color: #FFF;
     }
     &__tbody {
-    max-height: 200px;
+    max-height: 180px;
     overflow-y: auto;
     margin-bottom: 20px;
         .table__row {
@@ -78,6 +81,10 @@ export default {
     }
     &__row {
         display: flex;
+    }
+    &__scroll-cell {
+        width: 17px;
+        border-left: 1px solid #FFF;
     }
 }
 

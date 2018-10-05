@@ -1080,6 +1080,11 @@ export default {
   padding-left: 5px;
 }
 
+.filters .datepicker-custom {
+  width: 166px;
+  height: 30px;
+}
+
 .calendar-custom {
   width: 220px;
   left: -21px;

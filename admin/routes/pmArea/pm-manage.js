@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
-const { Users, Languages, Projects } = require("../../models");
+const { User, Languages, Projects } = require("../../models");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -20,6 +20,16 @@ router.post("/new-project", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on creating a project!');
+    }
+})
+
+router.get("/all-managers", async (req, res) => {
+    try {
+        const users = await User.find({}, {firstName: 1, lastName: 1});
+        res.send(users);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting managers " + err);
     }
 })
 

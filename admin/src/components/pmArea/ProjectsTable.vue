@@ -3,6 +3,7 @@
     DataTable(
         :fields="fields"
         :tableData="allProjects"
+        :hasScroll="hasScroll"
         @onRowClicked="onRowClicked"
     )
         template(slot="ID" slot-scope="{ field }")
@@ -29,7 +30,6 @@
             span.projects-table__label {{ field.label }}
         template(slot="Edit" slot-scope="{ field }")
             span.projects-table__label
-        //- template(slot="scroll" slot-scope="{ field }" v-if="needScroll")
         template(slot="projectId" slot-scope="{ row }")
             span {{ row.projectId }}
         template(slot="clientName" slot-scope="{ row }")
@@ -52,8 +52,8 @@
             span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
         template(slot="projectManager" slot-scope="{ row }")
             span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}              
-        template(slot="edit" slot-scope="{ row }")
-            span edit
+        template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
+            img.projects-table__edit(@click="edit" src="../../assets/images/edit-icon-qa.png")
 </template>
 
 <script>
@@ -139,11 +139,14 @@ export default {
             return arr.reduce((init, cur) => {
                 return init + cur.sourceLanguage + ' >> ' + cur.targetLanguage + '; '
             }, "")
+        },
+        edit() {
+            console.log("edit");
         }
     },
     computed: {
-        needScroll() {
-            return this.allProjects.length > 5;
+        hasScroll() {
+            return document.body.offsetWidth > 1024 && this.allProjects.length > 5;
         }
     },
     components: {
@@ -159,6 +162,9 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    &__edit {
+        cursor: pointer;
     }
 }
 </style>

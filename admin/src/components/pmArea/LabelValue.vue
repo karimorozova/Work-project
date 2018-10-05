@@ -28,6 +28,9 @@ export default {
             margin-bottom: 8px;
             opacity: 0.67;
         }
+        .filters__date &, .filters_flex-end & {
+            margin-right: 10px;
+        }
     }
     .descriptors & {
         margin-bottom: 18px;
@@ -39,6 +42,9 @@ export default {
     .project__textarea & {
         flex-direction: column;
         align-items: flex-start;
+    }
+    .filters__date &, .filters_flex-end & {
+        justify-content: flex-end;
     }
 }
 </style>
