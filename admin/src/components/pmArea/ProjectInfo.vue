@@ -188,7 +188,8 @@ export default {
                             status: "",
                             receivables: "",
                             payable: "",
-                            margin: ""
+                            margin: "",
+                            check: false
                         })
                     } else {
                         for(const task of project.tasks) {
