@@ -1,11 +1,11 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             span.selected(v-if="selectedLang.length == 1 && selectedLang[0].length") {{ selectedLang[0] }}
             .selected(v-if="selectedLang.length > 1") 
                 span(v-for="lang in selectedLang") {{ lang }};
             span.selected(v-if="!selectedLang[0].length") Options
-            .arrowButton(@click="showLangs")
+            .arrow-button(@click="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
         .drop(v-if="droppedLang")
@@ -118,7 +118,7 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -130,7 +130,7 @@ export default {
             transform: rotate(180deg);
         }
     }
-    .innerComponent & {
+    .inner-component & {
         border: none;
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
@@ -142,7 +142,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         font-size: 14px;
@@ -172,7 +172,7 @@ export default {
                 background-color: rgba(191, 176, 157, 0.363);
             }
         }
-        .innerComponent & {
+        .inner-component & {
             max-height: 118px;
             padding-top: 28px;
             span {
@@ -180,7 +180,7 @@ export default {
             }
         }
     }
-    .innerComponent & {
+    .inner-component & {
         height: 100%;
     }
     .search {
@@ -193,7 +193,7 @@ export default {
         box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
-        .innerComponent & {
+        .inner-component & {
             width: 88%;
         }
     }

@@ -111,6 +111,7 @@ export default {
            this.setProjectValue({value: option, prop: "status"}) 
         },
         setValue({option, refersTo}) {
+            console.log(option);
             this[refersTo] = option;
         },
         setTargets({option}) {
@@ -140,9 +141,13 @@ export default {
             const source = this.languages.find(item => {
                 return item.lang === this.sourceLanguage;
             })
+            const service = this.services.find(item => {
+                return item.title === this.service
+            })
             let form = new FormData();
             form.append('customerId', xtmCustomer.id);
             form.append('template', template.id);
+            form.append('service', service._id);
             form.append('source', JSON.stringify(source));
             form.append('targets', JSON.stringify(this.targetLanguages));
             form.append('projectId', this.currentProject._id);

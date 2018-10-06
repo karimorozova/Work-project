@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             template(v-if="selectedServ.length && selectedServ[0].title != 'All' && selectedServ[0].title != 'Select'")
                 .selected
                     span(v-for="serv in selectedServ") {{ serv.title }}; 
             template(v-if="!selectedServ.length || selectedServ[0].title == 'All' || selectedServ[0].title == 'Select'") 
                 span.selected {{ selectedServ[0].title }}
-            .arrowButton(@click="showServs")
+            .arrow-button(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
             .drop__item(v-for="(service, index) in services" @click="changeServ(index)")
@@ -117,7 +117,7 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -128,12 +128,12 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
-        .innerComponent & {
+        .inner-component & {
             background-color: white;
             box-shadow: inset -1px 0 5px #bfb09d;
         }
     }
-    .innerComponent & {
+    .inner-component & {
         border: none;
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
@@ -144,7 +144,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         font-size: 14px;
@@ -176,11 +176,11 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
-        .innerComponent & {
+        .inner-component & {
             max-height: 130px;
         }
     }
-    .innerComponent & {
+    .inner-component & {
         height: 100%;
     }
 }

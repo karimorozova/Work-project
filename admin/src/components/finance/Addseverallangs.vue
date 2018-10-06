@@ -32,11 +32,11 @@
         .add-several__service-industry                 
             .services
                 span.services__title Service
-                .services__innerComponent
+                .services__inner-component
                     ServiceMultiDuoSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
             .industries
                 span Industry
-                .industries__innerComponent
+                .industries__inner-component
                     IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
         .add-several__service-rates(v-if="selectedServ[0].title != 'Select' && selectedServ[0].title != 'All'")
             .chosen-services(v-for="serv in selectedServ")
@@ -377,7 +377,7 @@ export default {
     align-items: center;
     width: 50%;
     margin-bottom: 30px;
-    &__innerComponent {
+    &__inner-component {
         width: 192px;
         margin-left: 20px;
     }

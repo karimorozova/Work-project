@@ -1,8 +1,8 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             span.selected {{ selectedServ.title }} 
-            .arrowButton(@click="showServs")
+            .arrow-button(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
             span.drop__item(v-for="(service, index) in filteredServices" @click="changeServ(index)") {{ service.title }}
@@ -90,7 +90,7 @@ export default {
         display: flex;
         align-items: center;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -103,7 +103,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         font-size: 14px;

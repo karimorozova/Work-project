@@ -103,9 +103,9 @@ export default {
             const prop = (goal === 'sourceFilter') ? 'sourceLangs' : 'targetLangs';
             const position = this[prop].indexOf(lang.symbol);
             if(position != -1) {
-                this.$emit('langFilterSplice', {from: goal, position: position})
+                this.$emit('removeLangFilter', {from: goal, position: position})
             } else {
-                this.$emit('langFilterPush', {to: goal, lang: lang})
+                this.$emit('addLangFilter', {to: goal, lang: lang})
             }
         },
         setClientName(event) {

@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             template(v-if="selectedInd.length && selectedInd[0].name != 'All' && selectedInd[0].name != 'Select'")
                 .selected
                     img(v-for="name in selectedInd" :src="name.icon") 
             template(v-if="!selectedInd.length || selectedInd[0].name == 'All' || selectedInd[0].name == 'Select'") 
                 span.selected {{ selectedInd[0].name }}
-            .arrowButton(@click="showInds")
+            .arrow-button(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
             .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)")
@@ -124,7 +124,7 @@ export default {
             max-height: 21px;
         }
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -135,12 +135,12 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
-        .innerComponent & {
+        .inner-component & {
             background-color: white;
             box-shadow: inset -1px 0 5px #bfb09d;
         }
     }
-    .innerComponent & {
+    .inner-component & {
         border: none;
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
@@ -151,7 +151,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         font-size: 14px;
@@ -179,11 +179,11 @@ export default {
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }
-        .innerComponent & {
+        .inner-component & {
             max-height: 130px;
         }
     }
-    .innerComponent & {
+    .inner-component & {
         height: 100%;
     }
 }

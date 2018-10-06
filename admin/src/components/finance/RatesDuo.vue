@@ -1,50 +1,50 @@
 <template lang="pug">
-.duoWrap
+.duo-wrap
   .filters
-    .filters__item.sourceMenu
+    .filters__item
       label Source Language
       LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
-    .filters__item.targetMenu
+    .filters__item
       label Target Language
       LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
-    .filters__item.industryMenu
+    .filters__item
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
-    .filters__item.serviceMenu
+    .filters__item
       label Service
       ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="chosenServ")
-  .addButton
-    input(type="button" @click="addSevLangs" value="Add several languages")           
-  .tableData
-    table.duoFinance(:style="{width: tableWidth}")
+  .add-button
+    input(type="button" @click="addSevLangs" value="Add several languages")
+  .table-data
+    table.duo-finance(:style="{width: tableWidth}")
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
       tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
-            td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
-              .innerComponent(v-if="!info.icons[1].active")
+            td.drop-option 
+              template(v-if='info.icons.edit.active && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All")') {{ info.sourceLanguage.lang }}
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-            td.dropOption 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .innerComponent(v-if="!info.icons[1].active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td.dropOption              
-              span(v-if="!indus.icon") {{ indus.name }}
-              .dropOption__image
-                img(v-if="indus.icon" :src="indus.icon")
+            td.drop-option 
+              template(v-if='info.icons.edit.active && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All")') {{ info.targetLanguage.lang }}
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[fullInfo[currentActive].targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+            td.drop-option              
+              span(v-if="!indus.icon && info.icons.edit.active") {{ indus.name }}
+              .drop-option__image
+                img(v-if="indus.icon && info.icons.edit.active" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
-              .innerComponent(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
-            td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
-            td.iconsField
-              template(v-for="(icon, iconIndex) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
+            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
+              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
+            td.icons-field
+              template(v-for="(icon, key) in info.icons")
+                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -101,7 +101,7 @@ export default {
       ],
       fullInfo: [],
       changedRate: '',
-      currentActive: 'none',
+      currentActive: -1,
       notUnique: false,
       editing: false,
       uniqueCheck: {source: "", target: "", industry: ""},
@@ -234,14 +234,16 @@ export default {
         })
       }
     },
-    action(index, iconIndex) {
-      if(this.currentActive != "none") {
+    async action(index, key) {
+      if(this.currentActive !== -1) {
         if(index != this.currentActive) {
-          this.editing = true;
-          return true;
+          return this.editing = true;
         }
       }
-      if(iconIndex == 0) {
+      if(key === 'save') {
+        if(!this.fullInfo[index].icons.save.active) {
+          return
+        }
         this.validError = [];
         if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
         if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
@@ -271,47 +273,36 @@ export default {
           if(exist) break;
         }        
         if(!exist) {
-          this.fullInfo[index].icons[0].active = false;
-          this.fullInfo[index].icons[1].active = true;
+          this.fullInfo[index].icons.save.active = false;
+          this.fullInfo[index].icons.edit.active = true;
           this.fullInfo[index].industry = [];
           
           for(let elem of this.industrySelected) {
             elem.rate = this.changedRate;
+            elem.active = true;
             this.fullInfo[index].industry.push(elem)
           };
-          this.$http.post('/service/rates', this.fullInfo[index])
-          .then(res => {
-            console.log(res)
-          })
-          .catch(err => {
-            console.log(err)
-          });
-          this.currentActive = "none";
+          const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
+          console.log(saveResult);
+          this.currentActive = -1;
           this.refreshServices();
         } else {
           this.notUnique = true;
         }
       }
 
-      if(iconIndex == 1) {
+      if(key === 'edit') {
+        this.currentActive = index;
         for(let elem of this.fullInfo[index].industry) {
           this.industrySelected = [];
           this.industrySelected.push(elem)  
         }
         this.changedRate = this.fullInfo[index].industry[0].rate;
-        this.currentActive = index;
-        for(let i in this.fullInfo) {
-          if(i == index) {
-            this.fullInfo[i].icons[1].active = false;
-            this.fullInfo[i].icons[0].active = true;   
-          } else {
-              this.fullInfo[i].icons[1].active = true;
-              this.fullInfo[i].icons[0].active = false;
-          }
-        }
+        this.fullInfo[index].icons.edit.active = false;
+        this.fullInfo[index].icons.save.active = true;   
       }
 
-      if(iconIndex == 2) {
+      if(key === 'delete') {
         let deletedRate = this.fullInfo.splice(index, 1)[0];
         this.$http.post('/service/delete-duorate', deletedRate)
         .then(res => {
@@ -321,7 +312,7 @@ export default {
         .catch(err => {
           console.log(err)
         });
-        this.currentActive = "none";
+        this.currentActive = -1;
       }
     },
     refreshServices() {
@@ -335,9 +326,12 @@ export default {
         title: this.serviceSelect.title,
         sourceLanguage: "", 
         targetLanguage: "", 
-        industry: [{name: "All", rate: 0.1}], 
-        active: true, 
-        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
+        industry: [{name: "All", rate: 0.1, active: true}],  
+        icons: {
+          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
+          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
+          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        }
       });
       this.currentActive = this.fullInfo.length-1;
       this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
@@ -349,11 +343,11 @@ export default {
       const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
       this.fullInfo = result.body;
       this.fullInfo.forEach(item => {
-        item.icons = [
-          {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        ]
+        item.icons = {
+          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        }
       })
       this.services.forEach(item => {
         item.crud = item.title === this.serviceSelect.title;
@@ -414,16 +408,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.duoWrap {
+.duo-wrap {
   position: relative;
   font-family: MyriadPro;
   min-width: 872px; 
 }
-.tableData {
+.table-data {
   max-width: 872px;
   overflow-x: scroll;
 }
-.duoFinance {
+.duo-finance {
   border-collapse: collapse;
   width: 868px;
   thead, tbody {
@@ -475,15 +469,15 @@ td {
   border-right: 1px solid #BFB09D;
   border-bottom: 1px solid #BFB09D;
 }
-.iconsField{
+.icons-field{
   text-align: center;
 }
-.crudIcon {
+.crud-icon {
   margin: 0 5px;
   opacity: .5;
   cursor: pointer;
 }
-.activeIcon {
+.active-icon {
   opacity: 1;
 }
 .filters {
@@ -500,7 +494,7 @@ td {
     }
   }
 }
-.addButton {
+.add-button {
   width: 100%;
   text-align: right;
   margin-bottom: 15px;
@@ -541,9 +535,9 @@ td {
   outline: none;
   width: 114px;
 }
-.dropOption {
+.drop-option {
   position: relative;
-  .innerComponent {
+  .inner-component {
     position: absolute;
     background-color: #fff;
     top: 0;
@@ -573,7 +567,7 @@ td {
     }
   }
 }
-.addShadow {
+.add-shadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 

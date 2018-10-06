@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             template(v-if="selectedStatus")
                 .selected
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
                 span.selected.no-status Options
-            .arrowButton(@click="showStatuses")
+            .arrow-button(@click="showStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
@@ -73,7 +73,7 @@ export default {
         overflow: auto;
         position: relative;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -85,7 +85,7 @@ export default {
             transform: rotate(180deg);
         }
     }
-    .innerComponent & {
+    .inner-component & {
         width: 132px;
         border: none;
         border-radius: 0;
@@ -99,7 +99,7 @@ export default {
         opacity: 0.5;
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         position: absolute;
@@ -131,7 +131,7 @@ export default {
             background-color: rgba(191, 176, 157, 0.5);
         }
     }
-    .innerComponent & {
+    .inner-component & {
         height: 100%;
     }
 }

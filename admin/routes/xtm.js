@@ -36,7 +36,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             });
             await Projects.updateOne({"_id": project._id}, 
             {$set: {xtmId: xtmProject.projectId, detailFiles: [translationFile]}, 
-            $push: {jobs: {id: xtmProject.jobs[0].jobId, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "In Progress", cost: "", check: false}}}
+            $push: {jobs: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "In Progress", cost: "", check: false}}}
             );
         }
         const updatedProject = await Projects.findOne({"_id": tasksInfo.projectId});

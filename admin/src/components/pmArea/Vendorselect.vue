@@ -1,5 +1,5 @@
 <template lang="pug">
-.dropSelect(v-click-outside="outClick")
+.drop-select(v-click-outside="outClick")
     .select
         template(v-if="selectedVendors.length && selectedVendors[0].name != 'All'")
             .selected
@@ -7,7 +7,7 @@
                     span {{ item.firstName }}; 
         template(v-if="!selectedVendors.length || selectedVendors[0].name == 'All' ") 
             span.selected.no-industry Options
-        .arrowButton(@click="showVends")
+        .arrow-button(@click="showVends")
             img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedVend}")
     .drop(v-if="droppedVend")
         .drop__item(v-for="(vendor, index) in vendors" @click="changeVend(index)")
@@ -99,7 +99,7 @@ export default {
     .no-industry {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -112,7 +112,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     width: 100%;
     .drop {

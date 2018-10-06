@@ -28,14 +28,14 @@
                         input.personal(type="text" placeholder="email" v-model="contact.email")
                     .names-gender__item
                         label Gender:
-                        .dropSelect(v-click-outside="outGenders")
+                        .drop-select(v-click-outside="outGenders")
                             .select
                                 template(v-if="contact.gender")
                                     .selected
                                         span {{ contact.gender }}
                                 template(v-if="!contact.gender")
                                     span.selected.no-gender Gender
-                                .arrowButton(@click="openGenders")
+                                .arrow-button(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
                                 .drop__item(@click="() => contact.gender = 'Male'")
@@ -320,7 +320,7 @@ textarea.non-personal {
     opacity: 0.5;
 }
 
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         position: absolute;
@@ -375,7 +375,7 @@ textarea.non-personal {
     .no-gender {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;

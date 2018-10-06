@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             template(v-if="selectedManager")
                 .selected
                     span {{ selectedManager }}
             template(v-if="!selectedManager") 
                 span.selected.no-manager Options
-            .arrowButton(@click="showManagers")
+            .arrow-button(@click="showManagers")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{chosen: manager == selectedManager}")
@@ -82,7 +82,7 @@ export default {
     .no-manager {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -95,7 +95,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         position: absolute;

@@ -53,7 +53,8 @@
         template(slot="projectManager" slot-scope="{ row }")
             span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}              
         template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
-            img.projects-table__edit(@click="edit" src="../../assets/images/edit-icon-qa.png")
+            span.projects-table__icon(@click.stop="edit")
+                img.projects-table__edit(src="../../assets/images/edit-icon-qa.png")
 </template>
 
 <script>
@@ -162,6 +163,11 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    &__icon {
+        height: 100%;
+        width: 100%;
+        z-index: 100;
     }
     &__edit {
         cursor: pointer;

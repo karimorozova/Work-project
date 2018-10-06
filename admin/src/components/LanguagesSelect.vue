@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             span.selected(v-if="selectedLang.length == 1") {{ selectedLang[0] }}
             span.selected(v-if="!selectedLang.length") Select
             .selected(v-if="selectedLang.length > 1") 
-                span(v-for="lang in selectedLang") {{ lang }};  
-            .arrowButton(@click="showLangs")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
+                span(v-for="lang in selectedLang") {{ lang }}; &nbsp;
+            .arrow-button(@click="showLangs")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
         .drop(v-if="droppedLang")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
@@ -106,7 +106,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    .filters & {
+    .all-projects__filters & {
         border: 1px solid #67573E;
         height: 28px;
     }
@@ -121,33 +121,33 @@ export default {
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
-        .filters & {
+        .all-projects__filters & {
             border-right: none;
             width: 76%;
             height: 23px;
         }
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
         align-items: center;
-        .filters & {
+        .all-projects__filters & {
             border-left: 1px solid #68573E;
             width: 24%;
         }
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-Icon {
             transform: rotate(180deg);
         }
-        .innerComponent & {
+        .inner-component & {
             background-color: white;
             box-shadow: inset -1px 0 5px #bfb09d;
         }
     }
-    .innerComponent & {
+    .inner-component & {
         border: none;
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
@@ -158,9 +158,9 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
-    .filters & {
+    .all-projects__filters & {
         position: absolute;
         width: 100%;
     }
@@ -190,11 +190,11 @@ export default {
             &:hover {
                 background-color: rgba(191, 176, 157, 0.363);
             }
-            .filters & {
+            .all-projects__filters & {
                 font-size: 12px;
             }
         }
-        .innerComponent & {
+        .inner-component & {
             max-height: 118px;
             padding-top: 28px;
             span {
@@ -202,7 +202,7 @@ export default {
             }
         }
     }
-    .innerComponent & {
+    .inner-component & {
         height: 100%;
     }
     .search {
@@ -215,7 +215,7 @@ export default {
         box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
-        .innerComponent &, .filters & {
+        .inner-component &, .all-projects__filters & {
             width: 88%;
         }
     }

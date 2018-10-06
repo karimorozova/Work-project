@@ -8,8 +8,8 @@
                 :status="statusFilter"
                 :projectManager="managerFilter"
                 :managers="managers"
-                @langFilterSplice="langFilterSplice"
-                @langFilterPush="langFilterPush"
+                @addLangFilter="addLangFilter"
+                @removeLangFilter="removeLangFilter"
                 @setFilter="setFilter"
             )
         .all-projects__table(v-if="!showProjectDetails")
@@ -65,10 +65,10 @@ export default {
         setFilter({option, refersTo}) {
             this[refersTo] = option;
         },
-        langFilterSplice({from, position}) {
+        removeLangFilter({from, position}) {
             this[from].splice(position, 1);
         },
-        langFilterPush({to, lang}) {
+        addLangFilter({to, lang}) {
             this[to].push(lang.symbol);
         },
         selectProject({project}) {

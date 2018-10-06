@@ -55,6 +55,7 @@ export default {
         }
     }
     &__thead-cell {
+        box-sizing: border-box;
         font-size: 14px;
         padding: 7px 5px 5px 6px;
         border: 0.5px solid #938676;
@@ -68,6 +69,7 @@ export default {
         }
     }
     &__tbody-cell {
+        box-sizing: border-box;
         font-size: 14px;
         padding: 7px 5px 5px 6px;
         border: 0.5px solid #938676;

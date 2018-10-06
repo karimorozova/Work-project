@@ -78,176 +78,186 @@ router.post('/jobcost', async (req, res) => {
   var project = req.body;
   var jobs = req.body.jobs;
   var service = project.service;
-
-  let result = await Services.find({'title': service}).populate('languageCombinations.source').populate('languageCombinations.target');
-  var rates = result[0].languageCombinations;
-      for(let i = 0; i < jobs.length; i++) {
-        for(let j = 0; j < rates.length; j++) {
-          if(jobs[i].sourceLanguage == rates[j].source.lang &&
-            jobs[i].targetLanguage == rates[j].target.lang ) {
-              for(let elem of rates[j].industries) {
-                if(project.industry == elem.name) {
-                  jobs[i].cost = parseFloat((+jobs[i].wordcount * +elem.rate).toFixed(2));
+  try {
+    let result = await getOneService({'title': service});
+    var rates = result[0].languageCombinations;
+        for(let i = 0; i < jobs.length; i++) {
+          for(let j = 0; j < rates.length; j++) {
+            if(jobs[i].sourceLanguage == rates[j].source.lang &&
+              jobs[i].targetLanguage == rates[j].target.lang ) {
+                for(let elem of rates[j].industries) {
+                  if(project.industry == elem.name) {
+                    jobs[i].cost = parseFloat((+jobs[i].wordcount * +elem.rate).toFixed(2));
+                  }
+                  // if(project.industry == 'General' && elem.name == 'All') {
+                  //   jobs[i].cost = +jobs[i].wordcount * +elem.rate;
+                  // }
                 }
-                // if(project.industry == 'General' && elem.name == 'All') {
-                //   jobs[i].cost = +jobs[i].wordcount * +elem.rate;
-                // }
-              }
+            }
           }
-        }
-      }  
-  const totalCost = jobs.reduce((init, cur) => {
-    return init + cur.cost;
-  }, 0)
-  Projects.update({"_id": project._id}, {$set: {'jobs': jobs, 'totalCost': totalCost}})
-  .then(result => {
-    res.send(result);
-  });
+        }  
+    const totalCost = jobs.reduce((init, cur) => {
+      return init + cur.cost;
+    }, 0)
+    const finalResult = await Projects.update({"_id": project._id}, {$set: {'jobs': jobs, 'totalCost': totalCost}});
+    res.send(finalResult);
+  } catch(err) {
+      console.log(err);
+      res.status(500).send('Error on calculating job cost ' + err);
+  }
 })
 
 router.post('/rates-mono', async (req, res) => {
-  var rate = await req.body;
-  let industries = await Industries.find();
-  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
-
-  for(let indus of rate.industry) {
-    for(let industry of industries) {
-      if(industry.name == indus.name) {
-        industry.rate = indus.rate;
-        industry.active = indus.active;
-      } else {
-        industry.active = false;
-      }
-    }
-  }
-
-  var exist = false;
-
-  rates = service[0].languageCombinations;
-  
-  for(let j = 0; j < rate.industry.length; j++) {
-    for(let i = 0; i < rates.length; i++) {
-      if(rate.targetLanguage.lang == rates[i].target.lang) {
-        exist = true;
-        rates[i].package = rate.package;
-        for(let elem of rates[i].industries) {
-          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-            elem.rate = rate.industry[j].rate;
-            elem.active = rate.industry[j].active;
-          }
+  try {
+    var rate = await req.body;
+    let industries = await Industries.find();
+    let service = await getOneService({'title': rate.title});
+    for(let indus of rate.industry) {
+      for(let industry of industries) {
+        if(industry.name == indus.name) {
+          industry.rate = indus.rate;
+          industry.active = indus.active;
+        } else {
+          industry.active = false;
         }
       }
     }
-    if(exist) {
-      break;
-    }
-  }
-  if(exist) {
-    let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-    res.send(result);
-  } else {
-    rates.push({
-      source: null,
-      target: rate.targetLanguage,
-      active: true,
-      industries: industries
-    });
-    await Services.update({'title': rate.title}, {'languageCombinations': rates}).then(response => {
-      res.send(response);
-    }).catch(err => {
-      console.log(err)
-    })
-  }
 
+    var exist = false;
+
+    rates = service.languageCombinations;
+    
+    for(let j = 0; j < rate.industry.length; j++) {
+      for(let i = 0; i < rates.length; i++) {
+        if(rate.targetLanguage.lang == rates[i].target.lang) {
+          exist = true;
+          rates[i].package = rate.package;
+          for(let elem of rates[i].industries) {
+            if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
+              elem.rate = rate.industry[j].rate;
+              elem.active = rate.industry[j].active;
+            }
+          }
+        }
+      }
+      if(exist) {
+        break;
+      }
+    }
+    if(exist) {
+      let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+      res.send(result);
+    } else {
+      rates.push({
+        source: null,
+        target: rate.targetLanguage,
+        active: true,
+        industries: industries
+      });
+      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+      res.send(result);
+    }
+  } catch(err) {
+      console.log(err);
+      res.status(500).send('Error on adding/updating mono-rate ' + err);
+    }
 })
 
 router.post('/delete-monorate', async (req, res) => {
-  var rate = await req.body;
-  if(!rate.targetLanguage || !rate.industry[0].package) {
-    return true;
-  }
-  var rates = [];
-  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
-  rates = service[0].languageCombinations;
-  var findRate = "";
+  try {
+    var rate = await req.body;
+    if(!rate.targetLanguage || !rate.industry[0].package) {
+      return true;
+    }
+    var rates = [];
+    let service = await getOneService({'title': rate.title})
+    rates = service.languageCombinations;
+    var findRate = "";
 
-  for(let j = 0; j < rate.industry.length; j++) {
-    for(let i = 0; i < rates.length; i++) {
-      if(rate.targetLanguage.lang == rates[i].target.lang) {
-        for(let elem of rates[i].industries) {
-          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-            elem.rate = 0;
-            elem.active = false;
+    for(let j = 0; j < rate.industry.length; j++) {
+      for(let i = 0; i < rates.length; i++) {
+        if(rate.targetLanguage.lang == rates[i].target.lang) {
+          for(let elem of rates[i].industries) {
+            if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
+              elem.rate = 0;
+              elem.active = false;
+            }
           }
-        }
-        findRate = rates[i].industries.find(item => {
-          if(item.rate > 0) {
-            return item;
+          findRate = rates[i].industries.find(item => {
+            if(item.rate > 0) {
+              return item;
+            }
+          });
+          if(!findRate) {
+            rates.splice(i, 1);
           }
-        });
-        if(!findRate) {
-          rates.splice(i, 1);
         }
       }
     }
+    let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+    res.send(result);
+  } catch(err) {
+      console.log(err);
+      res.status(500).send('Error on deleting mono-rate ' + err);
   }
-  let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-  res.send(result);
 })
 
 router.post('/rates', async (req, res) => {
-  var rate = await req.body;
-  var rates = [];
-  let industries = await Industries.find();
-  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
+  try {
+    var rate = await req.body;
+    var rates = [];
+    let industries = await Industries.find();
+    let service = await getOneService({'title': rate.title});
 
-  for(let indus of rate.industry) {
-    for(let industry of industries) {
-      if(industry.name == indus.name) {
-        industry.rate = indus.rate;
-        industry.active = indus.active;
-      } else {
-        industry.active = false;
-      }
-    }
-  }
-  
-  var exist = false;
-
-  rates = service[0].languageCombinations;
-  
-  for(let j = 0; j < rate.industry.length; j++) {
-    for(let i = 0; i < rates.length; i++) {
-      if(rate.sourceLanguage.lang == rates[i].source.lang &&
-        rate.targetLanguage.lang == rates[i].target.lang) {
-        exist = true;
-        for(let elem of rates[i].industries) {
-          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-            elem.rate = rate.industry[j].rate
-            elem.active = rate.industry[j].active;
-          }
+    for(let indus of rate.industry) {
+      for(let industry of industries) {
+        if(industry.name == indus.name || indus.name == 'All') {
+          industry.rate = indus.rate;
+          industry.active = indus.active;
         }
       }
     }
-    if(exist) {
-      break;
+    
+    var exist = false;
+
+    rates = service.languageCombinations;
+    
+    for(let j = 0; j < rate.industry.length; j++) {
+      for(let i = 0; i < rates.length; i++) {
+        if(rate.sourceLanguage._id == rates[i].source.id &&
+          rate.targetLanguage._id == rates[i].target.id) {
+          exist = true;
+          for(let elem of rates[i].industries) {
+            if(rate.industry[j].name == elem.industry.name || rate.industry[j].name == 'All') {
+              elem.rate = rate.industry[j].rate
+              elem.active = rate.industry[j].active;
+            }
+          }
+        }
+      }
+      if(exist) {
+        break;
+      }
     }
-  }
-  if(exist) {
-    let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-    res.send(result);  
-  } else {
-    rates.push({
-      source: rate.sourceLanguage,
-      target: rate.targetLanguage,
-      active: true,
-      industries: industries
-    });
-    await Services.update({'title': rate.title}, {'languageCombinations': rates}).then(response => {
-      res.send(response);
-    }).catch(err => {
+    if(exist) {
+      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+      res.send(result);  
+    } else {
+      industries = industries.map(item => {
+        const active = item.rate > 0; 
+        return {industry: item._id, active: active, rate: item.rate}
+      })
+      rates.push({
+        source: rate.sourceLanguage,
+        target: rate.targetLanguage,
+        industries: industries
+      });
+      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
+      res.send(result);
+    }
+  } catch(err) {
       console.log(err)
-    })
+      res.status(500).send('Error on adding/updating duo-rate ' + err);
   }
 })
 
@@ -255,7 +265,7 @@ router.post('/several-langs', async (req, res) => {
   let langCombs = req.body;
   let industries = await Industries.find();
   industries = JSON.stringify(industries);
-  let services = await Services.find({languageForm: "Duo"}).populate('languageCombinations.source').populate('languageCombinations.target');
+  let services = await getManyServices({languageForm: "Duo"});
   for(let comb of langCombs) {
     let service = services.find(item => {
       return item.title == comb.service.title
@@ -301,64 +311,67 @@ router.post('/several-langs', async (req, res) => {
 })
 
 router.post('/delete-duorate', async (req, res) => {
-  var rate = await req.body;
-  if(!rate.sourceLanguage || !rate.targetLanguage) {
-    return true;
-  }
-  var rates = [];
-  let service = await Services.find({'title': rate.title}).populate('languageCombinations.source').populate('languageCombinations.target');
-  rates = service[0].languageCombinations;
-  var findRate = "";
+  try {
+    const rate = await req.body;
+    if(!rate.sourceLanguage || !rate.targetLanguage) {
+      res.send('empty row deleted');
+      return true;
+    }
+    const service = await getOneService({'title': rate.title})
+    let rates = service.languageCombinations;
+    var findRate = "";
 
-  for(let j = 0; j < rate.industry.length; j++) {
-    for(let i = 0; i < rates.length; i++) {
-      if(rate.sourceLanguage.lang == rates[i].source.lang &&
-        rate.targetLanguage.lang == rates[i].target.lang) {
-        for(let elem of rates[i].industries) {
-          if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-            elem.rate = 0;
-            elem.active = false;
+    for(let j = 0; j < rate.industry.length; j++) {
+      for(let i = 0; i < rates.length; i++) {
+        if(rate.sourceLanguage._id == rates[i].source.id &&
+          rate.targetLanguage._id == rates[i].target.id) {
+          for(let elem of rates[i].industries) {
+            if(rate.industry[j].name == elem.industry.name || rate.industry[j].name == 'All') {
+              elem.rate = 0;
+              elem.active = false;
+            }
           }
-        }
-        findRate = rates[i].industries.find(item => {
-          if(item.rate > 0) {
-            return item;
+          findRate = rates[i].industries.find(item => {
+            if(item.rate > 0) {
+              return item;
+            }
+          });
+          if(!findRate) {
+            rates.splice(i, 1);
           }
-        });
-        if(!findRate) {
-          rates.splice(i, 1);
         }
       }
     }
+    const result = await Services.updateOne({'title': rate.title}, {$set: {'languageCombinations': rates}});
+    res.send(result);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on deleting duo-rate ' + err);
   }
-  let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-  res.send(result);
 })
 
 router.get('/parsed-rates', async (req, res) => {
   try{
-    let service = await Services.findOne({"title": req.query.title, "languageForm": req.query.form})
-          .populate('languageCombinations.source')
-          .populate('languageCombinations.target')
-          .populate('languageCombinations.industries.industry');
+    let service = await getOneService({title: req.query.title, languageForm: req.query.form});
     let rates = [];
-    for(let i = 0; i < service.languageCombinations.length; i++) {
-      for(let elem of service.languageCombinations[i].industries) {
+    for(let comb of service.languageCombinations) {
+      for(let elem of comb.industries) {
         if(elem.rate > 0) {
-          elem.industry.rate = elem.rate;
-          elem.industry.active = elem.active;
+          let industry = {...elem.industry._doc};
+          industry.rate = elem.rate;
+          industry.active = elem.active;
           if(req.query.form === "Duo") {
             rates.push({
               title: service.title,
-              sourceLanguage: service.languageCombinations[i].source,
-              targetLanguage: service.languageCombinations[i].target,
-              industry: [elem.industry],
+              sourceLanguage: comb.source,
+              targetLanguage: comb.target,
+              industry: [industry],
             })
           } else {
             rates.push({
               title: service.title,
-              targetLanguage: service.languageCombinations[i].target,
-              industry: [elem.industry],
+              targetLanguage: comb.target,
+              industry: [industry],
             })
           }
         }
@@ -370,5 +383,21 @@ router.get('/parsed-rates', async (req, res) => {
     res.status(500).send('Something went wrong!' + err)
   }
 })
+
+async function getManyServices(obj) {
+  const services = await Services.find(obj)
+  .populate('languageCombinations.source')
+  .populate('languageCombinations.target')
+  .populate('languageCombinations.industries.industry');
+  return services;
+}
+
+async function getOneService(obj) {
+  const service = await Services.findOne(obj)
+  .populate('languageCombinations.source')
+  .populate('languageCombinations.target')
+  .populate('languageCombinations.industries.industry');
+  return service;
+}
 
 module.exports = router;

@@ -1,13 +1,13 @@
 <template lang="pug">
     .timezones-list
-        .dropSelect(v-click-outside="outTimezones")
+        .drop-select(v-click-outside="outTimezones")
             .select
                 template(v-if="timezoneSelected")
                     .selected
                         span {{ timezoneSelected }}
                 template(v-if="!timezoneSelected")
                     span.selected.no-country Timezone
-                .arrowButton(@click="openTimezones")
+                .arrow-button(@click="openTimezones")
                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: timezonesDropped}")
             .search-zone(v-if="timezonesDropped")
                 input.search(type="text" v-model="timezoneSearch" placeholder="Search")
@@ -70,7 +70,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.dropSelect {
+.drop-select {
     position: relative;
     .search-zone {
         position: absolute;
@@ -147,7 +147,7 @@ export default {
     .no-country {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 9%;
         display: flex;
         justify-content: center;

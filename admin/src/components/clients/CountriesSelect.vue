@@ -1,13 +1,13 @@
 <template lang="pug">
     .countries-list
-        .dropSelect(v-click-outside="outCountries")
+        .drop-select(v-click-outside="outCountries")
             .select
                 template(v-if="countrySelected")
                     .selected
                         span {{ countrySelected }}
                 template(v-if="!countrySelected")
                     span.selected.no-country Country
-                .arrowButton(@click="openCountries")
+                .arrow-button(@click="openCountries")
                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: countriesDropped}")
             .search-country(v-if="countriesDropped")
                 input.search(type="text" v-model="countrySearch" placeholder="Search")
@@ -66,7 +66,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.dropSelect {
+.drop-select {
     position: relative;
     .search-country {
         position: absolute;
@@ -134,7 +134,7 @@ export default {
     .no-country {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 9%;
         display: flex;
         justify-content: center;

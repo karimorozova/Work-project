@@ -18,20 +18,20 @@
       tbody.mono-tbody
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1")
-            td.dropOption 
+            td.drop-option 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
-              .innerComponent(v-if="!info.icons[1].active")
+              .inner-component(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-            td.dropOption 
+            td.drop-option 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .innerComponent(v-if="!info.icons[1].active")
+              .inner-component(v-if="!info.icons[1].active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td.dropOption              
+            td.drop-option              
               span(v-if="!indus.icon") {{ indus.name }}
-              .dropOption__image
+              .drop-option__image
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
-              .innerComponent(v-if="!info.icons[1].active")
+              .inner-component(v-if="!info.icons[1].active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
               input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
@@ -449,9 +449,9 @@ td {
   outline: none;
   width: 114px;
 }
-.dropOption {
+.drop-option {
   position: relative;
-  .innerComponent {
+  .inner-component {
     position: absolute;
     background-color: #fff;
     top: 0;

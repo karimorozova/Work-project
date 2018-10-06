@@ -1,12 +1,12 @@
 <template lang="pug">
-    .dropSelect(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick")
         .select
             template(v-if="selectedLeadsource")
                 .selected
                     span {{ selectedLeadsource }}
             template(v-if="!selectedLeadsource") 
                 span.selected.no-industry Options
-            .arrowButton(@click="showLeadsources")
+            .arrow-button(@click="showLeadsources")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(leadsource, index) in leadsources" @click="changeLeadsource(index)" :class="{chosen: leadsource == selectedLeadsource}")
@@ -91,7 +91,7 @@ export default {
     .no-industry {
         opacity: 0.5;
     }
-    .arrowButton {
+    .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
@@ -104,7 +104,7 @@ export default {
         }
     }
 }
-.dropSelect {
+.drop-select {
     position: relative;
     .drop {
         position: absolute;

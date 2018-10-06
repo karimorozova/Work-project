@@ -14,10 +14,10 @@
         td(:class="{outliner: service.crud}")
           input.inprow2(v-model="service.title" :readonly="!service.crud")
         td.langForm {{ service.languageForm }}
-          .innerComponent(v-if="service.crud")
+          .inner-component(v-if="service.crud")
             LanguageForm(:formOption="service.languageForm" :index="ind" :isActiveUpload="service.crud" @sendToParentM="getLangFormData" @sendToParentDuo="getLangFormData" :class="{outliner: service.crud}" )
         td.calcUnit {{ service.calculationUnit }}
-          .innerComponent(v-if="service.crud")
+          .inner-component(v-if="service.crud")
             CalculationUnite(:unitOption="service.calculationUnit" :index="ind" :isActiveUpload="service.crud" @calcSendFirst="getCalcFormData" @calcSendSecond="getCalcFormData" @calcSendThird="getCalcFormData" :class="{outliner: service.crud}" )
         td(:class="{outliner: service.crud}")
           input.inprow2(type="checkbox" :disabled="!service.crud" v-model="service.active" :checked="service.crud")
@@ -416,7 +416,7 @@ export default {
 }
 .langForm, .calcUnit {
   position: relative;
-  .innerComponent {
+  .inner-component {
     position: absolute;
     background-color: #fff;
     top: 0;

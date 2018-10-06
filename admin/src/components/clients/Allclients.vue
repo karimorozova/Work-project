@@ -46,12 +46,12 @@
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.status")
                         td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.website")
-                        td.dropOption(@click="clientDetails(ind)")              
+                        td.drop-option(@click="clientDetails(ind)")              
                             //- span(v-if="!client.industry.icon") {{ client.industry.name }}
-                            .dropOption__image
+                            .drop-option__image
                                 img(v-for="indus in client.industry" :src="indus.icon")
                                 //- span.titleTooltip {{ client.industry.name }} 
-                            .innerComponent(v-if="!client.icons[0].active")
+                            .inner-component(v-if="!client.icons[0].active")
                                 MultiClientIndustrySelect(:selectedInd="industrySelected" :filteredIndustries="selectedIndNames" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="clientDetails(ind)")
                             input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.leadSource")                        
@@ -473,9 +473,9 @@ td {
         color: #67573E;
     }
 }
-.dropOption {
+.drop-option {
   position: relative;
-  .innerComponent {
+  .inner-component {
     position: absolute;
     background-color: #fff;
     top: 0;

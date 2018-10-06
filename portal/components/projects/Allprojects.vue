@@ -1,7 +1,7 @@
 <template lang="pug">
     .allProjects
         .allProjects__dropMenu(:class="{opened: openAll}")
-            .dropSelect(@click="showAllProjects") All Projects
+            .drop-select(@click="showAllProjects") All Projects
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
             .dropItem(v-if="openAll")
                 .dropItem__filters

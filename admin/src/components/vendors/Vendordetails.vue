@@ -38,14 +38,14 @@
                         NativeLanguageSelect(:selectedLang="[vendor.native.lang]" @chosenLang="changeLang")
                     .block-item
                         label Gender:
-                        .dropSelect(v-click-outside="outGenders")
+                        .drop-select(v-click-outside="outGenders")
                             .select
                                 template(v-if="vendor.gender")
                                     .selected
                                         span {{ vendor.gender }}
                                 template(v-if="!vendor.gender")
                                     span.selected.no-gender Gender
-                                .arrowButton(@click="openGenders")
+                                .arrow-button(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
                                 .drop__item(@click="() => vendor.gender = 'Male'")
@@ -255,7 +255,7 @@ export default {
     }
 }
 
-.dropSelect {
+.drop-select {
     width: 191px;
     position: relative;
     .drop {
@@ -309,7 +309,7 @@ export default {
         .no-gender {
             opacity: 0.5;
         }
-        .arrowButton {
+        .arrow-button {
             width: 18%;
             display: flex;
             justify-content: center;

@@ -47,24 +47,24 @@
                     tr(v-for="(vend, ind) in allVendors")  
                         td(@click="vendorDetails(ind)")
                             span.vendorName {{ vend.firstName }} {{ vend.surname }}
-                        td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)")
+                        td.drop-option(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)")
                             span(v-if="vend.icons[1].active") {{ vend.status }}
-                            .innerComponent(v-if="!vend.icons[1].active")
+                            .inner-component(v-if="!vend.icons[1].active")
                                 VendorStatusSelect(:selectedStatus="vend.status" :parentInd="ind" @chosenStatus="changeStatus")
                         td(@click="vendorDetails(ind)")
                             .lang-combs
                                 span.langs-info(v-for="langs in vend.languageCombinations") {{ langs.source.symbol }} >> {{ langs.target.symbol }}, 
                             //- input.langs-info(type="text" :readonly="vend.icons[1].active" v-model="vend.languageCombination")
-                        td.dropOption(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
+                        td.drop-option(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
                             span(v-if="vend.icons[1].active") {{ vend.native.lang }}
-                            .innerComponent(v-if="!vend.icons[1].active")
+                            .inner-component(v-if="!vend.icons[1].active")
                                 NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
-                        td.dropOption(@click="vendorDetails(ind)")              
+                        td.drop-option(@click="vendorDetails(ind)")              
                             //- span(v-if="!indus.icon") {{ indus.name }}
-                            .dropOption__image
+                            .drop-option__image
                                 img(v-for="indus in vend.industry" :src="indus.icon")
                             //-     span.titleTooltip {{ vend.industry.name }} 
-                            .innerComponent(v-if="!vend.icons[1].active")
+                            .inner-component(v-if="!vend.icons[1].active")
                                 MultiVendorIndustrySelect(:selectedInd="industrySelected" :filteredIndustries="selectedIndNames" :parentInd="ind" @chosenInd="changeIndustry")
                         td(@click="vendorDetails(ind)") 
                             input.vendorRates-info(type="text" :readonly="vend.icons[1].active" v-model="vend.basicRate")
@@ -631,9 +631,9 @@ td {
     overflow-y: auto;
 }
 
-.dropOption {
+.drop-option {
   position: relative;
-  .innerComponent {
+  .inner-component {
     position: absolute;
     background-color: #fff;
     top: 0;
