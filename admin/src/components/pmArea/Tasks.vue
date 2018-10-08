@@ -1,60 +1,53 @@
 <template lang="pug">
-.jobs
-    .jobs__table
+.tasks
+    .tasks__table
         DataTable(
             :fields="fields"
             :tableData="allTasks"
             @onRowClicked="onRowClicked"
         )
             template(slot="check" slot-scope="{ field }")
-                input.jobs__check(type="checkbox")
+                input.tasks__check(type="checkbox")
             template(slot="Step" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Language" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Vendor name" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Start" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Deadline" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Progress" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Status" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Receivables" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Payable" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="Margin" slot-scope="{ field }")
-                span.jobs__label {{ field.label }}
+                span.tasks__label {{ field.label }}
             template(slot="check" slot-scope="{ row }")
-                input.jobs__job-data(type="checkbox") 
+                input.tasks__task-data(type="checkbox") 
             template(slot="step" slot-scope="{ row }")
-                span.jobs__job-data {{ row.step }}
+                span.tasks__task-data {{ step }}
             template(slot="language" slot-scope="{ row }")
-                span.jobs__job-data {{ row.source }} >> {{ row.target }}
+                span.tasks__task-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="vendor" slot-scope="{ row }")
-                Vendorselect(
-                    :vendors="vendors"
-                    :selectedVendors="selectedVendors"
-                    :filteredVendors="vendorsIds"
-                    @changeVend="setVendor"
-                )
             template(slot="start" slot-scope="{ row }")
-                span.jobs__job-data {{ row.start }}
             template(slot="deadline" slot-scope="{ row }")
-                span.jobs__job-data {{ row.deadline }}
+                span.tasks__task-data {{ row.wordcount }}
             template(slot="progress" slot-scope="{ row }")
-                span.jobs__job-data {{ progress(row.progress) }}
+                span.tasks__task-data {{ row.cost }}
             template(slot="status" slot-scope="{ row }")
-                span.jobs__job-data {{ row.status }}
+                span.tasks__task-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
-                span.jobs__job-data {{ row.receivables }}
+                span.tasks__task-data {{ row.wordcount }}
             template(slot="payable" slot-scope="{ row }")
-                span.jobs__job-data {{ row.payable }}
+                span.tasks__task-data {{ row.cost }}
             template(slot="margin" slot-scope="{ row }")
-                span.jobs__job-data {{ row.margin }}
+                span.tasks__task-data {{ row.cost }}
 </template>
 
 <script>
@@ -64,9 +57,6 @@ import Vendorselect from "./Vendorselect";
 export default {
     props: {
         allTasks: {
-            type: Array
-        },
-        vendors: {
             type: Array
         }
     },
@@ -84,34 +74,16 @@ export default {
                 {label: "Receivables", key: "receivables", width: "11%"},
                 {label: "Payable", key: "payable", width: "9%"},
                 {label: "Margin", key: "margin", width: "9%"},
-            ],
-            selectedVendors: []
+            ]
         }
     },
     methods: {
         onRowClicked({index}) {
             this.$emit("onRowClicked", {index: index})
-        },
-        setVendor({vendor}) {
-            const position = this.vendorsIds.indexOf(vendor._id);
-            if(position != -1) {
-
-            }
-        },
-        progress(prog) {
-            return (prog.wordsDone/prog.wordsTotal)*100;
-        }
-    },
-    computed: {
-        vendorsIds() {
-            return this.selectedVendors.map(item => {
-                return item._id
-            })
         }
     },
     components: {
         DataTable,
-        Vendorselect
     }    
 }
 </script>

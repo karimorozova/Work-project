@@ -17,7 +17,7 @@
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .project__date
                 LabelValue(label="Deadline")
-                    Datepicker(v-model="project.date" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                    Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
         .project__info-row
             .project__client
@@ -86,7 +86,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            startDate: "",
+            createdAt: new Date(),
             deadline: "",
         }
     },

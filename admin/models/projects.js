@@ -27,11 +27,11 @@ const ProjectsSchema = new mongoose.Schema({
   industry: {
     type: Schema.Types.ObjectId, ref: 'Industries',
   },
-  jobs: {
+  tasks: {
     type: Array,
     default: []
   },
-  tasks: {
+  steps: {
     type: Array,
     default: []
   },

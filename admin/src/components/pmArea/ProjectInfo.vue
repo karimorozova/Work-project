@@ -48,22 +48,14 @@
             .project-info__tasks-col       
                 .project-info__add-tasks
                     Button(value="Add tasks" @clicked="addTasks")
-        .project-info__data-type(v-if="currentProject.jobs.length")
-            SelectSingle(
-                :selectedOption="presentedData" 
-                :options="dataTypes"
-                refersTo="presentedData"
-                @chooseOption="setValue"
-            )
-        Jobs(v-if="presentedData === 'Jobs'"
-            :allJobs="currentProject.jobs"
-            :vendors="allVendors"
-        )
-        Tasks(v-if="presentedData === 'Tasks'"
+        Tasks(v-if="currentProject.tasks.length && !currentProject.steps.length"
             :allTasks="currentProject.tasks"
+        )
+        Steps(v-if="currentProject.steps.length"
+            :allSteps="currentProject.steps"
             :vendors="allVendors"
         )
-        Button(v-if="currentProject.jobs.length" :value="metricsButton" @clicked="getMetrics")
+        Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
 </template>
 
 <script>
@@ -74,8 +66,8 @@ import Button from "../Button";
 import LabelValue from "./LabelValue";
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
-import Jobs from "./Jobs";
 import Tasks from "./Tasks";
+import Steps from "./Steps";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -95,9 +87,7 @@ export default {
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
             sourceFiles: [],
-            refFiles: [],
-            presentedData: "Jobs",
-            dataTypes: ["Jobs", "Tasks"]
+            refFiles: []
         }
     },
     methods: {
@@ -111,7 +101,6 @@ export default {
            this.setProjectValue({value: option, prop: "status"}) 
         },
         setValue({option, refersTo}) {
-            console.log(option);
             this[refersTo] = option;
         },
         setTargets({option}) {
@@ -172,43 +161,43 @@ export default {
             this.loadingToggle(true);
             let project = JSON.stringify(this.currentProject);
             project = JSON.parse(project);
-            for(let job of project.jobs) {
-                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${job.projectId}`);
-                job.metrics = metrics.body.metrics;
-                job.wordcount = metrics.body.metrics.totalWords;
+            for(let task of project.tasks) {
+                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
+                task.metrics = metrics.body.metrics;
                 for(const key in metrics.body.progress) {
-                    const existedTask = project.tasks.find(item => {
-                        return item.jobId === job.id && item.step === key
+                    const existedTask = project.steps.find(item => {
+                        return item.taskId === task.id && item.name === key
                     })
                     if(!existedTask) {
-                        project.tasks.push({
-                            jobId: job.id,
-                            step: key,
-                            source: job.sourceLanguage,
-                            target: job.targetLanguage,
+                        project.steps.push({
+                            taskId: task.id,
+                            name: key,
+                            source: task.sourceLanguage,
+                            target: task.targetLanguage,
                             vendor: "",
                             start: "",
                             deadline: "",
                             progress: metrics.body.progress[key],
                             status: "",
                             receivables: "",
-                            payable: "",
+                            payables: "",
                             margin: "",
                             check: false
                         })
                     } else {
-                        for(const task of project.tasks) {
-                            if(task.jobId === job.id) {
-                                task.progress = metrics.body.progress[task.step];
+                        for(const step of project.steps) {
+                            if(step.taskId === task.id) {
+                                step.progress = metrics.body.progress[step.name];
                             }
                         }
                     }
                 }
             }
             project.isMetricsExist = true;
-            await this.$http.post('/xtm/update-project', {id: project._id, jobs: project.jobs, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
+            await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
+            const updatedProject = await this.$http.get(`/service/costs?projectId=${project._id}`);
+            await this.storeProject(updatedProject.body);
             this.$emit("refreshProjects");
-            await this.storeProject(project);
             this.loadingToggle(false);
         },
         async getVendors() {
@@ -259,8 +248,8 @@ export default {
         LabelValue,
         Project,
         ProjectShortDetails,
-        Jobs,
-        Tasks
+        Tasks,
+        Steps
     },
     mounted() {
         this.getVendors();
@@ -307,6 +296,8 @@ export default {
         width: 100%;
         display: flex;
         justify-content: space-between;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #68573E;
     }
     &__tasks-col {
         width: 25%;
@@ -320,15 +311,6 @@ export default {
         display: flex;
         height: 78px;
         align-items: flex-end;
-    }
-    &__data-type {
-        position: relative;
-        margin-bottom: 15px;
-        height: 28px;
-        border-top: 0.5px solid #68573E;
-        padding-top: 15px;
-        display: flex;
-        justify-content: flex-end;
     }
 }
 </style>

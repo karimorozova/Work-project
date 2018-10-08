@@ -2,7 +2,8 @@ const router = require('express').Router();
 const upload = require('../utils/uploads');
 const moveFile = require('../utils/moveFile');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
-const { saveJobs, saveTemplateJobs, getMetrics } = require('../services/xtmApi');
+const { saveTasks, saveTemplateTasks, getMetrics } = require('../services/xtmApi');
+const { metricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -18,14 +19,14 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     if(sourceFiles) {
         translationFile = await moveFile(sourceFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename}`)
     }
-    let template = tasksInfo.template ? tasksInfo.template : '247336FD';
-    let workflow = tasksInfo.workflow ? tasksInfo.workflow : 2890;
-    let customerId = tasksInfo.customerId ? +tasksInfo.customerId : 23;
+    let template = tasksInfo.template || '247336FD';
+    let workflow = tasksInfo.workflow || 2890;
+    let customerId = tasksInfo.customerId || 23;
     try {
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         for(let target of tasksInfo.targets) {
             let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`
-            let xtmProject = await saveTemplateJobs({
+            let xtmProject = await saveTemplateTasks({
                 customerId: customerId,
                 name: name,
                 source: tasksInfo.source.xtm,
@@ -36,7 +37,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             });
             await Projects.updateOne({"_id": project._id}, 
             {$set: {xtmId: xtmProject.projectId, detailFiles: [translationFile]}, 
-            $push: {jobs: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "In Progress", cost: "", check: false}}}
+            $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "In Progress", cost: "", check: false}}}
             );
         }
         const updatedProject = await Projects.findOne({"_id": tasksInfo.projectId});
@@ -51,36 +52,14 @@ router.get('/project-metrics', async (req, res) => {
     unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${req.query.projectId}/metrics`)
     .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
     'Content-Type': 'application/json'})
-    .end(response => {
+    .end(async (response) => {
         if(response.error) {
             console.log(response.error);
             res.status(500).send("Error on getting metrics " + response.error)
         }
         const metrics = response.body[0].jobsMetrics[0];
-        const jobMetrics = {
-            iceMatch: metrics.coreMetrics.iceMatchWords,
-            fuzzyMatch75: metrics.coreMetrics.lowFuzzyMatchWords,
-            fuzzyMatch85: metrics.coreMetrics.mediumFuzzyMatchWords,
-            fuzzyMatch95: metrics.coreMetrics.highFuzzyMatchWords,
-            repeat: metrics.coreMetrics.repeatsWords,
-            leveragedMatch: metrics.coreMetrics.leveragedWords,
-            fuzzyRepeats75: metrics.coreMetrics.lowFuzzyRepeatsWords,
-            fuzzyRepeats85: metrics.coreMetrics.mediumFuzzyRepeatsWords,
-            fuzzyRepeats95: metrics.coreMetrics.highFuzzyRepeatsWords,
-            nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
-            totalWords: metrics.coreMetrics.totalWords,
-        }     
-        const progress = {};
-        for(const key in metrics.metricsProgress) {
-            progress[key] = {
-                wordsTotal: metrics.metricsProgress[key].totalWordCount,
-                wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
-                wordsDone: metrics.metricsProgress[key].wordsDone,
-                wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,
-                wordsToBeCorrected: metrics.metricsProgress[key].wordsToBeCorrected,
-            }
-        }
-        res.send({metrics: jobMetrics, progress: progress});
+        const taskMetrics = await metricsCalc(metrics);
+        res.send(taskMetrics);
     })
 })
 
@@ -126,7 +105,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
         let name = date + ` ${nextNumber} ` + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
         let proj;
         if(xtmData.customerId) {
-            proj = await saveTemplateJobs({
+            proj = await saveTemplateTasks({
                 customerId: xtmData.customerId,
                 name: name,
                 source: source,
@@ -136,7 +115,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
                 workflowId: workflowId
             });
         } else {
-            proj = await saveJobs({
+            proj = await saveTasks({
                 customerId: 23,
                 name: name,
                 source: source,
@@ -194,7 +173,7 @@ router.post('/saveproject', async (req, res) => {
 router.post('/update-project', async (req, res) => {
     const project = { ...req.body };
     try {
-        const savedProject = await Projects.updateOne({"_id": project.id}, {$set: {jobs: project.jobs, tasks: project.tasks, isMetricsExist: project.isMetricsExist}});
+        const savedProject = await Projects.updateOne({"_id": project.id}, {$set: {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist}});
         res.send('Project updated!');
     } catch(err) {
         console.log(err);

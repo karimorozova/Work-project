@@ -2,6 +2,8 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
+const { getOneService, getManyServices } = require('../services/');
+const { receivablesCalc, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -30,22 +32,22 @@ var uploadServices = multer({
 });
 
 router.post("/saveservices", uploadServices.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
-  var serviceID = req.body.dbIndex;
-  var serviceIcon = req.files["uploadedFileIcon"];
-  var iconPath = "";
+  const serviceID = req.body.dbIndex;
+  const serviceIcon = req.files["uploadedFileIcon"];
+  let iconPath = "";
   let date = new Date().getTime();
   if (serviceIcon) {
     moveServiceIcon(serviceIcon[0], date);
     iconPath = `/static/services/${date}-` + serviceIcon[0].filename;
   }
 
-  var objForUpdate = {
+  let objForUpdate = {
     active: req.body.activeFormValue,
     languageForm: req.body.languageFormValue,
     calculationUnit: req.body.calcFormValue
   };
   
-  var nameVal = req.body.nameTitle;
+  const nameVal = req.body.nameTitle;
   
   if (nameVal.length) {
     objForUpdate.title = nameVal;
@@ -64,7 +66,7 @@ router.post("/saveservices", uploadServices.fields([{name: "uploadedFileIcon"}])
 });
 
 router.post("/removeservices", async (req, res) => {
-  var serviceID = req.body.serviceRem;
+  const serviceID = req.body.serviceRem;
   Services.deleteOne({ "_id": serviceID })
     .then(result => {
       res.send('Removed');
@@ -74,13 +76,36 @@ router.post("/removeservices", async (req, res) => {
     });
 });
 
+router.get('/costs', async (req, res) => {
+  const projectId = req.query.projectId;
+  try {
+    let project = await getProject({"_id": projectId});
+    for(let task of project.tasks) {
+      const service = await getOneService({"_id": task.service});
+      const combinations = service.languageCombinations;
+      const price = await receivablesCalc(task, project.industry.id, combinations);
+      for(let step of project.steps) {
+        if(step.taskId === task.id) {
+          step.receivables = price
+        }
+      }
+    }
+    await Projects.updateOne({"_id": projectId}, {steps: project.steps});
+    const updatedProject = await getProject({"_id": projectId});
+    res.send(updatedProject);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on getting costs ' + err);
+  }
+})
+
 router.post('/jobcost', async (req, res) => {
-  var project = req.body;
-  var jobs = req.body.jobs;
-  var service = project.service;
+  let project = req.body;
+  let jobs = req.body.jobs;
+  const service = project.service;
   try {
     let result = await getOneService({'title': service});
-    var rates = result[0].languageCombinations;
+    var rates = result.languageCombinations;
         for(let i = 0; i < jobs.length; i++) {
           for(let j = 0; j < rates.length; j++) {
             if(jobs[i].sourceLanguage == rates[j].source.lang &&
@@ -109,7 +134,7 @@ router.post('/jobcost', async (req, res) => {
 
 router.post('/rates-mono', async (req, res) => {
   try {
-    var rate = await req.body;
+    let rate = req.body;
     let industries = await Industries.find();
     let service = await getOneService({'title': rate.title});
     for(let indus of rate.industry) {
@@ -123,7 +148,7 @@ router.post('/rates-mono', async (req, res) => {
       }
     }
 
-    var exist = false;
+    let exist = false;
 
     rates = service.languageCombinations;
     
@@ -165,14 +190,14 @@ router.post('/rates-mono', async (req, res) => {
 
 router.post('/delete-monorate', async (req, res) => {
   try {
-    var rate = await req.body;
+    let rate = req.body;
     if(!rate.targetLanguage || !rate.industry[0].package) {
       return true;
     }
-    var rates = [];
+    let rates = [];
     let service = await getOneService({'title': rate.title})
     rates = service.languageCombinations;
-    var findRate = "";
+    let findRate = "";
 
     for(let j = 0; j < rate.industry.length; j++) {
       for(let i = 0; i < rates.length; i++) {
@@ -204,8 +229,8 @@ router.post('/delete-monorate', async (req, res) => {
 
 router.post('/rates', async (req, res) => {
   try {
-    var rate = await req.body;
-    var rates = [];
+    let rate = req.body;
+    let rates = [];
     let industries = await Industries.find();
     let service = await getOneService({'title': rate.title});
 
@@ -218,7 +243,7 @@ router.post('/rates', async (req, res) => {
       }
     }
     
-    var exist = false;
+    let exist = false;
 
     rates = service.languageCombinations;
     
@@ -319,7 +344,7 @@ router.post('/delete-duorate', async (req, res) => {
     }
     const service = await getOneService({'title': rate.title})
     let rates = service.languageCombinations;
-    var findRate = "";
+    let findRate = "";
 
     for(let j = 0; j < rate.industry.length; j++) {
       for(let i = 0; i < rates.length; i++) {
@@ -362,6 +387,7 @@ router.get('/parsed-rates', async (req, res) => {
           industry.active = elem.active;
           if(req.query.form === "Duo") {
             rates.push({
+              _id: comb._id,
               title: service.title,
               sourceLanguage: comb.source,
               targetLanguage: comb.target,
@@ -369,6 +395,7 @@ router.get('/parsed-rates', async (req, res) => {
             })
           } else {
             rates.push({
+              _id: comb._id,
               title: service.title,
               targetLanguage: comb.target,
               industry: [industry],
@@ -383,21 +410,5 @@ router.get('/parsed-rates', async (req, res) => {
     res.status(500).send('Something went wrong!' + err)
   }
 })
-
-async function getManyServices(obj) {
-  const services = await Services.find(obj)
-  .populate('languageCombinations.source')
-  .populate('languageCombinations.target')
-  .populate('languageCombinations.industries.industry');
-  return services;
-}
-
-async function getOneService(obj) {
-  const service = await Services.findOne(obj)
-  .populate('languageCombinations.source')
-  .populate('languageCombinations.target')
-  .populate('languageCombinations.industries.industry');
-  return service;
-}
 
 module.exports = router;

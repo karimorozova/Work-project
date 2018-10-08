@@ -1,11 +1,10 @@
 <template lang="pug">
 .table
-    .table__thead
+    .table__thead(:class="{'table_scroll-padding': hasScroll}")
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.label" :field="field")
-            .table__scroll-cell(v-if="hasScroll")
-    .table__tbody
+    .table__tbody(:class="{'table_bottom-bordered': hasScroll}")
         .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
                 slot(:name="field.key" :row="row" :index="index")
@@ -84,9 +83,11 @@ export default {
     &__row {
         display: flex;
     }
-    &__scroll-cell {
-        width: 17px;
-        border-left: 1px solid #FFF;
+    &_scroll-padding {
+        padding-right: 15px;
+    }
+    &_bottom-bordered {
+        border-bottom: 0.5px solid #938676;
     }
 }
 

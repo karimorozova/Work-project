@@ -22,8 +22,8 @@ export default {
                 brief: "",
                 notes: "",
                 industry: [],
-                createdAt: "",
-                date: "",
+                createdAt: new Date(),
+                deadline: "",
             }
         }
     },

@@ -108,13 +108,13 @@ export default {
                 this.selectedVendors = [{name: "All"}]
             }
         },
-        refreshProjects() {
-            this.getProjects();
+        async refreshProjects() {
+            await this.getProjects();
         },
         async getProjects() {
             let projectsArray = await this.$http.get('/api/allprojects');
             this.projects = projectsArray.body;
-            this.setStoreProjects(projectsArray.body);
+            await this.setStoreProjects(projectsArray.body);
         },
         showJobs(id) {
             this.jobsShow = true;
