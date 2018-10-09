@@ -6,8 +6,8 @@
             :tableData="allSteps"
             @onRowClicked="onRowClicked"
         )
-            template(slot="check" slot-scope="{ field }")
-                input.steps__check(type="checkbox")
+            template(slot="Check" slot-scope="{ field }")
+                input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
             template(slot="Step" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="Language" slot-scope="{ field }")
@@ -29,7 +29,7 @@
             template(slot="Margin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row }")
-                input.steps__step-data(type="checkbox") 
+                input.steps__step-data(type="checkbox" v-model="row.check") 
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
@@ -50,9 +50,10 @@
             template(slot="status" slot-scope="{ row }")
                 span.steps__step-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
+                span.steps__money(v-if="row.receivables") &euro;
                 span.steps__step-data {{ row.receivables }}
             template(slot="payable" slot-scope="{ row }")
-                span.steps__step-data {{ row.payable }}
+                span.steps__step-data {{ row.payables }}
             template(slot="margin" slot-scope="{ row }")
                 span.steps__step-data {{ row.margin }}
 </template>
@@ -73,19 +74,20 @@ export default {
     data() {
         return {
             fields: [
-                {label: "check", key: "check", width: "4%"},
+                {label: "Check", key: "check", width: "4%"},
                 {label: "Step", key: "name", width: "9%"},
                 {label: "Language", key: "language", width: "11%"},
-                {label: "Vendor name", key: "vendor", width: "11%"},
+                {label: "Vendor name", key: "vendor", width: "15%"},
                 {label: "Start", key: "start", width: "9%"},
                 {label: "Deadline", key: "deadline", width: "9%"},
-                {label: "Progress", key: "progress", width: "9%"},
+                {label: "Progress", key: "progress", width: "8%"},
                 {label: "Status", key: "status", width: "9%"},
-                {label: "Receivables", key: "receivables", width: "11%"},
-                {label: "Payable", key: "payable", width: "9%"},
-                {label: "Margin", key: "margin", width: "9%"},
+                {label: "Receivables", key: "receivables", width: "9%"},
+                {label: "Payable", key: "payables", width: "9%"},
+                {label: "Margin", key: "margin", width: "8%"},
             ],
-            selectedVendors: []
+            selectedVendors: [],
+            isAllSelected: false
         }
     },
     methods: {
@@ -100,6 +102,9 @@ export default {
         },
         progress(prog) {
             return (prog.wordsDone/prog.wordsTotal)*100;
+        },
+        selectAll() {
+            this.$emit("selectAll", {isAllSelected: this.isAllSelected});
         }
     },
     computed: {

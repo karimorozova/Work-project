@@ -88,7 +88,7 @@ export default {
             this.$emit("setFilter", {option: event, refersTo: 'deadlineFilter'})
         },
         customFormatter(date) {
-            return moment(date).format('DD MM YYYY, h:mm:ss');
+            return moment(date).format('DD-MM-YYYY, h:mm:ss');
         },
         setValue({option, refersTo}) {
             this.$emit('setFilter', {option: option, refersTo: refersTo})

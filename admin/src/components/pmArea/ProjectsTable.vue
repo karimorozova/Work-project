@@ -82,7 +82,6 @@ export default {
                 {label: "Deadline", key: "deadline", width: "7%"},
                 {label: "Project Manager", key: "projectManager", width: "11%"},
                 {label: "Edit", key: "edit", width: "3%"},
-                // {label: "scroll", key: "scroll", width: "16px"},
             ],
         }
     },
@@ -90,49 +89,6 @@ export default {
         async onRowClicked({index}) {
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
-        // async estimate(ind) {
-        //     let project = this.allProjects[ind];
-        //     for(let job of project.jobs) {
-        //         job.wordcount = +words;
-        //     }
-        //     let jobsCosts = await this.$http.post('../service/jobcost', project);
-        //     let clientRates = await this.checkClientRates(ind);
-        //     if(clientRates.length) {
-        //         for(let job of project.jobs) {
-        //             for(let elem of clientRates) {
-        //                 if(job.targetLanguage == elem.target) {
-        //                     job.cost = parseFloat((job.wordcount*elem.rate).toFixed(2));
-        //                 }
-        //             }
-        //         }
-        //         let saveJobs = await this.$http.post('../xtm/savejobs', {id: project._id, jobs: project.jobs, metrics: project.metrics});
-        //     }
-        //     this.$emit('refreshProjects');
-        // },
-        // async checkClientRates(ind) {
-        //     let id = this.allProjects[ind].customer;
-        //     let client = await this.$http.get(`../clientsapi/client?id=${id}`);
-        //     let combinations = client.body.languageCombinations;
-        //     let result = [];
-        //     for(let comb of combinations) {
-        //         if(comb.active && comb.service.title == this.allProjects[ind].service && 
-        //             comb.source.lang == this.allProjects[ind].sourceLanguage.lang) {
-        //             for(let lang of this.allProjects[ind].targetLanguages) {
-        //                 if(lang.lang == comb.target.lang) {
-        //                     for(let industry of comb.industry) {
-        //                         if(industry.name === this.allProjects[ind].industry) {
-        //                             result.push({
-        //                                 target: comb.target.lang,
-        //                                 rate: industry.rate
-        //                             })
-        //                         }    
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return result;
-        // },
         clientName(elem) {
             return elem.name;
         },

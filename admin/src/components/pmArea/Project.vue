@@ -92,7 +92,7 @@ export default {
     },
     methods: {
         customFormatter(date) {
-            return moment(date).format('DD MM YYYY, h:mm:ss');
+            return moment(date).format('DD-MM-YYYY, h:mm:ss');
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});

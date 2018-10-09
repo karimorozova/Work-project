@@ -52,6 +52,9 @@ export default {
                 background-color: #ddd3c8;
             }
         }
+        .steps__table & {
+            overflow-y: overlay;
+        }
     }
     &__thead-cell {
         box-sizing: border-box;

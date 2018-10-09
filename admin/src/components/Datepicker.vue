@@ -1019,7 +1019,7 @@ export default {
 
 .vdp-datepicker__calendar .cell.today {
   background-color: #D15F45;
-  color: #D50000;
+  color: #FFF;
   font-weight: bold;  
 }
 
