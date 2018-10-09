@@ -265,62 +265,6 @@ router.get('/projects-analysis', async (req, res) => {
         })
 })
 
-// router.get('/newcustomer', async (req, res) => {
-//     var customerName = req.query.name;
-//     var str = '<?xml version="1.0" encoding="UTF-8"?>' +
-//         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
-//     '<soapenv:Header/>' +
-//     '<soapenv:Body>' +
-//       '<pm:createCustomer>'+
-//          '<loginAPI>'+
-//             '<client>Pangea</client>' +
-//             '<password>pm</password>' +
-//             '<userId>3150</userId>' +
-//          '</loginAPI>' +
-//          '<customer>' + 
-//             '<customerBase>' +
-//                `<name>${customerName}</name>` +
-//             '</customerBase>' +
-//          '</customer>' +
-//          '<options/>' +
-//       '</pm:createCustomer>' +
-//     '</soapenv:Body>' +
-//     '</soapenv:Envelope>';
-//     function createCORSRequest(method, url) {
-//         var xhr = new XMLHttpRequest();
-//         if ("withCredentials" in xhr) {
-//             xhr.open(method, url, false);
-//         } else if (typeof XDomainRequest != "undefined") {
-//             alert
-//             xhr = new XDomainRequest();
-//             xhr.open(method, url);
-//         } else {
-//             console.log("CORS not supported");
-//             alert("CORS not supported");
-//             xhr = null;
-//         }
-//         return xhr;
-//     }
-//     var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
-//     if(!xhr){
-//     console.log("XHR issue");
-//     return;
-//     }
-
-//     xhr.onload = function (){
-//     var results = xhr.responseText;
-//     var id;
-//     if(results.indexOf('<id>') != -1) {
-//         results = results.split('<id>')[1];
-//         id = results.split("</id>")[0];
-//     }
-//     res.send(id);
-//     }
-
-//     xhr.setRequestHeader('Content-Type', 'text/xml');
-//     xhr.send(str);
-// })
-
 router.get('/xtmwords', async (req, res) => {
     var id = req.query.projectId;
     var str = '<?xml version="1.0" encoding="UTF-8"?>' +
