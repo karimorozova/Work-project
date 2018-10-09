@@ -181,7 +181,7 @@ export default {
                             name: key,
                             source: task.sourceLanguage,
                             target: task.targetLanguage,
-                            vendor: [],
+                            vendor: "",
                             start: "",
                             deadline: "",
                             progress: metrics.body.progress[key],
