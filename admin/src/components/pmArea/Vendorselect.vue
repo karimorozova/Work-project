@@ -1,18 +1,14 @@
 <template lang="pug">
 .drop-select(v-click-outside="outClick")
     .select
-        template(v-if="selectedVendors.length && selectedVendors[0].name != 'All'")
-            .selected
-                .industry-tooltip(v-for="item in selectedVendors")
-                    span {{ item.firstName }}; 
-        template(v-if="!selectedVendors.length || selectedVendors[0].name == 'All' ") 
-            span.selected.no-industry Options
+        template(v-if="selectedVendor")
+            span.selected {{ selectedVendor }}
+        template(v-if="!selectedVendor") 
+            span.selected.no-industry Select
         .arrow-button(@click="showVends")
             img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedVend}")
     .drop(v-if="droppedVend")
-        .drop__item(v-for="(vendor, index) in vendors" @click="changeVend(index)")
-            .checkbox
-                .checkbox__check(:class="{checked: filteredVendors.indexOf(vendor._id) != -1}")
+        .drop__item(v-for="(vendor, index) in vendors" @click="changeVend(index)" :class="{chosen: selectedVendor === vendor.firstName + ' ' + vendor.surname}")
             span {{ vendor.firstName }} {{ vendor.surname }}
 </template>
 
@@ -21,11 +17,8 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedVendors: {
-            type: Array
-        },
-        filteredVendors: {
-            type: Array
+        selectedVendor: {
+            type: String
         },
         vendors: {
             type: Array
@@ -45,6 +38,7 @@ export default {
             this.droppedVend = false;
         },
         changeVend(ind) {
+            this.droppedVend = false;
             this.$emit('changeVend', {vendor: this.vendors[ind]})
         },
     },
@@ -130,7 +124,7 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            padding: 5px 2px;
+            padding: 5px 6px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;

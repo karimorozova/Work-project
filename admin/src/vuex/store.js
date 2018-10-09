@@ -62,6 +62,12 @@ const mutations = {
     },
     storeProjectValue(state, payload) {
         state.currentProject[payload.prop] = payload.value;
+    },
+    stepVendorStore(state, payload) {
+        state.currentProject.steps[payload.index].vendor = payload.value;
+    },
+    stepVendorDelete(state, payload) {
+        state.currentProject.steps[payload.index].vendor = "";
     }
 };
 

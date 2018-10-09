@@ -55,6 +55,7 @@
             :allSteps="currentProject.steps"
             :vendors="allVendors"
             @selectAll="selectAll"
+            @setVendor="setVendor"
         )
         Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
 </template>
@@ -96,8 +97,13 @@ export default {
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
             vendorsSetting: "vendorsSetting",
-            loadingToggle: 'loadingToggle'
+            loadingToggle: 'loadingToggle',
+            removeStepVendor: 'removeStepVendor',
+            setStepVendor: 'setStepVendor'
         }),
+        setVendor({vendor, index}) {
+            this.setStepVendor({value: vendor, index: index});
+        },
         setStatus({option}) {
            this.setProjectValue({value: option, prop: "status"}) 
         },
@@ -175,7 +181,7 @@ export default {
                             name: key,
                             source: task.sourceLanguage,
                             target: task.targetLanguage,
-                            vendor: "",
+                            vendor: [],
                             start: "",
                             deadline: "",
                             progress: metrics.body.progress[key],

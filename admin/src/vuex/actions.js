@@ -11,6 +11,8 @@ export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', p
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
 export const setProjectValue = ({ commit }, payload) => commit('storeProjectValue', payload);
+export const setStepVendor = ({ commit }, payload) => commit('stepVendorStore', payload);
+export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);  
 export const login = ({ commit }, creds) => {
     commit("LOGIN");

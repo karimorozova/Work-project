@@ -3,7 +3,7 @@ const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
 const { getOneService, getManyServices } = require('../services/');
-const { receivablesCalc, getProjects, getProject } = require('../projects/');
+const { receivablesCalc, payablesCalc, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -83,10 +83,13 @@ router.get('/costs', async (req, res) => {
     for(let task of project.tasks) {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
-      const price = await receivablesCalc(task, project.industry.id, combinations);
+      const receivables = receivablesCalc(task, project.industry.id, combinations);
       for(let step of project.steps) {
+        const payables = step.vendor ? await payablesCalc(task, project.industry.id, step.vendor) : "";
         if(step.taskId === task.id) {
-          step.receivables = price
+          step.receivables = receivables;
+          step.payables = payables;
+          step.margin = step.receivables - step.payables;
         }
       }
     }
