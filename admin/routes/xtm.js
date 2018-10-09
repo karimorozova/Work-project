@@ -2,7 +2,8 @@ const router = require('express').Router();
 const upload = require('../utils/uploads');
 const moveFile = require('../utils/moveFile');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics } = require('../services/xtmApi');
+const { saveTasks, saveTemplateTasks, getMetrics, newXtmCustomer } = require('../services/');
+const { getProject } = require('../projects/');
 const { metricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
@@ -21,7 +22,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     }
     let template = tasksInfo.template || '247336FD';
     let workflow = tasksInfo.workflow || 2890;
-    let customerId = tasksInfo.customerId || 23;
+    let customerId = tasksInfo.customerId || await newXtmCustomer(tasksInfo.customerName);
     try {
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         for(let target of tasksInfo.targets) {
@@ -37,10 +38,10 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             });
             await Projects.updateOne({"_id": project._id}, 
             {$set: {xtmId: xtmProject.projectId, detailFiles: [translationFile]}, 
-            $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "In Progress", cost: "", check: false}}}
+            $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", check: false}}}
             );
         }
-        const updatedProject = await Projects.findOne({"_id": tasksInfo.projectId});
+        const updatedProject = await getProject({"_id": tasksInfo.projectId});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
@@ -264,61 +265,61 @@ router.get('/projects-analysis', async (req, res) => {
         })
 })
 
-router.get('/newcustomer', async (req, res) => {
-    var customerName = req.query.name;
-    var str = '<?xml version="1.0" encoding="UTF-8"?>' +
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
-    '<soapenv:Header/>' +
-    '<soapenv:Body>' +
-      '<pm:createCustomer>'+
-         '<loginAPI>'+
-            '<client>Pangea</client>' +
-            '<password>pm</password>' +
-            '<userId>3150</userId>' +
-         '</loginAPI>' +
-         '<customer>' + 
-            '<customerBase>' +
-               `<name>${customerName}</name>` +
-            '</customerBase>' +
-         '</customer>' +
-         '<options/>' +
-      '</pm:createCustomer>' +
-    '</soapenv:Body>' +
-    '</soapenv:Envelope>';
-    function createCORSRequest(method, url) {
-        var xhr = new XMLHttpRequest();
-        if ("withCredentials" in xhr) {
-            xhr.open(method, url, false);
-        } else if (typeof XDomainRequest != "undefined") {
-            alert
-            xhr = new XDomainRequest();
-            xhr.open(method, url);
-        } else {
-            console.log("CORS not supported");
-            alert("CORS not supported");
-            xhr = null;
-        }
-        return xhr;
-    }
-    var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
-    if(!xhr){
-    console.log("XHR issue");
-    return;
-    }
+// router.get('/newcustomer', async (req, res) => {
+//     var customerName = req.query.name;
+//     var str = '<?xml version="1.0" encoding="UTF-8"?>' +
+//         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
+//     '<soapenv:Header/>' +
+//     '<soapenv:Body>' +
+//       '<pm:createCustomer>'+
+//          '<loginAPI>'+
+//             '<client>Pangea</client>' +
+//             '<password>pm</password>' +
+//             '<userId>3150</userId>' +
+//          '</loginAPI>' +
+//          '<customer>' + 
+//             '<customerBase>' +
+//                `<name>${customerName}</name>` +
+//             '</customerBase>' +
+//          '</customer>' +
+//          '<options/>' +
+//       '</pm:createCustomer>' +
+//     '</soapenv:Body>' +
+//     '</soapenv:Envelope>';
+//     function createCORSRequest(method, url) {
+//         var xhr = new XMLHttpRequest();
+//         if ("withCredentials" in xhr) {
+//             xhr.open(method, url, false);
+//         } else if (typeof XDomainRequest != "undefined") {
+//             alert
+//             xhr = new XDomainRequest();
+//             xhr.open(method, url);
+//         } else {
+//             console.log("CORS not supported");
+//             alert("CORS not supported");
+//             xhr = null;
+//         }
+//         return xhr;
+//     }
+//     var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+//     if(!xhr){
+//     console.log("XHR issue");
+//     return;
+//     }
 
-    xhr.onload = function (){
-    var results = xhr.responseText;
-    var id;
-    if(results.indexOf('<id>') != -1) {
-        results = results.split('<id>')[1];
-        id = results.split("</id>")[0];
-    }
-    res.send(id);
-    }
+//     xhr.onload = function (){
+//     var results = xhr.responseText;
+//     var id;
+//     if(results.indexOf('<id>') != -1) {
+//         results = results.split('<id>')[1];
+//         id = results.split("</id>")[0];
+//     }
+//     res.send(id);
+//     }
 
-    xhr.setRequestHeader('Content-Type', 'text/xml');
-    xhr.send(str);
-})
+//     xhr.setRequestHeader('Content-Type', 'text/xml');
+//     xhr.send(str);
+// })
 
 router.get('/xtmwords', async (req, res) => {
     var id = req.query.projectId;

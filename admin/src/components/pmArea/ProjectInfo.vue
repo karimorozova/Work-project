@@ -131,6 +131,7 @@ export default {
             const xtmCustomer = this.xtmCustomers.find(item => {
                 return item.name === this.currentProject.customer.name
             });
+            const xtmId = xtmCustomer ? xtmCustomer.id : "";
             const template = this.template ? this.templates.find(item => {
                     return item.name === this.template
                 }) : {id: ""}
@@ -141,7 +142,8 @@ export default {
                 return item.title === this.service
             })
             let form = new FormData();
-            form.append('customerId', xtmCustomer.id);
+            form.append('customerId', xtmId);
+            form.append('customerName', this.currentProject.customer.name);
             form.append('template', template.id);
             form.append('service', service._id);
             form.append('source', JSON.stringify(source));
@@ -185,7 +187,7 @@ export default {
                             start: "",
                             deadline: "",
                             progress: metrics.body.progress[key],
-                            status: "",
+                            status: "Created",
                             receivables: "",
                             payables: "",
                             margin: "",

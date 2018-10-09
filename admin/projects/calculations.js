@@ -36,19 +36,11 @@ function receivablesCalc(task, industry, combs) {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
     });
-    const cost = comb.industries.find(item => {
+    const wordCost = comb.industries.find(item => {
         return item.industry.id === industry
     })
-    let receivables = 0;
-    let wordsSum = 0;
-    for(let key in metrics) {
-        if(key != 'totalWords' && key != "nonTranslatable" && key != "__proto__") {
-            receivables+= metrics[key].value*metrics[key].client*cost.rate;
-            wordsSum += metrics[key].value;
-        }
-    }
-    receivables += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*cost.rate;
-    return receivables.toFixed(3);
+    const rate = wordCost.rate;
+    return costCalc(metrics, 'client', rate)
 }
 
 async function payablesCalc(task, industry, ven) {
@@ -59,19 +51,24 @@ async function payablesCalc(task, industry, ven) {
         item.target.symbol === task.targetLanguage &&
         item.service.id === task.service
     });
-    const cost = comb.industry.find(item => {
+    const wordCost = comb.industry.find(item => {
         return item.industry.id === industry
-    }) || comb.industry[0];
-    let payables = 0;
+    });
+    const rate = wordCost ? wordCost.rate : vendor.basicRate;
+    return costCalc(metrics, 'vendor', rate);
+}
+
+function costCalc(metrics, field, rate) {
+    let cost = 0;
     let wordsSum = 0;
     for(let key in metrics) {
         if(key != 'totalWords' && key != "nonTranslatable" && key != "__proto__") {
-            payables+= metrics[key].value*metrics[key].vendor*cost.rate;
+            cost+= metrics[key].value*metrics[key][field]*rate;
             wordsSum += metrics[key].value;
         }
     }
-    payables += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*cost.rate;
-    return payables.toFixed(3);
+    cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
+    return cost.toFixed(3);
 }
 
 module.exports = { metricsCalc, receivablesCalc, payablesCalc };

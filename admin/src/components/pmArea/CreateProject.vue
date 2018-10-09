@@ -21,7 +21,7 @@ export default {
                 customer: {name: ""},
                 brief: "",
                 notes: "",
-                industry: [],
+                industry: "",
                 createdAt: new Date(),
                 deadline: "",
             }

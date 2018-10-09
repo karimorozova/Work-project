@@ -73,9 +73,6 @@ export default {
         },
         selectProject({project}) {
             this.chosenProject = project;
-            this.chosenProject.customer = this.allCustomers.find(item => {
-                return item._id = project.customer; 
-            })
             this.storeProject(this.chosenProject);
             this.$router.push({name: 'pm-project-details'});
         },

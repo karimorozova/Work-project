@@ -2,6 +2,7 @@ const router = require("express").Router();
 const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
 const { User, Languages, Projects } = require("../../models");
+const { getProject } = require('../../projects/');
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -15,7 +16,8 @@ router.post("/new-project", async (req, res) => {
     const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
     project.status = "Draft";
     project.projectId = req.body.dateFormatted + ' ' + nextNumber;
-    const result = await Projects.create(project);
+    const newProject = await Projects.create(project);
+    const result = await getProject({"_id": newProject.id});
     res.send(result); 
     } catch(err) {
         console.log(err);

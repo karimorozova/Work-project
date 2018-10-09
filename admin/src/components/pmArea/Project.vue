@@ -33,10 +33,10 @@
             .project__industry
                 LabelValue(label="Industry")
                     .project__drop-menu
-                        SelectMulti(
-                            :selectedOptions="industryNames"
+                        SelectSingle(
+                            :selectedOption="selectedIndustry.name || project.industry.name"
                             :options="industriesList"
-                            @chooseOptions="addIndustry"
+                            @chooseOptions="setIndustry"
                             placeholder="Industry"
                         )
             .project__id
@@ -63,7 +63,7 @@ import Datepicker from "../Datepicker";
 import LabelValue from "./LabelValue";
 import Button from "../Button";
 import moment from "moment";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -78,7 +78,7 @@ export default {
                 "template 2",
                 "template 3",
             ],
-            selectedIndustries: [],
+            selectedIndustry: "",
             industries: [],
             disabled: {
                 to: moment().add(-1, 'day').endOf('day').toDate()
@@ -91,31 +91,30 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            loadingToggle: "loadingToggle"
+        }),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, h:mm:ss');
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});
             if(refersTo === 'customer' && this.project.customer.industry.length == 1) {
-                this.selectedIndustries = [this.project.customer.industry[0]]
+                this.selectedIndustry = this.project.customer.industry[0];
             }
         },
-        addIndustry({option}) {
-            const position = this.industryNames.indexOf(option.name);
-            if(position === -1) {
-                this.selectedIndustries.push(option);
-            } else {
-                this.selectedIndustries.splice(position, 1)
-            }
+        setIndustry({option}) {
+            this.selectedIndustry = option;
         },
         async createProject() {
+            this.loadingToggle(true);
             this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
-            this.project.industry = this.selectedIndustries.map(item => {
-                return item._id
-            });
+            this.project.industry = this.selectedIndustry._id;
+            const customer = {...this.project.customer};
+            this.project.customer = customer._id;
             const newProject = await this.$http.post("/pm-manage/new-project", this.project);
-            const customer = this.project.customer;
-            this.$emit('projectCreated', {project: newProject.body, customer: customer});            
+            this.$emit('projectCreated', {project: newProject.body, customer: customer});
+            this.loadingToggle(false);
         },
         async getIndustries() {
             const industries = await this.$http.get('/api/industries');
@@ -132,15 +131,6 @@ export default {
         ...mapGetters({
             allClients: "getClients"
         }),
-        industryNames() {
-            return this.project.customer.industry ? 
-            this.project.customer.industry.map(item => {
-                return item.name;
-            }) 
-            : this.selectedIndustries.map(item => {
-                return item.name;
-            })
-        },
         industriesList() {
             return this.project.customer.name ? this.project.customer.industry : this.industries
         }
