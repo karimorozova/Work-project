@@ -1,6 +1,7 @@
 const { Projects, Services, Clients, Vendors } = require('../models/');
 const { getVendor } = require('../routes/vendors/');
 const { getClient } = require('../clients/');
+const { getOneService } = require('../services/');
 
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {
@@ -32,6 +33,9 @@ async function metricsCalc(metrics) {
 }
 
 async function receivablesCalc(task, project, step, combs) {
+    if(step.name !== "translate1") {
+        return await calcProofingStep(task, project, task.metrics.totalWords);
+    } 
     const metrics = task.metrics;
     const customerCost = await checkCustomerCombs(task, project.industry.id, project.customer.id);
     const comb = combs.find(item => {
@@ -46,26 +50,24 @@ async function receivablesCalc(task, project, step, combs) {
 }
 
 async function payablesCalc(task, project, step) {
+    const service = step.name !== "translate1" ? 'Proofing' : task.service;
     const metrics = task.metrics;
     const vendor = await getVendor({"_id": step.vendor._id});
     const comb = vendor.languageCombinations.find(item => {
         return item.source.symbol === task.sourceLanguage &&
         item.target.symbol === task.targetLanguage &&
-        item.service.id === task.service
+        item.service.id === service
     });
     const wordCost = comb ? comb.industry.find(item => {
         return item.industry.id === project.industry.id
     }) : "";
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
-    return calcCost(metrics, 'vendor', rate, step);
+    return step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
+        : calcCost(metrics, 'vendor', rate, step);
 }
 
-function calcCost(metrics, field, rate, step) {
+function calcCost(metrics, field, rate) {
     let cost = 0;
-    if(step.name !== "translate1") {
-      cost = metrics.totalWords*rate;
-      return cost.toFixed(2);
-    } 
     let wordsSum = 0;
     for(let key in metrics) {
         if(key != 'totalWords' && key != "nonTranslatable" && key != "__proto__") {
@@ -88,6 +90,19 @@ async function checkCustomerCombs(task, industry, customerId) {
         return item.id === industry
     }) : "";
     return wordCost;
+}
+
+async function calcProofingStep(task, project, words) {
+    const service = await getOneService({title: 'Proofing'});
+    const clientCombs = await checkCustomerCombs(task, project.industry.id, project.customer.id);
+    const comb = service.languageCombinations.find(item => {
+        return item.source.symbol === task.sourceLanguage &&
+                item.target.symbol === task.targetLanguage
+    });
+    const wordCost = clientCombs || comb.industries.find(item => {
+        return item.industry.id === project.industry.id
+    })
+    return (words*wordCost.rate).toFixed(2);
 }
 
 module.exports = { metricsCalc, receivablesCalc, payablesCalc };
