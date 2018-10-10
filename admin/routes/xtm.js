@@ -24,7 +24,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
         referenceFile = await moveFile(refFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/reference-${refFiles[0].filename.replace(/\s+/g, '_')}`)
     }
     let template = tasksInfo.template || '247336FD';
-    let workflow = tasksInfo.workflow || 2941;
+    let workflow = tasksInfo.workflow || 2917;
     let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
     try {
         const project = await Projects.findOne({"_id": tasksInfo.projectId});

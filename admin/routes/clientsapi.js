@@ -3,6 +3,7 @@ const multer = require('multer');
 const fs = require('fs');
 const fse = require('fs-extra');
 const mv = require('mv');
+const { getClient, getClients} = require('../clients/');
 const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
@@ -145,31 +146,27 @@ router.get('/get-rates', async (req, res) => {
     const service = req.query.service;
     const form = req.query.form;
     try {
-        const client = await Clients.findOne({"_id": clientId})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        let client = await getClient({"_id": clientId});
         let rates = [];
         for(let comb of client.languageCombinations) {
             if(comb.service.title === service) {
                 for(let elem of comb.industry) {
-                    elem.industry.active = elem.active;
-                    elem.industry.rate = elem.rate;
+                    let industry = {...elem.industry._doc};
+                    industry.rate = elem.rate;
+                    industry.active = elem.active;
                     if(form === "Duo") {
                         rates.push({
                             service: comb.service,
                             sourceLanguage: comb.source,
                             targetLanguage: comb.target,
-                            industry: [elem.industry]
+                            industry: [industry]
                         })
                     } else {
-                        elem.industry.package = elem.package;
+                        industry.package = elem.package;
                         rates.push({
                             service: comb.service,
                             targetLanguage: comb.target,
-                            industry: [elem.industry]
+                            industry: [industry]
                         })
                     }
                     

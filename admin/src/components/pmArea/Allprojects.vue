@@ -189,13 +189,13 @@ export default {
             }
             if(this.sourceFilter.length) {
                 result = result.filter(item => {
-                    return this.sourceFilter.indexOf(item.jobs[0].sourceLanguage) != -1;
+                    return this.sourceFilter.indexOf(item.tasks[0].sourceLanguage) != -1;
                 })
             }
             if(this.targetFilter.length) {
                 result = result.filter(item => {
-                    for(const job of item.jobs) {
-                        if (this.targetFilter.indexOf(job.targetLanguage) != -1) {
+                    for(const task of item.tasks) {
+                        if (this.targetFilter.indexOf(task.targetLanguage) != -1) {
                             return item;
                         }
                     }

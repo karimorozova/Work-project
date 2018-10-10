@@ -11,6 +11,14 @@ const ServicesSchema = new mongoose.Schema({
         default: '',
         trim: true
     },
+    symbol: {
+        type: String,
+        default: ''
+    },
+    formType: {
+        type: String,
+        default: '' 
+    },
     icon: {
         type: String,
         default: ''

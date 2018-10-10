@@ -1,9 +1,9 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            span.selected(v-if="selectedLang.length == 1") {{ selectedLang[0] }}
-            span.selected(v-if="!selectedLang.length") Select
-            .selected(v-if="selectedLang.length > 1") 
+            span.selected(v-if="selectedLang.length == 1" :class="{'no-opacity': selectedLang.length}") {{ selectedLang[0] }}
+            span.selected(v-if="!selectedLang.length") {{ placeholder }}
+            .selected(v-if="selectedLang.length > 1" :class="{'no-opacity': selectedLang.length}") 
                 span(v-for="lang in selectedLang") {{ lang }}; &nbsp;
             .arrow-button(@click="showLangs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': droppedLang}")
@@ -12,7 +12,7 @@
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: selectedLang.indexOf(language.symbol) != -1}")
-                span {{ language.lang }}
+                span(:class="{'left-pad': !isCheckboxShown}") {{ language.lang }}
 </template>
 
 <script>
@@ -28,6 +28,14 @@ export default {
             default: 0
         },
         addAll: {
+            type: Boolean,
+            default: false
+        },
+        placeholder: {
+            type: String,
+            default: 'Select'
+        },
+        single: {
             type: Boolean,
             default: false
         }
@@ -55,7 +63,8 @@ export default {
                 height = tr.offsetHeight;
             }
             this.droppedLang = !this.droppedLang;
-            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height})
+            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height});
+            this.searchLang = "";
         },
         async getLanguages() {
             await this.$http.get('api/languages')
@@ -75,9 +84,14 @@ export default {
         },
         outClick() {
             this.droppedLang = false;
+            this.searchLang = "";
         },
         changeLang(index) {
-            this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex})
+            this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex});
+            if(this.single) {
+                this.droppedLang = false;
+                this.searchLang = "";
+            }
         }
     },
     computed: {
@@ -106,7 +120,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    .all-projects__filters & {
+    .all-projects__filters &, .project-info__drop-menu & {
         border: 1px solid #67573E;
         height: 28px;
     }
@@ -126,6 +140,13 @@ export default {
             width: 76%;
             height: 23px;
         }
+        .project-info__drop-menu & {
+            width: 80%;
+            height: 23px;
+            border-right: none;
+            padding: 3px 10px;
+            opacity: 0.5;
+        }
     }
     .arrow-button {
         width: 18%;
@@ -135,6 +156,10 @@ export default {
         .all-projects__filters & {
             border-left: 1px solid #68573E;
             width: 24%;
+        }
+        .project-info__drop-menu & {
+            width: 20%;
+            border-left: 1px solid #68573E;
         }
         img {
             padding-right: 2px;
@@ -157,10 +182,15 @@ export default {
             padding: 2px 5px;
         }
     }
+    .project-info__drop-menu & {
+        .no-opacity {
+            opacity: 1;
+        }
+    }
 }
 .drop-select {
     position: relative;
-    .all-projects__filters & {
+    .all-projects__filters &, .project-info__drop-menu & {
         position: absolute;
         width: 100%;
     }
@@ -193,6 +223,9 @@ export default {
             .all-projects__filters & {
                 font-size: 12px;
             }
+            .left-pad {
+                padding-left: 5px;
+            }
         }
         .inner-component & {
             max-height: 118px;
@@ -217,6 +250,9 @@ export default {
         border-right: none;
         .inner-component &, .all-projects__filters & {
             width: 88%;
+        }
+        .project-info__drop-menu & {
+            width: 90%;
         }
     }
 }

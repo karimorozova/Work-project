@@ -9,12 +9,11 @@
         .project-info__input-data-row
             .project-info__tasks-col
                 .project-info__drop-menu
-                    SelectSingle(
-                        :selectedOption="sourceLanguage" 
-                        :options="allLangs" 
-                        placeholder="Source Language"
-                        refersTo="sourceLanguage"
-                        @chooseOption="setValue"
+                    LanguagesSelect(
+                        placeholder="Source Languages"
+                        :single='true'
+                        :selectedLang="sourceLanguage"
+                        @chosenLang="setSource"
                     )
                 .project-info__drop-menu
                     SelectSingle(
@@ -26,11 +25,10 @@
                     )
             .project-info__tasks-col
                 .project-info__drop-menu            
-                    SelectMulti(
-                        :selectedOptions="targetLangs"
-                        :options="allLangs" 
-                        placeholder="Target Language"
-                        @chooseOptions="setTargets"
+                    LanguagesSelect(
+                        placeholder="Target Languages"
+                        :selectedLang="targetLangs"
+                        @chosenLang="setTargets"
                     )
                 .project-info__drop-menu           
                     SelectSingle(
@@ -43,9 +41,16 @@
             .project-info__tasks-col
                 .project-info__upload-file
                     UploadFileButton(text="Source Files" @uploadFiles="uploadDetailFiles")
+                .project-info__drop-menu           
+                    SelectSingle(
+                        :selectedOption="selectedWorkflow.name" 
+                        :options="workflowStepsNames" 
+                        placeholder="Service"
+                        @chooseOption="({option}) => setValue({option}, {refersTo: 'selectedWorkflow'})"
+                    ) 
+            .project-info__tasks-col
                 .project-info__upload-file
-                    UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")
-            .project-info__tasks-col       
+                    UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")     
                 .project-info__add-tasks
                     Button(value="Add tasks" @clicked="addTasks")
         Tasks(v-if="currentProject.tasks.length && !currentProject.steps.length"
@@ -63,6 +68,7 @@
 <script>
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
+import LanguagesSelect from "../LanguagesSelect";
 import UploadFileButton from "../UploadFileButton";
 import Button from "../Button";
 import LabelValue from "./LabelValue";
@@ -83,8 +89,10 @@ export default {
                 {name: 'Multilingual Excel', id: 'multiexcel'},
                 {name: 'Standard processing', id: '247336FD'},        
             ],
+            workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
+            selectedWorkflow: {name:"2 Steps", id: 2917},
             template: "",
-            sourceLanguage: "",
+            sourceLanguage: [],
             targetLanguages: [],
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
@@ -111,11 +119,11 @@ export default {
         setValue({option, refersTo}) {
             this[refersTo] = option;
         },
-        setTargets({option}) {
-            const lang = this.languages.find(item => {
-                return item.lang === option;
-            }) 
-            const position = this.targetLangs.indexOf(lang.lang);
+        setSource({lang}) {
+            this.sourceLanguage[0] = lang.symbol;
+        },
+        setTargets({lang}) { 
+            const position = this.targetLangs.indexOf(lang.symbol);
             if(position != -1) {
                 this.targetLanguages.splice(position, 1)
             } else {
@@ -137,7 +145,7 @@ export default {
                     return item.name === this.template
                 }) : {id: ""}
             const source = this.languages.find(item => {
-                return item.lang === this.sourceLanguage;
+                return item.symbol === this.sourceLanguage[0];
             })
             const service = this.services.find(item => {
                 return item.title === this.service
@@ -146,6 +154,7 @@ export default {
             form.append('customerId', xtmId);
             form.append('customerName', this.currentProject.customer.name);
             form.append('template', template.id);
+            form.append('workflow', this.selectedWorkflow.id);
             form.append('service', service._id);
             form.append('source', JSON.stringify(source));
             form.append('targets', JSON.stringify(this.targetLanguages));
@@ -226,6 +235,12 @@ export default {
                 return item;
             })
             await this.setProjectValue({value: steps, prop: 'steps'});
+        },
+        defaultService() {
+            const service = this.services.find(item => {
+                return item.symbol === 'tr'
+            });
+            this.service = service.title;
         }
     },
     computed: {
@@ -253,7 +268,12 @@ export default {
         },
         targetLangs() {
             return this.targetLanguages.map(item => {
-                return item.lang
+                return item.symbol
+            })
+        },
+        workflowStepsNames() {
+            return this.workflowSteps.map(item => {
+                return item.name
             })
         },
         metricsButton() {
@@ -263,6 +283,7 @@ export default {
     components: {
         SelectSingle,
         SelectMulti,
+        LanguagesSelect,
         UploadFileButton,
         Button,
         LabelValue,
@@ -275,7 +296,9 @@ export default {
         this.getVendors();
         if(!this.currentProject._id) {
             this.$router.replace({name: "pm-projects"})
-        }
+        };
+        this.defaultService();
+
     }
 }
 </script>
