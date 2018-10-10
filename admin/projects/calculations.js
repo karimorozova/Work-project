@@ -1,5 +1,6 @@
 const { Projects, Services, Clients, Vendors } = require('../models/');
 const { getVendor } = require('../routes/vendors/');
+const { getClient } = require('../clients/');
 
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {
@@ -30,36 +31,41 @@ async function metricsCalc(metrics) {
     })
 }
 
-function receivablesCalc(task, industry, combs) {
+async function receivablesCalc(task, project, step, combs) {
     const metrics = task.metrics;
+    const customerCost = await checkCustomerCombs(task, project.industry.id, project.customer.id);
     const comb = combs.find(item => {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
     });
     const wordCost = comb.industries.find(item => {
-        return item.industry.id === industry
+        return item.industry.id === project.industry.id
     })
-    const { rate } = wordCost;
-    return calcCost(metrics, 'client', rate)
+    const { rate } = customerCost || wordCost;
+    return calcCost(metrics, 'client', rate, step)
 }
 
-async function payablesCalc(task, industry, ven) {
+async function payablesCalc(task, project, step) {
     const metrics = task.metrics;
-    const vendor = await getVendor({"_id": ven._id});
+    const vendor = await getVendor({"_id": step.vendor._id});
     const comb = vendor.languageCombinations.find(item => {
         return item.source.symbol === task.sourceLanguage &&
         item.target.symbol === task.targetLanguage &&
         item.service.id === task.service
     });
-    const wordCost = comb.industry.find(item => {
-        return item.industry.id === industry
-    });
+    const wordCost = comb ? comb.industry.find(item => {
+        return item.industry.id === project.industry.id
+    }) : "";
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
-    return calcCost(metrics, 'vendor', rate);
+    return calcCost(metrics, 'vendor', rate, step);
 }
 
-function calcCost(metrics, field, rate) {
+function calcCost(metrics, field, rate, step) {
     let cost = 0;
+    if(step.name !== "translate1") {
+      cost = metrics.totalWords*rate;
+      return cost.toFixed(2);
+    } 
     let wordsSum = 0;
     for(let key in metrics) {
         if(key != 'totalWords' && key != "nonTranslatable" && key != "__proto__") {
@@ -68,7 +74,20 @@ function calcCost(metrics, field, rate) {
         }
     }
     cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
-    return cost.toFixed(3);
+    return cost.toFixed(2);
+}
+
+async function checkCustomerCombs(task, industry, customerId) {
+    const customer = await getClient({"_id": customerId});
+    const comb = customer.languageCombinations.find(item => {
+        return item.source.symbol === task.sourceLanguage &&
+                item.target.symbol === task.targetLanguage &&
+                item.service.id === task.service
+    })
+    const wordCost = comb ? comb.industry.find(item => {
+        return item.id === industry
+    }) : "";
+    return wordCost;
 }
 
 module.exports = { metricsCalc, receivablesCalc, payablesCalc };

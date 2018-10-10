@@ -41,9 +41,9 @@
                     @changeVend="(vendor) => setVendor(vendor, index)"
                 )
             template(slot="start" slot-scope="{ row }")
-                span.steps__step-data {{ row.start }}
+                span.steps__step-data {{ row.start.split('T')[0].split('-').reverse().join('-') }}
             template(slot="deadline" slot-scope="{ row }")
-                span.steps__step-data {{ row.deadline }}
+                span.steps__step-data {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
             template(slot="progress" slot-scope="{ row }")
                 span.steps__step-data {{ progress(row.progress) }}
             template(slot="status" slot-scope="{ row }")

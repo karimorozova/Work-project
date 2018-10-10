@@ -83,13 +83,13 @@ router.get('/costs', async (req, res) => {
     for(let task of project.tasks) {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
-      const receivables = receivablesCalc(task, project.industry.id, combinations);
       for(let step of project.steps) {
-        const payables = step.vendor ? await payablesCalc(task, project.industry.id, step.vendor) : "";
+        const receivables = await receivablesCalc(task, project, step, combinations);
+        const payables = step.vendor ? await payablesCalc(task, project, step) : "";
         if(step.taskId === task.id) {
           step.receivables = receivables;
           step.payables = payables;
-          step.margin = step.receivables - step.payables;
+          step.margin = (step.receivables - step.payables).toFixed(2);
         }
       }
     }

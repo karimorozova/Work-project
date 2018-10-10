@@ -101,8 +101,9 @@ export default {
             removeStepVendor: 'removeStepVendor',
             setStepVendor: 'setStepVendor'
         }),
-        setVendor({vendor, index}) {
-            this.setStepVendor({value: vendor, index: index});
+        async setVendor({vendor, index}) {
+            await this.setStepVendor({value: vendor, index: index});
+            this.getMetrics();
         },
         setStatus({option}) {
            this.setProjectValue({value: option, prop: "status"}) 
@@ -173,19 +174,22 @@ export default {
             for(let task of project.tasks) {
                 const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
                 task.metrics = metrics.body.metrics;
+                const keysArr = Object.keys(metrics.body.progress);
                 for(const key in metrics.body.progress) {
                     const existedTask = project.steps.find(item => {
                         return item.taskId === task.id && item.name === key
                     })
                     if(!existedTask) {
+                        const startDate = key === 'translate1' ? new Date() : "";
+                        const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
                         project.steps.push({
                             taskId: task.id,
                             name: key,
                             source: task.sourceLanguage,
                             target: task.targetLanguage,
                             vendor: "",
-                            start: "",
-                            deadline: "",
+                            start: startDate,
+                            deadline: deadline,
                             progress: metrics.body.progress[key],
                             status: "Created",
                             receivables: "",

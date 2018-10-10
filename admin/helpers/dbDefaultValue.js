@@ -187,7 +187,7 @@ const industriesDefault = [
     {name: 'More', rate: 0,  icon: '/static/industries/more-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
 ];
 
-const projectsDefault = [{projectId: "04-09-2018 Test [1]", xtmId: 7787, projectName: "Test", createdAt: new Date(), date: new Date(), customer: "DDD", industry: "Legal", jobs: [{sourceLanguage: "English (United Kingdom)", targetLanguage: "French (France)", status: "Open", wordcount: 280, cost: ""},{sourceLanguage: "English (United Kingdom)", targetLanguage: "Polish", status: "Open", wordcount: 280, cost: ""}], service: "Translation", status: "Open", sourceLanguage: {lang: "English (United Kingdom)"}, targetLanguages: [{lang: "French (France)"}, {lang: "Polish"}], brief: "", detailFiles: [], refFiles: [], jsession: "", genBrief: ""}];
+const projectsDefault = [];
 
 const ratesduoDefault = [];
 
