@@ -39,8 +39,8 @@ function receivablesCalc(task, industry, combs) {
     const wordCost = comb.industries.find(item => {
         return item.industry.id === industry
     })
-    const rate = wordCost.rate;
-    return costCalc(metrics, 'client', rate)
+    const { rate } = wordCost;
+    return calcCost(metrics, 'client', rate)
 }
 
 async function payablesCalc(task, industry, ven) {
@@ -55,10 +55,10 @@ async function payablesCalc(task, industry, ven) {
         return item.industry.id === industry
     });
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
-    return costCalc(metrics, 'vendor', rate);
+    return calcCost(metrics, 'vendor', rate);
 }
 
-function costCalc(metrics, field, rate) {
+function calcCost(metrics, field, rate) {
     let cost = 0;
     let wordsSum = 0;
     for(let key in metrics) {

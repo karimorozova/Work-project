@@ -2,7 +2,7 @@ const router = require('express').Router();
 const upload = require('../utils/uploads');
 const moveFile = require('../utils/moveFile');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, newXtmCustomer } = require('../services/');
+const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer } = require('../services/');
 const { getProject } = require('../projects/');
 const { metricsCalc } = require('../projects/');
 const fs = require('fs');
@@ -22,7 +22,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     }
     let template = tasksInfo.template || '247336FD';
     let workflow = tasksInfo.workflow || 2890;
-    let customerId = tasksInfo.customerId || await newXtmCustomer(tasksInfo.customerName);
+    let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
     try {
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         for(let target of tasksInfo.targets) {

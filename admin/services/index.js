@@ -1,14 +1,14 @@
 const mailTransporter = require("./mailTransporter");
-const { saveTasks, saveTemplateTasks, getMetrics, newXtmCustomer } = require("./xtmApi");
+const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer } = require("./xtmApi");
 const { getOneService, getManyServices } = require("./getServices");
-const Services = {
+const services = {
     mailTransporter,
     getOneService,
     getManyServices,
     saveTasks,
     saveTemplateTasks,
     getMetrics,
-    newXtmCustomer
+    createNewXtmCustomer
 }
 
-module.exports = Services
+module.exports = services

@@ -1,5 +1,5 @@
 const unirest = require('unirest');
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const { XMLHttpRequest } = require("xmlhttprequest");
 
 function saveTasks(object) {
 
@@ -55,7 +55,7 @@ function getMetrics(projectId) {
     })
 }
 
-function newXtmCustomer(name) {
+function createNewXtmCustomer(name) {
     const customerName = name;
     return new Promise((resolve, reject) => {
         const str = `<?xml version="1.0" encoding="UTF-8"?>
@@ -106,15 +106,13 @@ function createCORSRequest(method, url) {
     if ("withCredentials" in xhr) {
         xhr.open(method, url, false);
     } else if (typeof XDomainRequest != "undefined") {
-        alert
         xhr = new XDomainRequest();
         xhr.open(method, url);
     } else {
         console.log("CORS not supported");
-        alert("CORS not supported");
         xhr = null;
     }
     return xhr;
 }
 
-module.exports = { saveTasks, saveTemplateTasks, getMetrics, newXtmCustomer };
+module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer };
