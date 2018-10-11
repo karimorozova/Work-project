@@ -61,6 +61,7 @@
             :vendors="allVendors"
             @selectAll="selectAll"
             @setVendor="setVendor"
+            @setDate="setDate"
         )
         Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
 </template>
@@ -107,10 +108,15 @@ export default {
             vendorsSetting: "vendorsSetting",
             loadingToggle: 'loadingToggle',
             removeStepVendor: 'removeStepVendor',
-            setStepVendor: 'setStepVendor'
+            setStepVendor: 'setStepVendor',
+            setStepDate: 'setStepDate'
         }),
         async setVendor({vendor, index}) {
             await this.setStepVendor({value: vendor, index: index});
+            this.getMetrics();
+        },
+        async setDate({date, prop, index}) {
+            await this.setStepDate({value: date, prop: prop, index: index});
             this.getMetrics();
         },
         setStatus({option}) {

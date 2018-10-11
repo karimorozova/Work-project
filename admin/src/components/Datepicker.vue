@@ -1072,12 +1072,27 @@ export default {
   color: rgba(0, 0, 0, 0.2);
 }
 
+/* Custom styles for different components */
+
 .datepicker-custom {
   border-radius: 5px;
   border: 1px solid #68573E;
   height: 28px;
   color: #68573E;
   padding-left: 5px;
+}
+
+.steps__custom-input {
+  color: #68573E;
+  border: none;
+  width: 100%;
+  background-color: transparent;
+}
+
+.steps__calendar-custom {
+  width: 200px;
+  right: -175px;
+  top: -6px;
 }
 
 .filters .datepicker-custom {
@@ -1089,14 +1104,17 @@ export default {
   width: 220px;
   left: -21px;
 }
-.calendar-custom .cell {
+.calendar-custom .cell,
+.steps__calendar-custom .cell {
   height: 30px;
 	line-height: 30px;
 }
-.custom-fonts .cell.day {
+.custom-fonts .cell.day,
+.steps__calendar-custom .cell.day {
   font-size: 14px;
 }
-.custom-fonts .cell.day-header {
+.custom-fonts .cell.day-header,
+.steps__calendar-custom .cell.day-header {
   font-size: 12px;
 }
 </style>

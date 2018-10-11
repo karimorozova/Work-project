@@ -82,6 +82,13 @@ export default {
         &:focus-within {
             box-shadow: inset 0 0 5px #938676;
         }
+        .steps__table & {
+            display: flex;
+            align-items: center;
+            &:nth-of-type(4) {
+                padding: 0;
+            }
+        }
     }
     &__row {
         display: flex;

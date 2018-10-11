@@ -40,10 +40,24 @@
                     :selectedVendor="vendorName(row.vendor)"
                     @changeVend="(vendor) => setVendor(vendor, index)"
                 )
-            template(slot="start" slot-scope="{ row }")
-                span.steps__step-data {{ row.start.split('T')[0].split('-').reverse().join('-') }}
-            template(slot="deadline" slot-scope="{ row }")
-                span.steps__step-data {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
+            template(slot="start" slot-scope="{ row, index }")
+                Datepicker(@selected="(e) => changeDate(e, 'start', index)" 
+                    v-model="row.start"
+                    inputClass="steps__custom-input" 
+                    calendarClass="steps__calendar-custom" 
+                    :format="customFormatter" 
+                    monday-first=true
+                    :disabled="disabled"
+                    :highlighted="highlighted")
+            template(slot="deadline" slot-scope="{ row, index }")
+                Datepicker(@selected="(e) => changeDate(e, 'deadline', index)" 
+                    v-model="row.deadline"
+                    inputClass="steps__custom-input" 
+                    calendarClass="steps__calendar-custom" 
+                    :format="customFormatter" 
+                    monday-first=true
+                    :disabled="disabled"
+                    :highlighted="highlighted")
             template(slot="progress" slot-scope="{ row }")
                 span.steps__step-data {{ progress(row.progress) }}
             template(slot="status" slot-scope="{ row }")
@@ -62,6 +76,8 @@
 <script>
 import DataTable from "../DataTable";
 import Vendorselect from "./Vendorselect";
+import Datepicker from "../Datepicker";
+import moment from "moment";
 
 export default {
     props: {
@@ -74,6 +90,12 @@ export default {
     },
     data() {
         return {
+            highlighted: {
+                days: [6, 0]
+            },
+            disabled: {
+                to: moment().add(-1, 'day').endOf('day').toDate()
+            },
             fields: [
                 {label: "Check", key: "check", width: "4%"},
                 {label: "Step", key: "name", width: "9%"},
@@ -92,6 +114,9 @@ export default {
         }
     },
     methods: {
+        customFormatter(date) {
+            return moment(date).format('DD-MM-YYYY');
+        },
         onRowClicked({index}) {
             this.$emit("onRowClicked", {index: index})
         },
@@ -106,18 +131,15 @@ export default {
         },
         vendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
-        }
-    },
-    computed: {
-        vendorsIds() {
-            return this.selectedVendors.map(item => {
-                return item._id
-            })
+        },
+        changeDate(e, prop, index) {
+            this.$emit('setDate', {date: new Date(e), prop: prop, index: index});
         }
     },
     components: {
         DataTable,
-        Vendorselect
+        Vendorselect,
+        Datepicker
     }    
 }
 </script>

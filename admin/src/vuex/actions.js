@@ -12,6 +12,7 @@ export const setAllProjects = ({ commit }, payload) => commit('allProjects', pay
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
 export const setProjectValue = ({ commit }, payload) => commit('storeProjectValue', payload);
 export const setStepVendor = ({ commit }, payload) => commit('stepVendorStore', payload);
+export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);  
 export const login = ({ commit }, creds) => {

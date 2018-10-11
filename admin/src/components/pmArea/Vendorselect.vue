@@ -89,6 +89,13 @@ export default {
                 }
             }
         }
+        .steps__table & {
+            padding-top: 3px;
+        }
+    }
+    .steps__table & {
+        border: none;
+        border-radius: 0;
     }
     .no-industry {
         opacity: 0.5;
@@ -104,6 +111,9 @@ export default {
         .reverseIcon {
             transform: rotate(180deg);
         }
+        .steps__table & {
+            padding-top: 3px;
+        }
     }
 }
 .drop-select {
@@ -113,6 +123,7 @@ export default {
         font-size: 14px;
         position: absolute;
         width: 100%;
+        box-sizing: border-box;
         border: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
