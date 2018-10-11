@@ -46,7 +46,7 @@ export default {
     box-sizing: border-box;
     width: 20%;
     margin-top: 20px;
-    padding: 40px 30px;
+    padding: 10px 20px;
     box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
     display: flex;
     flex-direction: column;

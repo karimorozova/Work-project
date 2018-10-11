@@ -4,66 +4,69 @@
     .project-info__all-info
         Project(:project="currentProject")
         ProjectShortDetails(:project="currentProject" @setStatus="setStatus")
-    .project-info__tasks
-        .project-info__tasks-title Tasks and Steps
-        .project-info__input-data-row
-            .project-info__tasks-col
-                .project-info__drop-menu
-                    LanguagesSelect(
-                        placeholder="Source Languages"
-                        :single='true'
-                        :selectedLang="sourceLanguage"
-                        @chosenLang="setSource"
-                    )
-                .project-info__drop-menu
-                    SelectSingle(
-                        :selectedOption="template"
-                        :options="allTemplates"
-                        placeholder="Template"
-                        refersTo="template"
-                        @chooseOption="setValue"
-                    )
-            .project-info__tasks-col
-                .project-info__drop-menu            
-                    LanguagesSelect(
-                        placeholder="Target Languages"
-                        :selectedLang="targetLangs"
-                        @chosenLang="setTargets"
-                    )
-                .project-info__drop-menu           
-                    SelectSingle(
-                        :selectedOption="service" 
-                        :options="allServices" 
-                        placeholder="Service"
-                        refersTo="service"
-                        @chooseOption="setValue"
-                    )     
-            .project-info__tasks-col
-                .project-info__upload-file
-                    UploadFileButton(text="Source Files" @uploadFiles="uploadDetailFiles")
-                .project-info__drop-menu           
-                    SelectSingle(
-                        :selectedOption="selectedWorkflow.name" 
-                        :options="workflowStepsNames" 
-                        placeholder="Service"
-                        @chooseOption="({option}) => setValue({option}, {refersTo: 'selectedWorkflow'})"
-                    ) 
-            .project-info__tasks-col
-                .project-info__upload-file
-                    UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")     
-                .project-info__add-tasks
-                    Button(value="Add tasks" @clicked="addTasks")
-        Tasks(v-if="currentProject.tasks.length && !currentProject.steps.length"
-            :allTasks="currentProject.tasks"
-        )
-        Steps(v-if="currentProject.steps.length"
-            :allSteps="currentProject.steps"
-            :vendors="allVendors"
-            @selectAll="selectAll"
-            @setVendor="setVendor"
-            @setDate="setDate"
-        )
-        Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
+    .project-info__all-info
+        .project-info__tasks
+            .project-info__tasks-title Tasks and Steps
+            .project-info__input-data-row
+                .project-info__tasks-col
+                    .project-info__drop-menu
+                        LanguagesSelect(
+                            placeholder="Source Languages"
+                            :single='true'
+                            :selectedLang="sourceLanguage"
+                            @chosenLang="setSource"
+                        )
+                    .project-info__drop-menu
+                        SelectSingle(
+                            :selectedOption="template"
+                            :options="allTemplates"
+                            placeholder="Template"
+                            refersTo="template"
+                            @chooseOption="setValue"
+                        )
+                .project-info__tasks-col
+                    .project-info__drop-menu            
+                        LanguagesSelect(
+                            placeholder="Target Languages"
+                            :selectedLang="targetLangs"
+                            @chosenLang="setTargets"
+                        )
+                    .project-info__drop-menu           
+                        SelectSingle(
+                            :selectedOption="service" 
+                            :options="allServices" 
+                            placeholder="Service"
+                            refersTo="service"
+                            @chooseOption="setValue"
+                        )     
+                .project-info__tasks-col
+                    .project-info__upload-file
+                        UploadFileButton(text="Source Files" @uploadFiles="uploadDetailFiles")
+                    .project-info__drop-menu           
+                        SelectSingle(
+                            :selectedOption="selectedWorkflow.name" 
+                            :options="workflowStepsNames" 
+                            placeholder="Service"
+                            @chooseOption="({option}) => setValue({option}, {refersTo: 'selectedWorkflow'})"
+                        ) 
+                .project-info__tasks-col
+                    .project-info__upload-file
+                        UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")     
+                    .project-info__add-tasks
+                        Button(value="Add tasks" @clicked="addTasks")
+            Tasks(v-if="currentProject.tasks.length && !currentProject.steps.length"
+                :allTasks="currentProject.tasks"
+            )
+            Steps(v-if="currentProject.steps.length"
+                :allSteps="currentProject.steps"
+                :vendors="allVendors"
+                @selectAll="selectAll"
+                @setVendor="setVendor"
+                @setDate="setDate"
+            )
+            Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
+        .project-info__action
+            ProjectAction(:project="currentProject")
 </template>
 
 <script>
@@ -75,14 +78,12 @@ import Button from "../Button";
 import LabelValue from "./LabelValue";
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
+import ProjectAction from "./ProjectAction";
 import Tasks from "./Tasks";
 import Steps from "./Steps";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-    props: {
-        
-    },
     data() {
         return {
             templates: [
@@ -295,6 +296,7 @@ export default {
         LabelValue,
         Project,
         ProjectShortDetails,
+        ProjectAction,
         Tasks,
         Steps
     },
@@ -334,6 +336,7 @@ export default {
         width: 60%;
         padding: 20px;
         margin-left: 20px;
+        margin-right: 20px;
         box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
     }
     &__tasks-title {
@@ -360,6 +363,9 @@ export default {
         display: flex;
         height: 78px;
         align-items: flex-end;
+    }
+    &__action {
+        width: 20%;
     }
 }
 </style>

@@ -2,7 +2,9 @@ const router = require("express").Router();
 const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
 const { User, Languages, Projects } = require("../../models");
-const { getProject } = require('../../projects/');
+const { getProject } = require("../../projects/");
+const { getOneService } = require("../../services/")
+const { clientQuoteEmail, messageForClient } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -32,6 +34,21 @@ router.get("/all-managers", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting managers " + err);
+    }
+})
+
+router.post("/send-quote", async (req, res) => {
+    try {
+        const project = await getProject({"_id": req.body.id});
+        const service = await getOneService({"_id": project.tasks[0].service});
+        let quote = {...project._doc};
+        quote.service = service.title;
+        const message = messageForClient(quote);
+        const clientMail = await clientQuoteEmail(project.customer, message);
+        res.send(clientMail);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending a Quote " + err);
     }
 })
 

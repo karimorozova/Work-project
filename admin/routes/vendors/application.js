@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const upload = require("../../utils/uploads");
 const moveFile = require("../../utils/moveFile");
-const sendEmail = require("../../utils/mailTemplate");
-const applicationMessage = require("../../utils/emailMessages");
+const { sendEmail, applicationMessage } = require("../../utils/");
 const { Vendors, Languages } = require("../../models");
 
 router.post("/send-form", upload.any(), async (req, res) => {

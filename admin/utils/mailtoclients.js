@@ -1,11 +1,11 @@
-const nodemailer = require('nodemailer');
+const { clientQuoteEmail } = require('./mailTemplate');
 
 const mailhandler = {
   clientMail(project, client) {
-    var acceptQuote = "";
-    var declineQuote = "";
-    var langPairs = "";
-    var date = new Date().getTime();
+    let acceptQuote = "";
+    let declineQuote = "";
+    let langPairs = "";
+    const date = new Date().getTime();
     let totalCost = 56;
     let expiryDate = new Date(date + 60000);
     for(let target of project.targetLanguages) {
@@ -14,45 +14,7 @@ const mailhandler = {
     acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?project=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${project.projectId}, ${totalCost} &euro;</a>`
     declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?project=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${project.projectId}, ${totalCost} &euro;</a>`
     
-    // if(request.genBrief) {
-    //   detailFile = `<a href='http://admin.pangea.global/reqfiles/${request.id}/written.txt' download target='_self'>written.txt</a>`;
-    // }
-    // if (request.detailFiles.length > 0) {
-    //   for (var i = 0; i < request.detailFiles.length; i++) {
-    //     detailFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-    //     detailFile += request.detailFiles[i];
-    //     detailFile += "' download target='_self'>" + request.detailFiles[i] + "</a><br/>";
-    //   }
-    // }
-
-    // var referenceFile = "";
-    // if (request.refFiles.length > 0) {
-    //   for (var i = 0; i < request.refFiles.length; i++) {
-    //     referenceFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-    //     referenceFile += request.refFiles[i];
-    //     referenceFile += "' download target='_self'>" + request.refFiles[i] + "</a><br/>";
-    //   }
-    // }
-
-    // var targetLangs = "";
-    // request.targetLanguages.forEach(element => {
-    //   targetLangs += element.lang + ",";
-    // });
-
-    let transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com', //in-v3.mailjet.com
-      port: 587,
-      secure: false, // upgrade later with STARTTLS
-      auth: {
-        user: 'translation@pangea.global', //2a629a8646758c2140a8aced91f03dcb
-        pass: 'LetMeInNow!' //fc72170d536b40480711bfad6ff1a8c1
-      }
-    });
-    // var msg = `<li>Hello dear ${client.contactName}</li>` + 
-    //           `<li>Click on ${acceptQuote} to accept a quote` + 
-    //           `<li>Click on ${declineQuote} to decline a quote`;
-
-    var msg = `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+    let msg = `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
     <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${client.contactName},</h3>
     <div class="all-info" style="padding: 0 15px 0 30px;">
         <p class="description" style="font-size: 18px;">
