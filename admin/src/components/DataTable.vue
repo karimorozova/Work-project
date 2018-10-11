@@ -51,6 +51,9 @@ export default {
             &:hover {
                 background-color: #ddd3c8;
             }
+            .steps__table & {
+                cursor: default;
+            }
         }
         .steps__table & {
             overflow-y: overlay;

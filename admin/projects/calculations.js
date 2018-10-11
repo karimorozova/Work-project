@@ -93,7 +93,7 @@ async function checkCustomerCombs(task, industry, customerId) {
 }
 
 async function calcProofingStep(task, project, words) {
-    const service = await getOneService({title: 'Proofing'});
+    const service = await getOneService({symbol: 'pr'});
     const clientCombs = await checkCustomerCombs(task, project.industry.id, project.customer.id);
     const comb = service.languageCombinations.find(item => {
         return item.source.symbol === task.sourceLanguage &&

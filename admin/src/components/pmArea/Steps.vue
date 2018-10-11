@@ -47,7 +47,6 @@
                     calendarClass="steps__calendar-custom" 
                     :format="customFormatter" 
                     monday-first=true
-                    :disabled="disabled"
                     :highlighted="highlighted")
             template(slot="deadline" slot-scope="{ row, index }")
                 Datepicker(@selected="(e) => changeDate(e, 'deadline', index)" 
@@ -121,7 +120,8 @@ export default {
             this.$emit("onRowClicked", {index: index})
         },
         setVendor({vendor}, index) {
-            this.$emit("setVendor", {vendor: vendor, index: index});
+            const { _id, firstName, surname, email } = vendor;
+            this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index: index});
         },
         progress(prog) {
             return (prog.wordsDone/prog.wordsTotal)*100;
@@ -133,7 +133,7 @@ export default {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
         changeDate(e, prop, index) {
-            this.$emit('setDate', {date: new Date(e), prop: prop, index: index});
+            this.$emit('setDate', {date: new Date(e), prop, index});
         }
     },
     components: {

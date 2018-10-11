@@ -42,8 +42,6 @@ export default {
             this.$emit('changeVend', {vendor: this.vendors[ind]})
         },
     },
-    mounted() {
-    },
     directives: {
         ClickOutside
     }
@@ -71,24 +69,6 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        .industry-tooltip {
-            width: 40px;
-            max-height: 28px;
-            display: flex;
-            .toolTip {
-                position: absolute;
-                color: #D15F45;
-                font-size: 12px;
-                display: none;
-                left: 36px;
-                top: 8px;
-            }
-            &:hover {
-                .toolTip {
-                    display: inline-block;
-                }
-            }
-        }
         .steps__table & {
             padding-top: 3px;
         }
@@ -105,6 +85,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -149,35 +130,6 @@ export default {
         }
         .chosen {
             background-color: rgba(191, 176, 157, 0.5);
-        }
-    }
-}
-.checkbox {
-    width: 13px;
-    height: 13px;
-    border: 1px solid #67573E;
-    margin-right: 3px;
-    .checked {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        &::before {
-            content: '';
-            position: absolute;
-            width: 5px;
-            border: 1px solid #67573E;
-            top: 6px;
-            left: 1px;
-            transform: rotate(45deg);
-        }
-        &::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            border: 1px solid #67573E;
-            top: 5px;
-            left: 3px;
-            transform: rotate(-58deg);
         }
     }
 }

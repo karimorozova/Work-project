@@ -1087,6 +1087,7 @@ export default {
   border: none;
   width: 100%;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .steps__calendar-custom {

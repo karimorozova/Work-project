@@ -93,7 +93,16 @@ router.get('/costs', async (req, res) => {
         }
       }
     }
-    await Projects.updateOne({"_id": projectId}, {steps: project.steps});
+    project.receivables = project.steps.reduce((init, current) => {
+      return +init + +current.receivables
+    }, 0).toFixed(2);
+    project.payables = project.steps.reduce((init, current) => {
+      return +init + +current.payables
+    }, 0).toFixed(2);
+    await Projects.updateOne({"_id": projectId}, 
+      {steps: project.steps, 
+        receivables: project.receivables, 
+        payables: project.payables});
     const updatedProject = await getProject({"_id": projectId});
     res.send(updatedProject);
   } catch(err) {

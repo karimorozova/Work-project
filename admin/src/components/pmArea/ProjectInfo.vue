@@ -112,11 +112,11 @@ export default {
             setStepDate: 'setStepDate'
         }),
         async setVendor({vendor, index}) {
-            await this.setStepVendor({value: vendor, index: index});
+            await this.setStepVendor({value: vendor, index});
             this.getMetrics();
         },
         async setDate({date, prop, index}) {
-            await this.setStepDate({value: date, prop: prop, index: index});
+            await this.setStepDate({value: date, prop, index});
             this.getMetrics();
         },
         setStatus({option}) {
