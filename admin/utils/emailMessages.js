@@ -10,12 +10,12 @@ function applicationMessage(obj) {
     let positions = "";
     if(obj.cvFiles) {
         cvFiles = obj.cvFiles.reduce((initial, current, index) => {
-            return initial + `<a href=https://admin.pangea.global/${current.split('./dist/')[1]} download target='_self'>cvFile${index+1}</a>; `
+            return initial + `<a href=${apiUrl}/${current.split('./dist/')[1]} download target='_self'>cvFile${index+1}</a>; `
         }, "")
     }
     if(obj.coverLetterFiles) {
         coverLetterFiles = obj.coverLetterFiles.reduce((initial, current, index) => {
-            return initial + `<a href=https://admin.pangea.global/${current.split('./dist/')[1]} download target='_self'>coverLetterFile${index+1}</a>; `
+            return initial + `<a href=${apiUrl}/${current.split('./dist/')[1]} download target='_self'>coverLetterFile${index+1}</a>; `
         }, "")
     }
     if(obj.languagePairs) {
@@ -102,8 +102,8 @@ function messageForClient(obj) {
         let langPairs = obj.tasks.reduce((init, current) => {
             return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
         }, "")
-        const acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.receivables} &euro;</a>`
-        const declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.receivables} &euro;</a>`
+        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.receivables} &euro;</a>`
+        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.receivables} &euro;</a>`
         
         return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.customer.contactName},</h3>

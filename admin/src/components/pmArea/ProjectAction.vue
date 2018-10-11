@@ -36,7 +36,6 @@ export default {
         async makeAction() {
             this.loadingToggle(true);
             const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id});
-            console.log(result);
             this.loadingToggle(false);
         },
         ...mapActions({
