@@ -75,7 +75,11 @@ const mutations = {
         state.currentProject.steps[payload.index].vendor = payload.value;
     },
     stepDateStore(state, payload) {
-        state.currentProject.steps[payload.index][payload.prop] = payload.value
+        state.currentProject.steps[payload.index][payload.prop] = payload.value;
+        if(payload.prop === 'deadline' && 
+            state.currentProject.steps[payload.index].taskId === state.currentProject.steps[payload.index + 1].taskId) {
+            state.currentProject.steps[payload.index + 1].start = payload.value;
+        }
     },
     stepVendorDelete(state, payload) {
         state.currentProject.steps[payload.index].vendor = "";

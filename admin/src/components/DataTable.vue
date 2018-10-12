@@ -8,6 +8,8 @@
         .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
                 slot(:name="field.key" :row="row" :index="index")
+            .table__row-expanded(v-if="isExpand && activeIndex === index")
+                slot(name="expanded")
 </template>
 
 <script>
@@ -21,6 +23,13 @@ export default {
         },
         hasScroll: {
             type: Boolean
+        },
+        isExpand: {
+            type: Boolean,
+            default: false
+        },
+        activeIndex: {
+            type: Number
         }
     },
     methods: {
@@ -49,7 +58,9 @@ export default {
                 background-color: #f4f0ee;
             }
             &:hover {
-                background-color: #ddd3c8;
+                .table__tbody-cell {
+                    background-color: #ddd3c8;
+                }
             }
             .steps__table & {
                 cursor: default;
@@ -95,6 +106,11 @@ export default {
     }
     &__row {
         display: flex;
+        flex-wrap: wrap;
+    }
+    &__row-expanded {
+        width: 100%;
+        height: 250px;
     }
     &_scroll-padding {
         padding-right: 15px;

@@ -13,6 +13,8 @@
         DataTable(
             :fields="fields"
             :tableData="allSteps"
+            :isExpand="isExpand"
+            :activeIndex="activeIndex"
             @onRowClicked="onRowClicked"
         )
             template(slot="Check" slot-scope="{ field }")
@@ -79,11 +81,14 @@
             template(slot="margin" slot-scope="{ row }")
                 span.steps__money(v-if="row.margin") &euro;
                 span.steps__step-data {{ row.margin }}
+            template(slot="expanded")
+                StepInfo
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import Vendorselect from "./Vendorselect";
+import StepInfo from "./StepInfo";
 import SelectSingle from "../SelectSingle";
 import Datepicker from "../Datepicker";
 import moment from "moment";
@@ -122,7 +127,9 @@ export default {
             selectedVendors: [],
             isAllSelected: false,
             selectedAction: "",
-            actions: ["Request confirmation", "Other Action"]
+            actions: ["Request confirmation", "Other Action"],
+            isExpand: false,
+            activeIndex: -1
         }
     },
     methods: {
@@ -130,6 +137,13 @@ export default {
             return moment(date).format('DD-MM-YYYY');
         },
         onRowClicked({index}) {
+            if(this.activeIndex !== index) {
+                this.activeIndex = index;
+                this.isExpand = true;    
+            } else {
+                this.activeIndex = -1;
+                this.isExpand = false;
+            }
             this.$emit("onRowClicked", {index: index})
         },
         setVendor({vendor}, index) {
@@ -182,7 +196,8 @@ export default {
         DataTable,
         Vendorselect,
         SelectSingle,
-        Datepicker
+        Datepicker,
+        StepInfo
     }    
 }
 </script>
