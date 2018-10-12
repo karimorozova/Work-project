@@ -60,7 +60,6 @@
             Steps(v-if="currentProject.steps.length"
                 :allSteps="currentProject.steps"
                 :vendors="allVendors"
-                @selectAll="selectAll"
                 @setVendor="setVendor"
                 @setDate="setDate"
             )
@@ -235,13 +234,6 @@ export default {
                 this.vendorsSetting(result.body);
             }
             this.loadingToggle(false);
-        },
-        async selectAll({isAllSelected}) {
-            const steps = this.currentProject.steps.map(item => {
-                item.check = isAllSelected;
-                return item;
-            })
-            await this.setProjectValue({value: steps, prop: 'steps'});
         },
         defaultService() {
             const service = this.services.find(item => {

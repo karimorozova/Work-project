@@ -1,6 +1,6 @@
 <template lang="pug">
 .alert-message
-    .alert-message__text(:class="[error ? 'alert-message_error' : 'alert-message_success']") {{ text }}
+    .alert-message__text(:class="[type === 'error' ? 'alert-message_error' : 'alert-message_success']") {{ text }}
 </template>
 
 <script>
@@ -9,8 +9,8 @@ export default {
         text: {
             type: String
         },
-        error: {
-            type: Boolean
+        type: {
+            type: String
         }
     }
 }
@@ -26,9 +26,9 @@ export default {
     position: fixed;
     z-index: 100;
     right: 20px;
-    top: 60px;
+    top: 70px;
     width: 230px;
-    padding: 30px 20px;
+    padding: 30px 20px 30px 40px;
     box-shadow: 0 0 15px $brown-shadow;
     background-color: $white;
     color: $green-success;

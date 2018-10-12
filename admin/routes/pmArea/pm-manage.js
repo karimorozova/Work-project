@@ -52,4 +52,8 @@ router.post("/send-quote", async (req, res) => {
     }
 })
 
+router.post("/vendor-request", async (req, res) => {
+    res.send('Request has been sent');
+})
+
 module.exports = router;

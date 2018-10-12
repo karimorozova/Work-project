@@ -41,7 +41,7 @@ export default {
       try {
       const loginResult = await this.$http.post('../login', this.form);
       await this.$store.dispatch("login", loginResult.body);
-      this.alertToggle({message: "You are logged in", isShow: true, isError: false})
+      this.alertToggle({message: "You are logged in", isShow: true, type: "success"})
       this.$router.push("/")
       } catch(err) {
         this.alertToggle({message: err.body, isShow: true, isError: true});
@@ -52,7 +52,7 @@ export default {
         try {
           await this.$http.get('../logout');
         } catch(err) {
-          this.alertToggle({message: "Cannot log out", isShow: true, isError: true})
+          this.alertToggle({message: "Cannot log out", isShow: true, type: "error"})
         }
       }
     },

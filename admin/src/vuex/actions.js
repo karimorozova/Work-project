@@ -18,7 +18,7 @@ export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payl
 export const alertToggle = ({ commit }, payload) => {
   commit('alertingMessage', payload);
   setTimeout(() => {
-    commit('alertingMessage', {message: "", isShow: false, isError: false});
+    commit('alertingMessage', {message: "", isShow: false, type: "success"});
   }, 5000)
 }
 export const login = ({ commit }, creds) => {

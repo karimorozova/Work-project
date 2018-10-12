@@ -18,7 +18,7 @@ const state = {
     isLoggedIn: !!localStorage.getItem("token"),
     isLoading: false,
     isAlert: false,
-    isError: false,
+    alertType: 'success',
     alertMessage: ''
 };
 
@@ -39,7 +39,7 @@ const mutations = {
     alertingMessage(state, payload) {
         state.alertMessage = payload.message;
         state.isAlert = payload.isShow;
-        state.isError = payload.isError;
+        state.alertType = payload.type;
     },
     servicesFill(state, payload) {
         state.services = payload

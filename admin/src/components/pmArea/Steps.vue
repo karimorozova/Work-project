@@ -1,5 +1,14 @@
 <template lang="pug">
 .steps
+    .steps__action
+        .steps__title Step Action
+        .steps__drop-menu
+            SelectSingle(
+                :selectedOption="selectedAction"
+                :options="actions"
+                placeholder="Select Action"
+                @chooseOption="setAction"
+            )
     .steps__table
         DataTable(
             :fields="fields"
@@ -28,8 +37,8 @@
                 span.steps__label {{ field.label }}
             template(slot="Margin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="check" slot-scope="{ row }")
-                input.steps__step-data(type="checkbox" v-model="row.check") 
+            template(slot="check" slot-scope="{ row, index }")
+                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep(index)") 
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
@@ -75,8 +84,10 @@
 <script>
 import DataTable from "../DataTable";
 import Vendorselect from "./Vendorselect";
+import SelectSingle from "../SelectSingle";
 import Datepicker from "../Datepicker";
 import moment from "moment";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     props: {
@@ -109,7 +120,9 @@ export default {
                 {label: "Margin", key: "margin", width: "8%"},
             ],
             selectedVendors: [],
-            isAllSelected: false
+            isAllSelected: false,
+            selectedAction: "",
+            actions: ["Request confirmation", "Other Action"]
         }
     },
     methods: {
@@ -123,27 +136,73 @@ export default {
             const { _id, firstName, surname, email } = vendor;
             this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index: index});
         },
+        async setAction({option}) {
+            this.loadingToggle(true);
+            this.selectedAction = option;
+            const steps = this.allSteps.map(item => {
+                return item.check
+            })
+            try {
+                if(option === "Request confirmation") {
+                    const result = await this.$http.post('/pm-manage/vendor-request', { steps });
+                    this.alertToggle({message: "Request confirmation has been sent.", isShow: true, type: 'success'})
+                }
+            } catch(err) {
+                this.alertToggle({message: "Internal server error. Request confirmation cannot be sent.", isShow: true, type: 'error'})
+            }
+            this.loadingToggle(false);
+
+        },
         progress(prog) {
             return (prog.wordsDone/prog.wordsTotal)*100;
         },
-        selectAll() {
-            this.$emit("selectAll", {isAllSelected: this.isAllSelected});
+        async selectAll() {
+            const steps = this.allSteps.map(item => {
+                item.check = this.isAllSelected;
+                return item;
+            })
+            await this.setProjectValue({value: steps, prop: 'steps'});
+        },
+        async selectStep() {
+            await this.setProjectValue({value: this.allSteps, prop: 'steps'});
         },
         vendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
-        }
+        },
+        ...mapActions({
+            loadingToggle: "loadingToggle",
+            alertToggle: "alertToggle",
+            setProjectValue: "setProjectValue"
+        })
     },
     components: {
         DataTable,
         Vendorselect,
+        SelectSingle,
         Datepicker
     }    
 }
 </script>
 
 <style lang="scss" scoped>
-
+.steps {
+    display: flex;
+    flex-direction: column;
+    &__action {
+        align-self: flex-end;
+    }
+    &__title {
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
+    &__drop-menu {
+        position: relative;
+        width: 191px;
+        height: 28px;
+        margin-bottom: 20px;
+    }
+}
 </style>

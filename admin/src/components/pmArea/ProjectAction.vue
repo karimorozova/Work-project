@@ -36,14 +36,16 @@ export default {
         async makeAction() {
             this.loadingToggle(true);
             try {
-            const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id});
+                const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id});
+                this.alertToggle({message: 'The Quote has been sent', isShow: true, type: 'success'})
             } catch(err) {
-                
+                this.alertToggle({message: 'Internal server error. Cannot send the Quote.', isShow: true, type: 'error'})
             }
             this.loadingToggle(false);
         },
         ...mapActions({
             loadingToggle: 'loadingToggle',
+            alertToggle: "alertToggle"
         }),
     },
     components: {

@@ -4,7 +4,7 @@
     //-  a.b-log-in(href='/login') Log in
     Loading(v-if="isLoading")
     transition(name="slide-fade")
-      AlertMessage(v-if="isAlert" :text="alertMessage" :error="isError")
+      AlertMessage(v-if="isAlert" :text="alertMessage" :type="alertType")
     router-view
 </template>
 
@@ -19,7 +19,7 @@ export default {
       isLoggedIn: 'isLoggedIn',
       isLoading: 'loading',
       isAlert: 'isAlert',
-      isError: 'isError',
+      alertType: 'alertType',
       alertMessage: 'alertMessage'
     })
   },
@@ -45,7 +45,7 @@ body {
   transition: all .5s ease;
 }
 .slide-fade-leave-active {
-  transition: all .7s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateX(20px);
