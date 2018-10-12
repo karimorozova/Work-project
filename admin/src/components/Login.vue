@@ -22,6 +22,7 @@
 </template>
 <script>
 import PasswordRestore from '../components/PasswordRestore';
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
@@ -36,31 +37,31 @@ export default {
     };
   },
   methods: {
-    login() {
-      this.$http.post('../login', this.form)
-      .then(res => {
-        this.$store.dispatch("login", res.body)
-        .then(() => {
-          this.$router.push("/")
-        });
-      })
-      
-    },
-    destroySession() {
-      if(!localStorage.getItem("token")) {
-        this.$http.get('../logout')
-        .then(res => {
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    async login() {
+      try {
+      const loginResult = await this.$http.post('../login', this.form);
+      await this.$store.dispatch("login", loginResult.body);
+      this.alertToggle({message: "You are logged in", isShow: true, isError: false})
+      this.$router.push("/")
+      } catch(err) {
+        this.alertToggle({message: err.body, isShow: true, isError: true});
       }
     },
-    
+    async destroySession() {
+      if(!localStorage.getItem("token")) {
+        try {
+          await this.$http.get('../logout');
+        } catch(err) {
+          this.alertToggle({message: "Cannot log out", isShow: true, isError: true})
+        }
+      }
+    },
     forget(){
       this.forgotLink = !this.forgotLink;
-    } 
+    },
+    ...mapActions({
+      alertToggle: "alertToggle"
+    })
   },
   computed: {},
   created() {

@@ -63,6 +63,10 @@ app.use((req, res, next) => {
 const routes = require("./routes");
 app.use("/", routes);
 
+app.use((err, req, res, next) => {
+  return res.status(err.status).send(err.message);
+})
+
 app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);
 

@@ -14,7 +14,13 @@ export const setProjectValue = ({ commit }, payload) => commit('storeProjectValu
 export const setStepVendor = ({ commit }, payload) => commit('stepVendorStore', payload);
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
-export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);  
+export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+export const alertToggle = ({ commit }, payload) => {
+  commit('alertingMessage', payload);
+  setTimeout(() => {
+    commit('alertingMessage', {message: "", isShow: false, isError: false});
+  }, 5000)
+}
 export const login = ({ commit }, creds) => {
     commit("LOGIN");
     return new Promise(resolve => {

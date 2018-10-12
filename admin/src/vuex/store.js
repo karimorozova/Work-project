@@ -16,7 +16,10 @@ const state = {
     projects: [],
     currentProject: {},
     isLoggedIn: !!localStorage.getItem("token"),
-    isLoading: false
+    isLoading: false,
+    isAlert: false,
+    isError: false,
+    alertMessage: ''
 };
 
 const mutations = {
@@ -32,6 +35,11 @@ const mutations = {
     },
     loadingValue(state, payload) {
         state.isLoading = payload;
+    },
+    alertingMessage(state, payload) {
+        state.alertMessage = payload.message;
+        state.isAlert = payload.isShow;
+        state.isError = payload.isError;
     },
     servicesFill(state, payload) {
         state.services = payload
