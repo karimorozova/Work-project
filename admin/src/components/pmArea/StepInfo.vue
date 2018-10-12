@@ -1,5 +1,5 @@
 <template lang="pug">
-.step-info Here will detailed informatioknnabout chosen step!
+.step-info Here will be detailed information about chosen step!
 
 </template>
 
@@ -10,5 +10,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.step-info {
+    padding: 15px;
+}
 </style>

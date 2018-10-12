@@ -4,7 +4,7 @@ const moveFile = require("../../utils/moveFile");
 const { User, Languages, Projects } = require("../../models");
 const { getProject } = require("../../projects/");
 const { getOneService } = require("../../services/")
-const { clientQuoteEmail, messageForClient } = require("../../utils/");
+const { sendEmail, clientQuoteEmail, messageForClient, requestMessageForVendor } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -48,12 +48,27 @@ router.post("/send-quote", async (req, res) => {
         res.send(clientMail);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on sending a Quote " + err);
+        res.status(500).send("Error on sending the Quote");
     }
 })
 
 router.post("/vendor-request", async (req, res) => {
-    res.send('Request has been sent');
+    const { projectId, steps } = req.body;
+    try {
+        const project = await getProject({"_id": projectId});
+        for(const step of steps) {
+            let sendInfo = {...step};
+            sendInfo.projectName = project.projectName;
+            sendInfo.industry = project.industry.name;
+            sendInfo.brief = project.brief;
+            const message = requestMessageForVendor(sendInfo);
+            const result = await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
+        }
+        res.send('Requests has been sent');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending the Request Confirmation");
+    }
 })
 
 module.exports = router;

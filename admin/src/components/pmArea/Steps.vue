@@ -153,16 +153,16 @@ export default {
         async setAction({option}) {
             this.loadingToggle(true);
             this.selectedAction = option;
-            const steps = this.allSteps.map(item => {
-                return item.check
+            const steps = this.allSteps.filter(item => {
+                return item.check 
             })
             try {
                 if(option === "Request confirmation") {
-                    const result = await this.$http.post('/pm-manage/vendor-request', { steps });
-                    this.alertToggle({message: "Request confirmation has been sent.", isShow: true, type: 'success'})
+                    const result = await this.$http.post('/pm-manage/vendor-request', { steps: steps, projectId: this.currentProject._id });
+                    this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
                 }
             } catch(err) {
-                this.alertToggle({message: "Internal server error. Request confirmation cannot be sent.", isShow: true, type: 'error'})
+                this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'})
             }
             this.loadingToggle(false);
 
@@ -190,6 +190,11 @@ export default {
             loadingToggle: "loadingToggle",
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue"
+        })
+    },
+    computed: {
+        ...mapGetters({
+            currentProject: 'getCurrentProject' 
         })
     },
     components: {

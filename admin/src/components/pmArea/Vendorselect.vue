@@ -76,6 +76,7 @@ export default {
     .steps__table & {
         border: none;
         border-radius: 0;
+        height: 29px;
     }
     .no-industry {
         opacity: 0.5;

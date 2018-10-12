@@ -41,12 +41,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../assets/scss/colors.scss';
+
 .table {
     width: 100%;
     overflow: hidden;
     &__thead {
-        background-color: #938676;
-        color: #FFF;
+        background-color: $thead-background;
+        color: $white;
     }
     &__tbody {
     max-height: 180px;
@@ -55,11 +57,11 @@ export default {
         .table__row {
             cursor: pointer;
             &:nth-of-type(odd) {
-                background-color: #f4f0ee;
+                background-color: $table-row-zebra-background;
             }
             &:hover {
                 .table__tbody-cell {
-                    background-color: #ddd3c8;
+                    background-color: $cell-background;
                 }
             }
             .steps__table & {
@@ -74,27 +76,27 @@ export default {
         box-sizing: border-box;
         font-size: 14px;
         padding: 7px 5px 5px 6px;
-        border: 0.5px solid #938676;
+        border: 0.5px solid $cell-border;
         border-right: none;
-        border-left: 0.5px solid #FFF;
+        border-left: 0.5px solid $white;
         &:first-child {
-            border-left: 0.5px solid #938676;
+            border-left: 0.5px solid $cell-border;
         }
         &:last-child {
-            border-right: 0.5px solid #938676;
+            border-right: 0.5px solid $cell-border;
         }
     }
     &__tbody-cell {
         box-sizing: border-box;
         font-size: 14px;
         padding: 7px 5px 5px 6px;
-        border: 0.5px solid #938676;
+        border: 0.5px solid $cell-border;
         border-right: none;
         &:last-child {
-            border-right: 0.5px solid #938676;
+            border-right: 0.5px solid $cell-border;
         }
         &:focus-within {
-            box-shadow: inset 0 0 5px #938676;
+            box-shadow: inset 0 0 5px $cell-border;
         }
         .steps__table & {
             display: flex;
@@ -116,7 +118,7 @@ export default {
         padding-right: 15px;
     }
     &_bottom-bordered {
-        border-bottom: 0.5px solid #938676;
+        border-bottom: 0.5px solid $cell-border;
     }
 }
 

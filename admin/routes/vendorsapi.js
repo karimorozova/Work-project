@@ -302,5 +302,12 @@ router.post('/deletevendor', async (req, res) => {
     }
 })
 
+router.get('/accept-step', async (req, res) => {
+    res.send('Step is accepted')
+})
+
+router.get('/decline-step', async (req, res) => {
+    res.send('Step is rejected')
+})
 
 module.exports = router;
