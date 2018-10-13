@@ -53,11 +53,11 @@
       p The combination you want to add already exists!
       .message__info-list
         li Source: 
-          span.info-item {{ uniqueCheck.source }}
+          span.info-item {{ uniqueComb.source }}
         li Target: 
-          span.info-item {{ uniqueCheck.target }}
+          span.info-item {{ uniqueComb.target }}
         li Industry: 
-          span.info-item {{ uniqueCheck.industry }}
+          span.info-item {{ uniqueComb.industry }}
       span.close(@click="closeUnique") +
   .edition-message(v-if="editing")
     .message
@@ -104,7 +104,7 @@ export default {
       currentActive: -1,
       notUnique: false,
       editing: false,
-      uniqueCheck: {source: "", target: "", industry: ""},
+      uniqueComb: {source: "", target: "", industry: ""},
       showValidError: false,
       validError: [],
     }
@@ -241,7 +241,7 @@ export default {
         }
       }
       if(key === 'save') {
-        return await this.saveRates(index)
+        return await this.checkErrors(index)
       }
 
       if(key === 'edit') {
@@ -252,10 +252,7 @@ export default {
         return this.deleteRate(index);
       }
     },
-    async saveRates(index) {
-      if(!this.fullInfo[index].icons.save.active) {
-          return
-        }
+    async checkErrors(index) {
         this.validError = [];
         if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
         if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
@@ -265,46 +262,56 @@ export default {
           this.changedRate = this.fullInfo[index].industry[0].rate;
           return true;
         }
-        var exist = false;
-        for(let ind in this.fullInfo) {
-          if(ind != index) {
-            for(let indus of this.industrySelected) {
-            if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
-              this.fullInfo[index].sourceLanguage.lang == this.fullInfo[ind].sourceLanguage.lang &&
-              this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
-                exist = true;
-                this.uniqueCheck = {
-                  source: this.fullInfo[index].sourceLanguage.lang,
-                  target: this.fullInfo[index].targetLanguage.lang,
-                  industry: indus.name,
-                }
-                break;
+        await this.saveRates(index);
+    },
+    uniqueCheck(index) {
+      let exist = false;
+      for(let ind in this.fullInfo) {
+        if(ind != index) {
+          for(let indus of this.industrySelected) {
+          if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
+            this.fullInfo[index].sourceLanguage.lang == this.fullInfo[ind].sourceLanguage.lang &&
+            this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
+              exist = true;
+              this.uniqueComb = {
+                source: this.fullInfo[index].sourceLanguage.lang,
+                target: this.fullInfo[index].targetLanguage.lang,
+                industry: indus.name,
               }
+              break;
             }
           }
-          if(exist) break;
-        }        
-        if(!exist) {
-          this.fullInfo[index].icons.save.active = false;
-          this.fullInfo[index].icons.edit.active = true;
-          this.fullInfo[index].industry = [];
-          
-          for(let elem of this.industrySelected) {
-            elem.rate = this.changedRate;
-            elem.active = true;
-            this.fullInfo[index].industry.push(elem)
-          };
-          try {
-            const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
-            this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
-          } catch(err) {
-            this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
-          }
-          this.currentActive = -1;
-          this.refreshServices();
-        } else {
-          this.notUnique = true;
         }
+        if(exist) break;
+      }
+      return exist;     
+    },
+    async saveRates(index) {
+      if(!this.fullInfo[index].icons.save.active) {
+        return
+      }
+      if(!this.uniqueCheck(index)) {
+        this.fullInfo[index].icons.save.active = false;
+        this.fullInfo[index].icons.edit.active = true;
+        this.fullInfo[index].industry = [];
+        
+        for(let elem of this.industrySelected) {
+          elem.rate = this.changedRate;
+          elem.active = true;
+          this.fullInfo[index].industry.push(elem)
+        };
+        try {
+          const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
+          await this.combinations();
+          this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
+        } catch(err) {
+          this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+        }
+        this.currentActive = -1;
+        this.refreshServices();
+      } else {
+        this.notUnique = true;
+      }
     },
     editRate(index) {
       this.currentActive = index;

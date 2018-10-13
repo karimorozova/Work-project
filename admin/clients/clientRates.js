@@ -13,6 +13,9 @@ function checkRates(client, industries, rate) {
                 }
                 exist = true;
             }
+            if(exist) {
+                break
+            }
         }
     }
     if(!exist || !client.languageCombinations.length) {

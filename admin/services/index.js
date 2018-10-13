@@ -1,7 +1,7 @@
 const mailTransporter = require("./mailTransporter");
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer } = require("./xtmApi");
 const { getOneService, getManyServices } = require("./getServices");
-const { deleteServiceRate } = require("./rates");
+const { checkServiceRates, deleteServiceRate } = require("./rates");
 
 const services = {
     mailTransporter,
@@ -11,6 +11,7 @@ const services = {
     saveTemplateTasks,
     getMetrics,
     createNewXtmCustomer,
+    checkServiceRates,
     deleteServiceRate
 }
 

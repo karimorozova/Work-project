@@ -197,7 +197,10 @@ router.post('/client-rates', async (req, res) => {
         }
         const industries = client.industry.map(item => {
             const active = item.rate > 0;
-            return {industry: item._id, active: active, rate: item.rate}
+            if(rate.form === 'Duo') {
+                return {industry: item._id, active: active, rate: item.rate}
+            }
+            return {industry: item._id, active: active, rate: item.rate, package: item.package}
         })
         const updatedCombinations = checkRates(client, industries, rate)
         await Clients.updateOne({"_id": id}, {$set: {languageCombinations: updatedCombinations}});

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
-const { getOneService, getManyServices, deleteServiceRate } = require('../services/');
+const { getOneService, getManyServices, checkServiceRates, deleteServiceRate } = require('../services/');
 const { receivablesCalc, payablesCalc, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
@@ -221,47 +221,18 @@ router.post('/rates', async (req, res) => {
         }
       }
     }
-    
-    let exist = false;
-
-    rates = service.languageCombinations;
-    
-    for(let j = 0; j < rate.industry.length; j++) {
-      for(let i = 0; i < rates.length; i++) {
-        if(rate.sourceLanguage._id == rates[i].source.id &&
-          rate.targetLanguage._id == rates[i].target.id) {
-          exist = true;
-          for(let elem of rates[i].industries) {
-            if(rate.industry[j].name == elem.industry.name || rate.industry[j].name == 'All') {
-              elem.rate = rate.industry[j].rate
-              elem.active = rate.industry[j].active;
-            }
-          }
-        }
-      }
-      if(exist) {
-        break;
-      }
-    }
-    if(exist) {
-      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-      res.send(result);  
-    } else {
-      industries = industries.map(item => {
-        const active = item.rate > 0; 
-        return {industry: item._id, active: active, rate: item.rate}
-      })
-      rates.push({
-        source: rate.sourceLanguage,
-        target: rate.targetLanguage,
-        industries: industries
-      });
-      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-      res.send(result);
-    }
+    industries = industries.map(item => {
+      if(service.languageForm === 'Duo') {
+        return {industry: item._id, active: item.active, rate: item.rate}
+      } 
+      return {industry: item._id, active: item.active, rate: item.rate, package: item.package}
+    })
+    const updatedCombinations = checkServiceRates(service, industries, rate);
+    const result = await Services.update({'title': rate.title}, {'languageCombinations': updatedCombinations});
+    res.send(result);  
   } catch(err) {
       console.log(err)
-      res.status(500).send('Error on adding/updating duo-rate ' + err);
+      res.status(500).send('Error on adding/updating the rate');
   }
 })
 

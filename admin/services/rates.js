@@ -1,3 +1,33 @@
+function checkServiceRates(service, industries, rate) {
+    let exist = false;
+    let combinations = service.languageCombinations
+    for(let elem of rate.industry) {
+      for(let comb of combinations) {
+        if(rate.sourceLanguage._id == comb.source.id &&
+          rate.targetLanguage._id == comb.target.id) {
+          exist = true;
+          for(let indus of comb.industries) {
+            if(elem.name == indus.name || elem.name == 'All') {
+                indus.rate = elem.rate
+                indus.active = elem.active;
+            }
+          }
+        }
+      }
+      if(exist) {
+        break;
+      }
+    }
+    if(!exist || !service.languageCombinations.length) {
+        service.languageCombinations.push({
+            source: rate.sourceLanguage._id,
+            target: rate.targetLanguage._id,
+            industries: industries,
+        })
+    }
+    return service.languageCombinations;
+}
+
 function deleteServiceRate(service, industries, id) {
     const combIndex = service.languageCombinations.findIndex(item => {
         return item.id === id;
@@ -20,4 +50,4 @@ function deleteServiceRate(service, industries, id) {
       return updatedCombinations;
 }
 
-module.exports = { deleteServiceRate };
+module.exports = { checkServiceRates, deleteServiceRate };
