@@ -1,4 +1,7 @@
 function checkServiceRates(service, industries, rate) {
+    if(service.languageForm === 'Mono') {
+        return checkMonoRates(service, industries, rate);
+    }
     let exist = false;
     let combinations = service.languageCombinations
     for(let elem of rate.industry) {
@@ -7,7 +10,7 @@ function checkServiceRates(service, industries, rate) {
           rate.targetLanguage._id == comb.target.id) {
           exist = true;
           for(let indus of comb.industries) {
-            if(elem.name == indus.name || elem.name == 'All') {
+            if(elem._id == indus.industry.id || elem.name == 'All') {
                 indus.rate = elem.rate
                 indus.active = elem.active;
             }
@@ -21,6 +24,35 @@ function checkServiceRates(service, industries, rate) {
     if(!exist || !service.languageCombinations.length) {
         service.languageCombinations.push({
             source: rate.sourceLanguage._id,
+            target: rate.targetLanguage._id,
+            industries: industries,
+        })
+    }
+    return service.languageCombinations;
+}
+
+function checkMonoRates(service, industries, rate) {
+    let exist = false;
+    let combinations = service.languageCombinations
+    for(let elem of rate.industry) {
+      for(let comb of combinations) {
+        if(rate.targetLanguage._id == comb.target.id) {
+          exist = true;
+          for(let indus of comb.industries) {
+            if(elem._id == indus.industry.id || elem.name == 'All') {
+                indus.rate = elem.rate
+                indus.active = elem.active;
+                indus.package = elem.package
+            }
+          }
+        }
+      }
+      if(exist) {
+        break;
+      }
+    }
+    if(!exist || !service.languageCombinations.length) {
+        service.languageCombinations.push({
             target: rate.targetLanguage._id,
             industries: industries,
         })

@@ -216,8 +216,14 @@ router.post('/rates', async (req, res) => {
     for(let indus of rate.industry) {
       for(let industry of industries) {
         if(industry.name == indus.name || indus.name == 'All') {
-          industry.rate = indus.rate;
-          industry.active = indus.active;
+          if(service.languageForm === 'Duo') {
+            industry.rate = indus.rate;
+            industry.active = indus.active;
+          } else {
+            industry.rate = indus.rate;
+            industry.active = indus.active;
+            industry.package = indus.package;
+          }
         }
       }
     }

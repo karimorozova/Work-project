@@ -301,7 +301,7 @@ export default {
           this.fullInfo[index].industry.push(elem)
         };
         try {
-          const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
+          await this.$http.post('/service/rates', this.fullInfo[index]);
           await this.combinations();
           this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
         } catch(err) {
@@ -332,10 +332,10 @@ export default {
         await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
         this.fullInfo.splice(index, 1)[0];
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
+        this.refreshServices();
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
       }
-        this.refreshServices();
         this.currentActive = -1;
     },
     refreshServices() {

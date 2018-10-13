@@ -20,24 +20,24 @@
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.drop-option 
               template(v-if='targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .inner-component(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td(:class="{addShadow: !info.icons[1].active}")
-              input.rates(:value="indus.package" @input="changePackage" :readonly="info.icons[1].active")
+            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}")
+              input.rates(:value="indus.package" @input="changePackage" :readonly="info.icons.edit.active")
             td.drop-option              
               span(v-if="!indus.icon") {{ indus.name }}
               .drop-option__image
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
-              .inner-component(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
-            td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
+            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
+              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
             td.iconsField
-              template(v-for="(icon, iconIndex) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, iconIndex)" :class="{activeIcon: icon.active}") 
+              template(v-for="(icon, key) in info.icons") 
+                img.crudIcon(:src="icon.image" @click="action(index, key)" :class="{activeIcon: icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -46,9 +46,9 @@
       p The combination you want to add already exists!
       .message__info-list
         li Target: 
-          span.info-item {{ uniqueCheck.target }}
+          span.info-item {{ uniqueCombination.target }}
         li Industry: 
-          span.info-item {{ uniqueCheck.industry }}
+          span.info-item {{ uniqueCombination.industry }}
       span.close(@click="closeUnique") +
   .edition-message(v-if="editing")
     .message
@@ -93,10 +93,10 @@ export default {
       fullInfo: [],
       changedRate: '',
       changedPackage: '',
-      currentActive: 'none',
+      currentActive: -1,
       notUnique: false,
       editing: false,
-      uniqueCheck: {target: "", industry: ""},
+      uniqueCombination: {target: "", industry: ""},
       showValidError: false,
       validError: []
     }
@@ -208,93 +208,110 @@ export default {
         })
       }
     },
-    action(index, iconIndex) {
-      if(this.currentActive != "none") {
-        if(index != this.currentActive) {
-          this.editing = true;
-          return true;
-        }
+    async checkErrors(index) {
+      this.validError = [];
+      if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+      if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
+      if(this.validError.length) {
+        this.showValidError = true;
+        this.changedRate = this.fullInfo[index].industry[0].rate;
+        return;
       }
-      if(iconIndex == 0) {
-        this.validError = [];
-        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
-        if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
-        if(this.validError.length) {
-          this.showValidError = true;
-          this.changedRate = this.fullInfo[index].industry[0].rate;
-          return true;
-        }
-        var exist = false;
-        for(let ind in this.fullInfo) {
-          if(ind != index) {
-            for(let indus of this.industrySelected) {
-            if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
-              this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
-                exist = true;
-                this.uniqueCheck = {
-                  target: this.fullInfo[index].targetLanguage.lang,
-                  industry: indus.name,
-                }
-                break;
+      await this.saveRates(index);
+    },
+    uniqueCheck(index) {
+      let exist = false;
+      for(let ind in this.fullInfo) {
+        if(ind != index) {
+          for(let indus of this.industrySelected) {
+          if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
+            this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
+              exist = true;
+              this.uniqueCombination = {
+                target: this.fullInfo[index].targetLanguage.lang,
+                industry: indus.name,
               }
+              break;
             }
           }
-          if(exist) break;
         }
-        if(!exist) {
-          this.fullInfo[index].icons[0].active = false;
-          this.fullInfo[index].icons[1].active = true;
-          this.fullInfo[index].industry = [];
-          for(let elem of this.industrySelected) {
-            elem.rate = this.changedRate;
-            elem.package = this.changedPackage;
-            this.fullInfo[index].industry.push(elem)
-          };
-          this.$http.post('/service/rates-mono', this.fullInfo[index])
-          .then(res => {
-            console.log(res)
-          })
-          .catch(err => {
-            console.log(err)
-          });
-          this.currentActive = "none";
-          this.refreshServices();
+        if(exist) break;
+      }
+      return exist;
+    },
+    async action(index, key) {
+      if(this.currentActive != -1) {
+        if(index != this.currentActive) {
+          return this.editing = true;
+        }
+      }
+      if(key === "save") {
+        return await this.checkErrors(index);        
+      }
+
+      if(key === "edit") {
+        return this.edit(index);
+      }
+
+      if(key === "delete") {
+        return await this.deleteRate(index);
+      }
+    },
+    async saveRates(index) {
+      if(!this.uniqueCheck(index)) {
+        this.fullInfo[index].icons.save.active = false;
+        this.fullInfo[index].icons.edit.active = true;
+        this.fullInfo[index].industry = [];
+        for(let elem of this.industrySelected) {
+          elem.rate = this.changedRate;
+          elem.package = this.changedPackage;
+          this.fullInfo[index].industry.push(elem)
+        };
+      try{
+        await this.$http.post('/service/rates', this.fullInfo[index]);
+        await this.combinations();
+        this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
+      } catch(err) {
+          this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+        }  
+        this.currentActive = -1;
+        this.refreshServices();
+      } else {
+        this.notUnique = true;
+      }
+    },
+    edit(index) {
+      for(let elem of this.fullInfo[index].industry) {
+        this.industrySelected = [];
+        this.industrySelected.push(elem)  
+      }
+      this.changedRate = this.fullInfo[index].industry[0].rate;
+      this.changedPackage = this.fullInfo[index].industry[0].package
+      this.currentActive = index;
+      for(let i in this.fullInfo) {
+        if(i == index) {
+          this.fullInfo[i].icons.edit.active = false;
+          this.fullInfo[i].icons.save.active = true;   
         } else {
-          this.notUnique = true;
+            this.fullInfo[i].icons.edit.active = true;
+            this.fullInfo[i].icons.save.active = false;
         }
       }
-
-      if(iconIndex == 1) {
-        for(let elem of this.fullInfo[index].industry) {
-          this.industrySelected = [];
-          this.industrySelected.push(elem)  
+    },
+    async deleteRate(index) {
+      try {
+        const deletedRate = {
+          serviceId: this.serviceSelect._id,
+          industries: this.fullInfo[index].industry,
         }
-        this.changedRate = this.fullInfo[index].industry[0].rate;
-        this.changedPackage = this.fullInfo[index].industry[0].package
-        this.currentActive = index;
-        for(let i in this.fullInfo) {
-          if(i == index) {
-            this.fullInfo[i].icons[1].active = false;
-            this.fullInfo[i].icons[0].active = true;   
-          } else {
-              this.fullInfo[i].icons[1].active = true;
-              this.fullInfo[i].icons[0].active = false;
-          }
-        }
+        await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        this.fullInfo.splice(index, 1)[0];
+        this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
+        this.refreshServices();  
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});        
       }
-
-      if(iconIndex == 2) {
-        let deletedRate = this.fullInfo.splice(index, 1)[0];
-        this.$http.post('/service/delete-monorate', deletedRate)
-        .then(res => {
-          this.refreshServices();
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err)
-        });
-        this.currentActive = "none";
-      }
+      this.currentActive = -1;
     },
     refreshServices() {
       this.$emit('refreshServices');
@@ -307,10 +324,11 @@ export default {
         targetLanguage: "", 
         industry: [{name: "All", rate: 0.1, package: 200}], 
         active: true, 
-        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
-          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
-          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        ]
+        icons: {
+          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
+          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
+          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        }
       });
       this.currentActive = this.fullInfo.length-1;
       this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
@@ -323,22 +341,31 @@ export default {
       const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Mono`)
       this.fullInfo = result.body;
       this.fullInfo.forEach(item => {
-        item.icons = [
-          {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-          {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-          {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        ]
+        item.icons = {
+          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        }
       })
       this.services.forEach(item => {
         item.crud = item.title === this.serviceSelect.title
       })
       this.loadingToggle(false);
     },
+    defaultService() {
+      this.serviceSelect = this.vuexServices.find(item => {
+        return item.symbol === 'co'
+      })
+    },
     ...mapActions({
-      loadingToggle: "loadingToggle"
+      loadingToggle: "loadingToggle",
+      alertToggle: "alertToggle"
     })
   },
   computed: {
+    ...mapGetters({
+      vuexServices: "getVuexServices"
+    }),
     filterIndustry() {
       let result = [];
       if(this.industryFilter.length) {
@@ -383,6 +410,7 @@ export default {
   },
   mounted() {
    this.combinations();
+   this.defaultService();
   }
 }
 
