@@ -241,7 +241,19 @@ export default {
         }
       }
       if(key === 'save') {
-        if(!this.fullInfo[index].icons.save.active) {
+        return await this.saveRates(index)
+      }
+
+      if(key === 'edit') {
+        return this.editRate(index);
+      }
+
+      if(key === 'delete') {
+        return this.deleteRate(index);
+      }
+    },
+    async saveRates(index) {
+      if(!this.fullInfo[index].icons.save.active) {
           return
         }
         this.validError = [];
@@ -282,17 +294,20 @@ export default {
             elem.active = true;
             this.fullInfo[index].industry.push(elem)
           };
-          const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
-          console.log(saveResult);
+          try {
+            const saveResult = await this.$http.post('/service/rates', this.fullInfo[index]);
+            this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
+          } catch(err) {
+            this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+          }
           this.currentActive = -1;
           this.refreshServices();
         } else {
           this.notUnique = true;
         }
-      }
-
-      if(key === 'edit') {
-        this.currentActive = index;
+    },
+    editRate(index) {
+      this.currentActive = index;
         for(let elem of this.fullInfo[index].industry) {
           this.industrySelected = [];
           this.industrySelected.push(elem)  
@@ -300,20 +315,21 @@ export default {
         this.changedRate = this.fullInfo[index].industry[0].rate;
         this.fullInfo[index].icons.edit.active = false;
         this.fullInfo[index].icons.save.active = true;   
+    },
+    async deleteRate(index) {
+      try {
+        const deletedRate = {
+          serviceId: this.serviceSelect._id,
+          industries: this.fullInfo[index].industry,
+        }
+        await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        this.fullInfo.splice(index, 1)[0];
+        this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
       }
-
-      if(key === 'delete') {
-        let deletedRate = this.fullInfo.splice(index, 1)[0];
-        this.$http.post('/service/delete-duorate', deletedRate)
-        .then(res => {
-          this.refreshServices();
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err)
-        });
+        this.refreshServices();
         this.currentActive = -1;
-      }
     },
     refreshServices() {
       this.$emit('refreshServices');
@@ -340,6 +356,7 @@ export default {
       }, 0)
     },
     async combinations() {
+      try {
       const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
       this.fullInfo = result.body;
       this.fullInfo.forEach(item => {
@@ -352,13 +369,25 @@ export default {
       this.services.forEach(item => {
         item.crud = item.title === this.serviceSelect.title;
       })
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot get rates.', isShow: true, type: 'error'});
+      }
       this.loadingToggle(false);
     },
+    defaultService() {
+      this.serviceSelect = this.vuexServices.find(item => {
+        return item.symbol === 'tr'
+      })
+    },
     ...mapActions({
-      loadingToggle: "loadingToggle"
+      loadingToggle: "loadingToggle",
+      alertToggle: "alertToggle"
     })
   },
   computed: {
+    ...mapGetters({
+      vuexServices: "getVuexServices"
+    }),
     filterIndustry() {
       let result = [];
       if(this.industryFilter.length) {
@@ -403,6 +432,7 @@ export default {
   },
   mounted() {
     this.combinations();
+    this.defaultService();
   }
 };
 </script>

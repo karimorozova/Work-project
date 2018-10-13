@@ -3,7 +3,7 @@ const multer = require('multer');
 const fs = require('fs');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients} = require('../clients/');
+const { getClient, getClients, checkRates, deleteRate} = require('../clients/');
 const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
@@ -156,6 +156,7 @@ router.get('/get-rates', async (req, res) => {
                     industry.active = elem.active;
                     if(form === "Duo") {
                         rates.push({
+                            id: comb._id,
                             service: comb.service,
                             sourceLanguage: comb.source,
                             targetLanguage: comb.target,
@@ -164,6 +165,7 @@ router.get('/get-rates', async (req, res) => {
                     } else {
                         industry.package = elem.package;
                         rates.push({
+                            id: comb._id,
                             service: comb.service,
                             targetLanguage: comb.target,
                             industry: [industry]
@@ -184,51 +186,25 @@ router.post('/client-rates', async (req, res) => {
     let rate = req.body;
     const id = rate.client;
     try {
-        let client = await Clients.findOne({"_id": id})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        let client = await getClient({"_id": id});
         for(let indus of rate.industry) {
             for(let ind of client.industry) {
-                if(ind.name == indus.name || indus.name == "All") {
+                if(ind.id === indus._id || indus.name == "All") {
                     ind.rate = indus.rate;
+                    ind.active = indus.active;
                 }
             }
         }
-        let industries = JSON.stringify(client.industry);
-        industries = JSON.parse(industries);
-        let exist = false;
-        if(client.languageCombinations.length) {
-            for(let comb of client.languageCombinations) {
-            if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
-                comb.target.lang == rate.targetLanguage.lang) {
-                    for(let ind of comb.industry) {
-                        for(let indus of rate.industry) {
-                            if(ind.name == indus.name || indus.name == "All") {
-                                comb.industry = industries;
-                            }
-                        }
-                    }
-                    exist = true;
-                }
-            }
-        }
-        if(!exist || !client.languageCombinations.length) {
-            client.languageCombinations.push({
-                source: rate.sourceLanguage,
-                target: rate.targetLanguage,
-                service: rate.service,
-                industry: industries,
-                active: true
-            })
-        }
-        await Clients.updateOne({"_id": id}, {$set: {languageCombinations: client.languageCombinations}});
+        const industries = client.industry.map(item => {
+            const active = item.rate > 0;
+            return {industry: item._id, active: active, rate: item.rate}
+        })
+        const updatedCombinations = checkRates(client, industries, rate)
+        await Clients.updateOne({"_id": id}, {$set: {languageCombinations: updatedCombinations}});
         res.send('rates changed')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on updating rates of Client " + err);
+        res.status(500).send("Error on updating rates of Client");
     }
 })
 
@@ -276,40 +252,20 @@ router.post('/several-langs', async (req, res) => {
     }
 })
 
-router.post('/delete-duorate', async (req, res) => {
-    var rate = req.body;
-    const id = rate.client;
+router.delete('/delete-rate/:id', async (req, res) => {
+    let  { clientId, industry } = req.body;
+    const { id } = req.params;
+    if(!id) {
+        return res.send("Deleted");
+    }
     try {
-        let client = await Clients.findOne({"_id": id})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
-        let allZero = [];
-        for(let i = 0; i < client.languageCombinations.length; i++) {
-            if(client.languageCombinations[i].service.title == rate.service.title && client[0].languageCombinations[i].source.lang == rate.sourceLanguage.lang &&
-                client.languageCombinations[i].target.lang == rate.targetLanguage.lang) {
-                for(let ind of client.languageCombinations[i].industry) {
-                    for(let indus of rate.industry) {
-                        if(ind.name == indus.name) {
-                            ind.rate = 0;
-                        }
-                    }
-                    allZero.push(ind.rate);
-                }
-                let sum = allZero.reduce( (x,y) => x + y);
-                if(!sum) {
-                    client[0].languageCombinations.splice(i, 1);
-                    break;
-                }
-            }
-        }
-        await Clients.updateOne({"_id": id}, {$set: {languageCombinations: client.languageCombinations}});
+        let client = await getClient({"_id": clientId})
+        const updatedCombinations = deleteRate(client, industry, id);
+        await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}});
         res.send('rate deleted')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting rates of Client " + err);
+        res.status(500).send("Error on deleting rates of Client");
     }
 })
 

@@ -57,11 +57,11 @@ router.post("/vendor-request", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         for(const step of steps) {
-            let sendInfo = {...step};
-            sendInfo.projectName = project.projectName;
-            sendInfo.industry = project.industry.name;
-            sendInfo.brief = project.brief;
-            const message = requestMessageForVendor(sendInfo);
+            let requestInfo = {...step};
+            requestInfo.projectName = project.projectName;
+            requestInfo.industry = project.industry.name;
+            requestInfo.brief = project.brief;
+            const message = requestMessageForVendor(requestInfo);
             const result = await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
         }
         res.send('Requests has been sent');

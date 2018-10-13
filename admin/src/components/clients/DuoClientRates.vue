@@ -25,26 +25,26 @@
           tr(v-for="(indus, indusInd) in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
             td.drop-option 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
-              .inner-component(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.drop-option 
               template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .inner-component(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.drop-option              
               span(v-if="!indus.icon") {{ indus.name }}
               .drop-option__image
                 img(v-if="indus.icon" :src="indus.icon")
                 span.titleTooltip {{ indus.name }}
-              .inner-component(v-if="!info.icons[1].active")
+              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :who="client" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons[1].active")
-            td(:class="{addShadow: !info.icons[1].active}") 
-              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons[1].active")
+              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
+            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
+              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
             td.iconsField
-              template(v-for="(icon, iconIndex) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, iconIndex, indusInd)" :class="{activeIcon: icon.active}") 
+              template(v-for="(icon, key) in info.icons") 
+                img.crudIcon(:src="icon.image" @click="action(index, key, indusInd)" :class="{activeIcon: icon.active}") 
   .addRow
     .addRow__plus(@click="addNewRow")
       span +
@@ -99,7 +99,7 @@ export default {
       ],
       fullInfo: [],
       changedRate: '',
-      currentActive: 'none'
+      currentActive: -1
     }
   },
 
@@ -221,15 +221,27 @@ export default {
         })
       }
     },
-    action(index, iconIndex, indusInd) {
-      if(this.currentActive != "none") {
+    async action(index, key, indusInd) {
+      if(this.currentActive != -1) {
         if(index != this.currentActive) {
           this.editing = true;
           return true;
         }
       }
-      if(iconIndex == 0) {
-        this.validError = [];
+      if(key === "save" ) {
+        return await this.saveRate(index);
+      }
+
+      if(key === "edit") {
+        return this.editRate(index);
+      }
+
+      if(key === "delete") {
+        return await this.deleteRate(index, indusInd); 
+      }
+    },
+    async saveRate(index) {
+      this.validError = [];
         let regex = /^[0-9.]+$/;
         if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
         if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
@@ -239,8 +251,8 @@ export default {
           this.changedRate = this.fullInfo[index].industry[0].rate;
           return true;
         }
-        this.fullInfo[index].icons[0].active = false;
-        this.fullInfo[index].icons[1].active = true;
+        this.fullInfo[index].icons.save.active = false;
+        this.fullInfo[index].icons.edit.active = true;
         this.fullInfo[index].industry = [];
         for(let elem of this.industrySelected) {
           elem.rate = this.changedRate;
@@ -248,58 +260,42 @@ export default {
         };
         this.fullInfo[index].form = "Duo";
         this.fullInfo[index].client = this.client._id;
-        this.$http.post('clientsapi/client-rates', this.fullInfo[index])
-        .then(res => {
-          console.log(res);
-          this.$emit('ratesUpdate', {clientId: this.client._id})
-        })
-        .catch(err => {
-          console.log(err)
-        });
-        this.currentActive = "none";
+        try {
+          const result = await this.$http.post('clientsapi/client-rates', this.fullInfo[index]);
+          await this.clientRates();
+          this.$emit('ratesUpdate', {clientId: this.client._id});
+          this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
+        } catch(err) {
+          this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+        };
+        this.currentActive = -1;
+    },
+    editRate(index) {
+      for(let elem of this.fullInfo[index].industry) {
+        this.industrySelected = [];
+        this.industrySelected.push(elem)  
       }
-
-      if(iconIndex == 1) {
-        for(let elem of this.fullInfo[index].industry) {
-          this.industrySelected = [];
-          this.industrySelected.push(elem)  
-        }
-        this.changedRate = this.fullInfo[index].industry[0].rate;
-        this.currentActive = index;
-        for(let i in this.fullInfo) {
-          if(i == index) {
-            this.fullInfo[i].icons[1].active = false;
-            this.fullInfo[i].icons[0].active = true;   
-          } else {
-              this.fullInfo[i].icons[1].active = true;
-              this.fullInfo[i].icons[0].active = false;
-          }
-        }
+      this.changedRate = this.fullInfo[index].industry[0].rate;
+      this.currentActive = index;
+      this.fullInfo[index].icons.edit.active = false;
+      this.fullInfo[index].icons.save.active = true;   
+    },
+    async deleteRate(index, indusInd) {
+      this.currentActive = -1;
+      let deletedRate = {
+        client: this.client._id,
+        industry: [this.fullInfo[index].industry[indusInd]]
       }
-
-      if(iconIndex == 2) {
-        let deletedRate = {
-          active: this.fullInfo[index].active,
-          form: this.fullInfo[index].form,
-          industry: [this.fullInfo[index].industry[indusInd]],
-          service: this.fullInfo[index].service,
-          sourceLanguage: this.fullInfo[index].sourceLanguage,
-          targetLanguage: this.fullInfo[index].targetLanguage,
-          client: this.fullInfo[index].client,
-        }
-        this.currentActive = "none";
-        deletedRate.form = "Duo";
-        deletedRate.client = this.client._id;
-        this.$http.post('clientsapi/delete-duorate', deletedRate)
-        .then(res => {
-          this.$emit('ratesUpdate', {clientId: this.client._id})
-          console.log(res)
-        })
-        .catch(err => {
-          console.log(err)
-        });
+      deletedRate.form = "Duo";
+      deletedRate.clientId = this.client._id;
+      try {
+        await this.$http.delete(`clientsapi/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        this.$emit('ratesUpdate', {clientId: this.client._id});
         this.fullInfo[index].industry.splice(indusInd, 1);
-      }
+        this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
+      };
     },
     addNewRow() {
       this.sourceSelect = ["All"];
@@ -311,7 +307,11 @@ export default {
         targetLanguage: {lang: ""}, 
         industry: [{name: "All", rate: "-"}], 
         active: true, 
-        icons: [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}]
+        icons: {
+          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
+          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
+          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+        }
       });
       this.currentActive = this.fullInfo.length - 1;
       setTimeout( () => {
@@ -321,18 +321,29 @@ export default {
     async clientRates() {
       this.loadingToggle(true);
       this.fullInfo = [];
-      const rates = await this.$http.get(`/clientsapi/get-rates?form=Duo&service=${this.serviceSelect.title}&id=${this.client._id}`);
-      this.fullInfo = rates.body;
-      this.fullInfo.forEach(item => {
-        item.icons = [{image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false},
-            {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-            {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-          ]
-      });
+      try {
+        const rates = await this.$http.get(`/clientsapi/get-rates?form=Duo&service=${this.serviceSelect.title}&id=${this.client._id}`);
+        this.fullInfo = rates.body;
+        this.fullInfo.forEach(item => {
+          item.icons = {
+            save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+            edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+            delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+          }
+        });
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot get rates for client.', isShow: true, type: 'error'});
+      }
       this.loadingToggle(false);
     },
+    defaultService() {
+      this.serviceSelect = this.vuexServices.find(item => {
+        return item.symbol === 'tr'
+      })
+    },
     ...mapActions({
-      loadingToggle: "loadingToggle"
+      loadingToggle: "loadingToggle",
+      alertToggle: "alertToggle"
     })
   },
   computed: {
@@ -396,6 +407,7 @@ export default {
   },
   mounted() {
     this.clientRates();
+    this.defaultService();
   }
 };
 </script>

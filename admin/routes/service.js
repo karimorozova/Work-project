@@ -2,7 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
-const { getOneService, getManyServices } = require('../services/');
+const { getOneService, getManyServices, deleteServiceRate } = require('../services/');
 const { receivablesCalc, payablesCalc, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
@@ -108,39 +108,6 @@ router.get('/costs', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting costs ' + err);
-  }
-})
-
-router.post('/jobcost', async (req, res) => {
-  let project = req.body;
-  let jobs = req.body.jobs;
-  const service = project.service;
-  try {
-    let result = await getOneService({'title': service});
-    var rates = result.languageCombinations;
-        for(let i = 0; i < jobs.length; i++) {
-          for(let j = 0; j < rates.length; j++) {
-            if(jobs[i].sourceLanguage == rates[j].source.lang &&
-              jobs[i].targetLanguage == rates[j].target.lang ) {
-                for(let elem of rates[j].industries) {
-                  if(project.industry == elem.name) {
-                    jobs[i].cost = parseFloat((+jobs[i].wordcount * +elem.rate).toFixed(2));
-                  }
-                  // if(project.industry == 'General' && elem.name == 'All') {
-                  //   jobs[i].cost = +jobs[i].wordcount * +elem.rate;
-                  // }
-                }
-            }
-          }
-        }  
-    const totalCost = jobs.reduce((init, cur) => {
-      return init + cur.cost;
-    }, 0)
-    const finalResult = await Projects.update({"_id": project._id}, {$set: {'jobs': jobs, 'totalCost': totalCost}});
-    res.send(finalResult);
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Error on calculating job cost ' + err);
   }
 })
 
@@ -347,43 +314,20 @@ router.post('/several-langs', async (req, res) => {
   res.send('Several langs added..')
 })
 
-router.post('/delete-duorate', async (req, res) => {
+router.delete('/delete-rate/:id', async (req, res) => {
+  const { serviceId, industries } = req.body;
+  const { id } = req.params;
+  if(!id) {
+    return res.send('Empty row deleted');
+  }
   try {
-    const rate = await req.body;
-    if(!rate.sourceLanguage || !rate.targetLanguage) {
-      res.send('empty row deleted');
-      return true;
-    }
-    const service = await getOneService({'title': rate.title})
-    let rates = service.languageCombinations;
-    let findRate = "";
-
-    for(let j = 0; j < rate.industry.length; j++) {
-      for(let i = 0; i < rates.length; i++) {
-        if(rate.sourceLanguage._id == rates[i].source.id &&
-          rate.targetLanguage._id == rates[i].target.id) {
-          for(let elem of rates[i].industries) {
-            if(rate.industry[j].name == elem.industry.name || rate.industry[j].name == 'All') {
-              elem.rate = 0;
-              elem.active = false;
-            }
-          }
-          findRate = rates[i].industries.find(item => {
-            if(item.rate > 0) {
-              return item;
-            }
-          });
-          if(!findRate) {
-            rates.splice(i, 1);
-          }
-        }
-      }
-    }
-    const result = await Services.updateOne({'title': rate.title}, {$set: {'languageCombinations': rates}});
+    const service = await getOneService({'_id': serviceId});
+    const updatedCombinations = deleteServiceRate(service, industries, id);
+    const result = await Services.updateOne({'_id': serviceId}, {$set: {'languageCombinations': updatedCombinations}});
     res.send(result);
   } catch(err) {
     console.log(err);
-    res.status(500).send('Error on deleting duo-rate ' + err);
+    res.status(500).send('Error on deleting the rate');
   }
 })
 
@@ -399,7 +343,7 @@ router.get('/parsed-rates', async (req, res) => {
           industry.active = elem.active;
           if(req.query.form === "Duo") {
             rates.push({
-              _id: comb._id,
+              id: comb._id,
               title: service.title,
               sourceLanguage: comb.source,
               targetLanguage: comb.target,
@@ -407,7 +351,7 @@ router.get('/parsed-rates', async (req, res) => {
             })
           } else {
             rates.push({
-              _id: comb._id,
+              id: comb._id,
               title: service.title,
               targetLanguage: comb.target,
               industry: [industry],
