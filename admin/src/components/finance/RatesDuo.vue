@@ -314,13 +314,13 @@ export default {
     },
     editRate(index) {
       this.currentActive = index;
-        for(let elem of this.fullInfo[index].industry) {
-          this.industrySelected = [];
-          this.industrySelected.push(elem)  
-        }
-        this.changedRate = this.fullInfo[index].industry[0].rate;
-        this.fullInfo[index].icons.edit.active = false;
-        this.fullInfo[index].icons.save.active = true;   
+      for(let elem of this.fullInfo[index].industry) {
+        this.industrySelected = [];
+        this.industrySelected.push(elem)  
+      }
+      this.changedRate = this.fullInfo[index].industry[0].rate;
+      this.fullInfo[index].icons.edit.active = false;
+      this.fullInfo[index].icons.save.active = true;   
     },
     async deleteRate(index) {
       try {
@@ -363,18 +363,15 @@ export default {
     },
     async combinations() {
       try {
-      const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
-      this.fullInfo = result.body;
-      this.fullInfo.forEach(item => {
-        item.icons = {
-          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        }
-      })
-      this.services.forEach(item => {
-        item.crud = item.title === this.serviceSelect.title;
-      })
+        const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
+        this.fullInfo = result.body;
+        this.fullInfo.forEach(item => {
+          item.icons = {
+            save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+            edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+            delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+          }
+        })
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot get rates.', isShow: true, type: 'error'});
       }

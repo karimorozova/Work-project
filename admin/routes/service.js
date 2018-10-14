@@ -167,45 +167,6 @@ router.post('/rates-mono', async (req, res) => {
     }
 })
 
-router.post('/delete-monorate', async (req, res) => {
-  try {
-    let rate = req.body;
-    if(!rate.targetLanguage || !rate.industry[0].package) {
-      return true;
-    }
-    let rates = [];
-    let service = await getOneService({'title': rate.title})
-    rates = service.languageCombinations;
-    let findRate = "";
-
-    for(let j = 0; j < rate.industry.length; j++) {
-      for(let i = 0; i < rates.length; i++) {
-        if(rate.targetLanguage.lang == rates[i].target.lang) {
-          for(let elem of rates[i].industries) {
-            if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-              elem.rate = 0;
-              elem.active = false;
-            }
-          }
-          findRate = rates[i].industries.find(item => {
-            if(item.rate > 0) {
-              return item;
-            }
-          });
-          if(!findRate) {
-            rates.splice(i, 1);
-          }
-        }
-      }
-    }
-    let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-    res.send(result);
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Error on deleting mono-rate ' + err);
-  }
-})
-
 router.post('/rates', async (req, res) => {
   try {
     let rate = req.body;
@@ -233,8 +194,7 @@ router.post('/rates', async (req, res) => {
       } 
       return {industry: item._id, active: item.active, rate: item.rate, package: item.package}
     })
-    const updatedCombinations = checkServiceRatesMatches(service, industries, rate);
-    const result = await Services.update({'title': rate.title}, {'languageCombinations': updatedCombinations});
+    const result = await checkServiceRatesMatches(service, industries, rate);
     res.send(result);  
   } catch(err) {
       console.log(err)
@@ -299,8 +259,7 @@ router.delete('/delete-rate/:id', async (req, res) => {
   }
   try {
     const service = await getOneService({'_id': serviceId});
-    const updatedCombinations = deleteServiceRate(service, industries, id);
-    const result = await Services.updateOne({'_id': serviceId}, {$set: {'languageCombinations': updatedCombinations}});
+    const result = await deleteServiceRate(service, industries, id);
     res.send(result);
   } catch(err) {
     console.log(err);
@@ -327,6 +286,7 @@ router.get('/parsed-rates', async (req, res) => {
               industry: [industry],
             })
           } else {
+            industry.package = elem.package;
             rates.push({
               id: comb._id,
               title: service.title,

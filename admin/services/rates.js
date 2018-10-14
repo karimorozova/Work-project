@@ -1,11 +1,12 @@
-function checkServiceRatesMatches(service, industries, rate) {
+const { Services } = require("../models/");
+
+async function checkServiceRatesMatches(service, industries, rate) {
     if(service.languageForm === 'Mono') {
-        return checkMonoRatesMatches(service, industries, rate);
+        return await checkMonoRatesMatches(service, industries, rate);
     }
     let exist = false;
-    let combinations = service.languageCombinations
     for(let elem of rate.industry) {
-      for(let comb of combinations) {
+      for(let comb of service.languageCombinations) {
         if(rate.sourceLanguage._id == comb.source.id &&
           rate.targetLanguage._id == comb.target.id) {
           exist = true;
@@ -28,14 +29,14 @@ function checkServiceRatesMatches(service, industries, rate) {
             industries: industries,
         })
     }
-    return service.languageCombinations;
+    const result = await Services.updateOne({'title': rate.title}, {'languageCombinations': service.languageCombinations});
+    return result;
 }
 
-function checkMonoRatesMatches(service, industries, rate) {
+async function checkMonoRatesMatches(service, industries, rate) {
     let exist = false;
-    let combinations = service.languageCombinations
     for(let elem of rate.industry) {
-      for(let comb of combinations) {
+      for(let comb of service.languageCombinations) {
         if(rate.targetLanguage._id == comb.target.id) {
           exist = true;
           for(let indus of comb.industries) {
@@ -57,10 +58,11 @@ function checkMonoRatesMatches(service, industries, rate) {
             industries: industries,
         })
     }
-    return service.languageCombinations;
+    const result = await Services.updateOne({'title': rate.title}, {'languageCombinations': service.languageCombinations});
+    return result;
 }
 
-function deleteServiceRate(service, industries, id) {
+async function deleteServiceRate(service, industries, id) {
     const combIndex = service.languageCombinations.findIndex(item => {
         return item.id === id;
       });
@@ -79,7 +81,8 @@ function deleteServiceRate(service, industries, id) {
       const sum = allZero.reduce((init, cur) => {return init + cur}, 0);
       const updatedCombinations = sum ? service.languageCombinations 
       : service.languageCombinations.filter(item => {return item.id !== id});
-      return updatedCombinations;
+    const result = await Services.updateOne({'_id': service.id}, {$set: {'languageCombinations': updatedCombinations}});
+    return result;
 }
 
 module.exports = { checkServiceRatesMatches, deleteServiceRate };

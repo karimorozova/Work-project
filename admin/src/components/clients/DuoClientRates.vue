@@ -229,7 +229,7 @@ export default {
         }
       }
       if(key === "save" ) {
-        return await this.saveRate(index);
+        return await this.checkForErrors(index);
       }
 
       if(key === "edit") {
@@ -240,35 +240,38 @@ export default {
         return await this.deleteRate(index, indusInd); 
       }
     },
-    async saveRate(index) {
+    async checkForErrors(index) {
       this.validError = [];
-        let regex = /^[0-9.]+$/;
-        if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
-        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
-        if(!regex.test(this.changedRate)) this.validError.push("Please set the correct rate value!");
-        if(this.validError.length) {
-          this.showValidError = true;
-          this.changedRate = this.fullInfo[index].industry[0].rate;
-          return true;
-        }
-        this.fullInfo[index].icons.save.active = false;
-        this.fullInfo[index].icons.edit.active = true;
-        this.fullInfo[index].industry = [];
-        for(let elem of this.industrySelected) {
-          elem.rate = this.changedRate;
-          this.fullInfo[index].industry.push(elem)
-        };
-        this.fullInfo[index].form = "Duo";
-        this.fullInfo[index].client = this.client._id;
-        try {
-          const result = await this.$http.post('clientsapi/client-rates', this.fullInfo[index]);
-          await this.clientRates();
-          this.$emit('ratesUpdate', {clientId: this.client._id});
-          this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
-        } catch(err) {
-          this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
-        };
-        this.currentActive = -1;
+      let regex = /^[0-9.]+$/;
+      if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
+      if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+      if(!regex.test(this.changedRate)) this.validError.push("Please set the correct rate value!");
+      if(this.validError.length) {
+        this.showValidError = true;
+        this.changedRate = this.fullInfo[index].industry[0].rate;
+        return;
+      }
+      await this.saveRate(index);
+    },
+    async saveRate(index) {
+      this.fullInfo[index].icons.save.active = false;
+      this.fullInfo[index].icons.edit.active = true;
+      this.fullInfo[index].industry = [];
+      for(let elem of this.industrySelected) {
+        elem.rate = this.changedRate;
+        this.fullInfo[index].industry.push(elem)
+      };
+      this.fullInfo[index].form = "Duo";
+      this.fullInfo[index].client = this.client._id;
+      try {
+        const result = await this.$http.post('clientsapi/client-rates', this.fullInfo[index]);
+        await this.clientRates();
+        this.$emit('ratesUpdate', {clientId: this.client._id});
+        this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
+      } catch(err) {
+        this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+      };
+      this.currentActive = -1;
     },
     editRate(index) {
       for(let elem of this.fullInfo[index].industry) {
@@ -289,7 +292,7 @@ export default {
       deletedRate.form = "Duo";
       deletedRate.clientId = this.client._id;
       try {
-        await this.$http.delete(`clientsapi/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        await this.$http.delete(`clientsapi/rate/${this.fullInfo[index].id}`, {body: deletedRate});
         this.$emit('ratesUpdate', {clientId: this.client._id});
         this.fullInfo[index].industry.splice(indusInd, 1);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});

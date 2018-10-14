@@ -322,8 +322,7 @@ export default {
       this.fullInfo.push({
         title: this.serviceSelect.title,
         targetLanguage: "", 
-        industry: [{name: "All", rate: 0.1, package: 200}], 
-        active: true, 
+        industry: [{name: "All", rate: 0.1, package: 200, active: true}], 
         icons: {
           save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
           edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
@@ -332,7 +331,7 @@ export default {
       });
       this.currentActive = this.fullInfo.length-1;
       this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
-      this.changedPackage = this.fullInfo[this.currentActive].industry[0].changedPackage;
+      this.changedPackage = this.fullInfo[this.currentActive].industry[0].package;
       setTimeout( () => {
         this.handleScroll();
       },100);
@@ -347,10 +346,6 @@ export default {
           delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
         }
       })
-      this.services.forEach(item => {
-        item.crud = item.title === this.serviceSelect.title
-      })
-      this.loadingToggle(false);
     },
     defaultService() {
       this.serviceSelect = this.vuexServices.find(item => {

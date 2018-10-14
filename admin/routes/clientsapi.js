@@ -192,19 +192,21 @@ router.post('/client-rates', async (req, res) => {
                 if(ind.id === indus._id || indus.name == "All") {
                     ind.rate = indus.rate;
                     ind.active = indus.active;
+                    if(rate.form === "Mono") {
+                        ind.package = indus.package;
+                    }
                 }
             }
         }
         const industries = client.industry.map(item => {
             const active = item.rate > 0;
             if(rate.form === 'Duo') {
-                return {industry: item._id, active: active, rate: item.rate}
+                return {industry: item.id, active: active, rate: item.rate}
             }
-            return {industry: item._id, active: active, rate: item.rate, package: item.package}
+            return {industry: item.id, active: active, rate: item.rate, package: item.package}
         })
-        const updatedCombinations = checkRates(client, industries, rate)
-        await Clients.updateOne({"_id": id}, {$set: {languageCombinations: updatedCombinations}});
-        res.send('rates changed')
+        const result = await checkRates(client, industries, rate);
+        res.send('rates changed');
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating rates of Client");
@@ -255,7 +257,7 @@ router.post('/several-langs', async (req, res) => {
     }
 })
 
-router.delete('/delete-rate/:id', async (req, res) => {
+router.delete('/rate/:id', async (req, res) => {
     let  { clientId, industry } = req.body;
     const { id } = req.params;
     if(!id) {
@@ -263,9 +265,8 @@ router.delete('/delete-rate/:id', async (req, res) => {
     }
     try {
         let client = await getClient({"_id": clientId})
-        const updatedCombinations = deleteRate(client, industry, id);
-        await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}});
-        res.send('rate deleted')
+        const result = await deleteRate(client, industry, id);
+        res.send('rate deleted');
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting rates of Client");

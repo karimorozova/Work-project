@@ -98,6 +98,9 @@ const ClientSchema = new mongoose.Schema({
             active: {
                 type: Boolean,
                 default: true
+            },
+            package: {
+                type: Number
             }
         }]
     }],
