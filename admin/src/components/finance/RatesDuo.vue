@@ -175,7 +175,6 @@ export default {
     chosenServ(data) {
       if(this.serviceSelect.title != data.title) {
         this.serviceSelect = data;
-        this.loadingToggle(true);
         this.fullInfo = [];
         this.combinations();
       }
@@ -379,7 +378,6 @@ export default {
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot get rates.', isShow: true, type: 'error'});
       }
-      this.loadingToggle(false);
     },
     defaultService() {
       this.serviceSelect = this.vuexServices.find(item => {

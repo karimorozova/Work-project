@@ -2,7 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
-const { getOneService, getManyServices, checkServiceRates, deleteServiceRate } = require('../services/');
+const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate } = require('../services/');
 const { receivablesCalc, payablesCalc, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
@@ -233,7 +233,7 @@ router.post('/rates', async (req, res) => {
       } 
       return {industry: item._id, active: item.active, rate: item.rate, package: item.package}
     })
-    const updatedCombinations = checkServiceRates(service, industries, rate);
+    const updatedCombinations = checkServiceRatesMatches(service, industries, rate);
     const result = await Services.update({'title': rate.title}, {'languageCombinations': updatedCombinations});
     res.send(result);  
   } catch(err) {

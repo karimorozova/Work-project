@@ -1,6 +1,6 @@
-function checkServiceRates(service, industries, rate) {
+function checkServiceRatesMatches(service, industries, rate) {
     if(service.languageForm === 'Mono') {
-        return checkMonoRates(service, industries, rate);
+        return checkMonoRatesMatches(service, industries, rate);
     }
     let exist = false;
     let combinations = service.languageCombinations
@@ -31,7 +31,7 @@ function checkServiceRates(service, industries, rate) {
     return service.languageCombinations;
 }
 
-function checkMonoRates(service, industries, rate) {
+function checkMonoRatesMatches(service, industries, rate) {
     let exist = false;
     let combinations = service.languageCombinations
     for(let elem of rate.industry) {
@@ -82,4 +82,4 @@ function deleteServiceRate(service, industries, id) {
       return updatedCombinations;
 }
 
-module.exports = { checkServiceRates, deleteServiceRate };
+module.exports = { checkServiceRatesMatches, deleteServiceRate };

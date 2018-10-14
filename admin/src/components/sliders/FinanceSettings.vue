@@ -57,13 +57,11 @@ export default {
     },
     openMono() {
       if(!this.monoDrop) {
-        this.loadingToggle(true);
       }
       this.monoDrop = !this.monoDrop;
     },
     openDuo() {
       if(!this.duoDrop) {
-        this.loadingToggle(true);
       }
       this.duoDrop = !this.duoDrop;
     },

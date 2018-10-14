@@ -17,6 +17,14 @@ export const bus = new Vue();
 
 // Vue.use(BootstrapVue);
 Vue.use(VueResource);
+
+Vue.http.interceptors.push((request, next) => {
+  store.dispatch('loadingToggle', true);
+  next((response) => {
+    store.dispatch('loadingToggle', false);
+  })
+})
+
 Vue.use(VueLodash);
 Vue.config.productionTip = false
 
