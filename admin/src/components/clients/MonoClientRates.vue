@@ -84,12 +84,12 @@ export default {
       this.changedPackage = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByClassName('mono-tbody')[0];
+      let element = document.querySelector('.mono-tbody');
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        var tbody = document.getElementsByClassName('mono-tbody')[0];
+        let tbody = document.querySelector('.mono-tbody');
         setTimeout(() => {
           const offsetBottom = data.offsetTop + data.offsetHeight*2;
           const scrollBottom = tbody.scrollTop + tbody.offsetHeight;

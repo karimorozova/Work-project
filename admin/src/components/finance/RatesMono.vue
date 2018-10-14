@@ -119,12 +119,12 @@ export default {
       this.changedPackage = +event.target.value
     },
     handleScroll() {
-      let element = document.getElementsByClassName('mono-tbody')[0];
+      let element = document.querySelector('.mono-tbody');
       element.scrollTop = element.scrollHeight;
     },
     scrollDrop(data) {
       if(data.drop) {
-        var tbody = document.getElementsByClassName('mono-tbody')[0];
+        let tbody = document.querySelector('.mono-tbody');
         setTimeout(() => {
           const offsetBottom = data.offsetTop + data.offsetHeight*2;
           const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
@@ -305,7 +305,7 @@ export default {
           industries: this.fullInfo[index].industry,
         }
         await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
-        this.fullInfo.splice(index, 1)[0];
+        this.fullInfo.splice(index, 1);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
         this.refreshServices();  
       } catch(err) {
