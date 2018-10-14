@@ -1,22 +1,22 @@
 <template lang="pug">
-.duoWrap
+.duo-wrap
   .filters
-    .filters__item.sourceMenu
+    .filters__item
       label Source Language
       LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
-    .filters__item.targetMenu
+    .filters__item
       label Target Language
       LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
-    .filters__item.industryMenu
+    .filters__item
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
-    .filters__item.serviceMenu
+    .filters__item
       label Service
       ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="chosenServ" :direction="direction")
-  .addButton
+  .add-button
     input(type="button" value="Add several languages" @click="addSevLangs")           
-  .tableData
-    table.duoFinance(:style="{width: tableWidth}")
+  .table-data
+    table.duo-finance(:style="{width: tableWidth}")
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
@@ -35,18 +35,18 @@
               span(v-if="!indus.icon") {{ indus.name }}
               .drop-option__image
                 img(v-if="indus.icon" :src="indus.icon")
-                span.titleTooltip {{ indus.name }}
+                span.title-tooltip {{ indus.name }}
               .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :who="client" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
               input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
-            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
+            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
-            td.iconsField
+            td.icons-field
               template(v-for="(icon, key) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, key, indusInd)" :class="{activeIcon: icon.active}") 
-  .addRow
-    .addRow__plus(@click="addNewRow")
+                img.crudIcon(:src="icon.image" @click="action(index, key, indusInd)" :class="{'active-icon': icon.active}") 
+  .add-row
+    .add-row__plus(@click="addNewRow")
       span +
   .edition-message(v-if="editing")
     .message
@@ -66,8 +66,6 @@ import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSingleSelect from "../ServiceSingleSelect";
 import { mapGetters, mapActions } from "vuex";
-import { bus } from "../../main";
-
 
 export default {
   props: {
@@ -322,10 +320,9 @@ export default {
       },100);
     },
     async clientRates() {
-      this.loadingToggle(true);
       this.fullInfo = [];
       try {
-        const rates = await this.$http.get(`/clientsapi/get-rates?form=Duo&service=${this.serviceSelect.title}&id=${this.client._id}`);
+        const rates = await this.$http.get(`/clientsapi/get-rates?form=Duo&service=${this.serviceSelect.title}&clientId=${this.client._id}`);
         this.fullInfo = rates.body;
         this.fullInfo.forEach(item => {
           item.icons = {
@@ -337,7 +334,6 @@ export default {
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot get rates for client.', isShow: true, type: 'error'});
       }
-      this.loadingToggle(false);
     },
     defaultService() {
       this.serviceSelect = this.vuexServices.find(item => {
@@ -416,16 +412,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.duoWrap {
+.duo-wrap {
   position: relative;
   font-family: MyriadPro;
   min-width: 850px; 
 }
-.tableData {
+.table-data {
   max-width: 872px;
   overflow-x: scroll;
 }
-.duoFinance {
+.duo-finance {
   border-collapse: collapse;
   width: 868px;
   thead, tbody {
@@ -435,7 +431,6 @@ export default {
   }
   tbody {
     height: 184px;
-    // max-height: 173px;
     overflow-y: scroll;
     transition: all 0.3s;
   }
@@ -477,7 +472,7 @@ td {
   border-right: 1px solid #BFB09D;
   border-bottom: 1px solid #BFB09D;
 }
-.iconsField{
+.icons-field{
   text-align: center;
 }
 .crudIcon {
@@ -485,7 +480,7 @@ td {
   opacity: .5;
   cursor: pointer;
 }
-.activeIcon {
+.active-icon {
   opacity: 1;
 }
 .filters {
@@ -502,7 +497,7 @@ td {
     }
   }
 }
-.addButton {
+.add-button {
   width: 100%;
   text-align: right;
   margin-bottom: 15px;
@@ -519,7 +514,7 @@ td {
     cursor: pointer;
   }
 }
-.addRow {
+.add-row {
   margin-top: 10px;
   margin-left: 25px; 
   &__plus {
@@ -557,7 +552,7 @@ td {
   &__image {
     max-height: 21px;
     width: 30px;
-    .titleTooltip {
+    .title-tooltip {
       position: absolute;
       display: none;
       color: #D15F45;
@@ -566,7 +561,7 @@ td {
       left: 35px;
     }
     &:hover {
-      .titleTooltip {
+      .title-tooltip {
         display: block;
       }
     }
@@ -575,7 +570,7 @@ td {
     }
   }
 }
-.addShadow {
+.add-shadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 

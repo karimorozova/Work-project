@@ -1,17 +1,17 @@
 <template lang="pug">
-.duoWrap
+.duo-wrap
   .filters
-    .filters__item.sourceMenu
+    .filters__item
       label Language
       LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
-    .filters__item.industryMenu
+    .filters__item
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
-    .filters__item.serviceMenu
+    .filters__item
       label Service
       ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Mono" @chosenServ="chosenServ")           
-  .tableData
-    table.duoFinance(:style="{width: tableWidth}")
+  .table-data
+    table.duo-finance(:style="{width: tableWidth}")
       thead
         tr
           th(v-for="head in tableHeader") {{ head.title }}
@@ -22,24 +22,24 @@
               template(v-if='targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}")
+            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}")
               input.rates(:value="indus.package" @input="changePackage" :readonly="info.icons.edit.active")
             td.drop-option              
               span(v-if="!indus.icon") {{ indus.name }}
               .drop-option__image
                 img(v-if="indus.icon" :src="indus.icon")
-                span.titleTooltip {{ indus.name }}
+                span.title-tooltip {{ indus.name }}
               .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
               input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
-            td(:class="{addShadow: currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
+            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
               input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
-            td.iconsField
+            td.icons-field
               template(v-for="(icon, key) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, key)" :class="{activeIcon: icon.active}") 
-  .addRow
-    .addRow__plus(@click="addNewRow")
+                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': icon.active}") 
+  .add-row
+    .add-row__plus(@click="addNewRow")
       span +
   .unique-message(v-if="notUnique")
     .message
@@ -304,7 +304,7 @@ export default {
           serviceId: this.serviceSelect._id,
           industries: this.fullInfo[index].industry,
         }
-        await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        await this.$http.delete(`/service/rate/${this.fullInfo[index].id}`, {body: deletedRate});
         this.fullInfo.splice(index, 1);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
         this.refreshServices();  
@@ -412,16 +412,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.duoWrap {
+.duo-wrap {
   position: relative;
   font-family: MyriadPro;
   min-width: 872px; 
 }
-.tableData {
+.table-data {
   max-width: 872px;
   overflow-x: scroll;
 }
-.duoFinance {
+.duo-finance {
   border-collapse: collapse;
   width: 868px;
   thead, tbody {
@@ -473,15 +473,15 @@ td {
   border-right: 1px solid #BFB09D;
   border-bottom: 1px solid #BFB09D;
 }
-.iconsField{
+.icons-field{
   text-align: center;
 }
-.crudIcon {
+.crud-icon {
   margin: 0 5px;
   opacity: .5;
   cursor: pointer;
 }
-.activeIcon {
+.active-icon {
   opacity: 1;
 }
 .filters {
@@ -498,7 +498,7 @@ td {
     }
   }
 }
-.addButton {
+.add-button {
   width: 100%;
   text-align: right;
   margin-bottom: 15px;
@@ -515,7 +515,7 @@ td {
     cursor: pointer;
   }
 }
-.addRow {
+.add-row {
   margin-top: 10px;
   margin-left: 25px; 
   &__plus {
@@ -553,7 +553,7 @@ td {
   &__image {
     max-height: 21px;
     width: 30px;
-    .titleTooltip {
+    .title-tooltip {
       position: absolute;
       display: none;
       color: #D15F45;
@@ -562,7 +562,7 @@ td {
       left: 35px;
     }
     &:hover {
-      .titleTooltip {
+      .title-tooltip {
         display: block;
       }
     }
@@ -571,7 +571,7 @@ td {
     }
   }
 }
-.addShadow {
+.add-shadow {
   box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 

@@ -35,7 +35,7 @@
               span(v-if="!indus.icon && info.icons.edit.active") {{ indus.name }}
               .drop-option__image
                 img(v-if="indus.icon && info.icons.edit.active" :src="indus.icon")
-                span.titleTooltip {{ indus.name }}
+                span.title-tooltip {{ indus.name }}
               .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
@@ -45,8 +45,8 @@
             td.icons-field
               template(v-for="(icon, key) in info.icons")
                 img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': icon.active}") 
-  .addRow
-    .addRow__plus(@click="addNewRow")
+  .add-row
+    .add-row__plus(@click="addNewRow")
       span +
   .unique-message(v-if="notUnique")
     .message
@@ -328,7 +328,7 @@ export default {
           serviceId: this.serviceSelect._id,
           industries: this.fullInfo[index].industry,
         }
-        await this.$http.delete(`/service/delete-rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        await this.$http.delete(`/service/rate/${this.fullInfo[index].id}`, {body: deletedRate});
         this.fullInfo.splice(index, 1);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
         this.refreshServices();
@@ -543,7 +543,7 @@ td {
     cursor: pointer;
   }
 }
-.addRow {
+.add-row {
   margin-top: 10px;
   margin-left: 25px; 
   &__plus {
@@ -581,7 +581,7 @@ td {
   &__image {
     max-height: 21px;
     width: 30px;
-    .titleTooltip {
+    .title-tooltip {
       position: absolute;
       display: none;
       color: #D15F45;
@@ -590,7 +590,7 @@ td {
       left: 35px;
     }
     &:hover {
-      .titleTooltip {
+      .title-tooltip {
         display: block;
       }
     }

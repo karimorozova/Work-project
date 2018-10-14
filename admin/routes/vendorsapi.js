@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
+const { getVendor, getVendors, checkRates, deleteRate } = require('./vendors/');
 const { vendorMail } = require('../utils/mailtovendor');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
@@ -34,74 +35,54 @@ return oldFile.filename;
 router.get('/vendor', async (req, res) => {
     const id = req.query.id;
     try {
-        const vendor = await Vendors.findOne({"_id": id})
-                .populate('industry')
-                .populate('native')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languagePairs.source')
-                .populate('languagePairs.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
-                res.send(vendor)
-        } catch(err) {
-            console.log(err);
-            res.status(500).send("Error on getting Vendors " + err);
-        }
+        const vendor = await getVendor({"_id": id});
+        res.send(vendor)
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting Vendors");
+    }
 })
 
 router.post('/mailtovendors', async (req, res) => {
     let vendors = req.body;
     try {
         for(let vend of vendors) {
-            const vendor = await Vendors.findOne({"_id": vend._id})
-                    .populate('industry')
-                    .populate('native')
-                    .populate('languageCombinations.source')
-                    .populate('languageCombinations.target')
-                    .populate('languagePairs.source')
-                    .populate('languagePairs.target')
-                    .populate('languageCombinations.service')
-                    .populate('languageCombinations.industry.industry');
-            await vendorMail(vendor);    
+            const vendor = await getVendor({"_id": vend._id});
+            await vendorMail(vendor);
         }
         res.send('All messages were sent')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on sending email to Vendors " + err);
+        res.status(500).send("Error on sending email to Vendors");
     }
 })
 
 router.get('/get-rates', async (req, res) => {
-    const vendorId = req.query.id;
-    const service = req.query.service;
-    const form = req.query.form;
+    const { vendorId, service, form } = req.query;
     try {
-        const vendor = await Vendors.findOne({"_id": vendorId})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const vendor = await getVendor({"_id": vendorId});
         let rates = [];
         for(let comb of vendor.languageCombinations) {
             if(comb.service.title === service) {
                 for(let elem of comb.industry) {
-                    elem.industry.active = elem.active;
-                    elem.industry.rate = elem.rate;
+                    let industry = {...elem.industry._doc};
+                    industry.rate = elem.rate;
+                    industry.active = elem.active;
                     if(form === "Duo") {
                         rates.push({
+                            id: comb.id,
                             service: comb.service,
                             sourceLanguage: comb.source,
                             targetLanguage: comb.target,
-                            industry: [elem.industry]
+                            industry: [industry]
                         })
                     } else {
-                        elem.industry.package = elem.package;
+                        industry.package = elem.package;
                         rates.push({
+                            id: comb.id,
                             service: comb.service,
                             targetLanguage: comb.target,
-                            industry: [elem.industry]
+                            industry: [industry]
                         })
                     }
                     
@@ -111,47 +92,7 @@ router.get('/get-rates', async (req, res) => {
         res.send(rates);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on getting Client rates ' + err);
-    }
-})
-
-router.post('/delete-duorate', async (req,res) => {
-    var rate = req.body;
-    const id = rate.vendor;
-    try {
-        let vendor = await Vendors.findOne({"_id": id})
-                .populate('industry')
-                .populate('native')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languagePairs.source')
-                .populate('languagePairs.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
-        let allZero = [];
-        for(let i = 0; i < vendor.languageCombinations.length; i++) {
-            if(vendor.languageCombinations[i].service.title == rate.service.title && vendor.languageCombinations[i].source.lang == rate.sourceLanguage.lang &&
-                vendor.languageCombinations[i].target.lang == rate.targetLanguage.lang) {
-                for(let ind of vendor.languageCombinations[i].industry) {
-                    for(let indus of rate.industry) {
-                        if(ind.name == indus.name) {
-                            ind.rate = 0;
-                        }
-                    }
-                    allZero.push(ind.rate);
-                }
-                let sum = allZero.reduce( (x,y) => x + y);
-                if(!sum) {
-                    vendor[0].languageCombinations.splice(i, 1);
-                    break;
-                }
-            }
-        }
-        await Vendors.updateOne({"_id": id}, {$set: {languageCombinations: vendor.languageCombinations}})
-        res.send('rate deleted')
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting rate of Vendor " + err);
+        res.status(500).send('Error on getting Vendor rates');
     }
 })
 
@@ -159,55 +100,46 @@ router.post('/vendor-rates', async (req, res) => {
     var rate = req.body;
     const id = rate.vendor;
     try {
-        let vendor = await Vendors.findOne({"_id": id})
-                .populate('industry')
-                .populate('native')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languagePairs.source')
-                .populate('languagePairs.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        let vendor = await getVendor({"_id": id})
         for(let indus of rate.industry) {
             for(let ind of vendor.industry) {
-                if(ind.name == indus.name || indus.name == "All") {
+                if(ind.id === indus._id || indus.name == "All") {
                     ind.rate = indus.rate;
-                }
-            }
-        }
-        let industries = JSON.stringify(vendor.industry);
-        industries = JSON.parse(industries);
-        let exist = false;
-        if(vendor.languageCombinations.length) {
-            for(let comb of vendor.languageCombinations) {
-                if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
-                    comb.target.lang == rate.targetLanguage.lang) {
-                    for(let ind of comb.industry) {
-                        for(let indus of rate.industry) {
-                            if(ind.name == indus.name || indus.name == "All") {
-                                comb.industry = industries;
-                            }
-                        }
+                    ind.active = indus.active;
+                    if(rate.form === "Mono") {
+                        ind.package = indus.package;
                     }
-                    exist = true;
                 }
             }
         }
-        if(!exist || !vendor.languageCombinations.length) {
-            vendor.languageCombinations.push({
-                source: rate.sourceLanguage,
-                target: rate.targetLanguage,
-                service: rate.service,
-                industry: industries,
-                active: true
-            })
-        }
-        await Vendors.updateOne({"_id": id}, {$set: {languageCombinations: vendor.languageCombinations}})
-        res.send('rates changed')
-    }
-      catch(err) {
+        const industries = vendor.industry.map(item => {
+            const active = item.rate > 0;
+            if(rate.form === 'Duo') {
+                return {industry: item.id, active: active, rate: item.rate}
+            }
+            return {industry: item.id, active: active, rate: item.rate, package: item.package}
+        })
+        const result = await checkRates(vendor, industries, rate);
+        res.send('rates changed');
+    } catch(err) {
         console.log(err);
-        res.status(500).send("Error on updating rates of Vendor " + err);
+        res.status(500).send("Error on updating rates of Vendor");
+    }
+})
+
+router.delete('/rate/:id', async (req,res) => {
+    let  { vendorId, industry } = req.body;
+    const { id } = req.params;
+    if(id === "undefined") {
+        return res.send("Deleted");
+    }
+    try {
+        let vendor = await getVendor({"_id": vendorId})
+        const result = await deleteRate(vendor, industry, id);
+        res.send('rate deleted');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rates of Vendor");
     }
 })
 
@@ -215,15 +147,7 @@ router.post('/several-langs', async (req, res) => {
     const vendorId = req.body.vendor;
     let langCombs = JSON.parse(req.body.langs);
     try {
-        let vendor = await Vendors.findOne({"_id": vendorId})
-                .populate('industry')
-                .populate('native')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languagePairs.source')
-                .populate('languagePairs.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        let vendor = await getVendor({"_id": vendorId})
         for(let comb of langCombs) {
             let langPairExist = false;
             for(let venComb of vendor.languageCombinations) {
@@ -254,7 +178,7 @@ router.post('/several-langs', async (req, res) => {
         res.send('Several langs added..')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several langs for Vendor " + err);
+        res.status(500).send("Error on adding several langs for Vendor");
     }
 })
 
@@ -272,7 +196,7 @@ router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) 
         res.send({id: id})
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on creating Vendor " + err);
+        res.status(500).send("Error on creating Vendor");
     }
 })
 
@@ -288,7 +212,7 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
         res.send('Vendor info updated')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on updating Vendor " + err);
+        res.status(500).send("Error on updating Vendor");
     }
 })
 
@@ -298,7 +222,7 @@ router.post('/deletevendor', async (req, res) => {
         res.send('Deleted');
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting Vendor " + err);
+        res.status(500).send("Error on deleting Vendor");
     }
 })
 

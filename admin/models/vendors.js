@@ -101,6 +101,9 @@ const VendorSchema = new mongoose.Schema({
             active: {
                 type: Boolean,
                 default: true
+            },
+            package: {
+                type: Number
             }
         }]
     }],

@@ -50,49 +50,34 @@ return oldFile.filename;
 router.get('/client', async (req, res) => {
     let id = req.query.id;
     try {
-        const client = await Clients.findOne({"_id": id})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const client = await getClient({"_id": id})
         res.send(client);
     }  catch(err) {
             console.log(err);
-            res.status(500).send("Error on getting Client " + err);
+            res.status(500).send("Error on getting Client");
         }
 })
 
 router.get('/clients-every', async (req,res) => {
     try {
-        const clients = await Clients.find({})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const clients = await getClients({});
         res.send(clients);
     }  catch(err) {
             console.log(err);
-            res.status(500).send("Error on getting Client " + err);
+            res.status(500).send("Error on getting Client");
         }
 })
 
 router.post('/mailtoclient', async (req, res) => {
     const project = req.body;
     try {
-        const client = await Clients.findOne({"_id": project.customer})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const client = await getClient({"_id": project.customer});
         await clientMail(project, client);
         console.log('email to client');
         res.send('An email to Cilent sent!')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on mailing to Client " + err);
+        res.status(500).send("Error on mailing to Client");
     }
 })
 
@@ -142,9 +127,7 @@ router.get('/declinequote', async (req, res) => {
 })
 
 router.get('/get-rates', async (req, res) => {
-    const clientId = req.query.id;
-    const service = req.query.service;
-    const form = req.query.form;
+    const { clientId, service, form } = req.query;
     try {
         let client = await getClient({"_id": clientId});
         let rates = [];
@@ -156,7 +139,7 @@ router.get('/get-rates', async (req, res) => {
                     industry.active = elem.active;
                     if(form === "Duo") {
                         rates.push({
-                            id: comb._id,
+                            id: comb.id,
                             service: comb.service,
                             sourceLanguage: comb.source,
                             targetLanguage: comb.target,
@@ -165,7 +148,7 @@ router.get('/get-rates', async (req, res) => {
                     } else {
                         industry.package = elem.package;
                         rates.push({
-                            id: comb._id,
+                            id: comb.id,
                             service: comb.service,
                             targetLanguage: comb.target,
                             industry: [industry]
@@ -178,7 +161,7 @@ router.get('/get-rates', async (req, res) => {
         res.send(rates);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on getting Client rates ' + err);
+        res.status(500).send('Error on getting Client rates');
     }
 })
 
@@ -213,16 +196,27 @@ router.post('/client-rates', async (req, res) => {
     }
 })
 
+router.delete('/rate/:id', async (req, res) => {
+    let  { clientId, industry } = req.body;
+    const { id } = req.params;
+    if(id === "undefined") {
+        return res.send("Deleted");
+    }
+    try {
+        let client = await getClient({"_id": clientId})
+        const result = await deleteRate(client, industry, id);
+        res.send('rate deleted');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rates of Client");
+    }
+})
+
 router.post('/several-langs', async (req, res) => {
     const clientId = req.body.client;
     let langCombs = JSON.parse(req.body.langs);
     try {
-        let client = await Clients.findOne({"_id": clientId})
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        let client = await getClient({"_id": clientId});
         for(let comb of langCombs) {
             let langPairExist = false;
             for(let clientComb of client.languageCombinations) {
@@ -253,23 +247,7 @@ router.post('/several-langs', async (req, res) => {
         res.send('Several langs added..');
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several languages for Client " + err);
-    }
-})
-
-router.delete('/rate/:id', async (req, res) => {
-    let  { clientId, industry } = req.body;
-    const { id } = req.params;
-    if(!id) {
-        return res.send("Deleted");
-    }
-    try {
-        let client = await getClient({"_id": clientId})
-        const result = await deleteRate(client, industry, id);
-        res.send('rate deleted');
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting rates of Client");
+        res.status(500).send("Error on adding several languages for Client");
     }
 })
 
@@ -336,7 +314,7 @@ router.post('/update-client', upload.any(), async (req, res) => {
         res.send({id: clientId})
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on updating/creating Client " + err);
+        res.status(500).send("Error on updating/creating Client");
     }
 })
 
@@ -359,7 +337,7 @@ router.post('/deleteclient', async (req, res) => {
         res.send('Deleted')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting Client " + err);
+        res.status(500).send("Error on deleting Client");
     }
 })
 
@@ -369,7 +347,7 @@ router.post('/deleteContact', async (req, res) => {
         res.send('Deleted')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting contact of Client " + err);
+        res.status(500).send("Error on deleting contact of Client");
     }
 })
 

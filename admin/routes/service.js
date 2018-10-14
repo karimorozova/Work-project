@@ -111,62 +111,6 @@ router.get('/costs', async (req, res) => {
   }
 })
 
-router.post('/rates-mono', async (req, res) => {
-  try {
-    let rate = req.body;
-    let industries = await Industries.find();
-    let service = await getOneService({'title': rate.title});
-    for(let indus of rate.industry) {
-      for(let industry of industries) {
-        if(industry.name == indus.name) {
-          industry.rate = indus.rate;
-          industry.active = indus.active;
-        } else {
-          industry.active = false;
-        }
-      }
-    }
-
-    let exist = false;
-
-    rates = service.languageCombinations;
-    
-    for(let j = 0; j < rate.industry.length; j++) {
-      for(let i = 0; i < rates.length; i++) {
-        if(rate.targetLanguage.lang == rates[i].target.lang) {
-          exist = true;
-          rates[i].package = rate.package;
-          for(let elem of rates[i].industries) {
-            if(rate.industry[j].name == elem.name || rate.industry[j].name == 'All') {
-              elem.rate = rate.industry[j].rate;
-              elem.active = rate.industry[j].active;
-            }
-          }
-        }
-      }
-      if(exist) {
-        break;
-      }
-    }
-    if(exist) {
-      let result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-      res.send(result);
-    } else {
-      rates.push({
-        source: null,
-        target: rate.targetLanguage,
-        active: true,
-        industries: industries
-      });
-      const result = await Services.update({'title': rate.title}, {'languageCombinations': rates});
-      res.send(result);
-    }
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Error on adding/updating mono-rate ' + err);
-    }
-})
-
 router.post('/rates', async (req, res) => {
   try {
     let rate = req.body;
@@ -251,10 +195,10 @@ router.post('/several-langs', async (req, res) => {
   res.send('Several langs added..')
 })
 
-router.delete('/delete-rate/:id', async (req, res) => {
+router.delete('/rate/:id', async (req, res) => {
   const { serviceId, industries } = req.body;
   const { id } = req.params;
-  if(!id) {
+  if(id === "undefined") {
     return res.send('Empty row deleted');
   }
   try {
