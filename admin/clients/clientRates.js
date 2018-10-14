@@ -40,7 +40,7 @@ async function checkMonoRatesMatches(client, industries, rate) {
     if(client.languageCombinations.length) {
         for(let elem of rate.industry) {
         for(let comb of client.languageCombinations) {
-            if(rate.targetLanguage._id == comb.target.id) {
+            if(rate.targetLanguage._id == comb.target.id && !comb.source) {
             exist = true;
             for(let indus of comb.industry) {
                 if(elem._id == indus.industry.id || elem.name == 'All') {
