@@ -1,6 +1,7 @@
 import axios from "axios";
 
-export const incrementCounter = ({ commit }) => commit('INCREMENT_COUNTER');
+export const incrementRequestCounter = ({ commit }) => commit('startRequest');
+export const decrementRequestCounter = ({ commit }) => commit('endRequest');
 export const loadingToggle = ({ commit }, payload) => commit('loadingValue', payload);
 export const servicesGetting = ({ commit }, payload) => commit('servicesFill', payload);
 export const customersGetting = ({ commit }, payload) => commit('allCustomers', payload);

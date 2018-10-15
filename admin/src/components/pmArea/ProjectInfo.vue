@@ -106,14 +106,25 @@ export default {
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
             vendorsSetting: "vendorsSetting",
-            loadingToggle: 'loadingToggle',
+            alertToggle: 'alertToggle',
             removeStepVendor: 'removeStepVendor',
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate'
         }),
         async setVendor({vendor, index}) {
-            await this.setStepVendor({value: vendor, index});
-            this.getMetrics();
+            if(this.currentProject.steps[index].vendor && 
+                this.currentProject.steps[index].vendor._id === vendor._id) {
+                    return
+            }
+            try {
+                await this.setStepVendor({value: vendor, index});
+                const step = this.currentProject.steps[index];
+                const updatedProject = await this.$http.post('/service/step-payables', {projectId: this.currentProject._id, step: step});
+                await this.storeProject(updatedProject.body);
+                this.$emit("refreshProjects");
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot calculate payables for the step.", isShow: true, type: "error"})
+            }
         },
         async setDate({date, prop, index}) {
             await this.setStepDate({value: date, prop, index});
@@ -176,64 +187,73 @@ export default {
                     form.append('refFiles', file)
                 }
             }
-            this.loadingToggle(true);
-            const updatedProject = await this.$http.post('/xtm/add-tasks', form);
-            await this.storeProject(updatedProject.body);
-            this.$emit("tasksAdded", {id: this.currentProject._id});
-            this.loadingToggle(false);
+            try {
+                const updatedProject = await this.$http.post('/xtm/add-tasks', form);
+                await this.storeProject(updatedProject.body);
+                this.$emit("tasksAdded", {id: this.currentProject._id});
+                this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
+            }
         },
         async getMetrics() {
-            this.loadingToggle(true);
             let project = JSON.stringify(this.currentProject);
             project = JSON.parse(project);
-            for(let task of project.tasks) {
-                const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
-                task.metrics = metrics.body.metrics;
-                const keysArr = Object.keys(metrics.body.progress);
-                for(const key in metrics.body.progress) {
-                    const existedTask = project.steps.find(item => {
-                        return item.taskId === task.id && item.name === key
-                    })
-                    if(!existedTask) {
-                        const startDate = key === 'translate1' ? new Date() : "";
-                        const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
-                        project.steps.push({
-                            taskId: task.id,
-                            name: key,
-                            source: task.sourceLanguage,
-                            target: task.targetLanguage,
-                            vendor: "",
-                            start: startDate,
-                            deadline: deadline,
-                            progress: metrics.body.progress[key],
-                            status: "Created",
-                            receivables: "",
-                            payables: "",
-                            margin: "",
-                            check: false
+            try {
+                for(let task of project.tasks) {
+                    const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
+                    task.metrics = metrics.body.metrics;
+                    const keysArr = Object.keys(metrics.body.progress);
+                    for(const key in metrics.body.progress) {
+                        const existedTask = project.steps.find(item => {
+                            return item.taskId === task.id && item.name === key
                         })
-                    } else {
-                        for(const step of project.steps) {
-                            if(step.taskId === task.id) {
-                                step.progress = metrics.body.progress[step.name];
+                        if(!existedTask) {
+                            const startDate = key === 'translate1' ? new Date() : "";
+                            const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
+                            project.steps.push({
+                                taskId: task.id,
+                                name: key,
+                                source: task.sourceLanguage,
+                                target: task.targetLanguage,
+                                vendor: "",
+                                start: startDate,
+                                deadline: deadline,
+                                progress: metrics.body.progress[key],
+                                status: "Created",
+                                receivables: "",
+                                payables: "",
+                                margin: "",
+                                check: false
+                            })
+                        } else {
+                            for(const step of project.steps) {
+                                if(step.taskId === task.id) {
+                                    step.progress = metrics.body.progress[step.name];
+                                }
                             }
                         }
                     }
                 }
+                project.isMetricsExist = true;
+                await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
+                const updatedProject = await this.$http.get(`/service/costs?projectId=${project._id}`);
+                await this.storeProject(updatedProject.body);
+                this.$emit("refreshProjects");
+                this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot get metrics.", isShow: true, type: "error"})
             }
-            project.isMetricsExist = true;
-            await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
-            const updatedProject = await this.$http.get(`/service/costs?projectId=${project._id}`);
-            await this.storeProject(updatedProject.body);
-            this.$emit("refreshProjects");
-            this.loadingToggle(false);
         },
         async getVendors() {
-            if(!this.allVendors.length) {
-                const result = await this.$http.get('/all-vendors');
-                this.vendorsSetting(result.body);
+            try{
+                if(!this.allVendors.length) {
+                    const result = await this.$http.get('/all-vendors');
+                    this.vendorsSetting(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot get Vendors.", isShow: true, type: "error"})
             }
-            this.loadingToggle(false);
         },
         defaultService() {
             const service = this.services.find(item => {

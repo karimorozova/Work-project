@@ -3,7 +3,7 @@ const multer = require('multer');
 const mv = require('mv');
 const { Clients, Projects, Languages, Services, Industries } = require('../models');
 const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate } = require('../services/');
-const { receivablesCalc, payablesCalc, getProjects, getProject } = require('../projects/');
+const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -77,37 +77,46 @@ router.post("/removeservices", async (req, res) => {
 });
 
 router.get('/costs', async (req, res) => {
-  const projectId = req.query.projectId;
+  const { projectId } = req.query;
   try {
     let project = await getProject({"_id": projectId});
     for(let task of project.tasks) {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
       for(let step of project.steps) {
-        const receivables = await receivablesCalc(task, project, step, combinations);
-        const payables = step.vendor ? await payablesCalc(task, project, step) : "";
+        const receivables = step.receivables || await receivablesCalc(task, project, step, combinations);
         if(step.taskId === task.id) {
           step.receivables = receivables;
-          step.payables = payables;
           step.margin = (step.receivables - step.payables).toFixed(2);
         }
       }
     }
-    project.receivables = project.steps.reduce((init, current) => {
-      return +init + +current.receivables
-    }, 0).toFixed(2);
-    project.payables = project.steps.reduce((init, current) => {
-      return +init + +current.payables
-    }, 0).toFixed(2);
-    await Projects.updateOne({"_id": projectId}, 
-      {steps: project.steps, 
-        receivables: project.receivables, 
-        payables: project.payables});
+    await updateProjectCosts(project);
     const updatedProject = await getProject({"_id": projectId});
     res.send(updatedProject);
   } catch(err) {
     console.log(err);
-    res.status(500).send('Error on getting costs ' + err);
+    res.status(500).send('Error on getting costs');
+  }
+})
+
+router.post('/step-payables', async (req, res) => {
+  let { projectId, step } = req.body;
+  try {
+    let project = await getProject({"_id": projectId});
+    const task = project.tasks.find(item => {
+      return item.id == step.taskId;
+    })
+    const stepIndex = project.steps.findIndex(item => {
+      return item.taskId == step.taskId && item.name === step.name;
+    })
+    project.steps[stepIndex] = await payablesCalc(task, project, step);
+    await updateProjectCosts(project);
+    const updatedProject = await getProject({"_id": projectId});
+    res.send(updatedProject);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on getting step payables');
   }
 })
 

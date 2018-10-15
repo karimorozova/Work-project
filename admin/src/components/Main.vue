@@ -294,13 +294,11 @@ export default {
     }
   },
   async mounted() {
-    this.loadingToggle(true);
     this.mainPageRender();
     await this.getServices();
     await this.getCustomers();
     await this.getXtmCustomers();
     await this.getLanguages();
-    this.loadingToggle(false);
   },
   directives: {
     ClickOutside

@@ -1,6 +1,6 @@
 const { Vendors } = require("../../models/");
 
-async function checkRates(vendor, industries, rate) {
+async function checkRatesMatch(vendor, industries, rate) {
     if(rate.form === "Mono") {
         return await checkMonoRatesMatches(vendor, industries, rate);
     }
@@ -90,4 +90,4 @@ async function deleteRate(vendor, industry, id) {
     return result;
 }
 
-module.exports= { checkRates, deleteRate };
+module.exports= { checkRatesMatch, deleteRate };

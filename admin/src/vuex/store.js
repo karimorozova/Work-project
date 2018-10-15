@@ -19,7 +19,8 @@ const state = {
     isLoading: false,
     isAlert: false,
     alertType: 'success',
-    alertMessage: ''
+    alertMessage: '',
+    requestCounter: 0
 };
 
 const mutations = {
@@ -32,6 +33,12 @@ const mutations = {
     },
     LOGOUT(state) {
         state.isLoggedIn = false;
+    },
+    startRequest(state) {
+        state.requestCounter++
+    },
+    endRequest(state) {
+       state.requestCounter-- 
     },
     loadingValue(state, payload) {
         state.isLoading = payload;

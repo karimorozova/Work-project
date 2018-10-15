@@ -20,8 +20,12 @@ Vue.use(VueResource);
 
 Vue.http.interceptors.push((request, next) => {
   store.dispatch('loadingToggle', true);
+  store.dispatch('incrementRequestCounter');
   next((response) => {
-    store.dispatch('loadingToggle', false);
+    store.dispatch('decrementRequestCounter');
+    if(store.state.requestCounter === 0); {
+      store.dispatch('loadingToggle', false);
+    }
   })
 })
 

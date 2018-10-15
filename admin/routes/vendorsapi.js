@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
-const { getVendor, getVendors, checkRates, deleteRate } = require('./vendors/');
+const { getVendor, getVendors, checkRatesMatch, deleteRate } = require('./vendors/');
 const { vendorMail } = require('../utils/mailtovendor');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
@@ -119,7 +119,7 @@ router.post('/vendor-rates', async (req, res) => {
             }
             return {industry: item.id, active: active, rate: item.rate, package: item.package}
         })
-        const result = await checkRates(vendor, industries, rate);
+        const result = await checkRatesMatch(vendor, industries, rate);
         res.send('rates changed');
     } catch(err) {
         console.log(err);

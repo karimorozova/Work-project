@@ -3,7 +3,7 @@ const multer = require('multer');
 const fs = require('fs');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, checkRates, deleteRate} = require('../clients/');
+const { getClient, getClients, checkRatesMatch, deleteRate} = require('../clients/');
 const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
@@ -188,7 +188,7 @@ router.post('/client-rates', async (req, res) => {
             }
             return {industry: item.id, active: active, rate: item.rate, package: item.package}
         })
-        const result = await checkRates(client, industries, rate);
+        const result = await checkRatesMatch(client, industries, rate);
         res.send('rates changed');
     } catch(err) {
         console.log(err);

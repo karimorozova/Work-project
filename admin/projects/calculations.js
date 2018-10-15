@@ -37,7 +37,7 @@ async function receivablesCalc(task, project, step, combs) {
         return await calcProofingStep(task, project, task.metrics.totalWords);
     } 
     const metrics = task.metrics;
-    const customerCost = await checkCustomerCombs(task, project.industry.id, project.customer.id);
+    const customerCost = await checkCustomerCombsMatch(task, project.industry.id, project.customer.id);
     const comb = combs.find(item => {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
@@ -50,20 +50,19 @@ async function receivablesCalc(task, project, step, combs) {
 }
 
 async function payablesCalc(task, project, step) {
-    const service = step.name !== "translate1" ? 'Proofing' : task.service;
+    const service = step.name !== "translate1" ? await Services.findOne({"symbol":'pr'}) 
+    : await Services.findOne({"_id": task.service});
     const metrics = task.metrics;
     const vendor = await getVendor({"_id": step.vendor._id});
-    const comb = vendor.languageCombinations.find(item => {
-        return item.source.symbol === task.sourceLanguage &&
-        item.target.symbol === task.targetLanguage &&
-        item.service.id === service
-    });
+    const comb = getCombination(vendor.languageCombinations, service, task);
     const wordCost = comb ? comb.industry.find(item => {
         return item.industry.id === project.industry.id
     }) : "";
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
-    return step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
-        : calcCost(metrics, 'vendor', rate, step);
+    step.payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
+    : calcCost(metrics, 'vendor', rate, step);
+    step.margin = (step.receivables - step.payables).toFixed(2);
+    return step;
 }
 
 function calcCost(metrics, field, rate) {
@@ -79,13 +78,10 @@ function calcCost(metrics, field, rate) {
     return cost.toFixed(2);
 }
 
-async function checkCustomerCombs(task, industry, customerId) {
+async function checkCustomerCombsMatch(task, industry, customerId) {
+    const service = await Services.findOne({"_id": task.service});
     const customer = await getClient({"_id": customerId});
-    const comb = customer.languageCombinations.find(item => {
-        return item.source.symbol === task.sourceLanguage &&
-                item.target.symbol === task.targetLanguage &&
-                item.service.id === task.service
-    })
+    const comb = getCombination(customer.languageCombinations, service, task);
     const wordCost = comb ? comb.industry.find(item => {
         return item.id === industry
     }) : "";
@@ -94,7 +90,7 @@ async function checkCustomerCombs(task, industry, customerId) {
 
 async function calcProofingStep(task, project, words) {
     const service = await getOneService({symbol: 'pr'});
-    const clientCombs = await checkCustomerCombs(task, project.industry.id, project.customer.id);
+    const clientCombs = await checkCustomerCombsMatch(task, project.industry.id, project.customer.id);
     const comb = service.languageCombinations.find(item => {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
@@ -105,4 +101,29 @@ async function calcProofingStep(task, project, words) {
     return (words*wordCost.rate).toFixed(2);
 }
 
-module.exports = { metricsCalc, receivablesCalc, payablesCalc };
+async function updateProjectCosts(project) {
+    project.receivables = project.steps.reduce((init, current) => {
+        return +init + +current.receivables
+    }, 0).toFixed(2);
+    project.payables = project.steps.reduce((init, current) => {
+        return +init + +current.payables
+    }, 0).toFixed(2);
+    await Projects.updateOne({"_id": project.id}, 
+    {steps: project.steps, receivables: project.receivables, payables: project.payables});
+}
+
+function getCombination(combs, service, task) {
+    return combs.filter(item => {
+        return service.languageForm === "Duo" ? item.source : !item.source
+    }).find(item => {
+        if(service.languageForm === "Duo") {
+            return item.source.symbol === task.sourceLanguage &&
+                    item.target.symbol === task.targetLanguage &&
+                    item.service.id === service._id
+            }
+        return item.target.symbol === task.targetLanguage &&
+        item.service.id === service._id
+    })
+}
+
+module.exports = { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts };
