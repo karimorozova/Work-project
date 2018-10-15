@@ -1,19 +1,24 @@
 const { Projects } = require('../models/');
 
 async function getProjects(obj) {
-    const projects = await Projects.find(obj)
+    return await Projects.find(obj)
     .populate('industry')
     .populate('customer')
     .populate('projectManager');
-    return projects;
 }
   
 async function getProject(obj) {
-    const project = await Projects.findOne(obj)
+    return await Projects.findOne(obj)
     .populate('industry')
     .populate('customer')
     .populate('projectManager');
-    return project;
 }
 
-module.exports = { getProject, getProjects };
+async function getUpdatedProject(query, update) {
+    return await Projects.findOneAndUpdate(query, update, {new: true})
+    .populate('industry')
+    .populate('customer')
+    .populate('projectManager');
+}
+
+module.exports = { getProject, getProjects, getUpdatedProject };

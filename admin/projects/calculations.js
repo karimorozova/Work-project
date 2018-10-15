@@ -2,7 +2,7 @@ const { Projects, Services, Clients, Vendors } = require('../models/');
 const { getVendor } = require('../routes/vendors/');
 const { getClient } = require('../clients/');
 const { getOneService } = require('../services/');
-const { getProject } = require('../projects/');
+const { getUpdatedProject } = require('./getProjects');
 
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {
@@ -109,9 +109,8 @@ async function updateProjectCosts(project) {
     project.payables = project.steps.reduce((init, current) => {
         return +init + +current.payables
     }, 0).toFixed(2);
-    await Projects.updateOne({"_id": project.id}, 
+    return await getUpdatedProject({"_id": project.id}, 
     {steps: project.steps, receivables: project.receivables, payables: project.payables});
-    return await getProject({"_id": project.id});
 }
 
 function getCombination(combs, service, task) {
