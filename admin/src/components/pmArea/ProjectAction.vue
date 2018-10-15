@@ -34,18 +34,17 @@ export default {
             this.selectedAction = option;
         },
         async makeAction() {
-            this.loadingToggle(true);
             try {
                 const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id});
+                await this.storeProject(result.body);
                 this.alertToggle({message: 'The Quote has been sent', isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot send the Quote.', isShow: true, type: 'error'})
             }
-            this.loadingToggle(false);
         },
         ...mapActions({
-            loadingToggle: 'loadingToggle',
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            storeProject: "setCurrentProject"
         }),
     },
     components: {

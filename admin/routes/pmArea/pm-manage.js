@@ -44,8 +44,10 @@ router.post("/send-quote", async (req, res) => {
         let quote = {...project._doc};
         quote.service = service.title;
         const message = messageForClient(quote);
-        const clientMail = await clientQuoteEmail(project.customer, message);
-        res.send(clientMail);
+        await clientQuoteEmail(project.customer, message);
+        await Projects.updateOne({"_id": project.id}, {status: "Quote sent"});
+        const updatedProject = await getProject({"_id": project.id});
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending the Quote");
