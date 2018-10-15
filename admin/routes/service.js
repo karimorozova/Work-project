@@ -91,8 +91,7 @@ router.get('/costs', async (req, res) => {
         }
       }
     }
-    await updateProjectCosts(project);
-    const updatedProject = await getProject({"_id": projectId});
+    const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch(err) {
     console.log(err);
@@ -111,8 +110,7 @@ router.post('/step-payables', async (req, res) => {
       return item.taskId == step.taskId && item.name === step.name;
     })
     project.steps[stepIndex] = await payablesCalc(task, project, step);
-    await updateProjectCosts(project);
-    const updatedProject = await getProject({"_id": projectId});
+    const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch(err) {
     console.log(err);

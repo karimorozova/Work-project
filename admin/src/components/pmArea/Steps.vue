@@ -151,7 +151,6 @@ export default {
             this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index: index});
         },
         async setAction({option}) {
-            this.loadingToggle(true);
             this.selectedAction = option;
             const steps = this.allSteps.filter(item => {
                 return item.check 
@@ -164,7 +163,6 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'})
             }
-            this.loadingToggle(false);
 
         },
         progress(prog) {
@@ -187,7 +185,6 @@ export default {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
         ...mapActions({
-            loadingToggle: "loadingToggle",
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue"
         })

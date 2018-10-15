@@ -2,6 +2,7 @@ const { Projects, Services, Clients, Vendors } = require('../models/');
 const { getVendor } = require('../routes/vendors/');
 const { getClient } = require('../clients/');
 const { getOneService } = require('../services/');
+const { getProject } = require('../projects/');
 
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {
@@ -37,7 +38,7 @@ async function receivablesCalc(task, project, step, combs) {
         return await calcProofingStep(task, project, task.metrics.totalWords);
     } 
     const metrics = task.metrics;
-    const customerCost = await checkCustomerCombsMatch(task, project.industry.id, project.customer.id);
+    const customerCost = await getCustomerRate(task, project.industry.id, project.customer.id);
     const comb = combs.find(item => {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
@@ -78,7 +79,7 @@ function calcCost(metrics, field, rate) {
     return cost.toFixed(2);
 }
 
-async function checkCustomerCombsMatch(task, industry, customerId) {
+async function getCustomerRate(task, industry, customerId) {
     const service = await Services.findOne({"_id": task.service});
     const customer = await getClient({"_id": customerId});
     const comb = getCombination(customer.languageCombinations, service, task);
@@ -90,7 +91,7 @@ async function checkCustomerCombsMatch(task, industry, customerId) {
 
 async function calcProofingStep(task, project, words) {
     const service = await getOneService({symbol: 'pr'});
-    const clientCombs = await checkCustomerCombsMatch(task, project.industry.id, project.customer.id);
+    const clientCombs = await getCustomerRate(task, project.industry.id, project.customer.id);
     const comb = service.languageCombinations.find(item => {
         return item.source.symbol === task.sourceLanguage &&
                 item.target.symbol === task.targetLanguage
@@ -110,6 +111,7 @@ async function updateProjectCosts(project) {
     }, 0).toFixed(2);
     await Projects.updateOne({"_id": project.id}, 
     {steps: project.steps, receivables: project.receivables, payables: project.payables});
+    return await getProject({"_id": project.id});
 }
 
 function getCombination(combs, service, task) {
