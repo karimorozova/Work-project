@@ -69,7 +69,10 @@
                     :disabled="disabled"
                     :highlighted="highlighted")
             template(slot="progress" slot-scope="{ row }")
-                span.steps__step-data {{ progress(row.progress) }}
+                span.steps__step-data(v-if="!progress(row.progress)") {{ progress(row.progress) }}
+                .steps__progress-bar(v-if="progress(row.progress)")
+                    .steps__progress-filler(:style="{width: progress(row.progress) + '%'}")
+                    span.steps__progress-tooltip {{ progress(row.progress) }}%
             template(slot="status" slot-scope="{ row }")
                 span.steps__step-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
@@ -166,7 +169,7 @@ export default {
 
         },
         progress(prog) {
-            return (prog.wordsDone/prog.wordsTotal)*100;
+            return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
         },
         async selectAll() {
             const steps = this.allSteps.map(item => {
@@ -247,6 +250,34 @@ export default {
             left: 2px;
             transform: rotate(-60deg);
         }
+    }
+    &__progress-tooltip {
+        position: absolute;
+        opacity: 0;
+        background-color: $white;
+        color: $main-color;
+        transition: all 0.2s;
+        font-size: 14px;
+        top: -1px;
+        left: 14px;
+        padding: 0 3px;
+    }
+    &__progress-bar {
+        width: 100%;
+        height: 15px;
+        border: 1px solid $brown-border;
+        position: relative;
+        box-sizing: border-box;
+        padding: 1px;
+        &:hover {
+            .steps__progress-tooltip {
+                opacity: 1;
+            }
+        }
+    }
+    &__progress-filler {
+        background-color: $green-success;
+        height: 100%;
     }
 }
 </style>
