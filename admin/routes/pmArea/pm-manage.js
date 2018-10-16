@@ -65,7 +65,7 @@ router.post("/vendor-request", async (req, res) => {
             requestInfo.brief = project.brief;
             const message = requestMessageForVendor(requestInfo);
             await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
-            const index = step.vendorsClickedOffer.indexOf(vendor._id, step);
+            const index = step.vendorsClickedOffer.indexOf(vendor._id);
             if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
         }
         await Projects.updateOne({"_id": projectId}, {steps: steps});
