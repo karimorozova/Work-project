@@ -10,7 +10,7 @@
                 slot(:name="field.key" :row="row" :index="index")
             transition(name="slide-fade")
                 .table__row-expanded(v-if="isExpand && activeIndex === index")
-                    slot(name="expanded")
+                    slot(name="expanded" :row="row" :index="index")
 </template>
 
 <script>
@@ -132,7 +132,7 @@ export default {
   transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 .slide-fade-enter, .slide-fade-leave-to {
-  transform: translateY(10px);
+  transform: translateY(-10px);
   opacity: 0;
 }
 

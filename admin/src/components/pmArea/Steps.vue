@@ -46,7 +46,7 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                Vendorselect(
+                VendorSelect(
                     :vendors="vendors"
                     :selectedVendor="vendorName(row.vendor)"
                     @changeVend="(vendor) => setVendor(vendor, index)"
@@ -84,13 +84,16 @@
             template(slot="margin" slot-scope="{ row }")
                 span.steps__money(v-if="row.margin") &euro;
                 span.steps__step-data {{ row.margin }}
-            template(slot="expanded")
-                StepInfo
+            template(slot="expanded" slot-scope="{ row }")
+                StepInfo(
+                    :step="row"
+                    :vendors="vendors"
+                )
 </template>
 
 <script>
 import DataTable from "../DataTable";
-import Vendorselect from "./Vendorselect";
+import VendorSelect from "./VendorSelect";
 import StepInfo from "./StepInfo";
 import SelectSingle from "../SelectSingle";
 import Datepicker from "../Datepicker";
@@ -199,7 +202,7 @@ export default {
     },
     components: {
         DataTable,
-        Vendorselect,
+        VendorSelect,
         SelectSingle,
         Datepicker,
         StepInfo

@@ -49,9 +49,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .select {
-    border: 1px solid #67573E;
+    border: 1px solid $main-color;
     border-radius: 5px;
     width: 100%;
     height: 28px;
@@ -59,7 +60,7 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -77,6 +78,10 @@ export default {
         border: none;
         border-radius: 0;
         height: 29px;
+    }
+    .step-vendor & {
+        border: 1px solid $light-brown;
+        border-radius: 5px;
     }
     .no-industry {
         opacity: 0.5;
@@ -106,19 +111,19 @@ export default {
         position: absolute;
         width: 100%;
         box-sizing: border-box;
-        border: 1px solid #BFB09D;
+        border: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        background-color: white;
+        background-color: $white;
         z-index: 6;
         &__item {
             display: flex;
             align-items: center;
             padding: 5px 6px;
-            border-bottom: .5px solid #BFB09D;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
@@ -126,11 +131,11 @@ export default {
                 border: none;
             }
             &:hover {
-                background-color: rgba(191, 176, 157, 0.5);
+                background-color: $active-background;
             }
         }
         .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
+            background-color: $active-background;
         }
     }
 }

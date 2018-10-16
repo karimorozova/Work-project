@@ -31,7 +31,7 @@
 
 <script>
 import moment from "moment";
-import Vendorselect from "./Vendorselect";
+import VendorSelect from "./VendorSelect";
 import ProjectsTable from "./ProjectsTable";
 import ProjectInfo from "./ProjectInfo";
 import ProjectFilters from "./ProjectFilters";
@@ -209,7 +209,7 @@ export default {
         this.getManagers();
     },
     components: {
-        Vendorselect,
+        VendorSelect,
         ProjectsTable,
         ProjectInfo,
         ProjectFilters

@@ -52,7 +52,7 @@
 
 <script>
 import DataTable from "../DataTable";
-import Vendorselect from "./Vendorselect";
+import VendorSelect from "./VendorSelect";
 
 export default {
     props: {
