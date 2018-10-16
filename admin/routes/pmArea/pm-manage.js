@@ -45,7 +45,7 @@ router.post("/send-quote", async (req, res) => {
         quote.service = service.title;
         const message = messageForClient(quote);
         await clientQuoteEmail(project.customer, message);
-        await Projects.updateOne({"_id": project.id}, {status: "Quote sent"});
+        await Projects.updateOne({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         const updatedProject = await getProject({"_id": project.id});
         res.send(updatedProject);
     } catch(err) {
@@ -64,8 +64,11 @@ router.post("/vendor-request", async (req, res) => {
             requestInfo.industry = project.industry.name;
             requestInfo.brief = project.brief;
             const message = requestMessageForVendor(requestInfo);
-            const result = await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
+            await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
+            const index = step.vendorsClickedOffer.indexOf(vendor._id, step);
+            if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
         }
+        await Projects.updateOne({"_id": projectId}, {steps: steps});
         res.send('Requests has been sent');
     } catch(err) {
         console.log(err);

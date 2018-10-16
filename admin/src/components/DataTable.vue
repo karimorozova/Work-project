@@ -8,8 +8,9 @@
         .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
                 slot(:name="field.key" :row="row" :index="index")
-            .table__row-expanded(v-if="isExpand && activeIndex === index")
-                slot(name="expanded")
+            transition(name="slide-fade")
+                .table__row-expanded(v-if="isExpand && activeIndex === index")
+                    slot(name="expanded")
 </template>
 
 <script>
@@ -70,6 +71,7 @@ export default {
         }
         .steps__table & {
             overflow-y: overlay;
+            max-height: 300px;
         }
     }
     &__thead-cell {
@@ -113,6 +115,7 @@ export default {
     &__row-expanded {
         width: 100%;
         height: 250px;
+        background-color: $white;
     }
     &_scroll-padding {
         padding-right: 15px;
@@ -120,6 +123,17 @@ export default {
     &_bottom-bordered {
         border-bottom: 0.5px solid $cell-border;
     }
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
 }
 
 </style>

@@ -105,6 +105,10 @@ const ProjectsSchema = new mongoose.Schema({
   genBrief: {
     type: String,
     default: ""
+  },
+  isClientOfferClicked: {
+    type: Boolean,
+    default: false
   }
 });
 

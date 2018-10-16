@@ -15,7 +15,6 @@
             :tableData="allSteps"
             :isExpand="isExpand"
             :activeIndex="activeIndex"
-            @onRowClicked="onRowClicked"
         )
             template(slot="Check" slot-scope="{ field }")
                 input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
@@ -40,7 +39,8 @@
             template(slot="Margin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
-                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep(index)") 
+                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep(index)")
+                .steps__expander(@click="expandRow(index)")
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
@@ -136,7 +136,7 @@ export default {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
         },
-        onRowClicked({index}) {
+        expandRow(index) {
             if(this.activeIndex !== index) {
                 this.activeIndex = index;
                 this.isExpand = true;    
@@ -205,6 +205,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .steps {
     display: flex;
     flex-direction: column;
@@ -220,6 +222,31 @@ export default {
         width: 191px;
         height: 28px;
         margin-bottom: 20px;
+    }
+    &__expander {
+        position: relative;
+        cursor: pointer;
+        opacity: 0.6;
+        padding: 5px;
+        margin-left: 5px;
+        &:before {
+            content: "";
+            position: absolute;
+            width: 7px;
+            border: 1px solid $brown-border;
+            top: 4px;
+            left: -2px;
+            transform: rotate(60deg);
+        }
+        &:after {
+            content: "";
+            position: absolute;
+            width: 7px;
+            border: 1px solid $brown-border;
+            top: 4px;
+            left: 2px;
+            transform: rotate(-60deg);
+        }
     }
 }
 </style>

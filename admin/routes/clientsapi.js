@@ -85,15 +85,20 @@ router.get('/acceptquote', async (req, res) => {
     const mailDate = req.query.to;
     const date = new Date().getTime();
     const expiry = date - mailDate;
+    const projectId = req.query.project;
     try {
         if(expiry > 60000) {
             res.set('Content-Type', 'text/html');
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
-            const projectId = req.query.project;
-            await Projects.updateOne({"_id": projectId}, {$set: {status: 'Accepted'}});
+            const project = await getProject({"_id": projectId});
+            if(project.isClientOfferClicked) {
+                res.set('Content-Type', 'text/html');
+                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
+            }
+            await Projects.updateOne({"_id": projectId}, {$set: {status: 'Accepted', isClientOfferClicked: true}});
             res.set('Content-Type', 'text/html')
-            res.send("Thank you!")
+            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
         }
     } catch(err) {
             console.log(err);
@@ -106,16 +111,21 @@ router.get('/declinequote', async (req, res) => {
     const mailDate = req.query.to;
     const date = new Date().getTime();
     const expiry = date - mailDate;
+    const projectId = req.query.project;
     try {
         if(expiry > 60000) {
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
-            const projectId = req.query.project;
             const project = await Projects.findOne({"_id": projectId});
+            if(project.isClientOfferClicked) {
+                res.set('Content-Type', 'text/html');
+                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
+            }
             const client = await Clients.findOne({"_id": project.customer});
             const user = await User.findOne({"username": client.projectManager});
-            pmMail(project, client, user);
+            await pmMail(project, client, user);
+            await Projects.updateOne({"_id": projectId}, {isClientOfferClicked: true})
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
         }

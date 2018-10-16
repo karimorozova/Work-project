@@ -224,7 +224,8 @@ export default {
                                 receivables: "",
                                 payables: "",
                                 margin: "",
-                                check: false
+                                check: false,
+                                vendorsClickedOffer: []
                             })
                         } else {
                             for(const step of project.steps) {
