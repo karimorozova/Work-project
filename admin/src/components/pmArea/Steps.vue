@@ -15,6 +15,9 @@
             :tableData="allSteps"
             :isExpand="isExpand"
             :activeIndex="activeIndex"
+            :bodyStyle="bodyStyle"
+            :bodyCellStyle="bodyCellStyle"
+            :bodyRowStyle="bodyRowStyle"
         )
             template(slot="Check" slot-scope="{ field }")
                 input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
@@ -84,10 +87,11 @@
             template(slot="margin" slot-scope="{ row }")
                 span.steps__money(v-if="row.margin") &euro;
                 span.steps__step-data {{ row.margin }}
-            template(slot="expanded" slot-scope="{ row }")
+            template(slot="expanded" slot-scope="{ row, index }")
                 StepInfo(
                     :step="row"
                     :vendors="vendors"
+                    :task="getTask(index)"
                 )
 </template>
 
@@ -103,6 +107,9 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
     props: {
         allSteps: {
+            type: Array
+        },
+        tasks: {
             type: Array
         },
         vendors: {
@@ -121,7 +128,7 @@ export default {
                 {label: "Check", key: "check", width: "4%"},
                 {label: "Step", key: "name", width: "9%"},
                 {label: "Language", key: "language", width: "11%"},
-                {label: "Vendor name", key: "vendor", width: "15%"},
+                {label: "Vendor name", key: "vendor", width: "15%", padding: 0},
                 {label: "Start", key: "start", width: "9%"},
                 {label: "Deadline", key: "deadline", width: "9%"},
                 {label: "Progress", key: "progress", width: "8%"},
@@ -135,12 +142,26 @@ export default {
             selectedAction: "",
             actions: ["Request confirmation", "Other Action"],
             isExpand: false,
-            activeIndex: -1
+            activeIndex: -1,
+            bodyStyle: {
+                'overflow-y': 'overlay',
+                'max-height': '300px'
+            },
+            bodyCellStyle: {
+                display: 'flex',
+                'align-items': 'center'
+            },
+            bodyRowStyle: {cursor: 'default'}
         }
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
+        },
+        getTask(index) {
+            return this.tasks.find(item => {
+                return item.id === this.allSteps[index].taskId
+            })
         },
         expandRow(index) {
             if(this.activeIndex !== index) {

@@ -23,7 +23,8 @@
         .step-vendor__check
             CustomRadio(:isChecked="isAfterTimeCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterTimeCheck')")
             .step-vendor__text Send next vendor after
-                .step-vendor__time 12h
+            .step-vendor__time(:class="{'step-vendor_gap': isTimeDouble}")
+                input.step-vendor__time-select(type="number" v-model="nextSendTime" min="1" max="24")
 </template>
 
 <script>
@@ -42,7 +43,8 @@ export default {
     data() {
         return {
             isAfterRejectCheck: false,
-            isAfterTimeCheck: false
+            isAfterTimeCheck: false,
+            nextSendTime: 1 
         }
     },
     methods: {
@@ -64,11 +66,17 @@ export default {
             return this.vendors.map(item => {
                 return item.firstName + ' ' + item.surname
             })
+        },
+        isTimeDouble() {
+            return this.nextSendTime.length === 2;
         }
     },
     components: {
         SelectSingle,
         CustomRadio
+    },
+    updated() {
+        console.log(this.nextSendTime);
     }
 }
 </script>
@@ -120,11 +128,40 @@ export default {
     }
     &__check {
         display: flex;
+        align-items: center;
         width: 50%;
     }
     &__text {
         margin-left: 10px;
         display: flex;
+    }
+    &__time {
+        position: relative;
+        &:after {
+            content: "h";
+            position: absolute;
+            top: 3px;
+            left: 27px;
+        }
+    }
+    &_gap {
+        &:after {
+            left: 34px
+        }
+    }
+    &__time-select {
+        margin-left: 10px;
+        border-radius: 5px;
+        border: 1px solid $light-brown;
+        overflow: hidden;
+        color: $main-color;
+        outline: none;
+        padding-left: 5px;
+        padding-top: 2px;
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            opacity: 1;
+        }
     }
 }
 </style>

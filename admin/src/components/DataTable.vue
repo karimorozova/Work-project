@@ -1,12 +1,12 @@
 <template lang="pug">
 .table
     .table__thead(:class="{'table_scroll-padding': hasScroll}")
-        .table__row
+        .table__head-row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.label" :field="field")
-    .table__tbody(:class="{'table_bottom-bordered': hasScroll}")
-        .table__row(v-for="(row, index) of tableData" @click="onClick(index)")
-            .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
+    .table__tbody(:class="{'table_bottom-bordered': hasScroll}" :style="bodyStyle")
+        .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :style="bodyRowStyle")
+            .table__tbody-cell(v-for="field of fields" :style="[{width: field.width, padding: field.padding}, bodyCellStyle]")
                 slot(:name="field.key" :row="row" :index="index")
             transition(name="slide-fade")
                 .table__row-expanded(v-if="isExpand && activeIndex === index")
@@ -31,6 +31,15 @@ export default {
         },
         activeIndex: {
             type: Number
+        },
+        bodyStyle: {
+            type: Object
+        },
+        bodyRowStyle: {
+            type: Object
+        },
+        bodyCellStyle: {
+            type: Object
         }
     },
     methods: {
@@ -48,30 +57,27 @@ export default {
     width: 100%;
     overflow: hidden;
     &__thead {
-        background-color: $thead-background;
-        color: $white;
+        .table__head-row {
+            background-color: $thead-background;
+            color: $white;
+        }
     }
     &__tbody {
     max-height: 180px;
     overflow-y: auto;
     margin-bottom: 20px;
-        .table__row {
+        .table__body-row {
             cursor: pointer;
             &:nth-of-type(odd) {
-                background-color: $table-row-zebra-background;
+                .table__tbody-cell {
+                    background-color: $table-row-zebra-background;
+                }
             }
             &:hover {
                 .table__tbody-cell {
                     background-color: $cell-background;
                 }
             }
-            .steps__table & {
-                cursor: default;
-            }
-        }
-        .steps__table & {
-            overflow-y: overlay;
-            max-height: 300px;
         }
     }
     &__thead-cell {
@@ -100,22 +106,32 @@ export default {
         &:focus-within {
             box-shadow: inset 0 0 5px $cell-border;
         }
-        .steps__table & {
-            display: flex;
-            align-items: center;
-            &:nth-of-type(4) {
-                padding: 0;
-            }
-        }
     }
-    &__row {
+    &__head-row, &__body-row {
         display: flex;
         flex-wrap: wrap;
     }
     &__row-expanded {
         width: 100%;
-        height: 250px;
         background-color: $white;
+        .table__body-row {
+            cursor: default;
+            &:nth-of-type(even) {
+                .table__tbody-cell  {
+                    background-color: $white;
+                }
+            }
+            &:nth-of-type(odd) {
+                .table__tbody-cell  {
+                    background-color: $table-row-zebra-background;
+                }
+            }
+            &:hover {
+                .table__tbody-cell {
+                    background-color: $cell-background;
+                }
+            }
+        }
     }
     &_scroll-padding {
         padding-right: 15px;
