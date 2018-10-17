@@ -102,8 +102,8 @@ function messageForClient(obj) {
         let langPairs = obj.tasks.reduce((init, current) => {
             return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
         }, "")
-        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.receivables} &euro;</a>`
-        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?project=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.receivables} &euro;</a>`
+        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.receivables} &euro;</a>`
+        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.receivables} &euro;</a>`
         
         return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.customer.contactName},</h3>

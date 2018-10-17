@@ -11,8 +11,8 @@ const mailhandler = {
     for(let target of project.targetLanguages) {
       langPairs += project.sourceLanguage.symbol + " >> " + target.symbol + "; "
     }
-    acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?project=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${project.projectId}, ${totalCost} &euro;</a>`
-    declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?project=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${project.projectId}, ${totalCost} &euro;</a>`
+    acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?projectId=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${project.projectId}, ${totalCost} &euro;</a>`
+    declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?projectId=${project._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${project.projectId}, ${totalCost} &euro;</a>`
     
     let msg = `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
     <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${client.contactName},</h3>

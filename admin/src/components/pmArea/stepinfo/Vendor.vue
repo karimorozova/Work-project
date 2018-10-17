@@ -55,8 +55,8 @@ export default {
             })
             this.$emit('setStepVendor', { vendor });
         },
-        toggleRadio(e, value) {
-            this[value] = !this[value];
+        toggleRadio(e, key) {
+            this[key] = !this[key];
         }
     },
     computed: {

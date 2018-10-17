@@ -85,7 +85,7 @@ router.get('/acceptquote', async (req, res) => {
     const mailDate = req.query.to;
     const date = new Date().getTime();
     const expiry = date - mailDate;
-    const projectId = req.query.project;
+    const projectId = req.query.projectId;
     try {
         if(expiry > 60000) {
             res.set('Content-Type', 'text/html');
@@ -111,7 +111,7 @@ router.get('/declinequote', async (req, res) => {
     const mailDate = req.query.to;
     const date = new Date().getTime();
     const expiry = date - mailDate;
-    const projectId = req.query.project;
+    const projectId = req.query.projectId;
     try {
         if(expiry > 60000) {
             res.set('Content-Type', 'text/html')

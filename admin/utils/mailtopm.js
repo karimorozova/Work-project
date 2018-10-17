@@ -5,8 +5,8 @@ const mailhandler = {
     var acceptQuote = "";
     var declineQuote = "";
     var date = new Date().getTime();
-    acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?project=${project._id}&to=${date}` + ' target="_blank">accept</a>'
-    declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?project=${project._id}&to=${date}` + ' target="_blank">decline</a>'
+    acceptQuote = '<a href=' + `http://localhost:3001/clientsapi/acceptquote?projectId=${project._id}&to=${date}` + ' target="_blank">accept</a>'
+    declineQuote = '<a href=' + `http://localhost:3001/clientsapi/declinequote?projectId=${project._id}&to=${date}` + ' target="_blank">decline</a>'
     // if(request.genBrief) {
     //   detailFile = `<a href='http://admin.pangea.global/reqfiles/${request.id}/written.txt' download target='_self'>written.txt</a>`;
     // }
