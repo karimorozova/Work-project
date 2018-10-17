@@ -86,7 +86,8 @@ router.get('/costs', async (req, res) => {
       for(let step of project.steps) {
         const receivables = step.receivables || await receivablesCalc(task, project, step, combinations);
         if(step.taskId === task.id) {
-          step.receivables = receivables;
+          step.clientRate = receivables.rate;
+          step.receivables = receivables.cost;
           step.margin = (step.receivables - step.payables).toFixed(2);
         }
       }

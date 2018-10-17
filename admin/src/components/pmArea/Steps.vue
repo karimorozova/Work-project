@@ -15,9 +15,9 @@
             :tableData="allSteps"
             :isExpand="isExpand"
             :activeIndex="activeIndex"
-            :bodyStyle="bodyStyle"
-            :bodyCellStyle="bodyCellStyle"
-            :bodyRowStyle="bodyRowStyle"
+            bodyClass="steps-table-body"
+            bodyCellClass="steps-table-cell"
+            bodyRowClass="steps-table-row"
         )
             template(slot="Check" slot-scope="{ field }")
                 input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
@@ -143,15 +143,6 @@ export default {
             actions: ["Request confirmation", "Other Action"],
             isExpand: false,
             activeIndex: -1,
-            bodyStyle: {
-                'overflow-y': 'overlay',
-                'max-height': '300px'
-            },
-            bodyCellStyle: {
-                display: 'flex',
-                'align-items': 'center'
-            },
-            bodyRowStyle: {cursor: 'default'}
         }
     },
     methods: {

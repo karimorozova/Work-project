@@ -7,15 +7,15 @@ const { getUpdatedProject } = require('./getProjects');
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {
         const taskMetrics =  {
-            iceMatch: {value: metrics.coreMetrics.iceMatchWords, client: 0.025, vendor: 0.01},
-            fuzzyMatch75: {value: metrics.coreMetrics.lowFuzzyMatchWords, client: 0.09, vendor: 0.08},
-            fuzzyMatch85: {value: metrics.coreMetrics.mediumFuzzyMatchWords, client: 0.07, vendor: 0.06},
-            fuzzyMatch95: {value: metrics.coreMetrics.highFuzzyMatchWords, client: 0.04, vendor: 0.025},
-            repeat: {value: metrics.coreMetrics.repeatsWords, client: 0.03, vendor: 0.02},
-            leveragedMatch: {value: metrics.coreMetrics.leveragedWords, client: 0.03, vendor: 0.02},
-            fuzzyRepeats75: {value: metrics.coreMetrics.lowFuzzyRepeatsWords, client: 0.09, vendor: 0.08},
-            fuzzyRepeats85: {value: metrics.coreMetrics.mediumFuzzyRepeatsWords, client: 0.07, vendor: 0.06},
-            fuzzyRepeats95: {value: metrics.coreMetrics.highFuzzyRepeatsWords, client: 0.04, vendor: 0.025},
+            iceMatch: {text: "ICE Match", value: metrics.coreMetrics.iceMatchWords, client: 0.25, vendor: 0.1},
+            fuzzyMatch75: {text: "75-84%", value: metrics.coreMetrics.lowFuzzyMatchWords, client: 0.9, vendor: 0.8},
+            fuzzyMatch85: {text: "85-94%", value: metrics.coreMetrics.mediumFuzzyMatchWords, client: 0.7, vendor: 0.6},
+            fuzzyMatch95: {text: "95-99%", value: metrics.coreMetrics.highFuzzyMatchWords, client: 0.4, vendor: 0.25},
+            repeat: {text: "Repetitions", value: metrics.coreMetrics.repeatsWords, client: 0.25, vendor: 0.2},
+            leveragedMatch: {text: "Leveraged Match", value: metrics.coreMetrics.leveragedWords, client: 0.25, vendor: 0.2},
+            fuzzyRepeats75: {text: "Internal 75-84%", value: metrics.coreMetrics.lowFuzzyRepeatsWords, client: 0.9, vendor: 0.8},
+            fuzzyRepeats85: {text: "Internal 85-94%", value: metrics.coreMetrics.mediumFuzzyRepeatsWords, client: 0.7, vendor: 0.6},
+            fuzzyRepeats95: {text: "Internal 95-99%", value: metrics.coreMetrics.highFuzzyRepeatsWords, client: 0.4, vendor: 0.25},
             nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
             totalWords: metrics.coreMetrics.totalWords,
         }     
@@ -35,7 +35,8 @@ async function metricsCalc(metrics) {
 
 async function receivablesCalc(task, project, step, combs) {
     if(step.name !== "translate1") {
-        return await calcProofingStep(task, project, task.metrics.totalWords);
+        const costObj = await calcProofingStep(task, project, task.metrics.totalWords);
+        return {cost: costObj.cost, rate: costObj.rate};
     } 
     const metrics = task.metrics;
     const customerCost = await getCustomerRate(task, project.industry.id, project.customer.id);
@@ -47,7 +48,8 @@ async function receivablesCalc(task, project, step, combs) {
         return item.industry.id === project.industry.id
     })
     const { rate } = customerCost || wordCost;
-    return calcCost(metrics, 'client', rate, step)
+    const cost = calcCost(metrics, 'client', rate, step);
+    return {cost: cost, rate: rate};
 }
 
 async function payablesCalc(task, project, step) {
@@ -63,6 +65,7 @@ async function payablesCalc(task, project, step) {
     step.payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
     : calcCost(metrics, 'vendor', rate, step);
     step.margin = (step.receivables - step.payables).toFixed(2);
+    step.vendorRate = rate;
     return step;
 }
 
@@ -99,7 +102,8 @@ async function calcProofingStep(task, project, words) {
     const wordCost = clientCombs || comb.industries.find(item => {
         return item.industry.id === project.industry.id
     })
-    return (words*wordCost.rate).toFixed(2);
+    const cost = (words*wordCost.rate).toFixed(2);
+    return {cost: cost, rate: wordCost.rate}
 }
 
 async function updateProjectCosts(project) {

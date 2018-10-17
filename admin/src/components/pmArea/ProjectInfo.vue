@@ -224,6 +224,8 @@ export default {
                                 status: "Created",
                                 receivables: "",
                                 payables: "",
+                                clientRate: "",
+                                vandorRate: "",
                                 margin: "",
                                 check: false,
                                 vendorsClickedOffer: []

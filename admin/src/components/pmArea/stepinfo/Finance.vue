@@ -1,7 +1,6 @@
 <template lang="pug">
 .step-finance
-    .step-finance__title(@click="showInfo") Finance
-        img.step-finance__icon(src="../../../assets/images/open-close-arrow-brown.png" :class="{'step-finance_reverse': isInfoShown}")
+    StepInfoTitle(title="Finance" :isIconReversed="isInfoShown" @titleClick="showInfo")
     .step-finance__info(:class="{'step-finance_static-pos': isInfoShown}")
         .step-finance__table
             DataTable(
@@ -40,6 +39,7 @@
 <script>
 import DataTable from "../../DataTable";
 import Add from "../../Add";
+import StepInfoTitle from "./StepInfoTitle";
 
 export default {
     props: {
@@ -79,7 +79,8 @@ export default {
     },
     components: {
         DataTable,
-        Add
+        Add,
+        StepInfoTitle
     }
 }
 </script>
@@ -90,13 +91,6 @@ export default {
 .step-finance {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
-    &__title {
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-    }
     &__info {
         margin-top: 20px;
         display: flex;
@@ -124,12 +118,6 @@ export default {
         display: flex;
         width: 70%;
         justify-content: space-between;
-    }
-    &__icon {
-        transition: all 0.2s;
-    }
-    &_reverse {
-        transform: rotate(180deg);
     }
 }
 </style>

@@ -10,11 +10,16 @@
             :financeData="financeData"
             @addRow="addFinanceData"
         )
+    .step-info__block
+        Matrix(
+            :matrixData="matrixData"
+        )
 </template>
 
 <script>
 import Vendor from "./stepinfo/Vendor";
 import Finance from "./stepinfo/Finance";
+import Matrix from "./stepinfo/Matrix";
 
 export default {
     props: {
@@ -34,7 +39,9 @@ export default {
                 {title: "Wordcount", receivables: "", payables: "", margin: ""},
                 {title: "Price", receivables: "", payables: "", margin: ""},
                 {title: "Discount 10%", receivables: "", payables: "", margin: ""},
-            ]
+            ],
+            matrixData: [],
+            excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
     methods: {
@@ -57,9 +64,8 @@ export default {
             }
         },
         wordsCalculation() {
-            const excludeKeys = ["nonTranslatable", "totalWords"];
             const words = Object.keys(this.task.metrics).filter(item => {
-                return excludeKeys.indexOf(item) === -1;
+                return this.excludeKeys.indexOf(item) === -1;
             }).reduce((init, cur) => {
                 return init + this.task.metrics[cur].value;
             }, 0)
@@ -69,14 +75,44 @@ export default {
             this.financeData.push({
                 title: "", receivables: "", payables: "", margin: ""
             })
+        },
+        getMatrixData() {
+            for(let key of Object.keys(this.task.metrics)) {
+                if(this.excludeKeys.indexOf(key) === -1) {
+                    this.matrixData.push({
+                        title: this.task.metrics[key].text,
+                        value: this.task.metrics[key].client*100, 
+                        wordcount: this.task.metrics[key].value,
+                        rate: this.step.clientRate*this.task.metrics[key].client,
+                        total: this.step.clientRate*this.task.metrics[key].client*this.task.metrics[key].value
+                    });
+                }
+            }
+            this.lastMatrixDateRow();
+        },
+        lastMatrixDateRow() {
+            const totalMatchedWords = this.matrixData.reduce((init, cur) => {
+                return init + cur.wordcount; 
+            }, 0);
+            const wordcount = this.task.metrics.totalWords - totalMatchedWords;
+            const total = wordcount*this.step.clientRate;
+            this.matrixData.push({
+                title: "No match",
+                value: "100",
+                wordcount: wordcount,
+                rate: this.step.clientRate,
+                total: total
+            })
         }
     },
     components: {
         Vendor,
-        Finance
+        Finance,
+        Matrix
     },
     mounted() {
         this.getFinanceData();
+        this.getMatrixData();
     }
 }
 </script>

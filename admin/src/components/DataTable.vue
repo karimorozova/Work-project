@@ -4,9 +4,9 @@
         .table__head-row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.label" :field="field")
-    .table__tbody(:class="{'table_bottom-bordered': hasScroll}" :style="bodyStyle")
-        .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :style="bodyRowStyle")
-            .table__tbody-cell(v-for="field of fields" :style="[{width: field.width, padding: field.padding}, bodyCellStyle]")
+    .table__tbody(:class="[{'table_bottom-bordered': hasScroll}, bodyClass]")
+        .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
+            .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="bodyCellClass")
                 slot(:name="field.key" :row="row" :index="index")
             transition(name="slide-fade")
                 .table__row-expanded(v-if="isExpand && activeIndex === index")
@@ -32,14 +32,14 @@ export default {
         activeIndex: {
             type: Number
         },
-        bodyStyle: {
-            type: Object
+        bodyClass: {
+            type: String
         },
-        bodyRowStyle: {
-            type: Object
+        bodyRowClass: {
+            type: String
         },
-        bodyCellStyle: {
-            type: Object
+        bodyCellClass: {
+            type: String
         }
     },
     methods: {
@@ -64,7 +64,7 @@ export default {
     }
     &__tbody {
     max-height: 180px;
-    overflow-y: auto;
+    overflow-y: overlay;
     margin-bottom: 20px;
         .table__body-row {
             cursor: pointer;
@@ -78,6 +78,9 @@ export default {
                     background-color: $cell-background;
                 }
             }
+        }
+        .steps-table-row {
+            cursor: default;
         }
     }
     &__thead-cell {
@@ -140,7 +143,18 @@ export default {
         border-bottom: 0.5px solid $cell-border;
     }
 }
-
+.steps-table-body {
+    overflow-y: overlay;
+    max-height: 300px;
+}
+.steps-table-cell {
+    display: flex;
+    align-items: center;
+}
+.matrix-table {
+    max-height: 350px;
+    overflow-y: overlay;
+}
 .slide-fade-enter-active {
   transition: all .3s ease;
 }
