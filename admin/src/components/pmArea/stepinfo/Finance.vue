@@ -1,7 +1,7 @@
 <template lang="pug">
 .step-finance
     StepInfoTitle(title="Finance" :isIconReversed="isInfoShown" @titleClick="showInfo")
-    .step-finance__info(:class="{'step-finance_block': isInfoShown}")
+    .step-finance__info(:class="{'step-finance_flex-display': isInfoShown}")
         .step-finance__table
             DataTable(
                 :fields="fields"
@@ -98,8 +98,8 @@ export default {
         display: none;
         transition: all 0.3s;
     }
-    &_block {
-       display: block
+    &_flex-display {
+       display: flex;
     }
     &__table {
         width: 70%;

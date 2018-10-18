@@ -13,11 +13,10 @@ router.post("/send-form", upload.any(), async (req, res) => {
             person[newKey] = JSON.parse(person[key]);
         }
     }
-    let vendor;
     try {
-        vendor = await Vendors.create(person);
+        let vendor = await Vendors.create(person);
         person.to = "career@pangea.global";
-        person.subject = "Application";
+        person.subject = `Application form ${person.firstName} ${person.surname}`;
         let languagePairs = [];
         for(let lang of person.languagePairs) {
             let source = await Languages.find({"_id": lang.source});
@@ -40,7 +39,7 @@ router.post("/send-form", upload.any(), async (req, res) => {
                     let nameArr = cv.filename.split('.');
                     let newFileName = `cvFile${counter}.${nameArr[nameArr.length-1]}`;
                     let path = `./dist/application/${vendor.id}/${newFileName}`;
-                    let filePath = moveFile(cv, path);
+                    let filePath = await moveFile(cv, path);
                     person.cvFiles.push(filePath);
                     counter++;
             }
@@ -57,21 +56,14 @@ router.post("/send-form", upload.any(), async (req, res) => {
                     counter++;
             }
         }
+        await Vendors.updateOne({"_id": vendor.id}, {$set: {status: "Potential"}});
+        let message = applicationMessage(person);
+        await sendEmail(person, message);
+        res.send("Sent");
     } catch(err) {
         console.log(err);
+        res.status(500).send("Error on updating Vendor");
     }
-    try {
-        await Vendors.updateOne({"_id": vendor.id}, {$set: {status: "Potential"}});
-    } catch(err) {
-        console.log("Error on updating Vendor: " + err)
-    }
-    let message = applicationMessage(person);
-    try {
-        await sendEmail(person, message);
-    } catch(err) {
-        console.log(err)
-    }
-    res.send("Sent");
 })
 
 module.exports = router;

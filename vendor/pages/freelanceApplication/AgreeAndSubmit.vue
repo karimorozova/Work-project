@@ -43,8 +43,8 @@ export default {
             if(!this.person.phone) this.errors.push("Please enter your phone number.");
             if(!this.person.native) this.errors.push("Please select your mother tongue.");
             if(!this.person.timezone) this.errors.push("Please select your timezone.");
-            if(this.person.languagePairs && !this.person.languagePairs.length) this.errors.push("Please set at least one language pair.");
-            if(this.person.cvFiles && !this.person.cvFiles.length) this.errors.push("Please upload CV file.");
+            if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
+            if(!this.person.cvFiles || (this.person.cvFiles && !this.person.cvFiles.length)) this.errors.push("Please upload CV file.");
             if(!this.person.position) this.errors.push("Please select position(s).");
             if(!this.person.translationExp) this.errors.push("Please select years of experience.");
             if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");

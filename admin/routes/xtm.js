@@ -14,13 +14,12 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     tasksInfo.targets = JSON.parse(tasksInfo.targets);
     const sourceFiles = req.files["sourceFiles"];
     const referenceFiles = req.files["refFiles"];
-    let translationFile = "";
-    const detailFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
-    const refFiles = await storeFiles(referenceFiles, tasksInfo.projectId);
     let template = tasksInfo.template || '247336FD';
     let workflow = tasksInfo.workflow || 2917;
-    let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
     try {
+        let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
+        const detailFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
+        const refFiles = await storeFiles(referenceFiles, tasksInfo.projectId);
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         for(let target of tasksInfo.targets) {
             let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`

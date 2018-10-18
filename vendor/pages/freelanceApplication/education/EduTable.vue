@@ -3,7 +3,6 @@
     .table__thead
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") {{ field.label }}
-            .table__empty-cell(v-if="tbodyHasScroll")
     .table__tbody
         .table__row(v-for="(row, index) of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
@@ -47,13 +46,16 @@ export default {
         color: #FFF;
     }
     &__tbody {
-    overflow-y: auto;
+    overflow-y: overlay;
     height: 97px;
     }
     &__thead-cell {
         font-size: 12px;
         padding: 5px 0 5px 6px;
         border-right: 0.5px solid #FFF;
+        &:last-child {
+            border-right: none;
+        }
     }
     &__tbody-cell {
         font-size: 12px;
@@ -63,9 +65,9 @@ export default {
         &:focus-within {
             box-shadow: inset 0 0 5px #67563D;
         }
-    }
-    &__empty-cell {
-        width: 16px;
+        &:last-child {
+            border-right: none;
+        }
     }
     &__row {
         display: flex;

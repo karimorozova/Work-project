@@ -10,12 +10,12 @@ function applicationMessage(obj) {
     let positions = "";
     if(obj.cvFiles) {
         cvFiles = obj.cvFiles.reduce((initial, current, index) => {
-            return initial + `<a href=${apiUrl}/${current.split('./dist/')[1]} download target='_self'>cvFile${index+1}</a>; `
+            return initial + `<a href="${apiUrl}/${current.split('./dist/')[1]}" download target='_self'>cvFile${index+1}</a>; `
         }, "")
     }
     if(obj.coverLetterFiles) {
         coverLetterFiles = obj.coverLetterFiles.reduce((initial, current, index) => {
-            return initial + `<a href=${apiUrl}/${current.split('./dist/')[1]} download target='_self'>coverLetterFile${index+1}</a>; `
+            return initial + `<a href="${apiUrl}/${current.split('./dist/')[1]}" download target='_self'>coverLetterFile${index+1}</a>; `
         }, "")
     }
     if(obj.languagePairs) {

@@ -118,23 +118,25 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   await request.save();
   if (detailFiles) {
     for (var i = 0; i < detailFiles.length; i += 1) {
-      request.detailFiles.push(moveFile(detailFiles[i], request.id));
+      let storedFile = await moveFile(detailFiles[i], request.id);
+      request.detailFiles.push(storedFile);
     }
   }
   if (refFiles) {
     for (var i = 0; i < refFiles.length; i += 1) {
-      request.refFiles.push(moveFile(refFiles[i], request.id))
+      let storedFile = await moveFile(refFiles[i], request.id);
+      request.refFiles.push(storedFile);
     }
   }
 
   await request.save();
   if (projectName) {
-    sendMailPortal(request);
+    await sendMailPortal(request);
     quote(request);
   } else {
-    sendMail(request);
+    await sendMail(request);
   }
-  sendMailClient(request);
+  await sendMailClient(request);
   // quote(request);
 
   console.log("Saved");
@@ -143,7 +145,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   });
   } catch (err) {
       console.log(err);
-      res.status(500).send("Something went wrong while adding request " + err)
+      res.status(500).send("Something went wrong while adding request")
     }
 });
 

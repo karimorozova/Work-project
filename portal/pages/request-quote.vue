@@ -2,6 +2,7 @@
   .externalWrap
     noscript
       iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-KM2S59F" height="0" width="0" style="display:none;visibility:hidden")
+      img(src="https://mc.yandex.ru/watch/50790364" style="position:absolute; left:-9999px;" alt="")
     .top
       .logo
         .mainWrapper
@@ -43,14 +44,12 @@
               .source__drop(v-if='sourceDrop' :style="{'max-height': maxSourceHeight + 'px'}")
                 .source__drop-list(v-for='language in sourceLangsArray')
                   .pair(@click='changeSourceSelect(language)')
-                    //- img(:src="'/flags/' + language.symbol + '.png'")
                     img(:src="'https://admin.pangea.global' + language.icon")
                     span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
                       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language.lang == selectLangSource}")
                   .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
                     template(v-for='(dialect in language.dialects')
                       .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                        //- img(:src="'/flags/' + dialect.symbol + '.png'")
                         img(:src="'https://admin.pangea.global' + dialect.icon")
                         span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
             span Target Language(s)
@@ -64,14 +63,12 @@
               .target__drop(v-if='targetDrop' :style="{'max-height': maxTargetHeight + 'px'}")
                 .target__drop-list(v-for='language in targetLangsArray')
                   .pair(@click='changeTargetSelect(language)')
-                    //- img(:src="'/flags/' + language.symbol  + '.png'")
                     img(:src="'https://admin.pangea.global' + language.icon")
                     span.list-item(:class="{ active: language.check }") {{ language.lang }}
                       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
                   .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangTarget }")
                     template(v-for='dialect in language.dialects')
                       .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                        //- img(:src="'/flags/' + dialect.symbol + '.png'")
                         img(:src="'https://admin.pangea.global' + dialect.icon")              
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
           .number 
@@ -245,6 +242,9 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
+      transition(name="slide-fade")
+        .server-err(v-if="isServerError")
+          ServerError(:errorMessage="serverErrMessage")
     .footer
       .linkList
         .linkList__item.first
@@ -286,7 +286,7 @@ import { logicalExpression } from "../../admin/node_modules/@types/babel-types";
 </script>
 
 <script>
-
+import ServerError from '../components/ServerError';
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
@@ -297,9 +297,7 @@ var sbjs = require('sourcebuster');
 export default {
   name: 'pang-form',
   head: {
-    // script: [
-    //   { src: './hotjar.js' }
-    // ]
+   
   },
   data () {
     return {
@@ -446,7 +444,9 @@ export default {
         {
           socialLink: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')
         }
-      ]
+      ],
+      serverErrMessage: "",
+      isServerError: false
     }
   },
   methods: {
@@ -472,7 +472,6 @@ export default {
       for(var i = 0; i < event.target.files.length; i++){
         this.detailFiles.push(event.target.files[i]);
       }      
-      console.log(this.detailFiles);
     },
     detailRemove(event) {   
       this.detailFiles.splice(this.detailFiles.indexOf(event),1)
@@ -482,7 +481,6 @@ export default {
     },
     changeRefFiles(event) {
       this.refFiles = event.target.files[0];
-      console.log(this.refFiles);
     },
     changeServiceSelect(event) {
       this.serviceSelect = event;
@@ -689,44 +687,74 @@ export default {
           sendForm.append("detailFiles", this.detailFiles[i]);
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
-        /*`for(var i = 0; i < this.refFiles.length; i++){
-          console.log(this.refFiles[i]);
-          sendForm.append("refFiles", this.refFiles[i]);
-        }*/
-        
-
-        const result = await this.$axios.$post('api/request', sendForm);
+        try {
+          const result = await this.$axios.$post('api/request', sendForm);
+        } catch(err) {
+          this.isServerError = true;
+          this.serverErrMessage = 'Error on sending the request form (sendForm func)';
+          setTimeout(()=> {
+            this.isServerError = false;
+          }, 5000);
+          console.log(err);
+        }
     },
     async getServices() {
-      const result = await this.$axios.$get('api/services')
-      result.sort((a, b) => {return a.sortIndex - b.sortIndex});
-      for (let i = 0; i < result.length; i++) {
-        this.services.push(result[i])
+      try {
+        const result = await this.$axios.$get('api/services')
+        result.sort((a, b) => {return a.sortIndex - b.sortIndex});
+        for (let i = 0; i < result.length; i++) {
+          this.services.push(result[i])
+        }
+      } catch(err) {
+        this.isServerError = true;
+        this.serverErrMessage = 'Error on getting services';
+        setTimeout(()=> {
+          this.isServerError = false;
+        }, 5000);
+        console.log(err);
       }
     },
     async getLanguages() {
-      const result = await this.$axios.$get('api/languages');
-      this.languages = result.filter(item => {
-        return item.active
-      });
-      for(let lang of this.languages) {
-        if(lang.children) {
-          lang.dialects = [];
-          for(let i = 0; i < this.languages.length;) {
-            if(this.languages[i].parent == lang.symbol) {
-                lang.dialects.push(this.languages[i]);
-                this.languages.splice(i, 1);
-                i--;
-            } else {
-              i++
+      try {
+        const result = await this.$axios.$get('api/languages');
+        this.languages = result.filter(item => {
+          return item.active
+        });
+        for(let lang of this.languages) {
+          if(lang.children) {
+            lang.dialects = [];
+            for(let i = 0; i < this.languages.length;) {
+              if(this.languages[i].parent == lang.symbol) {
+                  lang.dialects.push(this.languages[i]);
+                  this.languages.splice(i, 1);
+                  i--;
+              } else {
+                i++
+              }
             }
           }
         }
+      } catch(err) {
+        this.isServerError = true;
+        this.serverErrMessage = 'Error on getting languages';
+        setTimeout(()=> {
+          this.isServerError = false;
+        }, 5000);
+        console.log(err);
       }
     },
     async getIndustries() {
-      const result = await this.$axios.$get('api/industries');
-      this.industries = result;
+      try {
+        const result = await this.$axios.$get('api/industries');
+        this.industries = result;
+      } catch(err) {
+        this.isServerError = true;
+        this.serverErrMessage = 'Error on getting industries';
+        setTimeout(()=> {
+          this.isServerError = false;
+        }, 5000)
+        console.log(err);
+      }
     },
     
     async checkForm(event) {
@@ -760,19 +788,25 @@ export default {
         else if(!this.validEmail(this.request.contactEmail)) {
         this.errors.push("Email should be like address@email.com");
       }
-      let captchaValidation = await grecaptcha.getResponse();
-      if(captchaValidation.length === 0) this.errors.push("captcha required");
-      if(!this.errors.length){
-        this.sendForm();
-        console.log("sent")
-        window.top.location.href = "https://www.pangea.global/thank-you"; 
-      } else {
-        this.showError();
-        
-        event.preventDefault();
+      try {
+        let captchaValidation = await grecaptcha.getResponse();
+        if(captchaValidation.length === 0) this.errors.push("captcha required");
+        if(!this.errors.length){
+          await this.sendForm();
+          console.log("sent")
+          window.top.location.href = "https://www.pangea.global/thank-you"; 
+        } else {
+          this.showError();        
+          event.preventDefault();
+        }
+      } catch(err) {
+        this.isServerError = true;
+        this.serverErrMessage = 'Error on sending the request form (checkForm func)';
+        setTimeout(()=> {
+          this.isServerError = false;
+        }, 5000)
+        console.log(err);
       }
-      //this.$refs.myForm.submit();
-      
     },
     validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -905,7 +939,8 @@ export default {
   },
   components: {
     Datepicker,
-    Drop
+    Drop,
+    ServerError
   },
   mounted(){
     this.google();
@@ -921,6 +956,22 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss'>
-@import '../assets/request-quote.scss'
+@import '../assets/request-quote.scss';
+
+.server-err {
+  position: fixed;
+  right: 40px;
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .4s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
 
 </style>

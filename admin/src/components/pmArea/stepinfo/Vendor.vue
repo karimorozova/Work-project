@@ -34,7 +34,7 @@ import CustomRadio from "../../CustomRadio";
 export default {
     props: {
         vendor: {
-            type: Object
+            type: [Object, String]
         },
         vendors: {
             type: Array
@@ -74,9 +74,6 @@ export default {
     components: {
         SelectSingle,
         CustomRadio
-    },
-    updated() {
-        console.log(this.nextSendTime);
     }
 }
 </script>

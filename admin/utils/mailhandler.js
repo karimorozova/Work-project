@@ -1,22 +1,19 @@
 const nodemailer = require('nodemailer');
+const apiUrl = require("../helpers/apiurl");
 
 const mailhandler = {
   sendMail(request) {
-    var detailFile = "";
+    let detailFile = "";
     if (request.detailFiles.length > 0) {
       for (var i = 0; i < request.detailFiles.length; i++) {
-        detailFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-        detailFile += request.detailFiles[i];
-        detailFile += "' download target='_self'>" + request.detailFiles[i] + "</a><br/>";
+        detailFile += `<a href="${apiUrl}/reqfiles/${request.id}/${request.detailFiles[i]}" download target='_self'>${request.detailFiles[i]}</a><br/>`;
       }
     }
 
-    var referenceFile = "";
+    let referenceFile = "";
     if (request.refFiles.length > 0) {
       for (var i = 0; i < request.refFiles.length; i++) {
-        referenceFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-        referenceFile += request.refFiles[i];
-        referenceFile += "' download target='_self'>" + request.refFiles[i] + "</a><br/>";
+        referenceFile += `<a href="${apiUrl}/reqfiles/${request.id}/${request.refFiles[i]}" download target='_self'>${request.refFiles[i]}</a><br/>`;
       }
     }
 
@@ -123,7 +120,7 @@ const mailhandler = {
 
     let mailOptions = {
       from: 'translation@pangea.global', // sender address
-      to: 'sales@pangea.global', // sales@pangea.global list of receivers
+      to: 'sales@pangea.global, illy@pangea.global, daniyal@wellyes.ru', // sales@pangea.global list of receivers
       subject: `A new lead from ${request.companyName}`, // Subject line
       text: "plain text", // plain text body
       html: "<b>" + msg + "</b>" // html body
@@ -135,8 +132,6 @@ const mailhandler = {
       }
       console.log('Message sent: %s', info.messageId);
 
-      // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-      // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     });
 
   }
