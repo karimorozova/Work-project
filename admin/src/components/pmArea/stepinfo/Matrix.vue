@@ -1,7 +1,7 @@
 <template lang="pug">
 .step-matrix
     StepInfoTitle(title="Matrix" :isIconReversed="isMatrixShown" @titleClick="showMatrix")
-    .step-matrix__table(:class="{'step-matrix_static-pos': isMatrixShown}")
+    .step-matrix__table(:class="{'step-matrix_block': isMatrixShown}")
         DataTable(
             :fields="fields"
             :tableData="matrixData"
@@ -75,17 +75,10 @@ export default {
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
-        opacity: 0;
-        position: absolute;
-        z-index: -100;
-        transform: translateY(-50px);
-        transition: all 0.3s;
+        display: none;
     }
-    &_static-pos {
-        opacity: 1;
-        z-index: 0;
-        position: static;
-        transform: translateY(0);
+    &_block {
+        display: block;
     }
 }
 </style>

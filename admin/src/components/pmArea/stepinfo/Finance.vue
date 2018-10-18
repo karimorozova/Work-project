@@ -1,7 +1,7 @@
 <template lang="pug">
 .step-finance
     StepInfoTitle(title="Finance" :isIconReversed="isInfoShown" @titleClick="showInfo")
-    .step-finance__info(:class="{'step-finance_static-pos': isInfoShown}")
+    .step-finance__info(:class="{'step-finance_block': isInfoShown}")
         .step-finance__table
             DataTable(
                 :fields="fields"
@@ -95,17 +95,11 @@ export default {
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
-        opacity: 0;
-        position: absolute;
-        z-index: -100;
-        transform: translateY(-50px);
+        display: none;
         transition: all 0.3s;
     }
-    &_static-pos {
-        opacity: 1;
-        z-index: 0;
-        position: static;
-        transform: translateY(0);
+    &_block {
+       display: block
     }
     &__table {
         width: 70%;

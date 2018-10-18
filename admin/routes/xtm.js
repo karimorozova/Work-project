@@ -1,10 +1,8 @@
 const router = require('express').Router();
-const upload = require('../utils/uploads');
-const moveFile = require('../utils/moveFile');
+const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer } = require('../services/');
-const { getProject } = require('../projects/');
-const { metricsCalc } = require('../projects/');
+const { getProject, metricsCalc, storeFiles } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -15,14 +13,10 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     tasksInfo.source = JSON.parse(tasksInfo.source);
     tasksInfo.targets = JSON.parse(tasksInfo.targets);
     const sourceFiles = req.files["sourceFiles"];
-    const refFiles = req.files["refFiles"];
+    const referenceFiles = req.files["refFiles"];
     let translationFile = "";
-    if(sourceFiles) {
-        translationFile = await moveFile(sourceFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/source-${sourceFiles[0].filename.replace(/\s+/g, '_')}`)
-    }
-    if(refFiles) {
-        referenceFile = await moveFile(refFiles[0], `./dist/projectFiles/${tasksInfo.projectId}/reference-${refFiles[0].filename.replace(/\s+/g, '_')}`)
-    }
+    const detailFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
+    const refFiles = await storeFiles(referenceFiles, tasksInfo.projectId);
     let template = tasksInfo.template || '247336FD';
     let workflow = tasksInfo.workflow || 2917;
     let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
@@ -35,12 +29,12 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                file: translationFile,
+                file: detailFiles[0],
                 templateId: template,
                 workflowId: workflow
             });
             await Projects.updateOne({"_id": project._id}, 
-            {$set: {xtmId: xtmProject.projectId, detailFiles: [translationFile]}, 
+            {$set: {xtmId: xtmProject.projectId, detailFiles: detailFiles, refFiles: refFiles}, 
             $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", check: false}}}
             );
         }

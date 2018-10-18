@@ -35,8 +35,8 @@ async function metricsCalc(metrics) {
 
 async function receivablesCalc(task, project, step, combs) {
     if(step.name !== "translate1") {
-        const costObj = await calcProofingStep(task, project, task.metrics.totalWords);
-        return {cost: costObj.cost, rate: costObj.rate};
+        const { cost, rate } = await calcProofingStep(task, project, task.metrics.totalWords);
+        return {cost, rate};
     } 
     const metrics = task.metrics;
     const customerCost = await getCustomerRate(task, project.industry.id, project.customer.id);

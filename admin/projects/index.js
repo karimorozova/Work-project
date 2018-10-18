@@ -1,5 +1,6 @@
 const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts } = require('./calculations');
 const { getProject, getProjects, getUpdatedProject } = require('./getProjects');
+const { storeFiles } = require('./files');
 
 const projectFunctions = {
     metricsCalc,
@@ -8,7 +9,8 @@ const projectFunctions = {
     updateProjectCosts,
     getProject,
     getProjects,
-    getUpdatedProject
+    getUpdatedProject,
+    storeFiles
 }
 
 module.exports = projectFunctions;
