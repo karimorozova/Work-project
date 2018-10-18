@@ -1,28 +1,13 @@
 const router = require('express').Router();
-const multer = require('multer');
+const upload = require('../utils/');
 const mv = require('mv');
 const { getVendor, getVendors, checkRatesMatch, deleteRate } = require('./vendors/');
 const { vendorMail } = require('../utils/mailtovendor');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './dist/uploads/')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
-});
-
-var upload = multer({
-    storage: storage,
-    limits: {fieldSize: 25 * 1024 * 1024}
-});
-
-
 function moveFile(oldFile, vendorId) {
 
-var newFile = './dist/vendorsDocs/' + vendorId + '/' + oldFile.filename;
+let newFile = './dist/vendorsDocs/' + vendorId + '/' + oldFile.filename;
 
 mv(oldFile.path, newFile, {
         mkdirp: true
@@ -97,7 +82,7 @@ router.get('/get-rates', async (req, res) => {
 })
 
 router.post('/vendor-rates', async (req, res) => {
-    var rate = req.body;
+    let rate = req.body;
     const id = rate.vendor;
     try {
         let vendor = await getVendor({"_id": id})

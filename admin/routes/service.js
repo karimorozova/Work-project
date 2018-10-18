@@ -1,19 +1,10 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
-const { Clients, Projects, Languages, Services, Industries } = require('../models');
+const upload = require('../utils/');
+const { Services, Industries } = require('../models');
 const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './dist/uploads/')
-  },
-  filename: function (req, file, cb) {
-    console.log(file)
-    cb(null, file.originalname)
-  }
-});
 
 function moveServiceIcon(oldFile, date) {
   var newFile = './dist/static/services/' + date + '-' + oldFile.filename
@@ -27,53 +18,50 @@ function moveServiceIcon(oldFile, date) {
   console.log('Flag icon moved!')
 }
 
-var uploadServices = multer({
-  storage: storage
-});
-
-router.post("/saveservices", uploadServices.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
-  const serviceID = req.body.dbIndex;
+router.post("/saveservices", upload.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
+  const serviceId = req.body.dbIndex;
   const serviceIcon = req.files["uploadedFileIcon"];
   let iconPath = "";
-  let date = new Date().getTime();
-  if (serviceIcon) {
-    moveServiceIcon(serviceIcon[0], date);
-    iconPath = `/static/services/${date}-` + serviceIcon[0].filename;
-  }
+  const  date = new Date().getTime();
+  try {
+    if (serviceIcon) {
+      await moveServiceIcon(serviceIcon[0], date);
+      iconPath = `/static/services/${date}-` + serviceIcon[0].filename;
+    }
 
-  let objForUpdate = {
-    active: req.body.activeFormValue,
-    languageForm: req.body.languageFormValue,
-    calculationUnit: req.body.calcFormValue
-  };
-  
-  const nameVal = req.body.nameTitle;
-  
-  if (nameVal.length) {
-    objForUpdate.title = nameVal;
-  }
+    let objForUpdate = {
+      active: req.body.activeFormValue,
+      languageForm: req.body.languageFormValue,
+      calculationUnit: req.body.calcFormValue
+    };
+    
+    const nameVal = req.body.nameTitle;
+    
+    if (nameVal.length) {
+      objForUpdate.title = nameVal;
+    }
 
-  if(iconPath.length) {
-    objForUpdate.icon = iconPath;
-  }
+    if(iconPath.length) {
+      objForUpdate.icon = iconPath;
+    }
 
-  Services.update({ "_id": serviceID }, objForUpdate).then(result => {
+    await Services.update({ "_id": serviceId }, objForUpdate);
     res.send('Service updated')
-  }).catch(err => {
+  } catch(err) {
     console.log(err);
-    res.send('Something wrong...')
-  });
+    res.status(500).send('Error / Cannot save Service')
+  }
 });
 
 router.post("/removeservices", async (req, res) => {
-  const serviceID = req.body.serviceRem;
-  Services.deleteOne({ "_id": serviceID })
-    .then(result => {
-      res.send('Removed');
-    })
-    .catch(err => {
+  const serviceId = req.body.serviceRem;
+  try {
+    await Services.deleteOne({ "_id": serviceId });
+    res.send('Removed');
+  } catch(err) {
       console.log(err);
-    });
+      res.status(500).send('Error / Cannot remove Service')
+    }
 });
 
 router.get('/costs', async (req, res) => {
@@ -156,51 +144,56 @@ router.post('/rates', async (req, res) => {
 
 router.post('/several-langs', async (req, res) => {
   let langCombs = req.body;
-  let industries = await Industries.find();
-  industries = JSON.stringify(industries);
-  let services = await getManyServices({languageForm: "Duo"});
-  for(let comb of langCombs) {
-    let service = services.find(item => {
-      return item.title == comb.service.title
-    });
-    let exist = false;
-    for(let servComb of service.languageCombinations) {
-      if(comb.source.lang == servComb.source.lang && comb.target.lang == servComb.target.lang) {
-        for(let indus of servComb.industries) {
+  try {
+    let industries = await Industries.find();
+    industries = JSON.stringify(industries);
+    let services = await getManyServices({languageForm: "Duo"});
+    for(let comb of langCombs) {
+      let service = services.find(item => {
+        return item.title == comb.service.title
+      });
+      let exist = false;
+      for(let servComb of service.languageCombinations) {
+        if(comb.source.lang == servComb.source.lang && comb.target.lang == servComb.target.lang) {
+          for(let indus of servComb.industries) {
+            for(let ind of comb.industry) {
+              if(indus.name == ind.name) {
+                indus.rate = ind.rate
+              }
+            }
+          }
+          exist = true;
+        }
+      }
+      if(!exist) {
+        let industry = JSON.parse(industries);
+        for(let indus of industry) {
           for(let ind of comb.industry) {
             if(indus.name == ind.name) {
-              indus.rate = ind.rate
+              indus.rate = ind.rate;
+              indus.active = true;
+            } else {
+              indus.rate = 0;
+              indus.active = false;
             }
           }
         }
-        exist = true;
+        service.languageCombinations.push({
+          source: comb.source,
+          target: comb.target,
+          industries: industry,
+          active: true
+        })
+        await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
+      } else {
+        await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
       }
     }
-    if(!exist) {
-      let industry = JSON.parse(industries);
-      for(let indus of industry) {
-        for(let ind of comb.industry) {
-          if(indus.name == ind.name) {
-            indus.rate = ind.rate;
-            indus.active = true;
-          } else {
-            indus.rate = 0;
-            indus.active = false;
-          }
-        }
-      }
-      service.languageCombinations.push({
-        source: comb.source,
-        target: comb.target,
-        industries: industry,
-        active: true
-      })
-      let result = await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
-    } else {
-      let result = await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
-    }
+    res.send('Several langs added..');
+  } catch(err) {
+    console.log(err)
+    res.status(500).send('Error on adding several language combinations');
   }
-  res.send('Several langs added..')
 })
 
 router.delete('/rate/:id', async (req, res) => {
@@ -252,7 +245,7 @@ router.get('/parsed-rates', async (req, res) => {
     res.send(rates);
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something went wrong!')
+    res.status(500).send('Error on getting rates!')
   }
 })
 

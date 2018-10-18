@@ -1,33 +1,10 @@
 const router = require('express').Router();
-const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-const unirest = require('unirest');
-const querystring = require('querystring');
-const fs = require('fs');
 const mv = require('mv');
-const { sendMail } = require('../utils/mailhandler');
-const { sendMailClient } = require('../utils/mailhandlerclient');
-const { sendMailPortal } = require('../utils/mailhandlerportal')
-const { Requests, Languages, Services, Industries } = require('../models');
-const { quote, project } = require('../models/xtrf');
-const reqq = require('request');
-const fileType = require('file-type');
-const http = require('http');
-const writeFile = require('write');
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './dist/uploads/')
-  },
-  filename: function (req, file, cb) {
-    console.log(file)
-    cb(null, file.originalname)
-  }
-});
+const { Industries } = require('../models');
+const upload = require('../utils/');
 
 function moveIndustryIcon(oldFile, date) {
-  var newFile = './dist/static/industries/' + date + '-' + oldFile.filename
+  let newFile = './dist/static/industries/' + date + '-' + oldFile.filename
   mv(oldFile.path, newFile, {
     mkdirp: true
   }, function (err) {
@@ -39,7 +16,7 @@ function moveIndustryIcon(oldFile, date) {
 }
 
 function moveExcelFile(oldFile, date) {
-  var newFile = './dist/static/industries/exel/' + date + '-' + oldFile.filename
+  let newFile = './dist/static/industries/exel/' + date + '-' + oldFile.filename
   mv(oldFile.path, newFile, {
     mkdirp: true
   }, function (err) {
@@ -49,58 +26,53 @@ function moveExcelFile(oldFile, date) {
   });
 }
 
-var uploadIndustries = multer({
-  storage: storage
-});
+router.post("/saveindustries", upload.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
+  const industryID = req.body.dbIndex;
+  let iconsArray = req.files["uploadedFileIcon"];
+  let iconPath = "";
+  const date = new Date().getTime();
+  try {
+    if(iconsArray) {
+      await moveIndustryIcon(iconsArray[0], date);
+      iconPath = `/static/industries/${date}-` + iconsArray[0].filename;
+    }
+    let genericArray = req.files["uploadedFile"];
+    let genericPath = "";
+    if (genericArray) {
+      await moveExcelFile(genericArray[0], date);
+      genericPath = `/static/industries/exel/${date}` + '-' + genericArray[0].filename;    
+    }
+    let nameVal = req.body.nameTitle;
 
-router.post("/saveindustries", uploadIndustries.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
-  var industryID = req.body.dbIndex;
-  var iconsArray = req.files["uploadedFileIcon"];
-  var iconPath = "";
-  let date = new Date().getTime();
-  if(iconsArray) {
-    moveIndustryIcon(iconsArray[0], date);
-    iconPath = `/static/industries/${date}-` + iconsArray[0].filename;
-  }
-  var genericArray = req.files["uploadedFile"];
-  var genericPath = "";
-  if (genericArray) {
-    moveExcelFile(genericArray[0], date);
-    genericPath = `/static/industries/exel/${date}` + '-' + genericArray[0].filename;    
-  }
-  var nameVal = req.body.nameTitle;
-
-  var objForUpdate = {
-    active: req.body.activeFormValue
-  };
-  if(nameVal.length ) {
-    objForUpdate.name = nameVal
-  }
-  if(iconPath) {
-    objForUpdate.icon = iconPath
-  }
-  if(genericPath) {
-    objForUpdate.generic = genericPath
-  }
-  console.log(objForUpdate);
-  Industries.update({ "_id": industryID }, objForUpdate).then(result => {
+    let objForUpdate = {
+      active: req.body.activeFormValue
+    };
+    if(nameVal.length ) {
+      objForUpdate.name = nameVal
+    }
+    if(iconPath) {
+      objForUpdate.icon = iconPath
+    }
+    if(genericPath) {
+      objForUpdate.generic = genericPath
+    }
+    await Industries.update({ "_id": industryID }, objForUpdate);
     res.send('done');
-  }).catch(err => {
+  } catch(err) {
     console.log(err);
-    res.send('Something wrong...')
-  });
+    res.status(500).send('Something wrong on Industry saving');
+  }
 });
 
 router.post("/removeindustries", async (req, res) => {
-  var industryID = req.body.industryRem;
-  Industries.deleteOne({ "_id": industryID })
-    .then(result => {
-      res.send('Removed');
-      // console.log(result);
-    })
-    .catch(err => {
+  const industryID = req.body.industryRem;
+  try {
+    await Industries.deleteOne({ "_id": industryID });
+    res.send('Removed'); 
+    } catch(err) {
       console.log(err);
-    });
+      res.status(500).send('Something wrong on Industry removing');
+    }
 });
 
 module.exports = router;

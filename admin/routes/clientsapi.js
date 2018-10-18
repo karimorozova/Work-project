@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const multer = require('multer');
+const upload = require('../utils/');
 const fs = require('fs');
+const apiUrl = require('../helpers/apiUrl');
 const fse = require('fs-extra');
 const mv = require('mv');
 const { getClient, getClients, checkRatesMatch, deleteRate} = require('../clients/');
@@ -8,40 +9,23 @@ const { clientMail } = require('../utils/mailtoclients');
 const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './dist/uploads/')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
-});
-
-var upload = multer({
-    storage: storage,
-    limits: {fieldSize: 25 * 1024 * 1024}
-});
-
-
 function movePhoto(oldFile, clientId, contact) {
-
-var newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
-
+const newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
 mv(oldFile.path, newFile, {
         mkdirp: true
     }, function (err) {
+        console.log(err);
 });
 
 return oldFile.filename;
 }
 
 function moveNdaCont(oldFile, clientId, ndaCont) {
-
-var newFile = './dist/clientsDocs/' + clientId + `/${ndaCont}/` + oldFile.filename;
-
+const newFile = './dist/clientsDocs/' + clientId + `/${ndaCont}/` + oldFile.filename;
 mv(oldFile.path, newFile, {
         mkdirp: true
     }, function (err) {
+        console.log(err);
 });
 
 return oldFile.filename;
@@ -73,7 +57,6 @@ router.post('/mailtoclient', async (req, res) => {
     try {
         const client = await getClient({"_id": project.customer});
         await clientMail(project, client);
-        console.log('email to client');
         res.send('An email to Cilent sent!')
     } catch(err) {
         console.log(err);
@@ -249,9 +232,9 @@ router.post('/several-langs', async (req, res) => {
             }
             if(!langPairExist) {
                 client.languageCombinations.push(comb);
-                let result = await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
+                await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
             } else {
-                let result = await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
+                await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
             }
         }
         res.send('Several langs added..');
@@ -319,7 +302,6 @@ router.post('/update-client', upload.any(), async (req, res) => {
             await moveNdaCont(nda, clientId, "nda");
             client.nda = '/clientsDocs/' + clientId + '/nda/' + nda.filename;
         }
-
         await Clients.updateOne({"_id": clientId}, client);
         res.send({id: clientId})
     } catch(err) {
@@ -330,12 +312,12 @@ router.post('/update-client', upload.any(), async (req, res) => {
 
 router.get('/get-contract', async (req, res) => {
     const path = req.query.path;
-    res.send(`http://localhost:3001${path}`);
+    res.send(`${apiUrl}${path}`);
 })
 
 router.get('/get-nda', async (req, res) => {
     const path = req.query.path;
-    res.send(`http://localhost:3001${path}`);
+    res.send(`${apiUrl}${path}`);
 })
 
 router.post('/deleteclient', async (req, res) => {

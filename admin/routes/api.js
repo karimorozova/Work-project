@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const multer = require('multer');
 const axios = require('axios');
 const unirest = require('unirest');
 const HomeApi = require('../models/xtrf/home');
 const ClientApi = require('../models/xtrf/client');
+const upload = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
 const { sendMail } = require('../utils/mailhandler');
@@ -11,26 +11,15 @@ const { sendMailClient } = require('../utils/mailhandlerclient');
 const { sendMailPortal } = require('../utils/mailhandlerportal')
 const { Requests, Projects, Languages, Services, Industries, Timezones, User, Clients } = require('../models');
 const { quote, project } = require('../models/xtrf');
+const { getProject, getProjects } = require('../projects/');
+const { getManyServices } = require('../services/');
 const reqq = require('request');
 const writeFile = require('write');
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './dist/uploads/')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-});
-
-var upload = multer({
-  storage: storage
-});
 
 
 function moveFile(oldFile, requestId) {
 
-  var newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
+  let newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
 
   mv(oldFile.path, newFile, {
     mkdirp: true
@@ -41,7 +30,7 @@ function moveFile(oldFile, requestId) {
 }
 
 function moveLangIcon(oldFile, date) {
-  var newFile = './dist/static/flags31x21pix/' + date + '-' + oldFile.filename;
+  let newFile = './dist/static/flags31x21pix/' + date + '-' + oldFile.filename;
   mv(oldFile.path, newFile, {
     mkdirp: true
   }, function (err) {
@@ -53,46 +42,50 @@ function moveLangIcon(oldFile, date) {
 }
 
 router.get('/wordcount', async (req, res) => {
-
-  var link = req.query.web;
+  let link = req.query.web;
   if (link.indexOf('dropbox') >= 0) {
-    var firstPart = link.split("=")[0];
+    let firstPart = link.split("=")[0];
     link = firstPart + "=1";
   }
-  const resFull = await axios({
-    url: link,
-    method: 'GET',
-    responseType: 'blob', // important
-  });
-  var wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
-  wstream.write(resFull.data);
-  wstream.end(() => {
-    unirest.post('https://pangea.s.xtrf.eu/qrf/file')
-      .headers({ 'Content-Type': 'multipart/form-data' })
-      .attach('file', './dist/testtest.txt') // Attachment
-      .end(function (response) {
-        var token = response.body.token;
-        fs.unlink('./dist/testtest.txt', (err) => {
-          if (err) throw err;
-          console.log("testtеst.txt was deleted!")
+  try {
+    const resFull = await axios({
+      url: link,
+      method: 'GET',
+      responseType: 'blob', // important
+    });
+    let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
+    wstream.write(resFull.data);
+    wstream.end(() => {
+      unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+        .headers({ 'Content-Type': 'multipart/form-data' })
+        .attach('file', './dist/testtest.txt') // Attachment
+        .end(function (response) {
+          let token = response.body.token;
+          fs.unlink('./dist/testtest.txt', (err) => {
+            if (err) throw err;
+            console.log("testtеst.txt was deleted!")
+          });
+          console.log('done');
+          res.send({ token });
         });
-        console.log('done');
-        res.send({ token });
-      });
-  });
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on getting wordcount');
+  }
 });
 
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
   try {
   const request = new Requests(req.body);
-  var projectName = "";
+  let projectName = "";
   if (request.projectName) {
     projectName = request.projectName;
   }
 
   if (req.body.genBrief) {
-    var obj = JSON.parse(req.body.genBrief);
+    let obj = JSON.parse(req.body.genBrief);
     await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
      \nDescription: ${obj.briefDescr};
      \nTargeted Audience: ${obj.briefAudience}; 
@@ -117,13 +110,13 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   
   await request.save();
   if (detailFiles) {
-    for (var i = 0; i < detailFiles.length; i += 1) {
+    for (let i = 0; i < detailFiles.length; i += 1) {
       let storedFile = await moveFile(detailFiles[i], request.id);
       request.detailFiles.push(storedFile);
     }
   }
   if (refFiles) {
-    for (var i = 0; i < refFiles.length; i += 1) {
+    for (let i = 0; i < refFiles.length; i += 1) {
       let storedFile = await moveFile(refFiles[i], request.id);
       request.refFiles.push(storedFile);
     }
@@ -138,7 +131,6 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   }
   await sendMailClient(request);
   // quote(request);
-
   console.log("Saved");
   res.send({
     message: "request was added"
@@ -152,13 +144,13 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
 router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
   try {
   const request = new Requests(req.body);
-  var projectName = "";
+  let projectName = "";
   if (request.projectName) {
     projectName = request.projectName;
   }
 
   if (req.body.genBrief) {
-    var obj = JSON.parse(req.body.genBrief);
+    let obj = JSON.parse(req.body.genBrief);
     
     await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
      \nDescription: ${obj.briefDescr};
@@ -183,12 +175,12 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
   await request.save();
   if (detailFiles) {
-    for (var i = 0; i < detailFiles.length; i += 1) {
+    for (let i = 0; i < detailFiles.length; i += 1) {
       request.detailFiles.push(moveFile(detailFiles[i], request.id));
     }
   }
   if (refFiles) {
-    for (var i = 0; i < refFiles.length; i += 1) {
+    for (let i = 0; i < refFiles.length; i += 1) {
       request.refFiles.push(moveFile(refFiles[i], request.id))
     }
   }
@@ -209,22 +201,18 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
   });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Something went wrong while adding request " + err)
+    res.status(500).send("Something went wrong while adding request")
   }
 });
 
 router.get('/allprojects', async (req, res) => {
   try {
-    const projects = await Projects.find({})
-        .populate('customer')
-        .populate('industry')
-        .populate('service')
-        .populate('projectManager', ['firstName', 'lastName']);
+    const projects = await getProjects({});
     res.send(projects)
   } catch(err) {
       console.log(err);
       res.status(500);
-      res.send('Something wrong with DB while getting projects! ' + err)
+      res.send('Something wrong with DB while getting projects!')
     }
 })
 
@@ -235,21 +223,18 @@ router.get('/languages', async (req, res) => {
   } catch(err) {
       console.log(err)
       res.status(500);
-      res.send('Something wrong with DB ' + err)
+      res.send('Something wrong with DB / Cannot get languages')
     }
 });
 
 router.get('/services', async (req, res) => {
   try {
-  const services = await Services.find()
-        .populate('languageCombinations.source')
-        .populate('languageCombinations.target')
-        .populate('languageCombinations.industries.industry');
+  const services = await getManyServices({});
     res.send(services);
   } catch(err) {
       console.log(err)
       res.status(500);
-      res.send('Something wrong with DB ' + err);
+      res.send('Something wrong with DB / Cannot get Services');
   }
 });
 
@@ -260,7 +245,7 @@ router.get('/industries', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500);
-    res.send('Something wrong with DB ' + err);
+    res.send('Something wrong with DB / Cannot get Industries');
   }
 });
 
@@ -271,7 +256,7 @@ router.get('/timezones', async (req, res) => {
   } catch(err) {
       console.log(err);
       res.status(500);
-      res.send('Something wrong with DB ' + err);
+      res.send('Something wrong with DB / Cannot get Timezones');
   }
 })
 
@@ -282,7 +267,7 @@ router.get('/customers', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.statusCode(500);
-    res.send('Something wrong with DB ' + err);
+    res.send('Error / Cannot get Customers from XTRF');
   }
 })
 
@@ -293,7 +278,7 @@ router.get('/person', async (req, res) => {
     res.send(email);
   } catch(err) {
     res.statusCode(500);
-    res.send('Something wrong with DB ' + err);
+    res.send('Error / Cannot get Person from XTRF');
   }
 })
 
@@ -303,8 +288,9 @@ router.post('/get-token', async (req, res) => {
     let token = await HomeApi.getTokenCircular(email);
     res.send(token);
   } catch (err) {
-    res.send(err);
     console.log(err);
+    res.statusCode(500);
+    res.send('Error / Cannot get Token from XTRF');
   }
 })
 
@@ -313,17 +299,19 @@ router.post('/token-session', async (req, res) => {
     let sessionId = await ClientApi.login(req.body.token.body);
       res.send(sessionId);
   } catch(err) {
-    res.send(err)
+    console.log(err);
+    res.statusCode(500);
+    res.send('Error / Cannot open Token-session in XTRF');
   }
   
 })
 
 router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {
   const flag = req.files["flag"];
-  var langID = req.body.dbIndex;
+  let langID = req.body.dbIndex;
   try {
     let languageIcon = await Languages.find({'_id': langID});
-    var existIcon = languageIcon[0].icon;
+    let existIcon = languageIcon[0].icon;
     let old = './dist' + languageIcon[0].icon;
     let date = new Date().getTime();
     if (flag) {
@@ -336,7 +324,7 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
       await moveLangIcon(flag[0], date);
       existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
     }
-    var objForUpdate = {
+    let objForUpdate = {
       lang: req.body.languageName,
       symbol: req.body.languageSymbol,
       iso1: req.body.languageIso1,
@@ -348,7 +336,7 @@ router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) 
     res.send(result);
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something went wrong while Language saving ' + err);
+    res.status(500).send('Something went wrong while Language saving');
   }
 });
 
@@ -359,7 +347,7 @@ router.post("/removelanguages", async(req, res) => {
     res.send('Removed')
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something is wrong with Language removing ' + err)
+    res.status(500).send('Something is wrong with Language removing')
   }
 });
 

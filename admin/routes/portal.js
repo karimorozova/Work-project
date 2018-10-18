@@ -1,11 +1,8 @@
 const { ClientApi, HomeApi } = require('../models/xtrf');
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
-const { getSpecializations } = require('../models/xtrf/home');
 const router = require('express').Router();
 const fs = require('fs');
-var unirest = require('unirest');
 const https = require('https');
-
 
 router.get('/', (req, res) => {
     res.send("portal");
@@ -41,6 +38,7 @@ router.get('/language-combinations', async (req, res) => {
         let languages = result.data;
         res.send(languages);
     } catch(err) {
+        console.log(err);
         res.status(500).send('Error on getting language combinations');
     }
 })
@@ -50,6 +48,7 @@ router.get('/customer-info', async (req, res) => {
         let customer = await HomeApi.customerInfo(req.query.customerId);
         res.send(customer)
     } catch(err) {
+        console.log(err);
         res.status(500).send('Error on getting customer info');
     }
 })
