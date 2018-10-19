@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const mailhandlerclient = {
-  sendMailClient(request) {
+const sendMailClient = function(request) {
     var detailFile = "";
     if (request.detailFiles.length > 0) {
       for (var i = 0; i < request.detailFiles.length; i++) {
@@ -204,9 +203,6 @@ const mailhandlerclient = {
       // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     });
 
-  }
 }
 
-
-
-module.exports = mailhandlerclient;
+module.exports = { sendMailClient };

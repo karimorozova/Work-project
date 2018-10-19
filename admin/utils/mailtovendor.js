@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const mailhandler = {
-  vendorMail(vendor) {
+const vendorMail = function(vendor) {
     // if(request.genBrief) {
     //   detailFile = `<a href='http://admin.pangea.global/reqfiles/${request.id}/written.txt' download target='_self'>written.txt</a>`;
     // }
@@ -94,10 +93,6 @@ const mailhandler = {
       console.log('Message sent: %s', info.messageId);
 
     });
-
-  }
 }
 
-
-
-module.exports = mailhandler;
+module.exports = { vendorMail };

@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const upload = require('../utils/');
+const { upload, vendorMail } = require('../utils/');
 const mv = require('mv');
 const { getVendor, getVendors, checkRatesMatch, deleteRate } = require('./vendors/');
-const { vendorMail } = require('../utils/mailtovendor');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
 function moveFile(oldFile, vendorId) {

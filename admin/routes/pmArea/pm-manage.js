@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const upload = require("../../utils/uploads");
-const moveFile = require("../../utils/moveFile");
 const { User, Languages, Projects } = require("../../models");
 const { getProject, getUpdatedProject } = require("../../projects/");
 const { getOneService } = require("../../services/")

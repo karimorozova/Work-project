@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const mv = require('mv');
 const { Industries } = require('../models');
-const upload = require('../utils/');
+const { upload } = require('../utils/');
 
 function moveIndustryIcon(oldFile, date) {
   let newFile = './dist/static/industries/' + date + '-' + oldFile.filename

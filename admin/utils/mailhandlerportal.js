@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const mailhandler = {
-  sendMailPortal(request) {
+const sendMailPortal = function(request) {
     var detailFile = "";
     if(request.genBrief) {
       detailFile = `<a href='http://admin.pangea.global/reqfiles/${request.id}/written.txt' download target='_self'>written.txt</a>`;
@@ -92,10 +91,6 @@ const mailhandler = {
       console.log('Message sent: %s', info.messageId);
 
     });
-
-  }
 }
 
-
-
-module.exports = mailhandler;
+module.exports = { sendMailPortal };

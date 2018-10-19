@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const mailhandler = {
-  pmMail(project, client, user) {
+const pmMail = function(project, client, user) {
     var acceptQuote = "";
     var declineQuote = "";
     var date = new Date().getTime();
@@ -99,10 +98,6 @@ const mailhandler = {
       console.log('Message sent: %s', info.messageId);
 
     });
-
-  }
 }
 
-
-
-module.exports = mailhandler;
+module.exports = { pmMail };

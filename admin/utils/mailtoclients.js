@@ -1,7 +1,6 @@
-const { clientQuoteEmail } = require('./mailTemplate');
+const nodemailer = require('nodemailer');
 
-const mailhandler = {
-  clientMail(project, client) {
+const clientMail = function(project, client) {
     let acceptQuote = "";
     let declineQuote = "";
     let langPairs = "";
@@ -97,10 +96,8 @@ const mailhandler = {
       console.log('Message sent: %s', info.messageId);
 
     });
-
-  }
 }
 
 
 
-module.exports = mailhandler;
+module.exports = { clientMail };

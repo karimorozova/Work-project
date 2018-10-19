@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
-const upload = require('../utils/');
+const { upload } = require('../utils/');
 const { Services, Industries } = require('../models');
 const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');

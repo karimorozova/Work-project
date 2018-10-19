@@ -1,12 +1,10 @@
 const router = require('express').Router();
-const upload = require('../utils/');
+const { upload, clientMail, pmMail } = require('../utils/');
 const fs = require('fs');
-const apiUrl = require('../helpers/apiUrl');
+const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
 const { getClient, getClients, checkRatesMatch, deleteRate} = require('../clients/');
-const { clientMail } = require('../utils/mailtoclients');
-const { pmMail } = require('../utils/mailtopm');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 
 function movePhoto(oldFile, clientId, contact) {
