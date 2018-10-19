@@ -6,7 +6,7 @@
                 slot(:name="field.label" :field="field")
     .table__tbody(:class="[{'table_bottom-bordered': hasScroll}, bodyClass]")
         .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
-            .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="bodyCellClass")
+            .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
                 slot(:name="field.key" :row="row" :index="index")
             transition(name="slide-fade")
                 .table__row-expanded(v-if="isExpand && activeIndex === index")
@@ -154,6 +154,10 @@ export default {
 .matrix-table {
     max-height: 350px;
     overflow-y: overlay;
+}
+.step-files_centered {
+    display: flex;
+    justify-content: center;
 }
 .slide-fade-enter-active {
   transition: all .3s ease;

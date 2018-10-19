@@ -12,13 +12,13 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     let tasksInfo = {...req.body};
     tasksInfo.source = JSON.parse(tasksInfo.source);
     tasksInfo.targets = JSON.parse(tasksInfo.targets);
-    const sourceFiles = req.files["sourceFiles"];
+    const sourceFilesArr = req.files["sourceFiles"];
     const referenceFiles = req.files["refFiles"];
     let template = tasksInfo.template || '247336FD';
     let workflow = tasksInfo.workflow || 2917;
     try {
         let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        const detailFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
+        const sourceFiles = await storeFiles(sourceFilesArr, tasksInfo.projectId);
         const refFiles = await storeFiles(referenceFiles, tasksInfo.projectId);
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         for(let target of tasksInfo.targets) {
@@ -28,12 +28,12 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                file: detailFiles[0],
+                file: sourceFiles[0],
                 templateId: template,
                 workflowId: workflow
             });
             await Projects.updateOne({"_id": project._id}, 
-            {$set: {xtmId: xtmProject.projectId, detailFiles: detailFiles, refFiles: refFiles}, 
+            {$set: {xtmId: xtmProject.projectId, sourceFiles: sourceFiles, refFiles: refFiles}, 
             $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", check: false}}}
             );
         }
@@ -60,7 +60,7 @@ router.get('/project-metrics', async (req, res) => {
     })
 })
 
-router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
+router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
     let project = new Projects(req.body);
     let todayStart = new Date();
     todayStart.setUTCHours(0,0,0,0);
@@ -88,10 +88,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     let source = symbol[0].toLowerCase() + '_' + symbol[1];
     let target = [];
 
-    const detailFiles = req.files["detailFiles"];
+    const sourceFiles = req.files["sourceFiles"];
     const refFiles = req.files["refFiles"];
-    if (detailFiles) {
-        var detFile = detailFiles[0].path;
+    if (sourceFiles) {
+        var detFile = sourceFiles[0].path;
     }
 
     for(let i  = 0; i < targetLanguages.length; i++) {

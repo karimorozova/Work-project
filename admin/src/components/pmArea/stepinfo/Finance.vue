@@ -1,6 +1,6 @@
 <template lang="pug">
 .step-finance
-    StepInfoTitle(title="Finance" :isIconReversed="isInfoShown" @titleClick="showInfo")
+    StepInfoTitle(title="Finance" :isIconReversed="isInfoShown" @titleClick="toggleInfoShow")
     .step-finance__info(:class="{'step-finance_flex-display': isInfoShown}")
         .step-finance__table
             DataTable(
@@ -59,7 +59,7 @@ export default {
         }
     },
     methods: {
-        showInfo() {
+        toggleInfoShow() {
             this.isInfoShown = !this.isInfoShown;
         },
         addRow() {

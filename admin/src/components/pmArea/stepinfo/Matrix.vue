@@ -1,6 +1,6 @@
 <template lang="pug">
 .step-matrix
-    StepInfoTitle(title="Matrix" :isIconReversed="isMatrixShown" @titleClick="showMatrix")
+    StepInfoTitle(title="Matrix" :isIconReversed="isMatrixShown" @titleClick="toggleMatrixShow")
     .step-matrix__table(:class="{'step-matrix_block': isMatrixShown}")
         DataTable(
             :fields="fields"
@@ -54,7 +54,7 @@ export default {
         }
     },
     methods: {
-        showMatrix() {
+        toggleMatrixShow() {
             this.isMatrixShown = !this.isMatrixShown;
         }
     },

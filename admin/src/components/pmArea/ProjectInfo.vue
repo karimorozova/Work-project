@@ -41,7 +41,7 @@
                         )     
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Source Files" @uploadFiles="uploadDetailFiles")
+                        UploadFileButton(text="Source Files" @uploadFiles="uploadSourceFiles")
                     .project-info__drop-menu           
                         SelectSingle(
                             :selectedOption="selectedWorkflow.name" 
@@ -148,7 +148,7 @@ export default {
                 this.targetLanguages.push(lang);
             }
         },
-        uploadDetailFiles({files}) {
+        uploadSourceFiles({files}) {
             this.sourceFiles = files;
         },
         uploadRefFiles({files}) {

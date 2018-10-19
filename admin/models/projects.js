@@ -88,7 +88,7 @@ const ProjectsSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  detailFiles: {
+  sourceFiles: {
     type: Array,
     default: [],
     trim: true

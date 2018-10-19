@@ -14,12 +14,18 @@
         Matrix(
             :matrixData="matrixData"
         )
+    .step-info__block
+        Files(
+            :stepFiles="stepFiles"
+        )
 </template>
 
 <script>
 import Vendor from "./stepinfo/Vendor";
 import Finance from "./stepinfo/Finance";
 import Matrix from "./stepinfo/Matrix";
+import Files from "./stepinfo/Files";
+import { mapGetters } from 'vuex';
 
 export default {
     props: {
@@ -41,6 +47,7 @@ export default {
                 {title: "Discount 10%", receivables: "", payables: "", margin: ""},
             ],
             matrixData: [],
+            stepFiles: [],
             excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
@@ -103,16 +110,40 @@ export default {
                 rate: this.step.clientRate,
                 total: total
             })
+        },
+        getStepFiles() {
+            this.stepFilesFiller(this.currentProject.sourceFiles, "Source file");
+            this.stepFilesFiller(this.currentProject.refFiles, "Reference file");
+        },
+        stepFilesFiller(arr, category) {
+            for(let file of arr) {
+                const nameArr = file.split('/');
+                const fileName = nameArr[nameArr.length - 1];
+                this.stepFiles.push({
+                    check: false,
+                    fileName: fileName,
+                    category: category,
+                    source: file,
+                    target: this.step.targetFile || ""
+                })
+            }
         }
+    },
+    computed: {
+        ...mapGetters({
+            currentProject: "getCurrentProject"
+        })
     },
     components: {
         Vendor,
         Finance,
-        Matrix
+        Matrix,
+        Files
     },
     mounted() {
         this.getFinanceData();
         this.getMatrixData();
+        this.getStepFiles();
     }
 }
 </script>
