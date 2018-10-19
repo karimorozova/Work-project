@@ -1,12 +1,14 @@
 const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer } = require('../services/');
-const { getProject, metricsCalc, storeFiles } = require('../projects/');
+const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions } = require('../services/');
+const { getProject, getUpdatedProject, metricsCalc, storeFiles } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const parser = require('xml2json');
+const https = require('https');
+const { xtmAuth } = require('../configs/');
 
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     let tasksInfo = {...req.body};
@@ -380,6 +382,61 @@ router.get('/editor', async (req, res) => {
 
     xhr.setRequestHeader('Content-Type', 'text/xml');
     xhr.send(str);
+})
+
+router.post('/step-target', async (req, res) => {
+    const { step, projectId } = req.body;
+    try {
+        const project = await getProject({"_id": projectId});
+        let stepIndex = project.steps.findIndex(item => {
+            return item.taskId === step.taskId && item.name === step.name
+        });
+        project.steps[stepIndex].targetFiles = step.targetFiles;
+        const updatedProject = await getUpdatedProject({"_id": projectId}, {steps: project.steps});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error / Cannot add Target file to the Steps array of Project")
+    }
+})
+
+router.post('/generate-file', async (req, res) => {
+    const { projectId, taskId } = req.body;
+    try {
+        unirest.post(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/files/generate?jobIds=${taskId}&fileType=TARGET`)
+            .headers({"Authorization": xtmAuth.token})
+            .end( (response) => {
+                if(response.error) {
+                    console.log(response.error);
+                }
+                res.send(response.body);
+            }) 
+    } catch(err) {
+        console.log(err);
+        res.status(400).send('ERror / Cannot generate file in XTM');
+    }
+})
+
+router.get('/target-file', async (req, res) => {
+    const { id, projectId, fileId } = req.query;
+    const requestData = {
+        method: "GET",
+        path: `projects/${projectId}/files/${fileId}/download?fileType=TARGET`,
+    }
+    const options = getRequestOptions(requestData);
+    try {
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${fileId}.zip`);
+        let reqq = await https.request(options, (resp) => {
+            resp.pipe(wstream);
+        });
+        reqq.end(); 
+        wstream.on('finish', () => {
+        res.send({path: `/projectFiles/${id}/target-${fileId}.zip`});
+        })
+    } catch(err) {
+        console.log(err);
+        res.send(err);
+    }
 })
 
 module.exports = router;

@@ -72,7 +72,8 @@ router.get('/costs', async (req, res) => {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
       for(let step of project.steps) {
-        const receivables = step.receivables || await receivablesCalc(task, project, step, combinations);
+        const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
+        : await receivablesCalc(task, project, step, combinations);
         if(step.taskId === task.id) {
           step.clientRate = receivables.rate;
           step.receivables = receivables.cost;

@@ -1,5 +1,6 @@
 const unirest = require('unirest');
 const { XMLHttpRequest } = require("xmlhttprequest");
+const { xtmAuth } = require('../configs/');
 
 function saveTasks(object) {
 
@@ -115,4 +116,13 @@ function createCORSRequest(method, url) {
     return xhr;
 }
 
-module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer };
+function getRequestOptions(obj) {
+    return {
+        hostname: 'wstest2.xtm-intl.com',
+        path: `/rest-api/${obj.path}`,
+        method: obj.method,
+        headers: { 'Authorization': xtmAuth.token }
+    };
+}
+
+module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions };

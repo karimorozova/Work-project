@@ -17,6 +17,8 @@
     .step-info__block
         Files(
             :stepFiles="stepFiles"
+            :step="step"
+            :projectId="task.projectId"
         )
 </template>
 

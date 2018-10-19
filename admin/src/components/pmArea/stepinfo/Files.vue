@@ -23,19 +23,26 @@
             template(slot="category" slot-scope="{ row, index }")
                 span.step-files__data {{ row.category }}
             template(slot="source" slot-scope="{ row, index }")
-                img.step-files__image(src="../../../assets/images/download-big-b.png")
+                img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadSourceFile(index)")
             template(slot="target" slot-scope="{ row, index }")
-                img.step-files__image(src="../../../assets/images/download-big-b.png")                            
+                img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile")                            
 </template>
 
 <script>
 import StepInfoTitle from "./StepInfoTitle";
 import DataTable from "../../DataTable";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     props: {
         stepFiles: {
             type: Array
+        },
+        step: {
+            type: Object
+        },
+        projectId: {
+            type: Number
         }
     },
     data() {
@@ -52,9 +59,49 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            storeProject: "setCurrentProject",
+        }),
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
+        },
+        downloadSourceFile(index) {
+            const href = this.stepFiles[index].source.split('./dist')[1];
+            let link = document.createElement('a');
+            link.href = __WEBPACK__API_URL__ + href;
+            link.click();
+        },
+        async downloadTargetFile() {
+            const id = this.currentProject._id;
+            if(this.step.targetFiles && this.step.targetFiles.length) {
+                return this.downloadExistingTargets(this.step.targetFiles);
+            }
+            const fileIds = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, taskId: this.step.taskId});
+            let updatedStep = {...this.step};
+            updatedStep.targetFiles = [];
+            for(let obj of fileIds.body) {
+                let fileLink = await this.$http.get(`/xtm/target-file?id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
+                let href = fileLink.body.path;
+                updatedStep.targetFiles.push(href);
+                let link = document.createElement('a');
+                link.href = __WEBPACK__API_URL__ + href;
+                link.click();
+            }
+            const updatedProject = await this.$http.post('/xtm/step-target', {step: updatedStep, projectId: id});
+            await this.storeProject(updatedProject.body);
+        },
+        downloadExistingTargets(arr) {
+            for(let path of arr) {
+                let link = document.createElement('a');
+                link.href = __WEBPACK__API_URL__ + path;
+                link.click();
+            }
         }
+    },
+    computed: {
+        ...mapGetters({
+            currentProject: "getCurrentProject"
+        })
     },
     components: {
         StepInfoTitle,
