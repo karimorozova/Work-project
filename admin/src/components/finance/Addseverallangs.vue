@@ -50,6 +50,7 @@
 import ClickOutside from "vue-click-outside";
 import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
 import IndustrySelect from "../IndustrySelect";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -75,6 +76,9 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            alertToggle: "alertToggle"    
+        }),
         checkErrors() {
             this.errors = [];
             if(this.selectedInd[0].name == 'Select') this.errors.push('Choose industry');
@@ -88,7 +92,6 @@ export default {
                     }
                 }
             }
-            console.log(this.errors);
             if(this.errors.length) {
                 return true;
             } else {
@@ -117,21 +120,25 @@ export default {
                     }
                 }
             }
-            if(this.origin == 'rates') {
-                let result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
-                this.$emit('refreshServices');
+            try {
+                if(this.origin == 'rates') {
+                    let result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
+                    this.$emit('refreshServices');
+                }
+                if(this.origin == 'vendor') {
+                    let id = this.who._id;
+                    let vendorClient = this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
+                    this.$emit('refreshServices', {vendorId: id});
+                }
+                if(this.origin == 'client') {
+                    let id = this.who._id;
+                    let clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
+                    this.$emit('refreshServices', {clientId: id});
+                }
+            } catch(err) {
+                this.alertToggle({message: 'Internal server error. Cannot add several languages.', isShow: true, type: 'error'});
             }
-            if(this.origin == 'vendor') {
-                let id = this.who._id;
-                let vendorClient = this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
-                this.$emit('refreshServices', {vendorId: id});
-            }
-            if(this.origin == 'client') {
-                let id = this.who._id;
-                let clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
-                this.$emit('refreshServices', {clientId: id});
-            }
-            this.closeSeveral();
+                this.closeSeveral();
         },
         closeSeveral() {
             this.$emit('closeSeveral')

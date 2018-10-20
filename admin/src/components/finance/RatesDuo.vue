@@ -373,7 +373,7 @@ export default {
           }
         })
       } catch(err) {
-        this.alertToggle({message: 'Internal serer error. Cannot get rates.', isShow: true, type: 'error'});
+        this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
       }
     },
     defaultService() {
@@ -382,7 +382,6 @@ export default {
       })
     },
     ...mapActions({
-      loadingToggle: "loadingToggle",
       alertToggle: "alertToggle"
     })
   },

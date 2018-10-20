@@ -3,7 +3,7 @@ const multer = require('multer');
 const mv = require('mv');
 const { upload } = require('../utils/');
 const { Services, Industries } = require('../models');
-const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate } = require('../services/');
+const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, severalLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');
 
 function moveServiceIcon(oldFile, date) {
@@ -147,48 +147,17 @@ router.post('/several-langs', async (req, res) => {
   let langCombs = req.body;
   try {
     let industries = await Industries.find();
-    industries = JSON.stringify(industries);
     let services = await getManyServices({languageForm: "Duo"});
     for(let comb of langCombs) {
       let service = services.find(item => {
-        return item.title == comb.service.title
+        return item.id === comb.service._id
       });
-      let exist = false;
-      for(let servComb of service.languageCombinations) {
-        if(comb.source.lang == servComb.source.lang && comb.target.lang == servComb.target.lang) {
-          for(let indus of servComb.industries) {
-            for(let ind of comb.industry) {
-              if(indus.name == ind.name) {
-                indus.rate = ind.rate
-              }
-            }
-          }
-          exist = true;
-        }
-      }
-      if(!exist) {
-        let industry = JSON.parse(industries);
-        for(let indus of industry) {
-          for(let ind of comb.industry) {
-            if(indus.name == ind.name) {
-              indus.rate = ind.rate;
-              indus.active = true;
-            } else {
-              indus.rate = 0;
-              indus.active = false;
-            }
-          }
-        }
-        service.languageCombinations.push({
-          source: comb.source,
-          target: comb.target,
-          industries: industry,
-          active: true
-        })
-        await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
-      } else {
-        await Services.updateOne({"_id": service._id}, {$set: {languageCombinations: service.languageCombinations}})
-      }
+      await severalLangCombs({
+        serviceId: service.id,
+        comb: comb,
+        serviceCombinations: service.languageCombinations,
+        industries: industries
+      })
     }
     res.send('Several langs added..');
   } catch(err) {
