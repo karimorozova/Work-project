@@ -1,11 +1,12 @@
 const { getClient, getClients } = require('./getClients');
-const { checkRatesMatch, deleteRate } = require('./clientRates');
+const { checkRatesMatch, deleteRate, addClientsSeveralLangs } = require('./clientRates');
 
 const clients = {
     getClient,
     getClients,
     checkRatesMatch,
-    deleteRate
+    deleteRate,
+    addClientsSeveralLangs
 }
 
 module.exports = clients;

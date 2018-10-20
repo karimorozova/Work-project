@@ -4,7 +4,7 @@ const fs = require('fs');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, checkRatesMatch, deleteRate} = require('../clients/');
+const { getClient, getClients, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 
 function movePhoto(oldFile, clientId, contact) {
@@ -208,32 +208,15 @@ router.post('/several-langs', async (req, res) => {
     let langCombs = JSON.parse(req.body.langs);
     try {
         let client = await getClient({"_id": clientId});
+        const clientCombinations = client.languageCombinations.filter(item => {
+            return item.source
+        }) 
         for(let comb of langCombs) {
-            let langPairExist = false;
-            for(let clientComb of client.languageCombinations) {
-                if(comb.source.lang == clientComb.source.lang && comb.target.lang == clientComb.target.lang
-                    && comb.service.title == clientComb.service.title) {
-                    for(let indus of comb.industry) {
-                        let industryExist = false;
-                        for(let ind of clientComb.industry) {
-                            if(ind.name == indus.name) {
-                                ind.rate = indus.rate;
-                                industryExist = true;
-                            }
-                        }
-                        if(!industryExist) {
-                            clientComb.industry.push(indus);
-                        }
-                    }
-                    langPairExist = true;                
-                }
-            }
-            if(!langPairExist) {
-                client.languageCombinations.push(comb);
-                await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
-            } else {
-                await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: client.languageCombinations}})
-            }
+            await addClientsSeveralLangs({
+                clientId: clientId,
+                comb: comb,
+                clientCombinations: clientCombinations
+            })
         }
         res.send('Several langs added..');
     } catch(err) {
