@@ -120,12 +120,13 @@ export default {
         stepFilesFiller(arr, category) {
             for(let file of arr) {
                 const nameArr = file.split('/');
+                const filePath =  __WEBPACK__API_URL__ + file.split('./dist')[1];
                 const fileName = nameArr[nameArr.length - 1];
                 this.stepFiles.push({
                     check: false,
                     fileName: fileName,
                     category: category,
-                    source: file,
+                    source: filePath,
                     target: this.step.targetFile || ""
                 })
             }

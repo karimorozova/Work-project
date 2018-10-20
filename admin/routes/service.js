@@ -73,7 +73,7 @@ router.get('/costs', async (req, res) => {
       const combinations = service.languageCombinations;
       for(let step of project.steps) {
         const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
-        : await receivablesCalc(task, project, step, combinations);
+        : await receivablesCalc({task: task, project: project, step: step, combs: combinations});
         if(step.taskId === task.id) {
           step.clientRate = receivables.rate;
           step.receivables = receivables.cost;
@@ -99,7 +99,7 @@ router.post('/step-payables', async (req, res) => {
     const stepIndex = project.steps.findIndex(item => {
       return item.taskId == step.taskId && item.name === step.name;
     })
-    project.steps[stepIndex] = await payablesCalc(task, project, step);
+    project.steps[stepIndex] = await payablesCalc({task: task, project: project, step: step});
     const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch(err) {

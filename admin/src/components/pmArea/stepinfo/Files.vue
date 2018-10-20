@@ -22,8 +22,9 @@
                 span.step-files__data {{ row.fileName }}
             template(slot="category" slot-scope="{ row, index }")
                 span.step-files__data {{ row.category }}
-            template(slot="source" slot-scope="{ row, index }")
-                img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadSourceFile(index)")
+            template(slot="source" slot-scope="{ row, index }") 
+                a.step-files__link(:href='row.source')
+                    img.step-files__image(src="../../../assets/images/download-big-b.png")
             template(slot="target" slot-scope="{ row, index }")
                 img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile")                            
 </template>
@@ -64,12 +65,6 @@ export default {
         }),
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
-        },
-        downloadSourceFile(index) {
-            const href = this.stepFiles[index].source.split('./dist')[1];
-            let link = document.createElement('a');
-            link.href = __WEBPACK__API_URL__ + href;
-            link.click();
         },
         async downloadTargetFile() {
             const id = this.currentProject._id;

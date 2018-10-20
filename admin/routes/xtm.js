@@ -29,7 +29,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                file: sourceFiles[0],
+                file: filesToTranslate[0],
                 templateId: template,
                 workflowId: workflow
             });
@@ -407,13 +407,13 @@ router.post('/generate-file', async (req, res) => {
             .headers({"Authorization": xtmAuth.token})
             .end( (response) => {
                 if(response.error) {
-                    console.log(response.error);
+                    throw new Error('Error on generating file in XTM');
                 }
                 res.send(response.body);
             }) 
     } catch(err) {
         console.log(err);
-        res.status(400).send('ERror / Cannot generate file in XTM');
+        res.status(400).send('Error / Cannot generate file in XTM');
     }
 })
 
