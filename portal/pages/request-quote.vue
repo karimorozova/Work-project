@@ -2,7 +2,6 @@
   .externalWrap
     noscript
       iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-KM2S59F" height="0" width="0" style="display:none;visibility:hidden")
-      img(src="https://mc.yandex.ru/watch/50790364" style="position:absolute; left:-9999px;" alt="")
     .top
       .logo
         .mainWrapper
