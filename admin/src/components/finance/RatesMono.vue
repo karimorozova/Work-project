@@ -68,7 +68,6 @@ import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSingleSelect from "../ServiceSingleSelect";
 import { mapGetters, mapActions } from "vuex";
-import { loadingToggle } from '../../vuex/actions';
 
 export default {
   props: {
@@ -164,7 +163,6 @@ export default {
     },
     chosenServ(data) {
       if(this.serviceSelect.title != data.title) {
-        this.loadingToggle(true);
         this.serviceSelect = data;
         this.fullInfo = [];
         this.combinations();

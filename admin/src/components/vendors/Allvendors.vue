@@ -58,7 +58,7 @@
                         td.drop-option(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)") 
                             span(v-if="vend.icons[1].active") {{ vend.native.lang }}
                             .inner-component(v-if="!vend.icons[1].active")
-                                NativeLanguageSelect(:selectedLang="[vend.native]" :parentIndex="ind" @chosenLang="changeLang")
+                                NativeLanguageSelect(:selectedLang="vend.native" :parentIndex="ind" @chosenLang="changeLang")
                         td.drop-option(@click="vendorDetails(ind)")              
                             //- span(v-if="!indus.icon") {{ indus.name }}
                             .drop-option__image
@@ -92,6 +92,7 @@
             :origin="'vendor'" 
             :who="vendor" 
             @closeSeveral="closeSevLangs"
+            @severalLangsResult="severalLangsResult"            
             @refreshServices="ratesUpdate")
         .edit-error(v-if="editError")
             p.edit-message Please, finish current editing first!
@@ -135,6 +136,9 @@ export default {
     methods: {
         addSevLangs(data) {
             this.addSeveral = true;
+        },
+        severalLangsResult({message, isShow, type}) {
+            this.alertToggle({message, isShow, type})
         },
         closeSevLangs(data) {
             this.addSeveral = false
@@ -198,11 +202,11 @@ export default {
                 let vendor = this.allVendors[data.index];
                 for(let ven of this.vendors) {
                     if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
-                        ven.native = data.lang.lang
+                        ven.native = data.lang
                     }
                 }
             } else {
-                this.vendor.native = data.lang.lang;
+                this.vendor.native = data.lang;
             }
         },
         changeZone(data) {
@@ -217,26 +221,30 @@ export default {
                 this.vendor.timezone = data.zone;
             }
         },
-        async ratesUpdate(data) {
-            await this.getVendors();
-            for(let ven of this.allVendors) {
-                if(ven._id == this.vendor._id) {
-                    this.vendor = ven;
+        async ratesUpdate() {
+            try {
+                await this.getVendors();
+                for(let ven of this.allVendors) {
+                    if(ven._id === this.vendor._id) {
+                        this.vendor = ven;
+                    }
                 }
+            } catch(err) {
+                this.alertToggle({message: "Error / Cannot update rates", isShow: true, type: "error"})
             }
         },
-        saveVendor(data) {
-            if(this.isNew) {
-                let sendData = new FormData();
-                sendData.append('vendor', JSON.stringify(this.vendor));
-                sendData.append('photo', data.file);
-                this.$http.post("../vendorsapi/new-vendor", sendData)
-                .then(async res => {
+        async saveVendor(data) {
+            try {
+                if(this.isNew) {
+                    let sendData = new FormData();
+                    sendData.append('vendor', JSON.stringify(this.vendor));
+                    sendData.append('photo', data.file);
+                    const saveResult = await this.$http.post("../vendorsapi/new-vendor", sendData)
                     this.saveSuccess = true;
                     setTimeout(() => {
                         this.saveSuccess = false;
                     }, 2000);
-                    let id = res.data.id;
+                    let id = saveResult.data.id;
                     await this.getVendors();
                     for(let ven of this.allVendors) {
                         if(ven._id == id) {
@@ -244,26 +252,20 @@ export default {
                         }
                     }
                     this.isNew = false;
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-            } else {
-                let sendData = new FormData();
-                sendData.append('vendor', JSON.stringify(this.vendor));
-                sendData.append('photo', data.file)
-                this.$http.post("../vendorsapi/update-vendor", sendData)
-                .then(res => {
-                    console.log(res);
-                    this.saveSuccess = true;
-                    setTimeout(() => {
-                        this.saveSuccess = false;
-                    }, 2000);
-                    this.getVendors();
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+                    } else {
+                        let sendData = new FormData();
+                        sendData.append('vendor', JSON.stringify(this.vendor));
+                        sendData.append('photo', data.file)
+                        await this.$http.post("../vendorsapi/update-vendor", sendData);
+                        this.saveSuccess = true;
+                        setTimeout(() => {
+                            this.saveSuccess = false;
+                        }, 2000);
+                        await this.getVendors();
+                    }
+                    this.alertToggle({message: "Vendor saved", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Error / Cannot save Vendor", isShow: true, type: "error"})
             }
         },
         async vendorDelete(data) {
@@ -283,17 +285,21 @@ export default {
             let vendorDel = this.allVendors.splice(ind, 1);
             let id = vendorDel[0]._id;
             this.currentActive = "none";
-            await this.venDel(id);
+            try {
+                await this.venDel(id);
+                this.alertToggle({message: "Vendor deleted", isShow: true, type: "success"})                
+            } catch(err) {
+                this.alertToggle({message: "Error / Cannot delete Vendor", isShow: true, type: "error"})
+            }
             this.deleteMessageShow = false;
         },
-        venDel(id) {
-            this.$http.post("../vendorsapi/deletevendor", {"id": id})
-            .then(res => {
-                console.log(res)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+        async venDel(id) {
+            try{
+                await this.$http.post("../vendorsapi/deletevendor", {"id": id});
+                this.alertToggle({message: "Vendor deleted", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Error / Cannot delete Vendor", isShow: true, type: "error"})                
+            }
         },
         cancelDelete() {
             this.deleteMessageShow = false;
@@ -320,7 +326,7 @@ export default {
             this.$emit('cancelVendor');
             this.vendor = {};
         },
-        action(ind, i) {
+        async action(ind, i) {
             if(this.currentActive != 'none' && this.currentActive != ind) {
                 this.editError = true;
                 return true;
@@ -335,26 +341,19 @@ export default {
                 this.allVendors[ind].icons[0].active = false;
                 this.allVendors[ind].icons[1].active = true;
                 this.currentActive = "none";
-                if(vendor._id) {
-                    let sendData = new FormData();
-                    sendData.append('vendor', JSON.stringify(vendor));
-                    this.$http.post('../vendorsapi/update-vendor', sendData)
-                    .then(res => {
-                        console.log(res);
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-                } else {
-                    let sendData = new FormData();
-                    sendData.append('vendor', JSON.stringify(vendor));
-                    this.$http.post('../vendorsapi/new-vendor', sendData)
-                    .then(res => {
-                        console.log(res);
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                try {
+                    if(vendor._id) {
+                        let sendData = new FormData();
+                        sendData.append('vendor', JSON.stringify(vendor));
+                        await this.$http.post('../vendorsapi/update-vendor', sendData)
+                    } else {
+                        let sendData = new FormData();
+                        sendData.append('vendor', JSON.stringify(vendor));
+                        await this.$http.post('../vendorsapi/new-vendor', sendData)
+                    }
+                    this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"})
+                } catch(err) {
+                    this.alertToggle({message: "Error / Cannot update/add Vendor info", isShow: true, type: "error"})
                 }
             }
             if(i == 1) {
@@ -423,10 +422,9 @@ export default {
             if(!this.vuexVendors.length) {
                 this.vendorsSetting(result.body);
             }
-            this.loadingToggle(false);
         },
         ...mapActions({
-            loadingToggle: "loadingToggle",
+            alertToggle: "alertToggle",
             vendorsSetting: "vendorsSetting"
         })
     },

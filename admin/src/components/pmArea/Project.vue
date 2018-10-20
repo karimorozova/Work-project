@@ -107,14 +107,12 @@ export default {
             this.selectedIndustry = option;
         },
         async createProject() {
-            this.loadingToggle(true);
             this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
             this.project.industry = this.selectedIndustry._id;
             const customer = {...this.project.customer};
             this.project.customer = customer._id;
             const newProject = await this.$http.post("/pm-manage/new-project", this.project);
             this.$emit('projectCreated', {project: newProject.body, customer: customer});
-            this.loadingToggle(false);
         },
         async getIndustries() {
             const industries = await this.$http.get('/api/industries');

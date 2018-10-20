@@ -35,7 +35,7 @@
                         TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="chosenZone")
                     .block-item
                         label Native Language:
-                        NativeLanguageSelect(:selectedLang="[vendor.native.lang]" @chosenLang="changeLang")
+                        NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="changeLang")
                     .block-item
                         label Gender:
                         .drop-select(v-click-outside="outGenders")
@@ -151,8 +151,8 @@ export default {
         outGenders() {
             this.genderDropped = false;
         },
-        changeLang(data) {
-            this.$emit('changeLang', {lang: data.lang})
+        changeLang({lang}) {
+            this.$emit('changeLang', {lang: lang})
         },
         chosenZone(data) {
             this.$emit('changeZone', {zone: data})

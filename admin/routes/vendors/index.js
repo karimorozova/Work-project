@@ -1,11 +1,12 @@
 const { getVendor, getVendors } = require("./getVendors");
-const { checkRatesMatch, deleteRate } = require("./vendorRates");
+const { checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require("./vendorRates");
 
 const vendors = {
     getVendor,
     getVendors,
     checkRatesMatch,
-    deleteRate
+    deleteRate,
+    addVendorsSeveralLangs
 }
 
 module.exports = vendors;

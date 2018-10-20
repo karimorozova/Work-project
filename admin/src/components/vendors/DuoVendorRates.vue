@@ -337,7 +337,6 @@ export default {
       })
     },
     ...mapActions({
-      loadingToggle: "loadingToggle",
       alertToggle: "alertToggle"
     })
   },

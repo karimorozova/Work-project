@@ -34,7 +34,6 @@ export default {
     Allvendors
   },
   mounted() {
-    this.loadingToggle(true);
   }
 };
 </script>

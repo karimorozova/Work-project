@@ -36,7 +36,6 @@ export default {
     Allclients
   },
   mounted() {
-    this.loadingToggle(true);
   }
 };
 </script>

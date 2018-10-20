@@ -122,23 +122,24 @@ export default {
             }
             try {
                 if(this.origin == 'rates') {
-                    let result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
+                    const result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
                     this.$emit('refreshServices');
                 }
                 if(this.origin == 'vendor') {
-                    let id = this.who._id;
-                    let vendorClient = this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
+                    const id = this.who._id;
+                    const vendorClient = await this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
                     this.$emit('refreshServices', {vendorId: id});
                 }
                 if(this.origin == 'client') {
-                    let id = this.who._id;
-                    let clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
+                    const id = this.who._id;
+                    const clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
                     this.$emit('refreshServices', {clientId: id});
                 }
+                this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot add several languages.', isShow: true, type: 'error'});
             }
-                this.closeSeveral();
+            this.closeSeveral();
         },
         closeSeveral() {
             this.$emit('closeSeveral')

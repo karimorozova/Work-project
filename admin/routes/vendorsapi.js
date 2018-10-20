@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload, vendorMail } = require('../utils/');
 const mv = require('mv');
-const { getVendor, getVendors, checkRatesMatch, deleteRate } = require('./vendors/');
+const { getVendor, getVendors, checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require('./vendors/');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -131,33 +131,16 @@ router.post('/several-langs', async (req, res) => {
     const vendorId = req.body.vendor;
     let langCombs = JSON.parse(req.body.langs);
     try {
-        let vendor = await getVendor({"_id": vendorId})
+        let vendor = await getVendor({"_id": vendorId});
+        const vendorCombinations = vendor.languageCombinations.filter(item => {
+            return item.source;
+        }) 
         for(let comb of langCombs) {
-            let langPairExist = false;
-            for(let venComb of vendor.languageCombinations) {
-                if(comb.source.lang == venComb.source.lang && comb.target.lang == venComb.target.lang
-                    && comb.service.title == venComb.service.title) {
-                    for(let indus of comb.industry) {
-                        let industryExist = false;
-                        for(let ind of venComb.industry) {
-                            if(ind.name == indus.name) {
-                                ind.rate = indus.rate;
-                                industryExist = true;
-                            }
-                        }
-                        if(!industryExist) {
-                            venComb.industry.push(indus);
-                        }
-                    }
-                    langPairExist = true;                
-                }
-            }
-            if(!langPairExist) {
-                vendor.languageCombinations.push(comb);
-                await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendor.languageCombinations}})
-            } else {
-                await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendor.languageCombinations}})
-            }
+            await addVendorsSeveralLangs({
+                vendorId: vendorId,
+                comb: comb,
+                vendorCombinations: vendorCombinations
+            })
         }
         res.send('Several langs added..')
     } catch(err) {

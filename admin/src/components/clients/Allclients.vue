@@ -287,7 +287,6 @@ export default {
                 }
                 this.clients.push(client);
             }
-            this.loadingToggle(false);
         },
         ...mapActions({
             loadingToggle: "loadingToggle"

@@ -205,7 +205,6 @@ export default {
         if (x.title < y.title) return -1;
       });
       this.$store.dispatch("servicesGetting", this.services);
-      this.loadingToggle(false);
     },
     checkFields(ind) {
       if (!this.services[ind].title.length) {
@@ -231,7 +230,6 @@ export default {
     LanguageForm
   },
   mounted() {
-    this.loadingToggle(true);
     this.getServices();
   }
 };

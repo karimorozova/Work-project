@@ -90,4 +90,40 @@ async function deleteRate(vendor, industry, id) {
     return result;
 }
 
-module.exports= { checkRatesMatch, deleteRate };
+async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
+    let langPairExist = false;
+    for(let vendorComb of vendorCombinations) {
+        if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
+            && comb.service._id === vendorComb.service.id) {
+            vendorComb.industry = updateCombination(comb.industry, vendorComb.industry);
+            langPairExist = true;
+        }
+    }
+    if(!langPairExist) {
+        comb.industry = comb.industry.map(item => {
+            return {industry: item._id, rate: item.rate, active: item.active}
+        })
+        vendorCombinations.push(comb);
+        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendorCombinations}})
+    } else {
+        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendorCombinations}})
+    }
+}
+
+function updateCombination(combIndustries, vendorIndustries) {
+    for(let indus of combIndustries) {
+        let industryExist = false;
+        for(let ind of vendorIndustries) {
+            if(ind.industry.id === indus._id) {
+                ind.rate = indus.rate;
+                industryExist = true;
+            }
+        }
+        if(!industryExist) {
+            vendorIndustries.push(indus);
+        }
+    }
+    return vendorIndustries;
+}
+
+module.exports= { checkRatesMatch, deleteRate, addVendorsSeveralLangs };

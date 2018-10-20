@@ -1,10 +1,8 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            span.selected(v-if="selectedLang.length == 1 && selectedLang[0].length") {{ selectedLang[0] }}
-            .selected(v-if="selectedLang.length > 1") 
-                span(v-for="lang in selectedLang") {{ lang }};
-            span.selected(v-if="!selectedLang[0].length") Options
+            span.selected(v-if="selectedLang") {{ selectedLang.lang }}
+            span.selected(v-else) Options
             .arrow-button(@click="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
@@ -15,11 +13,12 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
         selectedLang: {
-            type: Array
+            type: [ Object, String ]
         },
         parentIndex: {
             type: Number,
@@ -56,9 +55,9 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getLanguages() {
-            await this.$http.get('api/languages')
-            .then(response => {
-                let sortedArray = response.body;
+            try {
+                const langs = await this.$http.get('api/languages')
+                let sortedArray = langs.body;
                 this.languages = sortedArray.sort( (a,b) => {
                     if(a.lang < b.lang) return -1;
                     if(a.lang > b.lang) return 1;
@@ -66,17 +65,19 @@ export default {
                 if(this.addAll) {
                     this.languages.unshift({lang: "All", symbol: "All"})
                 }
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+            } catch(err) {
+                this.alertToggle({message: "Server Error / Cannot get languages", isShow: true, type: "error"})                
+            }
         },
         outClick() {
             this.droppedLang = false;
         },
         changeLang(index) {
             this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex})
-        }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle",
+        })
     },
     computed: {
         filteredLangs() {

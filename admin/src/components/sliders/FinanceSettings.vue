@@ -24,7 +24,7 @@
               RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
       Addseverallangs(v-if="addSeveral"
         :origin="'rates'" 
-        @refreshServices="refreshServices" 
+        @refreshServices="refreshServices"
         @closeSeveral="closeSevLangs")
 </template>
 
@@ -66,7 +66,7 @@ export default {
       this.duoDrop = !this.duoDrop;
     },
     ...mapActions({
-      loadingToggle: "loadingToggle"
+      alertToggle: "alertToggle"
     })
   },
   computed: {
