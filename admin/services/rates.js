@@ -85,34 +85,37 @@ async function deleteServiceRate(service, industries, id) {
     return result;
 }
 
-async function severalLangCombs({serviceId, comb, serviceCombinations, industries}) {
+async function updateLangCombs({serviceId, comb, serviceCombinations, industries}) {
   let exist = false;
-      for(let servComb of serviceCombinations) {
-        if(comb.source._id === servComb.source.id && comb.target._id === servComb.target.id) {
-          servComb.industries = updateIndustryRates(comb.industry, servComb.industries);
-          exist = true;
-        }
-      }
-      if(!exist) {
-        serviceCombinations = addCombinations({comb, serviceCombinations, industries}) 
-        await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: serviceCombinations}})
-      } else {
-        await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: serviceCombinations}})
-      }
+  let updatedServCombinations = serviceCombinations;
+  for(let servComb of updatedServCombinations) {
+    if(comb.source._id === servComb.source.id && comb.target._id === servComb.target.id) {
+      servComb.industries = updateIndustryRates(comb.industry, servComb.industries);
+      exist = true;
+    }
+  }
+  if(!exist) {
+    updatedServCombinations = addCombinations({comb, updatedServCombinations, industries}) 
+    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedServCombinations}})
+  } else {
+    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedServCombinations}})
+  }
 }
 
 function updateIndustryRates(combIndustries, servIndustries) {
-  for(let indus of servIndustries) {
+  let updatedServIndustries = servIndustries;
+  for(let indus of updatedServIndustries) {
     for(let ind of combIndustries) {
       if(indus.industry.id === ind._id) {
         indus.rate = ind.rate
       }
     }
   }
-  return servIndustries;
+  return updatedServIndustries;
 }
 
 function addCombinations({comb, serviceCombinations, industries}) {
+  let updatedCombinations = serviceCombinations;
   for(let indus of industries) {
     for(let ind of comb.industry) {
       if(indus.id == ind._id) {
@@ -127,13 +130,13 @@ function addCombinations({comb, serviceCombinations, industries}) {
   industries = industries.map(item => {
     return {industry: item._id, active: item.active, rate: item.rate}
   })
-  serviceCombinations.push({
+  updatedCombinations.push({
     source: comb.source,
     target: comb.target,
     industries: industries,
     active: true
   })
-  return serviceCombinations;
+  return updatedCombinations;
 }
 
-module.exports = { checkServiceRatesMatches, deleteServiceRate, severalLangCombs };
+module.exports = { checkServiceRatesMatches, deleteServiceRate, updateLangCombs };

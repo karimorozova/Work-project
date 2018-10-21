@@ -92,7 +92,8 @@ async function deleteRate(vendor, industry, id) {
 
 async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
     let langPairExist = false;
-    for(let vendorComb of vendorCombinations) {
+    let updatedCombinations = vendorCombinations;
+    for(let vendorComb of updatedCombinations) {
         if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
             && comb.service._id === vendorComb.service.id) {
             vendorComb.industry = updateCombination(comb.industry, vendorComb.industry);
@@ -103,27 +104,28 @@ async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
         comb.industry = comb.industry.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
-        vendorCombinations.push(comb);
-        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendorCombinations}})
+        updatedCombinations.push(comb);
+        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
     } else {
-        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: vendorCombinations}})
+        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
     }
 }
 
 function updateCombination(combIndustries, vendorIndustries) {
+    let updatedIndustries = vendorIndustries;
     for(let indus of combIndustries) {
         let industryExist = false;
-        for(let ind of vendorIndustries) {
+        for(let ind of updatedIndustries) {
             if(ind.industry.id === indus._id) {
                 ind.rate = indus.rate;
                 industryExist = true;
             }
         }
         if(!industryExist) {
-            vendorIndustries.push(indus);
+            updatedIndustries.push(indus);
         }
     }
-    return vendorIndustries;
+    return updatedIndustries;
 }
 
 module.exports= { checkRatesMatch, deleteRate, addVendorsSeveralLangs };

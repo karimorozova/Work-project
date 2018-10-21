@@ -3,7 +3,7 @@ const multer = require('multer');
 const mv = require('mv');
 const { upload } = require('../utils/');
 const { Services, Industries } = require('../models');
-const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, severalLangCombs } = require('../services/');
+const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, updateLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');
 
 function moveServiceIcon(oldFile, date) {
@@ -73,7 +73,7 @@ router.get('/costs', async (req, res) => {
       const combinations = service.languageCombinations;
       for(let step of project.steps) {
         const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
-        : await receivablesCalc({task: task, project: project, step: step, combs: combinations});
+        : await receivablesCalc({task, project, step, combs: combinations});
         if(step.taskId === task.id) {
           step.clientRate = receivables.rate;
           step.receivables = receivables.cost;
@@ -99,7 +99,7 @@ router.post('/step-payables', async (req, res) => {
     const stepIndex = project.steps.findIndex(item => {
       return item.taskId == step.taskId && item.name === step.name;
     })
-    project.steps[stepIndex] = await payablesCalc({task: task, project: project, step: step});
+    project.steps[stepIndex] = await payablesCalc({task, project, step});
     const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch(err) {
@@ -152,7 +152,7 @@ router.post('/several-langs', async (req, res) => {
       let service = services.find(item => {
         return item.id === comb.service._id
       });
-      await severalLangCombs({
+      await updateLangCombs({
         serviceId: service.id,
         comb: comb,
         serviceCombinations: service.languageCombinations,
