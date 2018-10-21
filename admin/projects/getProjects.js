@@ -14,11 +14,11 @@ async function getProject(obj) {
     .populate('projectManager', ['firstName', 'lastName']);
 }
 
-async function getUpdatedProject(query, update) {
+async function updateProject(query, update) {
     return await Projects.findOneAndUpdate(query, update, {new: true})
     .populate('industry')
     .populate('customer')
     .populate('projectManager', ['firstName', 'lastName']);
 }
 
-module.exports = { getProject, getProjects, getUpdatedProject };
+module.exports = { getProject, getProjects, updateProject };

@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, getUpdatedProject } = require("../../projects/");
+const { getProject, updateProject } = require("../../projects/");
 const { getOneService } = require("../../services/")
 const { sendEmail, clientQuoteEmail, messageForClient, requestMessageForVendor } = require("../../utils/");
 
@@ -43,7 +43,7 @@ router.post("/send-quote", async (req, res) => {
         quote.service = service.title;
         const message = messageForClient(quote);
         await clientQuoteEmail(project.customer, message);
-        const updatedProject = await getUpdatedProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
+        const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

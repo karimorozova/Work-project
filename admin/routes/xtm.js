@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Languages, Services, Industries } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions } = require('../services/');
-const { getProject, getUpdatedProject, metricsCalc, storeFiles } = require('../projects/');
+const { getProject, updateProject, metricsCalc, storeFiles } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -392,7 +392,7 @@ router.post('/step-target', async (req, res) => {
             return item.taskId === step.taskId && item.name === step.name
         });
         project.steps[stepIndex].targetFiles = step.targetFiles;
-        const updatedProject = await getUpdatedProject({"_id": projectId}, {steps: project.steps});
+        const updatedProject = await updateProject({"_id": projectId}, {steps: project.steps});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

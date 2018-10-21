@@ -1,5 +1,5 @@
 const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts } = require('./calculations');
-const { getProject, getProjects, getUpdatedProject } = require('./getProjects');
+const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles } = require('./files');
 
 const projectFunctions = {
@@ -9,7 +9,7 @@ const projectFunctions = {
     updateProjectCosts,
     getProject,
     getProjects,
-    getUpdatedProject,
+    updateProject,
     storeFiles
 }
 
