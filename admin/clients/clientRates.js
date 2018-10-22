@@ -92,7 +92,7 @@ async function deleteRate(client, industry, id) {
 
 async function addClientsSeveralLangs({clientId, comb, clientCombinations}) {
     let langPairExist = false;
-    let updatedCombinations = clientCombinations;
+    let updatedCombinations = [...clientCombinations];
     for(let clientComb of updatedCombinations) {
         if(comb.source._id === clientComb.source.id && comb.target._id === clientComb.target.id
             && comb.service._id === clientComb.service.id) {
@@ -112,7 +112,7 @@ async function addClientsSeveralLangs({clientId, comb, clientCombinations}) {
 }
 
 function updateCombination(combIndustries, clientIndustries) {
-    let updatedIndustries = clientIndustries;
+    let updatedIndustries = [...clientIndustries];
     for(let indus of combIndustries) {
         let industryExist = false;
         for(let ind of updatedIndustries) {

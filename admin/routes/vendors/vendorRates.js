@@ -92,7 +92,7 @@ async function deleteRate(vendor, industry, id) {
 
 async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
     let langPairExist = false;
-    let updatedCombinations = vendorCombinations;
+    let updatedCombinations = [...vendorCombinations];
     for(let vendorComb of updatedCombinations) {
         if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
             && comb.service._id === vendorComb.service.id) {
@@ -112,7 +112,7 @@ async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
 }
 
 function updateCombination(combIndustries, vendorIndustries) {
-    let updatedIndustries = vendorIndustries;
+    let updatedIndustries = [...vendorIndustries];
     for(let indus of combIndustries) {
         let industryExist = false;
         for(let ind of updatedIndustries) {

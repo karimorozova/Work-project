@@ -947,54 +947,6 @@ body {
       }
     }
   }
-
-  // .image {
-  //   .legal & {
-  //     background-image: url('../assets/images/Legal.png');
-  //   }
-  //   .hotel & {
-  //     background-image: url('../assets/images/hotel.png');      
-  //   }
-  //   .trading & {
-  //     background-image: url('../assets/images/CFDs-Online-Trading.png');      
-  //   }
-  //   .crypto & {
-  //     background-image: url('../assets/images/Cryptocurrency.png');      
-  //   }
-  //   .casino & {
-  //     background-image: url('../assets/images/casino-poker-igaming.png');      
-  //   }
-  //   .games & {
-  //     background-image: url('../assets/images/Video-Games.png');      
-  //   }
-  //   .other & {
-  //     background-image: url('../assets/images/Other.png');      
-  //   }
-  // }
-  // .image-white {
-  //   .legal & {    
-  //     background-image: url('../assets/images/Legal-white.png');
-  //   }
-  //   .hotel & {
-  //     background-image: url('../assets/images/hotel-white.png');      
-  //   }
-  //   .trading & {
-  //     background-image: url('../assets/images/CFDs-Online-Trading-white.png');      
-  //   }
-  //   .crypto & {
-  //     background-image: url('../assets/images/Cryptocurrency-white.png');      
-  //   }
-  //   .casino & {
-  //     background-image: url('../assets/images/casino-poker-igaming-white.png');      
-  //   }
-  //   .games & {
-  //     background-image: url('../assets/images/Video-Games-white.png'); 
-  //   }
-  //   .other & {
-  //     background-image: url('../assets/images/Other-white.png');      
-  //   }
-  // }
-
   .openIcon {
     width: 10px;
   }
@@ -1031,7 +983,7 @@ body {
     }
   }
 
- table{ /*or other element you want*/
+ table{
      animation-name: blink ;
      animation-duration: .5s ;
      animation-timing-function: step-end ;
@@ -1353,6 +1305,7 @@ body {
     justify-content: space-between;
     align-items: center;
     @media (max-width: 450px) {
+      width: 100%;
       flex-direction: column;
       margin-top: 0;
     }
