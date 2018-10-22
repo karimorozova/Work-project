@@ -13,6 +13,8 @@
     .step-info__block
         Matrix(
             :matrixData="matrixData"
+            @toggleMatrixRowActive="toggleMatrixRowActive"
+            @updateMatrixValue="updateMatrixValue"
         )
     .step-info__block
         Files(
@@ -27,7 +29,7 @@ import Vendor from "./stepinfo/Vendor";
 import Finance from "./stepinfo/Finance";
 import Matrix from "./stepinfo/Matrix";
 import Files from "./stepinfo/Files";
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     props: {
@@ -89,6 +91,8 @@ export default {
             for(let key of Object.keys(this.task.metrics)) {
                 if(this.excludeKeys.indexOf(key) === -1) {
                     this.matrixData.push({
+                        key: key,
+                        active: false,
                         title: this.task.metrics[key].text,
                         value: this.task.metrics[key].client*100, 
                         wordcount: this.task.metrics[key].value,
@@ -106,6 +110,7 @@ export default {
             const wordcount = this.task.metrics.totalWords - totalMatchedWords;
             const total = wordcount*this.step.clientRate;
             this.matrixData.push({
+                active: false,
                 title: "No match",
                 value: "100",
                 wordcount: wordcount,
@@ -130,7 +135,28 @@ export default {
                     target: this.step.targetFile || ""
                 })
             }
-        }
+        },
+        toggleMatrixRowActive({index}) {
+            this.matrixData[index].active = !this.matrixData[index].active;
+        },
+        async updateMatrixValue({index}) {
+            try {
+            await this.updateMatrix({
+                projectId: this.currentProject._id,
+                taskId: this.task.id, 
+                key: this.matrixData[index].key,
+                value: this.matrixData[index].value,
+            });
+                this.alertToggle({message: "The matrix has been updated.", isShow: true , type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Internal server error / Cannot update matrix.", isShow: true , type: "error"})
+            }
+            this.matrixData[index].active = false;
+        },
+        ...mapActions({
+            alertToggle: "alertToggle",
+            updateMatrix: "updateMatrix"
+        })
     },
     computed: {
         ...mapGetters({

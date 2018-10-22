@@ -4,7 +4,7 @@ const mv = require('mv');
 const { upload } = require('../utils/');
 const { Services, Industries } = require('../models');
 const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, updateLangCombs } = require('../services/');
-const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject } = require('../projects/');
+const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
 
 function moveServiceIcon(oldFile, date) {
   var newFile = './dist/static/services/' + date + '-' + oldFile.filename
@@ -93,13 +93,17 @@ router.post('/step-payables', async (req, res) => {
   let { projectId, step } = req.body;
   try {
     let project = await getProject({"_id": projectId});
-    const task = project.tasks.find(item => {
+    const taskIndex = project.tasks.findIndex(item => {
       return item.id == step.taskId;
     })
+    const updatedMetrics = await updateTaskMetrics(project.tasks[taskIndex].metrics, step.vendor._id);
+    let updatedTask = {...project.tasks[taskIndex]};
+    updatedTask.metrics = updatedMetrics;
     const stepIndex = project.steps.findIndex(item => {
       return item.taskId == step.taskId && item.name === step.name;
     })
-    project.steps[stepIndex] = await payablesCalc({task, project, step});
+    project.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
+    project.tasks[taskIndex] = updatedTask;
     const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch(err) {

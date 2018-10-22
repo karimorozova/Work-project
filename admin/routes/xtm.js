@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
-const { Requests, Projects, Languages, Services, Industries } = require('../models');
+const { Requests, Projects, Clients, Languages, Services, Industries } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions } = require('../services/');
-const { getProject, updateProject, metricsCalc, storeFiles } = require('../projects/');
+const { getProject, updateProject, metricsCalc, storeFiles, taskMetricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -46,19 +46,35 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     }
 })
 
-router.get('/project-metrics', async (req, res) => {      
-    unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${req.query.projectId}/metrics`)
-    .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
-    'Content-Type': 'application/json'})
-    .end(async (response) => {
-        if(response.error) {
-            console.log(response.error);
-            res.status(500).send("Error on getting metrics " + response.error)
-        }
-        const metrics = response.body[0].jobsMetrics[0];
-        const taskMetrics = await metricsCalc(metrics);
-        res.send(taskMetrics);
-    })
+router.post('/update-matrix', async (req, res) => {
+    res.send('Done');
+})
+
+router.get('/project-metrics', async (req, res) => {
+    const { projectId, customerId } = req.query;
+    try {
+        unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
+        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        'Content-Type': 'application/json'})
+        .end(async (response) => {
+            if(response.error) {
+                throw new Error(response.error);
+            }
+            try {
+                const metrics = response.body[0].jobsMetrics[0];
+                const { xtmMetrics, progress } = await metricsCalc(metrics);
+                const customer = await Clients.findOne({"_id": customerId});    
+                const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
+                res.send({taskMetrics, progress});
+            } catch(err) {
+                console.log(err);
+                res.status(500).send("Error on getting metrics ");
+            }
+        })
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting metrics ");
+    }
 })
 
 router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {

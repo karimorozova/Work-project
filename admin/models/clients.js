@@ -110,6 +110,20 @@ const ClientSchema = new mongoose.Schema({
     contacts: {
         type: Array,
         default: []
+    },
+    matrix: {
+        type: Object,
+        default: {
+            iceMatch: {text: "ICE Match", rate: 0.25},
+            fuzzyMatch75: {text: "75-84%", rate: 0.9},
+            fuzzyMatch85: {text: "85-94%", rate: 0.7},
+            fuzzyMatch95: {text: "95-99%", rate: 0.4},
+            repeat: {text: "Repetitions", rate: 0.25},
+            leveragedMatch: {text: "Leveraged Match", rate: 0.25},
+            fuzzyRepeats75: {text: "Internal 75-84%", rate: 0.9},
+            fuzzyRepeats85: {text: "Internal 85-94%", rate: 0.7},
+            fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.4}
+        }
     }
 });
 

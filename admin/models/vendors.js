@@ -129,6 +129,20 @@ const VendorSchema = new mongoose.Schema({
     password: {
         type: String,
         default: '',
+    },
+    matrix: {
+        type: Object,
+        default: {
+            iceMatch: {text: "ICE Match", rate: 0.1},
+            fuzzyMatch75: {text: "75-84%", rate: 0.8},
+            fuzzyMatch85: {text: "85-94%", rate: 0.6},
+            fuzzyMatch95: {text: "95-99%", rate:0.25},
+            repeat: {text: "Repetitions", rate: 0.2},
+            leveragedMatch: {text: "Leveraged Match", rate: 0.2},
+            fuzzyRepeats75: {text: "Internal 75-84%", rate: 0.8},
+            fuzzyRepeats85: {text: "Internal 85-94%", rate: 0.6},
+            fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.25}
+        }
     }
 });
 

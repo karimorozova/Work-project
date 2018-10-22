@@ -89,7 +89,7 @@ async function clientLangs() {
   let combs = service.languageCombinations;
 
   for(let client of clients) {
-    if(!client.languageCombinations.length) {
+    if(!client.languageCombinations.length  && !client._id) {
       let industry = {industry: client.industry[0]._id, active: true};
         for(let i = 0; i < 5; i++) {
           industry.rate = randomRates[Math.floor(Math.random()*3)];

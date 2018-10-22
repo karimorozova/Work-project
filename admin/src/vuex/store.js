@@ -90,6 +90,12 @@ const mutations = {
     },
     stepVendorDelete(state, payload) {
         state.currentProject.steps[payload.index].vendor = "";
+    },
+    updateMatrixData(state, payload) {
+        const taskIndex = state.currentProject.tasks.findIndex(item => {
+            return item.id === payload.taskId;
+        })
+        state.currentProject.tasks[taskIndex][payload.key] = payload.value;
     }
 };
 

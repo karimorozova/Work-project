@@ -202,10 +202,11 @@ export default {
             project = JSON.parse(project);
             try {
                 for(let task of project.tasks) {
-                    const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}`);
-                    task.metrics = metrics.body.metrics;
-                    const keysArr = Object.keys(metrics.body.progress);
-                    for(const key in metrics.body.progress) {
+                    const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
+                    const { taskMetrics, progress } = metrics.body;
+                    task.metrics = {...taskMetrics};
+                    const keysArr = Object.keys(progress);
+                    for(const key in progress) {
                         const existedTask = project.steps.find(item => {
                             return item.taskId === task.id && item.name === key
                         })
@@ -220,12 +221,12 @@ export default {
                                 vendor: "",
                                 start: startDate,
                                 deadline: deadline,
-                                progress: metrics.body.progress[key],
+                                progress: progress[key],
                                 status: "Created",
                                 receivables: "",
                                 payables: "",
                                 clientRate: "",
-                                vandorRate: "",
+                                vendorRate: "",
                                 margin: "",
                                 check: false,
                                 vendorsClickedOffer: []
@@ -233,7 +234,7 @@ export default {
                         } else {
                             for(const step of project.steps) {
                                 if(step.taskId === task.id) {
-                                    step.progress = metrics.body.progress[step.name];
+                                    step.progress = progress[step.name];
                                 }
                             }
                         }

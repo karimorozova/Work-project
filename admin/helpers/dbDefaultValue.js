@@ -316,7 +316,7 @@ const timezonesDefault = [
     "(UTC+12:00) Petropavlovsk-Kamchatsky - Old",
     "(UTC+13:00) Nuku'alofa",
     "(UTC+13:00) Samoa"
- ]
+]
 
 const defaultValue = {
     languagesDefault,

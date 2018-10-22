@@ -18,9 +18,10 @@
                 span.step-matrix__label {{ field.label }}
             template(slot="title" slot-scope="{ row }")
                 span.step-matrix__value {{ row.title }}
-            template(slot="value" slot-scope="{ row }")
-                span.step-matrix__value {{ row.value }}
-                    span.step-matrix__percent(v-if="row.value") %
+            template(slot="value" slot-scope="{ row, index }")
+                span.step-matrix__value
+                    input.step-matrix__number-input(type="number" min="0" max="100" v-model="row.value" @focus="toggleRowActive(index)" @blur="updateMatrixValue(index)")
+                    span.step-matrix__percent(v-if="!row.active" :class="{'step-matrix_left-15': row.value < 100, 'step-matrix_left-8': row.value < 10}") %
             template(slot="wordcount" slot-scope="{ row }")
                 span.step-matrix__value {{ row.wordcount }}
             template(slot="rate" slot-scope="{ row }")
@@ -56,6 +57,12 @@ export default {
     methods: {
         toggleMatrixShow() {
             this.isMatrixShown = !this.isMatrixShown;
+        },
+        toggleRowActive(index) {
+            this.$emit("toggleMatrixRowActive", {index: index});
+        },
+        updateMatrixValue(index) {
+            this.$emit("updateMatrixValue", {index: index});
         }
     },
     components: {
@@ -79,6 +86,30 @@ export default {
     }
     &_block {
         display: block;
+    }
+    &__number-input {
+        width: 22px;
+        color: $main-color;
+        border: none;
+        background-color: transparent;
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button, {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+    &__value {
+        position: relative;
+    }
+    &__percent {
+        position: absolute;
+        top: 0;
+    }
+    &_left-15 {
+        left: 15px;
+    }
+    &_left-8 {
+        left: 8px;
     }
 }
 </style>

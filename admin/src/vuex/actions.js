@@ -16,6 +16,16 @@ export const setStepVendor = ({ commit }, payload) => commit('stepVendorStore', 
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+export const updateMatrix = async ({ commit }, payload) => {
+  commit('updateMatrixData', payload);
+  commit('loadingValue', true);  
+  try {
+    await axios.post('/xtm/update-matrix', {payload});
+  } catch(err) {
+
+  }
+  commit('loadingValue', false);  
+};
 export const alertToggle = ({ commit }, payload) => {
   commit('alertingMessage', payload);
   setTimeout(() => {
