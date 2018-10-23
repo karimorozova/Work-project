@@ -1,6 +1,9 @@
 <template lang="pug">
 .step-matrix
     StepInfoTitle(title="Matrix" :isIconReversed="isMatrixShown" @titleClick="toggleMatrixShow")
+    .step-matrix__toggler(v-if="isMatrixShown")
+        .step-matrix__toggle-option(@click="refreshMatrix('receivables')" :class="{'step-matrix_active-option': matrixOption === 'receivables'}") Receivables
+        .step-matrix__toggle-option(@click="refreshMatrix('payables')" :class="{'step-matrix_active-option': matrixOption === 'payables'}") Payables
     .step-matrix__table(:class="{'step-matrix_block': isMatrixShown}")
         DataTable(
             :fields="fields"
@@ -51,7 +54,8 @@ export default {
                 {label: "Wordcount", key: "wordcount", width: "19%"},
                 {label: "Rate", key: "rate", width: "19%"},
                 {label: "Total", key: "total", width: "19%"},
-            ]
+            ],
+            matrixOption: "receivables"
         }
     },
     methods: {
@@ -63,6 +67,13 @@ export default {
         },
         updateMatrixValue(index) {
             this.$emit("updateMatrixValue", {index: index});
+        },
+        refreshMatrix(value) {
+            if(this.matrixOption === value) {
+                return
+            }
+            this.matrixOption = value;
+            this.$emit("refreshMatrix", {costs: value});
         }
     },
     components: {
@@ -79,10 +90,31 @@ export default {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
     &__table {
-        margin-top: 20px;
         display: flex;
         justify-content: space-between;
         display: none;
+    }
+    &__toggler {
+        display: flex;
+        margin-top: 10px;
+    }
+    &__toggle-option {
+        padding: 5px;
+        width: 10%;
+        font-size: 14px;
+        border: 1px solid $brown-border;
+        border-bottom: none;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 3px;
+        background-color: $table-row-zebra-background;
+        box-shadow: inset 0 0 3px $brown-shadow;
+        cursor: pointer;
+        opacity: 0.6;
+        z-index: 0;
+    }
+    &_active-option {
+        background-color: $white;
+        opacity: 1;
     }
     &_block {
         display: block;

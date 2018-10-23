@@ -106,14 +106,15 @@ router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFile
     let target = [];
 
     const { sourceFiles, refFiles } = req.files;
+    let detFile = "";
     if (sourceFiles) {
-        var detFile = sourceFiles[0].path;
+        detFile = sourceFiles[0].path;
     }
 
     for(let i  = 0; i < targetLanguages.length; i++) {
         target.push(targetLanguages[i].xtm);
     }
-    var ids = [];
+    let ids = [];
     for(let i = 0; i < target.length; i++) {
         let name = date + ` ${nextNumber} ` + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
         let proj;
@@ -278,8 +279,8 @@ router.get('/projects-analysis', async (req, res) => {
 })
 
 router.get('/xtmwords', async (req, res) => {
-    var id = req.query.projectId;
-    var str = '<?xml version="1.0" encoding="UTF-8"?>' +
+    let id = req.query.projectId;
+    let str = '<?xml version="1.0" encoding="UTF-8"?>' +
     '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
     '<soapenv:Header/>' +
     '<soapenv:Body>' +
@@ -297,7 +298,7 @@ router.get('/xtmwords', async (req, res) => {
     '</soapenv:Envelope>';
 
     function createCORSRequest(method, url) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         if ("withCredentials" in xhr) {
             xhr.open(method, url, false);
         } else if (typeof XDomainRequest != "undefined") {
@@ -311,15 +312,15 @@ router.get('/xtmwords', async (req, res) => {
         }
         return xhr;
     }
-    var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+    let xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
     if(!xhr){
     console.log("XHR issue");
     return;
     }
 
     xhr.onload = function (){
-    // var results = '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope' + xhr.responseText.split('<soap:Envelope')[1].split('--uuid')[0];
-    var results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
+    // let results = '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope' + xhr.responseText.split('<soap:Envelope')[1].split('--uuid')[0];
+    let results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
     // console.log(parser.toJson(results));
     let object = JSON.parse(parser.toJson(results));
     let wordsTotal = object.projectMetrics.coreMetrics.totalWords;
@@ -368,7 +369,7 @@ router.get('/editor', async (req, res) => {
     '</soapenv:Envelope>';
 
     function createCORSRequest(method, url) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         if ("withCredentials" in xhr) {
             xhr.open(method, url, false);
         } else if (typeof XDomainRequest != "undefined") {
@@ -382,14 +383,14 @@ router.get('/editor', async (req, res) => {
         }
         return xhr;
     }
-    var xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+    let xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
     if(!xhr){
     console.log("XHR issue");
     return;
     }
 
     xhr.onload = function (){
-    var results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
+    let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
     // console.log(parser.toJson(results));
     let object = JSON.parse(parser.toJson(results));
     let editorLink = object.editorURL;

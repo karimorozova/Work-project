@@ -10,11 +10,12 @@
             :financeData="financeData"
             @addRow="addFinanceData"
         )
-    .step-info__block
+    .step-info__block(v-if="step.name === 'translate1'")
         Matrix(
             :matrixData="matrixData"
             @toggleMatrixRowActive="toggleMatrixRowActive"
             @updateMatrixValue="updateMatrixValue"
+            @refreshMatrix="refreshMatrix"
         )
     .step-info__block
         Files(
@@ -87,34 +88,38 @@ export default {
                 title: "", receivables: "", payables: "", margin: ""
             })
         },
-        getMatrixData() {
+        getMatrixData(rateProp, prop) {
+            if(this.step.name !== "translate1") {
+                return
+            }
+            this.matrixData = [];
             for(let key of Object.keys(this.task.metrics)) {
                 if(this.excludeKeys.indexOf(key) === -1) {
                     this.matrixData.push({
                         key: key,
                         active: false,
                         title: this.task.metrics[key].text,
-                        value: this.task.metrics[key].client*100, 
+                        value: this.task.metrics[key][prop]*100, 
                         wordcount: this.task.metrics[key].value,
-                        rate: this.step.clientRate*this.task.metrics[key].client,
-                        total: this.step.clientRate*this.task.metrics[key].client*this.task.metrics[key].value
+                        rate: +this.step[rateProp]*this.task.metrics[key][prop],
+                        total: this.step[rateProp]*this.task.metrics[key][prop]*this.task.metrics[key].value
                     });
                 }
             }
-            this.lastMatrixDateRow();
+            this.lastMatrixDateRow(rateProp);
         },
-        lastMatrixDateRow() {
+        lastMatrixDateRow(rateProp) {
             const totalMatchedWords = this.matrixData.reduce((init, cur) => {
                 return init + cur.wordcount; 
             }, 0);
             const wordcount = this.task.metrics.totalWords - totalMatchedWords;
-            const total = wordcount*this.step.clientRate;
+            const total = wordcount*this.step[rateProp];
             this.matrixData.push({
                 active: false,
                 title: "No match",
                 value: "100",
                 wordcount: wordcount,
-                rate: this.step.clientRate,
+                rate: +this.step[rateProp],
                 total: total
             })
         },
@@ -153,6 +158,10 @@ export default {
             }
             this.matrixData[index].active = false;
         },
+        refreshMatrix({costs}) {
+            return costs === 'receivables' ? this.getMatrixData('clientRate', 'client')
+            : this.getMatrixData('vendorRate', 'vendor')
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             updateMatrix: "updateMatrix"
@@ -171,7 +180,7 @@ export default {
     },
     mounted() {
         this.getFinanceData();
-        this.getMatrixData();
+        this.getMatrixData('clientRate', 'client');
         this.getStepFiles();
     }
 }
