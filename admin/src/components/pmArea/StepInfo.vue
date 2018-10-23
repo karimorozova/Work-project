@@ -144,14 +144,18 @@ export default {
         toggleMatrixRowActive({index}) {
             this.matrixData[index].active = !this.matrixData[index].active;
         },
-        async updateMatrixValue({index}) {
+        async updateMatrixValue({index, prop}) {
+            const property = prop === "receivables" ? "client" : "vendor" 
             try {
             await this.updateMatrix({
                 projectId: this.currentProject._id,
-                taskId: this.task.id, 
+                taskId: this.task.id,
+                step: this.step,
                 key: this.matrixData[index].key,
                 value: this.matrixData[index].value,
+                prop: property
             });
+                this.refreshMatrix({costs: prop});
                 this.alertToggle({message: "The matrix has been updated.", isShow: true , type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Internal server error / Cannot update matrix.", isShow: true , type: "error"})

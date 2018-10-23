@@ -63,7 +63,7 @@ async function receivablesCalc({task, project, step, combs}) {
         return item.industry.id === project.industry.id
     })
     const { rate } = customerCost || wordCost;
-    const cost = calcCost(metrics, 'client', rate, step);
+    const cost = calcCost(metrics, 'client', rate);
     return {cost: cost, rate: rate};
 }
 
@@ -78,7 +78,7 @@ async function payablesCalc({task, project, step}) {
     }) : "";
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
     step.payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
-    : calcCost(metrics, 'vendor', rate, step);
+    : calcCost(metrics, 'vendor', rate);
     step.margin = (step.receivables - step.payables).toFixed(2);
     step.vendorRate = rate;
     return step;
@@ -146,4 +146,4 @@ function getCombination({combs, service, task}) {
     })
 }
 
-module.exports = { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTaskMetrics, taskMetricsCalc };
+module.exports = { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc };

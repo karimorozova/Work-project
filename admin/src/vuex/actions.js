@@ -20,11 +20,13 @@ export const updateMatrix = async ({ commit }, payload) => {
   commit('updateMatrixData', payload);
   commit('loadingValue', true);  
   try {
-    await axios.post('/xtm/update-matrix', {payload});
+    const updatedProject = await axios.post('/xtm/update-matrix', {...payload});
+    await commit('storeCurrentProject', updatedProject.data);
+    commit('loadingValue', false);
   } catch(err) {
-
+    commit('loadingValue', false);
+    throw new Error(err.message);
   }
-  commit('loadingValue', false);  
 };
 export const alertToggle = ({ commit }, payload) => {
   commit('alertingMessage', payload);

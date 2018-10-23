@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Clients, Languages, Services, Industries } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions } = require('../services/');
-const { getProject, updateProject, metricsCalc, storeFiles, taskMetricsCalc } = require('../projects/');
+const { getProject, updateProject, updateProjectCosts, metricsCalc, storeFiles, calcCost, taskMetricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -42,12 +42,34 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on adding project to XTM ' + err);
+        res.status(500).send('Error on adding project to XTM');
     }
 })
 
 router.post('/update-matrix', async (req, res) => {
-    res.send('Done');
+    const { projectId, taskId, step, key, value, prop } = req.body;
+    const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' } 
+    : {rate: step.vendroRate, costName: 'payables'};
+    try {
+        let project = await getProject({"_id": projectId});
+        let taskIndex = project.tasks.findIndex(item => {
+            return item.id === taskId
+        });
+        let stepIndex = project.steps.findIndex(item => {
+            return item.name === step.name && item.taskId === step.taskId
+        })
+        let tasks = [...project.tasks];
+        let steps = [...project.steps];
+        tasks[taskIndex].metrics[key][prop] = +value/100;
+        const cost = calcCost(tasks[taskIndex].metrics, prop, rate);
+        steps[stepIndex][costName] = cost;
+        let updatedProject = {...project._doc, id: projectId, tasks, steps};
+        const result = await updateProjectCosts(updatedProject);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on updating value of matrix');
+    }
 })
 
 router.get('/project-metrics', async (req, res) => {

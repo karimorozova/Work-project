@@ -66,7 +66,7 @@ export default {
             this.$emit("toggleMatrixRowActive", {index: index});
         },
         updateMatrixValue(index) {
-            this.$emit("updateMatrixValue", {index: index});
+            this.$emit("updateMatrixValue", {index: index, prop: this.matrixOption});
         },
         refreshMatrix(value) {
             if(this.matrixOption === value) {
