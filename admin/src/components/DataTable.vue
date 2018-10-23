@@ -79,7 +79,7 @@ export default {
                 }
             }
         }
-        .steps-table-row {
+        .steps-table-row, .rates-matrix-row {
             cursor: default;
         }
     }
@@ -144,7 +144,6 @@ export default {
     }
 }
 .steps-table-body {
-    overflow-y: overlay;
     max-height: 300px;
 }
 .steps-table-cell {
@@ -153,7 +152,10 @@ export default {
 }
 .matrix-table {
     max-height: 350px;
-    overflow-y: overlay;
+}
+.rates-matrix-body {
+    max-height: 400px;
+    margin-bottom: 0;
 }
 .step-files_centered {
     display: flex;
