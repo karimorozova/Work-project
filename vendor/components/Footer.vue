@@ -64,6 +64,7 @@ export default {
     align-items: center;
     @media (max-width: 450px) {
         flex-direction: column;
+        width: 100%;
     }
     &-text {
         color: #fff;
