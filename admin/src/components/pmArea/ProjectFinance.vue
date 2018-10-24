@@ -6,6 +6,7 @@
         DataTable(
             :fields="fields"
             :tableData="financeData"
+            bodyRowClass="steps-table-row"
         )
             template(slot="headerTitle" slot-scope="{ field }")
             template(slot="headerReceivables" slot-scope="{ field }")
@@ -46,10 +47,10 @@ export default {
             ],
             financeData: [
                 {title: "Wordcount", receivables: "", payables: "", margin: ""},
-                {title: "Price", receivables: "", payables: "", margin: ""},
-                {title: "Discount 10%", receivables: "", payables: "", margin: ""}
+                {title: "Price", receivables: "", payables: "", margin: ""}
             ],
-            excludeKeys: ["nonTranslatable", "totalWords"]
+            excludeKeys: ["nonTranslatable", "totalWords"],
+            discountOptions: ["Discount-1", "Discount-2", "Discount-3"]
         }
     },
     methods: {
@@ -68,7 +69,7 @@ export default {
             for(const task of this.currentProject.tasks) {
                 const taskPayableWords = this.wordsCalculation(task);
                 payableWords += taskPayableWords;
-                totalWords+= task.metrics.totalWords - task.metrics.nonTranslatable;
+                totalWords += task.metrics.totalWords - task.metrics.nonTranslatable;
             }
             const receivableWords = totalWords;
             const margin = receivableWords - payableWords;
@@ -86,9 +87,6 @@ export default {
                     obj.receivables = this.currentProject.receivables;
                     obj.payables = this.currentProject.payables;
                     obj.margin = this.currentProject.receivables - this.currentProject.payables;
-                }
-                if(obj.title === "Discount 10%") {
-                    obj.receivables = this.currentProject.discount || "";
                 }
             }
         },

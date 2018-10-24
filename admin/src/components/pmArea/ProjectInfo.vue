@@ -54,17 +54,20 @@
                         UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")     
                     .project-info__add-tasks
                         Button(value="Add tasks" @clicked="addTasks")
-            Tasks(v-if="currentProject.tasks.length && !currentProject.steps.length"
-                :allTasks="currentProject.tasks"
-            )
-            Steps(v-if="currentProject.steps.length"
-                :allSteps="currentProject.steps"
-                :tasks="currentProject.tasks"
-                :vendors="allVendors"
-                @setVendor="setVendor"
-                @setDate="setDate"
-            )
-            Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
+            .project-info__tasks-steps
+                Tasks(v-if="currentProject.tasks.length && isTasksShow"
+                    :allTasks="currentProject.tasks"
+                    @showTab="showTab"
+                )
+                Steps(v-if="currentProject.steps.length && isStepsShow"
+                    :allSteps="currentProject.steps"
+                    :tasks="currentProject.tasks"
+                    :vendors="allVendors"
+                    @setVendor="setVendor"
+                    @setDate="setDate"
+                    @showTab="showTab"
+                )
+                Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
         .project-info__action
             ProjectAction(:project="currentProject")
     .project-info__all-info
@@ -102,7 +105,9 @@ export default {
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
             sourceFiles: [],
-            refFiles: []
+            refFiles: [],
+            isStepsShow: true,
+            isTasksShow: false
         }
     },
     methods: {
@@ -115,6 +120,15 @@ export default {
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate'
         }),
+        showTab({tab}) {
+            if(tab === 'Tasks') {
+                this.isStepsShow = false;
+                this.isTasksShow = true;
+            } else {
+                this.isStepsShow = true;
+                this.isTasksShow = false;
+            }
+        },
         async setVendor({vendor, index}) {
             if(this.currentProject.steps[index].vendor && 
                 this.currentProject.steps[index].vendor._id === vendor._id) {
@@ -387,6 +401,12 @@ export default {
     }
     &__action {
         width: 20%;
+    }
+    &__tasks-steps {
+        position: relative;
+    }
+    &__tabs {
+        position: absolute;
     }
 }
 </style>

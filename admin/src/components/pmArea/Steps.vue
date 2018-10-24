@@ -10,6 +10,12 @@
                 @chooseOption="setAction"
             )
     .steps__table
+        .steps__tabs
+            Tabs(
+                :tabs="tabs"
+                selectedTab="Steps"
+                @setTab="showTab"
+            )
         DataTable(
             :fields="fields"
             :tableData="allSteps"
@@ -42,7 +48,7 @@
             template(slot="headerMargin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
-                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep(index)")
+                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep")
                 .steps__expander(@click="expandRow(index)")
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
@@ -97,6 +103,7 @@
 
 <script>
 import DataTable from "../DataTable";
+import Tabs from "../Tabs";
 import VendorSelect from "./VendorSelect";
 import StepInfo from "./StepInfo";
 import SelectSingle from "../SelectSingle";
@@ -124,6 +131,7 @@ export default {
             disabled: {
                 to: moment().add(-1, 'day').endOf('day').toDate()
             },
+            tabs: ['Tasks', 'Steps'],
             fields: [
                 {label: "Check", headerKey: "headerCheck", key: "check", width: "4%"},
                 {label: "Step", headerKey: "headerName", key: "name", width: "9%"},
@@ -139,7 +147,6 @@ export default {
             ],
             selectedVendors: [],
             isAllSelected: false,
-            selectedAction: "",
             actions: ["Request confirmation", "Other Action"],
             isExpand: false,
             activeIndex: -1,
@@ -148,6 +155,10 @@ export default {
     methods: {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
+        },
+        showTab({index}) {
+            return this.tabs[index] === 'Steps' ? true
+            : this.$emit('showTab', { tab: this.tabs[index] });
         },
         getTask(index) {
             return this.tasks.find(item => {
@@ -187,10 +198,10 @@ export default {
             return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
         },
         async selectAll() {
-            const steps = this.allSteps.map(item => {
-                item.check = this.isAllSelected;
-                return item;
-            })
+            let steps = [];
+            for(const step of this.allSteps) {
+                steps.push({...step, check: this.isAllSelected})
+            }
             await this.setProjectValue({value: steps, prop: 'steps'});
         },
         async selectStep() {
@@ -217,7 +228,8 @@ export default {
         VendorSelect,
         SelectSingle,
         Datepicker,
-        StepInfo
+        StepInfo,
+        Tabs
     }    
 }
 </script>
@@ -239,7 +251,6 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
-        margin-bottom: 20px;
     }
     &__expander {
         position: relative;
