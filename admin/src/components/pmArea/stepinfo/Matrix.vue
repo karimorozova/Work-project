@@ -10,12 +10,13 @@
             :tableData="matrixData"
             bodyClass="matrix-table"
         )
-            template(slot="Title" slot-scope="{ field }")
-            template(slot="Value" slot-scope="{ field }")
-                span.step-matrix__label % {{ field.label }}
-            template(slot="Wordcount" slot-scope="{ field }")
+            template(slot="headerTitle" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}
-            template(slot="Rate" slot-scope="{ field }")
+            template(slot="headerValue" slot-scope="{ field }")
+                span.step-matrix__label {{ field.label }}
+            template(slot="headerWordcount" slot-scope="{ field }")
+                span.step-matrix__label {{ field.label }}
+            template(slot="headerRate" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}
             template(slot="Total" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}
@@ -49,11 +50,11 @@ export default {
         return {
             isMatrixShown: false,
             fields: [
-                {label: "Title", key: "title", width: "24%"},
-                {label: "Value", key: "value", width: "19%"},
-                {label: "Wordcount", key: "wordcount", width: "19%"},
-                {label: "Rate", key: "rate", width: "19%"},
-                {label: "Total", key: "total", width: "19%"},
+                {label: "Translation match", headerKey: "headerTitle", key: "title", width: "24%"},
+                {label: "Value %", headerKey: "headerValue", key: "value", width: "19%"},
+                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "19%"},
+                {label: "Rate", headerKey: "headerRate", key: "rate", width: "19%"},
+                {label: "Total", headerKey: "headerTotal", key: "total", width: "19%"},
             ],
             matrixOption: "receivables"
         }

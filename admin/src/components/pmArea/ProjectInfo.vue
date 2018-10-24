@@ -67,6 +67,8 @@
             Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
         .project-info__action
             ProjectAction(:project="currentProject")
+    .project-info__all-info
+        ProjectFinance
 </template>
 
 <script>
@@ -79,6 +81,7 @@ import LabelValue from "./LabelValue";
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
 import ProjectAction from "./ProjectAction";
+import ProjectFinance from "./ProjectFinance";
 import Tasks from "./Tasks";
 import Steps from "./Steps";
 import { mapGetters, mapActions } from 'vuex';
@@ -315,7 +318,8 @@ export default {
         ProjectShortDetails,
         ProjectAction,
         Tasks,
-        Steps
+        Steps,
+        ProjectFinance
     },
     mounted() {
         this.getVendors();

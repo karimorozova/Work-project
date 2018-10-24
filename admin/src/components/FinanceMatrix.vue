@@ -7,11 +7,10 @@
             bodyRowClass="rates-matrix-row"
             bodyClass="rates-matrix-body"
         )
-            template(slot="Translation match" slot-scope="{ field }")
+            template(slot="headerText" slot-scope="{ field }")
                 span.finance-matrix__text {{ field.label }}
-            template(slot="Value" slot-scope="{ field }")
+            template(slot="headerRate" slot-scope="{ field }")
                 span.finance-matrix__text {{ field.label }}
-                span.finance-matrix__percent %
             template(slot="text" slot-scope="{ row }")
                 span.finance-matrix__text {{ row.text }}
             template(slot="rate" slot-scope="{ row }")
@@ -31,8 +30,8 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Translation match", key: "text", width: "50%"},
-                {label: "Value", key: "rate", width: "50%"}
+                {label: "Translation match", headerKey: "headerText", key: "text", width: "50%"},
+                {label: "Value %", headerKey: "headerRate", key: "rate", width: "50%"}
             ],
         }
     },

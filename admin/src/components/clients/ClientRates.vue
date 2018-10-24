@@ -17,7 +17,7 @@
                         @ratesUpdate="ratesUpdate"
                         @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
-            .client-rates____open
+            .client-rates__open
                 .client-rates__select(@click="matrixToggler")
                     span.client-rates__label Matrix
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMatrixShow}") 

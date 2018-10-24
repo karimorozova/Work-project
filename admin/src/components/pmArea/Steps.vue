@@ -19,27 +19,27 @@
             bodyCellClass="steps-table-cell"
             bodyRowClass="steps-table-row"
         )
-            template(slot="Check" slot-scope="{ field }")
+            template(slot="headerCheck" slot-scope="{ field }")
                 input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
-            template(slot="Step" slot-scope="{ field }")
+            template(slot="headerName" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Language" slot-scope="{ field }")
+            template(slot="headerLanguage" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Vendor name" slot-scope="{ field }")
+            template(slot="headerVendor" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Start" slot-scope="{ field }")
+            template(slot="headerStart" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Deadline" slot-scope="{ field }")
+            template(slot="headerDeadline" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Progress" slot-scope="{ field }")
+            template(slot="headerProgress" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Status" slot-scope="{ field }")
+            template(slot="headerStatus" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Receivables" slot-scope="{ field }")
+            template(slot="headerReceivables" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Payables" slot-scope="{ field }")
+            template(slot="headerPayables" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
-            template(slot="Margin" slot-scope="{ field }")
+            template(slot="headerMargin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
                 input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep(index)")
@@ -125,17 +125,17 @@ export default {
                 to: moment().add(-1, 'day').endOf('day').toDate()
             },
             fields: [
-                {label: "Check", key: "check", width: "4%"},
-                {label: "Step", key: "name", width: "9%"},
-                {label: "Language", key: "language", width: "11%"},
-                {label: "Vendor name", key: "vendor", width: "15%", padding: 0},
-                {label: "Start", key: "start", width: "9%"},
-                {label: "Deadline", key: "deadline", width: "9%"},
-                {label: "Progress", key: "progress", width: "8%"},
-                {label: "Status", key: "status", width: "9%"},
-                {label: "Receivables", key: "receivables", width: "9%"},
-                {label: "Payables", key: "payables", width: "9%"},
-                {label: "Margin", key: "margin", width: "8%"},
+                {label: "Check", headerKey: "headerCheck", key: "check", width: "4%"},
+                {label: "Step", headerKey: "headerName", key: "name", width: "9%"},
+                {label: "Language", headerKey: "headerLanguage", key: "language", width: "11%"},
+                {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "15%", padding: 0},
+                {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
+                {label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "9%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%"},
+                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%"},
+                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
             ],
             selectedVendors: [],
             isAllSelected: false,

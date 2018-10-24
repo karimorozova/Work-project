@@ -6,15 +6,15 @@
             :fields="fields"
             :tableData="stepFiles"
         )
-            template(slot="Check" slot-scope="{ field }")
+            template(slot="headerCheck" slot-scope="{ field }")
                 input.step-files__check(type="checkbox" v-model="isAllChecked")
-            template(slot="File Name" slot-scope="{ field }")
+            template(slot="headerFileName" slot-scope="{ field }")
                 span.step-files__label {{ field.label }}
-            template(slot="Category" slot-scope="{ field }")
+            template(slot="headerCategory" slot-scope="{ field }")
                 span.step-files__label {{ field.label }}
-            template(slot="Source" slot-scope="{ field }")
+            template(slot="headerSource" slot-scope="{ field }")
                 span.step-files__label {{ field.label }}
-            template(slot="Target" slot-scope="{ field }")
+            template(slot="headerTarget" slot-scope="{ field }")
                 span.step-files__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
                 input.step-files__check(type="checkbox" v-model="row.check")
@@ -51,11 +51,11 @@ export default {
             isFilesShown: false,
             isAllChecked: false,
             fields: [
-                {label: "Check", key: "check", width: "5%"},
-                {label: "File Name", key: "fileName", width: "33%"},
-                {label: "Category", key: "category", width: "22%"},
-                {label: "Source", key: "source", width: "20%", cellClass: "step-files_centered"},
-                {label: "Target", key: "target", width: "20%", cellClass: "step-files_centered"},
+                {label: "Check", headerKey: "headerCheck", key: "check", width: "5%"},
+                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "33%"},
+                {label: "Category", headerKey: "headerCategory", key: "category", width: "22%"},
+                {label: "Source", headerKey: "headerSource", key: "source", width: "20%", cellClass: "step-files_centered"},
+                {label: "Target", headerKey: "headerTarget", key: "target", width: "20%", cellClass: "step-files_centered"},
             ]
         }
     },

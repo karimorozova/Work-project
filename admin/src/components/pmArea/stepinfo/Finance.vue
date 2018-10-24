@@ -7,12 +7,12 @@
                 :fields="fields"
                 :tableData="financeData"
             )
-                template(slot="Title" slot-scope="{ field }")
-                template(slot="Receivables" slot-scope="{ field }")
+                template(slot="headerTitle" slot-scope="{ field }")
+                template(slot="headerReceivables" slot-scope="{ field }")
                     span.step-finance__label {{ field.label }}
-                template(slot="Payables" slot-scope="{ field }")
+                template(slot="headerPayables" slot-scope="{ field }")
                     span.step-finance__label {{ field.label }}
-                template(slot="Margin" slot-scope="{ field }")
+                template(slot="headerMargin" slot-scope="{ field }")
                     span.step-finance__label {{ field.label }}
                 template(slot="title" slot-scope="{ row }")
                     span.step-finance__value {{ row.title }}
@@ -32,13 +32,10 @@
             .step-finance__summary
                 .step-finance__summary-value Margin: 
                     span.step-finance__money {{ totalSum.margin }} &euro;
-    .step-finance__add-row(v-if="isInfoShown")
-        Add(@add="addRow")
 </template>
 
 <script>
 import DataTable from "../../DataTable";
-import Add from "../../Add";
 import StepInfoTitle from "./StepInfoTitle";
 
 export default {
@@ -50,10 +47,10 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Title", key: "title", width: "25%"},
-                {label: "Receivables", key: "receivables", width: "25%"},
-                {label: "Payables", key: "payables", width: "25%"},
-                {label: "Margin", key: "margin", width: "25%"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: "25%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "25%"},
+                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
+                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
             ],
             isInfoShown: false
         }
@@ -61,9 +58,6 @@ export default {
     methods: {
         toggleInfoShow() {
             this.isInfoShown = !this.isInfoShown;
-        },
-        addRow() {
-            this.$emit("addRow");
         },
         showMoney(row, key) {
             return (row.title === "Price" || row.title === "Discount 10%") && row[key]
@@ -79,7 +73,6 @@ export default {
     },
     components: {
         DataTable,
-        Add,
         StepInfoTitle
     }
 }

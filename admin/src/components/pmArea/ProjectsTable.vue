@@ -6,29 +6,29 @@
         :hasScroll="hasScroll"
         @onRowClicked="onRowClicked"
     )
-        template(slot="ID" slot-scope="{ field }")
+        template(slot="headerProjectId" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Client Name" slot-scope="{ field }")
+        template(slot="headerClientName" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Project Name" slot-scope="{ field }")
+        template(slot="headerProjectName" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Languages" slot-scope="{ field }")
+        template(slot="headerLanguages" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Status" slot-scope="{ field }")
+        template(slot="headerStatus" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Receivables" slot-scope="{ field }")
+        template(slot="headerReceivables" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Payables" slot-scope="{ field }")
+        template(slot="headerPayables" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="ROI" slot-scope="{ field }")
+        template(slot="headerRoi" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Start date" slot-scope="{ field }") 
+        template(slot="headerCreatedAt" slot-scope="{ field }") 
             span.projects-table__label {{ field.label }}
-        template(slot="Deadline" slot-scope="{ field }")
+        template(slot="headerDeadline" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Project Manager" slot-scope="{ field }")
+        template(slot="headerProjectManager" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="Edit" slot-scope="{ field }")
+        template(slot="headerEdit" slot-scope="{ field }")
             span.projects-table__label
         template(slot="projectId" slot-scope="{ row }")
             span {{ row.projectId }}
@@ -72,18 +72,18 @@ export default {
     data() {
         return {
             fields: [
-                {label: "ID", key: "projectId", width: "10%"},
-                {label: "Client Name", key: "clientName", width: "11%"},
-                {label: "Project Name", key: "projectName", width: "12%"},
-                {label: "Languages", key: "languages", width: "12%"},
-                {label: "Status", key: "status", width: "8%"},
-                {label: "Receivables", key: "receivables", width: "7%"},
-                {label: "Payables", key: "payables", width: "6%"},
-                {label: "ROI", key: "roi", width: "6%"},
-                {label: "Start date", key: "createdAt", width: "7%"},
-                {label: "Deadline", key: "deadline", width: "7%"},
-                {label: "Project Manager", key: "projectManager", width: "11%"},
-                {label: "Edit", key: "edit", width: "3%"},
+                {label: "ID", headerKey: "headerProjectiId", key: "projectId", width: "10%"},
+                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "11%"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
+                {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "12%"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
+                {label: "Receivables", headerKey: "headerRecievables", key: "receivables", width: "7%"},
+                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%"},
+                {label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%"},
+                {label: "Start date", headerKey: "headerCreatedAt", key: "createdAt", width: "7%"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
+                {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
+                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "3%"},
             ],
         }
     },
