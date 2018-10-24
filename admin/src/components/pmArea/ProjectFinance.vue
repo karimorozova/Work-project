@@ -64,14 +64,13 @@ export default {
             this.isFinanceShow = !this.isFinanceShow;
         },
         getWordsData() {
-            let totalWords = 0;
+            let receivableWords = 0;
             let payableWords = 0;
             for(const task of this.currentProject.tasks) {
                 const taskPayableWords = this.wordsCalculation(task);
                 payableWords += taskPayableWords;
-                totalWords += task.metrics.totalWords - task.metrics.nonTranslatable;
+                receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
             }
-            const receivableWords = totalWords;
             const margin = receivableWords - payableWords;
             return {payableWords, receivableWords, margin}
         },
