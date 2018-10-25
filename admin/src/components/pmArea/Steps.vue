@@ -55,10 +55,10 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                VendorSelect(
-                    :vendors="vendors"
-                    :selectedVendor="vendorName(row.vendor)"
-                    @changeVend="(vendor) => setVendor(vendor, index)"
+                PersonSelect(
+                    :persons="vendors"
+                    :selectedPerson="vendorName(row.vendor)"
+                    @setPerson="(person) => setVendor(person, index)"
                 )
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(@selected="(e) => changeDate(e, 'start', index)" 
@@ -104,7 +104,7 @@
 <script>
 import DataTable from "../DataTable";
 import Tabs from "../Tabs";
-import VendorSelect from "./VendorSelect";
+import PersonSelect from "./PersonSelect";
 import StepInfo from "./StepInfo";
 import SelectSingle from "../SelectSingle";
 import Datepicker from "../Datepicker";
@@ -175,8 +175,8 @@ export default {
             }
             this.$emit("onRowClicked", {index: index})
         },
-        setVendor({vendor}, index) {
-            const { _id, firstName, surname, email } = vendor;
+        setVendor({person}, index) {
+            const { _id, firstName, surname, email } = person;
             this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index: index});
         },
         async setAction({option}) {
@@ -225,7 +225,7 @@ export default {
     },
     components: {
         DataTable,
-        VendorSelect,
+        PersonSelect,
         SelectSingle,
         Datepicker,
         StepInfo,

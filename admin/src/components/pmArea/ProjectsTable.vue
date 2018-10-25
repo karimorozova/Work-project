@@ -42,10 +42,10 @@
             span {{ row.status }}
         template(slot="receivables" slot-scope="{ row }")
             span(v-if="row.receivables") &euro;
-            span {{ row.receivables }}
+            span {{ row.finance.Price.receivables }}
         template(slot="payables" slot-scope="{ row }")
             span(v-if="row.payables") &euro;
-            span {{ row.payables }}
+            span {{ row.finance.Price.payables }}
         template(slot="roi" slot-scope="{ row }")
             span {{ row.roi }}
         template(slot="createdAt" slot-scope="{ row }") 

@@ -1,15 +1,15 @@
 <template lang="pug">
 .drop-select(v-click-outside="outClick")
     .select
-        template(v-if="selectedVendor")
-            span.selected {{ selectedVendor }}
-        template(v-if="!selectedVendor") 
+        template(v-if="selectedPerson")
+            span.selected {{ selectedPerson }}
+        template(v-if="!selectedPerson") 
             span.selected.no-industry Select
-        .arrow-button(@click="showVends")
-            img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedVend}")
-    .drop(v-if="droppedVend")
-        .drop__item(v-for="(vendor, index) in vendors" @click="changeVend(index)" :class="{chosen: selectedVendor === vendor.firstName + ' ' + vendor.surname}")
-            span {{ vendor.firstName }} {{ vendor.surname }}
+        .arrow-button(@click="togglePersons")
+            img(src="../../assets/images/open-close-arrow-brown.png" :class="{'reverse-icon': isDropped}")
+    .drop(v-if="isDropped")
+        .drop__item(v-for="(person, index) in persons" @click="setPerson(index)" :class="{chosen: selectedPerson === person.firstName + ' ' + person.surname}")
+            span {{ person.firstName }} {{ person.surname }}
 </template>
 
 <script>
@@ -17,29 +17,29 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedVendor: {
+        selectedPerson: {
             type: String
         },
-        vendors: {
+        persons: {
             type: Array
         }
     },
     data() {
         return {
-            droppedVend: false,
+            isDropped: false,
             errors: []
         }
     },
     methods: {
-        showVends() {
-            this.droppedVend = !this.droppedVend;
+        togglePersons() {
+            this.isDropped = !this.isDropped;
         },
         outClick() {
-            this.droppedVend = false;
+            this.isDropped = false;
         },
-        changeVend(ind) {
-            this.droppedVend = false;
-            this.$emit('changeVend', {vendor: this.vendors[ind]})
+        setPerson(ind) {
+            this.isDropped = false;
+            this.$emit('setPerson', {person: this.persons[ind]})
         },
     },
     directives: {
@@ -95,7 +95,7 @@ export default {
         img {
             padding-right: 2px;
         }
-        .reverseIcon {
+        .reverse-icon {
             transform: rotate(180deg);
         }
         .steps__table & {

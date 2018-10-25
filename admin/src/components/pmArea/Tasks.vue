@@ -71,7 +71,6 @@
 <script>
 import DataTable from "../DataTable";
 import Tabs from "../Tabs";
-import VendorSelect from "./VendorSelect";
 import SelectSingle from "../SelectSingle";
 import { mapGetters, mapActions } from 'vuex';
 

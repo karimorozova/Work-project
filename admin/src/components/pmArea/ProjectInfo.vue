@@ -140,6 +140,7 @@ export default {
                 const updatedProject = await this.$http.post('/service/step-payables', {projectId: this.currentProject._id, step: step});
                 await this.storeProject(updatedProject.body);
                 this.$emit("refreshProjects");
+                this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Internal service error. Cannot calculate payables for the step.", isShow: true, type: "error"})
             }

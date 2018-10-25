@@ -94,6 +94,7 @@ router.post('/step-payables', async (req, res) => {
   let { projectId, step } = req.body;
   try {
     let project = await getProject({"_id": projectId});
+    let updatedProject = {...project._doc, id: projectId};
     const taskIndex = project.tasks.findIndex(item => {
       return item.id == step.taskId;
     })
@@ -103,10 +104,10 @@ router.post('/step-payables', async (req, res) => {
     const stepIndex = project.steps.findIndex(item => {
       return item.taskId == step.taskId && item.name === step.name;
     })
-    project.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
-    project.tasks[taskIndex] = updatedTask;
-    const updatedProject = await updateProjectCosts(project);
-    res.send(updatedProject);
+    updatedProject.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
+    updatedProject.tasks[taskIndex] = updatedTask;
+    const result = await updateProjectCosts(updatedProject);
+    res.send(result);
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting step payables');

@@ -193,13 +193,13 @@ const ratesduoDefault = [];
 
 const clientsDefault = [
     {name: "DDD", website: "www.ddd.com", status: "Active", contract: "", nda: "", accountManager: "aran.s", salesManager: "eirini.loi", projectManager: "illy.dim", leadSource: "Website", salesComission: "Passed threshold", officialName: "DDD LTD", contactName: "Jack Di", email: "ddd@ddd.com", vat: "", address: "345 DSD Street, Moscow, Russia", languageCombinations: [], industry: [{name: "Hotel & Real Estates"}], contacts: [{
-        photo: "", name: "Sam", surname: "Nolan", email: "sam@ddd.com", gender: "Male", position: "Manager", phone: 12345678, skype: "samNol", country: "Australia", timezone: "(UTC+10:00) Canberra, Melbourne, Sydney", leadContact: true, notes: ""}]
+        photo: "", firstName: "Sam", surname: "Nolan", email: "sam@ddd.com", gender: "Male", position: "Manager", phone: 12345678, skype: "samNol", country: "Australia", timezone: "(UTC+10:00) Canberra, Melbourne, Sydney", leadContact: true, notes: ""}]
     },
     {name: "EEE", website: "www.eee.com", status: "Active", contract: "", nda: "", accountManager: "angela.st", salesManager: "eirini.loi", projectManager: "illy.dim", leadSource: "Internet", salesComission: "Passed threshold", officialName: "EEE LTD", contactName: "Mark Brenson", email: "eee@eee.com", vat: "", address: "Old Street, Warsaw, Poland", languageCombinations: [], industry: [{name: "Legal"}], contacts: [{
-        photo: "", name: "Ella", surname: "Johns", email: "el@eee.com", gender: "Female", position: "Manager", phone: 12345678, skype: "el-jo", country: "Bahamas", timezone: "(UTC-04:00) Georgetown, La Paz, Manaus, San Juan", leadContact: true, notes: ""}]
+        photo: "", firstName: "Ella", surname: "Johns", email: "el@eee.com", gender: "Female", position: "Manager", phone: 12345678, skype: "el-jo", country: "Bahamas", timezone: "(UTC-04:00) Georgetown, La Paz, Manaus, San Juan", leadContact: true, notes: ""}]
     },
     {name: "FFF", website: "www.fff.com", status: "Inactive", contract: "", nda: "", accountManager: "aran.s", salesManager: "eirini.loi", projectManager: "alexia.m", leadSource: "Friend", salesComission: "Passed threshold", officialName: "FFF LTD", contactName: "Bruce Lee", email: "fff@fff.com", vat: "", address: "32 Ave, Seattle WA, USA", languageCombinations: [], industry: [{name: "CFDs & Online Trading"}], contacts: [{
-        photo: "", name: "Chen", surname: "Dong", email: "chen@fff.com", gender: "Male", position: "Manager", phone: 12345678, skype: "dong", country: "United States of America", timezone: "(UTC-06:00) Central America", leadContact: true, notes: ""}]
+        photo: "", firstName: "Chen", surname: "Dong", email: "chen@fff.com", gender: "Male", position: "Manager", phone: 12345678, skype: "dong", country: "United States of America", timezone: "(UTC-06:00) Central America", leadContact: true, notes: ""}]
     }
 ];
 

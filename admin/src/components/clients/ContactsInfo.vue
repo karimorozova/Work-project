@@ -29,7 +29,7 @@
             tbody
                 tr(v-for="(contact, ind) in client.contacts")  
                     td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
-                        input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.name")
+                        input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.firstName")
                     td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 
                         input.contact-info(type="text" :readonly="contact.icons[0].active" v-model="contact.email")
                     td(:class="{editing: !contact.icons[0].active}" @click="contactDetails(ind)") 

@@ -19,7 +19,7 @@
                 .names-gender
                     .names-gender__item
                         label Name:
-                        input.personal(type="text" placeholder="Name" v-model="client.contacts[ind].name")
+                        input.personal(type="text" placeholder="Name" v-model="client.contacts[ind].firstName")
                     .names-gender__item
                         label Surname:
                         input.personal(type="text" placeholder="Surname" v-model="client.contacts[ind].surname")
