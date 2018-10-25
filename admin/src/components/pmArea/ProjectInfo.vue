@@ -118,7 +118,8 @@ export default {
             alertToggle: 'alertToggle',
             removeStepVendor: 'removeStepVendor',
             setStepVendor: 'setStepVendor',
-            setStepDate: 'setStepDate'
+            setStepDate: 'setStepDate',
+            alerting: "alerting"
         }),
         showTab({tab}) {
             if(tab === 'Tasks') {
@@ -341,6 +342,7 @@ export default {
             this.$router.replace({name: "pm-projects"})
         };
         this.defaultService();
+        this.alerting();
 
     }
 }

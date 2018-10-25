@@ -1,0 +1,1 @@
+export const alerting = ({commit}) => commit('alertus');
