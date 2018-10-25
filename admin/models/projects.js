@@ -109,6 +109,9 @@ const ProjectsSchema = new mongoose.Schema({
   isClientOfferClicked: {
     type: Boolean,
     default: false
+  },
+  finance: {
+    type: Object
   }
 });
 

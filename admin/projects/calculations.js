@@ -122,14 +122,46 @@ async function calcProofingStep({task, project, words}) {
 }
 
 async function updateProjectCosts(project) {
-    project.receivables = project.steps.reduce((init, current) => {
+    let receivables = project.steps.reduce((init, current) => {
         return +init + +current.receivables
     }, 0).toFixed(2);
-    project.payables = project.steps.reduce((init, current) => {
+    const payables = project.steps.reduce((init, current) => {
         return +init + +current.payables
     }, 0).toFixed(2);
-    return await updateProject({"_id": project.id}, 
-    {steps: project.steps, tasks: project.tasks, receivables: project.receivables, payables: project.payables});
+    let finance = {};
+    finance['Wordcount'] = getWordsData(project);
+    finance['Price'] = {'receivables': receivables, 'payables': payables};
+    let updatedProject = {};
+    let discount = {};
+    if(project.finance['Discount']) {
+        discount = {...project.finance['Discount']};
+        discount.receivables = (receivables/100*discount.value).toFixed(2);
+        finance['Price'].receivables -= discount.receivables;
+        finance['Discount'] = discount;
+    }
+    updatedProject = {...project, finance};
+    return await updateProject({"_id": project.id}, updatedProject);
+}
+
+function getWordsData(project) {
+    let receivableWords = 0;
+    let payableWords = 0;
+    for(const task of project.tasks) {
+        const taskPayableWords = wordsCalculation(task);
+        payableWords += taskPayableWords;
+        receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
+    }
+    return {'receivables': receivableWords, 'payables': payableWords}
+}
+
+function  wordsCalculation(task) {
+    const excludeKeys = ["nonTranslatable", "totalWords"]
+    const words = Object.keys(task.metrics).filter(item => {
+        return excludeKeys.indexOf(item) === -1;
+    }).reduce((init, cur) => {
+        return init + task.metrics[cur].value;
+    }, 0)
+    return words;
 }
 
 function getCombination({combs, service, task}) {

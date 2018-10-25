@@ -68,12 +68,13 @@ router.get('/costs', async (req, res) => {
   const { projectId } = req.query;
   try {
     let project = await getProject({"_id": projectId});
-    for(let task of project.tasks) {
+    let updatedProject = {...project._doc, id: projectId};
+    for(let task of updatedProject.tasks) {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
-      for(let step of project.steps) {
+      for(let step of updatedProject.steps) {
         const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
-        : await receivablesCalc({task, project, step, combs: combinations});
+        : await receivablesCalc({task, updatedProject, step, combs: combinations});
         if(step.taskId === task.id) {
           step.clientRate = receivables.rate;
           step.receivables = receivables.cost;
@@ -81,8 +82,8 @@ router.get('/costs', async (req, res) => {
         }
       }
     }
-    const updatedProject = await updateProjectCosts(project);
-    res.send(updatedProject);
+    const result = await updateProjectCosts(updatedProject);
+    res.send(result);
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting costs');

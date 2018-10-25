@@ -34,7 +34,6 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        
     },
     data() {
         return {
@@ -45,11 +44,6 @@ export default {
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
             ],
-            financeData: [
-                {title: "Wordcount", receivables: "", payables: "", margin: ""},
-                {title: "Price", receivables: "", payables: "", margin: ""}
-            ],
-            excludeKeys: ["nonTranslatable", "totalWords"],
             discountOptions: ["Discount-1", "Discount-2", "Discount-3"]
         }
     },
@@ -62,54 +56,28 @@ export default {
         },
         toggleFinance() {
             this.isFinanceShow = !this.isFinanceShow;
-        },
-        getWordsData() {
-            let receivableWords = 0;
-            let payableWords = 0;
-            for(const task of this.currentProject.tasks) {
-                const taskPayableWords = this.wordsCalculation(task);
-                payableWords += taskPayableWords;
-                receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
-            }
-            const margin = receivableWords - payableWords;
-            return {payableWords, receivableWords, margin}
-        },
-        fillFinanceData() {
-            const { payableWords, receivableWords, margin } = this.getWordsData();
-            for(let obj of this.financeData) {
-                if(obj.title === "Wordcount") {
-                    obj.receivables = receivableWords;
-                    obj.payables = payableWords;
-                    obj.margin = margin;
-                }
-                if(obj.title === "Price") {
-                    obj.receivables = this.currentProject.receivables;
-                    obj.payables = this.currentProject.payables;
-                    obj.margin = this.currentProject.receivables - this.currentProject.payables;
-                }
-            }
-        },
-        wordsCalculation(task) {
-            const words = Object.keys(task.metrics).filter(item => {
-                return this.excludeKeys.indexOf(item) === -1;
-            }).reduce((init, cur) => {
-                return init + task.metrics[cur].value;
-            }, 0)
-            return words;
-        },
+        }
     },
     computed: {
         ...mapGetters({
             currentProject: "getCurrentProject"
         }),
-        
+        financeData() {
+            const finance = {...this.currentProject.finance};
+            let result = Object.keys(finance).map(key => {
+                let margin = (finance[key].receivables - finance[key].payables).toFixed(2);
+                return {
+                    title: key, 
+                    receivables: finance[key].receivables,
+                    payables: finance[key].payables,
+                    margin: margin}
+            })
+            return result;
+        }
     },
     components: {
         DataTable,
         Add
-    },
-    mounted() {
-        this.fillFinanceData();
     }
 }
 </script>

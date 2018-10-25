@@ -77,7 +77,7 @@ export default {
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
                 {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "12%"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
-                {label: "Receivables", headerKey: "headerRecievables", key: "receivables", width: "7%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "7%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%"},
                 {label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%"},
                 {label: "Start date", headerKey: "headerCreatedAt", key: "createdAt", width: "7%"},
