@@ -157,7 +157,7 @@ export default {
     max-height: 400px;
     margin-bottom: 0;
 }
-.step-files_centered {
+.step-files_centered, .tasks_centered {
     display: flex;
     justify-content: center;
 }

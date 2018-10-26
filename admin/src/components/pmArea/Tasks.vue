@@ -47,25 +47,30 @@
             template(slot="check" slot-scope="{ row }")
                 input.tasks__task-data(type="checkbox" v-model="row.check" @change="selectTask")
             template(slot="taskId" slot-scope="{ row }")
-                span.tasks__task-data {{ row.id }}
+                span.tasks__task-data {{ row.taskId }}
             template(slot="language" slot-scope="{ row }")
                 span.tasks__task-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="start" slot-scope="{ row }")
-                span.tasks__task-data {{ row.start }}
+                span.tasks__task-data {{ formatDate(row.start) }}
             template(slot="deadline" slot-scope="{ row }")
-                span.tasks__task-data {{ row.deadline }}
+                span.tasks__task-data {{ formatDate(row.deadline) }}
             template(slot="progress" slot-scope="{ row }")
-                span.tasks__task-data {{ row.progress }}
+                .tasks__progress-bar(v-if="progress(row)")
+                    .tasks__progress-filler(:style="{width: progress(row) + '%'}")
+                    span.tasks__progress-tooltip {{ progress(row) }}%
             template(slot="status" slot-scope="{ row }")
                 span.tasks__task-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
+                span.tasks__money(v-if="row.receivables") &euro;
                 span.tasks__task-data {{ row.receivables }}
             template(slot="payables" slot-scope="{ row }")
+                span.tasks__money(v-if="row.payables") &euro;
                 span.tasks__task-data {{ row.payables }}
             template(slot="margin" slot-scope="{ row }")
-                span.tasks__task-data {{ row.cost }}
+                span.tasks__money(v-if="row.margin") &euro;
+                span.tasks__task-data {{ row.margin }}
             template(slot="delivery" slot-scope="{ row }")
-                span.tasks__task-data {{ row.delivery }}
+                img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../assets/images/download-big-b.png")
 </template>
 
 <script>
@@ -84,16 +89,16 @@ export default {
         return {
             fields: [
                 {label: "check", headerKey: "headerCheck", key: "check", width: "4%"},
-                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "10%"},
+                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "14%"},
                 {label: "Language", headerKey: "headerLanguage", key: "language", width: "11%"},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "9%"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "10%"},
-                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "11%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "10%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%"},
-                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "9%"},
-                {label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "9%"},
+                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
+                {label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "7%", cellClass: "tasks_centered"},
             ],
             actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
@@ -111,6 +116,15 @@ export default {
         showTab({index}) {
             return this.tabs[index] === 'Tasks' ? true
             : this.$emit('showTab', { tab: this.tabs[index] });
+        },
+        formatDate(date) {
+            return date.split('T')[0].split('-').reverse().join('-');
+        },
+        progress(task) {
+            const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.id);
+            return taskSteps.reduce((init, cur) => {
+                return init + (cur.progress.wordsDone/cur.progress.wordsTotal)*100/taskSteps.length;
+            }, 0).toFixed(2);
         },
         async selectAll() {
             let tasks = [];
@@ -141,6 +155,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .tasks {
     display: flex;
     flex-direction: column;
@@ -155,6 +171,39 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
+    }
+    &__progress-tooltip {
+        position: absolute;
+        opacity: 0;
+        background-color: $white;
+        color: $main-color;
+        transition: all 0.2s;
+        font-size: 14px;
+        top: -1px;
+        left: 14px;
+        padding: 0 3px;
+    }
+    &__progress-bar {
+        width: 100%;
+        height: 15px;
+        border: 1px solid $brown-border;
+        position: relative;
+        box-sizing: border-box;
+        padding: 1px;
+        &:hover {
+            .tasks__progress-tooltip {
+                opacity: 1;
+            }
+        }
+    }
+    &__progress-filler {
+        background-color: $green-success;
+        height: 100%;
+    }
+    &__delivery-image {
+        height: 18px;
+        width: 18px;
+        cursor: pointer;
     }
 }
 </style>

@@ -18,7 +18,7 @@
         .project-details__contact-info(v-for="(contact, index) in selectedContacts")
             .project-details__contact-name {{ contact.firstName }} {{ contact.surname }}
             .project-details__contact-icons
-                .project-details__icon(@click="removeContact(index)" v-if="index !== 0")
+                .project-details__icon(@click="removeContact(index)" v-if="index")
                     span.project-details__remove remove
                 .project-details__icon
                     i.fa.fa-info-circle

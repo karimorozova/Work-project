@@ -22,6 +22,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
         const filesToTranslate = await storeFiles(sourceFiles, tasksInfo.projectId);
         const referenceFiles = await storeFiles(refFiles, tasksInfo.projectId);
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
+        let tasksLength = project.tasks.length + 1;
         for(let target of tasksInfo.targets) {
             let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`
             let xtmProject = await saveTemplateTasks({
@@ -33,10 +34,15 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 templateId: template,
                 workflowId: workflow
             });
+            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
+            let taskId = project.projectId + ` ${idNumber}`;
             await Projects.updateOne({"_id": project._id}, 
             {$set: {xtmId: xtmProject.projectId, sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
-            $push: {tasks: {id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", check: false}}}
+            $push: {tasks: {taskId: taskId, id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
+                deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
+                receivables: "", payables: "", margin: "", check: false}}}
             );
+            tasksLength++
         }
         const updatedProject = await getProject({"_id": tasksInfo.projectId});
         res.send(updatedProject);
