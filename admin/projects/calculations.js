@@ -77,9 +77,8 @@ async function payablesCalc({task, project, step}) {
         return item.industry.id === project.industry.id
     }) : "";
     const rate = wordCost ? wordCost.rate : vendor.basicRate;
-    step.payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
+    step.finance['Price'].payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
     : calcCost(metrics, 'vendor', rate);
-    step.margin = (step.receivables - step.payables).toFixed(2);
     step.vendorRate = rate;
     return step;
 }
@@ -122,11 +121,11 @@ async function calcProofingStep({task, project, words}) {
 }
 
 async function updateProjectCosts(project) {
-    let receivables = project.steps.reduce((init, current) => {
-        return +init + +current.receivables
+    let receivables = project.tasks.reduce((init, current) => {
+        return +init + +current.finance['Price'].receivables
     }, 0).toFixed(2);
-    const payables = project.steps.reduce((init, current) => {
-        return +init + +current.payables
+    const payables = project.tasks.reduce((init, current) => {
+        return +init + +current.finance['Price'].payables
     }, 0).toFixed(2);
     let finance = {};
     finance['Wordcount'] = getWordsData(project);

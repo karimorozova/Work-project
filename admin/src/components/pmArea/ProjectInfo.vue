@@ -106,8 +106,9 @@ export default {
             statuses: ["Accepted", "Draft", "Open", "Ready"],
             sourceFiles: [],
             refFiles: [],
-            isStepsShow: true,
-            isTasksShow: false
+            isStepsShow: false,
+            isTasksShow: true,
+            excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
     methods: {
@@ -215,6 +216,15 @@ export default {
                 this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
             }
         },
+        wordsCalculation(metrics) {
+            const payables = Object.keys(metrics).filter(item => {
+                return this.excludeKeys.indexOf(item) === -1;
+            }).reduce((init, cur) => {
+                return init + metrics[cur].value;
+            }, 0);
+            const receivables = metrics.totalWords - metrics.nonTranslatable;
+            return { receivables, payables };
+        },
         async getMetrics() {
             let project = JSON.stringify(this.currentProject);
             project = JSON.parse(project);
@@ -223,6 +233,7 @@ export default {
                     const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
                     const { taskMetrics, progress } = metrics.body;
                     task.metrics = {...taskMetrics};
+                    task.finance.Wordcount = this.wordsCalculation(task.metrics);
                     const keysArr = Object.keys(progress);
                     for(const key in progress) {
                         const existedTask = project.steps.find(item => {
@@ -244,6 +255,10 @@ export default {
                                 receivables: "",
                                 payables: "",
                                 clientRate: "",
+                                finance: {
+                                    'Wordcount': { ...task.finance.Wordcount },
+                                    'Price': {receivables: "", payables: ""}
+                                },
                                 vendorRate: "",
                                 margin: "",
                                 check: false,

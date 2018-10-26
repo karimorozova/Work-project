@@ -86,14 +86,14 @@
             template(slot="status" slot-scope="{ row }")
                 span.steps__step-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
-                span.steps__money(v-if="row.receivables") &euro;
-                span.steps__step-data {{ row.receivables }}
+                span.steps__money(v-if="row.finance.Price.receivables") &euro;
+                span.steps__step-data {{ row.finance.Price.receivables }}
             template(slot="payables" slot-scope="{ row }")
-                span.steps__money(v-if="row.payables") &euro;                
-                span.steps__step-data {{ row.payables }}
+                span.steps__money(v-if="row.finance.Price.payables") &euro;                
+                span.steps__step-data {{ row.finance.Price.payables }}
             template(slot="margin" slot-scope="{ row }")
-                span.steps__money(v-if="row.margin") &euro;
-                span.steps__step-data {{ row.margin }}
+                span.steps__money(v-if="+marginCalc(row.finance.Price)") &euro;
+                span.steps__step-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="expanded" slot-scope="{ row, index }")
                 StepInfo(
                     :step="row"
@@ -160,6 +160,9 @@ export default {
         showTab({index}) {
             return this.tabs[index] === 'Steps' ? true
             : this.$emit('showTab', { tab: this.tabs[index] });
+        },
+        marginCalc(finance) {
+            return (finance.receivables - finance.payables).toFixed(2);
         },
         getTask(index) {
             return this.tasks.find(item => {

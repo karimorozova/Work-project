@@ -46,11 +46,10 @@ export default {
     },
     data() {
         return {
-            financeData: [
-                {title: "Wordcount", receivables: "", payables: "", margin: ""},
-                {title: "Price", receivables: "", payables: "", margin: ""},
-                {title: "Discount 10%", receivables: "", payables: "", margin: ""},
-            ],
+            // financeData: [
+            //     {title: "Wordcount", receivables: "", payables: "", margin: ""},
+            //     {title: "Price", receivables: "", payables: "", margin: ""}
+            // ],
             matrixData: [],
             stepFiles: [],
             excludeKeys: ["nonTranslatable", "totalWords"]
@@ -61,7 +60,7 @@ export default {
             for(let obj of this.financeData) {
                 const matchedWords = this.wordsCalculation();
                 if(obj.title === "Wordcount") {
-                    obj.receivables = this.task.metrics.totalWords - this.task.metrics.nonTranslatable;;
+                    obj.receivables = this.task.metrics.totalWords - this.task.metrics.nonTranslatable;
                     obj.payables = matchedWords;
                     obj.margin = obj.receivables - obj.payables;
                 }
@@ -69,9 +68,6 @@ export default {
                     obj.receivables = this.step.receivables;
                     obj.payables = this.step.payables;
                     obj.margin = this.step.margin;
-                }
-                if(obj.title === "Discount 10%") {
-                    obj.receivables = this.step.discount || "";
                 }
             }
         },
@@ -174,7 +170,19 @@ export default {
     computed: {
         ...mapGetters({
             currentProject: "getCurrentProject"
-        })
+        }),
+        financeData() {
+            return Object.keys(this.step.finance).reduce((init, cur) => {
+                const margin = this.step.finance[cur].receivables - this.step.finance[cur].payables;
+                return [...init, {
+                    title: cur,
+                    receivables: +this.step.finance[cur].receivables,
+                    payables: +this.step.finance[cur].payables,
+                    margin: +margin.toFixed(2)
+                    }
+                ]
+            },[])
+        }
     },
     components: {
         Vendor,
@@ -183,7 +191,7 @@ export default {
         Files
     },
     mounted() {
-        this.getFinanceData();
+        // this.getFinanceData();
         this.getMatrixData('clientRate', 'client');
         this.getStepFiles();
     }

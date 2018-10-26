@@ -60,7 +60,7 @@ export default {
             this.isInfoShown = !this.isInfoShown;
         },
         showMoney(row, key) {
-            return (row.title === "Price" || row.title === "Discount 10%") && row[key]
+            return row.title !== "Wordcount" && row[key]
         }
     },
     computed: {

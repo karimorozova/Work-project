@@ -74,16 +74,14 @@ router.get('/costs', async (req, res) => {
       const combinations = service.languageCombinations;
       for(let step of projectToUpdate.steps) {
         if(step.taskId === task.id) {
-          const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
-          : await receivablesCalc({task, projectToUpdate, step, combs: combinations});
+          const receivables = step.finance['Price'].receivables ? {rate: step.clientRate, cost: step.finance['Price'].receivables}
+          : await receivablesCalc({task, project: projectToUpdate, step, combs: combinations});
           step.clientRate = receivables.rate;
-          step.receivables = receivables.cost;
-          step.margin = (step.receivables - step.payables).toFixed(2);
+          step.finance['Price'].receivables = receivables.cost;
         }
       }
-      task.receivables = projectToUpdate.steps.filter(item => item.taskId === task.id)
-      .reduce((init,cur) => init + +cur.receivables, 0).toFixed(2);
-      task.margin = (task.receivables - task.payables).toFixed(2);
+      task.finance['Price'].receivables = projectToUpdate.steps.filter(item => item.taskId === task.id)
+      .reduce((init,cur) => init + +cur.finance['Price'].receivables, 0).toFixed(2);
     }
     const updatedProject = await updateProjectCosts(projectToUpdate);
     res.send(updatedProject);
@@ -108,9 +106,8 @@ router.post('/step-payables', async (req, res) => {
       return item.taskId == step.taskId && item.name === step.name;
     })
     projectToUpdate.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
-    updatedTask.payables = projectToUpdate.steps.filter(item => item.taskId === updatedTask.id)
-    .reduce((init, cur) => init + +cur.payables, 0).toFixed(2);
-    updatedTask.margin = (updatedTask.receivables - updatedTask.payables).toFixed(2); 
+    updatedTask.finance['Price'].payables = projectToUpdate.steps.filter(item => item.taskId === updatedTask.id)
+    .reduce((init, cur) => init + +cur.finance['Price'].payables, 0).toFixed(2);
     projectToUpdate.tasks[taskIndex] = updatedTask;
     const updatedProject = await updateProjectCosts(projectToUpdate);
     res.send(updatedProject);

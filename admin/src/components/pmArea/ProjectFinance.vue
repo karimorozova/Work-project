@@ -18,10 +18,13 @@
             template(slot="title" slot-scope="{ row }")
                 span.project-finance__data {{ row.title }}
             template(slot="receivables" slot-scope="{ row }")
+                span(v-if="row.receivables") &euro;
                 span.project-finance__data {{ row.receivables }}
             template(slot="payables" slot-scope="{ row }")
+                span(v-if="row.payables") &euro;
                 span.project-finance__data {{ row.payables }}
             template(slot="margin" slot-scope="{ row }")
+                span(v-if="row.margin") &euro;
                 span.project-finance__data {{ row.margin }}
         .project-finance__add-row
             Add(@add="addRow")

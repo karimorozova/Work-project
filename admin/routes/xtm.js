@@ -40,7 +40,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             {$set: {xtmId: xtmProject.projectId, sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
             $push: {tasks: {taskId: taskId, id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
                 deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
-                receivables: "", payables: "", margin: "", check: false}}}
+                receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
             );
             tasksLength++
         }

@@ -61,14 +61,14 @@
             template(slot="status" slot-scope="{ row }")
                 span.tasks__task-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
-                span.tasks__money(v-if="row.receivables") &euro;
-                span.tasks__task-data {{ row.receivables }}
+                span.tasks__money(v-if="row.finance.Price.receivables") &euro;
+                span.tasks__task-data {{ row.finance.Price.receivables }}
             template(slot="payables" slot-scope="{ row }")
-                span.tasks__money(v-if="row.payables") &euro;
-                span.tasks__task-data {{ row.payables }}
+                span.tasks__money(v-if="row.finance.Price.payables") &euro;
+                span.tasks__task-data {{ row.finance.Price.payables }}
             template(slot="margin" slot-scope="{ row }")
-                span.tasks__money(v-if="row.margin") &euro;
-                span.tasks__task-data {{ row.margin }}
+                span.tasks__money(v-if="+marginCalc(row.finance.Price)") &euro;
+                span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
                 img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../assets/images/download-big-b.png")
 </template>
@@ -114,11 +114,15 @@ export default {
             return
         },
         showTab({index}) {
-            return this.tabs[index] === 'Tasks' ? true
+            return !this.currentProject.steps.length || this.tabs[index] === 'Tasks' ? true
             : this.$emit('showTab', { tab: this.tabs[index] });
+          
         },
         formatDate(date) {
             return date.split('T')[0].split('-').reverse().join('-');
+        },
+        marginCalc(finance) {
+            return (finance.receivables - finance.payables).toFixed(2);
         },
         progress(task) {
             const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.id);

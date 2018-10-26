@@ -111,9 +111,13 @@ const ProjectsSchema = new mongoose.Schema({
     default: false
   },
   finance: {
-    type: Object
+    type: Object,
+    default: {
+      'Wordcount': {},
+      'Price': {}
+    }
   }
-});
+},{ minimize: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);
 
