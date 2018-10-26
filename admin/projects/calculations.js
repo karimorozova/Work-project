@@ -131,7 +131,7 @@ async function updateProjectCosts(project) {
     let finance = {};
     finance['Wordcount'] = getWordsData(project);
     finance['Price'] = {'receivables': receivables, 'payables': payables};
-    let updatedProject = {};
+    let projectToUpdate = {};
     let discount = {};
     if(project.finance['Discount']) {
         discount = {...project.finance['Discount']};
@@ -139,8 +139,8 @@ async function updateProjectCosts(project) {
         finance['Price'].receivables -= discount.receivables;
         finance['Discount'] = discount;
     }
-    updatedProject = {...project, finance};
-    return await updateProject({"_id": project.id}, updatedProject);
+    projectToUpdate = {...project, finance};
+    return await updateProject({"_id": project.id}, projectToUpdate);
 }
 
 function getWordsData(project) {

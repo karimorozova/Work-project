@@ -55,11 +55,12 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                PersonSelect(
-                    :persons="vendors"
-                    :selectedPerson="vendorName(row.vendor)"
-                    @setPerson="(person) => setVendor(person, index)"
-                )
+                .steps__vendor-menu
+                    PersonSelect(
+                        :persons="vendors"
+                        :selectedPerson="vendorName(row.vendor)"
+                        @setPerson="(person) => setVendor(person, index)"
+                    )
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(@selected="(e) => changeDate(e, 'start', index)" 
                     v-model="row.start"
@@ -304,6 +305,11 @@ export default {
     &__progress-filler {
         background-color: $green-success;
         height: 100%;
+    }
+    &__vendor-menu {
+        position: relative;
+        width: 100%;
+        height: 29px;
     }
 }
 </style>

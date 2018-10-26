@@ -20,7 +20,7 @@ const state = {
     requestCounter: 0
 };
 
-export const overall = {
+export const generalStore = {
     state,
     actions,
     mutations,

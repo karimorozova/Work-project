@@ -68,13 +68,13 @@ router.get('/costs', async (req, res) => {
   const { projectId } = req.query;
   try {
     let project = await getProject({"_id": projectId});
-    let updatedProject = {...project._doc, id: projectId};
-    for(let task of updatedProject.tasks) {
+    let projectToUpdate = {...project._doc, id: projectId};
+    for(let task of projectToUpdate.tasks) {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
-      for(let step of updatedProject.steps) {
+      for(let step of projectToUpdate.steps) {
         const receivables = step.receivables ? {rate: step.clientRate, cost: step.receivables}
-        : await receivablesCalc({task, updatedProject, step, combs: combinations});
+        : await receivablesCalc({task, projectToUpdate, step, combs: combinations});
         if(step.taskId === task.id) {
           step.clientRate = receivables.rate;
           step.receivables = receivables.cost;
@@ -82,8 +82,8 @@ router.get('/costs', async (req, res) => {
         }
       }
     }
-    const result = await updateProjectCosts(updatedProject);
-    res.send(result);
+    const updatedProject = await updateProjectCosts(projectToUpdate);
+    res.send(updatedProject);
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting costs');
@@ -94,7 +94,7 @@ router.post('/step-payables', async (req, res) => {
   let { projectId, step } = req.body;
   try {
     let project = await getProject({"_id": projectId});
-    let updatedProject = {...project._doc, id: projectId};
+    let projectToUpdate = {...project._doc, id: projectId};
     const taskIndex = project.tasks.findIndex(item => {
       return item.id == step.taskId;
     })
@@ -104,10 +104,10 @@ router.post('/step-payables', async (req, res) => {
     const stepIndex = project.steps.findIndex(item => {
       return item.taskId == step.taskId && item.name === step.name;
     })
-    updatedProject.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
-    updatedProject.tasks[taskIndex] = updatedTask;
-    const result = await updateProjectCosts(updatedProject);
-    res.send(result);
+    projectToUpdate.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
+    projectToUpdate.tasks[taskIndex] = updatedTask;
+    const updatedProject = await updateProjectCosts(projectToUpdate);
+    res.send(updatedProject);
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting step payables');

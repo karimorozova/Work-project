@@ -4,11 +4,11 @@
         template(v-if="selectedPerson")
             span.selected {{ selectedPerson }}
         template(v-if="!selectedPerson") 
-            span.selected.no-industry Select
+            span.selected.no-select Select
         .arrow-button(@click="togglePersons")
             img(src="../../assets/images/open-close-arrow-brown.png" :class="{'reverse-icon': isDropped}")
     .drop(v-if="isDropped")
-        .drop__item(v-for="(person, index) in persons" @click="setPerson(index)" :class="{chosen: selectedPerson === person.firstName + ' ' + person.surname}")
+        .drop__item(v-for="(person, index) in persons" @click="setPerson(index)" :class="{chosen: selectedPerson === getPersonFullName(person)}")
             span {{ person.firstName }} {{ person.surname }}
 </template>
 
@@ -37,9 +37,12 @@ export default {
         outClick() {
             this.isDropped = false;
         },
-        setPerson(ind) {
+        getPersonFullName(person) {
+            return person.firstName + ' ' + person.surname;
+        },
+        setPerson(index) {
             this.isDropped = false;
-            this.$emit('setPerson', {person: this.persons[ind]})
+            this.$emit('setPerson', {person: this.persons[index]})
         },
     },
     directives: {
@@ -52,15 +55,12 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .select {
-    border: 1px solid $main-color;
-    border-radius: 5px;
     width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -83,7 +83,7 @@ export default {
         border: 1px solid $light-brown;
         border-radius: 5px;
     }
-    .no-industry {
+    .no-select {
         opacity: 0.5;
     }
     .arrow-button {
@@ -91,6 +91,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        border-left: 1px solid $brown-border;
         cursor: pointer;
         img {
             padding-right: 2px;
@@ -100,17 +101,19 @@ export default {
         }
         .steps__table & {
             padding-top: 3px;
+            border-left: 1px solid $light-brown;
         }
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
     width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     .drop {
         font-size: 14px;
-        position: absolute;
         width: 100%;
-        box-sizing: border-box;
         border: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
@@ -118,7 +121,7 @@ export default {
         display: flex;
         flex-direction: column;
         background-color: $white;
-        z-index: 6;
+        z-index: 10;
         &__item {
             display: flex;
             align-items: center;
@@ -133,10 +136,21 @@ export default {
             &:hover {
                 background-color: $active-background;
             }
+            .project-details__drop-menu & {
+                padding: 7px;
+            }
         }
         .chosen {
             background-color: $active-background;
         }
+        .project-details__drop-menu & {
+            border: none;
+            border-top: 1px solid $brown-border;
+        }
+    }
+    .project-details__drop-menu & {
+        border: 1px solid $brown-border;
+        border-radius: 5px;
     }
 }
 
