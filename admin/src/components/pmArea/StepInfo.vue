@@ -46,43 +46,14 @@ export default {
     },
     data() {
         return {
-            // financeData: [
-            //     {title: "Wordcount", receivables: "", payables: "", margin: ""},
-            //     {title: "Price", receivables: "", payables: "", margin: ""}
-            // ],
             matrixData: [],
             stepFiles: [],
             excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
     methods: {
-        getFinanceData() {
-            for(let obj of this.financeData) {
-                const matchedWords = this.wordsCalculation();
-                if(obj.title === "Wordcount") {
-                    obj.receivables = this.task.metrics.totalWords - this.task.metrics.nonTranslatable;
-                    obj.payables = matchedWords;
-                    obj.margin = obj.receivables - obj.payables;
-                }
-                if(obj.title === "Price") {
-                    obj.receivables = this.step.receivables;
-                    obj.payables = this.step.payables;
-                    obj.margin = this.step.margin;
-                }
-            }
-        },
-        wordsCalculation() {
-            const words = Object.keys(this.task.metrics).filter(item => {
-                return this.excludeKeys.indexOf(item) === -1;
-            }).reduce((init, cur) => {
-                return init + this.task.metrics[cur].value;
-            }, 0)
-            return words;
-        },
         addFinanceData() {
-            this.financeData.push({
-                title: "", receivables: "", payables: "", margin: ""
-            })
+            return
         },
         getMatrixData(rateProp, prop) {
             if(this.step.name !== "translate1") {
@@ -191,7 +162,6 @@ export default {
         Files
     },
     mounted() {
-        // this.getFinanceData();
         this.getMatrixData('clientRate', 'client');
         this.getStepFiles();
     }
