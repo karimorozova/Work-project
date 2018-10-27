@@ -16,16 +16,28 @@
             template(slot="headerMargin" slot-scope="{ field }")
                 span.project-finance__label {{ field.label }}
             template(slot="title" slot-scope="{ row }")
-                span.project-finance__data {{ row.title }}
+                .project-finance__data-title(v-if="row.title !== 'Select'")
+                    span.project-finance__data {{ row.title }}
+                .project-finance__drop-menu(v-if="row.title === 'Select'")
+                    SelectSingle(
+                        placeholder="Select"
+                        :selectedOption="selectedAdditionalOption"
+                        :options="discountOptions"
+                        @chooseOption="setDiscount"
+                    )
             template(slot="receivables" slot-scope="{ row }")
-                span(v-if="row.receivables") &euro;
-                span.project-finance__data {{ row.receivables }}
+                template(v-if="+row.receivables")
+                    span.project-finance__euro-sign(v-if="showEuroSign(row)") &euro;
+                    span.project-finance__data {{ row.receivables }}
+                template(v-if="row.title === 'Select'")
+                    input.project-finance__percent-value(type="number" min="0" max="100" v-model="additionalValue")
+                    span.project-finance__percent %
             template(slot="payables" slot-scope="{ row }")
-                span(v-if="row.payables") &euro;
-                span.project-finance__data {{ row.payables }}
+                span(v-if="+row.payables && showEuroSign(row)") &euro;
+                span.project-finance__data(v-if="+row.payables") {{ row.payables }}
             template(slot="margin" slot-scope="{ row }")
-                span(v-if="row.margin") &euro;
-                span.project-finance__data {{ row.margin }}
+                span(v-if="+row.margin && showEuroSign(row)") &euro;
+                span.project-finance__data(v-if="+row.margin") {{ row.margin }}
         .project-finance__add-row
             Add(@add="addRow")
 </template>
@@ -34,6 +46,7 @@
 import DataTable from "../DataTable";
 import Add from "../Add";
 import { mapGetters, mapActions } from "vuex";
+import SelectSingle from "../SelectSingle";
 
 export default {
     props: {
@@ -42,23 +55,32 @@ export default {
         return {
             isFinanceShow: false,
             fields: [
-                {label: "Title", headerKey: "headerTitle", key: "title", width: "25%"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: "25%", cellClass: "project-finance_no-padding"},
                 {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "25%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
             ],
-            discountOptions: ["Discount-1", "Discount-2", "Discount-3"]
+            discountOptions: ["Discount-1", "Discount-2", "Discount-3"],
+            selectedAdditionalOption: "",
+            additionalValue: 5
         }
     },
     methods: {
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            addFinanceProperty: "addFinanceProperty"
         }),
         addRow() {
-            this.financeData.push({title: "", receivables: ""});
+            this.addFinanceProperty({receivables: "", payables: ""});
         },
         toggleFinance() {
             this.isFinanceShow = !this.isFinanceShow;
+        },
+        setDiscount({option}) {
+            this.selectedAdditionalOption = option;
+        },
+        showEuroSign(data) {
+            return data.title !== 'Wordcount';
         }
     },
     computed: {
@@ -73,19 +95,23 @@ export default {
                     title: key, 
                     receivables: finance[key].receivables,
                     payables: finance[key].payables,
-                    margin: margin}
+                    margin: margin
+                    }
             })
             return result;
         }
     },
     components: {
         DataTable,
+        SelectSingle,
         Add
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .project-finance {
     box-sizing: border-box;
     width: 60%;
@@ -107,6 +133,27 @@ export default {
     }
     &__table {
         padding: 0 20px 20px 20px;
+    }
+    &__drop-menu {
+        position: relative;
+        height: 26px;
+        top: 0;
+    }
+    &__percent-value {
+        outline: 1px solid $blue-outline;
+        border: none;
+        padding-left: 5px;
+        width: 24px;
+        margin-right: 3px;
+        color: $main-color;
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button, {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+    &__data-title {
+        padding: 7px 6px;
     }
 }
 </style>

@@ -49,7 +49,7 @@ export default {
     },
     data() {
         return {
-            statuses: ["Accepted", "Draft", "Open", "Ready"],
+            statuses: ["Draft", "Quote sent", "Started", "Closed", "Cancelled", "Requested", "Rejected"],
             additional: {
                 urgent: {check: false, title: "Urgent"},
                 autoDelivery: {check: false, title: "Auto Delivery"},

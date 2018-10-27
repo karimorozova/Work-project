@@ -71,12 +71,15 @@
                 span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
                 img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../assets/images/download-big-b.png")
+    .tasks__approve-action(v-if="isApproveActionShow")
+        ApproveModal(text="Please, choose the action:" @close="closeApproveModal")
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import Tabs from "../Tabs";
 import SelectSingle from "../SelectSingle";
+import ApproveModal from "../ApproveModal";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -100,9 +103,11 @@ export default {
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
                 {label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "7%", cellClass: "tasks_centered"},
             ],
+            selectedAction: "",
             actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
-            isAllSelected: false
+            isAllSelected: false,
+            isApproveActionShow: false
         }
     },
     methods: {
@@ -111,7 +116,7 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
-            return
+            this.isApproveActionShow = true;
         },
         showTab({index}) {
             return !this.currentProject.steps.length || this.tabs[index] === 'Tasks' ? true
@@ -140,6 +145,10 @@ export default {
         async selectTask() {
             await this.setProjectValue({value: this.allTasks, prop: 'tasks'});
         },
+        closeApproveModal() {
+            this.isApproveActionShow = false;
+            this.selectedAction = "";
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue"
@@ -153,6 +162,7 @@ export default {
     components: {
         DataTable,
         SelectSingle,
+        ApproveModal,
         Tabs
     }    
 }
@@ -208,6 +218,12 @@ export default {
         height: 18px;
         width: 18px;
         cursor: pointer;
+    }
+    &__approve-action {
+        position: absolute;
+        right: 0;
+        z-index: 50;
+        background-color: $white;
     }
 }
 </style>

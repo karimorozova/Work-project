@@ -161,6 +161,9 @@ export default {
     display: flex;
     justify-content: center;
 }
+.project-finance_no-padding {
+    padding: 0;
+}
 .slide-fade-enter-active {
   transition: all .3s ease;
 }

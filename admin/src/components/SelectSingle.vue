@@ -122,7 +122,7 @@ export default {
             max-height: 220px;
         }
     }
-    .filters & {
+    .filters &, .project-finance__drop-menu & {
         width: 100%;
     }
 }

@@ -1,0 +1,70 @@
+<template lang="pug">
+.approve-modal
+    .approve-modal__text {{ text }}
+    .approve-modal__buttons
+        .approve-modal__button
+            Button(value="Send" @clicked="send")
+        .approve-modal__button
+            Button(value="Edit & Send" @clicked="edit")
+    span.approve-modal__close(@click="close") +
+</template>
+
+<script>
+import Button from "./Button";
+
+export default {
+    props: {
+        text: {
+            type: String
+        }
+    },
+    data() {
+        return {
+
+        }
+    },
+    methods: {
+        send() {
+            this.$emit("send");
+        },
+        edit() {
+            this.$emit("edit");
+        },
+        close() {
+            this.$emit("close");
+        }
+    },
+    components: {
+        Button
+    }    
+}
+</script>
+
+<style lang="scss">
+@import "../assets/scss/colors.scss";
+
+.approve-modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    box-shadow: 0 0 5px $brown-shadow;
+    &__buttons {
+        margin-top: 10px;
+        display: flex;
+    }
+    &__button {
+        margin: 5px;
+    }
+    &__close {
+        position: absolute;
+        top: 2px;
+        right: 8px;
+        transform: rotate(45deg);
+        cursor: pointer;
+        font-size: 22px;
+        font-weight: bold;
+    }
+}
+</style>

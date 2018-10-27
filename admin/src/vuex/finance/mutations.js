@@ -1,6 +1,5 @@
-export const mutations = {
-    alertus(state) {
-        console.log(state.counter);
-        console.log('Burumbu');
-    }
-}
+// export const mutations = {
+//     setFinanceProperty(state, rootState) {
+//         rootState.a.currentProject.finance.Select = {receivables: ""};
+//     }
+// }
