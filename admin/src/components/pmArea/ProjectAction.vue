@@ -26,7 +26,7 @@ export default {
     data() {
         return {
             selectedAction: "",
-            actions: ["Send a Quote", "Other Action"]
+            actions: ["Send a Quote", "Send Project Details", "Cancel", "Deliver"]
         }
     },
     methods: {

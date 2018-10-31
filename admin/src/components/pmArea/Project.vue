@@ -10,7 +10,8 @@
         )
     .project__all-info
         .project__info-row
-            input.project__name(type="text" v-model="project.projectName" placeholder="Project Name")
+            input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
+            input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name")
             .project__date
                 LabelValue(label="Start Date and Time")
                     Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
@@ -131,6 +132,9 @@ export default {
         }),
         industriesList() {
             return this.project.customer.name ? this.project.customer.industry : this.industries
+        },
+        nameOfProject() {
+            return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;
         }
     },
     components: {

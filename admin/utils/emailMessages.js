@@ -97,13 +97,13 @@ function applicationMessage(obj) {
 }
 
 function messageForClient(obj) {
-        const date = new Date().getTime();
-        const expiryDate = new Date(date + 60000);
+        const date = Date.now();
+        const expiryDate = new Date(date + 15*60000);
         let langPairs = obj.tasks.reduce((init, current) => {
             return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
         }, "")
-        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.receivables} &euro;</a>`
-        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.receivables} &euro;</a>`
+        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
+        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
         
         return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.customer.contactName},</h3>
@@ -142,7 +142,7 @@ function messageForClient(obj) {
                 </tr>
                 <tr>
                     <td>Amount:</td>
-                    <td>${obj.receivables} &euro;</td>
+                    <td>${obj.finance.Price.receivables} &euro;</td>
                 </tr>
             </table>
             <p class="description" style="font-size: 18px;">
@@ -169,8 +169,8 @@ function messageForClient(obj) {
 }
 
 function requestMessageForVendor(obj) {
-    const date = new Date().getTime();
-    const expiryDate = new Date(date + 60000);
+    const date = Date.now();
+    const expiryDate = new Date(date + 15*60000);
     const langPair = obj.sourceLanguage + " >> " + obj.targetLanguage + ";"
     const acceptQuote = '<a href=' + `${apiUrl}/vendorsapi/accept-step?taskId=${obj.taskId}&step=${obj.name}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.payables} &euro;</a>`
     const declineQuote = '<a href=' + `${apiUrl}/vendorsapi/decline-step?taskId=${obj.taskId}&step=${obj.name}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.payables} &euro;</a>`
@@ -239,5 +239,6 @@ function requestMessageForVendor(obj) {
         </div>
     </div>`;
 }
+
 
 module.exports = { applicationMessage, messageForClient, requestMessageForVendor };

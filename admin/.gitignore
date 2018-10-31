@@ -16,4 +16,4 @@ package-lock.json
 *.ntvs*
 *.njsproj
 *.sln
-*.env
+.env

@@ -21,6 +21,10 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
         let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
         const filesToTranslate = await storeFiles(sourceFiles, tasksInfo.projectId);
         const referenceFiles = await storeFiles(refFiles, tasksInfo.projectId);
+        let translationFiles = {};
+        for(let index in filesToTranslate) {
+            translationFiles[`translationFiles[${index}].file`] = filesToTranslate[index];
+        }
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         let tasksLength = project.tasks.length + 1;
         for(let target of tasksInfo.targets) {
@@ -30,7 +34,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                file: filesToTranslate[0],
+                // file: filesToTranslate[0],
+                translationFiles: translationFiles,
                 templateId: template,
                 workflowId: workflow
             });

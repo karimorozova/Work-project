@@ -32,7 +32,8 @@ function saveTemplateTasks(object) {
         .field('targetLanguages', object.target)
         .field('analysisTemplateId', object.templateId)
         .field('workflowId', object.workflowId)
-        .attach('translationFiles[0].file', object.file)
+        .attach(object.translationFiles)
+        // .attach('translationFiles[0].file', object.file)
         .end(response => {
             if(response.error) {
                 return reject(response.error)

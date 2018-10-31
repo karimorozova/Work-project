@@ -6,6 +6,7 @@ const fse = require('fs-extra');
 const mv = require('mv');
 const { getClient, getClients, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
+const { getProject } = require('../projects');
 
 function movePhoto(oldFile, clientId, contact) {
 const newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
@@ -68,7 +69,7 @@ router.get('/acceptquote', async (req, res) => {
     const expiry = date - mailDate;
     const projectId = req.query.projectId;
     try {
-        if(expiry > 60000) {
+        if(expiry > 300000) {
             res.set('Content-Type', 'text/html');
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
@@ -94,7 +95,7 @@ router.get('/declinequote', async (req, res) => {
     const expiry = date - mailDate;
     const projectId = req.query.projectId;
     try {
-        if(expiry > 60000) {
+        if(expiry > 300000) {
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {

@@ -10,8 +10,8 @@
                     @chooseOption="setStatus"
                 )
     .project-details__additional
-        .project-details__item(v-for="obj of additional")
-            input.project-details__check(type="checkbox" v-model="obj.check")
+        .project-details__item(v-for="(obj, key) in additional")
+            input.project-details__check(type="checkbox" v-model="project[key]" @change="toggleCheck(key)")
             span.project-details__option {{ obj.title }}
     .project-details__contacts
         .project-details__contact-title Client Contact
@@ -51,16 +51,19 @@ export default {
         return {
             statuses: ["Draft", "Quote sent", "Started", "Closed", "Cancelled", "Requested", "Rejected"],
             additional: {
-                urgent: {check: false, title: "Urgent"},
-                autoDelivery: {check: false, title: "Auto Delivery"},
-                acceptedStart: {check: false, title: "Start when accepted"},
-                invoice: {check: false, title: "Invoice"}
+                isUrgent: {title: "Urgent"},
+                isAutoDelivery: {title: "Auto Delivery"},
+                isStartAccepted: {title: "Start when accepted"},
+                isInvoice: {title: "Invoice"}
             },
             selectedContact: "",
             selectedContacts: []
         }
     },
     methods: {
+        toggleCheck(key) {
+            this.$emit('toggleCheck', { key });
+        },
         setStatus({option}) {
             this.$emit('setStatus', {option: option})
         },

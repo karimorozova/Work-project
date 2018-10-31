@@ -1,23 +1,21 @@
 <template lang="pug">
-  .loginMain
-    .loginWrapper(v-if="forgotLink")
-      .imageWrapper
+  .login-main
+    .login-main__forgot(v-if="forgotLink")
+      .login-main__image
         img(src="../assets/images/new-logo.png")
-      .loginForm
-        .labelWrapper
-          label.warningMessage(v-if="isLoginWarning") Check your email or password
-        .h2Wrapper
-          input.email(v-model='form.logemail' placeholder='Email' :class="{addShadow: form.logemail}")
-        .h2Wrapper
-          input.password(type="password" v-model='form.logpassword' placeholder='Password' :class="{addShadow: form.logpassword}")
-        .checkboxWrapper
-          input.checkboxWrapper__input(type="checkbox")
-          label.checkboxWrapper__label Remember me
-        .buttonWrapper
-          button(@click='login' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
-          h2(v-if='isLogin') You are logged in!
-        .formFooter
-          span.firstLabel(@click="forget") Forgot Your Password?
+      .login-main__form
+        .login-main__warning
+          label.login-main__message(v-if="isLoginWarning") Check your email or password
+        .login-main__item
+          input.login-main__email(v-model='form.logemail' placeholder='Email' :class="{addShadow: form.logemail}")
+        .login-main__item
+          input.login-main__password(type="password" v-model='form.logpassword' placeholder='Password' :class="{addShadow: form.logpassword}")
+        .login-main__check-wrap
+          input.login-main__check-input(type="checkbox")
+          label.login-main__check-label Remember me
+        button.login-main__button(@click='login' v-model='form.logemail, form.logpassword' :class="{'login-main_full-opacity': form.logemail && form.logpassword}") Sign In
+        .login-main__footer
+          span.login-main__footer-text(@click="forget") Forgot Your Password?
     passwordrestore(v-else)
 </template>
 <script>
@@ -44,7 +42,7 @@ export default {
       this.alertToggle({message: "You are logged in", isShow: true, type: "success"})
       this.$router.push("/")
       } catch(err) {
-        this.alertToggle({message: err.body, isShow: true, isError: true});
+        this.alertToggle({message: err.body, isShow: true, type: "error"});
       }
     },
     async destroySession() {
@@ -78,13 +76,13 @@ export default {
 
 <style lang="scss" scoped>
 
-  .loginMain {
+  .login-main {
     background-image: url('../assets/images/image-background.jpg');
-    height: 1300px;
+    height: 100vh;
     overflow: hidden;
   }
 
-  .loginWrapper {
+  .login-main__forgot {
       position: absolute;
       margin-left: -250px;
       left: 50%;
@@ -94,7 +92,7 @@ export default {
   
       border-radius: 26px;
   
-      .imageWrapper {
+      .login-main__image {
         display: flex;
         justify-content: center;
         margin-bottom: 2%;
@@ -104,22 +102,22 @@ export default {
         }
       }
   
-    .loginForm {
+    .login-main__form {
       padding: 1%;
       margin: 0 auto;
       width: 436px;
       background-color: #fff;
   
-      .labelWrapper {
+      .login-main__warning {
         margin-bottom: -3%;
         padding-top: 1%;
-        .warningMessage {
+        .login-main__message {
           color: #ff0000;
           padding-left: 7.3%;
         }
       }
   
-      .h2Wrapper {
+      .login-main__item {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -152,57 +150,55 @@ export default {
         box-shadow: 0 0 10px #66563d;
       }
   
-      .email {
+      .login-main__email {
         margin-top: 5.5%;
         margin-bottom: 5.5%;
       }
   
-      .password {
+      .login-main__password {
         margin-top: 0;
         margin-bottom: 2.5%;
       }
   
-      .checkboxWrapper {
+      .login-main__check-wrap {
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
-        .checkboxWrapper__input {
+        .login-main__check-input {
           width: 13px;
           height: 13px;
           margin-left: 7%;
         }
-        .checkboxWrapper__label {
+        .login-main__check-label {
           font-size: 15px;
           color: #2d2d2d;
           margin-left: 2%;
         }
       }
   
-      .buttonWrapper {
+      .login-main__button {
         display: flex;
         justify-content: center;
-        margin: 2% 0 0.2% 0;
-        padding-bottom: 3%;
-        button {
-          width: 142px;
-          height: 35px;
-          border-radius: 8px;
-          font-size: 20px;
-          background-color: #84ca8e;
-          color: #66563d;
-          opacity: 0.22;
-        }
-        .changeButtonView {
-          opacity: 1;
-          color: #fff;
-        }
+        margin: 10px auto;
+        width: 142px;
+        height: 35px;
+        border-radius: 8px;
+        font-size: 20px;
+        background-color: #84ca8e;
+        color: #66563d;
+        opacity: 0.22; 
+      }
+      
+      .login-main_full-opacity {
+        opacity: 1;
+        color: #fff;
       }
   
-      .formFooter {
+      .login-main__footer {
         display: flex;
         justify-content: space-between;
         font-size: 20px;
-        .firstLabel {
+        .login-main__footer-text {
           color: #4280d3;
           padding-left: 6%;
           margin-bottom: 4%;

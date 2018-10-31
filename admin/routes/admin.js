@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const path = require('path');
-const HomeApi = require('../models/xtrf/home');
 const { User, Requests, Reports, Clients, Vendors } = require('../models');
+const { getVendors } = require('./vendors/');
+const { getClients} = require('../clients/');
 const { requiresLogin } = require('../middleware/index');
 const { beginProject, projectJobs, projectJobsPagesCount } = require("../models/xtrf/report");
 const mongoose = require('mongoose');
@@ -42,12 +43,7 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/all-clients', requiresLogin, async (req, res, next) => {
     try {
-        const clients = await Clients.find()
-                .populate('industry')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const clients = await getClients({});
         res.send(clients);
     } catch(err) {
         console.log(err);
@@ -57,15 +53,7 @@ router.get('/all-clients', requiresLogin, async (req, res, next) => {
 
 router.get('/all-vendors', requiresLogin, async (req, res, next) => {
     try {
-        const vendors = await Vendors.find()
-                .populate('industry')
-                .populate('native')
-                .populate('languageCombinations.source')
-                .populate('languageCombinations.target')
-                .populate('languagePairs.source')
-                .populate('languagePairs.target')
-                .populate('languageCombinations.service')
-                .populate('languageCombinations.industry.industry');
+        const vendors = await getVendors({});
         res.send(vendors)
     } catch(err) {
         console.log(err);

@@ -116,7 +116,23 @@ const ProjectsSchema = new mongoose.Schema({
       'Wordcount': {},
       'Price': {}
     }
-  }
+  },
+  isUrgent: {
+    type: Boolean,
+    default: false
+  },
+  isAutoDelivery: {
+    type: Boolean,
+    default: false
+  },
+  isStartAccepted: {
+    type: Boolean,
+    default: false
+  },
+  isInvoice: {
+    type: Boolean,
+    default: false
+  } 
 },{ minimize: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);

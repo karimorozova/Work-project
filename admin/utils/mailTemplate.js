@@ -24,8 +24,8 @@ const clientQuoteEmail = function (obj, msg) {
     return new Promise( (res, rej) => {
         let mailOptions = {
             from: 'translation@pangea.global',
-            to: `${obj.email}`, 
-            subject: `Quote Details`,
+            to: obj.email, 
+            subject: obj.subject,
             text: "plain text",
             html: msg,
             attachments: [{

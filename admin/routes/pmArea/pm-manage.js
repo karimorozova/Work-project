@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject } = require("../../projects/");
+const { getProject, updateProject, changeProjectProp } = require("../../projects/");
 const { getOneService } = require("../../services/")
 const { sendEmail, clientQuoteEmail, messageForClient, requestMessageForVendor } = require("../../utils/");
 
@@ -35,14 +35,26 @@ router.get("/all-managers", async (req, res) => {
     }
 })
 
-router.post("/send-quote", async (req, res) => {
+router.put("/project-option", async (req, res) => {
+    const { projectId, property } = req.body;
     try {
-        const project = await getProject({"_id": req.body.id});
+        const result = await changeProjectProp(projectId, property);
+        res.send(result);
+    } catch(err) {
+        res.status(500).send("Internal server error / Cannot change Project's property")
+    }
+})
+
+router.post("/send-quote", async (req, res) => {
+    const { id } = req.body;
+    try {
+        const project = await getProject({"_id": id});
         const service = await getOneService({"_id": project.tasks[0].service});
         let quote = {...project._doc};
         quote.service = service.title;
         const message = messageForClient(quote);
-        await clientQuoteEmail(project.customer, message);
+        const subject = quote.isUrgent ? "URGENT! Quote Details" : "Quote Details";
+        await clientQuoteEmail({...project.customer._doc, subject: subject}, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {

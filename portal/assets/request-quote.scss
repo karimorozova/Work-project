@@ -509,7 +509,7 @@ body {
       border: 1px solid #66563D;
       border-radius: 10px;
       width: 29%;
-      min-height: 75px;
+      height: 75px;
       padding: 2px;
       padding-left: 10px;
       margin: 5px;
@@ -522,11 +522,10 @@ body {
       }
       @media (max-width: 450px) {
         width: 41.5%;
-        font-size: 14px;
+        font-size: 12px;
       }
       @media (max-width: 350px) {
         width: 40%;
-        font-size: 12px;
       }
       cursor: pointer;
       .image {
@@ -535,6 +534,11 @@ body {
         background-size: contain;
         background-position: center; 
         background-repeat: no-repeat;
+        @media (max-width: 380px) {
+          font-size: 12px;
+          width: 30px;
+          height: 30px;
+        }
       }
       .image-white {
         position: absolute;

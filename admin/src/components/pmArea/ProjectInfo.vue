@@ -3,7 +3,7 @@
     .project-info__title Project Details
     .project-info__all-info
         Project(:project="currentProject")
-        ProjectShortDetails(:project="currentProject" @setStatus="setStatus")
+        ProjectShortDetails(:project="currentProject" @setStatus="setStatus" @toggleCheck="toggleProjectOption")
     .project-info__all-info
         .project-info__tasks
             .project-info__tasks-title Tasks and Steps
@@ -121,6 +121,14 @@ export default {
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate',
         }),
+        async toggleProjectOption({key}) {
+            try {
+                const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
+                await this.storeProject(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
+            }
+        },
         showTab({tab}) {
             if(tab === 'Tasks') {
                 this.isStepsShow = false;
