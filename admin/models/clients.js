@@ -28,19 +28,16 @@ const ClientSchema = new mongoose.Schema({
         trim : true 
     },
     accountManager: {
-        type: String,
-        default: '',
-        trim : true 
+        type: Object,
+        default: {}
     },
     salesManager: {
-        type: String,
-        default: '',
-        trim : true 
+        type: Object,
+        default: {}
     },
     projectManager: { 
-        type : String, 
-        default : '', 
-        trim : true 
+        type : Object, 
+        default : {} 
     },
     leadSource: {
         type: String,
@@ -125,7 +122,7 @@ const ClientSchema = new mongoose.Schema({
             fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.4}
         }
     }
-});
+}, { minimize: false });
 
 const Clients = mongoose.model('Clients', ClientSchema);
 

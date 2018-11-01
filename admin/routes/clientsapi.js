@@ -7,6 +7,7 @@ const mv = require('mv');
 const { getClient, getClients, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 const { getProject } = require('../projects');
+const { emitter } = require('../events');
 
 function movePhoto(oldFile, clientId, contact) {
 const newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
@@ -69,7 +70,7 @@ router.get('/acceptquote', async (req, res) => {
     const expiry = date - mailDate;
     const projectId = req.query.projectId;
     try {
-        if(expiry > 300000) {
+        if(expiry > 900000) {
             res.set('Content-Type', 'text/html');
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
@@ -78,7 +79,8 @@ router.get('/acceptquote', async (req, res) => {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            await Projects.updateOne({"_id": projectId}, {$set: {status: 'Accepted', isClientOfferClicked: true}});
+            await Projects.updateOne({"_id": projectId}, {$set: {status: 'Started', isClientOfferClicked: true}});
+            emitter.emit('managersNotificationEmail', project);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
         }
@@ -95,7 +97,7 @@ router.get('/declinequote', async (req, res) => {
     const expiry = date - mailDate;
     const projectId = req.query.projectId;
     try {
-        if(expiry > 300000) {
+        if(expiry > 900000) {
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
@@ -107,7 +109,7 @@ router.get('/declinequote', async (req, res) => {
             const client = await Clients.findOne({"_id": project.customer});
             const user = await User.findOne({"username": client.projectManager});
             await pmMail(project, client, user);
-            await Projects.updateOne({"_id": projectId}, {isClientOfferClicked: true})
+            await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
         }

@@ -46,4 +46,24 @@ const clientQuoteEmail = function (obj, msg) {
     })
 }
 
-module.exports = { sendEmail, clientQuoteEmail };
+const managerNotifyMail = function(obj, msg) {
+    return new Promise( (res, rej) => {
+        let mailOptions = {
+            from: 'translation@pangea.global',
+            to: obj.email, 
+            subject: 'Quote Accepted but translators were not assigned',
+            text: "plain text",
+            html: msg
+        };
+        mailTransporter.sendMail(mailOptions, (error, info) => {
+            mailTransporter.close();
+            if (error) {
+                rej(error);
+            }
+        console.log('Message sent: %s', info.messageId);
+        res(info.messageId);
+        });
+    })
+}
+
+module.exports = { sendEmail, clientQuoteEmail, managerNotifyMail };

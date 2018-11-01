@@ -185,12 +185,13 @@ export default {
         },
         async setAction({option}) {
             this.selectedAction = option;
-            const steps = this.allSteps.filter(item => {
+            const checkedSteps = this.allSteps.filter(item => {
                 return item.check 
             })
             try {
-                if(option === "Request confirmation") {
-                    const result = await this.$http.post('/pm-manage/vendor-request', { steps: steps, projectId: this.currentProject._id });
+                if(option === "Request confirmation" && checkedSteps.length) {
+                    const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: checkedSteps, projectId: this.currentProject._id });
+                    await this.storeProject(result.body);
                     this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
                 }
             } catch(err) {
@@ -219,7 +220,8 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            setProjectValue: "setProjectValue"
+            setProjectValue: "setProjectValue",
+            storeProject: "setCurrentProject"
         })
     },
     computed: {

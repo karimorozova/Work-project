@@ -85,7 +85,7 @@ import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
 import ContactDetails from '../clients/ContactDetails';
 import NewContactDetails from '../clients/NewContactDetails';
-
+import { mapGetters, mapActions} from "vuex";
 
 export default {
     props: {
@@ -174,14 +174,14 @@ export default {
         chosenStatus(data) {
             this.$emit('chosenStatus', data);
         },
-        chosenAccManager(data) {
-            this.$emit('chosenAccManager', data);
+        chosenAccManager({manager}) {
+            this.$emit('chosenAccManager', {manager});
         },
-        chosenSalesManager(data) {
-            this.$emit('chosenSalesManager', data);
+        chosenSalesManager({manager}) {
+            this.$emit('chosenSalesManager', {manager});
         },
-        chosenProjManager(data) {
-            this.$emit('chosenProjManager', data);
+        chosenProjManager({manager}) {
+            this.$emit('chosenProjManager', {manager});
         },
         contactDetails(data) {
             this.clientShow = false;
@@ -197,7 +197,7 @@ export default {
         ratesUpdate(data) {
             this.$emit('refreshClients', data);
         },
-        updateClient() {
+        async updateClient() {
             let sendData = new FormData();
             sendData.append('client', JSON.stringify(this.client));
             // sendData.append('ind', data.ind);
@@ -210,14 +210,12 @@ export default {
             for(let i = 0; i < this.ndaFile.length; i++) {
                 sendData.append('nda', this.ndaFile[i]);
             }
-            this.$http.post('clientsapi/update-client', sendData)
-            .then(res => {
-                console.log(res);
-                this.$emit('refreshClients', {clientId: res.data.id});
-            })
-            .catch(err => {
-                console.log(err)
-            })            
+            try {
+                const result = await this.$http.post('/clientsapi/update-client', sendData);
+                this.$emit('refreshClients', {clientId: result.data.id});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error on updating Client info", isShow: true, type: "error"})
+            }  
         },
         approveClientDelete() {
             if(this.newClient) {
@@ -237,7 +235,10 @@ export default {
             this.$emit('newContact', {contact: data.contact});
             this.clientShow = true;
             this.contactShow = false;
-        }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle",
+        })
     },
     computed: {
         selectedIndNames() {

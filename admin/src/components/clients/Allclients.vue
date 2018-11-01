@@ -89,7 +89,6 @@ import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import ClientDetails from '../clients/ClientDetails';
 import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
-import { bus } from "../../main";
 
 export default {
     data() {
@@ -119,14 +118,14 @@ export default {
         changeStatus(data) {
             this.client.status = data;
         },
-        changeAccManager(data) {
-            this.client.accountManager = data;
+        changeAccManager({manager}) {
+            this.client.accountManager = manager;
         },
-        changeSalesManager(data) {
-            this.client.salesManager = data;
+        changeSalesManager({manager}) {
+            this.client.salesManager = manager;
         },
-        changeProjManager(data) {
-            this.client.projectManager = data;
+        changeProjManager({manager}) {
+            this.client.projectManager = manager;
         },
         clientCancel(data) {
             this.clientData = false;
@@ -266,13 +265,18 @@ export default {
             this.$emit('clientCancel');
         },
         async refreshClients(data) {
-            let result = await this.getclients();
-            if(data && data.clientId) {
-                this.client = this.clients.find(item => {
-                    if(item._id == data.clientId) {
-                        return item
-                    }
-                })
+            try {
+                let result = await this.getclients();
+                if(data && data.clientId) {
+                    this.client = this.clients.find(item => {
+                        if(item._id == data.clientId) {
+                            return item
+                        }
+                    })
+                }
+                this.alertToggle({message: "Information updated", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error / Cannot get Clients", isShow: true, type: "error"});
             }
         },
         async getclients() {
@@ -289,7 +293,7 @@ export default {
             }
         },
         ...mapActions({
-            loadingToggle: "loadingToggle"
+            alertToggle: "alertToggle"
         })
     },
     computed: {

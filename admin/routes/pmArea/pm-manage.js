@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp } = require("../../projects/");
+const { getProject, updateProject, changeProjectProp, stepVendorsRequestSending } = require("../../projects/");
 const { getOneService } = require("../../services/")
 const { sendEmail, clientQuoteEmail, messageForClient, requestMessageForVendor } = require("../../utils/");
 
@@ -64,21 +64,12 @@ router.post("/send-quote", async (req, res) => {
 })
 
 router.post("/vendor-request", async (req, res) => {
-    const { projectId, steps } = req.body;
+    const { projectId, checkedSteps } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        for(const step of steps) {
-            let requestInfo = {...step};
-            requestInfo.projectName = project.projectName;
-            requestInfo.industry = project.industry.name;
-            requestInfo.brief = project.brief;
-            const message = requestMessageForVendor(requestInfo);
-            await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
-            const index = step.vendorsClickedOffer.indexOf(vendor._id);
-            if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
-        }
-        await Projects.updateOne({"_id": projectId}, {steps: steps});
-        res.send('Requests has been sent');
+        const updatedSteps = await stepVendorsRequestSending(project, checkedSteps);
+        const updatedProject = await updateProject({"_id": project.id}, {steps: updatedSteps});
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending the Request Confirmation");

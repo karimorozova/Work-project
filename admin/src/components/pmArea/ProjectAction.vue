@@ -4,7 +4,7 @@
     .project-action__drop-menu
         SelectSingle(
             :selectedOption="selectedAction"
-            :options="actions"
+            :options="filteredActions"
             placeholder="Select Action"
             @chooseOption="setAction"
         )
@@ -46,6 +46,15 @@ export default {
             alertToggle: "alertToggle",
             storeProject: "setCurrentProject"
         }),
+    },
+    computed: {
+        filteredActions() {
+            let result = this.actions;
+            if(!this.project.finance.Price.receivables) {
+                result = ["Cancel"];
+            }
+            return result;
+        }
     },
     components: {
         SelectSingle,

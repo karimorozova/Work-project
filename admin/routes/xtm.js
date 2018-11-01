@@ -34,20 +34,21 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                // file: filesToTranslate[0],
                 translationFiles: translationFiles,
                 templateId: template,
                 workflowId: workflow
             });
-            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
-            let taskId = project.projectId + ` ${idNumber}`;
-            await Projects.updateOne({"_id": project._id}, 
-            {$set: {xtmId: xtmProject.projectId, sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
-            $push: {tasks: {taskId: taskId, id: xtmProject.jobs[0].jobId, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
-                deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
-                receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
-            );
-            tasksLength++
+            for(let job of xtmProject.jobs) {
+                let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
+                let taskId = project.projectId + ` ${idNumber}`;
+                await Projects.updateOne({"_id": project._id}, 
+                {$set: {xtmId: xtmProject.projectId, sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
+                $push: {tasks: {taskId: taskId, id: job.jobId, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
+                    deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
+                    receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
+                );
+                tasksLength++
+            }
         }
         const updatedProject = await getProject({"_id": tasksInfo.projectId});
         res.send(updatedProject);
