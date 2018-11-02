@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Clients, Languages, Services, Industries } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions } = require('../services/');
+const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress } = require('../services/');
 const { getProject, updateProject, updateProjectCosts, metricsCalc, storeFiles, calcCost, taskMetricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
@@ -38,17 +38,16 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 templateId: template,
                 workflowId: workflow
             });
-            for(let job of xtmProject.jobs) {
-                let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
-                let taskId = project.projectId + ` ${idNumber}`;
-                await Projects.updateOne({"_id": project._id}, 
-                {$set: {xtmId: xtmProject.projectId, sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
-                $push: {tasks: {taskId: taskId, id: job.jobId, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
-                    deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
-                    receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
-                );
-                tasksLength++
-            }
+            const jobIds = xtmProject.jobs.map(item => item.jobId);
+            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
+            let taskId = project.projectId + ` ${idNumber}`;
+            await Projects.updateOne({"_id": project._id}, 
+            {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
+            $push: {tasks: {taskId: taskId, xtmJobs: jobIds, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
+                deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
+                receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
+            );
+            tasksLength++
         }
         const updatedProject = await getProject({"_id": tasksInfo.projectId});
         res.send(updatedProject);
@@ -65,7 +64,7 @@ router.post('/update-matrix', async (req, res) => {
     try {
         let project = await getProject({"_id": projectId});
         let taskIndex = project.tasks.findIndex(item => {
-            return item.id === taskId
+            return item.taskId === taskId
         });
         let stepIndex = project.steps.findIndex(item => {
             return item.name === step.name && item.taskId === step.taskId
@@ -88,14 +87,14 @@ router.get('/project-metrics', async (req, res) => {
     const { projectId, customerId } = req.query;
     try {
         unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'application/json'})
         .end(async (response) => {
             if(response.error) {
                 throw new Error(response.error);
             }
             try {
-                const metrics = response.body[0].jobsMetrics[0];
+                const metrics = response.body[0];
                 const { xtmMetrics, progress } = await metricsCalc(metrics);
                 const customer = await Clients.findOne({"_id": customerId});    
                 const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
@@ -105,6 +104,30 @@ router.get('/project-metrics', async (req, res) => {
                 res.status(500).send("Error on getting metrics ");
             }
         })
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting metrics ");
+    }
+})
+
+router.get('/update-progress', async (req, res) => {
+    const { projectId } = req.query;
+    try {
+        const project = await getProject({"_id": projectId});
+        let steps = [...project.steps];
+        const tasks = [...project.tasks];
+        for(let task of tasks) {
+            const { progress } = await getTaskProgress(task);
+            steps = steps.map(item => {
+                if(task.taskId === item.taskId) {
+                    item.progress = progress[item.name];
+                    return item
+                }
+                return item;
+            });
+        }
+        const result = await updateProject({"_id": projectId}, {steps: steps});
+        res.send(result);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting metrics ");

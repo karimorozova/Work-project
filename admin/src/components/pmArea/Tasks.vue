@@ -130,7 +130,7 @@ export default {
             return (finance.receivables - finance.payables).toFixed(2);
         },
         progress(task) {
-            const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.id);
+            const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
             return taskSteps.reduce((init, cur) => {
                 return init + (cur.progress.wordsDone/cur.progress.wordsTotal)*100/taskSteps.length;
             }, 0).toFixed(2);

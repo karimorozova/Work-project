@@ -73,14 +73,14 @@ router.get('/costs', async (req, res) => {
       const service = await getOneService({"_id": task.service});
       const combinations = service.languageCombinations;
       for(let step of projectToUpdate.steps) {
-        if(step.taskId === task.id) {
+        if(step.taskId === task.taskId) {
           const receivables = step.finance['Price'].receivables ? {rate: step.clientRate, cost: step.finance['Price'].receivables}
           : await receivablesCalc({task, project: projectToUpdate, step, combs: combinations});
           step.clientRate = receivables.rate;
           step.finance['Price'].receivables = receivables.cost;
         }
       }
-      task.finance['Price'].receivables = projectToUpdate.steps.filter(item => item.taskId === task.id)
+      task.finance['Price'].receivables = projectToUpdate.steps.filter(item => item.taskId === task.taskId)
       .reduce((init,cur) => init + +cur.finance['Price'].receivables, 0).toFixed(2);
     }
     const updatedProject = await updateProjectCosts(projectToUpdate);
@@ -97,7 +97,7 @@ router.post('/step-payables', async (req, res) => {
     let project = await getProject({"_id": projectId});
     let projectToUpdate = {...project._doc, id: projectId};
     const taskIndex = project.tasks.findIndex(item => {
-      return item.id == step.taskId;
+      return item.taskId == step.taskId;
     })
     const updatedMetrics = await updateTaskMetrics(project.tasks[taskIndex].metrics, step.vendor._id);
     let updatedTask = {...project.tasks[taskIndex]};
@@ -106,7 +106,7 @@ router.post('/step-payables', async (req, res) => {
       return item.taskId == step.taskId && item.name === step.name;
     })
     projectToUpdate.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
-    updatedTask.finance['Price'].payables = projectToUpdate.steps.filter(item => item.taskId === updatedTask.id)
+    updatedTask.finance['Price'].payables = projectToUpdate.steps.filter(item => item.taskId === updatedTask.taskId)
     .reduce((init, cur) => init + +cur.finance['Price'].payables, 0).toFixed(2);
     projectToUpdate.tasks[taskIndex] = updatedTask;
     const updatedProject = await updateProjectCosts(projectToUpdate);
@@ -207,7 +207,7 @@ router.get('/parsed-rates', async (req, res) => {
               title: service.title,
               sourceLanguage: comb.source,
               targetLanguage: comb.target,
-              industry: [industry],
+              industry: [industry]
             })
           } else {
             industry.package = elem.package;
@@ -215,7 +215,7 @@ router.get('/parsed-rates', async (req, res) => {
               id: comb._id,
               title: service.title,
               targetLanguage: comb.target,
-              industry: [industry],
+              industry: [industry]
             })
           }
         }

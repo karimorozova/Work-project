@@ -147,8 +147,8 @@ function getWordsData(project) {
     let payableWords = 0;
     for(const task of project.tasks) {
         const taskPayableWords = wordsCalculation(task);
-        payableWords += taskPayableWords;
         receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
+        payableWords += task.metrics.totalWords - task.metrics.nonTranslatable - taskPayableWords;
     }
     return {'receivables': receivableWords, 'payables': payableWords}
 }
@@ -170,10 +170,10 @@ function getCombination({combs, service, task}) {
         if(service.languageForm === "Duo") {
             return item.source.symbol === task.sourceLanguage &&
                     item.target.symbol === task.targetLanguage &&
-                    item.service.id === service._id
+                    item.service.id === service.id
             }
         return item.target.symbol === task.targetLanguage &&
-        item.service.id === service._id
+        item.service.id === service.id
     })
 }
 

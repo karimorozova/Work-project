@@ -13,6 +13,7 @@
     .step-info__block(v-if="step.name === 'translate1'")
         Matrix(
             :matrixData="matrixData"
+            :step="step"
             @toggleMatrixRowActive="toggleMatrixRowActive"
             @updateMatrixValue="updateMatrixValue"
             @refreshMatrix="refreshMatrix"
@@ -116,7 +117,7 @@ export default {
             try {
             await this.updateMatrix({
                 projectId: this.currentProject._id,
-                taskId: this.task.id,
+                taskId: this.task.taskId,
                 step: this.step,
                 key: this.matrixData[index].key,
                 value: this.matrixData[index].value,

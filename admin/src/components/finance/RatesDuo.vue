@@ -365,13 +365,13 @@ export default {
       try {
         const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
         this.fullInfo = result.body;
-        this.fullInfo.forEach(item => {
-          item.icons = {
+        for(let info of this.fullInfo) {
+          info.icons = {
             save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
             edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
             delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
           }
-        })
+        }
       } catch(err) {
         this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
       }

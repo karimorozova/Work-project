@@ -1,12 +1,13 @@
 const unirest = require('unirest');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmAuth } = require('../configs/');
+const { metricsCalc } = require('../projects');
 
 function saveTasks(object) {
 
     return new Promise(resolve => {
         unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'multipart/form-data'})
         .field('customerId', object.customerId)
         .field('name', object.name)
@@ -24,7 +25,7 @@ function saveTasks(object) {
 function saveTemplateTasks(object) {
     return new Promise((resolve, reject) => {
         unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'multipart/form-data'})  
         .field('customerId', object.customerId)
         .field('name', object.name)
@@ -46,7 +47,7 @@ function saveTemplateTasks(object) {
 function getMetrics(projectId) {
     return new Promise((resolve, reject) => {
         unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+        .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'application/json'})
         .end(response => {
             if(response.error) {
@@ -126,4 +127,26 @@ function getRequestOptions(obj) {
     };
 }
 
-module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions };
+function getTaskProgress(task) {
+    return new Promise((resolve, reject) => {
+        unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${task.projectId}/metrics`)
+        .headers({"Authorization": xtmAuth.token,
+        'Content-Type': 'application/json'})
+        .end(async (response) => {
+            if(response.error) {
+                console.log(response.error);
+                reject(response.error);
+            }
+            const metrics = response.body[0];
+            try {
+                const { progress } = await metricsCalc(metrics);
+                resolve({progress});
+            } catch(err) {
+                console.log(err);
+                reject(err);
+            }
+        })
+    })
+}
+
+module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress };

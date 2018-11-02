@@ -100,7 +100,7 @@ export default {
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
             selectedWorkflow: {name:"2 Steps", id: 2917},
             template: "",
-            sourceLanguage: [],
+            sourceLanguage: ["EN-GB"],
             targetLanguages: [],
             service: "",
             statuses: ["Accepted", "Draft", "Open", "Ready"],
@@ -225,18 +225,32 @@ export default {
             }
         },
         wordsCalculation(metrics) {
-            const payables = Object.keys(metrics).filter(item => {
+            const repetitions = Object.keys(metrics).filter(item => {
                 return this.excludeKeys.indexOf(item) === -1;
             }).reduce((init, cur) => {
                 return init + metrics[cur].value;
             }, 0);
             const receivables = metrics.totalWords - metrics.nonTranslatable;
+            const payables = receivables - repetitions;
             return { receivables, payables };
         },
-        async getMetrics() {
-            let project = JSON.stringify(this.currentProject);
-            project = JSON.parse(project);
+        async updateProgress() {
             try {
+                const updatedData = await this.$http.get(`/xtm/update-progress?projectId=${this.currentProject._id}`);
+                await this.storeProject(updatedData.body);
+                this.$emit("refreshProjects");
+                this.alertToggle({message: "Metrics are updated.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot update metrics.", isShow: true, type: "error"})
+            }
+        },
+        async getMetrics() {
+            try {
+                if(this.currentProject.isMetricsExist) {
+                    return await this.updateProgress();
+                }
+                let project = JSON.stringify(this.currentProject);
+                project = JSON.parse(project);
                 for(let task of project.tasks) {
                     const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
                     const { taskMetrics, progress } = metrics.body;
@@ -245,13 +259,13 @@ export default {
                     const keysArr = Object.keys(progress);
                     for(const key in progress) {
                         const existedTask = project.steps.find(item => {
-                            return item.taskId === task.id && item.name === key
+                            return item.taskId === task.taskId && item.name === key
                         })
                         if(!existedTask) {
                             const startDate = key === 'translate1' ? new Date() : "";
                             const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
                             project.steps.push({
-                                taskId: task.id,
+                                taskId: task.taskId,
                                 name: key,
                                 source: task.sourceLanguage,
                                 target: task.targetLanguage,
@@ -274,7 +288,7 @@ export default {
                             })
                         } else {
                             for(const step of project.steps) {
-                                if(step.taskId === task.id) {
+                                if(step.taskId === task.taskId) {
                                     step.progress = progress[step.name];
                                 }
                             }

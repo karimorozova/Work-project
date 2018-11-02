@@ -4,6 +4,8 @@
     .step-matrix__toggler(v-if="isMatrixShown")
         .step-matrix__toggle-option(@click="refreshMatrix('receivables')" :class="{'step-matrix_active-option': matrixOption === 'receivables'}") Receivables
         .step-matrix__toggle-option(@click="refreshMatrix('payables')" :class="{'step-matrix_active-option': matrixOption === 'payables'}") Payables
+        transition(name="fade")
+            span.step-matrix__tooltip(v-if="isTooltipShow") A Vendor is not assigned
     .step-matrix__table(:class="{'step-matrix_block': isMatrixShown}")
         DataTable(
             :fields="fields"
@@ -18,7 +20,7 @@
                 span.step-matrix__label {{ field.label }}
             template(slot="headerRate" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}
-            template(slot="Total" slot-scope="{ field }")
+            template(slot="headerTotal" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}
             template(slot="title" slot-scope="{ row }")
                 span.step-matrix__value {{ row.title }}
@@ -44,6 +46,9 @@ export default {
     props: {
         matrixData: {
             type: Array
+        },
+        step: {
+            type: Object
         }
     },
     data() {
@@ -56,7 +61,8 @@ export default {
                 {label: "Rate", headerKey: "headerRate", key: "rate", width: "19%"},
                 {label: "Total", headerKey: "headerTotal", key: "total", width: "19%"},
             ],
-            matrixOption: "receivables"
+            matrixOption: "receivables",
+            isTooltipShow: false
         }
     },
     methods: {
@@ -73,8 +79,17 @@ export default {
             if(this.matrixOption === value) {
                 return
             }
+            if(value === 'payables' && !this.step.vendor) {
+                return this.noVendorToolTip()
+            }
             this.matrixOption = value;
             this.$emit("refreshMatrix", {costs: value});
+        },
+        noVendorToolTip() {
+            this.isTooltipShow = true;
+            setTimeout(() => {
+                this.isTooltipShow = false;
+            }, 3000)
         }
     },
     components: {
@@ -98,6 +113,16 @@ export default {
     &__toggler {
         display: flex;
         margin-top: 10px;
+        position: relative;
+    }
+    &__tooltip {
+        position: absolute;
+        box-shadow: 0 0 5px $brown-shadow;
+        border-radius: 8px;
+        color: $orange;
+        padding: 1px 5px;
+        top: -85%;
+        left: 23%;
     }
     &__toggle-option {
         padding: 5px;
@@ -145,4 +170,12 @@ export default {
         left: 8px;
     }
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 </style>

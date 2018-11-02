@@ -166,7 +166,7 @@ export default {
         },
         getTask(index) {
             return this.tasks.find(item => {
-                return item.id === this.allSteps[index].taskId
+                return item.taskId === this.allSteps[index].taskId
             })
         },
         expandRow(index) {
