@@ -106,8 +106,8 @@ router.get('/declinequote', async (req, res) => {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            const client = await Clients.findOne({"_id": project.customer});
-            const user = await User.findOne({"username": client.projectManager});
+            const client = await getClient({"_id": project.customer});
+            const user = await User.findOne({"_id": client.projectManager._id});
             await pmMail(project, client, user);
             await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});
             res.set('Content-Type', 'text/html')

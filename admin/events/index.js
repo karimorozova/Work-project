@@ -1,8 +1,7 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
 const { Vendors } = require('../models');
-const { sendEmail } = require('../utils');
-const { managerNotifying } = require('../projects');
+const { sendEmail, managerNotifying } = require('../utils');
 
 emitter.on('testEvent', () => {
     setTimeout(async () => {

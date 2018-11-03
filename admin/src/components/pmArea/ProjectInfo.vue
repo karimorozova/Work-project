@@ -62,7 +62,6 @@
                 Steps(v-if="currentProject.steps.length && isStepsShow"
                     :allSteps="currentProject.steps"
                     :tasks="currentProject.tasks"
-                    :vendors="allVendors"
                     @setVendor="setVendor"
                     @setDate="setDate"
                     @showTab="showTab"

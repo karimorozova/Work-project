@@ -2,8 +2,10 @@
 .step-info
     .step-info__block
         Vendor(
+            :step="step"
             :vendors="vendors"
             :vendor="step.vendor"
+            @setStepVendor="setStepVendor"
         )
     .step-info__block
         Finance(
@@ -43,6 +45,9 @@ export default {
         },
         task: {
             type: Object
+        },
+        index: {
+            type: [Number, String]
         }
     },
     data() {
@@ -55,6 +60,9 @@ export default {
     methods: {
         addFinanceData() {
             return
+        },
+        setStepVendor({person}) {
+            this.$emit("setStepVendor", { person });
         },
         getMatrixData(rateProp, prop) {
             if(this.step.name !== "translate1") {

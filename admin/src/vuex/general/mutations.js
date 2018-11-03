@@ -36,10 +36,14 @@ export const mutations = {
         state.xtmCustomers = payload
     },
     allVendors(state, payload) {
-        state.vendors = payload
+        state.vendors = payload.sort((a, b) => {
+            return a.firstName > b.firstName;
+        })
     },
     allLangs(state, payload) {
-        state.languages = payload
+        state.languages = payload.sort((a, b) => {
+            return a.lang > b.lang;
+        })
     },
     customerlangs(state, payload) {
         state.clientLangs = payload

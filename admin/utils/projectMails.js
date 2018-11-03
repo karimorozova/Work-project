@@ -1,5 +1,6 @@
 const { User, Projects } = require('../models');
-const { managerNotifyMail, managerAssignmentNotifyingMessage, requestMessageForVendor, sendEmail } = require('../utils');
+const { managerNotifyMail, sendEmail } = require('./mailTemplate');
+const { managerAssignmentNotifyingMessage, requestMessageForVendor } = require('./emailMessages');
 const { getClient } = require('../clients');
 
 async function managerNotifying(project) {
@@ -56,6 +57,19 @@ async function stepVendorsRequestSending(project, checkedSteps) {
     }
 }
 
+async function stepEmailToVendor(project, step) {
+    let steps = [...project.steps];
+    await sendRequestToVendor(project, step);
+    const updatedSteps = steps.map(item => {
+        if(step.taskId === item.taskId && step.name === item.name) {
+            item.status = "Request Sent";
+            return item;
+        }
+        return item;
+    });
+    return updatedSteps;
+}
+
 async function sendRequestToVendor(project, step) {
     let requestInfo = {...step};
     requestInfo.projectId = project.id;
@@ -70,4 +84,4 @@ async function sendRequestToVendor(project, step) {
     }
 }
 
-module.exports = { managerNotifying, stepVendorsRequestSending };
+module.exports = { managerNotifying, stepVendorsRequestSending, stepEmailToVendor };

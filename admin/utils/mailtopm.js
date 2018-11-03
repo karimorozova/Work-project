@@ -40,7 +40,7 @@ const pmMail = function(project, client, user) {
         pass: 'LetMeInNow!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
-    var msg = `<li>Hello dear ${user.firstName}</li>` + `<p>The Quote with Id ${project.projectId} was rejected ` + `by the client ${client.name}</p>`;
+    const msg = `<li>Hello dear ${user.firstName}</li>` + `<p>The Quote with Id ${project.projectId} was rejected ` + `by the client ${client.name}</p>`;
 
 //     var msg = `<table style="border: 2px solid #66563D;border-collapse: collapse;font-size: 14px;width: 400px;color: #66563D">
 //     <thead>

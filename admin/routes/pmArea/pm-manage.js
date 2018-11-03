@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp, stepVendorsRequestSending } = require("../../projects/");
-const { getOneService } = require("../../services/")
-const { sendEmail, clientQuoteEmail, messageForClient, requestMessageForVendor } = require("../../utils/");
+const { getProject, updateProject, changeProjectProp } = require("../../projects/");
+const { getOneService } = require("../../services/");
+const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};

@@ -3,16 +3,17 @@
     .step-vendor__title Vendor:
     .step-vendor__info
         .step-vendor__drop-menu
-            SelectSingle(
-                :selectedOption="vendorName(vendor)"
-                :options="vendorNames"
-                placeholder="Select"
-                @chosenOption="setVendor"
+            PersonSelect(
+                :selectedPerson="currentVendorName(vendor)"
+                :persons="filteredVendors"
+                :isExtended="isAllShow"
+                @setPerson="setVendor"
+                @togglePersonsData="toggleVendors"
             )
         .step-vendor__contacts
             .step-vendor__icon
                 i.fa.fa-info-circle
-            .step-vendor__icon
+            .step-vendor__icon(@click="sendEmail")
                 i.fa.fa-envelope
             .step-vendor__icon
                 i.fa.fa-slack
@@ -28,44 +29,70 @@
 </template>
 
 <script>
+import PersonSelect from "../PersonSelect";
 import SelectSingle from "../../SelectSingle";
 import CustomRadio from "../../CustomRadio";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     props: {
         vendor: {
             type: [Object, String]
         },
-        vendors: {
-            type: Array
+        step: {
+            type: Object
         }
     },
     data() {
         return {
             isAfterRejectCheck: false,
             isAfterTimeCheck: false,
-            nextSendTime: 1 
+            nextSendTime: 1,
+            isAllShow: false
         }
     },
     methods: {
-        vendorName(vendor) {
+        currentVendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
-        setVendor({option}) {
-            const vendor = this.vendors.find(item => { 
-                return item.firstName + " " + item.surname === option
-            })
-            this.$emit('setStepVendor', { vendor });
+        setVendor({person}) {
+            this.$emit('setStepVendor', { person })
         },
         toggleRadio(e, key) {
             this[key] = !this[key];
-        }
+        },
+        checkForLanguages(vendor) {
+            return vendor.languageCombinations.find(item => {
+                return item.source.symbol === this.step.source && 
+                    item.target.symbol === this.step.target
+            })
+        },
+        toggleVendors({isAll}) {
+            this.isAllShow = isAll;
+        },
+        async sendEmail() {
+            try {
+                await this.$http.post("/vendorsapi/step-email", {projectId: this.currentProject._id, step : this.step});
+                this.alertToggle({message: "Email hase been sent", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error"});
+            }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle"
+        })
     },
     computed: {
-        vendorNames() {
-            return this.vendors.map(item => {
-                return item.firstName + ' ' + item.surname
-            })
+        ...mapGetters({
+            vendors: "getVendors",
+            currentProject: "getCurrentProject"
+        }),
+        filteredVendors() {
+            if(this.isAllShow) {
+                return this.vendors;
+            }
+            const result = this.vendors.filter(item => this.checkForLanguages(item));
+            return result;
         },
         isTimeDouble() {
             return this.nextSendTime.length === 2;
@@ -73,6 +100,7 @@ export default {
     },
     components: {
         SelectSingle,
+        PersonSelect,
         CustomRadio
     }
 }

@@ -57,9 +57,11 @@
             template(slot="vendor" slot-scope="{ row, index }")
                 .steps__vendor-menu
                     PersonSelect(
-                        :persons="vendors"
+                        :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
+                        :isExtended="isAllShow"
                         @setPerson="(person) => setVendor(person, index)"
+                        @togglePersonsData="toggleVendors"
                     )
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(@selected="(e) => changeDate(e, 'start', index)" 
@@ -97,8 +99,10 @@
             template(slot="expanded" slot-scope="{ row, index }")
                 StepInfo(
                     :step="row"
+                    :index="index"
                     :vendors="vendors"
                     :task="getTask(index)"
+                    @setStepVendor="(person) => setVendor(person, index)"
                 )
 </template>
 
@@ -118,9 +122,6 @@ export default {
             type: Array
         },
         tasks: {
-            type: Array
-        },
-        vendors: {
             type: Array
         }
     },
@@ -151,11 +152,15 @@ export default {
             actions: ["Request confirmation", "Other Action"],
             isExpand: false,
             activeIndex: -1,
+            isAllShow: false
         }
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
+        },
+        toggleVendors({isAll}) {
+            this.isAllShow = isAll;
         },
         showTab({index}) {
             return this.tabs[index] === 'Steps' ? true
@@ -218,6 +223,19 @@ export default {
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
+        checkForLanguages(vendor, index) {
+            return vendor.languageCombinations.find(item => {
+                return item.source.symbol === this.allSteps[index].source && 
+                    item.target.symbol === this.allSteps[index].target
+            })
+        },
+        extendedVendors(index) {
+            if(this.isAllShow) {
+                return this.vendors;
+            }
+            const result = this.vendors.filter(item => this.checkForLanguages(item, index));
+            return result;
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
@@ -226,7 +244,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject' 
+            currentProject: 'getCurrentProject',
+            vendors: "getVendors"
         })
     },
     components: {

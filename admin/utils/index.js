@@ -6,6 +6,7 @@ const { sendMailPortal } = require('./mailhandlerportal');
 const { clientMail } = require('./mailtoclients');
 const { pmMail } = require('./mailtopm');
 const { vendorMail } = require('./mailtovendor');
+const { managerNotifying, stepVendorsRequestSending, stepEmailToVendor } = require('./projectMails');
 const upload = require('./uploads');
 const moveFile = require('./moveFile')
 
@@ -24,5 +25,8 @@ module.exports = {
     clientMail,
     pmMail,
     managerNotifyMail,
-    vendorMail
+    vendorMail,
+    managerNotifying,
+    stepVendorsRequestSending,
+    stepEmailToVendor
 }

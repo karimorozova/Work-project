@@ -8,8 +8,9 @@
         .arrow-button(@click="togglePersons")
             img(src="../../assets/images/open-close-arrow-brown.png" :class="{'reverse-icon': isDropped}")
     .drop(v-if="isDropped")
-        .drop__item(v-for="(person, index) in persons" @click="setPerson(index)" :class="{chosen: selectedPerson === getPersonFullName(person)}")
-            span {{ person.firstName }} {{ person.surname }}
+        .drop__item(v-for="(person, index) in extendedPersons" @click="setPerson(index)" :class="{chosen: selectedPerson === getPersonFullName(person)}")
+            span(v-if="person.firstName") {{ person.firstName }} {{ person.surname }}
+            span.drop__last-item(v-else) {{ person }}
 </template>
 
 <script>
@@ -22,6 +23,9 @@ export default {
         },
         persons: {
             type: Array
+        },
+        isExtended: {
+            type: Boolean
         }
     },
     data() {
@@ -41,12 +45,25 @@ export default {
             return person.firstName + ' ' + person.surname;
         },
         setPerson(index) {
+            if(this.extendedPersons[index] === "Show all") {
+                return this.$emit('togglePersonsData', { isAll: true })
+            }
+            if(this.extendedPersons[index] === "Hide all") {
+                return this.$emit('togglePersonsData', { isAll: false })
+            }
             this.isDropped = false;
-            this.$emit('setPerson', {person: this.persons[index]})
+            this.$emit('setPerson', {person: this.extendedPersons[index]})
         },
     },
     directives: {
         ClickOutside
+    },
+    computed: {
+        extendedPersons() {
+            let result = [...this.persons];
+            this.isExtended ? result.push("Hide all") : result.push("Show all");
+            return result;
+        }
     }
 }
 </script>
@@ -70,18 +87,14 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        .steps__table & {
+        .steps__vendor-menu & {
             padding-top: 3px;
         }
     }
-    .steps__table & {
+    .steps__vendor-menu & {
         border: none;
         border-radius: 0;
         height: 29px;
-    }
-    .step-vendor & {
-        border: 1px solid $light-brown;
-        border-radius: 5px;
     }
     .no-select {
         opacity: 0.5;
@@ -99,7 +112,7 @@ export default {
         .reverse-icon {
             transform: rotate(180deg);
         }
-        .steps__table & {
+        .steps__vendor-menu & {
             padding-top: 3px;
             border-left: 1px solid $light-brown;
         }
@@ -125,30 +138,31 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            padding: 5px 6px;
+            padding-left: 6px;
+            height: 28px;
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.4s;
+            transition: all 0.3s;
             &:last-child {
                 border: none;
             }
             &:hover {
                 background-color: $active-background;
             }
-            .project-details__drop-menu & {
-                padding: 7px;
-            }
         }
         .chosen {
             background-color: $active-background;
         }
-        .project-details__drop-menu & {
+        .project-details__drop-menu &, .step-vendor & {
             border: none;
             border-top: 1px solid $brown-border;
         }
+        &__last-item {
+            font-style: italic;
+        }
     }
-    .project-details__drop-menu & {
+    .project-details__drop-menu &, .step-vendor & {
         border: 1px solid $brown-border;
         border-radius: 5px;
     }

@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const { upload, vendorMail } = require('../utils/');
+const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
-const { getVendor, getVendors, checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require('./vendors/');
+const { updateProject, getProject } = require('../projects');
+const { getVendor, getVendors, checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require('./vendors');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -27,17 +28,16 @@ router.get('/vendor', async (req, res) => {
     }
 })
 
-router.post('/mailtovendors', async (req, res) => {
-    let vendors = req.body;
+router.post('/step-email', async (req, res) => {
+    const { projectId, step } = req.body;
     try {
-        for(let vend of vendors) {
-            const vendor = await getVendor({"_id": vend._id});
-            await vendorMail(vendor);
-        }
-        res.send('All messages were sent')
+        const project = await getProject({"_id": projectId});
+        const stepsAfterMailSent = await stepEmailToVendor(project, step);
+        await updateProject({"_id": projectId}, {steps: stepsAfterMailSent});
+        res.send('Email has been sent')
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on sending email to Vendors");
+        res.status(500).send("Error on sending email to Vendor");
     }
 })
 
