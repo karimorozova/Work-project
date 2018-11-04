@@ -81,6 +81,7 @@ export default {
         margin-bottom: 30px;
     }
     &__drop-menu {
+        width: 191px;
         height: 28px;
         position: relative;
         margin-bottom: 20px;

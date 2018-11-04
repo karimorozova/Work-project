@@ -60,6 +60,7 @@
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
                         :isExtended="isAllShow"
+                        isAdditionalShow="true"
                         @setPerson="(person) => setVendor(person, index)"
                         @togglePersonsData="toggleVendors"
                     )

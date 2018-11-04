@@ -26,6 +26,10 @@ export default {
         },
         isExtended: {
             type: Boolean
+        },
+        isAdditionalShow: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -61,7 +65,9 @@ export default {
     computed: {
         extendedPersons() {
             let result = [...this.persons];
-            this.isExtended ? result.push("Hide all") : result.push("Show all");
+            if(this.isAdditionalShow) {
+                this.isExtended ? result.push("Hide all") : result.push("Show all");
+            }
             return result;
         }
     }

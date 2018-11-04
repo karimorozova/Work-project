@@ -117,6 +117,9 @@ export default {
     width: 60%;
     margin: 20px;
     box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+    @media (max-width: 1600px) {
+        width: 70%;
+    }
     &__title {
         padding: 20px;
         font-size: 18px;

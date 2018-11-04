@@ -22,7 +22,7 @@
                     span.project-details__remove remove
                 .project-details__icon
                     i.fa.fa-info-circle
-                .project-details__icon
+                .project-details__icon(@click="sendEmailToContact(index)")
                     i.fa.fa-envelope
                 .project-details__icon
                     i.fa.fa-skype
@@ -40,6 +40,7 @@
 import SelectSingle from "../SelectSingle";
 import LabelValue from "./LabelValue";
 import PersonSelect from "./PersonSelect";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -85,7 +86,19 @@ export default {
             if(this.selectedContacts.length !== 1) {
                 this.selectedContacts.splice(index, 1);
             }
-        }
+        },
+        async sendEmailToContact(index) {
+            const contact = this.selectedContacts[index];
+            try {
+                await this.$http.post("/pm-manage/contact-mailing", { projectId: this.project._id, contact });
+                this.alertToggle({message: "Email has been sent", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Internal server error / Cannot send email", isShow: true, type: "error"})
+            }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle"
+        })
     },
     computed: {
         selectedPerson() {
@@ -116,6 +129,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    @media (max-width: 1600px) {
+        width: 23%;
+    }
     &__project-id {
         font-size: 26px;
         display: flex;

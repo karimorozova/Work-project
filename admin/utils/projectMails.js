@@ -1,6 +1,6 @@
-const { User, Projects } = require('../models');
-const { managerNotifyMail, sendEmail } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage, requestMessageForVendor } = require('./emailMessages');
+const { User, Projects, Services } = require('../models');
+const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
+const { managerAssignmentNotifyingMessage, requestMessageForVendor, emailMessageForContact } = require('./emailMessages');
 const { getClient } = require('../clients');
 
 async function managerNotifying(project) {
@@ -84,4 +84,18 @@ async function sendRequestToVendor(project, step) {
     }
 }
 
-module.exports = { managerNotifying, stepVendorsRequestSending, stepEmailToVendor };
+async function sendEmailToContact(project, contact) {
+    let projectInfo = {...project._doc};
+    projectInfo.firstName = contact.firstName;
+    projectInfo.surname = contact.surame;
+    try {
+        const service = await Services.findOne({"_id": project.tasks[0].service});
+        projectInfo.service = service.title;
+        const message = emailMessageForContact(projectInfo);
+        await clientQuoteEmail({email: contact.email, subject: 'Project information'}, message);
+    } catch(err) {
+        throw new Error('Cannot send email to contact / sendEmailToContact');
+    }
+}
+
+module.exports = { managerNotifying, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact };

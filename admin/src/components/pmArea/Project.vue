@@ -156,6 +156,9 @@ export default {
     width: 60%;
     display: flex;
     flex-direction: column;
+    @media (max-width: 1600px) {
+        width: 70%;
+    } 
     &__project-template {
         position: relative;
         width: 191px;

@@ -270,4 +270,58 @@ function managerAssignmentNotifyingMessage(obj) {
             </div>`;
 }
 
-module.exports = { applicationMessage, messageForClient, requestMessageForVendor, managerAssignmentNotifyingMessage };
+function emailMessageForContact(obj) {
+    const surname = obj.surname || "";
+    const langPairs = obj.tasks.reduce((init, current) => {
+        return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
+    }, "")
+    return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.firstName} ${surname},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="description" style="font-size: 18px;">
+                    Here is the information about the project: 
+                </p>
+                <h3 class="detailsTitle">Project Details</h3>
+                <table class="details">
+                    <tr>
+                        <td>Project number:</td>
+                        <td>${obj.projectId}</td>
+                    </tr>
+                    <tr>
+                        <td>Project name:</td>
+                        <td>${obj.projectName}</td>
+                    </tr>
+                    <tr>
+                        <td>Service:</td>
+                        <td>${obj.service}</td>
+                    </tr>
+                    <tr>
+                        <td>Languages:</td>
+                        <td>${langPairs}</td>
+                    </tr>
+                    <tr>
+                        <td>Specializtion:</td>
+                        <td>${obj.industry.name}</td>
+                    </tr>
+                    <tr>
+                        <td>Start date: </td>
+                        <td>${obj.createdAt}</td>
+                    </tr>
+                    <tr>
+                        <td>Deadline: </td>
+                        <td>${obj.deadline}</td>
+                    </tr>
+                </table>
+                <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea TRanslation Services (Cyprus) LTD</h2>
+                <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
+            </div>
+        </div>`;
+}
+
+module.exports = { 
+    applicationMessage, 
+    messageForClient, 
+    requestMessageForVendor, 
+    managerAssignmentNotifyingMessage,
+    emailMessageForContact
+};

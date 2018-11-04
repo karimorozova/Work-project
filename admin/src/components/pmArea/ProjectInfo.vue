@@ -409,6 +409,9 @@ export default {
         margin-left: 20px;
         margin-right: 20px;
         box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+        @media (max-width: 1600px) {
+            width: 70%;
+        }
     }
     &__tasks-title {
         font-size: 18px; 
@@ -437,6 +440,9 @@ export default {
     }
     &__action {
         width: 20%;
+        @media (max-width: 1600px) {
+            width: 23%;
+        }
     }
     &__tasks-steps {
         position: relative;

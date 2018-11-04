@@ -7,6 +7,7 @@
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="filteredVendors"
                 :isExtended="isAllShow"
+                isAdditionalShow="true"
                 @setPerson="setVendor"
                 @togglePersonsData="toggleVendors"
             )
