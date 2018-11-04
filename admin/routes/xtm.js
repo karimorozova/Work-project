@@ -42,7 +42,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
             let taskId = project.projectId + ` ${idNumber}`;
             await Projects.updateOne({"_id": project._id}, 
-            {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles}, 
+            {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles, isMetricsExist: false}, 
             $push: {tasks: {taskId: taskId, xtmJobs: jobIds, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
                 deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
                 receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
@@ -495,20 +495,20 @@ router.post('/generate-file', async (req, res) => {
 })
 
 router.get('/target-file', async (req, res) => {
-    const { id, projectId, fileId } = req.query;
+    const { step, id, projectId, fileId } = req.query;
     const requestData = {
         method: "GET",
         path: `projects/${projectId}/files/${fileId}/download?fileType=TARGET`,
     }
     const options = getRequestOptions(requestData);
     try {
-        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${fileId}.zip`);
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${step.name}-${fileId}.zip`);
         let reqq = await https.request(options, (resp) => {
             resp.pipe(wstream);
         });
         reqq.end(); 
         wstream.on('finish', () => {
-        res.send({path: `/projectFiles/${id}/target-${fileId}.zip`});
+        res.send({path: `/projectFiles/${id}/target-${step.name}-${fileId}.zip`});
         })
     } catch(err) {
         console.log(err);

@@ -41,7 +41,8 @@
                         )     
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Source Files" @uploadFiles="uploadSourceFiles")
+                        UploadFileButton(text="Source Files" :loadedFiles="sourceFiles" )
+                            input.upload-file__input(type="file" @change='uploadSourceFiles' multiple)
                     .project-info__drop-menu           
                         SelectSingle(
                             :selectedOption="selectedWorkflow.name" 
@@ -51,7 +52,8 @@
                         ) 
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Reference Files" @uploadFiles="uploadRefFiles")     
+                        UploadFileButton(text="Reference Files" :loadedFiles="refFiles" @uploadFiles="uploadRefFiles")
+                            input.upload-file__input(type="file" @change='uploadRefFiles' multiple)
                     .project-info__add-tasks
                         Button(value="Add tasks" @clicked="addTasks")
             .project-info__tasks-steps
@@ -174,11 +176,21 @@ export default {
                 this.targetLanguages.push(lang);
             }
         },
-        uploadSourceFiles({files}) {
-            this.sourceFiles = files;
+        uploadSourceFiles(event) {
+            this.sourceFiles.push(event.target.files[0]);
         },
-        uploadRefFiles({files}) {
-            this.refFiles = files;
+        uploadRefFiles(event) {
+            this.refFiles.push(event.target.files[0]);
+        },
+        clearTasksFormData() {
+            this.template = "";
+            this.targetLanguages = [];
+            this.sourceFiles = [];
+            this.refFiles = [];
+            let inputFiles = document.querySelectorAll(".upload-file__input");
+            for(let elem of inputFiles) {
+                elem.value = "";
+            }
         },
         async addTasks() {
             const xtmCustomer = this.xtmCustomers.find(item => {
@@ -219,6 +231,7 @@ export default {
                 await this.storeProject(updatedProject.body);
                 this.$emit("tasksAdded", {id: this.currentProject._id});
                 this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
+                this.clearTasksFormData()
             } catch(err) {
                 this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
             }
@@ -253,7 +266,7 @@ export default {
                 for(let task of project.tasks) {
                     const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
                     const { taskMetrics, progress } = metrics.body;
-                    task.metrics = {...taskMetrics};
+                    task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
                     task.finance.Wordcount = this.wordsCalculation(task.metrics);
                     const keysArr = Object.keys(progress);
                     for(const key in progress) {

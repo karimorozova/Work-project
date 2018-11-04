@@ -11,4 +11,4 @@ const moveFile = (oldFile, newPath) => {
     return newPath;
 } 
 
-module.exports = moveFile;
+module.exports = { moveFile };

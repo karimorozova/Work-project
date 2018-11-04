@@ -8,7 +8,7 @@ const { pmMail } = require('./mailtopm');
 const { vendorMail } = require('./mailtovendor');
 const { managerNotifying, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact } = require('./projectMails');
 const upload = require('./uploads');
-const moveFile = require('./moveFile')
+const { moveFile } = require('./movingFile')
 
 module.exports = {
     sendEmail,

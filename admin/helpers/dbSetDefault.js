@@ -160,30 +160,16 @@ function languages() {
   return Languages.find({})
     .then(async languages => {
       if (!languages.length) {
-         await instance.get("/dictionaries/language/all").then( async function (xtrfReq) {
-          const xtrfLangs = xtrfReq.data;
+        for (const lang of languagesDefault) {
+          await new Languages(lang).save().then((lang) => {
 
-          for (const lang of languagesDefault) {
-            var addXtrfId = xtrfLangs.find(x => x.symbol == lang.symbol);
-            lang.xtrf = addXtrfId.id;
-          }
-          for (const lang of languagesDefault) {
-            await new Languages(lang).save().then((lang) => {
-
-            })
-              .catch((err) => {
+            }).catch((err) => {
                 console.log(`Lang: ${lang.lang} wasn't save. Because of ${err.message}`)
               });
           }
           console.log('Langs are saved!');
-        }).catch(function (error) {
-          console.log("error gettings xtrf langs");
-        });
-
-
       }
-    })
-    .catch(err => {
+    }).catch(err => {
       console.log(err)
     })
 }
@@ -248,41 +234,19 @@ function users() {
   User.find({})
     .then(users => {
       if (!users.length) {
-        instance.get('/users').then(res => {
-          let usersArray = res.data;
-          for(let person of usersArray) {
-            instance.get(`/users/${person.id}`).then(res => {
-              let newUser = {
-                email: res.data.email,
-                username: res.data.login,
-                group: res.data.userGroupName,
-                firstName: res.data.firstName,
-                lastName: res.data.lastName,
-                gender: res.data.gender,
-                phone: res.data.mobilePhone,
-                position: res.data.positionName,
-                password: 12345
-              };
-              new User(newUser).save().
-              then(user => {
-                console.log(`User ${user.username} saved!`)
-              })
-              .catch((err) => {
-                console.log(`User with ${person.id} wasn't save. Because of ${err.message}`)
-              });
-            })
-            .catch((err) => {
-              console.log(`Cannot get user with id: ${person.id} because of ${err.message}`)
-            });
-          }
-        }).catch(err => {
-          console.log('Cannot get users')
-        })
+        for(let user of usersDefault) {
+          new User(user).save().
+          then(result => {
+            console.log(`User ${result.username} saved!`)
+          })
+          .catch((err) => {
+            console.log(`User cannot be saved. Because of ${err.message}`)
+          });
+        }
       }
-    })
-    .catch(err => {
-      console.log(err)
-    })
+    }).catch(err => {
+    console.log("Error on getting Users" + err.message)
+  })
 }
 
 function services() {

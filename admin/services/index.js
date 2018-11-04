@@ -3,7 +3,7 @@ const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getReque
 const { getOneService, getManyServices } = require("./getServices");
 const { checkServiceRatesMatches, deleteServiceRate, updateLangCombs } = require("./rates");
 
-const services = {
+module.exports = {
     mailTransporter,
     getOneService,
     getManyServices,
@@ -17,5 +17,3 @@ const services = {
     updateLangCombs,
     getTaskProgress
 }
-
-module.exports = services

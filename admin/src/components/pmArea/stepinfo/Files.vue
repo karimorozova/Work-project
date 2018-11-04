@@ -71,11 +71,12 @@ export default {
             if(this.step.targetFiles && this.step.targetFiles.length) {
                 return this.downloadExistingTargets(this.step.targetFiles);
             }
+            if(this.step.progress.wordsTotal != this.step.progress.wordsDone) return;
             const fileIds = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, taskId: this.step.taskId});
             let updatedStep = {...this.step};
             updatedStep.targetFiles = [];
             for(let obj of fileIds.body) {
-                let fileLink = await this.$http.get(`/xtm/target-file?id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
+                let fileLink = await this.$http.get(`/xtm/target-file?step=${updatedStep}&id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
                 let href = fileLink.body.path;
                 updatedStep.targetFiles.push(href);
                 let link = document.createElement('a');

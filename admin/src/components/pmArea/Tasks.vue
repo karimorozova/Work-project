@@ -72,7 +72,13 @@
             template(slot="delivery" slot-scope="{ row }")
                 img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../assets/images/download-big-b.png")
     .tasks__approve-action(v-if="isApproveActionShow")
-        ApproveModal(text="Please, choose the action:" @close="closeApproveModal")
+        ApproveModal(
+            :text="modalTexts.main" 
+            :approveValue="modalTexts.approve"
+            :notApproveValue="modalTexts.notApprove"
+            @approve="approveAction"
+            @notApprove="notApproveAction"
+            @close="closeApproveModal")
 </template>
 
 <script>
@@ -106,6 +112,9 @@ export default {
             selectedAction: "",
             actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
+            modalMainText: "",
+            approveText: "Send",
+            notApproveText: "Edit & Send",
             isAllSelected: false,
             isApproveActionShow: false
         }
@@ -116,7 +125,34 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
+            if(option === "Cancel") {
+                this.approveText = "Yes";
+                this.notApproveText = "No";
+            }
             this.isApproveActionShow = true;
+        },
+        async approveAction() {
+            const checkedTasks = this.allTasks.filter(item => item.check);
+            try {
+                if(this.selectedAction === "Cancel") {
+                    await this.cancelTasks(checkedTasks)
+                }
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"})
+            }
+            this.closeApproveModal();
+        },
+        notApproveAction() {
+            this.closeApproveModal();
+        },
+        async cancelTasks(tasks) {
+            try {
+                const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks, projectId: this.currentProject._id});
+                await this.storeProject(updatedProject.body);
+                this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error"})
+            }
         },
         showTab({index}) {
             return !this.currentProject.steps.length || this.tabs[index] === 'Tasks' ? true
@@ -151,13 +187,29 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            setProjectValue: "setProjectValue"
+            setProjectValue: "setProjectValue",
+            storeProject: "setCurrentProject"
         })
     },
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject' 
-        })
+        }),
+        modalTexts() {
+            if(this.selectedAction === "Cancel") {
+                return { 
+                    main: "Are you sure?",
+                    approve: "Yes",
+                    notApprove: "No"
+                }
+            } else {
+                return { 
+                    main: "Please, choose action:",
+                    approve: "Send",
+                    notApprove: "Edit & Send"
+                }
+            }
+        }
     },
     components: {
         DataTable,

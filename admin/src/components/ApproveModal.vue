@@ -2,10 +2,10 @@
 .approve-modal
     .approve-modal__text {{ text }}
     .approve-modal__buttons
-        .approve-modal__button
-            Button(value="Send" @clicked="send")
-        .approve-modal__button
-            Button(value="Edit & Send" @clicked="edit")
+        .approve-modal__button(@click="approve")
+            Button(:value="approveValue")
+        .approve-modal__button(@click="notApprove")
+            Button(:value="notApproveValue")
     span.approve-modal__close(@click="close") +
 </template>
 
@@ -16,6 +16,12 @@ export default {
     props: {
         text: {
             type: String
+        },
+        approveValue: {
+            type: String
+        },
+        notApproveValue: {
+            type: String
         }
     },
     data() {
@@ -24,11 +30,11 @@ export default {
         }
     },
     methods: {
-        send() {
-            this.$emit("send");
+        approve() {
+            this.$emit("approve");
         },
-        edit() {
-            this.$emit("edit");
+        notApprove() {
+            this.$emit("notApprove");
         },
         close() {
             this.$emit("close");

@@ -35,6 +35,15 @@ export default {
         },
         async makeAction() {
             try {
+                if(this.selectedAction === "Send a Quote") {
+                    await this.sendQuote();
+                }
+            } catch(err) {
+                this.alertToggle({message: 'Internal server error. Cannot execute chosen action.', isShow: true, type: 'error'})
+            }
+        },
+        async sendQuote() {
+            try {
                 const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id});
                 await this.storeProject(result.body);
                 this.alertToggle({message: 'The Quote has been sent', isShow: true, type: 'success'})

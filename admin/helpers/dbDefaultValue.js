@@ -1,6 +1,6 @@
 
 const languagesDefault = [
-    {"lang":"Afrikaans", "icon": "/static/flags31x21pix/Afrikaans[AF].png", "symbol":"AF", "iso1":"af", "iso2":"afr", "direction":"in", "crud": false, "active": true, "check": false,},
+    {"lang":"Afrikaans", "icon": "/static/flags31x21pix/Afrikaans[AF].png", "symbol":"AF", "xtm": "af_ZA", "iso1":"af", "iso2":"afr", "direction":"in", "crud": false, "active": true, "check": false,},
     {"lang":"Arabic", "icon":"/static/flags31x21pix/Arabic[AR].png", "symbol":"AR", "xtm": "ar_AA", "iso1":"ar-AA", "iso2":"ara", "direction":"both", "crud": false, "active": true, "check": false, children: true},
     {"lang":"Arabic (Morocco)", "icon":"/static/flags31x21pix/Arabic[AR-MA].png", "symbol":"AR-MA", "xtm": "ar_MA", "iso1":"ar-MA", "iso2":"ara-MA", "direction":"in", "crud": false, "check": false, "active": true, parent: "AR"},
     {"lang":"Arabic (Egypt)", "icon":"/static/flags31x21pix/Arabic[AR-EG].png", "symbol":"AR-EG", "xtm": "ar_EG", "iso1":"ar-EG", "iso2":"ara-EG", "direction":"in", "crud": false, "check": false, "active": true, parent: "AR"},
@@ -8,18 +8,19 @@ const languagesDefault = [
     {"lang":"Azerbaijani (Latin)", "icon":"/static/flags31x21pix/Azerbaijani[AZ-LN].png", "symbol":"AZ-LN", "xtm": "az_AZ_Latn", "iso1":"az-AZ-Latin", "iso2":"aze", "direction":"in", "crud": false, "active": true, "check": false,},
     {"lang":"Bulgarian", "icon":"/static/flags31x21pix/Bulgarian[BG].png", "symbol":"BG", "xtm": "bg_BG", "iso1":"bg-BG", "iso2":"bul", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Bengali (Indida)", "icon":"/static/flags31x21pix/Bengali[BN-IN].png", "symbol":"BN-IN", "xtm": "bn_IN", "iso1":"bn_IN", "iso2":"ben_IN", "direction":"in", "crud": false, "active": true, "check": false,},
-    {"lang":"Bosnian", "icon":"/static/flags31x21pix/Bosnian[BS].png", "symbol":"BS", "iso1":"bs", "iso2":"bos", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Bosnian (Cyrillic)", "icon":"/static/flags31x21pix/Bosnian[BS].png", "symbol":"BS", "xtm": "bs_BA_Cyrl", "iso1":"bs", "iso2":"bos", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Bosnian (Latin)", "icon":"/static/flags31x21pix/Bosnian[BS].png", "symbol":"BS-LAT", "xtm": "bs_BA_Latn", "iso1":"bs-lat", "iso2":"bos-lat", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Czech", "icon":"/static/flags31x21pix/Czech[CS].png", "symbol":"CS", "xtm": "cs_CZ", "iso1":"cz-CZ", "iso2":"cze", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Danish", "icon":"/static/flags31x21pix/Danish[DA].png", "symbol":"DA", "xtm": "da_DK", "iso1":"da-DK", "iso2":"dan", "direction":"both", "crud": false, "active": true, "check": false},
-    {"lang":"Dutch", "icon":"/static/flags31x21pix/Dutch[NL].png", "symbol":"NL","direction":"both", "iso1":"nl", "iso2":"dut", "crud": false, "active": true, "check": false, children: true},
+    {"lang":"Dutch", "icon":"/static/flags31x21pix/Dutch[NL].png", "symbol":"NL", "xtm": "nl_NL", "direction":"both", "iso1":"nl", "iso2":"dut", "crud": false, "active": true, "check": false, children: true},
     {"lang":"Flemish", "icon":"/static/flags31x21pix/Flemish[NL-BE].png", "symbol":"NL-BE", "xtm": "nl_BE", "iso1":"nl-BE", "iso2":"dut-BE", "direction":"both", "crud": false, "check": false, "active": true, parent: "NL"},
     {"lang":"Dutch (Netherlands)", "icon":"/static/flags31x21pix/Dutch[NL-NL].png", "symbol":"NL-NL", "xtm": "nl_NL", "iso1":"nl-NL", "iso2":"dut-NL", "direction":"both", "crud": false, "check": false, "active": true, parent: "NL"},    
-    {"lang":"German", "icon":"/static/flags31x21pix/German[DE].png", "symbol":"DE", "iso1":"de", "iso2":"ger", "diraction":"both", "crud": false, "active": true, "check": false, children: true},
+    {"lang":"German", "icon":"/static/flags31x21pix/German[DE].png", "symbol":"DE", "xtm": "de_DE", "iso1":"de", "iso2":"ger", "diraction":"both", "crud": false, "active": true, "check": false, children: true},
     {"lang":"German (Switzerland)", "icon":"/static/flags31x21pix/German[DE-CH].png", "symbol":"DE-CH", "xtm": "de_CH", "iso1":"de-CH", "iso2":"ger-CH", "direction":"both", "crud": false, "check": false, "active": true, parent: "DE"},
     {"lang":"German (Austria)", "icon":"/static/flags31x21pix/German[DE-AT].png", "symbol":"DE-AT", "xtm": "de_AT", "iso1":"de-AT", "iso2": "ger-AT", "direction":"both", "crud": false, "check": false, "active": true, parent: "DE"},
     {"lang":"German (Germany)", "icon":"/static/flags31x21pix/German[DE-DE].png", "symbol":"DE-DE", "xtm": "de_DE", "iso1":"de-DE", "iso2":"ger-DE", "direction":"both", "crud": false, "check": false, "active": true,  parent: "DE"},
     {"lang":"Greek", "icon":"/static/flags31x21pix/Greek[EL].png", "symbol":"EL", "xtm": "el_GR", "iso1":"el-GR", "iso2":"gre", "direction":"both", "crud": false, "active": true, "check": false},
-    {"lang":"English", "symbol":"EN", "icon":"/static/flags31x21pix/English[EN-GB].png", "iso1":"en", "iso2":"eng", "direction":"both", "crud": false, "active": true, "check": false, children: true},
+    {"lang":"English", "icon":"/static/flags31x21pix/English[EN-GB].png", "symbol":"EN", "xtm": "en_GB", "iso1":"en", "iso2":"eng", "direction":"both", "crud": false, "active": true, "check": false, children: true},
     {"lang":"English (United States)", "icon":"/static/flags31x21pix/English[EN-US].png", "symbol":"EN-US", "xtm": "en_US", "iso1":"en-US", "iso2":"eng-US", "direction":"both", "crud": false, "check": false, "active": true, parent: "EN"},
     {"lang":"English (United Kingdom)", "icon":"/static/flags31x21pix/English[EN-GB].png", "symbol":"EN-GB", "xtm": "en_GB", "iso1":"en-GB", "iso2":"eng-GB", "direction":"both", "crud": false, "check": false, "active": true, parent: "EN"},
     {"lang":"Spanish (Spain)", "icon":"/static/flags31x21pix/Spanish[ES-ES].png", "symbol":"ES-ES", "xtm": "es_ES", "iso1":"es-ES", "iso2":"spa-ES", "direction":"both", "crud": false, "active": true, "check": false},
@@ -29,7 +30,7 @@ const languagesDefault = [
     {"lang":"Estonian", "icon":"/static/flags31x21pix/Estonian[ET].png", "symbol":"ET", "xtm": "et_EE", "iso1":"et-EE", "iso2":"est", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Farsi (Persian)", "icon":"/static/flags31x21pix/Farsi[FA].png", "symbol":"FA", "xtm": "fa_IR", "iso1":"fa-IR", "iso2":"ger", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Finnish", "icon":"/static/flags31x21pix/Finnish[FI].png", "symbol":"FI", "xtm": "fi_FI", "iso1":"fi-FI", "iso2":"fin", "direction":"both", "crud": false, "active": true, "check": false},
-    {"lang":"French", "symbol":"FR", "icon":"/static/flags31x21pix/French[FR-FR].png", "iso1":"fr", "iso2":"fre", "direction":"both", "crud": false, "active": true, "check": false, children: true},
+    {"lang":"French", "icon":"/static/flags31x21pix/French[FR-FR].png", "symbol":"FR", "xtm": "fr_FR", "iso1":"fr", "iso2":"fre", "direction":"both", "crud": false, "active": true, "check": false, children: true},
     {"lang":"French (France)", "icon":"/static/flags31x21pix/French[FR-FR].png", "symbol":"FR-FR", "xtm": "fr_FR", "iso1":"fr-FR", "iso2":"fre-FR", "direction":"both", "crud": false, "check": false, "active": true, parent: "FR"},
     {"lang":"French (Belgium)", "icon":"/static/flags31x21pix/French[FR-BE].png", "symbol":"FR-BE", "xtm": "fr_BE", "iso1":"fr-BE", "iso2":"fre-BE", "direction":"both", "crud": false, "check": false, "active": true, parent: "FR"},
     {"lang":"French (Canada)", "icon":"/static/flags31x21pix/French[FR-CA].png", "symbol":"FR-CA", "xtm": "fr_CA", "iso1":"fr-CA", "iso2":"fre-CA", "direction":"in", "crud": false, "check": false, "active": true, parent: "FR"},
@@ -41,7 +42,7 @@ const languagesDefault = [
     {"lang":"Armenian", "icon":"/static/flags31x21pix/Armenian[HY].png", "symbol":"HY", "xtm": "hy_AM", "iso1":"hy-AM", "iso2":"hye", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Indonesian", "icon":"/static/flags31x21pix/Indonesian[ID].png", "symbol":"ID", "xtm": "id_ID", "iso1":"id-ID", "iso2":"ind", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Icelandic", "icon":"/static/flags31x21pix/Icelandic[IS].png", "symbol":"IS", "xtm": "is_IS", "iso1":"is-IS", "iso2":"ice", "direction":"both", "crud": false, "active": true, "check": false},
-    {"lang":"Italian", "icon":"/static/flags31x21pix/Italian[IT].png", "symbol":"IT", "iso1":"it", "iso2":"ita", "direction":"in", "crud": false, "active": true, "check": false, children: true},
+    {"lang":"Italian", "icon":"/static/flags31x21pix/Italian[IT].png", "symbol":"IT", "xtm": "it_IT", "iso1":"it", "iso2":"ita", "direction":"in", "crud": false, "active": true, "check": false, children: true},
     {"lang":"Italian (Italy)", "icon":"/static/flags31x21pix/Italian[IT-IT].png", "symbol":"IT-IT", "xtm": "it_IT", "iso1":"it-IT", "iso2":"ita-IT", "direction":"in", "crud": false, "check": false, "active": true, parent: "IT"},
     {"lang":"Italian (Switzerland)", "icon":"/static/flags31x21pix/Italian[IT-CH].png", "symbol":"IT-CH", "xtm": "it_CH", "iso1":"it-CH", "iso2":"ita-CH", "direction":"in", "crud": false, "check": false, "active": true, parent: "IT"},
     {"lang":"Japanese", "icon":"/static/flags31x21pix/Japanese[JA].png", "symbol":"JA", "xtm": "ja_JP", "iso1":"ja-JP", "iso2":"jpn", "direction":"in", "crud": false, "active": true, "check": false},
@@ -74,11 +75,11 @@ const languagesDefault = [
     {"lang":"Uzbek", "icon":"/static/flags31x21pix/Uzbek[UZ].png", "symbol":"UZ", "xtm": "uz", "iso1":"uz-UZ-Latn", "iso2":"uzb", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Vietnamese", "icon":"/static/flags31x21pix/Vietnamese[VI].png", "symbol":"VI", "xtm": "vi_VN", "iso1":"vi-VN", "iso2":"vie", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Chinese Simplified", "icon":"/static/flags31x21pix/ChineseSimplified[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_VN", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true, children: true},
-    {"lang":"Chinese (China)", "symbol":"ZH-CN", "icon":"/static/flags31x21pix/Chinese[ZH-CN].png", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "simplified"},
+    {"lang":"Chinese (China)", "icon":"/static/flags31x21pix/Chinese[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_CN", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "simplified"},
     {"lang":"Chinese (Singapore)", "icon":"/static/flags31x21pix/Chinese[ZH-SG].png", "symbol":"ZH-SG", "xtm": "zh_SG", "iso1":"zh-SG", "iso2":"zho-SG", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "simplified"},
     {"lang":"Chinese Traditional", "icon":"/static/flags31x21pix/ChineseTraditional[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_TW", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true},
     {"lang":"Chinese (Hong Kong)", "icon":"/static/flags31x21pix/Chinese[ZH-HK].png", "symbol":"ZH-HK", "xtm": "zh_HK", "iso1":"zh-HK", "iso2":"zho-HK", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"},
-    {"lang":"Chinese (Macao)", "icon":"/static/flags31x21pix/Chinese[ZH-MO].png", "symbol":"ZH-MO", "iso1":"zh-MO", "iso2":"zho-MO", "direction":"in", "crud": false, "active": true, parent: "ZH-CN", china: "traditional"},
+    {"lang":"Chinese (Macao)", "icon":"/static/flags31x21pix/Chinese[ZH-MO].png", "symbol":"ZH-MO", "xtm": "zh_TW", "iso1":"zh-MO", "iso2":"zho-MO", "direction":"in", "crud": false, "active": true, parent: "ZH-CN", china: "traditional"},
     {"lang":"Chinese (Taiwan)","icon":"/static/flags31x21pix/Chinese[ZH-TW].png", "symbol":"ZH-TW", "xtm": "goyu", "iso1":"zh-TW", "iso2":"zho-TW", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"}
 ];
 const requestsDefault = [
@@ -161,8 +162,117 @@ const requestsDefault = [
     }            
 ];
 const usersDefault = [
-    { email: 'test@test.com', password: '12345', username: 'Petia' }
-];
+    {
+      "email" : "illy@pangea.global",
+      "username" : "illy.dim",
+      "group" : "Sales",
+      "firstName" : "Illy",
+      "lastName" : "Dimitrova",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Business Development Manager",
+      "password" : "12345"
+    },
+    {
+      "email" : "kriti@pangea-langs.com",
+      "username" : "kriti.chris",
+      "group" : "Project Managers",
+      "firstName" : "Kriti",
+      "lastName" : "Christoforidou",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Senior Project Manager",
+      "password" : "12345"
+    },
+    {
+      "email" : "sergey@galuza.com",
+      "username" : "sergey.galuza",
+      "group" : "Developers",
+      "firstName" : "Sergey",
+      "lastName" : "Galuza",
+      "gender" : "MALE",
+      "phone" : "",
+      "position" : "Development Manager",
+      "password" : "12345"
+    },
+    {
+      "email" : "michal@pangea.global",
+      "username" : "admin",
+      "group" : "Administrators",
+      "firstName" : "Michal",
+      "lastName" : "Shinitzky",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Administrator",
+      "password" : "12345"
+    },
+    {
+      "email" : "rafaella@pangea.global",
+      "username" : "rafaella",
+      "group" : "Vendor Managers",
+      "firstName" : "Rafaella",
+      "lastName" : "Athanasiadi",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Vendor Manager & Translation Technologist",
+      "password" : "12345"
+    },
+    {
+      "email" : "sakis@pangea-langs.com",
+      "username" : "sakis.k",
+      "group" : "Project Managers",
+      "firstName" : "Sakis",
+      "lastName" : "Koulos",
+      "gender" : "MALE",
+      "phone" : "",
+      "position" : "Project Manager",
+      "password" : "12345"
+    },
+    {
+      "email" : "eirini@pangea-langs.com",
+      "username" : "eirini.loi",
+      "group" : "Accounting",
+      "firstName" : "Eri",
+      "lastName" : "Loi",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Bookkeeper",
+      "password" : "12345"
+    },
+    {
+      "email" : "arans@pangea-langs.com",
+      "username" : "aran.s",
+      "group" : "Vendor Managers",
+      "firstName" : "Aran",
+      "lastName" : "S",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Team Lead",
+      "password" : "12345"
+    },
+    {
+      "email" : "angela@pangea-langs.com",
+      "username" : "angela.st",
+      "group" : "Project Managers",
+      "firstName" : "Angela",
+      "lastName" : "Stephanou",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Copywriter",
+      "password" : "12345"
+    },
+    {
+      "email" : "alexia@pangea-langs.com",
+      "username" : "alexia.m",
+      "group" : "Project Managers",
+      "firstName" : "Alexia",
+      "lastName" : "Mavronicola",
+      "gender" : "FEMALE",
+      "phone" : "",
+      "position" : "Project Coordinator",
+      "password" : "12345"
+    }
+]
 
 const servicesDefault = [
     {sortIndex: 1, xtrf: 11, symbol: "tr", formType: "Translation", icon: "/static/services/Translation_Localization.png", "active": true, "crud": false, languageForm: "Duo", calculationUnit: "Words", projectType: "regular", title: "Translation", source: true, languageCombinations: [], languages: {source: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH"], target: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH", "AF", "AR-EG", "AR-MA", "AR-SA", "AZ-LN", "BN-IN", "BS", "CS", "ES-419", "ES-AR", "FR-CA", "FR-CH", "HI", "HR", "HU", "IT", "IT-IT", "IT-CH", "JA", "KA", "KK", "KO", "LT", "LV", "NB", "NL", "PL", "PT-PT", "RO", "RU", "SL", "SR-LA", "SV-SE", "TE", "TK", "TL", "TR", "UK", "UR", "UZ", "VI", "ZH-CN", "ZH-SG", "ZH-HK", "ZH-MO", "ZH-TW"]}},
@@ -178,7 +288,8 @@ const servicesDefault = [
 ];
 
 const industriesDefault = [
-    {name: 'Casino, Poker & Igaming', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'iGaming (Casino, Slot games, Gambling, etc.)', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Poker', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
     {name: 'CFDs & Online Trading', rate: 0,  icon: '/static/industries/cfds-online-tranding.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx',active: true},
     {name: 'Hotel & Real Estates', rate: 0,  icon: '/static/industries/hotel-real-estates.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
     {name: 'ICOs & Cryptocurrency', rate: 0,  icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},

@@ -1,7 +1,7 @@
-const { Projects, Services, Clients, Vendors } = require('../models/');
-const { getVendor } = require('../routes/vendors/');
-const { getClient } = require('../clients/');
-const { getOneService } = require('../services/');
+const { Projects, Services, Clients, Vendors } = require('../models');
+const { getVendor } = require('../routes/vendors/getVendors');
+const { getClient } = require('../clients/getClients');
+const { getOneService } = require('../services/getServices');
 const { updateProject } = require('./getProjects');
 
 async function metricsCalc(metrics) {
@@ -107,17 +107,21 @@ async function getCustomerRate({task, industry, customerId}) {
 }
 
 async function calcProofingStep({task, project, words}) {
-    const service = await getOneService({symbol: 'pr'});
-    const clientCombs = await getCustomerRate({task: task, industry: project.industry.id, customerId: project.customer.id});
-    const comb = service.languageCombinations.find(item => {
-        return item.source.symbol === task.sourceLanguage &&
-                item.target.symbol === task.targetLanguage
-    });
-    const wordCost = clientCombs || comb.industries.find(item => {
-        return item.industry.id === project.industry.id
-    })
-    const cost = (words*wordCost.rate).toFixed(2);
-    return {cost: cost, rate: wordCost.rate}
+    try{
+        const service = await getOneService({symbol: 'pr'});
+        const clientCombs = await getCustomerRate({task: task, industry: project.industry.id, customerId: project.customer.id});
+        const comb = service.languageCombinations.find(item => {
+            return item.source.symbol === task.sourceLanguage &&
+                    item.target.symbol === task.targetLanguage
+        });
+        const wordCost = clientCombs || comb.industries.find(item => {
+            return item.industry.id === project.industry.id
+        })
+        const cost = (words*wordCost.rate).toFixed(2);
+        return {cost: cost, rate: wordCost.rate}
+    } catch(err) {
+    console.log('Get One Service: ' + err);
+    }
 }
 
 async function updateProjectCosts(project) {

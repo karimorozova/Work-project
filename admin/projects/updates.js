@@ -8,4 +8,24 @@ async function changeProjectProp(projectId, property) {
     return await updateProject({"_id": projectId}, {...changedProject});
 }
 
-module.exports = { changeProjectProp };
+function cancelTasks(tasks, project) {
+    let projectTasks = [...project.tasks];
+    let projectSteps = [...project.steps];
+    const tasksIds = tasks.map(item => item.taskId);
+    const changedTasks = cancelledStatuses(tasksIds, projectTasks);
+    const changedSteps = cancelledStatuses(tasksIds, projectSteps);
+    return { changedTasks, changedSteps }
+}
+
+function cancelledStatuses(tasksIds, projectTasks) {
+    const updated = projectTasks.map(item => {
+        if(tasksIds.indexOf(item.taskId) !== -1) {
+            item.status = "Cancelled";
+            return item; 
+        }
+        return item;
+    })
+    return updated;
+}
+
+module.exports = { changeProjectProp, cancelTasks };

@@ -1,4 +1,4 @@
-const { moveFile } = require('../utils/');
+const { moveFile } = require('../utils/movingFile');
 
 async function storeFiles(filesArr, projectId) {
     let storedFiles = [];

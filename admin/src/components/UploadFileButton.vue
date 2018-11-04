@@ -3,7 +3,7 @@
     span.upload-file__label(v-if="label") {{ label }}
     .upload-file__button
         .upload-file__button-text {{ text }}
-        input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
+        slot
     span.upload-file__comment(v-if="comment") {{ comment }}
 </template>
 
@@ -24,12 +24,6 @@ export default {
     data() {
         return {
             files: []
-        }
-    },
-    methods: {
-        uploadFile(event) {
-            this.files.push(event.target.files[0]);
-            this.$emit("uploadFiles", {files: this.files})
         }
     }
 }
@@ -94,6 +88,17 @@ export default {
     &__comment {
         font-size: 12px;
         opacity: 0.6;
+    }
+    input {
+        top: 0px;
+        right: -25px;
+        z-index: 2;
+        position: absolute;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+        font-size: 30px;
+        font-family: MyriadPro;  
     }
 }
 </style>

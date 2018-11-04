@@ -150,7 +150,7 @@ export default {
             ],
             selectedVendors: [],
             isAllSelected: false,
-            actions: ["Request confirmation", "Other Action"],
+            actions: ["Request confirmation", "Mark as accept / reject", "Cancel"],
             isExpand: false,
             activeIndex: -1,
             isAllShow: false,

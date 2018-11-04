@@ -101,12 +101,12 @@ router.get('/declinequote', async (req, res) => {
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
-            const project = await Projects.findOne({"_id": projectId});
+            const project = await getProject({"_id": projectId});
             if(project.isClientOfferClicked) {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            const client = await getClient({"_id": project.customer});
+            const client = {...project.customer._doc, id: project.customer.id};
             const user = await User.findOne({"_id": client.projectManager._id});
             await pmMail(project, client, user);
             await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});

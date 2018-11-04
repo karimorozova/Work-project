@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp } = require("../../projects/");
+const { getProject, updateProject, changeProjectProp, cancelTasks } = require("../../projects/");
 const { getOneService } = require("../../services/");
 const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
@@ -85,6 +85,19 @@ router.post("/vendor-request", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending the Request Confirmation");
+    }
+})
+
+router.post("/cancel-tasks", async (req, res) => {
+    const { tasks, projectId } = req.body;
+    try {
+        const project = await getProject({"_id": projectId});
+        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on cancelling tasks / cancel-tasks");
     }
 })
 
