@@ -7,7 +7,7 @@
     tbody.bodyWrapper
       tr.rbody(v-for="(industry, ind) in industries" :class='"tr__row-" + (ind + 1)' )
         td.data1(:class="{outliner: industry.crud}")
-          span.indusryicons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
+          span.industryIcons(:style='{backgroundImage: "url(" + industry.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
           button.upload1(v-if="industry.crud")
           input.upload(v-if="industry.crud" @change="uploadFile" :readonly="!industry.crud" type="file" name="uploadedFileIcon")
         td.data2(:class="{outliner: industry.crud}")
@@ -302,10 +302,11 @@ export default {
         height: 17px;
         margin-right: 37px;
       }
-      .indusryicons {
+      .industryIcons {
         width: 20px;
         height: 20px;
-        background-size: contain; 
+        background-size: contain;
+        background-repeat: no-repeat;
       }
       .video_special {
         height: 25px;
