@@ -73,7 +73,10 @@ router.post('/update-matrix', async (req, res) => {
         let steps = [...project.steps];
         tasks[taskIndex].metrics[key][prop] = +value/100;
         const cost = calcCost(tasks[taskIndex].metrics, prop, rate);
-        steps[stepIndex][costName] = cost;
+        steps[stepIndex].finance.Price[costName] = cost;
+        tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
+            return init + +cur.finance.Price[costName];
+        }, 0)
         let updatedProject = {...project._doc, id: projectId, tasks, steps};
         const result = await updateProjectCosts(updatedProject);
         res.send(result);

@@ -72,7 +72,7 @@ export const mutations = {
     },
     updateMatrixData(state, payload) {
         const taskIndex = state.currentProject.tasks.findIndex(item => {
-            return item.id === payload.taskId;
+            return item.taskId === payload.taskId;
         })
         state.currentProject.tasks[taskIndex][payload.key] = payload.value;
     }

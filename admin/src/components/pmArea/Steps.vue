@@ -60,7 +60,7 @@
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
                         :isExtended="isAllShow"
-                        isAdditionalShow="true"
+                        :isAdditionalShow="isAdditionalShow"
                         @setPerson="(person) => setVendor(person, index)"
                         @togglePersonsData="toggleVendors"
                     )
@@ -153,7 +153,8 @@ export default {
             actions: ["Request confirmation", "Other Action"],
             isExpand: false,
             activeIndex: -1,
-            isAllShow: false
+            isAllShow: false,
+            isAdditionalShow: true
         }
     },
     methods: {
