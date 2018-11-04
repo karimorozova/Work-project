@@ -60,7 +60,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
 router.post('/update-matrix', async (req, res) => {
     const { projectId, taskId, step, key, value, prop } = req.body;
     const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' } 
-    : {rate: step.vendroRate, costName: 'payables'};
+    : {rate: step.vendorRate, costName: 'payables'};
     try {
         let project = await getProject({"_id": projectId});
         let taskIndex = project.tasks.findIndex(item => {
