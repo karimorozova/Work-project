@@ -17,8 +17,51 @@ function cancelTasks(tasks, project) {
     return { changedTasks, changedSteps }
 }
 
-function cancelledStatuses(tasksIds, projectTasks) {
-    const updated = projectTasks.map(item => {
+function cancelSteps(checkedSteps, project) {
+    const projectSteps = [...project.steps];
+    const projectTasks = [...project.tasks];
+    const stepIdentify = checkedSteps.map(item => {
+        return item.taskId + item.name;
+    })
+    const changedSteps = cancelledSteps(stepIdentify, projectSteps);
+    const changedTasks = cancelledTasks(changedSteps, projectTasks);
+    return { changedSteps, changedTasks };
+}
+
+function cancelledTasks(changedSteps, arr) {
+    const updated = arr.map(item => {
+        if(!checkForNotCancelledSteps(changedSteps, item)) {
+            item.status = "Cancelled";
+            return item;
+        }
+        return item;
+    })
+    return updated;
+}
+
+function checkForNotCancelledSteps(changedSteps, task) {
+    let isNotCancelledExist = false;
+    for(let step of changedSteps) {
+        if(step.taskId === task.taskId && step.status !== "Cancelled") {
+            isNotCancelledExist = true;
+        }
+    }
+    return isNotCancelledExist;
+}
+
+function cancelledSteps(stepIdentify, arr) {
+    const updated = arr.map(item => {
+        if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
+            item.status = "Cancelled";
+            return item;
+        }
+        return item;
+    })
+    return updated;
+}
+
+function cancelledStatuses(tasksIds, arr) {
+    const updated = arr.map(item => {
         if(tasksIds.indexOf(item.taskId) !== -1) {
             item.status = "Cancelled";
             return item; 
@@ -28,4 +71,4 @@ function cancelledStatuses(tasksIds, projectTasks) {
     return updated;
 }
 
-module.exports = { changeProjectProp, cancelTasks };
+module.exports = { changeProjectProp, cancelTasks, cancelSteps };

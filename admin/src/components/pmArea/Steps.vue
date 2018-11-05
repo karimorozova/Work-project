@@ -195,16 +195,38 @@ export default {
             const checkedSteps = this.allSteps.filter(item => {
                 return item.check 
             })
+            if(!checkedSteps.length) {
+                return
+            }
             try {
-                if(option === "Request confirmation" && checkedSteps.length) {
-                    const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: checkedSteps, projectId: this.currentProject._id });
-                    await this.storeProject(result.body);
-                    this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
+                if(option === "Request confirmation") {
+                   return await this.requestConfirmation(checkedSteps);
+                }
+                if(option === "Cancel") {
+                    return await this.cancelSteps(checkedSteps);
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'})
             }
 
+        },
+        async requestConfirmation(steps) {
+            try {
+                const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: steps, projectId: this.currentProject._id });
+                await this.storeProject(result.body);
+                this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
+            } catch(err) {
+                this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'});
+            }
+        },
+        async cancelSteps(steps) {
+            try {
+                const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: steps, projectId: this.currentProject._id });
+                await this.storeProject(result.body);
+                this.alertToggle({message: "Chosen steps are cancelled.", isShow: true, type: 'success'});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error. Cannot execute action.", isShow: true, type: 'error'});
+            }
         },
         progress(prog) {
             return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
