@@ -38,35 +38,29 @@ export default {
     async login() {
       try {
       const loginResult = await this.$http.post('../login', this.form);
-      await this.$store.dispatch("login", loginResult.body);
+      await this.loggingIn(loginResult.body);
       this.alertToggle({message: "You are logged in", isShow: true, type: "success"})
       this.$router.push("/")
       } catch(err) {
         this.alertToggle({message: err.body, isShow: true, type: "error"});
       }
     },
-    async destroySession() {
-      if(!localStorage.getItem("token")) {
-        try {
-          await this.$http.get('../logout');
-        } catch(err) {
-          this.alertToggle({message: "Cannot log out", isShow: true, type: "error"})
-        }
+    async logout() {
+      try {
+        await this.loggingOut();
+        this.$router.push("/login");
+      } catch(err) {
+        this.alertToggle({message: "Cannot log out", isShow: true, type: "error"})
       }
     },
     forget(){
       this.forgotLink = !this.forgotLink;
     },
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      loggingIn: "login",
+      loggingOut: "logout"
     })
-  },
-  computed: {},
-  created() {
-    this.destroySession();
-  },
-  mounted() {
-
   },
   components: {
     "passwordrestore": PasswordRestore

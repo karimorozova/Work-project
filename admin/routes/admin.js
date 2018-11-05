@@ -4,7 +4,8 @@ const { User, Requests, Reports, Clients, Vendors } = require('../models');
 const { getVendors } = require('./vendors/');
 const { getClients} = require('../clients/');
 const { requiresLogin } = require('../middleware/index');
-
+const jwt = require("jsonwebtoken");
+const { secretKey } = require('../configs');
 
 router.get('/', (req, res) => {
     res.sendFile(path.resolve() + '/dist/index.html');
@@ -89,27 +90,23 @@ router.get('/reps', requiresLogin, (req, res) => {
         })
 });
 
-router.get('/reports-update', requiresLogin, async (req, res) => {
-    try {
-        const me = await updateReports();
-        res.redirect("/tasks-report");
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on updating Reports ");
-    }
-});
-
 router.post('/login', (req, res, next) => {
     if (req.body.logemail && req.body.logpassword) {
-        User.authenticate(req.body.logemail, req.body.logpassword, (error, user) => {
+        User.authenticate(req.body.logemail, req.body.logpassword, async (error, user) => {
             if (error || !user) {
                 var err = new Error('Wrong email or password.');
                 err.status = 401;
                 return next(err);
             } else {
+                try {
+                const token = await jwt.sign({ user }, secretKey, { expiresIn: 60*120});
                 req.session.userId = user._id;
                 res.statusCode = 200;
-                res.send(user._id);
+                res.send(token);
+                } catch(err) {
+                    console.log(err);
+                    return next(err);
+                }
             }
         });
     } else {

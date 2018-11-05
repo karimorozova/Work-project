@@ -29,6 +29,13 @@ Vue.http.interceptors.push((request, next) => {
   })
 })
 
+Vue.http.interceptors.push((request, next) => {
+  const token = localStorage.getItem("token");
+  const value = token || ""
+  request.headers.set('token-header', value);
+  next();
+})
+
 Vue.use(VueLodash);
 Vue.config.productionTip = false
 

@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
-import Requests from '@/components/Requests'
 import TasksReport from '@/components/TasksReport'
 import Main from '@/components/Main'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
@@ -17,11 +16,11 @@ import Clientrequest from '@/components/request-forms/Clientrequest'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import CreateProject from '@/components/pmArea/CreateProject'
-
+import { store } from '../vuex/store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -48,18 +47,10 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         const token = localStorage.getItem("token");
         if(token) {
-          const tokenObject = JSON.parse(token);
-          const tokenDate = new Date(tokenObject.timestamp).getTime();
-          const date = new Date().getTime()
-          if(tokenDate <= date) {
-            localStorage.removeItem("token");
-            next('/login')  
+            next()  
           } else {
-            next()
+            next('/login')
           }
-        } else {
-          next('/login')
-        }
       },
       children: [
         {
@@ -127,3 +118,23 @@ export default new Router({
     },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  if(!token && to.path !== '/login') {
+    next('/login')
+  } else if(token) {
+    const date = Date.now();
+    const expiryTime = new Date(JSON.parse(token).timestamp);
+    if(date > expiryTime && to.path !== '/login') {
+      store.dispatch("logout");
+      next('/login')
+    } else {
+      next()
+    }
+  } else {
+    next();
+  }
+})
+
+export default router;

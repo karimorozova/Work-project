@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { requiresLogin } = require('../middleware/index');
+const { requiresLogin } = require('../middleware');
 
 const apiRouter = require('./api');
 const admin = require('./admin');
