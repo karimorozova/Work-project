@@ -41,8 +41,14 @@
                         )     
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Source Files" :loadedFiles="sourceFiles" )
-                            input.upload-file__input(type="file" @change='uploadSourceFiles' multiple)
+                        UploadFileButton(text="Source Files")
+                            input.project-info__file-input.project-info__source-file(type="file" @change='uploadSourceFiles' multiple)
+                        .project-info__files-list
+                            .project-info__files-expander(v-if="sourceFiles.length")
+                                .project-info__list-title(@click="toggleSourceFiles") Files list
+                                    img.project-info__list-icon(src="../../assets/images/arrow_open.png" :class="{'project-info_reversed-icon': isSourceFilesShow}")
+                            .project-info__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
+                                span.project-info__delete-file(@click="deleteFile(index, 'sourceFiles')") +
                     .project-info__drop-menu           
                         SelectSingle(
                             :selectedOption="selectedWorkflow.name" 
@@ -52,8 +58,14 @@
                         ) 
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Reference Files" :loadedFiles="refFiles" @uploadFiles="uploadRefFiles")
-                            input.upload-file__input(type="file" @change='uploadRefFiles' multiple)
+                        UploadFileButton(text="Reference Files")
+                            input.project-info__file-input.project-info__ref-file(type="file" @change='uploadRefFiles' multiple)
+                        .project-info__files-list
+                            .project-info__files-expander(v-if="refFiles.length")
+                                .project-info__list-title(@click="toggleRefFiles") Files list
+                                    img.project-info__list-icon(src="../../assets/images/arrow_open.png" :class="{'project-info_reversed-icon': isRefFilesShow}")
+                            .project-info__loaded-file(v-if="isRefFilesShow" v-for="(file, index) in refFiles") {{ file.name }}
+                                span.project-info__delete-file(@click="deleteFile(index, 'refFiles')") +
                     .project-info__add-tasks
                         Button(value="Add tasks" @clicked="addTasks")
             .project-info__tasks-steps
@@ -109,7 +121,9 @@ export default {
             refFiles: [],
             isStepsShow: false,
             isTasksShow: true,
-            excludeKeys: ["nonTranslatable", "totalWords"]
+            excludeKeys: ["nonTranslatable", "totalWords"],
+            isSourceFilesShow: false,
+            isRefFilesShow: false
         }
     },
     methods: {
@@ -179,15 +193,35 @@ export default {
         uploadSourceFiles(event) {
             this.sourceFiles.push(event.target.files[0]);
         },
+        toggleSourceFiles() {
+            this.isSourceFilesShow = !this.isSourceFilesShow;
+        },
         uploadRefFiles(event) {
             this.refFiles.push(event.target.files[0]);
+        },
+        toggleRefFiles() {
+            this.isRefFilesShow = !this.isRefFilesShow;
+        },
+        deleteFile(index, prop) {
+            this[prop].splice(index, 1);
+            if(!this[prop].length) {
+                if(prop === "sourceFiles") {
+                    this.isSourceFilesShow = false;
+                    return this.clearInputFiles(".project-info__source-file");
+                }
+                this.isRefFilesShow = false;
+                return this.clearInputFiles(".project-info__ref-file");
+            }
         },
         clearTasksFormData() {
             this.template = "";
             this.targetLanguages = [];
             this.sourceFiles = [];
             this.refFiles = [];
-            let inputFiles = document.querySelectorAll(".upload-file__input");
+            this.clearInputFiles(".project-info__file-input");
+        },
+        clearInputFiles(str) {
+            let inputFiles = document.querySelectorAll(str);
             for(let elem of inputFiles) {
                 elem.value = "";
             }
@@ -396,6 +430,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .project-info {
     position: relative;
     width: 100%;
@@ -421,7 +457,7 @@ export default {
         padding: 20px;
         margin-left: 20px;
         margin-right: 20px;
-        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+        box-shadow: 0 3px 20px $brown-shadow;
         @media (max-width: 1600px) {
             width: 70%;
         }
@@ -436,7 +472,7 @@ export default {
         display: flex;
         justify-content: space-between;
         padding-bottom: 20px;
-        border-bottom: 1px solid #68573E;
+        border-bottom: 1px solid $main-color;
     }
     &__tasks-col {
         width: 25%;
@@ -462,6 +498,50 @@ export default {
     }
     &__tabs {
         position: absolute;
+    }
+    &__upload-file {
+        position: relative;
+    }
+    &__files-list {
+        box-sizing: border-box;
+        background-color: $white;
+        padding: 5px;
+        position: absolute;
+        bottom: 33px;
+        left: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+    &__loaded-file {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 12px;
+    }
+    &__delete-file {
+        transform: rotate(45deg);
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    &__files-expander {
+        opacity: 0.7;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__list-icon {
+        margin-left: 5px;
+        transform: rotate(180deg);
+    }
+    &_reversed-icon {
+        transform: rotate(0);
+    }
+    &__list-title {
+        cursor: pointer;
     }
 }
 </style>
