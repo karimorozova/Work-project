@@ -588,6 +588,7 @@ thead, tbody {
 }
 tbody {
     overflow-y: scroll;
+    max-height: 500px;
 }
 th, td {
     width: 130px;
