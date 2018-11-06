@@ -82,6 +82,10 @@ export default {
         .steps-table-row, .rates-matrix-row {
             cursor: default;
         }
+        .vendors-table_height-28 {
+            cursor: default;
+            height: 32px;
+        }
     }
     &__thead-cell {
         box-sizing: border-box;
@@ -101,7 +105,7 @@ export default {
         box-sizing: border-box;
         font-size: 14px;
         padding: 7px 5px 5px 6px;
-        border: 0.5px solid $cell-border;
+        border: 1px solid $cell-border;
         border-right: none;
         &:last-child {
             border-right: 0.5px solid $cell-border;
@@ -149,6 +153,13 @@ export default {
 .steps-table-cell {
     display: flex;
     align-items: center;
+}
+.vendors-table__body {
+    max-height: 500px;
+    min-height: 150px;
+}
+.vendors-table_scroll-y {
+    overflow-y: auto;
 }
 .matrix-table {
     max-height: 350px;

@@ -2,7 +2,7 @@
 .sidebar
     span.sidebar__title(v-if="title") {{ title }}
     .sidebar__inner
-      .sidebar__col(v-for="(link, index) in links") {{ link }}
+      .sidebar__item(v-for="(link, index) in links") {{ link }}
 </template>
 
 <script>
@@ -19,15 +19,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
+
 .sidebar {
     height: 100%;
     background-color: #fff;
     width: 175px;
-    box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
+    box-shadow: 7px 1px 10px $brown-shadow;
     display: flex;
     flex-direction: column;
-    font-family: MyriadPro;
-    color: #67573e;
+    color: $main-color;
     font-size: 22px;
     transition: all 1s;
     &__title {
@@ -40,11 +41,11 @@ export default {
         display: flex;
         flex-direction: column;
     }   
-    &__col {
+    &__item {
         display: flex;
         justify-content: center;
-        border-top: 1px solid #c4beb6;
-        border-bottom: 1px solid #c4beb6;
+        border-top: 1px solid $beige;
+        border-bottom: 1px solid $beige;
         padding: 5px 0;
         cursor: pointer;
         &:nth-child(2) {

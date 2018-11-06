@@ -61,6 +61,11 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    .vendors-table__drop-menu & {
+        width: 100%;
+        border: none;
+        height: 30px;
+    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -72,6 +77,10 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .vendors-table__drop-menu & {
+            width: 75%;
+            max-height: 30px;
+        }
     }
     .arrow-button {
         width: 18%;
@@ -83,6 +92,9 @@ export default {
         }
         .reverseIcon {
             transform: rotate(180deg);
+        }
+        .vendors-table__drop-menu & {
+            width: 25%;
         }
     }
     .inner-component & {
