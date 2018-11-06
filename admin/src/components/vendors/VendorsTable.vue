@@ -122,7 +122,7 @@ export default {
             }
         },
         changeStatus({status, index}) {
-            console.log(stetus, index);
+            console.log(status, index);
         },
         async getVendors() {
             if(!this.vuexVendors.length) {

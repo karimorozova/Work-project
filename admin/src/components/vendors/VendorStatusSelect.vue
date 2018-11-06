@@ -6,7 +6,7 @@
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
                 span.selected.no-status Options
-            .arrow-button(@click="showStatuses")
+            .arrow-button(@click="toggleStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
@@ -33,21 +33,19 @@ export default {
         }
     },
     methods: {
-        showStatuses() {
+        toggleStatuses() {
             this.dropped = !this.dropped;
         },
         outClick() {
             this.dropped = false;
         },
         changeStatus(index) {
-            this.$emit("chosenStatus", {status: this.statuses[index], index: this.parentInd})
+            this.$emit("chosenStatus", {status: this.statuses[index], index: this.parentInd});
+            this.outClick();
         }
     },
     directives: {
         ClickOutside
-    },
-    mounted () {
-
     }
 }
 </script>
