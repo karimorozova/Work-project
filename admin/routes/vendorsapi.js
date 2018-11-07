@@ -41,7 +41,7 @@ router.post('/step-email', async (req, res) => {
     }
 })
 
-router.get('/get-rates', async (req, res) => {
+router.get('/rates', async (req, res) => {
     const { vendorId, service, form } = req.query;
     try {
         const vendor = await getVendor({"_id": vendorId});
@@ -139,7 +139,8 @@ router.post('/several-langs', async (req, res) => {
             await addVendorsSeveralLangs({
                 vendorId: vendorId,
                 comb: comb,
-                vendorCombinations: vendorCombinations
+                vendorCombinations: vendorCombinations,
+                langPairs: vendor.languagePairs
             })
         }
         res.send('Several langs added..')

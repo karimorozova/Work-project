@@ -265,7 +265,7 @@ export default {
     },
     async vendorRates() {
       this.fullInfo = [];
-      const rates = await this.$http.get(`/vendorsapi/get-rates?form=Mono&service=${this.serviceSelect.title}&vendorId=${this.vendor._id}`);
+      const rates = await this.$http.get(`/vendorsapi/rates?form=Mono&service=${this.serviceSelect.title}&vendorId=${this.vendor._id}`);
       this.fullInfo = rates.body;
       this.fullInfo.forEach(item => {
         item.icons = {

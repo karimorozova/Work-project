@@ -1,12 +1,35 @@
 const { Vendors } = require("../../models/");
 
+function getUpdatedLangPairs({ source, target, langPairs }) {
+    let pairs = [...langPairs];
+    let isPairExist = false;
+    for(let pair of pairs) {
+        if(pair.source.id === source._id && pair.target.id === target._id) {
+            isPairExist = true
+        }
+    }
+    if(!isPairExist) {
+        pairs.push({source, target})
+    }
+    return pairs;
+}
+
+function deletePair({ langPairs, combination}) {
+    const { source, target } = combination;
+    let pairIndex = langPairs.findIndex(item => item.source.id === source.id && item.target.id === target.id);
+    const pairs = [...langPairs];
+    pairs.splice(pairIndex, 1);
+    return pairs;
+}
+
 async function checkRatesMatch(vendor, industries, rate) {
     if(rate.form === "Mono") {
         return await checkMonoRatesMatches(vendor, industries, rate);
     }
     let exist = false;
-    if(vendor.languageCombinations.length) {
-        for(let comb of vendor.languageCombinations) {
+    let languageCombinations = [...vendor.languageCombinations];
+    if(languageCombinations.length) {
+        for(let comb of languageCombinations) {
         if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
             comb.target.lang == rate.targetLanguage.lang) {
                 for(let ind of comb.industry) {
@@ -23,15 +46,17 @@ async function checkRatesMatch(vendor, industries, rate) {
             }
         }
     }
-    if(!exist || !vendor.languageCombinations.length) {
-        vendor.languageCombinations.push({
+    let languagePairs = "";
+    if(!exist || !languageCombinations.length) {
+        languageCombinations.push({
             source: rate.sourceLanguage._id,
             target: rate.targetLanguage._id,
             service: rate.service._id,
             industry: industries,
         })
+        languagePairs = getUpdatedLangPairs({ source: rate.sourceLanguage, target: rate.targetLanguage, langPairs: vendor.languagePairs })
     }
-    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: vendor.languageCombinations}});
+    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: languageCombinations, languagePairs: languagePairs}});
     return result;
 }
 
@@ -86,26 +111,28 @@ async function deleteRate(vendor, industry, id) {
     const sum = allZero.reduce((init, cur) => {return init + cur}, 0);
     const updatedCombinations = sum ? vendor.languageCombinations
      : vendor.languageCombinations.filter(item => { return item.id !== id});
-    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: updatedCombinations}});
+    const updatetLangPairs = sum ? vendor.languagePairs : deletePair({langPairs: vendor.languagePairs, combination});
+    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: updatedCombinations, languagePairs: updatetLangPairs}});
     return result;
 }
 
-async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations}) {
-    let langPairExist = false;
+async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langPairs}) {
+    let isExist = false;
     let updatedCombinations = [...vendorCombinations];
     for(let vendorComb of updatedCombinations) {
         if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
             && comb.service._id === vendorComb.service.id) {
             vendorComb.industry = updateCombination(comb.industry, vendorComb.industry);
-            langPairExist = true;
+            isExist = true;
         }
     }
-    if(!langPairExist) {
+    if(!isExist) {
         comb.industry = comb.industry.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
         updatedCombinations.push(comb);
-        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
+        let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs});
+        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations, languagePairs: updatedLanguagePairs}})
     } else {
         await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
     }

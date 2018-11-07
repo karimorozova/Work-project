@@ -6,12 +6,13 @@ const ClientApi = require('../models/xtrf/client');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
-const { Requests, Projects, Languages, Services, Industries, Timezones, User, Clients } = require('../models');
+const { Requests, Projects, Languages, Services, Industries, Timezones, User, Vendors } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
 const writeFile = require('write');
+const { getVendors } = require('./vendors');
 
 
 function moveFile(oldFile, requestId) {
