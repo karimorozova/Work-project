@@ -8,10 +8,10 @@
                         //- span.toolTip {{ selectedInd[0].name }}
             template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
                 span.selected.no-industry Options
-            .arrow-button(@click="showInds")
+            .arrow-button(@click.stop="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+            .drop__item(v-for="(industry, index) in industries" @click.stop="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
                 .checkbox
                     .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
                 span {{ industry.name }}
@@ -91,8 +91,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .select {
-    border: 1px solid #67573E;
+    border: 1px solid $main-color;
     border-radius: 5px;
     width: 191px;
     height: 28px;
@@ -103,10 +105,15 @@ export default {
         width: 174px;
         border: none;
         border-radius: 0;
-        box-shadow: inset 0 0 6px rgba(103, 87, 62, 0.75);
+        box-shadow: inset 0 0 6px $brown-shadow;
+    }
+    .vendors-table__drop-menu & {
+        width: 100%;
+        border: none;
+        height: 30px;
     }
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -116,6 +123,10 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .vendors-table__drop-menu & {
+            width: 80%;
+            max-height: 30px;
+        }
         .industry-tooltip {
             width: 40px;
             max-height: 28px;
@@ -126,7 +137,7 @@ export default {
             }
             .toolTip {
                 position: absolute;
-                color: #D15F45;
+                color: $orange;
                 font-size: 12px;
                 display: none;
                 left: 36px;
@@ -147,6 +158,9 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        .vendors-table__drop-menu & {
+            width: 20%;
+        }
         img {
             padding-right: 2px;
         }
@@ -161,7 +175,7 @@ export default {
         font-size: 14px;
         position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
@@ -173,7 +187,7 @@ export default {
             display: flex;
             align-items: center;
             padding: 5px 2px;
-            border-bottom: .5px solid #BFB09D;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
@@ -181,18 +195,18 @@ export default {
                 border: none;
             }
             &:hover {
-                background-color: rgba(191, 176, 157, 0.5);
+                background-color: $active-background;
             }
         }
         .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
+            background-color: $active-background;
         }
     }
 }
 .checkbox {
     width: 13px;
     height: 13px;
-    border: 1px solid #67573E;
+    border: 1px solid $main-color;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -202,7 +216,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid #67573E;
+            border: 1px solid $main-color;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -211,7 +225,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid #67573E;
+            border: 1px solid $main-color;
             top: 5px;
             left: 3px;
             transform: rotate(-58deg);

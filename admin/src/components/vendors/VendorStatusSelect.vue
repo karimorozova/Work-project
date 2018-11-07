@@ -6,10 +6,10 @@
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
                 span.selected.no-status Options
-            .arrow-button(@click="toggleStatuses")
+            .arrow-button(@click.stop="toggleStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
+            .drop__item(v-for="(status, index) in allStatuses" @click.stop="changeStatus(index)" :class="{chosen: status == selectedStatus}")
                 span {{ status }}
 </template>
 
@@ -23,6 +23,9 @@ export default {
         },
         parentInd: {
             type: Number
+        },
+        isAllExist: {
+            type: String
         }
     },
     data() {
@@ -40,8 +43,18 @@ export default {
             this.dropped = false;
         },
         changeStatus(index) {
-            this.$emit("chosenStatus", {status: this.statuses[index], index: this.parentInd});
+            const option = this.allStatuses[index] === "All" ? "": this.allStatuses[index];
+            this.$emit("chosenStatus", { option, index: this.parentInd});
             this.outClick();
+        }
+    },
+    computed: {
+        allStatuses() {
+            let result = this.statuses;
+            if(this.isAllExist !== "no") {
+                result.unshift("All");
+            }
+            return result;
         }
     },
     directives: {
@@ -51,8 +64,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .select {
-    border: 1px solid #67573E;
     border-radius: 5px;
     width: 191px;
     height: 28px;
@@ -61,11 +75,13 @@ export default {
     overflow: hidden;
     .vendors-table__drop-menu & {
         width: 100%;
-        border: none;
         height: 30px;
     }
+    .gen-info__block & {
+        border:   1px solid $main-color;     
+    }
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -85,6 +101,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -99,7 +116,7 @@ export default {
         width: 132px;
         border: none;
         border-radius: 0;
-        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+        box-shadow: inset 0 0 8px $brown-shadow;
         .selected {
             opacity: 1;
             padding: 2px 5px;
@@ -111,22 +128,34 @@ export default {
 }
 .drop-select {
     position: relative;
+    .filters__drop-menu & {
+        position: absolute;
+        border-radius: 5px;
+        border: 1px solid $main-color;
+        overflow: hidden;
+        width: 100%;
+    }
     .drop {
         position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        background-color: white;
+        background-color: $white;
         z-index: 6;
+        .filters__drop-menu & {
+            position: relative;
+            border: none;
+            border-top: 1px solid $main-color;
+        }
         &__item {
             display: flex;
             align-items: center;
             padding: 5px 2px;
-            border-bottom: .5px solid #BFB09D;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
@@ -134,11 +163,11 @@ export default {
                 border: none;
             }
             &:hover {
-                background-color: rgba(191, 176, 157, 0.5);
+                background-color: $active-background;
             }
         }
         .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
+            background-color: $active-background;
         }
     }
     .inner-component & {

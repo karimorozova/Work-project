@@ -2,7 +2,7 @@
 .sidebar
     span.sidebar__title(v-if="title") {{ title }}
     .sidebar__inner
-      .sidebar__item(v-for="(link, index) in links") {{ link }}
+      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)") {{ link }}
 </template>
 
 <script>
@@ -13,6 +13,11 @@ export default {
         },
         title: {
             type: String
+        }
+    },
+    methods: {
+        onLinkClick(index) {
+            this.$emit("onLinkClick", {index})
         }
     }
 }

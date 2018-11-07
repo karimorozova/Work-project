@@ -5,6 +5,7 @@
         :tableData="filteredVendors"
         bodyClass="vendors-table__body"
         bodyRowClass="vendors-table_height-28"
+        @onRowClicked="onRowClicked"
     )
         template(slot="headerVendorName" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
@@ -27,46 +28,68 @@
         template(slot="status" slot-scope="{ row, index }")
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
                 VendorStatusSelect(
+                    isAllExist="no"
                     :selectedStatus="row.status"
                     :parentInd="index"
-                    @chosenStatus="changeStatus"
+                    @chosenStatus="setStatus"
                 )
-            .vendors-table__status(v-else) {{ row.status }}
+            .vendors-table__no-drop(v-else) {{ row.status }}
         template(slot="languageCombination" slot-scope="{ row }")
-            span.vendors-table__data {{ getLanguageCombs(row) }}
-        template(slot="native" slot-scope="{ row }")
-            span.vendors-table__data {{ row.native.lang }}
-        template(slot="industry" slot-scope="{ row }")
-            img.vendors-table__industry-icon(v-for="industry in row.industry" :src="industry.icon") 
-        template(slot="basicRate" slot-scope="{ row }")
-            span.vendors-table__data {{ row.basicRate }}
-        template(slot="tqi" slot-scope="{ row }")
-            span.vendors-table__data {{ row.tqi }}
+            .vendors-table__combinations {{ getLanguageCombs(row) }}
+        template(slot="native" slot-scope="{ row, index }")
+            .vendors-table__drop-menu(v-if="currentEditingIndex === index")
+                NativeLanguageSelect(
+                    :selectedLang="row.native"
+                    :parentIndex="index"
+                    @chosenLang="setNative"
+                )
+            .vendors-table__no-drop(v-else) {{ row.native.lang }}
+        template(slot="industry" slot-scope="{ row, index }")
+            .vendors-table__drop-menu(v-if="currentEditingIndex === index")
+                MultiVendorIndustrySelect(
+                    :selectedInd="industrySelected"
+                    :filteredIndustries="selectedIndNames" 
+                    :parentInd="index" 
+                    @chosenInd="setIndustry"
+                )
+            .vendors-table__no-drop(v-else)
+                img.vendors-table__industry-icon(v-for="industry in row.industry" :src="industry.icon") 
+        template(slot="basicRate" slot-scope="{ row, index }")
+            .vendors-table__active(v-if="currentEditingIndex === index")
+                input.vendors-table__input(type="text" v-model="currentBasicRate" @click.stop="stopPropagation")
+            .vendors-table__no-drop(v-else)
+                span.vendors-table__data {{ row.basicRate }}                
+        template(slot="tqi" slot-scope="{ row, index }")
+            .vendors-table__active(v-if="currentEditingIndex === index")
+                input.vendors-table__input(type="text" v-model="currentTqi" @click.stop="stopPropagation")
+            .vendors-table__no-drop(v-else)
+                span.vendors-table__data {{ row.tqi }}
         template(slot="icons" slot-scope="{ row, index }")
             span.vendors-table__icons
-                img.vendors-table__icon(@click="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
+                img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
+import NativeLanguageSelect from "./NativeLanguageSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        filterName: {
+        nameFilter: {
             type: String
         },
-        filterStatus: {
+        statusFilter: {
             type: String
         },
         industryFilter: {
-            type: Array,
-            default: () => ["All"]
+            type: [String, Object],
+            default: ""
         },
-        filterLeadsource: {
+        leadFilter: {
             type: String
         }
     },
@@ -76,18 +99,21 @@ export default {
                 {label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "13%"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "10%", padding: "0"},
                 {label: "Language Combination", headerKey: "headerLanguageCombination", key: "languageCombination", width: "18%", cellClass: "vendors-table_scroll-y"},
-                {label: "Native Language", headerKey: "headerNative", key: "native", width: "16%"},
-                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "15%"},
-                {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "8%"},
-                {label: "TQI", headerKey: "headerTqi", key: "tqi", width: "8%"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "12%"},        
+                {label: "Native Language", headerKey: "headerNative", key: "native", width: "16%", padding: "0"},
+                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "15%", padding: "0"},
+                {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "8%", padding: "0"},
+                {label: "TQI", headerKey: "headerTqi", key: "tqi", width: "8%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "3px"},        
             ],
             icons: {
                 save: {name: 'save', active: false, icon: require('../../assets/images/Other/save-icon-qa-form.png')},
                 edit: {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
                 delete: {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
             },
-            currentEditingIndex: -1
+            currentEditingIndex: -1,
+            currentBasicRate: "",
+            currentTqi: "",
+            industrySelected: []
         }
     },
     methods: {
@@ -95,6 +121,9 @@ export default {
             alertToggle: "alertToggle",
             vendorsSetting: "vendorsSetting"
         }),
+        stopPropagation() {
+            return
+        },
         getFullName(vendor) {
             return vendor.firstName + " " + vendor.surname;
         },
@@ -114,13 +143,31 @@ export default {
         makeAction(index, key) {
             if(key === 'edit') {
                 this.currentEditingIndex = index;
+                this.currentBasicRate = this.filteredVendors[index].basicRate;
+                this.currentTqi = this.filteredVendors[index].tqi;
+                this.industrySelected = this.filteredVendors[index].industry;
             }
             if(key === 'save') {
                 this.currentEditingIndex = -1;
+                this.currentBasicRate = "";
+                this.currentTqi = "";
+                this.industrySelected = [];
             }
         },
-        changeStatus({status, index}) {
-            console.log(status, index);
+        setStatus({option, index}) {
+            console.log(option, index);
+        },
+        setNative({lang, index}) {
+            console.log(lang.lang, index);
+        },
+        setIndustry({industry, index}) {
+            const position = this.industrySelected.findIndex(item => {
+                return item._id === industry._id
+            })
+            if(position !== -1) {
+                return this.industrySelected.splice(position, 1);
+            }
+            this.industrySelected.push(industry);
         },
         async getVendors() {
             if(!this.vuexVendors.length) {
@@ -128,6 +175,9 @@ export default {
                 this.vendorsSetting(result.body);
             }
         },
+        onRowClicked({index}) {
+            this.$emit("showVendorDetails", {vendor: this.filteredVendors[index]});
+        }
     },
     computed: {
         ...mapGetters({
@@ -135,43 +185,44 @@ export default {
         }),
         filteredVendors() {
             let result = this.vuexVendors;
-            // if(this.filterName) {
-            //     result = result.filter(item => {
-            //         return item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) != -1;
-            //     })
-            // }
-            if(this.filterStatus) {
+            if(this.nameFilter) {
                 result = result.filter(item => {
-                    return item.status == this.filterStatus;
+                    const name = item.firstName + " " + item.surname;
+                    return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
                 })
             }
-            // if(this.industryFilter[0].name != 'All') {
-            //     result = result.filter(item => {
-            //         let exist = false;
-            //         for(let indus of item.industry) {
-            //             if(indus.name == this.industryFilter[0].name) {
-            //                 exist = true;
-            //                 break;
-            //             }
-            //         }
-            //         if(exist) {
-            //             return item
-            //         }
-            //     })
-            // }
-            if(this.filterLeadsource) {
+            if(this.statusFilter) {
                 result = result.filter(item => {
-                    return item.leadSource == this.filterLeadsource;
+                    return item.status == this.statusFilter;
+                })
+            }
+            if(this.industryFilter && this.industryFilter.name !== 'All') {
+                result = result.filter(item => {
+                    const industryIds = item.industry.map(indus => indus._id);
+                    return industryIds.indexOf(this.industryFilter._id) !== -1;
+                })
+            }
+            if(this.leadFilter) {
+                result = result.filter(item => {
+                    return item.leadSource == this.leadFilter;
                 })
             }
             return result;
-        }
+        },
+        selectedIndNames() {
+            let result = [];
+            for(let ind of this.industrySelected) {
+                result.push(ind.name);
+            }
+            return result;
+        },
     },
     components: {
         DataTable,
         VendorLeadsourceSelect,
         VendorStatusSelect,
         MultiVendorIndustrySelect,
+        NativeLanguageSelect
     },
     mounted() {
         this.getVendors()
@@ -180,13 +231,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .vendors-table {
-    &__industry-icon {
-        width: 22px;
+    &__combinations {
+        padding: 4px;
         height: 22px;
     }
-    &__status {
-        padding: 7px 5px 5px 6px;
+    &__industry-icon {
+        width: 19px;
+        height: 19px;
+        margin-right: 3px;
+    }
+    &__no-drop {
+        padding: 6px 0 0 5px;
+        max-height: 28px;
     }
     &__icons {
         margin-right: 16px;
@@ -202,6 +261,17 @@ export default {
     }
     &__drop-menu {
         position: relative;
+    }
+    &__active {
+        padding: 5px;
+        box-shadow: inset 0 0 5px $brown-shadow; 
+    }
+    &__input {
+        border: none;
+        outline: none;
+        color: $main-color;
+        padding: 2px;
+        background-color: transparent;
     }
 }
 </style>

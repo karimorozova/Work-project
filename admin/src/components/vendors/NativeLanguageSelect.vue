@@ -3,11 +3,11 @@
         .select
             span.selected(v-if="selectedLang") {{ selectedLang.lang }}
             span.selected(v-else) Options
-            .arrow-button(@click="showLangs")
+            .arrow-button(@click.stop="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
-        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
+        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search" @click.stop="stopPropagation")        
         .drop(v-if="droppedLang")
-            .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
+            .drop__item( v-for="(language, index) in filteredLangs" @click.stop="changeLang(index)")
                 span {{ language.lang }}
 </template>
 
@@ -31,7 +31,6 @@ export default {
     },
     data() {
         return {
-            languages: [],
             droppedLang: false,
             errors: [],
             searchLang: ''
@@ -54,34 +53,30 @@ export default {
             this.droppedLang = !this.droppedLang;
             this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
-        async getLanguages() {
-            try {
-                const langs = await this.$http.get('api/languages')
-                let sortedArray = langs.body;
-                this.languages = sortedArray.sort( (a,b) => {
-                    if(a.lang < b.lang) return -1;
-                    if(a.lang > b.lang) return 1;
-                });
-                if(this.addAll) {
-                    this.languages.unshift({lang: "All", symbol: "All"})
-                }
-            } catch(err) {
-                this.alertToggle({message: "Server Error / Cannot get languages", isShow: true, type: "error"})                
-            }
-        },
         outClick() {
             this.droppedLang = false;
         },
         changeLang(index) {
-            this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex})
+            this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex});
+            this.outClick();
+        },
+        stopPropagation() {
+            return
         },
         ...mapActions({
             alertToggle: "alertToggle",
         })
     },
     computed: {
+        ...mapGetters({
+            languages: "getAllLanguages"
+        }),
         filteredLangs() {
-            let result = this.languages.filter(item => {
+            let result = this.languages;
+            if(this.addAll) {
+                result.unshift({lang: "All", symbol: "All"})
+            }
+            result = result.filter(item => {
                 if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
                     return item
                 }
@@ -91,24 +86,27 @@ export default {
     },
     directives: {
         ClickOutside
-    },
-    mounted () {
-        this.getLanguages()
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .select {
-    border: 1px solid #67573E;
+    border: 1px solid $main-color;
     border-radius: 5px;
     width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
+    .vendors-table__drop-menu & {
+        width: 100%;
+        border: none;
+        height: 30px;
+    }
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 3px 5px;
         font-size: 14px;
@@ -118,12 +116,19 @@ export default {
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
+        .vendors-table__drop-menu & {
+            width: 80%;
+            max-height: 30px;
+        }
     }
     .arrow-button {
         width: 18%;
         display: flex;
         justify-content: center;
         align-items: center;
+        .vendors-table__drop-menu & {
+            width: 20%;
+        }
         img {
             padding-right: 2px;
         }
@@ -134,7 +139,7 @@ export default {
     .inner-component & {
         border: none;
         border-radius: 0;
-        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+        box-shadow: inset 0 0 8px $brown-shadow;
         height: 26px;
         border: 1px solid #BFB09D;
         .selected {
@@ -149,28 +154,27 @@ export default {
         font-size: 14px;
         position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        background-color: white;
+        background-color: $white;
         z-index: 15;
         padding-top: 29px;
         &__item {
             display: flex;
             align-items: center;
             padding: 12px 2px;
-            border-bottom: .5px solid #BFB09D;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             transition: all 0.4s;
             &:last-child {
                 border: none;
             }
             &:hover {
-                // padding-left: 5px;
-                background-color: rgba(191, 176, 157, 0.363);
+                background-color: $active-background;
             }
         }
         .inner-component & {
@@ -191,8 +195,8 @@ export default {
         padding: 5px 3px;
         color: #67573E;
         outline: none;
-        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
-        border: 1px solid rgba(125, 138, 180, 0.466);
+        box-shadow: inset 0 0 5px $search-shadow;
+        border: 1px solid $search-border;
         border-right: none;
         .inner-component & {
             width: 88%;

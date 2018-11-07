@@ -20,22 +20,22 @@
                 .gen-info__block
                     .block-item
                         label First Name:
-                        input(type="text" placeholder="First Name" v-model="vendor.firstName")
+                        input(type="text" placeholder="First Name" :value="vendor.firstName" @change="(e) => updateProp(e,'firstName')")
                     .block-item
                         label Surname:
-                        input(type="text" placeholder="Surname" v-model="vendor.surname")
+                        input(type="text" placeholder="Surname" :value="vendor.surname" @change="(e) => updateProp(e,'surname')")
                     .block-item
                         label Email:
-                        input(type="text" placeholder="Email" v-model="vendor.email")
+                        input(type="text" placeholder="Email" :value="vendor.email" @change="(e) => updateProp(e,'email')")
                     .block-item
                         label Phone:
-                        input(type="text" placeholder="Phone" v-model="vendor.phone")
+                        input(type="text" placeholder="Phone" :value="vendor.phone" @change="(e) => updateProp(e,'phone')")
                     .block-item
                         label Time Zone:
-                        TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="chosenZone")
+                        TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
                     .block-item
                         label Native Language:
-                        NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="changeLang")
+                        NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
                     .block-item
                         label Gender:
                         .drop-select(v-click-outside="outGenders")
@@ -45,32 +45,32 @@
                                         span {{ vendor.gender }}
                                 template(v-if="!vendor.gender")
                                     span.selected.no-gender Gender
-                                .arrow-button(@click="openGenders")
+                                .arrow-button(@click="toggleGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
-                                .drop__item(@click="() => vendor.gender = 'Male'")
+                                .drop__item(@click="updateGender('Male')")
                                     span Male
-                                .drop__item(@click="() => vendor.gender = 'Female'")
+                                .drop__item(@click="updateGender('Female')")
                                     span Female
                 .gen-info__block
                     .block-item
                         label Company Name:
-                        input(type="text" placeholder="Company Name" v-model="vendor.companyName")
+                        input(type="text" placeholder="Company Name" :value="vendor.companyName" @change="(e) => updateProp(e,'companyName')")
                     .block-item
                         label Website:
-                        input(type="text" placeholder="Website" v-model="vendor.website")
+                        input(type="text" placeholder="Website" :value="vendor.website" @change="(e) => updateProp(e,'website')")
                     .block-item
                         label Skype:
-                        input(type="text" placeholder="Skype" v-model="vendor.skype")
+                        input(type="text" placeholder="Skype" :value="vendor.skype" @change="(e) => updateProp(e,'skype')")
                     .block-item
                         label Linkedin:
-                        input(type="text" placeholder="Linkedin" v-model="vendor.linkedin")
+                        input(type="text" placeholder="Linkedin" :value="vendor.linkedin" @change="(e) => updateProp(e,'linkedin')")
                     .block-item
                         label WhatsApp:
-                        input(type="text" placeholder="WhatsApp" v-model="vendor.whatsapp")
+                        input(type="text" placeholder="WhatsApp" :value="vendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
                     .block-item
                         label Vendor Status:
-                        VendorStatusSelect(:selectedStatus="vendor.status" @chosenStatus="chosenStatus")
+                        VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
                     .block-item
                         label Industries:
                         MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
@@ -93,6 +93,7 @@ import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import VendorRates from "./VendorRates";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -132,8 +133,45 @@ export default {
                 reader.readAsDataURL(input.files[0]);
             }
         },
-        updateVendor() {
-            this.$emit('saveVendor', {file: this.photoFile[0]});
+        async updateVendor() {
+            let sendData = new FormData();
+            sendData.append('vendor', JSON.stringify(this.vendor));
+            sendData.append('photo', this.photoFile[0]);
+            try {
+                if(!this.vendor._id) {
+                    const saveResult = await this.$http.post("/vendorsapi/new-vendor", sendData);
+                    const { vendorId, vendors } = saveResult.data;
+                    const updatedVendor = vendors.find(item => item._id === vendorId);
+                    await this.storeCurrentVendor({updatedVendor});
+                    await this.storeVendors(vendors);
+                    this.alertToggle({message: "New Vendor saved", isShow: true, type: "success"});
+                } else {
+                    const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
+                    const vendors = updatedVendors.data;
+                    const updatedVendor = vendors.find(item => item._id === this.vendor._id);
+                    await this.storeVendors(vendors);
+                    await this.storeCurrentVendor(updatedVendor);
+                    this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
+                }
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
+            }
+        },
+        updateProp(e, prop) {
+            const value = e.target.value;
+            this.updateVendorProp({prop, value});
+        },
+        updateGender(value) {
+            this.updateVendorProp({prop: 'gender', value})
+        },
+        setTimezone(data) {
+            this.updateVendorProp({prop: "timezone", value: data})
+        },
+        setNative({lang}) {
+            this.updateVendorProp({prop: "native", value: lang})
+        },
+        chosenStatus({option}) {
+            this.updateVendorProp({prop: "status", value: option})
         },
         ratesUpdate(data) {
             this.$emit('ratesUpdate');
@@ -145,33 +183,31 @@ export default {
             this.approveShow = false;
             this.$emit('vendorDelete')
         },
-        openGenders() {
+        toggleGenders() {
             this.genderDropped = !this.genderDropped;
         },
         outGenders() {
             this.genderDropped = false;
         },
-        changeLang({lang}) {
-            this.$emit('changeLang', {lang: lang})
+        chosenInd({industry}) {
+            this.updateIndustry(industry);
+            // this.$emit('changeInd', {industry: data.industry, filter: this.selectedIndNames})
         },
-        chosenZone(data) {
-            this.$emit('changeZone', {zone: data})
+        async getTimezones() {
+            try {
+                const timezones = await this.$http.get('/api/timezones');
+                this.timezones = tmezones.body;
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot get timezones", isSHow: true, type: "error"})
+            }
         },
-        chosenStatus(data) {
-            this.$emit('changeStatus', {status: data.status})
-        },
-        chosenInd(data) {
-            this.$emit('changeInd', {industry: data.industry, filter: this.selectedIndNames})
-        },
-        getTimezones() {
-            this.$http.get('/api/timezones')
-            .then(res => {
-                this.timezones = res.body;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        }
+        ...mapActions({
+            alertToggle: "alertToggle",
+            updateVendorProp: "updateVendorProp",
+            storeVendors: "vendorsSetting",
+            storeCurrentVendor: "storeCurrentVendor",
+            updateIndustry: "updateIndustry"
+        })
     },
     mounted() {
         this.getTimezones();

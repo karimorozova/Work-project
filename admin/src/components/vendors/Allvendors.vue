@@ -6,16 +6,19 @@
                 .filters__block
                     .filters-item
                         label Name
-                        input.filter-field(type="text" placeholder="Vendor Name" v-model="filterName")
+                        input.filter-field(type="text" placeholder="Vendor Name" v-model="nameFilter")
                     .filters-item
                         label Industry
-                        VendorIndustrySelect(:selectedInd="industryFilter" @chosenInd="chosenInd")
+                        .filters__drop-menu
+                            VendorIndustrySelect(:isAllExist="isAllIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenInd")
                     .filters-item
                         label Status
-                        VendorStatusSelect(:selectedStatus="filterStatus" @chosenStatus="chosenStatus")
+                        .filters__drop-menu
+                            VendorStatusSelect(:selectedStatus="statusFilter" @chosenStatus="chosenStatus")
                     .filters-item
                         label Lead Source
-                        VendorLeadsourceSelect(:selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
+                        .filters__drop-menu
+                            VendorLeadsourceSelect(:selectedLeadsource="leadFilter" @chosenLeadsource="chosenLeadsource")
                 .filters__block
                     input.add-button(type="submit" value="Add vendor" @click="addVendor")            
             table
@@ -50,7 +53,7 @@
                         td.drop-option(:class="{editing: !vend.icons[1].active}" @click="vendorDetails(ind)")
                             span(v-if="vend.icons[1].active") {{ vend.status }}
                             .inner-component(v-if="!vend.icons[1].active")
-                                VendorStatusSelect(:selectedStatus="vend.status" :parentInd="ind" @chosenStatus="changeStatus")
+                                VendorStatusSelect(isAllExist="no" :selectedStatus="vend.status" :parentInd="ind" @chosenStatus="changeStatus")
                         td(@click="vendorDetails(ind)")
                             .lang-combs
                                 span.langs-info(v-for="langs in vend.languageCombinations") {{ langs.source.symbol }} >> {{ langs.target.symbol }}, 
@@ -86,8 +89,6 @@
                 @ratesUpdate="ratesUpdate"
                 @addSevLangs="addSevLangs"
                 )
-            .save-success(v-if="saveSuccess")
-                p Information saved
         Addseverallangs(v-if="addSeveral"
             :origin="'vendor'" 
             :who="vendor" 
@@ -120,17 +121,17 @@ export default {
             vendors: [],
             vendor: {},
             isNew: false,
-            filterName: "",
-            filterStatus: "",
-            industryFilter: [{name: "All"}],
-            filterLeadsource: "",
+            nameFilter: "",
+            statusFilter: "",
+            industryFilter: {name: "All"},
+            leadFilter: "",
             currentActive: "none",
             editError: false,
             vendorData: false,
             industrySelected: [],
             deleteMessageShow: false,
-            saveSuccess: false,
-            addSeveral: false
+            addSeveral: false,
+            isAllIndustryExist: true
         }
     },
     methods: {
@@ -144,24 +145,24 @@ export default {
             this.addSeveral = false
         },
         chosenLeadsource(data) {
-            this.filterLeadsource = data;
+            this.leadFilter = data;
         },
-        chosenStatus(data) {
-            this.filterStatus = data.status;
+        chosenStatus({option}) {
+            this.statusFilter = option;
         },
-        chosenInd(data) {
-            this.industryFilter = [data.industry];
+        chosenInd({industry}) {
+            this.industryFilter = industry;
         },
-        changeStatus(data) {
+        changeStatus({option, index}) {
             if(!this.vendorData) {
-            let vendor = this.allVendors[data.index];
+            let vendor = this.allVendors[index];
                 for(let ven of this.vendors) {
                     if(vendor.firstName == ven.firstName && vendor.surname == ven.surname) {
-                        ven.status = data.status
+                        ven.status = option
                     }
                 }
             } else {
-                this.vendor.status = data.status;
+                this.vendor.status = option;
             }
             
         },
@@ -240,10 +241,6 @@ export default {
                     sendData.append('vendor', JSON.stringify(this.vendor));
                     sendData.append('photo', data.file);
                     const saveResult = await this.$http.post("../vendorsapi/new-vendor", sendData)
-                    this.saveSuccess = true;
-                    setTimeout(() => {
-                        this.saveSuccess = false;
-                    }, 2000);
                     let id = saveResult.data.id;
                     await this.getVendors();
                     for(let ven of this.allVendors) {
@@ -257,10 +254,6 @@ export default {
                         sendData.append('vendor', JSON.stringify(this.vendor));
                         sendData.append('photo', data.file)
                         await this.$http.post("../vendorsapi/update-vendor", sendData);
-                        this.saveSuccess = true;
-                        setTimeout(() => {
-                            this.saveSuccess = false;
-                        }, 2000);
                         await this.getVendors();
                     }
                     this.alertToggle({message: "Vendor saved", isShow: true, type: "success"})
@@ -314,10 +307,10 @@ export default {
                 this.vendor = JSON.stringify(this.allVendors[ind]);
                 this.vendor = JSON.parse(this.vendor);
                 this.vendorData = true;
-                this.filterName = "";
-                this.filterStatus = "";
-                this.industryFilter = [{name: 'All'}];
-                this.filterLeadsource = "";
+                this.nameFilter = "";
+                this.statusFilter = "";
+                this.industryFilter = {name: 'All'};
+                this.leadFilter = "";
                 this.$emit('vendorDetails');
             }
         },
@@ -401,10 +394,10 @@ export default {
                 }
                 this.isNew = true;
                 this.vendorData = true;
-                this.filterName = "";
-                this.filterStatus = "";
-                this.industryFilter = [{name: 'All'}];
-                this.filterLeadsource = "";
+                this.nameFilter = "";
+                this.statusFilter = "";
+                this.industryFilter = {name: 'All'};
+                this.leadFilter = "";
                 this.$emit('vendorDetails');
             }
         },
@@ -413,19 +406,22 @@ export default {
         },
         async getVendors() {
             this.vendors = [];
-            let result = await this.$http.get('/all-vendors');
-            for(let vendor of result.body) {
-                vendor.icons = [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
-                this.vendors.push(vendor);
-            }
-            if(!this.vuexVendors.length) {
-                this.vendorsSetting(result.body);
+            try {
+                let result = await this.$http.get('/all-vendors');
+                for(let vendor of result.body) {
+                    vendor.icons = [{name: "save", active: false, icon: require("../../assets/images/Other/save-icon-qa-form.png")}, {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                        {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
+                    this.vendors.push(vendor);
+                }
+                await this.vendorsSetting(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Internal server error / Cannot load vendors", isShow: true, type: "error"});
             }
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            vendorsSetting: "vendorsSetting"
+            vendorsSetting: "vendorsSetting",
+            setCurrentVendor: "setCurrentVendor"
         })
     },
     components: {
@@ -439,34 +435,27 @@ export default {
     },
     computed: {
         allVendors() {
-            let result = this.vendors;
-            if(this.filterName) {
+            let result = this.vendors.filter(item => item.status !== 'Potential');
+            if(this.nameFilter) {
                 result = result.filter(item => {
-                    return item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) != -1;
+                    const name = item.firstName + " " + item.surname;
+                    return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
                 })
             }
-            if(this.filterStatus) {
+            if(this.statusFilter) {
                 result = result.filter(item => {
-                    return item.status == this.filterStatus;
+                    return item.status == this.statusFilter;
                 })
             }
-            if(this.industryFilter[0].name != 'All') {
+            if(this.industryFilter && this.industryFilter.name !== 'All') {
                 result = result.filter(item => {
-                    let exist = false;
-                    for(let indus of item.industry) {
-                        if(indus.name == this.industryFilter[0].name) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if(exist) {
-                        return item
-                    }
+                    const industryIds = item.industry.map(indus => indus._id);
+                    return industryIds.indexOf(this.industryFilter._id) !== -1;
                 })
             }
-            if(this.filterLeadsource) {
+            if(this.leadFilter) {
                 result = result.filter(item => {
-                    return item.leadSource == this.filterLeadsource;
+                    return item.leadSource == this.leadFilter;
                 })
             }
             return result;
@@ -488,7 +477,8 @@ export default {
             return result;
         },
         ...mapGetters({
-            vuexVendors: "getVendors"
+            vuexVendors: "getVendors",
+            currentVendor: "getCurrentVendor"
         })
     },
     mounted() {
@@ -532,6 +522,11 @@ label {
             justify-content: flex-end;
         }
     }
+    &__drop-menu {
+        position: relative;
+        width: 191px;
+        z-index: 1;
+    }
 }
 
 .filters-item {
@@ -557,7 +552,7 @@ label {
 }
 
 .filter-field {
-    width: 188px;
+    width: 191px;
     height: 28px;
     padding-left: 3px;
     border: 1px solid #67573E;

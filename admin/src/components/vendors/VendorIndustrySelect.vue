@@ -1,17 +1,17 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
+            template(v-if="selectedInd && selectedInd.name !== 'All'")
                 .selected
                     .industry-tooltip
-                        img(:src="selectedInd[0].icon")
-                        span.toolTip {{ selectedInd[0].name }}
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
+                        img(:src="selectedInd.icon")
+                        span.toolTip {{ selectedInd.name }}
+            template(v-if="!selectedInd || selectedInd.name === 'All' ") 
                 span.selected.no-industry Options
             .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name === selectedInd.name}")
                 span {{ industry.name }}
 </template>
 
@@ -21,11 +21,15 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedInd: {
-            type: Array
+            type: [String, Object]
         },
         parentInd: {
             type: Number
-        }
+        },
+        isAllExist: {
+            type: Boolean,
+            default: false
+        } 
     },
     data() {
         return {
@@ -52,9 +56,9 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            await this.$http.get('api/industries')
-            .then(response => {
-                let sortedArray = response.data.filter(item => {
+            try {
+                const allIndustries = await this.$http.get('api/industries')
+                let sortedArray = allIndustries.data.filter(item => {
                     if (item.name != 'More') {
                         return item
                     }
@@ -63,17 +67,20 @@ export default {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
                 });
+                if(this.isAllExist) {
+                    sortedArray.unshift({name: "All"});
+                }
                 this.industries = sortedArray;
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+            } catch(err) {
+                this.errors.push(err)
+            }
         },
         outClick() {
             this.droppedInd = false;
         },
         changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd})
+            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd});
+            this.outClick();
         }
     },
     directives: {
@@ -87,8 +94,6 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 191px;
     height: 28px;
     display: flex;
@@ -142,6 +147,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -151,17 +157,18 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    border-radius: 5px;
+    border: 1px solid #67573E;
+    overflow: hidden;
+    width: 100%;
     .drop {
+        border-top: 1px solid #67573E;
         font-size: 14px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: auto;
+        overflow-y: overlay;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
         z-index: 6;
         &__item {

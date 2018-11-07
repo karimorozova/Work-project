@@ -160,8 +160,9 @@ router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) 
             await moveFile(photoFile[0], id)
             vendor.photo = `/vendorsDocs/${id}/${photoFile[0].filename}`;
         }
-        await Vendors.update({"_id": id}, vendor);
-        res.send({id: id})
+        const updatedVendor = await Vendors.updateOne({"_id": id}, vendor);
+        const vendors = await getVendors({});
+        res.send({vendors, vendorId: updatedVendor.id});
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on creating Vendor");
@@ -177,7 +178,8 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
             vendor.photo = `/vendorsDocs/${vendor._id}/${photoFile[0].filename}`;
         }
         await Vendors.updateOne({"_id": vendor._id}, vendor);
-        res.send('Vendor info updated')
+        const vendors = await getVendors({});
+        res.send(vendors);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating Vendor");

@@ -82,10 +82,6 @@ export default {
         .steps-table-row, .rates-matrix-row {
             cursor: default;
         }
-        .vendors-table_height-28 {
-            cursor: default;
-            height: 32px;
-        }
     }
     &__thead-cell {
         box-sizing: border-box;
@@ -156,10 +152,10 @@ export default {
 }
 .vendors-table__body {
     max-height: 500px;
-    min-height: 150px;
 }
 .vendors-table_scroll-y {
     overflow-y: auto;
+    padding: 0;
 }
 .matrix-table {
     max-height: 350px;

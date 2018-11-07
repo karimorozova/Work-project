@@ -255,7 +255,7 @@ export default {
         },
         extendedVendors(index) {
             if(this.isAllShow) {
-                return this.vendors;
+                return this.vendors.filter(item => item.status === 'Active');
             }
             const result = this.vendors.filter(item => this.checkForLanguages(item, index));
             return result;

@@ -24,7 +24,7 @@ export default {
     },
     data() {
         return {
-            leadsources: ["Internet", "Website", "Advertising", "Landing Pages", "Social Media", "Friend"],
+            leadsources: ["All", "Internet", "Website", "Advertising", "Landing Pages", "Social Media", "Friend"],
             dropped: false,
             errors: []
         }
@@ -37,7 +37,9 @@ export default {
             this.dropped = false;
         },
         changeLeadsource(index) {
-            this.$emit("chosenLeadsource", this.leadsources[index])
+            const option = this.leadsources[index] === 'All' ? "" : this.leadsources[index];
+            this.$emit("chosenLeadsource", { option });
+            this.outClick();
         }
     },
     directives: {
@@ -50,16 +52,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 191px;
     height: 28px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -75,7 +77,7 @@ export default {
             display: flex;
             .toolTip {
                 position: absolute;
-                color: #D15F45;
+                color: $orange;
                 font-size: 12px;
                 display: none;
                 left: 36px;
@@ -96,6 +98,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -105,23 +108,25 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    border-radius: 5px;
+    border: 1px solid $main-color;
+    overflow: hidden;
+    width: 100%;
     .drop {
-        position: absolute;
+        border-top: 1px solid $main-color;
+        font-size: 14px;
         width: 100%;
-        border: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: auto;
+        overflow-y: overlay;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        background-color: white;
+        background-color: $white;
         z-index: 6;
         &__item {
             display: flex;
             align-items: center;
             padding: 5px 2px;
-            border-bottom: .5px solid #BFB09D;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;

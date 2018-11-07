@@ -91,7 +91,7 @@ export default {
         }),
         filteredVendors() {
             if(this.isAllShow) {
-                return this.vendors;
+                return this.vendors.filter(item => item.status === 'Active');
             }
             const result = this.vendors.filter(item => this.checkForLanguages(item));
             return result;

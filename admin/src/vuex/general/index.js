@@ -17,7 +17,8 @@ const state = {
     isAlert: false,
     alertType: 'success',
     alertMessage: '',
-    requestCounter: 0
+    requestCounter: 0,
+    currentVendor: {}
 };
 
 export const generalStore = {
