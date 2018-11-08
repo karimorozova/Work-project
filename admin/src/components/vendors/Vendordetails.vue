@@ -199,7 +199,9 @@ export default {
                 return this.cancel();
             }
             try {
-                await this.$http.delete(`/vendorsapi/deletevendor/${this.vendor._id}`);
+                const updatedVendors = await this.$http.delete(`/vendorsapi/deletevendor/${this.vendor._id}`);
+                await this.storeVendors(updatedVendors.data);
+                this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot delete the Vendor", isShow: true, type: "error"});
             }

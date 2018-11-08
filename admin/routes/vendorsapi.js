@@ -105,7 +105,8 @@ router.post('/vendor-rates', async (req, res) => {
             return {industry: item.id, active: active, rate: item.rate, package: item.package}
         })
         const result = await checkRatesMatch(vendor, industries, rate);
-        res.send('rates changed');
+        const updatedVendors = await getVendors({});
+        res.send(updatedVendors);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating rates of Vendor");

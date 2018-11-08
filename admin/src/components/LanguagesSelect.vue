@@ -221,9 +221,6 @@ export default {
             .all-projects__filters & {
                 font-size: 12px;
             }
-            .left-pad {
-                padding-left: 5px;
-            }
         }
         &__name {
             max-width: 90%;

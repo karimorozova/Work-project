@@ -259,6 +259,7 @@ export default {
       this.fullInfo[index].vendor = this.vendor._id;
       try {
         const result = await this.$http.post('vendorsapi/vendor-rates', this.fullInfo[index]);
+        await this.storeVendors(result.body);
         await this.vendorRates();
         this.$emit('ratesUpdate', {vendorId: this.vendor._id});
         this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
@@ -337,7 +338,8 @@ export default {
       })
     },
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      storeVendors: "vendorsSetting",
     })
   },
   computed: {
