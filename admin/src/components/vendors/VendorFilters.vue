@@ -7,10 +7,10 @@
         label.filters__filter-title Industry
         .filters__drop-menu
             VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
-    .filters__item(v-if="statusFilter !== 'Potential'")
+    .filters__item(v-if="statusExcluded !== 'Potential'")
         label.filters__filter-title Status
         .filters__drop-menu
-            SelectSingle(:selectedOption="statusFilter" @chooseOption="chosenStatus")
+            SelectSingle(:selectedOption="statusFilter" :options="statuses" @chooseOption="chosenStatus" placeholder="Options")
     .filters__item
         label.filters__filter-title Lead Source
         .filters__drop-menu
@@ -32,12 +32,19 @@ export default {
         },
         leadFilter: {
             type: String
+        },
+        statusExcluded: {
+            type: String
+        },
+        statuses: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
         return {
             nameFilter: "",
-            isAllForIndustryExist: true
+            isAllForIndustryExist: true,
         }
     },
     methods: {
@@ -45,7 +52,8 @@ export default {
             this.$emit("setNameFilter", { option: this.nameFilter })
         },
         chosenStatus({option}) {
-            this.$emit("setStatusFilter", { option })
+            const statusOption = option === "All" ? "" : option
+            this.$emit("setStatusFilter", { option: statusOption })
         },
         chosenLead({option}) {
             this.$emit("setLeadFilter", { option });

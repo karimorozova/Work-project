@@ -2,31 +2,13 @@
 .recruitment
   Sidebar(title="RECRUITMENT" :links="sideBarLinks" @onLinkClick="onLinkClick")
   .recruitment__main
-    .recruitment__table(v-if="!isVendorDetails")
-      VendorFilters(
-        statusFilter="Potential"
-        :industryFilter="industryFilter"
-        :leadFilter="leadFilter"
-        @setNameFilter="(option) => setFilter(option, 'nameFilter')"
-        @setStatusFilter="(option) => setFilter(option, 'statusFilter')"
-        @setLeadFilter="(option) => setFilter(option, 'leadFilter')"
-        @setIndustryFilter="(option) => setFilter(option, 'industryFilter')"
-      )
-      VendorsTable(
-        :nameFilter="nameFilter"
-        :industryFilter="industryFilter"
-        :leadFilter="leadFilter"
-        statusFilter="Potential"
-        @showVendorDetails="showVendorDetails"
-      )
-    .recruitmet__table(v-if="isVendorDetails")
-      Vendordetails(
-        :vendor="currentVendor"
-        @cancelVendor="closeVendorDetails"
-      )
+    AllVendorsInfo(v-if="isAllVendorsShow"
+      statusExcluded="Potential"
+    )
 </template>
 
 <script>
+import AllVendorsInfo from "../vendors/AllVendorsInfo";
 import Sidebar from "../Sidebar";
 import VendorsTable from "../vendors/VendorsTable";
 import Vendordetails from "../vendors/Vendordetails";
@@ -37,44 +19,22 @@ export default {
   data() {
     return {
       sideBarLinks: ["Vendors"],
-      isVendorDetails: false,
-      statusFilter: "",
-      industryFilter: "",
-      leadFilter: "",
-      nameFilter: ""
+      isAllVendorsShow: true
     }
   },
   methods: {
     onLinkClick({index}) {
       if(this.sideBarLinks[index] === "Vendors") {
-        this.isVendorDetails = false;
+        this.isAllVendorsShow = true;
       }
-    },
-    showVendorDetails({vendor}) {
-      this.isVendorDetails = true;
-      this.storeCurrentVendor(vendor);
-    },
-    closeVendorDetails() {
-      this.isVendorDetails = false;
-      this.storeCurrentVendor({});
-    },
-    setFilter({option}, prop) {
-      this[prop] = option;
-    },
-    ...mapActions({
-      storeCurrentVendor: "storeCurrentVendor"
-    })
-  },
-  computed: {
-    ...mapGetters({
-      currentVendor: "getCurrentVendor"
-    })
+    }
   },
   components: {
     Sidebar,
     VendorsTable,
     Vendordetails,
-    VendorFilters
+    VendorFilters,
+    AllVendorsInfo
   }
 }
 </script>
@@ -89,11 +49,6 @@ export default {
   &__main {
     padding: 20px;
   }
-  &__table {
-    padding: 20px;
-    width: 1100px;
-    min-height: 150px;
-    box-shadow: 0 0 10px $brown-shadow;
-  }
 }
+
 </style>

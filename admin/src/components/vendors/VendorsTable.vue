@@ -29,7 +29,7 @@
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
                 VendorStatusSelect(
                     isAllExist="no"
-                    :selectedStatus="row.status"
+                    :selectedStatus="selectedStatus"
                     :parentInd="index"
                     @chosenStatus="setStatus"
                 )
@@ -39,7 +39,7 @@
         template(slot="native" slot-scope="{ row, index }")
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
                 NativeLanguageSelect(
-                    :selectedLang="row.native"
+                    :selectedLang="selectedNative"
                     :parentIndex="index"
                     @chosenLang="setNative"
                 )
@@ -67,6 +67,14 @@
         template(slot="icons" slot-scope="{ row, index }")
             span.vendors-table__icons
                 img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
+    .vendors-table__error(v-if="isErrorShow")
+        .vendors-table__error-message
+            p Please finish the current edition first!
+            span.vendors-table__close(@click="closeErrorMessage") +
+    .vendors-table__delete-approve(v-if="isDeleteMessageShow")
+            p Are you sure you want to delete?
+            Button.vendors-table__button(value="Cancel" @clicked="cancelDelete")
+            Button.vendors-table__button(value="Delete" @clicked="approveDelete")
 </template>
 
 <script>
@@ -75,6 +83,7 @@ import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
+import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -83,6 +92,9 @@ export default {
             type: String
         },
         statusFilter: {
+            type: String
+        },
+        statusExcluded: {
             type: String
         },
         industryFilter: {
@@ -111,15 +123,23 @@ export default {
                 delete: {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
             },
             currentEditingIndex: -1,
+            deletingVendorIndex: -1,
             currentBasicRate: "",
             currentTqi: "",
-            industrySelected: []
+            industrySelected: [],
+            selectedNative: {},
+            selectedStatus: "",
+            isErrorShow: false,
+            isDeleteMessageShow: false
         }
     },
     methods: {
         ...mapActions({
             alertToggle: "alertToggle",
-            vendorsSetting: "vendorsSetting"
+            updateVendorProp: "updateVendorProp",
+            storeVendors: "vendorsSetting",
+            storeCurrentVendor: "storeCurrentVendor",
+            updateIndustry: "updateIndustry",
         }),
         stopPropagation() {
             return
@@ -140,25 +160,81 @@ export default {
                 return key === 'edit'
             }
         },
-        makeAction(index, key) {
+        closeErrorMessage() {
+            this.isErrorShow = false;
+        },
+        setCurrentEditionValues(index) {
+            this.currentEditingIndex = index;
+            this.currentBasicRate = this.filteredVendors[index].basicRate;
+            this.currentTqi = this.filteredVendors[index].tqi;
+            this.industrySelected = this.filteredVendors[index].industry;
+            this.selectedStatus = this.filteredVendors[index].status;
+            this.selectedNative = this.filteredVendors[index].native;
+        },
+        setCurrentDefaults() {
+            this.currentEditingIndex = -1;
+            this.currentBasicRate = "";
+            this.currentTqi = "";
+            this.industrySelected = [];
+            this.selectedStatus = "";
+            this.selectedNative = {};
+        },
+        async updateVendor(index) {
+            let sendData = new FormData();
+            const updatingVendor = {
+                ...this.filteredVendors[index],
+                basicRate: this.currentBasicRate,
+                tqi: this.currentTqi,
+                industry: this.industrySelected,
+                status: this.selectedStatus,
+                native: this.selectedNative
+            }
+            sendData.append('vendor', JSON.stringify(updatingVendor));
+            try {
+                const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
+                await this.storeVendors(updatedVendors.data);
+                this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"}); 
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
+            }
+        },
+        async makeAction(index, key) {
+            if(this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
+                return this.isErrorShow = true;
+            }
             if(key === 'edit') {
-                this.currentEditingIndex = index;
-                this.currentBasicRate = this.filteredVendors[index].basicRate;
-                this.currentTqi = this.filteredVendors[index].tqi;
-                this.industrySelected = this.filteredVendors[index].industry;
+                this.setCurrentEditionValues(index);
             }
             if(key === 'save') {
-                this.currentEditingIndex = -1;
-                this.currentBasicRate = "";
-                this.currentTqi = "";
-                this.industrySelected = [];
+                await this.updateVendor(index);
+                this.setCurrentDefaults();
+            }
+            if(key === 'delete') {
+                this.deletingVendorIndex = index;
+                this.isDeleteMessageShow = true;
             }
         },
-        setStatus({option, index}) {
-            console.log(option, index);
+        async approveDelete() {
+            this.isDeleteMessageShow = false;
+            this.currentEditingIndex = -1;
+            const vendor = this.filteredVendors[this.deletingVendorIndex];
+            try {
+                const result = await this.$http.delete(`/vendorsapi/deletevendor/${vendor._id}`);
+                await this.storeVendors(result.data);
+                this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot delete the Vendor", isShow: true, type: "error"});
+            }
         },
-        setNative({lang, index}) {
-            console.log(lang.lang, index);
+        cancelDelete() {
+            this.deletingVendorIndex = -1;
+            this.isDeleteMessageShow = false;
+        },
+        setStatus({option}) {
+            this.selectedStatus = option
+        },
+        setNative({lang}) {
+            this.selectedNative = lang;
         },
         setIndustry({industry, index}) {
             const position = this.industrySelected.findIndex(item => {
@@ -172,19 +248,30 @@ export default {
         async getVendors() {
             if(!this.vuexVendors.length) {
                 const result = await this.$http.get('/all-vendors');
-                this.vendorsSetting(result.body);
+                this.storeVendors(result.body);
             }
         },
         onRowClicked({index}) {
+            if(this.currentEditingIndex === index) {
+                return
+            }
             this.$emit("showVendorDetails", {vendor: this.filteredVendors[index]});
         }
     },
     computed: {
         ...mapGetters({
-            vuexVendors: "getVendors"
+            vuexVendors: "getVendors",
         }),
         filteredVendors() {
             let result = this.vuexVendors;
+            if(this.statusExcluded) {
+                result = result.filter(item => {
+                    if(this.statusExcluded === 'Potential') {
+                        return item.status == 'Potential'
+                    }
+                    return item.status !== 'Potential';
+                })
+            }
             if(this.nameFilter) {
                 result = result.filter(item => {
                     const name = item.firstName + " " + item.surname;
@@ -222,7 +309,8 @@ export default {
         VendorLeadsourceSelect,
         VendorStatusSelect,
         MultiVendorIndustrySelect,
-        NativeLanguageSelect
+        NativeLanguageSelect,
+        Button
     },
     mounted() {
         this.getVendors()
@@ -234,6 +322,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .vendors-table {
+    position: relative;
     &__combinations {
         padding: 4px;
         height: 22px;
@@ -272,6 +361,60 @@ export default {
         color: $main-color;
         padding: 2px;
         background-color: transparent;
+    }
+    &__error {
+        position: absolute;
+        border: 1px solid $orange;
+        background-color: $white;
+        box-shadow: 0 0 15px $orange;
+        width: 300px;
+        top: 50%;
+        left: 50%;
+        margin-left: -150px;
+        padding: 0 15px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+    }
+    &__error-message {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    &__close {
+        position: absolute;
+        font-size: 24px;
+        font-weight: 700;
+        top: -2px;
+        right: -9px;
+        transform: rotate(45deg);
+        cursor: pointer;
+    }
+    &__delete-approve {
+        position: absolute;
+        width: 332px;
+        height: 270px;
+        top: 10%;
+        left: 50%;
+        margin-left: -166px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 10px #67573E;
+        background-color: #FFF;
+        z-index: 20;
+        p {
+            font-size: 21px;
+            width: 50%;
+            text-align: center;
+        }
+        .approve-block {
+            margin-bottom: 15px;
+        }
+    }
+    &__button {
+        margin-bottom: 5px;
     }
 }
 </style>

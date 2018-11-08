@@ -90,25 +90,38 @@ async function deleteRate(client, industry, id) {
     return result;
 }
 
-async function addClientsSeveralLangs({clientId, comb, clientCombinations}) {
+async function addClientsSeveralLangs({clientId, comb, clientCombinations, industry}) {
+    let industries = comb.industry[0].name === "All" ? addAllIndustries(comb.industry[0], industry) : comb.industry;
     let langPairExist = false;
     let updatedCombinations = [...clientCombinations];
     for(let clientComb of updatedCombinations) {
         if(comb.source._id === clientComb.source.id && comb.target._id === clientComb.target.id
             && comb.service._id === clientComb.service.id) {
-            clientComb.industry = updateCombination(comb.industry, clientComb.industry);
+            clientComb.industry = updateCombination(industries, clientComb.industry);
             langPairExist = true;
         }
     }
     if(!langPairExist) {
-        comb.industry = comb.industry.map(item => {
+        industries = industries.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
-        updatedCombinations.push(comb);
+        updatedCombinations.push({...comb, industry: industries});
         await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}})
     } else {
         await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}})
     }
+}
+
+function addAllIndustries(combIndustry, clientIndustry) {
+    let industries = [];
+    for(let indus of clientIndustry) {
+        industries.push({
+            ...indus._doc,
+            id: indus.id,
+            rate: combIndustry.rate
+        })
+    }
+    return industries
 }
 
 function updateCombination(combIndustries, clientIndustries) {

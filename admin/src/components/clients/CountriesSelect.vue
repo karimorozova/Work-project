@@ -13,7 +13,7 @@
                 input.search(type="text" v-model="countrySearch" placeholder="Search")
             .drop(v-if="countriesDropped")
                 .drop__item.country-name(v-for="(country, ind) in foundCountries" @click="chooseCountry(ind)")
-                    span {{ country.name }}
+                    span {{ country }}
 </template>
 
 <script>
@@ -36,7 +36,7 @@ export default {
     },
     methods: {
         chooseCountry(ind) {
-            this.$emit('chosenCountry', this.foundCountries[ind].name);
+            this.$emit('chosenCountry', this.foundCountries[ind]);
         },
         openCountries() {
             this.countriesDropped = !this.countriesDropped;
@@ -50,7 +50,7 @@ export default {
             let result = this.countries;
             if(this.countrySearch) {
                 result = result.filter(item => {
-                    if(item.name.toLowerCase().indexOf(this.countrySearch.toLowerCase()) != -1) {
+                    if(item.toLowerCase().indexOf(this.countrySearch.toLowerCase()) != -1) {
                         return item
                     }
                 })

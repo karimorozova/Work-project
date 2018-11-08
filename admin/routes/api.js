@@ -12,7 +12,7 @@ const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
 const writeFile = require('write');
-const { getVendors } = require('./vendors');
+const { getAllCountries } = require('../helpers/countries');
 
 
 function moveFile(oldFile, requestId) {
@@ -348,5 +348,15 @@ router.post("/removelanguages", async(req, res) => {
     res.status(500).send('Something is wrong with Language removing')
   }
 });
+
+router.get('/countries', (req, res) => {
+  try {
+    const countries = getAllCountries();
+    res.send(countries);
+  } catch(err) {
+    console.log(err)
+    res.status(500).send("Error on getting countries");
+  }
+})
 
 module.exports = router;

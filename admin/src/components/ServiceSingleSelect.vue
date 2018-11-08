@@ -5,7 +5,7 @@
             .arrow-button(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
-            span.drop__item(v-for="(service, index) in filteredServices" @click="changeServ(index)") {{ service.title }}
+            .drop__item(v-for="(service, index) in filteredServices" @click="changeServ(index)") {{ service.title }}
 </template>
 
 <script>
@@ -113,12 +113,10 @@ export default {
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
         z-index: 5;
         &__item {
-            padding: 2px;
+            padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -126,7 +124,6 @@ export default {
                 border: none;
             }
             &:hover {
-                // padding-left: 5px;
                 background-color: rgba(191, 176, 157, 0.5);
             }
         }

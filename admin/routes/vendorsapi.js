@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
+const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendors, checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require('./vendors');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
@@ -140,10 +141,12 @@ router.post('/several-langs', async (req, res) => {
                 vendorId: vendorId,
                 comb: comb,
                 vendorCombinations: vendorCombinations,
-                langPairs: vendor.languagePairs
+                langPairs: vendor.languagePairs,
+                industry: vendor.industry
             })
         }
-        res.send('Several langs added..')
+        const updatedVendors = await getVendors({});
+        res.send(updatedVendors);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on adding several langs for Vendor");
@@ -160,7 +163,7 @@ router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) 
             await moveFile(photoFile[0], id)
             vendor.photo = `/vendorsDocs/${id}/${photoFile[0].filename}`;
         }
-        const updatedVendor = await Vendors.updateOne({"_id": id}, vendor);
+        const updatedVendor = await Vendors.findOneAndUpdate({"_id": id}, vendor);
         const vendors = await getVendors({});
         res.send({vendors, vendorId: updatedVendor.id});
     } catch(err) {
@@ -186,10 +189,13 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
     }
 })
 
-router.post('/deletevendor', async (req, res) => {
+router.delete('/deletevendor/:id', async (req, res) => {
+    const { id } = req.params;
     try { 
-        await Vendors.deleteOne({"_id": req.body.id});
-        res.send('Deleted');
+        await Vendors.deleteOne({"_id": id});
+        await fse.remove('./dist/vendorsDocs/' + id);
+        const updatedVendors = await getVendors({});
+        res.send(updatedVendors);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting Vendor");

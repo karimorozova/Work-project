@@ -12,7 +12,7 @@
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: selectedLang.indexOf(language.symbol) != -1}")
-                span(:class="{'left-pad': !isCheckboxShown}") {{ language.lang }}
+                span.drop__name(:class="{'left-pad': !isCheckboxShown}") {{ language.lang }}
 </template>
 
 <script>
@@ -202,15 +202,13 @@ export default {
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
         z-index: 15;
         padding-top: 29px;
         &__item {
             display: flex;
             align-items: center;
-            padding: 12px 2px;
+            padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -226,6 +224,9 @@ export default {
             .left-pad {
                 padding-left: 5px;
             }
+        }
+        &__name {
+            max-width: 90%;
         }
         .inner-component & {
             max-height: 118px;

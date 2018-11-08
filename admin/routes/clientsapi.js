@@ -218,7 +218,8 @@ router.post('/several-langs', async (req, res) => {
             await addClientsSeveralLangs({
                 clientId: clientId,
                 comb: comb,
-                clientCombinations: clientCombinations
+                clientCombinations: clientCombinations,
+                industry: client.industry
             })
         }
         res.send('Several langs added..');

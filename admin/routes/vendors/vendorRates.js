@@ -28,6 +28,7 @@ async function checkRatesMatch(vendor, industries, rate) {
     }
     let exist = false;
     let languageCombinations = [...vendor.languageCombinations];
+    let languagePairs = [...vendor.languagePairs];
     if(languageCombinations.length) {
         for(let comb of languageCombinations) {
         if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
@@ -46,7 +47,6 @@ async function checkRatesMatch(vendor, industries, rate) {
             }
         }
     }
-    let languagePairs = "";
     if(!exist || !languageCombinations.length) {
         languageCombinations.push({
             source: rate.sourceLanguage._id,
@@ -116,26 +116,39 @@ async function deleteRate(vendor, industry, id) {
     return result;
 }
 
-async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langPairs}) {
+async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langPairs, industry}) {
+    let industries = comb.industry[0].name === "All" ? addAllIndustries(comb.industry[0], industry) : comb.industry;
     let isExist = false;
     let updatedCombinations = [...vendorCombinations];
     for(let vendorComb of updatedCombinations) {
         if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
             && comb.service._id === vendorComb.service.id) {
-            vendorComb.industry = updateCombination(comb.industry, vendorComb.industry);
+            vendorComb.industry = updateCombination(industries, vendorComb.industry);
             isExist = true;
         }
     }
     if(!isExist) {
-        comb.industry = comb.industry.map(item => {
+        industries = industries.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
-        updatedCombinations.push(comb);
+        updatedCombinations.push({...comb, industry: industries});
         let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs});
         await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations, languagePairs: updatedLanguagePairs}})
     } else {
         await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
     }
+}
+
+function addAllIndustries(combIndustry, clientIndustry) {
+    let industries = [];
+    for(let indus of clientIndustry) {
+        industries.push({
+            ...indus._doc,
+            id: indus.id,
+            rate: combIndustry.rate
+        })
+    }
+    return industries
 }
 
 function updateCombination(combIndustries, vendorIndustries) {

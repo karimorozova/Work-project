@@ -133,23 +133,21 @@ export default {
         contactUpdate() {
             this.$emit('contactUpdate', {file: this.photoFile[0], ind: this.ind})
         },
-        getCountries() {
-            this.$http.get('https://restcountries.eu/rest/v2/all')
-            .then(res => {
-                this.countries = res.body;
-            })
-            .catch(err => {
+        async getCountries() {
+            try {
+                const result = await this.$http.get('/api/countries');
+                this.countries = result.body;
+            } catch(err) {
                 console.log(err)
-            })
+            }
         },
-        getTimezones() {
-            this.$http.get('/api/timezones')
-            .then(res => {
-                this.timezones = res.body;
-            })
-            .catch(err => {
+        async getTimezones() {
+            try {
+                const result = await this.$http.get('/api/timezones')
+                this.timezones = result.body;
+            } catch(err) {
                 console.log(err)
-            })
+            }
         }
     },
     computed: {

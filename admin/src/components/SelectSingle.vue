@@ -93,7 +93,7 @@ export default {
         border-top: 1px solid #67573E;    
         z-index: 10;
         &__item {
-            padding: 7px;
+            padding: 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;

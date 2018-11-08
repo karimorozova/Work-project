@@ -83,6 +83,12 @@
                 p Are you sure you want to delete?
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
                 input.button(type="button" value="Delete" @click="approveVendorDelete")
+        Addseverallangs(v-if="isAddSeveral"
+            origin="vendor"
+            :who="vendor"
+            @closeSeveral="closeSevLangs"
+            @severalLangsResult="severalLangsResult"
+        )
 </template>
 
 <script>
@@ -93,6 +99,7 @@ import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import VendorRates from "./VendorRates";
+import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -108,12 +115,19 @@ export default {
             timezones: [],
             genderDropped: false,
             approveShow: false,
-            photoFile: []
+            photoFile: [],
+            isAddSeveral: false
         }
     },
     methods: {
-        addSevLangs(data) {
-            this.$emit('addSevLangs')
+        addSevLangs() {
+            this.isAddSeveral = true;
+        },
+        closeSevLangs() {
+            this.isAddSeveral = false;
+        },
+        severalLangsResult({message, isShow, type}) {
+            this.alertToggle({message, isShow, type});
         },
         deleteVendor() {
             this.approveShow = true;
@@ -142,8 +156,8 @@ export default {
                     const saveResult = await this.$http.post("/vendorsapi/new-vendor", sendData);
                     const { vendorId, vendors } = saveResult.data;
                     const updatedVendor = vendors.find(item => item._id === vendorId);
-                    await this.storeCurrentVendor({updatedVendor});
                     await this.storeVendors(vendors);
+                    await this.storeCurrentVendor(updatedVendor);
                     this.alertToggle({message: "New Vendor saved", isShow: true, type: "success"});
                 } else {
                     const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
@@ -179,9 +193,16 @@ export default {
         cancel() {
             this.$emit('cancelVendor')
         },
-        approveVendorDelete() {
+        async approveVendorDelete() {
             this.approveShow = false;
-            this.$emit('vendorDelete')
+            if(!this.vendor._id) {
+                return this.cancel();
+            }
+            try {
+                await this.$http.delete(`/vendorsapi/deletevendor/${this.vendor._id}`);
+            } catch(err) {
+                this.alertToggle({message: "Server error / Cannot delete the Vendor", isShow: true, type: "error"});
+            }
         },
         toggleGenders() {
             this.genderDropped = !this.genderDropped;
@@ -191,12 +212,11 @@ export default {
         },
         chosenInd({industry}) {
             this.updateIndustry(industry);
-            // this.$emit('changeInd', {industry: data.industry, filter: this.selectedIndNames})
         },
         async getTimezones() {
             try {
                 const timezones = await this.$http.get('/api/timezones');
-                this.timezones = tmezones.body;
+                this.timezones = timezones.body;
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot get timezones", isSHow: true, type: "error"})
             }
@@ -229,7 +249,8 @@ export default {
         MultiVendorIndustrySelect,
         NativeLanguageSelect,
         TimezoneSelect,
-        VendorRates
+        VendorRates,
+        Addseverallangs
     },
     directives: {
         ClickOutside

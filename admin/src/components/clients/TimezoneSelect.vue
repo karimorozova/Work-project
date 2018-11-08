@@ -37,6 +37,7 @@ export default {
     methods: {
         chooseZone(ind) {
             this.$emit('chosenZone', this.foundZones[ind].zone);
+            this.timezonesDropped = false;
         },
         openTimezones() {
             this.timezonesDropped = !this.timezonesDropped;

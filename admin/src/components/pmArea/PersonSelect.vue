@@ -10,7 +10,7 @@
     .drop(v-if="isDropped")
         .drop__item(v-for="(person, index) in extendedPersons" @click="setPerson(index)" :class="{chosen: selectedPerson === getPersonFullName(person)}")
             span(v-if="person.firstName") {{ person.firstName }} {{ person.surname }}
-            span.drop__last-item(v-else) {{ person }}
+            span.drop__last-item(v-if="person === 'Show all' || person === 'Hide all'") {{ person }}
 </template>
 
 <script>
@@ -137,15 +137,12 @@ export default {
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: $white;
         z-index: 10;
         &__item {
-            display: flex;
             align-items: center;
-            padding-left: 6px;
-            height: 28px;
+            padding: 6px 3px 6px 6px;
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;

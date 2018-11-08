@@ -77,7 +77,9 @@ export default {
     },
     methods: {
         ...mapActions({
-            alertToggle: "alertToggle"    
+            alertToggle: "alertToggle",
+            storeVendors: "vendorsSetting",
+            storeCurrentVendor: "storeCurrentVendor",
         }),
         checkErrors() {
             this.errors = [];
@@ -122,17 +124,19 @@ export default {
             }
             try {
                 if(this.origin == 'rates') {
-                    const result = await this.$http.post('../service/several-langs', JSON.stringify(languageCombinations));
+                    const result = await this.$http.post('/service/several-langs', JSON.stringify(languageCombinations));
                     this.$emit('refreshServices');
                 }
                 if(this.origin == 'vendor') {
                     const id = this.who._id;
-                    const vendorClient = await this.$http.post('../vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
-                    this.$emit('refreshServices', {vendorId: id});
+                    const updatedVendors = await this.$http.post('/vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
+                    await this.storeVendors(updatedVendors.body);
+                    const updatedVendor = updatedVendors.body.find(item => item._id === this.who._id);
+                    await this.storeCurrentVendor(updatedVendor);
                 }
                 if(this.origin == 'client') {
                     const id = this.who._id;
-                    const clientResult = await this.$http.post('../clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
+                    const clientResult = await this.$http.post('/clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
                     this.$emit('refreshServices', {clientId: id});
                 }
                 this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})

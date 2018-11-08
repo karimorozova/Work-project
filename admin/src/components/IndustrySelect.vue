@@ -12,7 +12,7 @@
             .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
-                span {{ industry.name }}
+                span.drop__name {{ industry.name }}
 </template>
 
 <script>
@@ -161,14 +161,12 @@ export default {
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
         z-index: 6;
         &__item {
             display: flex;
             align-items: center;
-            padding: 2px;
+            padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -178,6 +176,9 @@ export default {
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
             }
+        }
+        &__name {
+            max-width: 90%;
         }
         .inner-component & {
             max-height: 130px;
