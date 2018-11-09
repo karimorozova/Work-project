@@ -26,7 +26,7 @@
                 span.step-matrix__value {{ row.title }}
             template(slot="value" slot-scope="{ row, index }")
                 span.step-matrix__value
-                    input.step-matrix__number-input(type="number" min="0" max="100" v-model="row.value" @focus="toggleRowActive(index)" @blur="updateMatrixValue(index)")
+                    input.step-matrix__number-input(type="number" min="0" max="100" v-model="row.value" @focus="toggleRowActive(index)" @blur="updateMatrixValue(index)" @keyup.enter="(e)=>updateMatrixValue(index, e)")
                     span.step-matrix__percent(v-if="!row.active" :class="{'step-matrix_left-15': row.value < 100, 'step-matrix_left-8': row.value < 10}") %
             template(slot="wordcount" slot-scope="{ row }")
                 span.step-matrix__value {{ row.wordcount }}
@@ -72,8 +72,11 @@ export default {
         toggleRowActive(index) {
             this.$emit("toggleMatrixRowActive", {index: index});
         },
-        updateMatrixValue(index) {
+        updateMatrixValue(index, e) {
             this.$emit("updateMatrixValue", {index: index, prop: this.matrixOption});
+            if(e) {
+                e.target.blur();
+            }
         },
         refreshMatrix(value) {
             if(this.matrixOption === value) {
