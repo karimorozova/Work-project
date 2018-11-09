@@ -88,7 +88,7 @@ export default {
             const totalMatchedWords = this.matrixData.reduce((init, cur) => {
                 return init + cur.wordcount; 
             }, 0);
-            const wordcount = this.task.metrics.totalWords - totalMatchedWords;
+            const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
             const total = wordcount*this.step[rateProp];
             this.matrixData.push({
                 active: false,
