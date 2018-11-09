@@ -98,8 +98,8 @@ export default {
         return {
             fields: [
                 {label: "check", headerKey: "headerCheck", key: "check", width: "4%"},
-                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "14%"},
-                {label: "Language", headerKey: "headerLanguage", key: "language", width: "11%"},
+                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "13%"},
+                {label: "Language", headerKey: "headerLanguage", key: "language", width: "12%"},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "9%"},

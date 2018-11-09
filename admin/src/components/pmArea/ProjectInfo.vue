@@ -68,6 +68,9 @@
                                 span.project-info__delete-file(@click="deleteFile(index, 'refFiles')") +
                     .project-info__add-tasks
                         Button(value="Add tasks" @clicked="addTasks")
+                .project-info__join-files
+                    input.project-info__check(type="checkbox" v-model="isJoinFiles")
+                    span.project-info__check-title Join Files
             .project-info__tasks-steps
                 Tasks(v-if="currentProject.tasks.length && isTasksShow"
                     :allTasks="currentProject.tasks"
@@ -123,7 +126,8 @@ export default {
             isTasksShow: true,
             excludeKeys: ["nonTranslatable", "totalWords"],
             isSourceFilesShow: false,
-            isRefFilesShow: false
+            isRefFilesShow: false,
+            isJoinFiles: false
         }
     },
     methods: {
@@ -250,6 +254,7 @@ export default {
             form.append('targets', JSON.stringify(this.targetLanguages));
             form.append('projectId', this.currentProject._id);
             form.append('projectName', this.currentProject.projectName);
+            form.append('join', this.isJoinFiles);
             if(this.sourceFiles.length) {
                 for(let file of this.sourceFiles) {
                     form.append('sourceFiles', file)
@@ -475,7 +480,7 @@ export default {
         border-bottom: 1px solid $main-color;
     }
     &__tasks-col {
-        width: 25%;
+        width: 20%;
         height: 78px;
         display: flex;
         flex-direction: column;
@@ -542,6 +547,18 @@ export default {
     }
     &__list-title {
         cursor: pointer;
+    }
+    &__join-files {
+        display: flex;
+        align-items: flex-start;
+        padding-top: 7px;
+    }
+    &__check {
+        margin-right: 5px;
+        cursor: pointer;
+    }
+    &__check-title {
+        font-size: 14px;
     }
 }
 </style>

@@ -131,7 +131,15 @@ export default {
             allClients: "getClients"
         }),
         industriesList() {
-            return this.project.customer.name ? this.project.customer.industry : this.industries
+            let result = this.industries;
+            if(this.project.customer.name) {
+                const industry = this.project.customer.industry;
+                if(industry[0].name) {
+                    return result = industry;
+                }
+                return result = result.filter(item => industry.indexOf(item._id) !== -1);
+            }
+            return result;
         },
         nameOfProject() {
             return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;

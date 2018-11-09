@@ -36,7 +36,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 target: target.xtm,
                 translationFiles: translationFiles,
                 templateId: template,
-                workflowId: workflow
+                workflowId: workflow,
+                join: tasksInfo.join
             });
             const jobIds = xtmProject.jobs.map(item => item.jobId);
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 

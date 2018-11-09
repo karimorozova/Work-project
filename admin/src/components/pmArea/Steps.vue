@@ -138,8 +138,8 @@ export default {
             fields: [
                 {label: "Check", headerKey: "headerCheck", key: "check", width: "4%"},
                 {label: "Step", headerKey: "headerName", key: "name", width: "9%"},
-                {label: "Language", headerKey: "headerLanguage", key: "language", width: "11%"},
-                {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "15%", padding: 0},
+                {label: "Language", headerKey: "headerLanguage", key: "language", width: "12%"},
+                {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "14%", padding: 0},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%"},

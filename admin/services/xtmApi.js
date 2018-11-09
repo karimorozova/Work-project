@@ -23,6 +23,10 @@ function saveTasks(object) {
 }
 
 function saveTemplateTasks(object) {
+    const withJoinObject = object.join ? {
+        'workflowId': object.workflowId,
+        'fileProcessType': 'JOIN'
+    } : {'workflowId': object.workflowId}
     return new Promise((resolve, reject) => {
         unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
         .headers({"Authorization": xtmAuth.token,
@@ -32,9 +36,8 @@ function saveTemplateTasks(object) {
         .field('sourceLanguage', object.source)
         .field('targetLanguages', object.target)
         .field('analysisTemplateId', object.templateId)
-        .field('workflowId', object.workflowId)
+        .field(withJoinObject)
         .attach(object.translationFiles)
-        // .attach('translationFiles[0].file', object.file)
         .end(response => {
             if(response.error) {
                 return reject(response.error)
