@@ -8,6 +8,7 @@ import Vuex from 'vuex'
 import { store } from './vuex/store'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-vue/dist/bootstrap-vue.css';
+import axios from 'axios';
 import VueResource from 'vue-resource';
 import 'normalize.css';
 import "./assets/scss/style.scss";
@@ -15,6 +16,16 @@ import VueLodash from 'vue-lodash';
 
 export const bus = new Vue();
 
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem("token");
+  const value = token || "";
+  config.headers.common['token-header'] = value;
+  // axios.default.headers.common['token-header'] = value;
+  return config;
+}, error => {
+  // Do something with request error
+  return Promise.reject(error);
+});
 // Vue.use(BootstrapVue);
 Vue.use(VueResource);
 
@@ -44,6 +55,7 @@ new Vue({
   el: '#app',
   router,
   store,
+  axios,
   template: '<App/>',
   components: { App }
 })
