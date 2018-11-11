@@ -55,7 +55,6 @@ new Vue({
   el: '#app',
   router,
   store,
-  axios,
   template: '<App/>',
   components: { App }
 })
