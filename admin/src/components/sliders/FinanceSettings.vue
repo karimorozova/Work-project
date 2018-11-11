@@ -140,6 +140,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 10px 7px;
+    cursor: pointer;
     .reverse {
         transform: rotate(180deg); 
     }
