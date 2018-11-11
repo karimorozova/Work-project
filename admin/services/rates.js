@@ -95,8 +95,8 @@ async function updateLangCombs({serviceId, comb, serviceCombinations, industries
     }
   }
   if(!exist) {
-    updatedServCombinations = addCombinations({comb, updatedServCombinations, industries}) 
-    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedServCombinations}})
+    const updatedCombs = addCombinations({comb, serviceCombinations: updatedServCombinations, industries}) 
+    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedCombs}})
   } else {
     await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedServCombinations}})
   }
@@ -116,24 +116,28 @@ function updateIndustryRates(combIndustries, servIndustries) {
 
 function addCombinations({comb, serviceCombinations, industries}) {
   let updatedCombinations = [...serviceCombinations];
+  let updatingIndustries = [];
   for(let indus of industries) {
     for(let ind of comb.industry) {
       if(indus.id == ind._id) {
-        indus.rate = ind.rate;
-        indus.active = true;
+        updatingIndustries.push({
+          industry: indus.id,
+          active: ind.active, 
+          rate: ind.rate
+        })
       } else {
-        indus.rate = 0;
-        indus.active = false;
+        updatingIndustries.push({
+          industry: indus.id,
+          active: false, 
+          rate: 0
+        })
       }
     }
   }
-  industries = industries.map(item => {
-    return {industry: item._id, active: item.active, rate: item.rate}
-  })
   updatedCombinations.push({
     source: comb.source,
     target: comb.target,
-    industries: industries,
+    industries: updatingIndustries,
     active: true
   })
   return updatedCombinations;

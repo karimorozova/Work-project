@@ -23,7 +23,8 @@
             .rates-drop(v-if="duoDrop")
               RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
       Addseverallangs(v-if="addSeveral"
-        :origin="'rates'" 
+        origin="rates"
+        @severalLangsResult="severalLangsResult"
         @refreshServices="refreshServices"
         @closeSeveral="closeSevLangs")
 </template>
@@ -54,6 +55,9 @@ export default {
     },
     closeSevLangs(data) {
       this.addSeveral = false;
+    },
+    severalLangsResult({message, isShow, type}) {
+      this.alertToggle({message, isShow, type});
     },
     openMono() {
       if(!this.monoDrop) {

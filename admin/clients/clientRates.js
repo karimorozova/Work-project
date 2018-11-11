@@ -106,7 +106,7 @@ async function addClientsSeveralLangs({clientId, comb, clientCombinations, indus
             return {industry: item._id, rate: item.rate, active: item.active}
         })
         updatedCombinations.push({...comb, industry: industries});
-        await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}})
+        await Clients.updateOne({"_id": clientId}, {$push: {languageCombinations: {...comb, industry: industries}}})
     } else {
         await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}})
     }

@@ -131,9 +131,8 @@ async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langP
         industries = industries.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
-        updatedCombinations.push({...comb, industry: industries});
         let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs});
-        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations, languagePairs: updatedLanguagePairs}})
+        await Vendors.updateOne({"_id": vendorId}, {$push: {languageCombinations: {...comb, industry: industries}}, $set: {languagePairs: updatedLanguagePairs}})
     } else {
         await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
     }

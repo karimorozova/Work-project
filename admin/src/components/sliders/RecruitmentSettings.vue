@@ -5,6 +5,8 @@
     AllVendorsInfo(v-if="isAllVendorsShow"
       statusExcluded="Potential"
     )
+  .cucu
+    button(@click="cucuClick") Click on me
 </template>
 
 <script>
@@ -27,7 +29,13 @@ export default {
       if(this.sideBarLinks[index] === "Vendors") {
         this.isAllVendorsShow = true;
       }
-    }
+    },
+    async cucuClick() {
+      await this.cucu();
+    },
+    ...mapActions({
+      cucu: "cucu"
+    })
   },
   components: {
     Sidebar,
