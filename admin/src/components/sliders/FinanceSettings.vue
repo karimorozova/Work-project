@@ -51,12 +51,12 @@ export default {
     },
     addSevLangs(data) {
       this.addSeveral = true;
-      this.$emit('refreshServices', data);
     },
     closeSevLangs(data) {
       this.addSeveral = false;
     },
-    severalLangsResult({message, isShow, type}) {
+    async severalLangsResult({message, isShow, type}) {
+      await this.getDuoCombinations(this.serviceAfterAddSeveral);
       this.alertToggle({message, isShow, type});
     },
     openMono() {
@@ -65,17 +65,21 @@ export default {
       this.monoDrop = !this.monoDrop;
     },
     openDuo() {
-      if(!this.duoDrop) {
+      if(this.duoDrop) {
+        this.storeDuoRates({});
       }
       this.duoDrop = !this.duoDrop;
     },
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      storeDuoRates: "storeDuoRates",
+      getDuoCombinations: "getDuoCombinations"
     })
   },
   computed: {
     ...mapGetters({
       services: "getVuexServices",
+      serviceAfterAddSeveral: "getServiceAfterAddSeveral"
     }) 
   },
   components: {

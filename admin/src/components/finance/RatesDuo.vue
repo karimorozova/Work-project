@@ -3,16 +3,16 @@
   .filters
     .filters__item
       label Source Language
-      LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="chosenSource")
+      LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
     .filters__item
       label Target Language
-      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
+      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
     .filters__item
       label Industry
-      IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
+      IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .filters__item
       label Service
-      ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="chosenServ")
+      ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="setServiceFilter")
   .add-button
     input(type="button" @click="addSevLangs" value="Add several languages")
   .table-data
@@ -24,27 +24,28 @@
         template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
           tr(v-for="indus in info.industry" v-if="filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All'")
             td.drop-option 
-              template(v-if='info.icons.edit.active && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All")') {{ info.sourceLanguage.lang }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
+              template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All")') {{ info.sourceLanguage.lang }}
+              .inner-component(v-if="currentActive === index")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.drop-option 
-              template(v-if='info.icons.edit.active && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All")') {{ info.targetLanguage.lang }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[fullInfo[currentActive].targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+              template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All")') {{ info.targetLanguage.lang }}
+              .inner-component(v-if="currentActive === index")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.drop-option              
-              span(v-if="!indus.icon && info.icons.edit.active") {{ indus.name }}
+              span(v-if="!indus.icon && currentActive !== index") {{ indus.name }}
               .drop-option__image
-                img(v-if="indus.icon && info.icons.edit.active" :src="indus.icon")
+                img(v-if="indus.icon && currentActive !== index" :src="indus.icon")
                 span.title-tooltip {{ indus.name }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
+              .inner-component(v-if="currentActive === index")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
             td
-              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
-            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
-              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
+              input(v-if="currentActive !== index" type="checkbox" :checked="indus.active" :value="indus.active" disabled)
+              input(v-else type="checkbox" :checked="isIndustryActive" v-model="isIndustryActive")
+            td(:class="{'add-shadow': currentActive === index}") 
+              input.rates(:value="indus.rate" @input="changeRate" :readonly="currentActive !== index")
             td.icons-field
-              template(v-for="(icon, key) in info.icons")
-                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': icon.active}") 
+              template(v-for="(icon, key) in icons")
+                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': isActive(key, index)}") 
   .add-row
     .add-row__plus(@click="addNewRow")
       span +
@@ -99,19 +100,35 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
-      fullInfo: [],
       changedRate: '',
+      currentSource: {},
+      currentTarget: {},
       currentActive: -1,
       notUnique: false,
       editing: false,
       uniqueComb: {source: "", target: "", industry: ""},
       showValidError: false,
       validError: [],
+      isIndustryActive: true,
+      icons: {
+        save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
+        edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
+        delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+      }
     }
   },
 
   methods: {
+    isActive(key, index) {
+      if(this.currentActive === index) {
+        return key === "save" || key === "delete";
+      }
+      if(this.currentActive !== index) {
+        return key === "edit" || key === "delete";
+      }
+    },
     addSevLangs() {
+      this.storeServiceWhenAddSeveral(this.serviceSelect.title);
       this.$emit('addSevLangs', this.fullInfo);
     },
     closeErrorMessage() {
@@ -142,11 +159,11 @@ export default {
         }, 100)
       }
     },
-    changeSource(data) {
-      this.fullInfo[data.index].sourceLanguage = data.lang;
+    changeSource({lang, index}) {
+      this.currentSource = lang;
     },
-    changeTarget(data) {
-      this.fullInfo[data.index].targetLanguage = data.lang;
+    changeTarget({lang, index}) {
+      this.currentTarget = lang;
     },
     changeIndustry(data) {
       if(this.industrySelected[0].name == 'All') {
@@ -172,14 +189,13 @@ export default {
         })
       }
     },
-    chosenServ(data) {
+    setServiceFilter(data) {
       if(this.serviceSelect.title != data.title) {
         this.serviceSelect = data;
-        this.fullInfo = [];
-        this.combinations();
+        this.getAllCombinations();
       }
     },
-    chosenSource(data) {
+    setSourceFilter(data) {
       if(this.sourceSelect[0] == 'All') {
         this.sourceSelect = [];
         this.sourceSelect.push(data.lang.symbol)
@@ -195,7 +211,7 @@ export default {
         this.sourceSelect = ['All'];
       }
     },
-    chosenTarget(data) {
+    setTargetFilter(data) {
       if(this.targetSelect[0] == 'All') {
         this.targetSelect = [];
         this.targetSelect.push(data.lang.symbol)
@@ -211,7 +227,7 @@ export default {
         this.targetSelect = ['All'];
       }
     },
-    chosenInd(data) {
+    setIndustryFilter(data) {
       if(this.industryFilter[0].name == 'All') {
         this.industryFilter.splice(0, 1, data.industry);
       } else {
@@ -235,15 +251,20 @@ export default {
     },
     async action(index, key) {
       if(this.currentActive !== -1) {
-        if(index != this.currentActive) {
+        if(index !== this.currentActive) {
           return this.editing = true;
         }
       }
       if(key === 'save') {
-        return await this.checkErrors(index)
+        if(this.currentActive !== index) {
+          return
+        }
+        return await this.checkErrors(index);
       }
 
       if(key === 'edit') {
+        this.currentSource = this.fullInfo[index].sourceLanguage;
+        this.currentTarget = this.fullInfo[index].targetLanguage;
         return this.editRate(index);
       }
 
@@ -253,8 +274,8 @@ export default {
     },
     async checkErrors(index) {
         this.validError = [];
-        if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
-        if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
+        if(!this.currentSource) this.validError.push("Please, choose the source language!");
+        if(!this.currentTarget) this.validError.push("Please, choose the target language!");
         if(this.changedRate <= 0) this.validError.push("Please set the correct rate value!");
         if(this.validError.length) {
           this.showValidError = true;
@@ -269,12 +290,12 @@ export default {
         if(ind != index) {
           for(let indus of this.industrySelected) {
           if((indus.name == this.fullInfo[ind].industry[0].name || indus.name == 'All') &&
-            this.fullInfo[index].sourceLanguage.lang == this.fullInfo[ind].sourceLanguage.lang &&
-            this.fullInfo[index].targetLanguage.lang == this.fullInfo[ind].targetLanguage.lang) {
+            this.currentSource.lang == this.fullInfo[ind].sourceLanguage.lang &&
+            this.currentTarget.lang == this.fullInfo[ind].targetLanguage.lang) {
               exist = true;
               this.uniqueComb = {
-                source: this.fullInfo[index].sourceLanguage.lang,
-                target: this.fullInfo[index].targetLanguage.lang,
+                source: this.currentTarget.lang,
+                target: this.currentTarget.lang,
                 industry: indus.name,
               }
               break;
@@ -286,28 +307,26 @@ export default {
       return exist;     
     },
     async saveRates(index) {
-      if(!this.fullInfo[index].icons.save.active) {
-        return
-      }
       if(!this.uniqueCheck(index)) {
-        this.fullInfo[index].icons.save.active = false;
-        this.fullInfo[index].icons.edit.active = true;
-        this.fullInfo[index].industry = [];
-        
+        let info = {
+          title: this.serviceSelect.title,
+          sourceLanguage: this.currentSource,
+          targetLanguage: this.currentTarget,
+          industry: []  
+        };
         for(let elem of this.industrySelected) {
           elem.rate = this.changedRate;
           elem.active = true;
-          this.fullInfo[index].industry.push(elem)
+          info.industry.push(elem)
         };
         try {
-          await this.$http.post('/service/rates', this.fullInfo[index]);
-          await this.combinations();
+          await this.$http.post('/service/rates', info);
+          await this.getAllCombinations();
           this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
         } catch(err) {
           this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
         }
         this.currentActive = -1;
-        this.refreshServices();
       } else {
         this.notUnique = true;
       }
@@ -318,9 +337,7 @@ export default {
         this.industrySelected = [];
         this.industrySelected.push(elem)  
       }
-      this.changedRate = this.fullInfo[index].industry[0].rate;
-      this.fullInfo[index].icons.edit.active = false;
-      this.fullInfo[index].icons.save.active = true;   
+      this.changedRate = this.fullInfo[index].industry[0].rate;  
     },
     async deleteRate(index) {
       try {
@@ -328,10 +345,9 @@ export default {
           serviceId: this.serviceSelect._id,
           industries: this.fullInfo[index].industry,
         }
-        await this.$http.delete(`/service/rate/${this.fullInfo[index].id}`, {body: deletedRate});
-        this.fullInfo.splice(index, 1);
+        await this.deleteServiceRate({ id: this.fullInfo[index].id, deletedRate });
+        await this.getDuoCombinations(this.serviceSelect.title);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
-        this.refreshServices();
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
       }
@@ -348,12 +364,7 @@ export default {
         title: this.serviceSelect.title,
         sourceLanguage: "", 
         targetLanguage: "", 
-        industry: [{name: "All", rate: 0.1, active: true}],  
-        icons: {
-          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
-          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
-          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        }
+        industry: [{name: "All", rate: 0.1, active: true}],
       });
       this.currentActive = this.fullInfo.length-1;
       this.changedRate = this.fullInfo[this.currentActive].industry[0].rate;
@@ -361,17 +372,9 @@ export default {
         this.handleScroll();
       }, 0)
     },
-    async combinations() {
+    async getAllCombinations() {
       try {
-        const result = await this.$http.get(`/service/parsed-rates?title=${this.serviceSelect.title}&form=Duo`)
-        this.fullInfo = result.body;
-        for(let info of this.fullInfo) {
-          info.icons = {
-            save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-            edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-            delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-          }
-        }
+        await this.getDuoCombinations(this.serviceSelect.title);
       } catch(err) {
         this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
       }
@@ -382,12 +385,17 @@ export default {
       })
     },
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      getDuoCombinations: "getDuoCombinations",
+      storeDuoRates: "storeDuoRates",
+      storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
+      deleteServiceRate: "deleteServiceRate"
     })
   },
   computed: {
     ...mapGetters({
-      vuexServices: "getVuexServices"
+      vuexServices: "getVuexServices",
+      fullInfo: "getDuoRates"
     }),
     filterIndustry() {
       let result = [];
@@ -431,9 +439,9 @@ export default {
     IndustrySelect,
     ServiceSingleSelect,
   },
-  mounted() {
-    this.combinations();
+  created() {
     this.defaultService();
+    this.getAllCombinations();
   }
 };
 </script>
@@ -458,7 +466,6 @@ export default {
   }
   tbody {
     height: 184px;
-    // max-height: 173px;
     overflow-y: scroll;
     transition: all 0.3s;
   }

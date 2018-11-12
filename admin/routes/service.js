@@ -120,7 +120,6 @@ router.post('/step-payables', async (req, res) => {
 router.post('/rates', async (req, res) => {
   try {
     let rate = req.body;
-    let rates = [];
     let industries = await Industries.find();
     let service = await getOneService({'title': rate.title});
 

@@ -125,7 +125,6 @@ export default {
             try {
                 if(this.origin == 'rates') {
                     const result = await this.$http.post('/service/several-langs', JSON.stringify(languageCombinations));
-                    this.$emit('refreshServices');
                 }
                 if(this.origin == 'vendor') {
                     const id = this.who._id;

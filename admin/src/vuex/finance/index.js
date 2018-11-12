@@ -4,6 +4,9 @@ import { mutations } from './mutations';
 
 const state = {
     counter: 0,
+    duoRates: [],
+    monoRates: [],
+    serviceWhenAddSeveral: ""
 }
 
 export const finance = {
