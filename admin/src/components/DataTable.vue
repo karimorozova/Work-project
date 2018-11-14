@@ -1,6 +1,6 @@
 <template lang="pug">
 .table
-    .table__thead(:class="{'table_scroll-padding': hasScroll}")
+    .table__thead
         .table__head-row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.headerKey" :field="field")

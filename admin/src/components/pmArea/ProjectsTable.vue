@@ -72,8 +72,8 @@ export default {
     data() {
         return {
             fields: [
-                {label: "ID", headerKey: "headerProjectiId", key: "projectId", width: "10%"},
-                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "11%"},
+                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "9%"},
+                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%"},
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
                 {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "12%"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
@@ -83,7 +83,7 @@ export default {
                 {label: "Start date", headerKey: "headerCreatedAt", key: "createdAt", width: "7%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
                 {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
-                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "3%"},
+                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
             ],
         }
     },
