@@ -1,21 +1,18 @@
 const nodemailer = require('nodemailer');
+const apiUrl = require("../helpers/apiurl");
 
 const sendMailClient = function(request) {
     var detailFile = "";
     if (request.detailFiles.length > 0) {
       for (var i = 0; i < request.detailFiles.length; i++) {
-        detailFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-        detailFile += request.detailFiles[i];
-        detailFile += "' download target='_self'>" + request.detailFiles[i] + "</a><br/>";
+        detailFile += `<a href=${apiUrl}/reqfiles/${request.id}/${request.detailFiles[i]} download target='_self'>${request.detailFiles[i]}</a><br/>`;
       }
     }
 
     var referenceFile = "";
     if (request.refFiles.length > 0) {
       for (var i = 0; i < request.refFiles.length; i++) {
-        referenceFile += "<a href='http://admin.pangea.global/reqfiles/" + request.id + "/";
-        referenceFile += request.refFiles[i];
-        referenceFile += "' download target='_self'>" + request.refFiles[i] + "</a><br/>";
+        referenceFile += `<a href=${apiUrl}/reqfiles/${request.id}/${request.refFiles[i]} download target='_self'>${request.refFiles[i]}</a><br/>`;
       }
     }
 

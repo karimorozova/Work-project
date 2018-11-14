@@ -22,6 +22,9 @@ function moveFile(oldFile, requestId) {
   mv(oldFile.path, newFile, {
     mkdirp: true
   }, function (err) {
+    if(err) {
+      console.log("moveFile error in posting request" + err);
+    }
   });
 
   return oldFile.filename;
