@@ -92,16 +92,6 @@ export default {
           imgBrown: require("../assets/images/CATEGORIES/clients.png"),
           active: false
         },
-        // {
-        //   title: "QUOTES",
-        //   imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
-        //   active: false
-        // },
-        // {
-        //   title: "PROJECTS",
-        //   imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
-        //   active: false
-        // },
         {
           title: "PM AREA",
           imgBrown: require("../assets/images/CATEGORIES/pm-brown.png"),

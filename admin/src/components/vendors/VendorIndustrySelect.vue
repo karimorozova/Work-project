@@ -57,7 +57,7 @@ export default {
         },
         async getIndustries() {
             try {
-                const allIndustries = await this.$http.get('api/industries')
+                const allIndustries = await this.$http.get('/api/industries')
                 let sortedArray = allIndustries.data.filter(item => {
                     if (item.name != 'More') {
                         return item

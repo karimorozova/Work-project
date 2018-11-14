@@ -120,6 +120,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    overflow: hidden;
     .all-projects__filters &, .project-info__drop-menu & {
         border: 1px solid #67573E;
         height: 28px;

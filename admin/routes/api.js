@@ -6,7 +6,7 @@ const ClientApi = require('../models/xtrf/client');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
-const { Requests, Projects, Languages, Services, Industries, Timezones, User, Vendors } = require('../models');
+const { Requests, Projects, Languages, Services, Industries, Timezones, LeadSource, Vendors } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
@@ -356,6 +356,17 @@ router.get('/countries', (req, res) => {
   } catch(err) {
     console.log(err)
     res.status(500).send("Error on getting countries");
+  }
+})
+
+router.get('/leadsources', async (req, res) => {
+  try {
+    const leadsources = await LeadSource.find({});
+    const result = leadsources.map(item => item.source);
+    res.send(result);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on getting lead sources from DB")
   }
 })
 

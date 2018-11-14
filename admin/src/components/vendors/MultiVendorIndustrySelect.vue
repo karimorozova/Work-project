@@ -5,7 +5,6 @@
                 .selected
                     .industry-tooltip(v-for="item in selectedInd")
                         img(:src="item.icon")
-                        //- span.toolTip {{ selectedInd[0].name }}
             template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
                 span.selected.no-industry Options
             .arrow-button(@click.stop="showInds")

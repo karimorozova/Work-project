@@ -1,4 +1,5 @@
 const { Vendors } = require("../../models/");
+const { getVendor } = require("./getVendors");
 
 function getUpdatedLangPairs({ source, target, langPairs }) {
     let pairs = [...langPairs];
@@ -116,7 +117,7 @@ async function deleteRate(vendor, industry, id) {
     return result;
 }
 
-async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langPairs, industry}) {
+async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, industry}) {
     let industries = comb.industry[0].name === "All" ? addAllIndustries(comb.industry[0], industry) : comb.industry;
     let isExist = false;
     let updatedCombinations = [...vendorCombinations];
@@ -131,7 +132,8 @@ async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, langP
         industries = industries.map(item => {
             return {industry: item._id, rate: item.rate, active: item.active}
         })
-        let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs});
+        const vendor = await getVendor({"_id": vendorId});
+        let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs: vendor.languagePairs});
         await Vendors.updateOne({"_id": vendorId}, {$push: {languageCombinations: {...comb, industry: industries}}, $set: {languagePairs: updatedLanguagePairs}})
     } else {
         await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
@@ -143,7 +145,7 @@ function addAllIndustries(combIndustry, clientIndustry) {
     for(let indus of clientIndustry) {
         industries.push({
             ...indus._doc,
-            id: indus.id,
+            _id: indus.id,
             rate: combIndustry.rate
         })
     }
@@ -161,7 +163,11 @@ function updateCombination(combIndustries, vendorIndustries) {
             }
         }
         if(!industryExist) {
-            updatedIndustries.push(indus);
+            updatedIndustries.push({
+                industry: indus._id,
+                rate: indus.rate,
+                active: indus.active,
+            });
         }
     }
     return updatedIndustries;

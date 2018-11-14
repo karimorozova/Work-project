@@ -2,7 +2,7 @@
 .sidebar
     span.sidebar__title(v-if="title") {{ title }}
     .sidebar__inner
-      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)") {{ link }}
+      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="linkClass") {{ link }}
 </template>
 
 <script>
@@ -12,6 +12,9 @@ export default {
             type: Array
         },
         title: {
+            type: String
+        },
+        linkClass: {
             type: String
         }
     },
@@ -56,6 +59,9 @@ export default {
         &:nth-child(2) {
             border: none;
         }
-    }  
+    }
+    .client-details {
+        font-size: 16px;
+    }
 }
 </style>

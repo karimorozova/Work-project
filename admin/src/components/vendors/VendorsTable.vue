@@ -401,8 +401,8 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 10px #67573E;
-        background-color: #FFF;
+        box-shadow: 0 0 10px $main-color;
+        background-color: $white;
         z-index: 20;
         p {
             font-size: 21px;

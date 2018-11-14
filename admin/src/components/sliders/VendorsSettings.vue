@@ -16,7 +16,7 @@ export default {
     return {
       sidebarShow: false,
       allVendors: true,
-      sidebarLinks:["General Information"]
+      sidebarLinks: ["General Information"]
     }
   },
   methods: {

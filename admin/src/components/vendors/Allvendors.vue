@@ -45,8 +45,8 @@ export default {
 
 .vendors-data {
     position: relative;
-    margin-left: 20px;
-    margin-top: 20px;
+    margin-left: 40px;
+    margin-top: 40px;
     &__title {
         font-size: 22px;
         margin-bottom: 20px;

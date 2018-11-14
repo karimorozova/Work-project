@@ -1,5 +1,5 @@
 <template lang="pug">
-.custom-radio(@click="toggle")
+.custom-radio(@click.stop="toggle")
     .custom-radio__inside-circle(:class="{'custom-radio_checked': isChecked}")
 </template>
 

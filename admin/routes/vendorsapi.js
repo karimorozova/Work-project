@@ -142,7 +142,6 @@ router.post('/several-langs', async (req, res) => {
                 vendorId: vendorId,
                 comb: comb,
                 vendorCombinations: vendorCombinations,
-                langPairs: vendor.languagePairs,
                 industry: vendor.industry
             })
         }
