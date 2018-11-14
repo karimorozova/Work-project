@@ -32,19 +32,17 @@ async function checkRatesMatch(vendor, industries, rate) {
     let languagePairs = [...vendor.languagePairs];
     if(languageCombinations.length) {
         for(let comb of languageCombinations) {
-        if(comb.service.title == rate.service.title && comb.source.lang == rate.sourceLanguage.lang &&
-            comb.target.lang == rate.targetLanguage.lang) {
+        if(comb.service.id === rate.service._id && comb.source.id === rate.sourceLanguage._id &&
+            comb.target.id === rate.targetLanguage._id) {
                 for(let ind of comb.industry) {
                     for(let indus of rate.industry) {
                         if(ind.industry.id == indus._id || indus.name == "All") {
-                            comb.industry = industries;
+                            ind.rate = indus.rate;
+                            ind.active = indus.active;
                         }
                     }
                 }
                 exist = true;
-            }
-            if(exist) {
-                break
             }
         }
     }
@@ -65,21 +63,18 @@ async function checkMonoRatesMatches(vendor, industries, rate) {
     let exist = false;
     if(vendor.languageCombinations.length) {
         for(let elem of rate.industry) {
-        for(let comb of vendor.languageCombinations) {
-            if(rate.targetLanguage._id == comb.target.id && !comb.source) {
-            exist = true;
-            for(let indus of comb.industry) {
-                if(elem._id == indus.industry.id || elem.name == 'All') {
-                    indus.rate = elem.rate
-                    indus.active = elem.active;
-                    indus.package = elem.package
+            for(let comb of vendor.languageCombinations) {
+                if(rate.targetLanguage._id == comb.target.id && !comb.source) {
+                    exist = true;
+                    for(let indus of comb.industry) {
+                        if(elem._id == indus.industry.id || elem.name == 'All') {
+                            indus.rate = elem.rate
+                            indus.active = elem.active;
+                            indus.package = elem.package
+                        }
+                    }
                 }
             }
-            }
-        }
-        if(exist) {
-            break;
-        }
         }
     }
     if(!exist || !vendor.languageCombinations.length) {
