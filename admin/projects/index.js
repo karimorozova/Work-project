@@ -1,6 +1,6 @@
 const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTaskMetrics, calcCost, taskMetricsCalc } = require('./calculations');
 const { getProject, getProjects, updateProject } = require('./getProjects');
-const { storeFiles } = require('./files');
+const { storeFiles, deleteCopiedFiles } = require('./files');
 const { changeProjectProp, cancelTasks, cancelSteps } = require('./updates');
 
 const projectFunctions = {
@@ -12,6 +12,7 @@ const projectFunctions = {
     getProjects,
     updateProject,
     storeFiles,
+    deleteCopiedFiles,
     updateTaskMetrics,
     taskMetricsCalc,
     calcCost,

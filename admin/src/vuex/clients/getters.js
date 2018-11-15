@@ -1,0 +1,1 @@
+export const getCurrentClient = state => state.currentClient;

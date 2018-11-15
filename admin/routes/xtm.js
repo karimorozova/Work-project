@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload , moveFile } = require('../utils/');
 const { Requests, Projects, Clients, Languages, Services, Industries } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress } = require('../services/');
-const { getProject, updateProject, updateProjectCosts, metricsCalc, storeFiles, calcCost, taskMetricsCalc } = require('../projects/');
+const { getProject, updateProject, updateProjectCosts, metricsCalc, storeFiles, deleteCopiedFiles, calcCost, taskMetricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -19,12 +19,9 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     let workflow = tasksInfo.workflow || 2917;
     try {
         let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        const filesToTranslate = await storeFiles(sourceFiles, tasksInfo.projectId);
-        const referenceFiles = await storeFiles(refFiles, tasksInfo.projectId);
-        let translationFiles = {};
-        for(let index in filesToTranslate) {
-            translationFiles[`translationFiles[${index}].file`] = filesToTranslate[index];
-        }
+        const filesToTranslate = sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
+        const referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+        await deleteCopiedFiles();
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         let tasksLength = project.tasks.length + 1;
         for(let target of tasksInfo.targets) {
@@ -34,7 +31,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
                 name: name,
                 source: tasksInfo.source.xtm,
                 target: target.xtm,
-                translationFiles: translationFiles,
+                sourceFiles: filesToTranslate,
+                refFiels: referenceFiles,
                 templateId: template,
                 workflowId: workflow,
                 join: tasksInfo.join

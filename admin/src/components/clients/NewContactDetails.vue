@@ -1,11 +1,10 @@
 <template lang="pug">
     .contact-wrap
+        .contact-wrap__buttons
+            input.button(type="button" value="Save" @click="contactSave")
+            input.button(type="button" value="Cancel" @click="cancel")
         .title 
             span Contact Details
-            .title__buttons
-                input.button(type="button" value="Save" @click="contactSave")
-                input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete" @click="deleteContact")
         .details
             .details__item
                 .photo-wrap(v-if="!contact.photo")
@@ -38,9 +37,9 @@
                                 .arrow-button(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
-                                .drop__item(@click="() => contact.gender = 'Male'")
+                                .drop__item(@click="setGender('Male')")
                                     span Male
-                                .drop__item(@click="() => contact.gender = 'Female'")
+                                .drop__item(@click="setGender('Female')")
                                     span Female
             .details__item
                 label Position:
@@ -53,10 +52,10 @@
                 input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
             .details__item
                 label Country:
-                CountriesSelect(:countrySelected="contact.country" :countries="countries" @chosenCountry="chosenCountry")
+                CountriesSelect(:countrySelected="contact.country" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                TimezoneSelect(:timezoneSelected="contact.timezone" :timezones="timezones" @chosenZone="chosenZone")
+                TimezoneSelect(:timezoneSelected="contact.timezone" @chosenZone="chosenZone")
             .details__item
                 label Notes:
                 textarea.non-personal(type="text" placeholder="Type" v-model="contact.notes")
@@ -72,14 +71,6 @@ import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
 
 export default {
-    props: {
-        client: {
-            type: Object
-        },
-        ind: {
-            type: Number
-        }
-    },
     data() {
         return {
             contact: {
@@ -90,19 +81,12 @@ export default {
                 email: "",
                 gender: "",
                 phone: "",
-                icons:[
-                    {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
-                    ]
-                ,
                 photo: "",
                 skype: "",
                 position: "",
                 notes: "",
                 leadContact: false
             },
-            countries: [],
-            timezones: [],
             imageExist: false,
             genderDropped: false,
             approveShow: false,
@@ -129,6 +113,10 @@ export default {
         outGenders() {
             this.genderDropped = false;
         },
+        setGender(gen) {
+            this.contact.gender = gen;
+            this.outGenders();
+        },
         cancel() {
             this.$emit('cancel');
         },
@@ -147,25 +135,7 @@ export default {
             this.contact.timezone = data;
         },
         contactSave() {
-            this.$emit('contactSave', {contact: this.contact, file: this.photoFile[0], ind: this.ind})
-        },
-        getCountries() {
-            this.$http.get('https://restcountries.eu/rest/v2/all')
-            .then(res => {
-                this.countries = res.body;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        getTimezones() {
-            this.$http.get('/api/timezones')
-            .then(res => {
-                this.timezones = res.body;
-            })
-            .catch(err => {
-                console.log(err)
-            })
+            this.$emit('contactSave', {contact: this.contact, file: this.photoFile[0]})
         }
     },
     computed: {
@@ -177,10 +147,6 @@ export default {
     },
     directives: {
         ClickOutside
-    },
-    mounted() {
-        this.getCountries();
-        this.getTimezones();
     }
 }
 </script>
@@ -188,29 +154,25 @@ export default {
 <style lang="scss" scoped>
 
 .contact-wrap {
-    width: 1066px;
     font-size: 14px;
     position: relative;
     label {
         margin-bottom: 0;
     }
-}
-
-.title {
-    font-size: 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     &__buttons {
-        width: 474px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
     }
 }
 
+.title {
+    font-size: 22px;
+}
+
 .button {
     width: 138px;
+    margin-left: 30px;
     height: 33px;
     color: white;
     font-size: 14px;
@@ -314,6 +276,7 @@ textarea.non-personal {
     height: 60px;
     resize: none;
     padding-top: 5px;
+    color: #67573E;
 }
 
 ::-webkit-input-placeholder {

@@ -1,7 +1,7 @@
 <template lang="pug">
     .all-clients
         .title(v-if="!clientData") All Clients
-        .clients-table(v-if="!clientData")
+        .all-clients__table(v-if="!clientData")
             .filters
                 .filters__block
                     .filters-item
@@ -9,71 +9,23 @@
                         input.filter-field(type="text" placeholder="Company Name" v-model="filterName")
                     .filters-item
                         label Status
-                        ClientStatusSelect(:selectedStatus="filterStatus" @chosenStatus="chosenStatus")
+                        ClientStatusSelect(:isAllExist="isAllStatusExist" :selectedStatus="filterStatus" @chosenStatus="chosenStatus")
                 .filters__block
                     .filters-item
                         label Industry
-                        ClientIndustrySelect(:selectedInd="industryFilter" @chosenInd="chosenInd")
+                        ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
                     .filters-item
                         label Lead Source
-                        ClientLeadsourceSelect(:selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
+                        ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
                 .filters__block
-                    input.add-button(type="submit" value="Add client" @click="addClient")            
-            table
-                thead
-                    tr
-                        th 
-                            .head-title
-                                span Company Name
-                        th
-                            .head-title
-                                span Status
-                        th
-                            .head-title
-                                span Website
-                        th
-                            .head-title
-                                span Industry
-                        th
-                            .head-title
-                                span Lead Source                   
-                        th
-                tbody
-                    tr(v-for="(client, ind) in allClients")  
-                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
-                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.name")
-                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
-                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.status")
-                        td(:class="{editing: !client.icons[0].active}" @click="clientDetails(ind)") 
-                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.website")
-                        td.drop-option(@click="clientDetails(ind)")              
-                            //- span(v-if="!client.industry.icon") {{ client.industry.name }}
-                            .drop-option__image
-                                img(v-for="indus in client.industry" :src="indus.icon")
-                                //- span.titleTooltip {{ client.industry.name }} 
-                            .inner-component(v-if="!client.icons[0].active")
-                                MultiClientIndustrySelect(:selectedInd="industrySelected" :filteredIndustries="selectedIndNames" :parentInd="ind" @chosenInd="changeIndustry")
-                        td(@click="clientDetails(ind)")
-                            input.contact-info(type="text" :readonly="client.icons[0].active" v-model="client.leadSource")                        
-                        td
-                            .crud-icons
-                                img(v-for="(but, i) in client.icons" :src='but.icon' :class="{'not-active': !but.active}" @click="action(ind, i)")
-        .clients__data(v-if="clientData")
-            ClientDetails(:client="client"
-                :newClient="newClient"
-                :addSeveral="addSeveral"
-                @clientDelete="clientDelete"
-                @newContact="addNewContact"
-                @refreshClients="refreshClients"
-                @cancel="clientCancel"
-                @contactCancel="contactCancel"
-                @deleteContact="deleteContact"
-                @chosenInd="changeIndustry"
-                @chosenStatus="changeStatus"
-                @chosenAccManager="changeAccManager"
-                @chosenSalesManager="changeSalesManager"
-                @chosenProjManager="changeProjManager"
-                @addSevLangs="addSevLangs")
+                    input.add-button(type="submit" value="Add client" @click="addClient")
+            ClientsTable(
+                :filterName="filterName"
+                :filterStatus="filterStatus"
+                :filterLeadsource="filterLeadsource"
+                :filterIndustry="industryFilter"
+                @showClientDetails="showClientDetails"
+            )
         Addseverallangs(v-if="addSeveral"
             :who="client"
             :origin="'client'"
@@ -82,27 +34,27 @@
 </template>
 
 <script>
+import ClientsTable from "./ClientsTable";
 import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import MultiClientIndustrySelect from '../clients/MultiClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
-import ClientDetails from '../clients/ClientDetails';
 import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
-            newClient: false,
-            client: {},
-            clients: [],
             clientData: false,
             filterName: "",
             filterStatus: "",
-            industryFilter: [{name: 'All'}],
+            industryFilter: {name: 'All'},
             filterLeadsource: "",
             industrySelected: [],
-            addSeveral: false
+            addSeveral: false,
+            isAllIndustyFilter: true,
+            isAllStatusExist: true,
+            isAllLeadExist: true
         }
     },
     methods: {
@@ -112,66 +64,18 @@ export default {
         closeSevLangs(data) {
             this.addSeveral = false
         },
-        changeInd(data) {
-            this.client.industry = data;
-        },
-        changeStatus(data) {
-            this.client.status = data;
-        },
-        changeAccManager({manager}) {
-            this.client.accountManager = manager;
-        },
-        changeSalesManager({manager}) {
-            this.client.salesManager = manager;
-        },
-        changeProjManager({manager}) {
-            this.client.projectManager = manager;
-        },
-        clientCancel(data) {
+        clientCancel() {
             this.clientData = false;
-            this.refreshClients();
             this.$emit('clientCancel');
         },
-        contactCancel(data) {
-            // if(!this.newClient) {
-            //     this.refreshClients();
-            // }
+        showClientDetails({id}) {
+            this.$router.push(`/clients/${id}`);
         },
         clientDetails(ind) {
-            if(this.allClients[ind].icons[0].active) {
-                this.client = this.allClients[ind];
-                this.clientData = true;
-                this.newClient = false;
-                this.$emit('chosenClient');
-            }
+            this.$router.push(`/clients/${this.allClients[ind]._id}`);
         },
         addClient() {
-            this.client = {
-                name: "",
-                officialName: "",
-                status: "",
-                website: "",
-                contract: "",
-                nda: "",
-                accountManager: "",
-                salesManager: "",
-                projectManager: "",
-                leadSource: "",
-                salesComission: "",
-                contactName: "",
-                email: "",
-                vat: "",
-                address: "",
-                languageCombinations: [],
-                industry: [],
-                contacts: []
-            };
-            this.clientData = true;
-            this.newClient = true;
-            this.$emit('chosenClient');
-        },
-        addNewContact(data) {
-            this.client.contacts.push(data.contact)
+            this.$router.push('/new-client');
         },
         deleteContact(data) {
             let id = this.client._id;
@@ -184,53 +88,14 @@ export default {
                 consol.elog(err)
             })
         },
-        chosenLeadsource(data) {
-            this.filterLeadsource = data;
+        chosenLeadsource({leadSource}) {
+            this.filterLeadsource = leadSource;
         },
-        chosenStatus(data) {
-            this.filterStatus = data;
+        chosenStatus({status}) {
+            this.filterStatus = status;
         },
-        chosenInd(data) {
-            this.industryFilter = [data.industry];
-        },
-        changeIndustry(data) {
-            if(!this.clientData) {
-                let exist = false;
-                for(let ind in this.industrySelected) {
-                    if(this.industrySelected[ind].name == data.industry.name) {
-                        this.industrySelected.splice(ind, 1);
-                        exist = true;
-                    }
-                }
-                if(!exist) {
-                    this.industrySelected.push(data.industry);
-                }
-                let client = this.allClients[data.index];
-                for(let cli of this.clients) {
-                    if(client._id == cli._id && !cli.icons[1].active) {
-                        cli.industry = this.industrySelected;
-                    }
-                }
-            } else {
-                let exist = false;
-                for(let ind in this.client.industry) {
-                    if(this.client.industry[ind].name == data.industry.name) {
-                        this.client.industry.splice(ind, 1);
-                        exist = true;
-                    }
-                }
-                if(!exist) {
-                    this.client.industry.push(data.industry);
-                }
-            }
-        },
-        chooseLead(ind) {
-            if(!this.allClients[ind].icons[0].active) {
-                for(let client of this.allClients) {
-                    client.leadContact = false;
-                }
-                this.allClients[ind].leadContact = true;
-            }
+        chosenInd({industry}) {
+            this.industryFilter = industry;
         },
         action(ind, i) {
             if(i == 0) {
@@ -264,90 +129,21 @@ export default {
             this.getclients();
             this.$emit('clientCancel');
         },
-        async refreshClients(data) {
-            try {
-                let result = await this.getclients();
-                if(data && data.clientId) {
-                    this.client = this.clients.find(item => {
-                        if(item._id == data.clientId) {
-                            return item
-                        }
-                    })
-                }
-                this.alertToggle({message: "Information updated", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Internal server error / Cannot get Clients", isShow: true, type: "error"});
-            }
-        },
-        async getclients() {
-            this.clients = [];
-            let result = await this.$http.get('/all-clients');
-            for(let client of result.body) {
-                client.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                    {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}];
-                for(let cont of client.contacts) {
-                    cont.icons = [{name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                        {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}]
-                }
-                this.clients.push(client);
-            }
-        },
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            storeCurrentClient: "storeCurrentClient"
         })
     },
-    computed: {
-        allClients() {
-            let result = this.clients;
-            if(this.filterName) {
-                result = result.filter(item => {
-                    return item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) != -1;
-                })
-            }
-            if(this.filterStatus) {
-                result = result.filter(item => {
-                    return item.status == this.filterStatus;
-                })
-            }
-            if(this.industryFilter[0].name != 'All') {
-                result = result.filter(item => {
-                    let exist = false;
-                    for(let indus of item.industry) {
-                        if(indus.name == this.industryFilter[0].name) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if(exist) {
-                        return item
-                    }
-                })
-            }
-            if(this.filterLeadsource) {
-                result = result.filter(item => {
-                    return item.leadSource == this.filterLeadsource;
-                })
-            }
-            return result;
-        },
-        selectedIndNames() {
-            let result = [];
-            for(let ind of this.industrySelected) {
-                result.push(ind.name);
-            }
-            return result;
-        },
-    },
     components: {
+        ClientsTable,
         ClientIndustrySelect,
         MultiClientIndustrySelect,
         ClientStatusSelect,
         ClientLeadsourceSelect,
-        ClientDetails,
         Addseverallangs
     },
     mounted() {
-        this.getclients();
+        this.storeCurrentClient({});
     }
 }
 </script>
@@ -358,6 +154,7 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     position: relative;
+    width: 65%;
 }
 
 .title {
@@ -374,15 +171,15 @@ label {
     align-items: flex-end;
     margin-bottom: 20px;
     &__block {
-        width: 27%;
+        width: 24%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         &:nth-of-type(2) {
-            width: 30%;
+            width: 28%;
         }
         &:last-child {
-            width: 22%;
+            width: 19%;
         }
     }
 }
@@ -421,61 +218,14 @@ label {
     outline: none;
 }
 
-.clients-table {
-    width: 900px;
+.all-clients__table {
     margin: 40px;
-    padding: 30px;
+    padding: 20px;
     font-size: 14px;
     font-weight: normal;
     box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
-    table {
-        width: 100%;
-        border: 1px solid #67573E;
-        border-collapse: collapse;
-        thead {
-            background-color: #968A7E;
-            color: #FFF;
-        }
-    }
 }
-thead, tbody {
-    width: 100%;
-    display: block;
-}
-tbody {
-    overflow-y: scroll;
-}
-th, td {
-    width: 135px;
-    &:nth-of-type(3), &:nth-of-type(4) {
-        width: 180px;
-    }
-}
-th {
-    border-right: 1px solid #FFF;
-    padding: 5px 1px;
-    &:last-child {
-        border-right: none;
-        width: 117px
-    }
-    &:first-child {
-        padding-left: 0;
-    }
-}
-td {
-    border-right: 1px solid #67573E;
-    border-bottom: 1px solid #67573E;
-    &:last-child {
-        width: 102px;
-        border-right: none;
-    }
-    &:first-child {
-        padding-right: 0;
-    }
-    input {
-        color: #67573E;
-    }
-}
+
 .drop-option {
   position: relative;
   .inner-component {

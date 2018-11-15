@@ -4,7 +4,7 @@ const fs = require('fs');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
+const { getClient, getClients, getAfterUpdate, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 const { getProject } = require('../projects');
 const { emitter } = require('../events');
@@ -287,8 +287,8 @@ router.post('/update-client', upload.any(), async (req, res) => {
             await moveNdaCont(nda, clientId, "nda");
             client.nda = '/clientsDocs/' + clientId + '/nda/' + nda.filename;
         }
-        await Clients.updateOne({"_id": clientId}, client);
-        res.send({id: clientId})
+        const result = await getAfterUpdate({"_id": clientId}, client);
+        res.send({client: result})
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating/creating Client");
@@ -305,12 +305,13 @@ router.get('/get-nda', async (req, res) => {
     res.send(`${apiUrl}${path}`);
 })
 
-router.post('/deleteclient', async (req, res) => {
+router.delete('/deleteclient/:id', async (req, res) => {
+    const { id } = req.params;
     try {
-        await fse.remove('./dist/clientsDocs/' + req.body.id, (err) => {
-            console.log(err)
+        await fse.remove('./dist/clientsDocs/' + id, (err) => {
+            console.log(err);
         })
-        await Clients.deleteOne({"_id": req.body.id});
+        await Clients.deleteOne({"_id": id});
         res.send('Deleted')
     } catch(err) {
         console.log(err);
@@ -319,9 +320,10 @@ router.post('/deleteclient', async (req, res) => {
 })
 
 router.post('/deleteContact', async (req, res) => {
+    const { id, contacts } = req.body;
     try {
-        await Clients.updateOne({"_id": req.body.id}, {contacts: req.body.contacts})
-        res.send('Deleted')
+        const result = await getAfterUpdate({"_id": id}, {contacts: contacts})
+        res.send({updatedClient: result})
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting contact of Client");

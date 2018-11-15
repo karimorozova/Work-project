@@ -1,16 +1,15 @@
 <template lang="pug">
 .clients
-  .adminNavbar__slider.slider(v-if="sidebarShow")
-    span CLIENTS
-    .slider-inner
-      .slider-col General Information
-  .all-clients(v-if="allClients")
+  .clients__sidebar(v-if="sidebarShow")
+    Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
+  .clients__all(v-if="allClients")
     Allclients(@chosenClient="chosenClient"
       @clientCancel="clientCancel")
 </template>
 
 <script>
 import Allclients from '../clients/Allclients';
+import Sidebar from '../Sidebar';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -18,11 +17,11 @@ export default {
     return {
       allClients: true,
       sidebarShow: false,
+      sidebarLinks: ["General Information"]
     }
   },
   methods: {
     clientCancel(data) {
-      this.clientData = false;
       this.sidebarShow = false;
     },
     chosenClient(data) {
@@ -33,7 +32,8 @@ export default {
     })
   },
   components: {
-    Allclients
+    Allclients,
+    Sidebar
   },
   mounted() {
   }
@@ -43,9 +43,13 @@ export default {
 <style lang="scss" scoped>
 .clients {
   display: flex;
-  .all-clients, &__data, &__contact-details {
-    margin-top: 20px;
-    margin-left: 20px;
+  width: 100%;
+  &__all {
+    padding-top: 20px;
+    padding-left: 20px;
+  }
+  &__all {
+    width: 100%;
   }
 }
 .title {

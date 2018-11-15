@@ -7,6 +7,7 @@ const {
   Industries,
   Ratesduo,
   Timezones,
+  LeadSource,
   Clients,
   Vendors
 } = require('../models');
@@ -20,6 +21,7 @@ const {
   industriesDefault,
   ratesduoDefault,
   timezonesDefault,
+  leadSourcesDefault,
   clientsDefault,
   vendorsDefault
 } = require('./dbDefaultValue');
@@ -33,6 +35,24 @@ var instance = axios.create({
   }
 });
 
+function fillLeadSources() {
+  return LeadSource.find({})
+    .then(async sources => {
+      if(!sources.length) {
+        for(const source of leadSourcesDefault) {
+          await new LeadSource({ source }).save().then((times) => {
+
+          }).catch(err => {
+            console.log(`Leadsource ${source} hasn't been saved because of ${err.message}`)
+          })
+        }
+        console.log('Leadsources are saved!')
+      }
+    })
+    .catch(err => {
+      console.log('Something is wrong' + err)
+    })
+}
 
 function timeZones() {
   return Timezones.find({})
@@ -355,6 +375,7 @@ function industries() {
 }
 
 async function checkCollections() {
+  await fillLeadSources();
   await timeZones();
   await languages();
   await industries();

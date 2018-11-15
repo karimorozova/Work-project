@@ -6,10 +6,10 @@
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
                 span.selected.no-industry Options
-            .arrow-button(@click="showStatuses")
+            .arrow-button(@click.stop="showStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(status, index) in statuses" @click="changeStatus(index)" :class="{chosen: status == selectedStatus}")
+            .drop__item(v-for="(status, index) in allStatuses" @click.stop="changeStatus(index)" :class="{chosen: status == selectedStatus}")
                 span {{ status }}
 </template>
 
@@ -20,6 +20,9 @@ export default {
     props: {
         selectedStatus: {
             type: String
+        },
+        isAllExist: {
+            type: Boolean
         }
     },
     data() {
@@ -37,14 +40,22 @@ export default {
             this.dropped = false;
         },
         changeStatus(index) {
-            this.$emit("chosenStatus", this.statuses[index])
+            const option = this.allStatuses[index] === "All" ? "": this.allStatuses[index];
+            this.$emit("chosenStatus", {status: option});
+            this.outClick();
         }
     },
     directives: {
         ClickOutside
     },
-    mounted () {
-
+    computed: {
+        allStatuses() {
+            let result = this.statuses;
+            if(this.isAllExist) {
+                result.unshift("All");
+            }
+            return result;
+        }
     }
 }
 </script>
@@ -58,6 +69,11 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    .clients-table__drop-menu & {
+        width: 100%;
+        height: 30px;
+        border: none;
+    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -69,6 +85,10 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .clients-table__drop-menu & {
+            width: 77%;
+            max-height: 30px;
+        }
         .industry-tooltip {
             width: 40px;
             max-height: 28px;
@@ -96,11 +116,15 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
         .reverseIcon {
             transform: rotate(180deg);
+        }
+        .clients-table__drop-menu & {
+            width: 23%;
         }
     }
 }
@@ -108,12 +132,12 @@ export default {
     position: relative;
     .drop {
         position: absolute;
+        box-sizing: border-box;
         width: 100%;
         border: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;

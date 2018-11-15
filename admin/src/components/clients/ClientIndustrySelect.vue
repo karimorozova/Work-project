@@ -12,7 +12,7 @@
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
             .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
-                span {{ industry.name }}
+                span.drop__name {{ industry.name }}
 </template>
 
 <script>
@@ -25,6 +25,10 @@ export default {
         },
         parentInd: {
             type: Number
+        },
+        isAllExist: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -52,9 +56,9 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            await this.$http.get('api/industries')
-            .then(response => {
-                let sortedArray = response.data.filter(item => {
+            try {
+                const allIndustries = await this.$http.get('/api/industries')
+                let sortedArray = allIndustries.data.filter(item => {
                     if (item.name != 'More') {
                         return item
                     }
@@ -63,17 +67,20 @@ export default {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
                 });
+                if(this.isAllExist) {
+                    sortedArray.unshift({name: "All"});
+                }
                 this.industries = sortedArray;
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+            } catch(err) {
+                this.errors.push(err)
+            }
         },
         outClick() {
             this.droppedInd = false;
         },
         changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd})
+            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd});
+            this.outClick();
         }
     },
     directives: {
@@ -142,6 +149,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -154,13 +162,13 @@ export default {
     position: relative;
     .drop {
         font-size: 14px;
+        box-sizing: border-box;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: auto;
+        overflow-y: overlay;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;

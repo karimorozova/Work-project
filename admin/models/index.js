@@ -9,6 +9,7 @@ const Ratesduo = require('./ratesduo');
 const Timezones = require('./timezones');
 const Clients = require('./clients');
 const Vendors = require('./vendors');
+const LeadSource = require('./leadSource');
 
 const Models = {
     Languages,
@@ -20,6 +21,7 @@ const Models = {
     Industries,
     Ratesduo,
     Timezones,
+    LeadSource,
     Clients,
     Vendors
 };

@@ -1,25 +1,29 @@
 <template lang="pug">
     .clients-wrap
+        .clients-wrap__sidebar(v-if="sidebarShow")
+            Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
         .client-info(v-if="clientShow")
             .buttons
-                input.button(type="button" value="Save" @click="updateClient")
+                input.button(type="button" value="Save" @click="checkForErrors")
                 input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete" @click="deleteContact")
+                input.button(type="button" value="Delete" @click="deleteClient")
             .title General Information
-            .gen-info
+            .clients-wrap__gen-info
                 .gen-info__block
                     .block-item
                         label Company Name:
-                        input(type="text" placeholder="Company Name" v-model="client.name")
+                        input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'clients-wrap_error-shadow': !currentClient.name && isSaveClicked}")
                     .block-item
                         label Website:
-                        input(type="text" placeholder="Website" v-model="client.website")
+                        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
                     .block-item
                         label Industry:
-                        MultiClientIndustrySelect(:selectedInd="client.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industry.length && isSaveClicked}")
+                            MultiClientIndustrySelect(:selectedInd="currentClient.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                     .block-item
                         label Status:
-                        ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="chosenStatus")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.status && isSaveClicked}")
+                            ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
                 .gen-info__block
                     .block-item
                         label Contract:
@@ -27,36 +31,47 @@
                             .contract__upload
                                 input.upload(type="file" @change="contractLoad")
                             .contract__download
-                                img(v-if="client.contract" src="../../assets/images/Other/Download-icon.png" @click="contractDownload")
+                                a(v-if="currentClient.contract" :href="currentClient.contract")
+                                    img(src="../../assets/images/Other/Download-icon.png")
                         label NDA:
                         .nda
                             .nda__upload
                                 input.upload(type="file" @change="ndaLoad")
                             .nda__download
-                                img(v-if="client.nda" src="../../assets/images/Other/Download-icon.png" @click="ndaDownload")
+                                a(v-if="currentClient.nda" :href="currentClient.nda")
+                                    img(v-if="currentClient.nda" src="../../assets/images/Other/Download-icon.png")
                     .block-item
                         label Account Manager:
-                        AMSelect(:selectedManager="client.accountManager" @chosenManager="chosenAccManager")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
+                            AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
                     .block-item
                         label Sales Manager:
-                        AMSelect(:selectedManager="client.salesManager" @chosenManager="chosenSalesManager")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
+                            AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
                     .block-item
                         label Project Manager:
-                        AMSelect(:selectedManager="client.projectManager" @chosenManager="chosenProjManager")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.projectManager && isSaveClicked}")
+                            AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
             .title Contact Details
-            .contacts-info
-                ContactsInfo(:client="client" @contactDetails="contactDetails" @newContact="addNewContact")
-            .title(v-if="client._id") Rates    
-            .rates(v-if="client._id")
-                ClientRates(:client="client"
+            .clients-wrap__contacts-info
+                ContactsInfo(
+                    :client="currentClient"
+                    @contactDetails="contactDetails" 
+                    @saveContactUpdates="saveContactUpdates"
+                    @setLeadContact="setLeadContact"
+                    @newContact="addNewContact"
+                    @approveDelete="approveContactDelete")
+            .title(v-if="currentClient._id") Rates    
+            .clients-wrap__rates(v-if="currentClient._id")
+                ClientRates(:client="currentClient"
                     @addSevLangs="addSevLangs"
                     @ratesUpdate="ratesUpdate")
             .title Sales Information
-            .sales
-                ClientSalesInfo(:client="client" @deleteContact="approveDelete")
+            .clients-wrap__sales
+                ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
             .title Billing Informations
-            .billing
-                ClientBillInfo(:client="client")
+            .clients-wrap__billing
+                ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
             .delete-approve(v-if="approveShow")
                 p Are you sure you want to delete?
                 input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
@@ -65,17 +80,20 @@
             ContactDetails(v-if="!newContact" 
                 @cancel="contactCancel"
                 @contactUpdate="contactUpdate"
-                @approveDelete="approveDelete"
-                :client="client"
-                :ind="contactInd")
+                @approveDelete="approveContactDelete"
+                :index="contactInd")
             NewContactDetails(v-if="newContact" 
-                :client="client" 
-                :ind="client.contacts.length" 
                 @contactSave="contactSave"
-                @cancel="contactCancel")           
+                @cancel="contactCancel")
+        .clients-wrap__errors(v-if="areErrorsExist")
+            .clients-wrap__messages
+                .clients-wrap__errors-title Errors:
+                li.clients-wrap__error(v-for="error in errors") {{ error }}
+                span.clients-wrap__close(@click="closeErrorsBlock") +      
 </template>
 
 <script>
+import Sidebar from '../Sidebar';
 import MultiClientIndustrySelect from './MultiClientIndustrySelect';
 import ClientStatusSelect from './ClientStatusSelect';
 import AMSelect from './AMSelect';
@@ -88,14 +106,6 @@ import NewContactDetails from '../clients/NewContactDetails';
 import { mapGetters, mapActions} from "vuex";
 
 export default {
-    props: {
-        client: {
-            type: Object
-        },
-        newClient: {
-            type: Boolean
-        }
-    },
     data() {
         return {
             approveShow: false,
@@ -105,7 +115,16 @@ export default {
             newContact: false,
             contractFile: [],
             ndaFile: [],
-            contactsPhotos: []
+            contactsPhotos: [],
+            client: {},
+            sidebarShow: true,
+            sidebarLinks: ["General Information"],
+            fromRoute: "/clients",
+            areErrorsExist: false,
+            errors: [],
+            billErrors: [],
+            isLeadEmpty: "",
+            isSaveClicked: false
         }
     },
     methods: {
@@ -113,94 +132,122 @@ export default {
             if(e.target.files && e.target.files[0]) {
                 this.contractFile = e.target.files;
             }
-            console.log(this.contractFile);
         },
         ndaLoad(e) {
             if(e.target.files && e.target.files[0]) {
                 this.ndaFile = e.target.files;
             }
-            console.log(this.ndaFile);
-        },
-        contractDownload() {
-            this.$http.get(`../clientsapi/get-contract?path=${this.client.contract}`)
-            .then(res => {
-                console.log(res.data);
-                let file = res.data;
-                let link = document.createElement('a');
-                link.href = file;
-                link.click();
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        ndaDownload() {
-            this.$http.get(`../clientsapi/get-nda?path=${this.client.nda}`)
-            .then(res => {
-                let file = res.data;
-                let link = document.createElement('a');
-                link.href = file;
-                link.click();
-            })
-            .catch(err => {
-                console.log(err)
-            })
         },
         addSevLangs(data) {
             this.$emit('addSevLangs')
         },
-        cancel() {
-            this.$emit('cancel')
+        ratesUpdate(data) {
+            console.log(data);
         },
-        contactCancel(data) {
+        cancel() {
+            if(this.fromRoute === "/new-client") {
+                this.$router.push("/clients");
+            } else {
+                this.$router.push(this.fromRoute);
+            }
+        },
+        saveContactUpdates({index, contact}) {
+            this.updateClientContact({index, contact});
+        },
+        contactCancel() {
             this.clientShow = true;
             this.contactShow = false;
-            this.$emit('contactCancel', {id: this.client._id});
         },
-        deleteContact() {
+        deleteClient() {
             this.approveShow = true;
         },
-        approveDelete(data) {
+        async approveContactDelete({index}) {
             this.clientShow = true;
             this.contactShow = false;
-            this.$emit('deleteContact', data)
+            try {
+                const contacts = this.currentClient.contacts.filter((item, ind) => ind !== index);
+                const result = await this.$http.post('/clientsapi/deleteContact', {id: this.currentClient._id, contacts})
+                const {updatedClient} = result.body;
+                await this.storeClient(updatedClient);
+                await this.storeCurrentClient(updatedClient);
+                this.alertToggle({message: "Contact has been deleted", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error on deleting contact", isShow: true, type: "error"});
+            }
         },
         cancelApprove() {
             this.approveShow = false;
         },
-        chosenInd(data) {
-            this.$emit('chosenInd', {industry: data.industry, filter: this.selectedIndNames});
+        chosenInd({industry}) {
+            let industries = [...this.currentClient.industry];
+            const position = industries.findIndex(item => item._id === industry._id);
+            if(position !== -1) {
+                industries.splice(position, 1);
+            } else {
+                industries.push(industry);
+            }
+            this.storeClientProperty({prop: 'industry', value: industries});
         },
-        chosenStatus(data) {
-            this.$emit('chosenStatus', data);
+        setStatus({status}) {
+            this.storeClientProperty({prop: 'status', value: status})
         },
-        chosenAccManager({manager}) {
-            this.$emit('chosenAccManager', {manager});
+        setLeadSource({leadSource}) {
+            this.storeClientProperty({prop: 'leadSource', value: leadSource});
         },
-        chosenSalesManager({manager}) {
-            this.$emit('chosenSalesManager', {manager});
+        changeProperty(e, prop) {
+            this.storeClientProperty({prop, value: e.target.value});
         },
-        chosenProjManager({manager}) {
-            this.$emit('chosenProjManager', {manager});
+        changeBillingProp({prop, value}) {
+            this.storeClientProperty({prop, value});
         },
-        contactDetails(data) {
+        setManager({manager}, prop) {
+            this.storeClientProperty({prop, value: manager});
+        },
+        contactDetails({contactIndex}) {
             this.clientShow = false;
             this.contactShow = true;
             this.newContact = false;
-            this.contactInd = data.contactIndex;
+            this.contactInd = contactIndex;
         },
         addNewContact(data) {
             this.clientShow = false;
             this.contactShow = true;
             this.newContact = true;
         },
-        ratesUpdate(data) {
-            this.$emit('refreshClients', data);
+        closeErrorsBlock() {
+            this.areErrorsExist = false;
         },
+        clearErrors() {
+            this.errors = [];
+            this.billErrors = [];
+            this.isLeadEmpty = false;
+        },
+        async checkForErrors() {
+            this.clearErrors();
+            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
+            if(!this.currentClient.name) this.errors.push('Company name cannot be empty.');
+            if(!this.currentClient.industry.length) this.errors.push('Please, choose at least one industry.');
+            if(!this.currentClient.contacts.length) this.errors.push('Please, add at least one contact.');
+            if(!this.currentClient.status) this.errors.push('Please, choose status.');
+            if(!this.currentClient.leadSource) {
+                this.errors.push('Please, choose lead source.');
+                this.isLeadEmpty = true;
+            }
+            if(!this.currentClient.email || !emailValidRegex.test(this.currentClient.email.toLowerCase())) {
+                this.errors.push('Please provide a valid email.');
+                this.billErrors.push('email');
+            }
+            if(!this.currentClient.accountManager || !this.currentClient.salesManager || !this.currentClient.projectManager) this.errors.push('All managers should be assigned.');
+            if(this.errors.length) {
+                this.areErrorsExist = true;
+                this.isSaveClicked = true;
+                return
+            }
+            await this.updateClient();
+        }, 
         async updateClient() {
             let sendData = new FormData();
-            sendData.append('client', JSON.stringify(this.client));
-            // sendData.append('ind', data.ind);
+            sendData.append('client', JSON.stringify(this.currentClient));
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
             }
@@ -212,39 +259,68 @@ export default {
             }
             try {
                 const result = await this.$http.post('/clientsapi/update-client', sendData);
-                this.$emit('refreshClients', {clientId: result.data.id});
+                const { client } = result.body;
+                await this.storeClient(client);
+                await this.storeCurrentClient(client);
+                this.alertToggle({message: "Client info has been updated", isShow: true, type: "success"});
             } catch(err) {
-                this.alertToggle({message: "Internal server error on updating Client info", isShow: true, type: "error"})
+                this.alertToggle({message: "Internal server error on updating Client info", isShow: true, type: "error"});
             }  
         },
-        approveClientDelete() {
-            if(this.newClient) {
-                this.cancel()
-            } else {
-                this.$emit('clientDelete', this.client)
+        async approveClientDelete() {
+            const id = this.currentClient._id;
+            try {
+                const result = await this.$http.delete(`/clientsapi/deleteclient/${id}`);
+                await this.removeClient(id);
+                this.alertToggle({message: "Client has been removed", isShow: true, type: "success"});
+                this.$router.push('/clients');
+            } catch(err) {
+                this.alertToggle({message: "Internal server error on deleting the Client", isShow: true, type: "error"});
             }
         },
-        contactUpdate(data) {
-            this.contactsPhotos.push(data.file);
-            // this.updateClient(data);
-            this.clientShow = true;
-            this.contactShow = false;
+        contactUpdate({index, file, contact}) {
+            this.contactsPhotos.push(file);
+            this.updateClientContact({index, contact});
+            this.contactCancel();
         },
-        contactSave(data) {
-            this.contactsPhotos.push(data.file);
-            this.$emit('newContact', {contact: data.contact});
-            this.clientShow = true;
-            this.contactShow = false;
+        setLeadContact({index}) {
+            this.updateLeadContact(index);
+        },
+        contactSave({file, contact}) {
+            this.contactsPhotos.push(file);
+            this.storeClientContact(contact);
+            let newContact = {...contact};  
+            if(this.currentClient.contacts.length === 1) {
+                newContact.leadContact = true;
+                this.updateClientContact({index: 0, contact: newContact});
+            }
+            this.contactCancel();
+        },
+        async getClientInfo() {
+            const client = this.allClients.find(item => item._id === this.$route.params.id);
+            this.storeCurrentClient(client);
         },
         ...mapActions({
             alertToggle: "alertToggle",
+            storeClient: "storeClient",
+            storeCurrentClient: "storeCurrentClient",
+            storeClientProperty: "storeClientProperty",
+            removeClient: "removeClient",
+            storeClientContact: "storeClientContact",
+            updateClientContact: "updateClientContact",
+            updateLeadContact: "updateLeadContact",
+            deleteClientContact: "deleteClientContact"
         })
     },
     computed: {
+        ...mapGetters({
+            allClients: "getClients",
+            currentClient: "getCurrentClient"
+        }),
         selectedIndNames() {
             let result = [];
-            if(this.client.industry.length) {
-                for(let ind of this.client.industry) {
+            if(this.currentClient.industry.length) {
+                for(let ind of this.currentClient.industry) {
                     result.push(ind.name);
                 }
             }
@@ -252,45 +328,106 @@ export default {
         },
     },
     components: {
-    MultiClientIndustrySelect,
-    ClientStatusSelect,
-    AMSelect,
-    ContactsInfo,
-    ClientRates,
-    ClientSalesInfo,
-    ClientBillInfo,
-    ContactDetails,
-    NewContactDetails
-  }
+        Sidebar,
+        MultiClientIndustrySelect,
+        ClientStatusSelect,
+        AMSelect,
+        ContactsInfo,
+        ClientRates,
+        ClientSalesInfo,
+        ClientBillInfo,
+        ContactDetails,
+        NewContactDetails
+    },
+    created() {
+        this.getClientInfo();
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.fromRoute = from.path;
+        })
+    },
+    mounted() {
+        console.log(__WEBPACK__API_URL__);
+    }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .clients-wrap {
+    position: relative;
+    display: flex;
+    width: 100%;
+    &__gen-info, &__contacts-info, &__rates, &__sales, &__billing {
+        margin: 20px 10px 40px 10px;
+        padding: 40px;
+        box-shadow: 0 0 15px #67573e9d;
+        width: 800px;
+    }
+    &__rates {
+        padding: 10px;
+        width: 860px;
+    }
+    &__gen-info {
+        display: flex;
+        justify-content: space-between;
+        .gen-info__block {
+            width: 40%;
+        }
+    }
+    &__errors {
+        position: fixed;
+        top: 45%;
+        left: 50%;
+        margin-left: -300px;
+        width: 300px;
+        padding: 15px;
+        box-shadow: 0 0 10px $brown-shadow;
+        background-color: $white;
+        z-index: 50;
+    }
+    &__errors-title {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px; 
+    }
+    &__messages {
+        position: relative;
+    }
+    &__error {
+        color: $orange;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    &__close {
+        transform: rotate(45deg);
+        position: absolute;
+        top: -12px;
+        right: -8px;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    &_error-shadow {
+        box-shadow: 0 0 5px $red;
+    }
+}
+
+.client-info, .contact-info {
+    padding: 40px;
+    width: 55%;
+}
+
+.client-info {
     position: relative;
 }
 
 .title {
     font-size: 22px;
 }
-.gen-info, .contacts-info, .rates, .sales, .billing {
-    margin: 20px 10px 40px 10px;
-    padding: 40px;
-    box-shadow: 0 0 15px #67573e9d;
-    width: 800px;
-}
-.rates {
-    padding: 10px;
-    width: 860px;
-}
-.gen-info {
-    display: flex;
-    justify-content: space-between;
-    &__block {
-        width: 40%;
-    }
-}
+
 .block-item {
     font-size: 14px;
     display: flex;
@@ -328,19 +465,18 @@ export default {
         height: 22px;
         overflow: hidden;
         .upload {
-        padding-left: 0;
-        padding-right: 0;
-        width: 33px;
-        height: 22px;
-        border: none;
-        outline: none;
-        margin-top: -3px;
-        margin-right: 2px;
-        opacity: 0;
-        z-index: 2;
-        position: absolute;
-        cursor: pointer;
-        left: -10px;
+            padding-left: 0;
+            padding-right: 0;
+            width: 33px;
+            height: 22px;
+            border: none;
+            outline: none;
+            margin-top: -3px;
+            margin-right: 2px;
+            opacity: 0;
+            z-index: 2;
+            position: absolute;
+            left: -10px;
         }
     }
     &__download {
@@ -350,10 +486,9 @@ export default {
 }
 
 .buttons {
-  width: 99%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .button {

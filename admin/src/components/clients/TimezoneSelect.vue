@@ -23,18 +23,24 @@ export default {
     props: {
         timezoneSelected: {
             type: String
-        },
-        timezones: {
-            type: Array
         }
     },
     data() {
         return {
             timezonesDropped: false,
-            timezoneSearch: ""
+            timezoneSearch: "",
+            timezones: []
         }
     },
     methods: {
+        async getTimezones() {
+            try {
+                const result = await this.$http.get('/api/timezones')
+                this.timezones = result.body;
+            } catch(err) {
+                console.log(err)
+            }
+        },
         chooseZone(ind) {
             this.$emit('chosenZone', this.foundZones[ind].zone);
             this.timezonesDropped = false;
@@ -62,6 +68,9 @@ export default {
             }
             return result;
         }
+    },
+    mounted() {
+        this.getTimezones();
     },
     directives: {
         ClickOutside

@@ -13,6 +13,8 @@ import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import Clientrequest from '@/components/request-forms/Clientrequest'
+import ClientDetails from '@/components/clients/ClientDetails'
+import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import CreateProject from '@/components/pmArea/CreateProject'
@@ -82,7 +84,18 @@ const router = new Router({
         {
           path: 'clients',
           name: 'clients',
-          component: ClientsSettings
+          component: ClientsSettings,
+        },
+        {
+          path: 'new-client',
+          name: 'new-client',
+          component: NewClient
+        },
+        {
+          path: 'clients/:id',
+          name: 'client-details',
+          component: ClientDetails,
+          props: true
         },
         {
           path: 'pm-projects',

@@ -23,20 +23,27 @@ export default {
     props: {
         countrySelected: {
             type: String
-        },
-        countries: {
-            type: Array
         }
     },
     data() {
         return {
             countriesDropped: false,
-            countrySearch: ""
+            countrySearch: "",
+            countries: []
         }
     },
     methods: {
+        async getCountries() {
+            try {
+                const result = await this.$http.get('/api/countries');
+                this.countries = result.body;
+            } catch(err) {
+                console.log(err)
+            }
+        },
         chooseCountry(ind) {
             this.$emit('chosenCountry', this.foundCountries[ind]);
+            this.outCountries();
         },
         openCountries() {
             this.countriesDropped = !this.countriesDropped;
@@ -57,6 +64,9 @@ export default {
             }
             return result;
         }
+    },
+    mounted() {
+        this.getCountries();
     },
     directives: {
         ClickOutside

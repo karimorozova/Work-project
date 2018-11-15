@@ -27,6 +27,17 @@ function saveTemplateTasks(object) {
         'workflowId': object.workflowId,
         'fileProcessType': 'JOIN'
     } : {'workflowId': object.workflowId}
+    const filesObj = {};
+    if(obj.sourceFiles.length) {
+        for(let index in sourceFiles) {
+            filesObj[`translationFiles[${index}].file`] = sourceFiles[index];
+        }
+    }
+    if(obj.refFiles.length) {
+        for(let index in refFiles) {
+            filesObj[`referenceFiles[${index}].file`] = refFiles[index];
+        }
+    }
     return new Promise((resolve, reject) => {
         unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
         .headers({"Authorization": xtmAuth.token,
@@ -37,7 +48,7 @@ function saveTemplateTasks(object) {
         .field('targetLanguages', object.target)
         .field('analysisTemplateId', object.templateId)
         .field(withJoinObject)
-        .attach(object.translationFiles)
+        .attach(filesObj)
         .end(response => {
             if(response.error) {
                 return reject(response.error)

@@ -169,6 +169,10 @@ export default {
         this.navbarList.forEach(item => {
           item.active = (item.title === 'PM AREA') ? true: false
         })
+      } else if (window.location.toString().indexOf('new-client') != -1) {
+        this.navbarList.forEach(item => {
+          item.active = (item.title === 'CLIENTS') ? true: false
+        })
       } else {
         for(let elem of this.navbarList) {
           if(window.location.toString().indexOf(elem.title.toLowerCase()) != -1) {

@@ -37,16 +37,16 @@ export default {
             this.dropped = false;
         },
         changeManager(index) {
-            this.$emit("chosenManager", { manager: this.managers[index]})
+            this.$emit("chosenManager", { manager: this.managers[index]});
+            this.outClick();
         },
-        getManagers() {
-            this.$http.get('../users')
-            .then(res => {
-                this.managers = res.data;
-            })
-            .catch(err => {
-                console.log("Erron on getting users")
-            })    
+        async getManagers() {
+            try {
+            const result = await this.$http.get('/users')
+            this.managers = result.data;
+            } catch(err) {
+                console.log(err);
+            }  
         }
     },
     directives: {

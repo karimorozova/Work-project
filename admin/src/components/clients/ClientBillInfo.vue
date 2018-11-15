@@ -3,19 +3,19 @@
         .names-info
             .names-info__item
                 label Official Company Name:
-                input(type="text" v-model="client.officialName")
+                input(type="text" :value="client.officialName" @change="(e) => changeProperty(e, 'officialName')")
             .names-info__item
                 label Contact Name:
-                input(type="text" v-model="client.contactName")
+                input(type="text" :value="client.contactName" @change="(e) => changeProperty(e, 'contactName')")
             .names-info__item
                 label Email:
-                input(type="text" v-model="client.email")
+                input(type="text" :value="client.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
             .names-info__item
                 label VAT:
-                input(type="text" v-model="client.vat")
+                input(type="text" :value="client.vat" @change="(e) => changeProperty(e, 'vat')")
         .address
             label Address
-            textarea(type="text" placeholder="Text here" v-model="client.address")
+            textarea(type="text" placeholder="Text here" :value="client.address" @change="(e) => changeProperty(e, 'address')")
 </template>
 
 <script>
@@ -23,11 +23,20 @@ export default {
     props: {
         client: {
             type: Object
+        },
+        errorFields: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
         return {
         
+        }
+    },
+    methods: {
+        changeProperty(e, prop) {
+            this.$emit("changeProperty", {prop, value: e.target.value})
         }
     }
 }
@@ -67,6 +76,9 @@ export default {
                 color: #67573e;
             }
         }
+    }
+    &_error-shadow {
+        box-shadow: 0 0 5px red;
     }
 }
 

@@ -77,7 +77,7 @@ const languagesDefault = [
     {"lang":"Chinese Simplified", "icon":"/static/flags31x21pix/ChineseSimplified[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_VN", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true, children: true},
     {"lang":"Chinese (China)", "icon":"/static/flags31x21pix/Chinese[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_CN", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "simplified"},
     {"lang":"Chinese (Singapore)", "icon":"/static/flags31x21pix/Chinese[ZH-SG].png", "symbol":"ZH-SG", "xtm": "zh_SG", "iso1":"zh-SG", "iso2":"zho-SG", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "simplified"},
-    {"lang":"Chinese Traditional", "icon":"/static/flags31x21pix/ChineseTraditional[ZH-CN].png", "symbol":"ZH-CN", "xtm": "zh_TW", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true},
+    {"lang":"Chinese Traditional", "icon":"/static/flags31x21pix/ChineseTraditional[ZH-CN].png", "symbol":"ZH-TW", "xtm": "zh_TW", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true},
     {"lang":"Chinese (Hong Kong)", "icon":"/static/flags31x21pix/Chinese[ZH-HK].png", "symbol":"ZH-HK", "xtm": "zh_HK", "iso1":"zh-HK", "iso2":"zho-HK", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"},
     {"lang":"Chinese (Macao)", "icon":"/static/flags31x21pix/Chinese[ZH-MO].png", "symbol":"ZH-MO", "xtm": "zh_TW", "iso1":"zh-MO", "iso2":"zho-MO", "direction":"in", "crud": false, "active": true, parent: "ZH-CN", china: "traditional"},
     {"lang":"Chinese (Taiwan)","icon":"/static/flags31x21pix/Chinese[ZH-TW].png", "symbol":"ZH-TW", "xtm": "goyu", "iso1":"zh-TW", "iso2":"zho-TW", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"}
@@ -274,6 +274,8 @@ const usersDefault = [
     }
 ]
 
+const leadSourcesDefault = ["Advertising", "Friend", "Landing Pages", "Internet", "Social Media", "Website"]
+
 const servicesDefault = [
     {sortIndex: 1, xtrf: 11, symbol: "tr", formType: "Translation", icon: "/static/services/Translation_Localization.png", "active": true, "crud": false, languageForm: "Duo", calculationUnit: "Words", projectType: "regular", title: "Translation", source: true, languageCombinations: [], languages: {source: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH"], target: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH", "AF", "AR-EG", "AR-MA", "AR-SA", "AZ-LN", "BN-IN", "BS", "CS", "ES-419", "ES-AR", "FR-CA", "FR-CH", "HI", "HR", "HU", "IT", "IT-IT", "IT-CH", "JA", "KA", "KK", "KO", "LT", "LV", "NB", "NL", "PL", "PT-PT", "RO", "RU", "SL", "SR-LA", "SV-SE", "TE", "TK", "TL", "TR", "UK", "UR", "UZ", "VI", "ZH-CN", "ZH-SG", "ZH-HK", "ZH-MO", "ZH-TW"]}},
     {sortIndex: 2, xtrf: 11, symbol: "lo", formType: "Translation", icon: "/static/services/Translation_Localization.png", "active": true, "crud": false, languageForm: "Duo", calculationUnit: "Words", projectType: "regular", title: "Localization", source: true, languageCombinations: [], languages: {source: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH"], target: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH", "AF", "AR-EG", "AR-MA", "AR-SA", "AZ-LN", "BN-IN", "BS", "CS", "ES-419", "ES-AR", "FR-CA", "FR-CH", "HI", "HR", "HU", "IT", "IT-IT", "IT-CH", "JA", "KA", "KK", "KO", "LT", "LV", "NB", "NL", "PL", "PT-PT", "RO", "RU", "SL", "SR-LA", "SV-SE", "TE", "TK", "TL", "TR", "UK", "UR", "UZ", "VI", "ZH-CN", "ZH-SG", "ZH-HK", "ZH-MO", "ZH-TW"]}},
@@ -439,7 +441,8 @@ const defaultValue = {
     ratesduoDefault,
     timezonesDefault,
     clientsDefault,
-    vendorsDefault
+    vendorsDefault,
+    leadSourcesDefault
 };
 
 module.exports = defaultValue;

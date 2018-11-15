@@ -2,7 +2,7 @@
     .sales-info
         .lead-info
             label Lead Source:
-            .lead-info__menu
+            .lead-info__menu(:class="{'sales-info_error-shadow': !client.leadSource && isEmpty}")
                 ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
         .status-info
             label Sales comission status:
@@ -17,6 +17,9 @@ export default {
     props: {
         client: {
             type: Object
+        },
+        isEmpty: {
+            type: Boolean
         }
     },
     data() {
@@ -25,8 +28,8 @@ export default {
         }
     },
     methods: {
-        chosenLeadsource(data) {
-            this.client.leadSource = data;
+        chosenLeadsource({leadSource}) {
+            this.$emit("setLeadSource", { leadSource });
         }
     },
     components: {
@@ -38,23 +41,26 @@ export default {
 <style lang="scss" scoped>
 
 .sales-info {
+    width: 40%;
     font-size: 14px;
     display: flex;
     flex-direction: column;
+    &_error-shadow {
+        box-shadow: 0 0 5px red;
+        border-radius: 5px;
+    }
 }
 
 .lead-info, .status-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 280px;
     label {
         margin-bottom: 0;
     }
     &__data {
         display: flex;
         justify-content: flex-start;
-        width: 40%;
         opacity: 0.4;
     }
 }
@@ -63,7 +69,6 @@ export default {
     &__menu {
         display: flex;
         justify-content: flex-start;
-        width: 40%;
     }
     
 }

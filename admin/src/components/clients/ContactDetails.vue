@@ -1,65 +1,65 @@
 <template lang="pug">
     .contact-wrap
+        .contact-wrap__buttons
+            input.button(type="button" value="Save" @click="contactUpdate")
+            input.button(type="button" value="Cancel" @click="cancel")
+            input.button(type="button" value="Delete" @click="deleteContact")
         .title 
             span Contact Details
-            .title__buttons
-                input.button(type="button" value="Save" @click="contactUpdate")
-                input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete" @click="deleteContact")
         .details
             .details__item
-                .photo-wrap(v-if="!client.contacts[ind].photo")
+                .photo-wrap(v-if="!contact.photo")
                     input.photo-file(type="file" @change="previewPhoto")
                     .photo-text(v-if="!imageExist")
                         p upload your photo                          
                     img.photo-image(v-if="imageExist")
-                .photo-wrap(v-if="client.contacts[ind].photo")
+                .photo-wrap(v-if="contact.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
-                    img.photo-image(:src="client.contacts[ind].photo")   
+                    img.photo-image(:src="contact.photo")   
                 .names-gender
                     .names-gender__item
                         label Name:
-                        input.personal(type="text" placeholder="Name" v-model="client.contacts[ind].firstName")
+                        input.personal(type="text" placeholder="Name" v-model="contact.firstName")
                     .names-gender__item
                         label Surname:
-                        input.personal(type="text" placeholder="Surname" v-model="client.contacts[ind].surname")
+                        input.personal(type="text" placeholder="Surname" v-model="contact.surname")
                     .names-gender__item
                         label Email:
-                        input.personal(type="text" placeholder="email" v-model="client.contacts[ind].email")
+                        input.personal(type="text" placeholder="email" v-model="contact.email")
                     .names-gender__item
                         label Gender:
                         .drop-select(v-click-outside="outGenders")
                             .select
-                                template(v-if="client.contacts[ind].gender")
+                                template(v-if="contact.gender")
                                     .selected
-                                        span {{ client.contacts[ind].gender }}
-                                template(v-if="!client.contacts[ind].gender")
+                                        span {{ contact.gender }}
+                                template(v-if="!contact.gender")
                                     span.selected.no-gender Gender
                                 .arrow-button(@click="openGenders")
                                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
                             .drop(v-if="genderDropped")
-                                .drop__item(@click="() => client.contacts[ind].gender = 'Male'")
+                                .drop__item(@click="setGender('Male')")
                                     span Male
-                                .drop__item(@click="() => client.contacts[ind].gender = 'Female'")
+                                .drop__item(@click="setGender('Female')")
                                     span Female
             .details__item
                 label Position:
-                input.non-personal(type="text" placeholder="Position" v-model="client.contacts[ind].position")
+                input.non-personal(type="text" placeholder="Position" v-model="contact.position")
             .details__item
                 label Phone:
-                input.non-personal(type="text" placeholder="Phone number" v-model="client.contacts[ind].phone")
+                input.non-personal(type="text" placeholder="Phone number" v-model="contact.phone")
             .details__item
                 label Skype:
-                input.non-personal(type="text" placeholder="Skype name" v-model="client.contacts[ind].skype")
+                input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
             .details__item
                 label Country:
-                CountriesSelect(:countrySelected="client.contacts[ind].country" :countries="countries" @chosenCountry="chosenCountry")
+                CountriesSelect(:countrySelected="contact.country" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                TimezoneSelect(:timezoneSelected="client.contacts[ind].timezone" :timezones="timezones" @chosenZone="chosenZone")
+                TimezoneSelect(:timezoneSelected="contact.timezone" @chosenZone="chosenZone")
             .details__item
                 label Notes:
-                textarea.non-personal(type="text" placeholder="Type" v-model="client.contacts[ind].notes")
+                textarea.non-personal(type="text" placeholder="Type" v-model="contact.notes")
         .delete-approve(v-if="approveShow")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
@@ -70,14 +70,19 @@
 import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
+import { mapGetters } from 'vuex';
 
 export default {
     props: {
-        client: {
+        index: {
+            type: Number
+        },
+        newClient: {
             type: Object
         },
-        ind: {
-            type: Number
+        isNewClient: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -87,14 +92,15 @@ export default {
             imageExist: false,
             genderDropped: false,
             approveShow: false,
-            photoFile: []
+            photoFile: [],
+            contact: {}
         }
     },
     methods: {
         previewPhoto() {
             let input = document.getElementsByClassName('photo-file')[0];
             if(input.files && input.files[0]) {
-                this.client.contacts[this.ind].file = input.files[0].name;
+                this.contact.file = input.files[0].name;
                 this.photoFile = input.files;
                 this.imageExist = true;
                 let reader = new FileReader();
@@ -110,6 +116,10 @@ export default {
         outGenders() {
             this.genderDropped = false;
         },
+        setGender(gen) {
+            this.contact.gender = gen;
+            this.outGenders();
+        },
         cancel() {
             this.$emit('cancel');
         },
@@ -120,38 +130,34 @@ export default {
             this.approveShow = true;            
         },
         approveDelete() {
-            this.$emit('approveDelete', this.ind)
+            this.$emit('approveDelete', {index: this.index});
         },
         chosenCountry(data) {
             this.countrySelected = data;
-            this.client.contacts[this.ind].country = data;
+            this.contact.country = data;
         },
         chosenZone(data) {
             this.timezoneSelected = data;
-            this.client.contacts[this.ind].timezone = data;
+            this.contact.timezone = data;
         },
         contactUpdate() {
-            this.$emit('contactUpdate', {file: this.photoFile[0], ind: this.ind})
+            this.$emit('contactUpdate', {file: this.photoFile[0], index: this.index, contact: this.contact})
         },
-        async getCountries() {
-            try {
-                const result = await this.$http.get('/api/countries');
-                this.countries = result.body;
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async getTimezones() {
-            try {
-                const result = await this.$http.get('/api/timezones')
-                this.timezones = result.body;
-            } catch(err) {
-                console.log(err)
+        getContact() {
+            if(!this.isNewClient) {
+                this.contact = {...this.currentClient.contacts[this.index]};
+            } else {
+                this.contact = {...this.newClient.contacts[this.index]};
             }
         }
     },
     computed: {
-        
+        ...mapGetters({
+            currentClient: "getCurrentClient"
+        })
+    },
+    mounted() {
+        this.getContact();
     },
     components: {
         CountriesSelect,
@@ -159,10 +165,6 @@ export default {
     },
     directives: {
         ClickOutside
-    },
-    mounted() {
-        this.getCountries();
-        this.getTimezones();
     }
 }
 </script>
@@ -170,29 +172,25 @@ export default {
 <style lang="scss" scoped>
 
 .contact-wrap {
-    width: 1066px;
     font-size: 14px;
     position: relative;
     label {
         margin-bottom: 0;
     }
-}
-
-.title {
-    font-size: 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     &__buttons {
-        width: 474px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
     }
 }
 
+.title {
+    font-size: 22px;
+}
+
 .button {
     width: 138px;
+    margin-left: 30px;
     height: 33px;
     color: white;
     font-size: 14px;
@@ -296,6 +294,7 @@ textarea.non-personal {
     height: 60px;
     resize: none;
     padding-top: 5px;
+    color: #67573E;
 }
 
 ::-webkit-input-placeholder {

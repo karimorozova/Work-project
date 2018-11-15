@@ -1,6 +1,6 @@
 const allCountries = [
     "Afghanistan",
-    "Åland Islands",
+    "Aland Islands",
     "Albania",
     "Algeria",
     "American Samoa",

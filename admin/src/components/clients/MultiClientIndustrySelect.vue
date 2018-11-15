@@ -5,16 +5,15 @@
                 .selected
                     .industry-tooltip(v-for="item in selectedInd")
                         img(:src="item.icon")
-                        //- span.toolTip {{ selectedInd[0].name }}
             template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
                 span.selected.no-industry Options
-            .arrow-button(@click="showInds")
+            .arrow-button(@click.stop="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+            .drop__item(v-for="(industry, index) in industries" @click.stop="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
                 .checkbox
                     .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
-                span {{ industry.name }}
+                span.drop__name {{ industry.name }}
 </template>
 
 <script>
@@ -57,22 +56,21 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            await this.$http.get('api/industries')
-            .then(response => {
-                let sortedArray = response.data.filter(item => {
-                    if (item.name != 'More') {
-                        return item
-                    }
-                });
+            try {
+            const result = await this.$http.get('/api/industries')
+            let sortedArray = result.data.filter(item => {
+                if (item.name != 'More') {
+                    return item
+                }
+            });
                 sortedArray.sort( (a,b) => {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
                 });
                 this.industries = sortedArray;
-            })
-            .catch(e => {
+            } catch(e) {
                 this.errors.push(e)
-            })
+            }
         },
         outClick() {
             this.droppedInd = false;
@@ -105,6 +103,12 @@ export default {
         border-radius: 0;
         box-shadow: inset 0 0 6px rgba(103, 87, 62, 0.75);
     }
+    .clients-table__drop-menu & {
+        width: 100%;
+        border: none;
+        height: 30px;
+        border: none;
+    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -116,6 +120,10 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .clients-table__drop-menu & {
+            width: 80%;
+            max-height: 30px;
+        }
         .industry-tooltip {
             width: 40px;
             max-height: 28px;
@@ -147,6 +155,10 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
+        .clients-table__drop-menu & {
+            width: 20%;
+        }
         img {
             padding-right: 2px;
         }
@@ -159,14 +171,13 @@ export default {
     position: relative;
     .drop {
         font-size: 14px;
+        box-sizing: border-box;
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
         z-index: 6;
         &__item {
@@ -183,6 +194,9 @@ export default {
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
             }
+        }
+        &__name {
+            max-width: 89%;
         }
         .chosen {
             background-color: rgba(191, 176, 157, 0.5);

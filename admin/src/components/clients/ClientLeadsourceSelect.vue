@@ -6,10 +6,10 @@
                     span {{ selectedLeadsource }}
             template(v-if="!selectedLeadsource") 
                 span.selected.no-industry Options
-            .arrow-button(@click="showLeadsources")
+            .arrow-button(@click.stop="showLeadsources")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(leadsource, index) in leadsources" @click="changeLeadsource(index)" :class="{chosen: leadsource == selectedLeadsource}")
+            .drop__item(v-for="(leadsource, index) in allLeadsources" @click.stop="changeLeadsource(index)" :class="{chosen: leadsource == selectedLeadsource}")
                 span {{ leadsource }}
 </template>
 
@@ -20,16 +20,26 @@ export default {
     props: {
         selectedLeadsource: {
             type: String
+        },
+        isAllExist: {
+            type: Boolean
         }
     },
     data() {
         return {
-            leadsources: ["Internet", "Website", "Advertising", "Landing Pages", "Social Media", "Friend"],
+            leadsources: [],
             dropped: false,
-            errors: []
         }
     },
     methods: {
+        async getSources() {
+            try {
+                const result = await this.$http.get('/api/leadsources');
+                this.leadsources = result.body;
+            } catch(err) {
+                throw err
+            }
+        },
         showLeadsources() {
             this.dropped = !this.dropped;
         },
@@ -37,14 +47,25 @@ export default {
             this.dropped = false;
         },
         changeLeadsource(index) {
-            this.$emit("chosenLeadsource", this.leadsources[index])
+            const option = this.allLeadsources[index] === "All" ? "": this.allLeadsources[index];
+            this.$emit("chosenLeadsource", {leadSource: option});
+            this.outClick();
         }
     },
     directives: {
         ClickOutside
     },
-    mounted () {
-
+    computed:{
+        allLeadsources() {
+            let result = this.leadsources;
+            if(this.isAllExist) {
+                result.unshift("All");
+            }
+            return result;
+        }
+    },
+    mounted() {
+        this.getSources()
     }
 }
 </script>
@@ -58,6 +79,11 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    .clients-table__drop-menu & {
+        width: 100%;
+        height: 30px;
+        border: none;
+    }
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
@@ -69,6 +95,10 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
+        .clients-table__drop-menu & {
+            width: 77%;
+            max-height: 30px;
+        }
         .industry-tooltip {
             width: 40px;
             max-height: 28px;
@@ -96,11 +126,15 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
         .reverseIcon {
             transform: rotate(180deg);
+        }
+        .clients-table__drop-menu & {
+            width: 23%;
         }
     }
 }
@@ -108,12 +142,12 @@ export default {
     position: relative;
     .drop {
         position: absolute;
+        box-sizing: border-box;
         width: 100%;
         border: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;

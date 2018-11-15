@@ -20,4 +20,13 @@ async function getClients(obj) {
     return clients;
 }
 
-module.exports = { getClient, getClients };
+async function getAfterUpdate(query, update) {
+    return await Clients.findOneAndUpdate(query, update, {new: true})
+            .populate('industry')
+            .populate('languageCombinations.source')
+            .populate('languageCombinations.target')
+            .populate('languageCombinations.service')
+            .populate('languageCombinations.industry.industry');
+}
+
+module.exports = { getClient, getClients, getAfterUpdate };
