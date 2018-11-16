@@ -81,10 +81,6 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
-      changedRate: '',
-      currentSource: {},
-      currentTarget: {},
-      currentActive: -1,
       icons: {
         save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
         edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
@@ -181,7 +177,6 @@ export default {
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
       };
-      this.currentActive = -1;
     },
     async deleteCombination({industry, index}) {
       const deletedRate = {
