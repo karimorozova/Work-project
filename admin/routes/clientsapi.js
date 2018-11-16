@@ -182,8 +182,8 @@ router.post('/client-rates', async (req, res) => {
             }
             return {industry: item.id, active: active, rate: item.rate, package: item.package}
         })
-        const result = await checkRatesMatch(client, industries, rate);
-        res.send('rates changed');
+        const updatedClient = await checkRatesMatch(client, industries, rate);
+        res.send(updatedClient);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating rates of Client");
@@ -198,8 +198,8 @@ router.delete('/rate/:id', async (req, res) => {
     }
     try {
         let client = await getClient({"_id": clientId})
-        const result = await deleteRate(client, industry, id);
-        res.send('rate deleted');
+        const updatedClient = await deleteRate(client, industry, id);
+        res.send(updatedClient);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting rates of Client");
@@ -222,7 +222,8 @@ router.post('/several-langs', async (req, res) => {
                 industry: client.industry
             })
         }
-        res.send('Several langs added..');
+        const updatedClient = await getClient({"_id": clientId});
+        res.send(updatedClient);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on adding several languages for Client");
@@ -327,6 +328,16 @@ router.post('/deleteContact', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting contact of Client");
+    }
+})
+
+router.post('/update-matrix', async (req, res) => {
+    const { id, matrix } = req.body;
+    try {
+        const result = await getAfterUpdate({"_id": id}, {matrix: matrix});
+        res.send({updatedClient: result});
+    } catch(err) {
+        res.status(500).send("Error on updating matrix");
     }
 })
 

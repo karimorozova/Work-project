@@ -4,6 +4,7 @@ import { mutations } from './mutations';
 
 const state = {
     currentClient: {},
+    clientDuoRates: []
 }
 
 export const clients = {

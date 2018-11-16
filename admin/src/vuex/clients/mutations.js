@@ -19,5 +19,8 @@ export const mutations = {
             state.currentClient.contacts[index].leadContact = false;
         }
         state.currentClient.contacts[payload].leadContact = true;
+    },
+    setClientDuoRates(state, payload) {
+        state.clientDuoRates = payload;
     }
 }

@@ -14,7 +14,7 @@
             template(slot="text" slot-scope="{ row }")
                 span.finance-matrix__text {{ row.text }}
             template(slot="rate" slot-scope="{ row }")
-                input.finance-matrix__rate(type="number" min="0" max ="100" :value="row.rate*100")
+                input.finance-matrix__rate(type="number" min="0" max ="100" :value="row.rate*100" @change="(e) => setMatrixData(e, row.key)")
                 span.finance-matrix__percent %
 </template>
 
@@ -36,7 +36,9 @@ export default {
         }
     },
     methods: {
-
+        setMatrixData(e, key) {
+            this.$emit("setMatrixData", {value: e.target.value/100, key});
+        }
     },
     components: {
         DataTable
@@ -44,7 +46,7 @@ export default {
     computed: {
         tableData() {
             return Object.keys(this.entity.matrix).map(key => {
-                return this.entity.matrix[key]
+                return {...this.entity.matrix[key], key}
             });
         }
     }

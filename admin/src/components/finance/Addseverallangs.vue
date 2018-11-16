@@ -80,6 +80,7 @@ export default {
             alertToggle: "alertToggle",
             storeVendors: "vendorsSetting",
             storeCurrentVendor: "storeCurrentVendor",
+            storeClient: "storeClient"
         }),
         checkErrors() {
             this.errors = [];
@@ -136,7 +137,8 @@ export default {
                 if(this.origin == 'client') {
                     const id = this.who._id;
                     const clientResult = await this.$http.post('/clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
-                    this.$emit('refreshServices', {clientId: id});
+                    const updatedClient = {...clientResult.body};
+                    await this.storeClient(updatedClient);
                 }
                 this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})
             } catch(err) {

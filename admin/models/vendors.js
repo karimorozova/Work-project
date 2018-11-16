@@ -144,7 +144,7 @@ const VendorSchema = new mongoose.Schema({
             fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.25}
         }
     }
-});
+}, { minimize: false });
 
 const Vendors = mongoose.model('Vendors', VendorSchema);
 

@@ -24,3 +24,29 @@ export const storeClientProperty = ({commit}, payload) => commit('setClientPrope
 export const storeClientContact = ({commit}, payload) => commit('addContact', payload);
 export const updateClientContact = ({commit}, payload) => commit('updateContact', payload);
 export const updateLeadContact = ({commit}, payload) => commit('setLeadContact', payload);
+export const storeClientDuoRates = ({commit}, payload) => commit('setDuoRates', payload);
+export const storeClientMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
+export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
+export const getClientDuoCombinations = async ({commit}, payload) => {
+    try {
+    const result = await Vue.http.get(`/clientsapi/get-rates?form=Duo&service=${payload.serviceTitle}&clientId=${payload.clientId}`);
+    commit('setClientDuoRates', result.body);
+    } catch(err) {
+        throw new Error("Error on getting Duo rates")
+    }
+}
+export const getClientMonoCombinations = async ({commit}, payload) => {
+    try {
+    const result = await Vue.http.get(`/service/parsed-rates?title=${payload}&form=Mono`);
+    commit('setMonoRates', result.body);
+    } catch(err) {
+        throw new Error("Error on getting Mono rates")
+    }
+}
+export const deleteClientRate = async ({commit}, payload) => {
+    try {
+        await Vue.http.delete(`/clientsapi/rate/${payload.id}`, {body: payload.deletedRate});
+    } catch(err) {
+        throw new Error("Error on deleting rate");
+    }
+}

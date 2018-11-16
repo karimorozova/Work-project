@@ -15,53 +15,38 @@
       ServiceSingleSelect(:selectedServ="serviceSelect" langForm="Duo" @chosenServ="chosenServ" :direction="direction")
   .add-button
     input(type="button" value="Add several languages" @click="addSevLangs")           
-  .table-data
-    table.duo-finance(:style="{width: tableWidth}")
-      thead
-        tr
-          th(v-for="head in tableHeader") {{ head.title }}
-      tbody.duo-tbody
-        template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-for="(indus, indusInd) in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
-            td.drop-option 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All"') {{ info.sourceLanguage.lang }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.sourceLanguage.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-            td.drop-option 
-              template(v-if='sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td.drop-option              
-              span(v-if="!indus.icon") {{ indus.name }}
-              .drop-option__image
-                img(v-if="indus.icon" :src="indus.icon")
-                span.title-tooltip {{ indus.name }}
-              .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                IndustrySelect(:parentIndex="index" :who="client" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
-            td
-              input(type="checkbox" :checked="indus.active" v-model="indus.active" :disabled="info.icons.edit.active")
-            td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}") 
-              input.rates(:value="indus.rate" @input="changeRate" :readonly="info.icons.edit.active")
-            td.icons-field
-              template(v-for="(icon, key) in info.icons") 
-                img.crudIcon(:src="icon.image" @click="action(index, key, indusInd)" :class="{'active-icon': icon.active}") 
-  .add-row
-    .add-row__plus(@click="addNewRow")
-      span +
-  .edition-message(v-if="editing")
+  DuoRatesTable(
+    :client="client"
+    :fullInfo="fullInfo"
+    :sourceSelect="sourceSelect"
+    :targetSelect="targetSelect"
+    :filterIndustry="filterIndustry"
+    :industryFilter="industryFilter"
+    :serviceSelect="serviceSelect"
+    :isEditing="isEditing"
+    :isValidationError="isValidationError"
+    @showEditingError="showEditingError"
+    @showValidationErrors="showValidationErrors"
+    @saveCombination="saveCombination"
+    @deleteCombination="deleteCombination"
+    @addNewRow="addNewRow"
+    @deleteUnsavedAddedRow="deleteUnsavedAddedRow"
+  )
+  .edition-message(v-if="isEditing")
     .message
       p Please finish the current edition first!
       span.close(@click="closeEditionMessage") +
-  .error-message(v-if="showValidError")
+  .error-message(v-if="isValidationError")
     .message
       p Please finish the current edition first!
       .message__info-list
-        li(v-for="error in validError")
+        li(v-for="error in validErrors")
           span.info-item {{ error }}
-      span.close(@click="closeErrorMessage") +
+      span.close(@click="CloseValidationErrors") +
 </template>
 
 <script>
+import DuoRatesTable from "../finance/DuoRatesTable";
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceSingleSelect from "../ServiceSingleSelect";
@@ -79,14 +64,15 @@ export default {
   },
   data() {
     return {
-      editing: false,
-      showValidError: false,
-      validError: [],
+      isEditing: false,
+      isValidationError: false,
+      validErrors: [],
       direction: 'duo',
       sourceSelect: ["EN-GB"],
       targetSelect: ["All"],
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
+      isIndustryActive: true,
       serviceSelect: {title: "Translation"},
       heads: [
         { title: "Source Language" },
@@ -95,242 +81,143 @@ export default {
         { title: "Active" },
         { title: "" }
       ],
-      fullInfo: [],
       changedRate: '',
-      currentActive: -1
+      currentSource: {},
+      currentTarget: {},
+      currentActive: -1,
+      icons: {
+        save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
+        edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+        delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
+      }
     }
   },
 
   methods: {
+    showEditingError() {
+      this.isEditing = true;
+    },
     addSevLangs() {
-      this.$emit('addSevLangs')
+      this.$emit('addSevLangs', {serviceTitle: this.serviceSelect.title});
     },
     closeEditionMessage() {
-      this.editing = false
+      this.isEditing = false
     },
-    closeErrorMessage() {
-      this.showValidError = false;
+    showValidationErrors({validErrors}) {
+      this.isValidationError = true;
+      this.validErrors = [...validErrors];
     },
-    changeRate(event) {
-      this.changedRate = +event.target.value
+    CloseValidationErrors() {
+      this.isValidationError = false;
+      this.validErrors = []
     },
-    handleScroll() {
-      let element = document.querySelector('.duo-tbody');
-      element.scrollTop = element.scrollHeight;
-    },
-    scrollDrop(data) {
-      if(data.drop) {
-        let tbody = document.querySelector('.duo-tbody');
-        setTimeout(() => {
-          const offsetBottom = data.offsetTop + data.offsetHeight*2;
-          const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-          if (offsetBottom > scrollBottom) {
-            tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
-          }
-        }, 100)
-      }
-    },
-    changeSource(data) {
-      this.fullInfo[data.index].sourceLanguage = data.lang;
-    },
-    changeTarget(data) {
-      this.fullInfo[data.index].targetLanguage = data.lang;
-    },
-    changeIndustry(data) {
-      if(this.industrySelected[0].name == 'All') {
-        this.industrySelected.splice(0, 1, data.industry)
-      } else {
-        let hasIndustry = false;
-        for(let i in this.industrySelected) {
-          if(this.industrySelected[i].name == data.industry.name) {
-            this.industrySelected.splice(i, 1);
-            hasIndustry = true;
-          }
-        }
-        if(!hasIndustry) {
-          this.industrySelected.push(data.industry);
-        }
-      }
-      if(!this.industrySelected.length || data.industry.name == 'All') {
-        this.industrySelected = [];
-        this.industrySelected.push({
-          crud: true,
-          name: 'All',
-          rate: 0.1
-        })
-      }
+    deleteUnsavedAddedRow({index}) {
+      this.fullInfo.splice(index, 1);
     },
     chosenServ(data) {
       this.serviceSelect = data;
-      this.fullInfo = [];
       this.clientRates();
     },
-    chosenSource(data) {
+    chosenSource({lang}) {
       if(this.sourceSelect[0] == 'All') {
         this.sourceSelect = [];
-        this.sourceSelect.push(data.lang.symbol)
+        this.sourceSelect.push(lang.symbol)
       } else {
-          let index = this.sourceSelect.indexOf(data.lang.symbol);
-          if(index != -1) {
+          const index = this.sourceSelect.indexOf(lang.symbol);
+          if(index !== -1) {
             this.sourceSelect.splice(index, 1);
           } else {
-            this.sourceSelect.push(data.lang.symbol)
+            this.sourceSelect.push(lang.symbol)
           }
       }
-      if(data.lang.lang == 'All' || !this.sourceSelect.length) {
+      if(lang.lang == 'All' || !this.sourceSelect.length) {
         this.sourceSelect = ['All'];
       }
     },
-    chosenTarget(data) {
+    chosenTarget({lang}) {
       if(this.targetSelect[0] == 'All') {
         this.targetSelect = [];
-        this.targetSelect.push(data.lang.symbol)
+        this.targetSelect.push(lang.symbol)
       } else {
-          let index = this.targetSelect.indexOf(data.lang.symbol);
-          if(index != -1) {
+          const index = this.targetSelect.indexOf(lang.symbol);
+          if(index !== -1) {
             this.targetSelect.splice(index, 1);
           } else {
-            this.targetSelect.push(data.lang.symbol)
+            this.targetSelect.push(lang.symbol)
           }
       }
-      if(data.lang.lang == 'All' || !this.targetSelect.length) {
+      if(lang.lang == 'All' || !this.targetSelect.length) {
         this.targetSelect = ['All'];
       }
     },
-    chosenInd(data) {
+    chosenInd({industry}) {
       if(this.industryFilter[0].name == 'All') {
-        this.industryFilter.splice(0, 1, data.industry);
+        this.industryFilter.splice(0, 1, industry);
       } else {
-        let hasIndustry = false;
-        for(let i in this.industryFilter) {
-          if(this.industryFilter[i].name == data.industry.name) {
-            this.industryFilter.splice(i, 1);
-            hasIndustry = true;
+          const index = this.industryFilter.findIndex(item => item._id === industry._id);
+          if(index !== -1) {
+              this.industryFilter.splice(index, 1);
+          } else {
+              this.industryFilter.push(industry);
           }
-        }
-        if(!hasIndustry) {
-          this.industryFilter.push(data.industry);
-        }
       }
-      if(!this.industryFilter.length || data.industry.name == 'All') {
+      if(!this.industryFilter.length || industry.name == 'All') {
         this.industryFilter = [];
         this.industryFilter.push({
           name: 'All'
         })
       }
     },
-    async action(index, key, indusInd) {
-      if(this.currentActive != -1) {
-        if(index != this.currentActive) {
-          this.editing = true;
-          return true;
-        }
+    async saveCombination({info}) {
+      const combInfo = {
+        ...info,
+        form: "Duo",
+        client: this.client._id
       }
-      if(key === "save" ) {
-        return await this.checkForErrors(index);
-      }
-
-      if(key === "edit") {
-        return this.editRate(index);
-      }
-
-      if(key === "delete") {
-        return await this.deleteRate(index, indusInd); 
-      }
-    },
-    async checkForErrors(index) {
-      this.validError = [];
-      let regex = /^[0-9.]+$/;
-      if(!this.fullInfo[index].sourceLanguage) this.validError.push("Please, choose the source language!");
-      if(!this.fullInfo[index].targetLanguage) this.validError.push("Please, choose the target language!");
-      if(!regex.test(this.changedRate)) this.validError.push("Please set the correct rate value!");
-      if(this.validError.length) {
-        this.showValidError = true;
-        this.changedRate = this.fullInfo[index].industry[0].rate;
-        return;
-      }
-      await this.saveRate(index);
-    },
-    async saveRate(index) {
-      this.fullInfo[index].icons.save.active = false;
-      this.fullInfo[index].icons.edit.active = true;
-      this.fullInfo[index].industry = [];
-      for(let elem of this.industrySelected) {
-        elem.rate = this.changedRate;
-        this.fullInfo[index].industry.push(elem)
-      };
-      this.fullInfo[index].form = "Duo";
-      this.fullInfo[index].client = this.client._id;
       try {
-        const result = await this.$http.post('clientsapi/client-rates', this.fullInfo[index]);
-        await this.clientRates();
-        this.$emit('ratesUpdate', {clientId: this.client._id});
+        const result = await this.$http.post('/clientsapi/client-rates', combInfo);
+        await this.updateClientInfo(result.body);
         this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
       };
       this.currentActive = -1;
     },
-    editRate(index) {
-      for(let elem of this.fullInfo[index].industry) {
-        this.industrySelected = [];
-        this.industrySelected.push(elem)  
+    async deleteCombination({industry, index}) {
+      const deletedRate = {
+        industry,
+        form: "Duo",
+        clientId: this.client._id
       }
-      this.changedRate = this.fullInfo[index].industry[0].rate;
-      this.currentActive = index;
-      this.fullInfo[index].icons.edit.active = false;
-      this.fullInfo[index].icons.save.active = true;   
-    },
-    async deleteRate(index, indusInd) {
-      this.currentActive = -1;
-      let deletedRate = {
-        client: this.client._id,
-        industry: [this.fullInfo[index].industry[indusInd]]
-      }
-      deletedRate.form = "Duo";
-      deletedRate.clientId = this.client._id;
       try {
-        await this.$http.delete(`clientsapi/rate/${this.fullInfo[index].id}`, {body: deletedRate});
-        this.$emit('ratesUpdate', {clientId: this.client._id});
-        this.fullInfo[index].industry.splice(indusInd, 1);
+        const result = await this.$http.delete(`/clientsapi/rate/${this.fullInfo[index].id}`, {body: deletedRate});
+        await this.updateClientInfo(result.body);
         this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
       };
     },
+    async updateClientInfo(info) {
+      const updatedClient = {...info};
+      await this.clientRates();
+      this.storeClient(updatedClient);
+    },
     addNewRow() {
+      this.isNewRow = true;
       this.sourceSelect = ["All"];
       this.targetSelect = ["All"];
       this.industryFilter = [{name: "All"}];
       this.fullInfo.push({
         service: this.serviceSelect,
-        sourceLanguage: {lang: "English"}, 
-        targetLanguage: {lang: ""}, 
+        sourceLanguage: "", 
+        targetLanguage: "", 
         industry: [{name: "All", rate: "-"}], 
-        active: true, 
-        icons: {
-          save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
-          edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
-          delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-        }
+        active: true
       });
-      this.currentActive = this.fullInfo.length - 1;
-      setTimeout( () => {
-        this.handleScroll();
-      },100);
     },
     async clientRates() {
-      this.fullInfo = [];
       try {
-        const rates = await this.$http.get(`/clientsapi/get-rates?form=Duo&service=${this.serviceSelect.title}&clientId=${this.client._id}`);
-        this.fullInfo = rates.body;
-        this.fullInfo.forEach(item => {
-          item.icons = {
-            save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-            edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-            delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-          }
-        });
+        await this.getCombinations({serviceTitle: this.serviceSelect.title, clientId: this.client._id});
       } catch(err) {
         this.alertToggle({message: 'Internal serer error. Cannot get rates for client.', isShow: true, type: 'error'});
       }
@@ -341,13 +228,16 @@ export default {
       })
     },
     ...mapActions({
-      loadingToggle: "loadingToggle",
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      getCombinations: "getClientDuoCombinations",
+      storeClient: "storeClient",
+      deleteClientRate: "deleteClientRate"
     })
   },
   computed: {
     ...mapGetters({
-      vuexServices: "getVuexServices"
+      vuexServices: "getVuexServices",
+      fullInfo: "getClientDuoCombs" 
     }),
     services() {
       let result = this.vuexServices.filter(item => {
@@ -361,52 +251,22 @@ export default {
     filterIndustry() {
       let result = [];
       if(this.industryFilter.length) {
-        for(let elem of this.industryFilter) {
+          for(let elem of this.industryFilter) {
           result.push(elem.name)
-        }
+          }
       }
-      return result;
-    },
-    infoIndustries() {
-      let result = [];
-      if(this.industrySelected.length) {
-        for(let elem of this.industrySelected) {
-          result.push(elem.name);
-        }
-      }
-      return result;
-    },
-    tableHeader() {
-      let result = [];
-      for(let i = 0; i < 5; i++) {
-        result.push(this.heads[i])
-      }
-      for(let j = 0; j < this.services.length; j++) {
-        if(this.services[j].crud) {
-          result.splice(-1, 0, {title: this.services[j].title} )
-        }
-      }
-      return result;
-    },
-    tableWidth() {
-      let result = 850;
-      let cols = this.tableHeader.length;
-      if(cols > 6) {
-        let count = cols - 6;
-        result += 150*count;
-      }
-      result += 'px';
       return result;
     }
   },
   components: {
+    DuoRatesTable,
     LanguagesSelect,
     IndustrySelect,
     ServiceSingleSelect
   },
   mounted() {
-    this.clientRates();
     this.defaultService();
+    this.clientRates();
   }
 };
 </script>
@@ -417,72 +277,7 @@ export default {
   font-family: MyriadPro;
   min-width: 850px; 
 }
-.table-data {
-  max-width: 872px;
-  overflow-x: scroll;
-}
-.duo-finance {
-  border-collapse: collapse;
-  width: 868px;
-  thead, tbody {
-    border: 1px solid #BFB09D;
-    display: block;
-    width: 100%;
-  }
-  tbody {
-    height: 184px;
-    overflow-y: scroll;
-    transition: all 0.3s;
-  }
-}
-tr {
-  display: block;
-}
-th, td {
-  padding: 5px;
-  padding-right: 0;
-  font-size: 14px;
-  font-weight: normal;
-  white-space: nowrap;
-  width: 142px;
-  &:first-child, &:nth-of-type(2) {
-    min-width: 160px;
-  }
-  &:last-child {
-    width: 140px;
-  }
-  &:nth-of-type(4) {
-    min-width: 67px;
-    width: 67px;
-  }
-  &:nth-of-type(3) {
-    min-width: 178px;
-  }
-}
-th {
-  background-color: #988C7E;
-  color: white;
-  border-right: 1px solid #FFF;
-  &:last-child {
-    border-right: none;
-    width: 157px;
-  }
-}
-td {
-  border-right: 1px solid #BFB09D;
-  border-bottom: 1px solid #BFB09D;
-}
-.icons-field{
-  text-align: center;
-}
-.crudIcon {
-  margin: 0 5px;
-  opacity: .5;
-  cursor: pointer;
-}
-.active-icon {
-  opacity: 1;
-}
+
 .filters {
   margin-bottom: 20px;
   display: flex;
@@ -513,65 +308,6 @@ td {
     border: 1px solid #D15F45;
     cursor: pointer;
   }
-}
-.add-row {
-  margin-top: 10px;
-  margin-left: 25px; 
-  &__plus {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: 1px solid #BFB09D;
-    span {
-      font-size: 28px;
-      color: #BFB09D;
-      opacity: .7;
-    }
-  }
-}
-.rates {
-  border: none;
-  outline: none;
-  width: 114px;
-}
-.drop-option {
-  position: relative;
-  .inner-component {
-    position: absolute;
-    background-color: #fff;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 5;
-  }
-  &__image {
-    max-height: 21px;
-    width: 30px;
-    .title-tooltip {
-      position: absolute;
-      display: none;
-      color: #D15F45;
-      font-size: 12px;
-      top: 8px;
-      left: 35px;
-    }
-    &:hover {
-      .title-tooltip {
-        display: block;
-      }
-    }
-    img {
-      max-width: 21px;
-    }
-  }
-}
-.add-shadow {
-  box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
 }
 
 .unique-message, .edition-message, .error-message {

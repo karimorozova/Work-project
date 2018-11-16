@@ -13,8 +13,8 @@
                     span.client-rates__label Duo
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
                 .client-rates__drop(v-if="isDuoRatesShow")
-                    DuoClientRates(:client="client" 
-                        @ratesUpdate="ratesUpdate"
+                    DuoClientRates(
+                        :entity="client" 
                         @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open
@@ -22,7 +22,7 @@
                     span.client-rates__label Matrix
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMatrixShow}") 
                 .client-rates__drop(v-if="isMatrixShow")
-                    FinanceMatrix(:entity="client")
+                    FinanceMatrix(:entity="client" @setMatrixData="setMatrixData")
 </template>
 
 <script>
@@ -44,8 +44,8 @@ export default {
         }
     },
     methods: {
-        addSevLangs(data) {
-            this.$emit('addSevLangs')
+        addSevLangs({serviceTitle}) {
+            this.$emit('addSevLangs', {serviceTitle})
         },  
         monoRatesToggler() {
             this.isMonoRatesShow = !this.isMonoRatesShow;
@@ -58,6 +58,9 @@ export default {
         },
         ratesUpdate(data) {
             this.$emit('ratesUpdate', data);
+        },
+        setMatrixData({value, key}) {
+            this.$emit("setMatrixData", {value, key});
         }
     },
     components: {

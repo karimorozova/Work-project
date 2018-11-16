@@ -67,7 +67,7 @@ export default {
             this.searchLang = "";
         },
         async getLanguages() {
-            await this.$http.get('api/languages')
+            await this.$http.get('/api/languages')
             .then(response => {
                 let sortedArray = response.body;
                 this.languages = sortedArray.sort( (a,b) => {

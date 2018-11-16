@@ -82,7 +82,6 @@ export default {
                 languageCombinations: [],
                 languagePairs: [],
                 industry: [],
-                matrix: {},
                 test: false,
                 position: []
             }

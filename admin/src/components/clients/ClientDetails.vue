@@ -1,95 +1,100 @@
 <template lang="pug">
-    .clients-wrap
-        .clients-wrap__sidebar(v-if="sidebarShow")
-            Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
-        .client-info(v-if="clientShow")
-            .buttons
-                input.button(type="button" value="Save" @click="checkForErrors")
-                input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete" @click="deleteClient")
-            .title General Information
-            .clients-wrap__gen-info
-                .gen-info__block
-                    .block-item
-                        label Company Name:
-                        input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'clients-wrap_error-shadow': !currentClient.name && isSaveClicked}")
-                    .block-item
-                        label Website:
-                        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
-                    .block-item
-                        label Industry:
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industry.length && isSaveClicked}")
-                            MultiClientIndustrySelect(:selectedInd="currentClient.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-                    .block-item
-                        label Status:
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.status && isSaveClicked}")
-                            ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
-                .gen-info__block
-                    .block-item
-                        label Contract:
-                        .contract
-                            .contract__upload
-                                input.upload(type="file" @change="contractLoad")
-                            .contract__download
-                                a(v-if="currentClient.contract" :href="currentClient.contract")
-                                    img(src="../../assets/images/Other/Download-icon.png")
-                        label NDA:
-                        .nda
-                            .nda__upload
-                                input.upload(type="file" @change="ndaLoad")
-                            .nda__download
-                                a(v-if="currentClient.nda" :href="currentClient.nda")
-                                    img(v-if="currentClient.nda" src="../../assets/images/Other/Download-icon.png")
-                    .block-item
-                        label Account Manager:
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
-                            AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
-                    .block-item
-                        label Sales Manager:
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
-                            AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
-                    .block-item
-                        label Project Manager:
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.projectManager && isSaveClicked}")
-                            AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
-            .title Contact Details
-            .clients-wrap__contacts-info
-                ContactsInfo(
-                    :client="currentClient"
-                    @contactDetails="contactDetails" 
-                    @saveContactUpdates="saveContactUpdates"
-                    @setLeadContact="setLeadContact"
-                    @newContact="addNewContact"
-                    @approveDelete="approveContactDelete")
-            .title(v-if="currentClient._id") Rates    
-            .clients-wrap__rates(v-if="currentClient._id")
-                ClientRates(:client="currentClient"
-                    @addSevLangs="addSevLangs"
-                    @ratesUpdate="ratesUpdate")
-            .title Sales Information
-            .clients-wrap__sales
-                ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-            .title Billing Informations
-            .clients-wrap__billing
-                ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
-            .delete-approve(v-if="approveShow")
-                p Are you sure you want to delete?
-                input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-                input.button(type="button" value="Delete" @click="approveClientDelete")  
-        .contact-info(v-if="contactShow")
-            ContactDetails(v-if="!newContact" 
-                @cancel="contactCancel"
-                @contactUpdate="contactUpdate"
-                @approveDelete="approveContactDelete"
-                :index="contactInd")
-            NewContactDetails(v-if="newContact" 
-                @contactSave="contactSave"
-                @cancel="contactCancel")
-        .clients-wrap__errors(v-if="areErrorsExist")
-            .clients-wrap__messages
-                .clients-wrap__errors-title Errors:
-                li.clients-wrap__error(v-for="error in errors") {{ error }}
-                span.clients-wrap__close(@click="closeErrorsBlock") +      
+.clients-wrap
+    .clients-wrap__sidebar(v-if="sidebarShow")
+        Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
+    .client-info(v-if="clientShow")
+        .buttons
+            input.button(type="button" value="Save" @click="checkForErrors")
+            input.button(type="button" value="Cancel" @click="cancel")
+            input.button(type="button" value="Delete" @click="deleteClient")
+        .title General Information
+        .clients-wrap__gen-info
+            .gen-info__block
+                .block-item
+                    label Company Name:
+                    input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'clients-wrap_error-shadow': !currentClient.name && isSaveClicked}")
+                .block-item
+                    label Website:
+                    input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
+                .block-item
+                    label Industry:
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industry.length && isSaveClicked}")
+                        MultiClientIndustrySelect(:selectedInd="currentClient.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                .block-item
+                    label Status:
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.status && isSaveClicked}")
+                        ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
+            .gen-info__block
+                .block-item
+                    label Contract:
+                    .contract
+                        .contract__upload
+                            input.upload(type="file" @change="contractLoad")
+                        .contract__download
+                            a(v-if="currentClient.contract" :href="currentClient.contract")
+                                img(src="../../assets/images/Other/Download-icon.png")
+                    label NDA:
+                    .nda
+                        .nda__upload
+                            input.upload(type="file" @change="ndaLoad")
+                        .nda__download
+                            a(v-if="currentClient.nda" :href="currentClient.nda")
+                                img(v-if="currentClient.nda" src="../../assets/images/Other/Download-icon.png")
+                .block-item
+                    label Account Manager:
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
+                        AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
+                .block-item
+                    label Sales Manager:
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
+                        AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
+                .block-item
+                    label Project Manager:
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.projectManager && isSaveClicked}")
+                        AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
+        .title Contact Details
+        .clients-wrap__contacts-info
+            ContactsInfo(
+                :client="currentClient"
+                @contactDetails="contactDetails" 
+                @saveContactUpdates="saveContactUpdates"
+                @setLeadContact="setLeadContact"
+                @newContact="addNewContact"
+                @approveDelete="approveContactDelete")
+        .title(v-if="currentClient._id") Rates    
+        .clients-wrap__rates(v-if="currentClient._id")
+            ClientRates(:client="currentClient"
+                @addSevLangs="addSevLangs"
+                @setMatrixData="setMatrixData")
+        .title Sales Information
+        .clients-wrap__sales
+            ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
+        .title Billing Informations
+        .clients-wrap__billing
+            ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
+        .delete-approve(v-if="approveShow")
+            p Are you sure you want to delete?
+            input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+            input.button(type="button" value="Delete" @click="approveClientDelete")
+        Addseverallangs(v-if="addSeveral"
+            :who="currentClient"
+            :origin="'client'"
+            @closeSeveral="closeSevLangs"
+            @severalLangsResult="severalLangsResult")  
+    .contact-info(v-if="contactShow")
+        ContactDetails(v-if="!newContact" 
+            @cancel="contactCancel"
+            @contactUpdate="contactUpdate"
+            @approveDelete="approveContactDelete"
+            :index="contactInd")
+        NewContactDetails(v-if="newContact" 
+            @contactSave="contactSave"
+            @cancel="contactCancel")
+    .clients-wrap__errors(v-if="areErrorsExist")
+        .clients-wrap__messages
+            .clients-wrap__errors-title Errors:
+            li.clients-wrap__error(v-for="error in errors") {{ error }}
+            span.clients-wrap__close(@click="closeErrorsBlock") +        
 </template>
 
 <script>
@@ -103,6 +108,7 @@ import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
 import ContactDetails from '../clients/ContactDetails';
 import NewContactDetails from '../clients/NewContactDetails';
+import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions} from "vuex";
 
 export default {
@@ -124,7 +130,9 @@ export default {
             errors: [],
             billErrors: [],
             isLeadEmpty: "",
-            isSaveClicked: false
+            isSaveClicked: false,
+            addSeveral: false,
+            addSeveralServiceTitle: ""
         }
     },
     methods: {
@@ -138,11 +146,29 @@ export default {
                 this.ndaFile = e.target.files;
             }
         },
-        addSevLangs(data) {
-            this.$emit('addSevLangs')
+        addSevLangs({serviceTitle}) {
+            this.addSeveral = true;
+            this.addSeveralServiceTitle = serviceTitle;
         },
-        ratesUpdate(data) {
-            console.log(data);
+        closeSevLangs() {
+            this.addSeveral = false;
+        },
+        async severalLangsResult({message, isShow, type}) {
+            await this.getDuoCombinations({clientId: this.currentClient._id, serviceTitle: this.addSeveralServiceTitle});
+            this.alertToggle({message, isShow, type});
+        },
+        async setMatrixData({value, key}) {
+            let matrix = {...this.currentClient.matrix};
+            matrix[key].rate = value;
+            try {
+                const result = await this.$http.post("/clientsapi/update-matrix", { id: this.currentClient._id, matrix });
+                const { updatedClient } = result.body;
+                await this.storeClient(updatedClient);
+                this.storeClientProperty({prop: "matrix", value: matrix});
+                this.alertToggle({message: "Matrix has been updated", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Internal server error on updating matrix", isShow: true, type: "error"});
+            }
         },
         cancel() {
             if(this.fromRoute === "/new-client") {
@@ -309,7 +335,8 @@ export default {
             storeClientContact: "storeClientContact",
             updateClientContact: "updateClientContact",
             updateLeadContact: "updateLeadContact",
-            deleteClientContact: "deleteClientContact"
+            deleteClientContact: "deleteClientContact",
+            getDuoCombinations: "getClientDuoCombinations"
         })
     },
     computed: {
@@ -337,7 +364,8 @@ export default {
         ClientSalesInfo,
         ClientBillInfo,
         ContactDetails,
-        NewContactDetails
+        NewContactDetails,
+        Addseverallangs
     },
     created() {
         this.getClientInfo();
@@ -346,9 +374,6 @@ export default {
         next(vm => {
             vm.fromRoute = from.path;
         })
-    },
-    mounted() {
-        console.log(__WEBPACK__API_URL__);
     }
 }
 </script>

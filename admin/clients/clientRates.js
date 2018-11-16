@@ -1,4 +1,5 @@
 const { Clients } = require("../models/");
+const { getAfterUpdate } = require("./getClients");
 
 async function checkRatesMatch(client, industries, rate) {
     if(rate.form === "Mono") {
@@ -31,7 +32,7 @@ async function checkRatesMatch(client, industries, rate) {
             industry: industries,
         })
     }
-    const result = await Clients.updateOne({"_id": client.id}, {$set: {languageCombinations: client.languageCombinations}});
+    const result = await getAfterUpdate({"_id": client.id}, {$set: {languageCombinations: client.languageCombinations}});
     return result;
 }
 
@@ -86,7 +87,7 @@ async function deleteRate(client, industry, id) {
     const sum = allZero.reduce((init, cur) => {return init + cur}, 0);
     const updatedCombinations = sum ? client.languageCombinations
      : client.languageCombinations.filter(item => { return item.id !== id});
-    const result = await Clients.updateOne({"_id": client.id}, {$set: {languageCombinations: updatedCombinations}});
+    const result = await getAfterUpdate({"_id": client.id}, {$set: {languageCombinations: updatedCombinations}});
     return result;
 }
 

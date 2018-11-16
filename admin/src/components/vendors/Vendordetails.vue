@@ -176,7 +176,8 @@ export default {
             this.updateVendorProp({prop, value});
         },
         updateGender(value) {
-            this.updateVendorProp({prop: 'gender', value})
+            this.updateVendorProp({prop: 'gender', value});
+            this.genderDropped = false;
         },
         setTimezone(data) {
             this.updateVendorProp({prop: "timezone", value: data})

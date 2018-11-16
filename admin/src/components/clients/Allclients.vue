@@ -26,11 +26,6 @@
                 :filterIndustry="industryFilter"
                 @showClientDetails="showClientDetails"
             )
-        Addseverallangs(v-if="addSeveral"
-            :who="client"
-            :origin="'client'"
-            @closeSeveral="closeSevLangs"
-            @refreshServices="refreshClients")
 </template>
 
 <script>
@@ -39,7 +34,6 @@ import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import MultiClientIndustrySelect from '../clients/MultiClientIndustrySelect';
 import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
-import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -51,16 +45,12 @@ export default {
             industryFilter: {name: 'All'},
             filterLeadsource: "",
             industrySelected: [],
-            addSeveral: false,
             isAllIndustyFilter: true,
             isAllStatusExist: true,
             isAllLeadExist: true
         }
     },
     methods: {
-        addSevLangs(data) {
-            this.addSeveral = true
-        },
         closeSevLangs(data) {
             this.addSeveral = false
         },
@@ -140,7 +130,6 @@ export default {
         MultiClientIndustrySelect,
         ClientStatusSelect,
         ClientLeadsourceSelect,
-        Addseverallangs
     },
     mounted() {
         this.storeCurrentClient({});
