@@ -1,34 +1,40 @@
 <template lang="pug">
 .addSeveral-wrap(v-click-outside="closeSeveral")
     .add-several
+        .add-several__close
+            span.add-several__close-icon(@click="closeSeveral") +
         .add-several__language
             .title
-                span Source language
+                span Source language        
+            .add-several__clear-all(v-if="hasCheckedAllSource" @click="clearAllChecks('source')") Clear
             .languages
                 .list
-                    .list__item(v-for="(language, i) in source.all" @click="sourceTo(i)" :class="{chosen: language.check}") {{ language.lang }}
+                    .list__item(v-for="(language, i) in source.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'source', 'all')" @dblclick="forceMoveTo(i, 'source')" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
                     img(src="../../assets/images/right.png" @click="toChosenSource")
                 .arrows__left
-                    img(src="../../assets/images/left.png" @click="toAllSource") 
+                    img(src="../../assets/images/left.png" @click="toAllSource")
+            .add-several__clear-chosen(v-if="hasCheckedChosenSource" @click="clearChosenChecks('source')") Clear
             .languages
                 .list
-                    .list__item(v-for="(language, i) in source.chosen" @click="sourceBack(i)" :class="{chosen: language.check}") {{ language.lang }}
+                    .list__item(v-for="(language, i) in source.chosen" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiBack(e, i, 'source', 'chosen')" @dblclick="forceMoveFrom(i, 'source')" :class="{chosen: language.check}") {{ language.lang }}
         .add-several__language
             .title
                 span.title-target Target language
+            .add-several__clear-all(v-if="hasCheckedAllTarget" @click="clearAllChecks('target')") Clear
             .languages
                 .list
-                    .list__item(v-for="(language, i) in target.all" @click="targetTo(i)" :class="{chosen: language.check}") {{ language.lang }}
+                    .list__item(v-for="(language, i) in target.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'target', 'all')" @dblclick="forceMoveTo(i, 'target')" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
                     img(src="../../assets/images/right.png" @click="toChosenTarget")
                 .arrows__left
                     img(src="../../assets/images/left.png" @click="toAllTarget")
+            .add-several__clear-chosen(v-if="hasCheckedChosenTarget" @click="clearChosenChecks('target')") Clear
             .languages    
                 .list
-                    .list__item(v-for="(language, i) in target.chosen" @click="targetBack(i)" :class="{chosen: language.check}") {{ language.lang }}
+                    .list__item(v-for="(language, i) in target.chosen" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiBack(e, i, 'target', 'chosen')" @dblclick="forceMoveFrom(i, 'target')" :class="{chosen: language.check}") {{ language.lang }}
         .add-several__service-industry                 
             .services
                 span.services__title Service
@@ -82,6 +88,54 @@ export default {
             storeCurrentVendor: "storeCurrentVendor",
             storeClient: "storeClient"
         }),
+        preventShift(e) {
+            if(e.shiftKey) e.preventDefault();
+        },
+        clearAllChecks(prop) {
+            this[prop].all.forEach(item => item.check = false);
+        },
+        clearChosenChecks(prop) {
+            this[prop].chosen.forEach(item => item.check = false);
+        },
+        checkAllBefore({prop, subProp, index, i}) {
+            for(let j = index; j < i; j++ ) {
+                this[prop][subProp][j].check = true;   
+            };
+        },
+        checkAllAfter({prop, subProp, index, i}) {
+            for(let j = index; j > i; j-- ) {
+                this[prop][subProp][j].check = true;   
+            };
+        },
+        selectMany({e, i, prop, subProp}) {
+            if(e.shiftKey) {
+                e.preventDefault();
+                for(let index in this[prop][subProp]) {
+                    if(this[prop][subProp][index].check && index < i) {
+                        return this.checkAllBefore({prop, subProp, index, i});
+                    }
+                    if(this[prop][subProp][index].check && index > i) {
+                        return this.checkAllAfter({prop, subProp, index, i});
+                    }
+                }
+            }
+        },
+        selectAllMultiTo(e, i, prop, subProp) {
+            if(prop === 'source') {
+                this.sourceTo(i);
+            } else {
+                this.targetTo(i);
+            }
+            this.selectMany({e, i, prop, subProp})
+        },
+        selectAllMultiBack(e, i, prop, subProp) {
+            if(prop === 'source') {
+                this.sourceBack(i);
+            } else {
+                this.targetBack(i);
+            }
+            this.selectMany({e, i, prop, subProp})
+        },
         checkErrors() {
             this.errors = [];
             if(this.selectedInd[0].name == 'Select') this.errors.push('Choose industry');
@@ -101,18 +155,18 @@ export default {
                 this.langsAddition();
             }
         },
-        async langsAddition() {
-            let languageCombinations = [];
+        collectCombinations() {
+            let combinations = [];
             for(let sourLang of this.source.chosen) {
                 for(let targLang of this.target.chosen) {
-                    if(sourLang.lang != targLang.lang) {
+                    if(sourLang.lang !== targLang.lang) {
                         for(let serv of this.selectedServ) {
                             let indus = JSON.stringify(this.selectedInd);
                             indus = JSON.parse(indus);
                             for(let ind in indus) {
                                 indus[ind].rate = +serv.rate;
                             }
-                            languageCombinations.push({
+                            combinations.push({
                                 source: sourLang,
                                 target: targLang,
                                 service: serv,
@@ -123,6 +177,10 @@ export default {
                     }
                 }
             }
+            return combinations;
+        },
+        async langsAddition() {
+            let languageCombinations = this.collectCombinations();
             try {
                 if(this.origin == 'rates') {
                     const result = await this.$http.post('/service/several-langs', JSON.stringify(languageCombinations));
@@ -147,7 +205,31 @@ export default {
             this.closeSeveral();
         },
         closeSeveral() {
+            this.selectedInd = [{name: 'Select'}];
+            this.selectedServ = [{title: 'Select'}];
             this.$emit('closeSeveral')
+        },
+        sortLangArray(arr) {
+            arr.sort((a, b) => {
+                if(a.lang < b.lang) return -1;
+                if(a.lang > b.lang) return 1;
+            })
+        },
+        forceMoveTo(i, prop) {
+            const language = this[prop].all.splice(i, 1);
+            this[prop].chosen.push(language[0]);
+            this[prop].chosen.forEach(item => {
+                item.check = false
+            })
+            this.sortLangArray(this[prop].chosen);
+        },
+        forceMoveFrom(i, prop) {
+            const language = this[prop].chosen.splice(i, 1);
+            this[prop].all.push(language[0]);
+            this[prop].all.forEach(item => {
+                item.check = false
+            })
+            this.sortLangArray(this[prop].all);
         },
         toChosenSource() {
             for(let lang of this.source.all) {
@@ -161,10 +243,7 @@ export default {
             this.source.chosen.forEach(item => {
                 item.check = false
             })
-            this.source.chosen.sort((a, b) => {
-                if(a.lang < b.lang) return -1;
-                if(a.lang > b.lang) return 1;
-            })
+            this.sortLangArray(this.source.chosen);
         },
         toAllSource() {
             for(let lang of this.source.chosen) {
@@ -260,22 +339,22 @@ export default {
                 })
             }
         },
-        changeService(data) {
+        changeService({service}) {
             if(this.selectedServ[0].title == 'Select' || this.selectedServ[0].title == 'All') {
-                this.selectedServ.splice(0, 1, data.service)
+                this.selectedServ.splice(0, 1, {...service})
             } else {
                 let hasService = false;
                 for(let i in this.selectedServ) {
-                if(this.selectedServ[i].title == data.service.title) {
+                if(this.selectedServ[i].title == service.title) {
                     this.selectedServ.splice(i, 1);
                     hasService = true;
                 }
                 }
                 if(!hasService) {
-                this.selectedServ.push(data.service);
+                this.selectedServ.push({...service});
                 }
             }
-            if(!this.selectedServ.length || data.service.title == 'All') {
+            if(!this.selectedServ.length || service.title == 'All') {
                 this.selectedServ = [];
                 this.selectedServ.push({
                 crud: true,
@@ -317,6 +396,20 @@ export default {
                 }
             }
             return result;
+        },
+        hasCheckedAllSource() {
+            return this.source.all.find(item => item.check);
+        },
+        hasCheckedChosenSource() {
+            return this.source.chosen.find(item => item.check);
+
+        },
+        hasCheckedAllTarget() {
+            return this.target.all.find(item => item.check);
+        },
+        hasCheckedChosenTarget() {
+            return this.target.chosen.find(item => item.check);
+
         }
     },
     components: {
@@ -363,6 +456,7 @@ export default {
         align-items: center;
         justify-content: space-between;
         margin-bottom: 30px;
+        position: relative;
     }
     &__service-industry {
         width: 100%;
@@ -378,6 +472,38 @@ export default {
         padding-top: 30px;
         margin-left: 10px;
         border-top:1px solid #67573E;
+    }
+    &__close {
+        position: relative;
+        width: 100%;
+    }
+    &__close-icon {
+        position: absolute;
+        transform: rotate(45deg);
+        font-weight: 600;
+        top: -36px;
+        right: -26px;
+        font-size: 28px;
+        cursor: pointer;
+    }
+    &__clear-all, &__clear-chosen {
+        position: absolute;
+        top: -5px;
+        cursor: pointer;
+        padding: 1px 5px;
+        border: 1px solid #67573E;
+        border-radius: 8px;
+        transition: all 0.2s;
+        &:hover {
+            background-color: #67573E;
+            color: #FFF;
+        }
+    }
+    &__clear-all {
+        left: 105px;
+    }
+    &__clear-chosen {
+        right: 200px;
     }
 }
 
@@ -445,7 +571,7 @@ export default {
         cursor: pointer;
         transition: all 0.3s;
         &:hover {
-            background-color: #DFD7CD;
+            background-color: rgb(245, 238, 229);
         }
     }
     .chosen {
