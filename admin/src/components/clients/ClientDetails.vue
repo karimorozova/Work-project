@@ -176,6 +176,7 @@ export default {
             } else {
                 this.$router.push(this.fromRoute);
             }
+            this.storeCurrentClient({});
         },
         saveContactUpdates({index, contact}) {
             this.updateClientContact({index, contact});
@@ -324,7 +325,9 @@ export default {
         },
         async getClientInfo() {
             const client = this.allClients.find(item => item._id === this.$route.params.id);
-            this.storeCurrentClient(client);
+            let str = JSON.stringify(client);
+            const currentClient = JSON.parse(str);
+            this.storeCurrentClient(currentClient);
         },
         ...mapActions({
             alertToggle: "alertToggle",

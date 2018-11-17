@@ -37,8 +37,8 @@ export const getClientDuoCombinations = async ({commit}, payload) => {
 }
 export const getClientMonoCombinations = async ({commit}, payload) => {
     try {
-    const result = await Vue.http.get(`/service/parsed-rates?title=${payload}&form=Mono`);
-    commit('setMonoRates', result.body);
+    const result = await Vue.http.get(`/clientsapi/get-rates?form=Mono&service=${payload.serviceTitle}&clientId=${payload.clientId}`);
+    commit('setClientMonoRates', result.body);
     } catch(err) {
         throw new Error("Error on getting Mono rates")
     }

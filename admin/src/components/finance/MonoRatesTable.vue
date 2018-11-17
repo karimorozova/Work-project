@@ -1,25 +1,23 @@
 <template lang="pug">
-.duorates-table(v-click-outside="clearCurrentActive")
+.monorates-table(v-click-outside="clearCurrentActive")
     .table-data
-        table.duo-finance(:style="{width: tableWidth}")
+        table.mono-finance(:style="{width: tableWidth}")
             thead
                 tr
                     th(v-for="head in tableHeader") {{ head.title }}
-            tbody.duo-tbody
-                template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
+            tbody.mono-tbody
+                template(v-for="(info, index) in fullInfo" v-if="targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All'")
                     tr(v-for="(indus, indusInd) in info.industry" v-if="indus.rate != 0 && (filterIndustry.indexOf(indus.name) != -1 || industryFilter[0].name == 'All')")
                         td.drop-option 
-                            template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.sourceLanguage.symbol || sourceSelect[0] == "All")') {{ info.sourceLanguage.lang }}
-                            .inner-component(v-if="currentActive === index")
-                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-                        td.drop-option 
-                            template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || !info.targetLanguage.symbol || targetSelect[0] == "All" || sourceSelect[0] == "All")') {{ info.targetLanguage.lang }}
+                            template(v-if='currentActive !== index && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All")') {{ info.targetLanguage.lang }}
                             .inner-component(v-if="currentActive === index")
                                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                        td(:class="{'add-shadow': currentActive === index}")
+                            input.rates(:value="indus.package" @input="changePackage" :readonly="currentActive !== index")
                         td.drop-option              
-                            span(v-if="!indus.icon && currentActive !== index") {{ indus.name }}
+                            span(v-if="!indus.icon") {{ indus.name }}
                             .drop-option__image
-                                img(v-if="indus.icon && currentActive !== index" :src="indus.icon")
+                                img(v-if="indus.icon" :src="indus.icon")
                                 span.title-tooltip {{ indus.name }}
                             .inner-component(v-if="currentActive === index")
                                 IndustrySelect(:parentIndex="index" :who="entity" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
@@ -30,7 +28,7 @@
                             input.rates(:value="indus.rate" @input="changeRate" :readonly="currentActive !== index")
                         td.icons-field
                             template(v-for="(icon, key) in icons") 
-                                img.crudIcon(:src="icon.image" @click="action(index, key, indusInd)" :class="{'active-icon': isActive(key, index)}")
+                                img.crud-icon(:src="icon.image" @click="action(index, key, indusInd)" :class="{'active-icon': isActive(key, index)}") 
     .add-row
         .add-row__plus(@click="addNewRow")
             span +
@@ -48,9 +46,6 @@ export default {
             type: Object
         },
         fullInfo: {
-            type: Array
-        },
-        sourceSelect: {
             type: Array
         },
         targetSelect: {
@@ -74,17 +69,18 @@ export default {
     },
     data() {
         return {
-            direction: 'duo',
+            direction: 'mono',
             industrySelected: [{name: 'All'}],
             isIndustryActive: true,
             heads: [
-                { title: "Source Language" },
-                { title: "Target Language" },
+                { title: "Language" },
+                { title: "Package" },
                 { title: "Industry" },
                 { title: "Active" },
                 { title: "" }
             ],
             changedRate: '',
+            changedPackage: '',
             currentSource: {},
             currentTarget: {},
             currentActive: -1,
@@ -105,12 +101,12 @@ export default {
             }
         },
         handleScroll() {
-            let element = document.querySelector('.duo-tbody');
+            let element = document.querySelector('.mono-tbody');
             element.scrollTop = element.scrollHeight;
         },
         scrollDrop(data) {
             if(data.drop) {
-                let tbody = document.querySelector('.duo-tbody');
+                let tbody = document.querySelector('.mono-tbody');
                 setTimeout(() => {
                     const offsetBottom = data.offsetTop + data.offsetHeight*2;
                     const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
@@ -126,7 +122,7 @@ export default {
             }
             if(!this.isEditing && !this.isValidationError) {
                 this.changedRate = '';
-                this.currentSource = {};
+                this.changedPackage = '';
                 this.currentTarget = {};
                 if(!this.fullInfo[this.currentActive].id) {
                     this.$emit("deleteUnsavedAddedRow", {index: this.currentActive});
@@ -137,8 +133,8 @@ export default {
         changeRate(event) {
             this.changedRate = +event.target.value;
         },
-        changeSource({lang}) {
-            this.currentSource = lang;
+        changePackage(event) {
+            this.changedPackage = event.target.value;
         },
         changeTarget({lang}) {
             this.currentTarget = lang;
@@ -194,10 +190,11 @@ export default {
         },
         checkForErrors(index) {
             let validErrors = [];
-            let regex = /^[0-9.]+$/;
-            if(!this.currentSource.symbol) validErrors.push("Please, choose the source language!");
+            let rateRegex = /^[0-9.]+$/;
+            let packageRegex = /^[0-9]+$/;
             if(!this.currentTarget.symbol) validErrors.push("Please, choose the target language!");
-            if(!regex.test(this.changedRate)) validErrors.push("Please set the correct rate value!");
+            if(!rateRegex.test(this.changedRate)) validErrors.push("Please set the correct rate value!");
+            if(!packageRegex.test(this.changedPackage)) validErrors.push("Please set the correct package value!");
             if(validErrors.length) {
                 this.$emit('showValidationErrors', { validErrors })
                 return validErrors.length;
@@ -207,13 +204,13 @@ export default {
         async saveRate(index) {
             let info = {
                 service: this.serviceSelect,
-                sourceLanguage: this.currentSource,
                 targetLanguage: this.currentTarget,
-                form: "Duo",
+                form: "Mono",
                 industry: []  
             };
             for(let elem of this.industrySelected) {
                 elem.rate = this.changedRate;
+                elem.package = this.changedPackage;
                 elem.active = true;
                 info.industry.push(elem)
             };
@@ -222,13 +219,13 @@ export default {
         },
         editRate(index) {
             this.currentActive = index;
-            this.currentSource = this.fullInfo[index].sourceLanguage;
             this.currentTarget = this.fullInfo[index].targetLanguage;
             for(let elem of this.fullInfo[index].industry) {
                 this.industrySelected = [];
                 this.industrySelected.push(elem)  
             }
             this.changedRate = this.fullInfo[index].industry[0].rate;
+            this.changedPackage = this.fullInfo[index].industry[0].package;
         },
         async deleteRate(index, indusInd) {
             this.currentActive = -1;
@@ -281,7 +278,7 @@ export default {
     max-width: 872px;
     overflow-x: scroll;
 }
-.duo-finance {
+.mono-finance {
     border-collapse: collapse;
     width: 868px;
     thead, tbody {
@@ -335,7 +332,7 @@ td {
 .icons-field{
     text-align: center;
 }
-.crudIcon {
+.crud-icon {
     margin: 0 5px;
     opacity: .5;
     cursor: pointer;
@@ -343,6 +340,7 @@ td {
 .active-icon {
     opacity: 1;
 }
+
 .add-row {
     margin-top: 10px;
     margin-left: 25px; 

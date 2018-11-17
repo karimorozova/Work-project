@@ -42,6 +42,9 @@
                                     span Male
                                 .drop__item(@click="setGender('Female')")
                                     span Female
+            .details__item.details_no-space
+                label Lead Contact:
+                input.check(type="checkbox" v-model="contact.leadContact")
             .details__item
                 label Position:
                 input.non-personal(type="text" placeholder="Position" v-model="contact.position")
@@ -235,6 +238,9 @@ export default {
             }
         }
     }
+    &_no-space {
+        justify-content: flex-start;
+    }
 }
 
 .photo-file {
@@ -275,6 +281,13 @@ export default {
             margin-bottom: 0;
         }
     }
+}
+
+.check {
+    height: 18px;
+    width: 18px;
+    margin-left: 20px;
+    cursor: pointer;
 }
 
 .personal, .non-personal {

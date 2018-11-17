@@ -14,7 +14,7 @@
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
                 .client-rates__drop(v-if="isDuoRatesShow")
                     DuoClientRates(
-                        :entity="client" 
+                        :client="client" 
                         @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open

@@ -10,6 +10,12 @@ export const mutations = {
     },
     updateContact(state, payload) {
         state.currentClient.contacts[payload.index] = payload.contact;
+        if(payload.contact.leadContact) {
+            for(let index in state.currentClient.contacts) {
+                state.currentClient.contacts[index].leadContact = false;
+            }
+            state.currentClient.contacts[payload.index].leadContact = true;    
+        }
     },
     setLeadContact(state, payload) {
         if(state.currentClient.contacts[payload].leadContact) {
@@ -22,5 +28,8 @@ export const mutations = {
     },
     setClientDuoRates(state, payload) {
         state.clientDuoRates = payload;
+    },
+    setClientMonoRates(state, payload) {
+        state.clientMonoRates = payload;
     }
 }

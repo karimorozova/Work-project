@@ -16,7 +16,7 @@
   .add-button
     input(type="button" value="Add several languages" @click="addSevLangs")           
   DuoRatesTable(
-    :client="client"
+    :entity="client"
     :fullInfo="fullInfo"
     :sourceSelect="sourceSelect"
     :targetSelect="targetSelect"
@@ -73,19 +73,7 @@ export default {
       industryFilter: [{name: "All"}],
       industrySelected: [{name: 'All'}],
       isIndustryActive: true,
-      serviceSelect: {title: "Translation"},
-      heads: [
-        { title: "Source Language" },
-        { title: "Target Language" },
-        { title: "Industry" },
-        { title: "Active" },
-        { title: "" }
-      ],
-      icons: {
-        save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-        edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
-        delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-      }
+      serviceSelect: {title: "Translation"}
     }
   },
 
@@ -225,8 +213,7 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       getCombinations: "getClientDuoCombinations",
-      storeClient: "storeClient",
-      deleteClientRate: "deleteClientRate"
+      storeClient: "storeClient"
     })
   },
   computed: {

@@ -149,26 +149,6 @@ export default {
         getFullName(contact) {
             return `${contact.firstName} ${contact.surname}`;
         },
-        chooseLead(ind) {
-            if(!this.client.contacts[ind].icons[0].active) {
-                for(let cont of this.client.contacts) {
-                    cont.leadContact = false;
-                }
-                this.client.contacts[ind].leadContact = true;
-            }
-        },
-        action(ind, i) {
-            if(i == 0) {
-                for(let cont of this.client.contacts) {
-                    cont.icons[0].active = true;
-                }
-                this.client.contacts[ind].icons[0].active = false;
-            }
-            if(i == 1) {
-                this.client.contacts.splice(ind, 1);
-                this.$emit('deleteContact', ind);
-            }
-        },
         showContactDetails({index}) {
             if(this.currentEditingIndex === index) { 
                 return
@@ -181,9 +161,6 @@ export default {
         setLeadContact(index) {
             this.$emit("setLeadContact", { index });
         }
-    },
-    computed: {
-        
     },
     components: {
         DataTable,
