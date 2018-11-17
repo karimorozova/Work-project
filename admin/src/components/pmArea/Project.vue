@@ -23,7 +23,9 @@
         .project__info-row
             .project__client
                 LabelValue(label="Client Name")
-                    .project__drop-menu
+                    .project__client-link(v-if="project._id") 
+                        .project__link(@click="goToClientInfo") {{ project.customer.name }}
+                    .project__drop-menu(v-else)
                         SelectSingle(
                             :selectedOption="project.customer.name"
                             :options="allClients"
@@ -40,9 +42,9 @@
                             @chooseOptions="setIndustry"
                             placeholder="Industry"
                         )
-            .project__id
-                LabelValue(label="Project ID")
-                    input.project__input-text(type="text" v-model="project.projectId" placeholder="Project ID")
+            .project__number
+                LabelValue(label="Client Project Number")
+                    input.project__input-text(type="text" v-model="project.projectId" placeholder="Project Number")
         .project__info-row.project_no-margin
             .project__textarea
                 LabelValue(label="Project Brief")
@@ -124,6 +126,9 @@ export default {
         },
         deadlineOpen() {
             this.$refs.deadline.showCalendar();
+        },
+        goToClientInfo() {
+            this.$router.push(`/clients/${this.project.customer._id}`)
         }
     },
     computed: {
@@ -213,13 +218,22 @@ export default {
     &__industry {
         width: 27%;
     }
-    &__id {
-        width: 25%;
+    &__number {
+        width: 33%;
     }
     &__drop-menu {
         position: relative;
         height: 28px;
         width: 191px;
+    }
+    &__client-link {
+        width: 191px;
+        display: flex;
+        justify-content: flex-start;
+    }
+    &__link {
+        border-bottom: 1px solid #68573E;
+        cursor: pointer;
     }
     &__input-text {
         width: 151px;
