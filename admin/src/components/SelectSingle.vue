@@ -6,7 +6,8 @@
             .arrow-button
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
+            .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ showOption(option) }}
 </template>
 
@@ -26,11 +27,16 @@ export default {
         },
         refersTo: {
             type: String
+        },
+        hasSearch: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
         return {
-            isDropped: false
+            isDropped: false,
+            searchValue: ""
         }
     },
     methods: {
@@ -44,7 +50,7 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo});
+            this.$emit("chooseOption", {option: this.filteredOptions[index], refersTo: this.refersTo});
             this.outOptions();
         },
         activeClass(elem) {
@@ -52,11 +58,24 @@ export default {
             if(elem == "Yes" && this.selectedOption && 
             this.options.indexOf(this.selectedOption) === -1) return true;
             return false;
+        },
+        search(e) {
+            this.searchValue = e.target.value;
         }
     },
     computed: {
         isObject() {
             return typeof this.selectedOption === "object"
+        },
+        filteredOptions() {
+            let result = this.options;
+            if(this.searchValue) {
+                if(typeof opt === "string") {
+                    return result.filter(item => item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
+                }
+                return result.filter(item => item.name.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
+            }
+            return result;
         }
     },
     directives: {
@@ -92,6 +111,10 @@ export default {
         background-color: #FFF;
         border-top: 1px solid #67573E;    
         z-index: 10;
+        &__search {
+            color: #67573E;
+            padding-left: 3px;
+        }
         &__item {
             padding: 5px;
             border-bottom: .5px solid #BFB09D;
