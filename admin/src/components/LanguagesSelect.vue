@@ -38,6 +38,10 @@ export default {
         single: {
             type: Boolean,
             default: false
+        },
+        langFilter: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
@@ -74,6 +78,9 @@ export default {
                     if(a.lang < b.lang) return -1;
                     if(a.lang > b.lang) return 1;
                 });
+                if(this.langFilter.length) {
+                    this.languages = this.languages.filter(item => this.langFilter.indexOf(item._id) !== -1);
+                }
                 if(this.addAll) {
                     this.languages.unshift({lang: "All", symbol: "All"})
                 }

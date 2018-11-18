@@ -1,7 +1,7 @@
 <template lang="pug">
     .contact-wrap
         .contact-wrap__buttons
-            input.button(type="button" value="Save" @click="contactSave")
+            input.button(type="button" value="Save" @click="checkForErrors")
             input.button(type="button" value="Cancel" @click="cancel")
         .title 
             span Contact Details
@@ -18,13 +18,13 @@
                 .names-gender
                     .names-gender__item
                         label Name:
-                        input.personal(type="text" placeholder="Name" v-model="contact.firstName")
+                        input.personal(type="text" placeholder="Name" v-model="contact.firstName" :class="{'contact-wrap_error-shadow': !contact.firstName && isSaveClicked}")
                     .names-gender__item
                         label Surname:
                         input.personal(type="text" placeholder="Surname" v-model="contact.surname")
                     .names-gender__item
                         label Email:
-                        input.personal(type="text" placeholder="email" v-model="contact.email")
+                        input.personal(type="text" placeholder="email" v-model="contact.email" :class="{'contact-wrap_error-shadow': !contact.email && !isEmailValid}")
                     .names-gender__item
                         label Gender:
                         .drop-select(v-click-outside="outGenders")
@@ -43,7 +43,7 @@
                                     span Female
             .details__item
                 label Position:
-                input.non-personal(type="text" placeholder="Position" v-model="contact.position")
+                input.non-personal(type="text" placeholder="Position" v-model="contact.position" :class="{'contact-wrap_error-shadow': !contact.position && isSaveClicked}")
             .details__item
                 label Phone:
                 input.non-personal(type="text" placeholder="Phone number" v-model="contact.phone")
@@ -63,6 +63,11 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete")
+        .contact-wrap__errors(v-if="areErrorsExist")
+            .contact-wrap__messages
+                .contact-wrap__errors-title Errors:
+                li.contact-wrap__error(v-for="error in errors") {{ error }}
+                span.contact-wrap__close(@click="closeErrorsBlock") +
 </template>
 
 <script>
@@ -88,9 +93,12 @@ export default {
                 leadContact: false
             },
             imageExist: false,
+            areErrorsExist: false,
             genderDropped: false,
             approveShow: false,
-            photoFile: []
+            photoFile: [],
+            errors: [],
+            isSaveClicked: false
         }
     },
     methods: {
@@ -134,12 +142,34 @@ export default {
             this.timezoneSelected = data;
             this.contact.timezone = data;
         },
+        checkForErrors() {
+            this.errors = [];
+            const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            if(!this.contact.firstName) this.errors.push("Please, enter contact's first name.");
+            if(!this.contact.position) this.errors.push("Please, enter contact's position.");
+            if(!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.");
+            if(this.errors.length) {
+                this.areErrorsExist = true;
+                this.isSaveClicked = true;
+                return
+            }
+            this.contactSave();
+        },
         contactSave() {
             this.$emit('contactSave', {contact: this.contact, file: this.photoFile[0]})
-        }
+        },
+        closeErrorsBlock() {
+            this.areErrorsExist = false;
+        },
     },
     computed: {
-        
+        isEmailValid() {
+            if(this.isSaveClicked) {
+                let regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+                return regex.test(this.contact.email);
+            }
+            return true
+        }
     },
     components: {
         CountriesSelect,
@@ -152,6 +182,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .contact-wrap {
     font-size: 14px;
@@ -163,6 +194,42 @@ export default {
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+    &__errors {
+        position: fixed;
+        top: 45%;
+        left: 50%;
+        margin-left: -300px;
+        width: 300px;
+        padding: 15px;
+        box-shadow: 0 0 10px $brown-shadow;
+        background-color: $white;
+        z-index: 50;
+    }
+    &__errors-title {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px; 
+    }
+    &__messages {
+        position: relative;
+    }
+    &__error {
+        color: $orange;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    &__close {
+        transform: rotate(45deg);
+        position: absolute;
+        top: -12px;
+        right: -8px;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    &_error-shadow {
+        box-shadow: 0 0 5px $red;
     }
 }
 

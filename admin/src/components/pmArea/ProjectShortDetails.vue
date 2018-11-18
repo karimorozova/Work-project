@@ -18,7 +18,7 @@
         .project-details__contact-info(v-for="(contact, index) in selectedContacts")
             .project-details__contact-name {{ contact.firstName }} {{ contact.surname }}
             .project-details__contact-icons
-                .project-details__icon(@click="removeContact(index)" v-if="index")
+                .project-details__icon(@click="removeContact(index)" v-if="selectedContacts.length > 1")
                     span.project-details__remove remove
                 .project-details__icon
                     i.fa.fa-info-circle
@@ -69,10 +69,11 @@ export default {
             this.$emit('setStatus', {option: option})
         },
         setDefaultContact() {
+            const contact = this.project.customer.contacts.find(item => item.leadContact); 
             this.selectedContacts.push({
-                firstName: this.project.customer.contactName,
-                surname: "",
-                email: this.project.customer.email
+                firstName: contact.firstName,
+                surname: contact.surname,
+                email: contact.email
             })
         },
         addContact({person}) {

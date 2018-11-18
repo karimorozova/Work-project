@@ -49,6 +49,11 @@
             Button.contacts-info__button(value="Cancel" @clicked="cancelDelete")
             Button.contacts-info__button(value="Delete" @clicked="approveDelete")
         .contacts-info__cancel-edition(v-if="currentEditingIndex !== -1" @click="cancelEdition") Cancel edition
+        .contacts-info__valid-errors(v-if="areErrorsExist")
+            .contacts-info__messages
+                .contacts-info__errors-title Errors:
+                li.contacts-info__valid-error(v-for="error in errors") {{ error }}
+                span.contacts-info__close(@click="closeValidErrorsBlock") +
 </template>
 
 <script>
@@ -84,7 +89,9 @@ export default {
             currentEmail: "",
             currentPosition: "",
             currentNotes: "",
-            deletingContactIndex: -1
+            deletingContactIndex: -1,
+            areErrorsExist: false,
+            errors: []
         }
     },
     methods: {
@@ -96,6 +103,9 @@ export default {
         },
         closeErrorMessage() {
             this.isErrorShow = false;
+        },
+        closeValidErrorsBlock() {
+            this.areErrorsExist = false;
         },
         approveDelete() {
             this.$emit('approveDelete', { index: this.deletingContactIndex });
@@ -129,13 +139,23 @@ export default {
                 this.setCurrentEditionValues(index);
             }
             if(key === 'save') {
-                this.saveContactUpdates(index);
-                this.setCurrentDefaults();
+                this.checkForValidation(index);
             }
             if(key === 'delete') {
                 this.deletingContactIndex = index;
                 this.isDeleteMessageShow = true;
             }
+        },
+        checkForValidation(index) {
+            this.errors = [];
+            const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            if(!this.currentPosition) this.errors.push("Please, enter contact's position.");
+            if(!this.currentEmail || !emailValidReg.test(this.currentEmail)) this.errors.push("Please, enter valid e-mail address.");
+            if(this.errors.length) {
+                this.areErrorsExist = true;
+                return
+            }
+            this.saveContactUpdates(index);
         },
         saveContactUpdates(index) {
             const contact = {
@@ -145,6 +165,7 @@ export default {
                 notes: this.currentNotes
             }
             this.$emit("saveContactUpdates", { index, contact });
+            this.setCurrentDefaults();
         },
         getFullName(contact) {
             return `${contact.firstName} ${contact.surname}`;
@@ -290,37 +311,44 @@ export default {
         z-index: 10;
         background-color: $white;
     }
+    &__valid-errors {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        margin-left: -170px;
+        width: 300px;
+        padding: 15px;
+        box-shadow: 0 0 10px $brown-shadow;
+        background-color: $white;
+        z-index: 50;
+    }
+    &__errors-title {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px; 
+    }
+    &__messages {
+        position: relative;
+    }
+    &__valid-error {
+        color: $orange;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    &__close {
+        transform: rotate(45deg);
+        position: absolute;
+        top: -12px;
+        right: -8px;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+    }
 }
-
-// .add-contact {
-//     display: flex;
-//     width: 100%;
-//     margin-bottom: 15px;
-//     justify-content: flex-end;
-// }
-
-// .head-title {
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-between;
-//     padding: 0 5px;
-// }
-
-// .contact-info {
-//     border: none;
-//     outline: none;
-//     width: 109px;
-//     margin: 2px;
-//     padding: 3px 0 3px 5px;
-// }
 
 .editing {
     box-shadow: inset 0 0 8px $brown-shadow;
 }
-
-// .not-active {
-//     opacity: 0.5;
-// }
 
 .add-button {
     width: 190px;

@@ -12,6 +12,7 @@
                     .project-info__drop-menu
                         LanguagesSelect(
                             placeholder="Source Languages"
+                            :langFilter="customerLangFilter.source"
                             :single='true'
                             :selectedLang="sourceLanguage"
                             @chosenLang="setSource"
@@ -28,6 +29,7 @@
                     .project-info__drop-menu            
                         LanguagesSelect(
                             placeholder="Target Languages"
+                            :langFilter="customerLangFilter.target"
                             :selectedLang="targetLangs"
                             @chosenLang="setTargets"
                         )
@@ -115,7 +117,7 @@ export default {
             ],
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
             selectedWorkflow: {name:"2 Steps", id: 2917},
-            template: "",
+            template: "Standard processing",
             sourceLanguage: ["EN-GB"],
             targetLanguages: [],
             service: "",
@@ -371,6 +373,10 @@ export default {
                 return item.symbol === 'tr'
             });
             this.service = service.title;
+        },
+        async refreshCustomerInfo() {
+            const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
+            await this.setProjectValue({prop: 'customer', value: client.body}); 
         }
     },
     computed: {
@@ -408,6 +414,17 @@ export default {
         },
         metricsButton() {
             return this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
+        },
+        customerLangFilter() {
+            let result = {source: [], target: []};
+            const combs = this.currentProject.customer.languageCombinations;
+            for(let comb of combs) {
+                result.source.push(comb.source);
+                result.target.push(comb.target);
+            }
+            result.source.filter((elem, i, arr) => arr.indexOf(elem) === i);
+            result.target.filter((elem, i, arr) => arr.indexOf(elem) === i);
+            return result;
         }
     },
     components: {
@@ -430,6 +447,13 @@ export default {
             this.$router.replace({name: "pm-projects"})
         };
         this.defaultService();
+    },
+    beforeRouteEnter (to, from, next) {
+        next(async (vm) => {
+            if(from.name === "client-details"){
+                await vm.refreshCustomerInfo();
+            }
+        })
     }
 }
 </script>

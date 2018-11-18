@@ -32,7 +32,7 @@ return oldFile.filename;
 }
 
 router.get('/client', async (req, res) => {
-    let id = req.query.id;
+    let { id } = req.query;
     try {
         const client = await getClient({"_id": id})
         res.send(client);
