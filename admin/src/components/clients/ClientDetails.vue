@@ -90,15 +90,15 @@
         NewContactDetails(v-if="newContact" 
             @contactSave="contactSave"
             @cancel="contactCancel")
-    .clients-wrap__errors(v-if="areErrorsExist")
-        .clients-wrap__messages
-            .clients-wrap__errors-title Errors:
-            li.clients-wrap__error(v-for="error in errors") {{ error }}
-            span.clients-wrap__close(@click="closeErrorsBlock") +        
+    ValidationErrors(v-if="areErrorsExist"
+        :errors="errors"
+        @closeErrors="closeErrorsBlock"
+    )        
 </template>
 
 <script>
 import Sidebar from '../Sidebar';
+import ValidationErrors from "../ValidationErrors";
 import MultiClientIndustrySelect from './MultiClientIndustrySelect';
 import ClientStatusSelect from './ClientStatusSelect';
 import AMSelect from './AMSelect';
@@ -188,6 +188,9 @@ export default {
         deleteClient() {
             this.approveShow = true;
         },
+        contactLeadError() {
+            return this.currentClient.contacts.find(item => item.leadContact);
+        },
         async approveContactDelete({index}) {
             this.clientShow = true;
             this.contactShow = false;
@@ -255,6 +258,7 @@ export default {
             if(!this.currentClient.name) this.errors.push('Company name cannot be empty.');
             if(!this.currentClient.industry.length) this.errors.push('Please, choose at least one industry.');
             if(!this.currentClient.contacts.length) this.errors.push('Please, add at least one contact.');
+            if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');            
             if(!this.currentClient.status) this.errors.push('Please, choose status.');
             if(!this.currentClient.leadSource) {
                 this.errors.push('Please, choose lead source.');
@@ -359,6 +363,7 @@ export default {
     },
     components: {
         Sidebar,
+        ValidationErrors,
         MultiClientIndustrySelect,
         ClientStatusSelect,
         AMSelect,
@@ -404,39 +409,6 @@ export default {
         .gen-info__block {
             width: 40%;
         }
-    }
-    &__errors {
-        position: fixed;
-        top: 45%;
-        left: 50%;
-        margin-left: -300px;
-        width: 300px;
-        padding: 15px;
-        box-shadow: 0 0 10px $brown-shadow;
-        background-color: $white;
-        z-index: 50;
-    }
-    &__errors-title {
-        font-size: 18px;
-        text-align: center;
-        margin-bottom: 10px; 
-    }
-    &__messages {
-        position: relative;
-    }
-    &__error {
-        color: $orange;
-        font-size: 16px;
-        font-weight: 600;
-    }
-    &__close {
-        transform: rotate(45deg);
-        position: absolute;
-        top: -12px;
-        right: -8px;
-        font-size: 24px;
-        font-weight: 700;
-        cursor: pointer;
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;

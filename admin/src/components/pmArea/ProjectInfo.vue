@@ -10,6 +10,7 @@
             .project-info__input-data-row
                 .project-info__tasks-col
                     .project-info__drop-menu
+                        .project-info__menu-title Source Language
                         LanguagesSelect(
                             placeholder="Source Languages"
                             :langFilter="customerLangFilter.source"
@@ -18,6 +19,7 @@
                             @chosenLang="setSource"
                         )
                     .project-info__drop-menu
+                        .project-info__menu-title Template
                         SelectSingle(
                             :selectedOption="template"
                             :options="allTemplates"
@@ -26,14 +28,16 @@
                             @chooseOption="setValue"
                         )
                 .project-info__tasks-col
-                    .project-info__drop-menu            
+                    .project-info__drop-menu    
+                        .project-info__menu-title Target Languages        
                         LanguagesSelect(
                             placeholder="Target Languages"
                             :langFilter="customerLangFilter.target"
                             :selectedLang="targetLangs"
                             @chosenLang="setTargets"
                         )
-                    .project-info__drop-menu           
+                    .project-info__drop-menu
+                        .project-info__menu-title Service        
                         SelectSingle(
                             :selectedOption="service" 
                             :options="allServices" 
@@ -51,7 +55,8 @@
                                     img.project-info__list-icon(src="../../assets/images/arrow_open.png" :class="{'project-info_reversed-icon': isSourceFilesShow}")
                             .project-info__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
                                 span.project-info__delete-file(@click="deleteFile(index, 'sourceFiles')") +
-                    .project-info__drop-menu           
+                    .project-info__drop-menu
+                        .project-info__menu-title Workflow       
                         SelectSingle(
                             :selectedOption="selectedWorkflow.name" 
                             :options="workflowStepsNames" 
@@ -69,7 +74,7 @@
                             .project-info__loaded-file(v-if="isRefFilesShow" v-for="(file, index) in refFiles") {{ file.name }}
                                 span.project-info__delete-file(@click="deleteFile(index, 'refFiles')") +
                     .project-info__add-tasks
-                        Button(value="Add tasks" @clicked="addTasks")
+                        Button(value="Add tasks" @clicked="checkForErrors")
                 .project-info__join-files
                     input.project-info__check(type="checkbox" v-model="isJoinFiles")
                     span.project-info__check-title Join Files
@@ -90,11 +95,16 @@
             ProjectAction(:project="currentProject")
     .project-info__all-info
         ProjectFinance
+    ValidationErrors(v-if="areErrorsExist"
+        :errors="errors"
+        @closeErrors="closeErrorsBlock"
+    )
 </template>
 
 <script>
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
+import ValidationErrors from "../ValidationErrors";
 import LanguagesSelect from "../LanguagesSelect";
 import UploadFileButton from "../UploadFileButton";
 import Button from "../Button";
@@ -129,7 +139,9 @@ export default {
             excludeKeys: ["nonTranslatable", "totalWords"],
             isSourceFilesShow: false,
             isRefFilesShow: false,
-            isJoinFiles: false
+            isJoinFiles: false,
+            errors: [],
+            areErrorsExist: false
         }
     },
     methods: {
@@ -231,6 +243,20 @@ export default {
             for(let elem of inputFiles) {
                 elem.value = "";
             }
+        },
+        async checkForErrors() {
+            this.errors = [];
+            if(!this.selectedWorkflow) this.errors.push("Please, select Workflow.");
+            if(!this.template) this.errors.push("Please, select Template.");
+            if(!this.sourceLanguage.length) this.errors.push("Please, select Source language.");
+            if(!this.targetLanguages.length) this.errors.push("Please, select Target language(s).");
+            if(!this.service) this.errors.push("Please, select Service.");
+            if(!this.sourceFiles.length) this.errors.push("Please, upload Source file(s).");
+            if(this.errors.length) {
+                this.areErrorsExist = true;
+                return
+            }
+            await this.addTasks();
         },
         async addTasks() {
             const xtmCustomer = this.xtmCustomers.find(item => {
@@ -377,6 +403,9 @@ export default {
         async refreshCustomerInfo() {
             const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
             await this.setProjectValue({prop: 'customer', value: client.body}); 
+        },
+        closeErrorsBlock() {
+            this.areErrorsExist = false;
         }
     },
     computed: {
@@ -430,6 +459,7 @@ export default {
     components: {
         SelectSingle,
         SelectMulti,
+        ValidationErrors,
         LanguagesSelect,
         UploadFileButton,
         Button,
@@ -480,6 +510,11 @@ export default {
         height: 28px;
         width: 191px;
     }
+    &__menu-title {
+        position: absolute;
+        top: -20px;
+        font-size: 14px;
+    }
     &__tasks {
         box-sizing: border-box;
         width: 60%;
@@ -493,7 +528,7 @@ export default {
     }
     &__tasks-title {
         font-size: 18px; 
-        margin-bottom: 15px;
+        margin-bottom: 35px;
     }
     &__input-data-row {
         margin-bottom: 20px;
@@ -505,7 +540,7 @@ export default {
     }
     &__tasks-col {
         width: 20%;
-        height: 78px;
+        height: 100px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -583,6 +618,13 @@ export default {
     }
     &__check-title {
         font-size: 14px;
+    }
+    &__gen-info {
+        display: flex;
+        justify-content: space-between;
+        .gen-info__block {
+            width: 40%;
+        }
     }
 }
 </style>

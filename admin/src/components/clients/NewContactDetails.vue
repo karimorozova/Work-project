@@ -41,6 +41,9 @@
                                     span Male
                                 .drop__item(@click="setGender('Female')")
                                     span Female
+            .details__item.details_no-space
+                label Lead Contact:
+                input.check(type="checkbox" v-model="contact.leadContact")
             .details__item
                 label Position:
                 input.non-personal(type="text" placeholder="Position" v-model="contact.position" :class="{'contact-wrap_error-shadow': !contact.position && isSaveClicked}")
@@ -63,14 +66,14 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete")
-        .contact-wrap__errors(v-if="areErrorsExist")
-            .contact-wrap__messages
-                .contact-wrap__errors-title Errors:
-                li.contact-wrap__error(v-for="error in errors") {{ error }}
-                span.contact-wrap__close(@click="closeErrorsBlock") +
+        ValidationErrors(v-if="areErrorsExist"
+            :errors="errors"
+            @closeErrors="closeErrorsBlock"
+        )
 </template>
 
 <script>
+import ValidationErrors from "../ValidationErrors";
 import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
@@ -173,7 +176,8 @@ export default {
     },
     components: {
         CountriesSelect,
-        TimezoneSelect
+        TimezoneSelect,
+        ValidationErrors
     },
     directives: {
         ClickOutside
@@ -194,39 +198,6 @@ export default {
         display: flex;
         justify-content: flex-end;
         align-items: center;
-    }
-    &__errors {
-        position: fixed;
-        top: 45%;
-        left: 50%;
-        margin-left: -300px;
-        width: 300px;
-        padding: 15px;
-        box-shadow: 0 0 10px $brown-shadow;
-        background-color: $white;
-        z-index: 50;
-    }
-    &__errors-title {
-        font-size: 18px;
-        text-align: center;
-        margin-bottom: 10px; 
-    }
-    &__messages {
-        position: relative;
-    }
-    &__error {
-        color: $orange;
-        font-size: 16px;
-        font-weight: 600;
-    }
-    &__close {
-        transform: rotate(45deg);
-        position: absolute;
-        top: -12px;
-        right: -8px;
-        font-size: 24px;
-        font-weight: 700;
-        cursor: pointer;
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
@@ -284,6 +255,9 @@ export default {
             }
         }
     }
+    &_no-space {
+        justify-content: flex-start;
+    }
 }
 
 .photo-file {
@@ -324,6 +298,13 @@ export default {
             margin-bottom: 0;
         }
     }
+}
+
+.check {
+    height: 18px;
+    width: 18px;
+    margin-left: 20px;
+    cursor: pointer;
 }
 
 .personal, .non-personal {

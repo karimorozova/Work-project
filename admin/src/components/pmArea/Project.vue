@@ -29,6 +29,7 @@
                         SelectSingle(
                             :selectedOption="project.customer.name"
                             :options="allClients"
+                            :hasSearch="isSearchClient"
                             placeholder="Name"
                             refersTo="customer"
                             @chooseOption="setValue"
@@ -91,6 +92,7 @@ export default {
             },
             createdAt: new Date(),
             deadline: "",
+            isSearchClient: true
         }
     },
     methods: {

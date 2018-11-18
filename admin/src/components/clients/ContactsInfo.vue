@@ -49,17 +49,18 @@
             Button.contacts-info__button(value="Cancel" @clicked="cancelDelete")
             Button.contacts-info__button(value="Delete" @clicked="approveDelete")
         .contacts-info__cancel-edition(v-if="currentEditingIndex !== -1" @click="cancelEdition") Cancel edition
-        .contacts-info__valid-errors(v-if="areErrorsExist")
-            .contacts-info__messages
-                .contacts-info__errors-title Errors:
-                li.contacts-info__valid-error(v-for="error in errors") {{ error }}
-                span.contacts-info__close(@click="closeValidErrorsBlock") +
+        ValidationErrors(v-if="areErrorsExist"
+            :errors="errors"
+            :customStyles="errorsStyle"
+            @closeErrors="closeValidErrorsBlock"
+        )
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import CustomRadio from "../CustomRadio";
 import Button from "../Button";
+import ValidationErrors from "../ValidationErrors";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -91,7 +92,13 @@ export default {
             currentNotes: "",
             deletingContactIndex: -1,
             areErrorsExist: false,
-            errors: []
+            errors: [],
+            errorsStyle: {
+                "position": "absolute",
+                "top": "-25px",
+                "left": "50%",
+                "margin-left": "-170px"
+            }
         }
     },
     methods: {
@@ -186,7 +193,8 @@ export default {
     components: {
         DataTable,
         CustomRadio,
-        Button
+        Button,
+        ValidationErrors
     }
 }
 </script>
@@ -310,39 +318,6 @@ export default {
         font-weight: 700;
         z-index: 10;
         background-color: $white;
-    }
-    &__valid-errors {
-        position: absolute;
-        top: -25px;
-        left: 50%;
-        margin-left: -170px;
-        width: 300px;
-        padding: 15px;
-        box-shadow: 0 0 10px $brown-shadow;
-        background-color: $white;
-        z-index: 50;
-    }
-    &__errors-title {
-        font-size: 18px;
-        text-align: center;
-        margin-bottom: 10px; 
-    }
-    &__messages {
-        position: relative;
-    }
-    &__valid-error {
-        color: $orange;
-        font-size: 16px;
-        font-weight: 600;
-    }
-    &__close {
-        transform: rotate(45deg);
-        position: absolute;
-        top: -12px;
-        right: -8px;
-        font-size: 24px;
-        font-weight: 700;
-        cursor: pointer;
     }
 }
 
