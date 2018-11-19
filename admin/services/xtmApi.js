@@ -28,12 +28,12 @@ function saveTemplateTasks(object) {
         'fileProcessType': 'JOIN'
     } : {'workflowId': object.workflowId}
     const filesObj = {};
-    if(obj.sourceFiles.length) {
+    if(object.sourceFiles.length) {
         for(let index in sourceFiles) {
             filesObj[`translationFiles[${index}].file`] = sourceFiles[index];
         }
     }
-    if(obj.refFiles.length) {
+    if(object.refFiles.length) {
         for(let index in refFiles) {
             filesObj[`referenceFiles[${index}].file`] = refFiles[index];
         }

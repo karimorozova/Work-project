@@ -19,8 +19,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
     let workflow = tasksInfo.workflow || 2917;
     try {
         let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        const filesToTranslate = sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
-        const referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+        const filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
+        const referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
         await deleteCopiedFiles();
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         let tasksLength = project.tasks.length + 1;
