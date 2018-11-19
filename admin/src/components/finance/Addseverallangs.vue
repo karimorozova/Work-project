@@ -7,8 +7,9 @@
             .title
                 span Source language        
             .add-several__clear-all(v-if="hasCheckedAllSource" @click="clearAllChecks('source')") Clear
+            span.add-several__all-search-value(v-model="langSearchValue" v-if="isSourceSearch && langSearchValue") {{ langSearchValue }}
             .languages
-                .list
+                .list(tabindex="0" @keydown="(e) => findLanguage(e, 'source', 'all')" @blur="clearSearchValue('source', 'all')")
                     .list__item(v-for="(language, i) in source.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'source', 'all')" @dblclick="forceMoveTo(i, 'source')" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
@@ -23,8 +24,9 @@
             .title
                 span.title-target Target language
             .add-several__clear-all(v-if="hasCheckedAllTarget" @click="clearAllChecks('target')") Clear
+            span.add-several__all-search-value(v-model="langSearchValue" v-if="!isSourceSearch && langSearchValue") {{ langSearchValue }}
             .languages
-                .list
+                .list(tabindex="3" @keydown="(e) => findLanguage(e, 'target', 'all')" @blur="clearSearchValue('target', 'all')")
                     .list__item(v-for="(language, i) in target.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'target', 'all')" @dblclick="forceMoveTo(i, 'target')" :class="{chosen: language.check}") {{ language.lang }}
             .arrows
                 .arrows__right
@@ -78,7 +80,9 @@ export default {
             },
             selectedInd: [{name: 'Select'}],
             selectedServ: [{title: 'Select'}],
-            errors: []
+            errors: [],
+            langSearchValue: "",
+            isSourceSearch: true
         }
     },
     methods: {
@@ -88,6 +92,40 @@ export default {
             storeCurrentVendor: "storeCurrentVendor",
             storeClient: "storeClient"
         }),
+        clearSearchValue(prop, subProp) {
+            this.langSearchValue = "";
+            this.sortLangArray(this[prop][subProp]);
+        },
+        sortBySearch({val, prop, subProp}) {
+            const value = val.toLowerCase();
+            for(let index in this[prop][subProp]) {
+                const n = value.length;
+                if(this[prop][subProp][index].lang.toLowerCase().slice(0, n) === value) {
+                    let replaceLang = this[prop][subProp].splice(index, 1);
+                    this[prop][subProp].unshift(replaceLang[0]);
+                }
+            }
+        },
+        findLanguage(e, prop, subProp) {
+            this.isSourceSearch = true;
+            if(prop === "target") {
+                this.isSourceSearch = false;
+            }
+            if(e.keyCode === 27) {
+                this.clearAllChecks(prop);
+            } 
+            if(e.keyCode <= 90 && e.keyCode >= 65) {
+                this.langSearchValue += e.key;
+            }
+            if(e.keyCode === 8) {
+                this.langSearchValue = this.langSearchValue.slice(0, -1);
+            }
+            if(this.langSearchValue) {
+                this.sortBySearch({val: this.langSearchValue, prop, subProp});
+            } else {
+                this.sortLangArray(this[prop][subProp]);
+            }
+        },
         preventShift(e) {
             if(e.shiftKey) e.preventDefault();
         },
@@ -504,6 +542,13 @@ export default {
     }
     &__clear-chosen {
         right: 200px;
+    }
+    &__all-search-value {
+        position: absolute;
+        top: -17px;
+        left: 55%;
+        background: #FFF;
+        z-index: 20;
     }
 }
 
