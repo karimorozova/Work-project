@@ -2,19 +2,19 @@
     .billing-info
         .names-info
             .names-info__item
-                label Official Company Name:
+                label.names-info__label Official Company Name:
                 input(type="text" :value="client.officialName" @change="(e) => changeProperty(e, 'officialName')")
             .names-info__item
-                label Contact Name:
+                label.names-info__label Contact Name:
                 input(type="text" :value="client.contactName" @change="(e) => changeProperty(e, 'contactName')")
             .names-info__item
-                label Email:
+                label.names-info__label.names-info_asterisk Email:
                 input(type="text" :value="client.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
             .names-info__item
-                label VAT:
+                label.names-info__label VAT:
                 input(type="text" :value="client.vat" @change="(e) => changeProperty(e, 'vat')")
         .address
-            label Address
+            label.names-info__label Address
             textarea(type="text" placeholder="Text here" :value="client.address" @change="(e) => changeProperty(e, 'address')")
 </template>
 
@@ -79,6 +79,17 @@ export default {
     }
     &_error-shadow {
         box-shadow: 0 0 5px red;
+    }
+    &_asterisk {
+        position: relative;
+        &:after {
+            position: absolute;
+            content: "*";
+            top: -3px;
+            right: -8px;
+            color: red;
+            font-size: 14px;
+        }
     }
 }
 

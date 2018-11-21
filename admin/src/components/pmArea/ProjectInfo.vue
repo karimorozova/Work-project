@@ -10,7 +10,8 @@
             .project-info__input-data-row
                 .project-info__tasks-col
                     .project-info__drop-menu
-                        .project-info__menu-title Source Language
+                        label.project-info__menu-title.project-info_relative Source Language
+                            Asterisk(:customStyle="asteriskStyle")
                         LanguagesSelect(
                             placeholder="Source Languages"
                             :langFilter="customerLangFilter.source"
@@ -19,7 +20,7 @@
                             @chosenLang="setSource"
                         )
                     .project-info__drop-menu
-                        .project-info__menu-title Template
+                        label.project-info__menu-title Template
                         SelectSingle(
                             :selectedOption="template"
                             :options="allTemplates"
@@ -29,7 +30,8 @@
                         )
                 .project-info__tasks-col
                     .project-info__drop-menu    
-                        .project-info__menu-title Target Languages        
+                        label.project-info__menu-title.project-info_relative Target Languages
+                            Asterisk(:customStyle="asteriskStyle")  
                         LanguagesSelect(
                             placeholder="Target Languages"
                             :langFilter="customerLangFilter.target"
@@ -37,7 +39,8 @@
                             @chosenLang="setTargets"
                         )
                     .project-info__drop-menu
-                        .project-info__menu-title Service        
+                        label.project-info__menu-title.project-info_relative Service
+                            Asterisk(:customStyle="asteriskStyle")   
                         SelectSingle(
                             :selectedOption="service" 
                             :options="allServices" 
@@ -47,7 +50,7 @@
                         )     
                 .project-info__tasks-col
                     .project-info__upload-file
-                        UploadFileButton(text="Source Files")
+                        UploadFileButton(text="Source Files *")
                             input.project-info__file-input.project-info__source-file(type="file" @change='uploadSourceFiles' multiple)
                         .project-info__files-list
                             .project-info__files-expander(v-if="sourceFiles.length")
@@ -56,7 +59,7 @@
                             .project-info__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
                                 span.project-info__delete-file(@click="deleteFile(index, 'sourceFiles')") +
                     .project-info__drop-menu
-                        .project-info__menu-title Workflow       
+                        label.project-info__menu-title Workflow       
                         SelectSingle(
                             :selectedOption="selectedWorkflow.name" 
                             :options="workflowStepsNames" 
@@ -104,6 +107,7 @@
 <script>
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
+import Asterisk from "../Asterisk";
 import ValidationErrors from "../ValidationErrors";
 import LanguagesSelect from "../LanguagesSelect";
 import UploadFileButton from "../UploadFileButton";
@@ -141,7 +145,8 @@ export default {
             isRefFilesShow: false,
             isJoinFiles: false,
             errors: [],
-            areErrorsExist: false
+            areErrorsExist: false,
+            asteriskStyle: {"top": "-4px"}
         }
     },
     methods: {
@@ -469,7 +474,8 @@ export default {
         ProjectAction,
         Tasks,
         Steps,
-        ProjectFinance
+        ProjectFinance,
+        Asterisk
     },
     mounted() {
         this.getVendors();
@@ -511,9 +517,10 @@ export default {
         width: 191px;
     }
     &__menu-title {
-        position: absolute;
-        top: -20px;
         font-size: 14px;
+    }
+    &_relative {
+        position: relative;
     }
     &__tasks {
         box-sizing: border-box;
@@ -528,14 +535,14 @@ export default {
     }
     &__tasks-title {
         font-size: 18px; 
-        margin-bottom: 35px;
+        margin-bottom: 20px;
     }
     &__input-data-row {
         margin-bottom: 20px;
         width: 100%;
         display: flex;
         justify-content: space-between;
-        padding-bottom: 20px;
+        padding-bottom: 25px;
         border-bottom: 1px solid $main-color;
     }
     &__tasks-col {
@@ -545,6 +552,9 @@ export default {
         flex-direction: column;
         justify-content: space-between;
         align-items: flex-start;
+        &:nth-of-type(4) {
+            height: 117px;
+        }
     }
     &__add-tasks {
         display: flex;
@@ -565,6 +575,7 @@ export default {
     }
     &__upload-file {
         position: relative;
+        margin-top: 15px;
     }
     &__files-list {
         box-sizing: border-box;
@@ -610,7 +621,7 @@ export default {
     &__join-files {
         display: flex;
         align-items: flex-start;
-        padding-top: 7px;
+        padding-top: 20px;
     }
     &__check {
         margin-right: 5px;

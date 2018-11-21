@@ -13,16 +13,16 @@
             input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
             input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name")
             .project__date
-                LabelValue(label="Start Date and Time")
+                LabelValue(label="Start Date and Time" :isRequired="isRequiredField")
                     Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .project__date
-                LabelValue(label="Deadline")
+                LabelValue(label="Deadline" :isRequired="isRequiredField")
                     Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
         .project__info-row
             .project__client
-                LabelValue(label="Client Name")
+                LabelValue(label="Client Name" :isRequired="isRequiredField")
                     .project__client-link(v-if="project._id") 
                         .project__link(@click="goToClientInfo") {{ project.customer.name }}
                     .project__drop-menu(v-else)
@@ -35,12 +35,12 @@
                             @chooseOption="setValue"
                         )
             .project__industry
-                LabelValue(label="Industry")
+                LabelValue(label="Industry" :isRequired="isRequiredField")
                     .project__drop-menu
                         SelectSingle(
                             :selectedOption="selectedIndustry.name || project.industry.name"
                             :options="industriesList"
-                            @chooseOptions="setIndustry"
+                            @chooseOption="setIndustry"
                             placeholder="Industry"
                         )
             .project__number
@@ -56,13 +56,17 @@
         .project__button(v-if="!project.projectId")
             Button(
                 value="Create Project"
-                @clicked="createProject"
+                @clicked="checkForErrors"
             )
+    ValidationErrors(v-if="areErrorsExist"
+        :errors="errors"
+        @closeErrors="closeErrors")
 </template>
 
 <script>
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
+import ValidationErrors from "../ValidationErrors";
 import Datepicker from "../Datepicker";
 import LabelValue from "./LabelValue";
 import Button from "../Button";
@@ -92,12 +96,15 @@ export default {
             },
             createdAt: new Date(),
             deadline: "",
-            isSearchClient: true
+            isSearchClient: true,
+            isRequiredField: true,
+            errors: [],
+            areErrorsExist: false
         }
     },
     methods: {
         ...mapActions({
-            loadingToggle: "loadingToggle"
+            alertToggle: "alertToggle"
         }),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, h:mm:ss');
@@ -111,13 +118,37 @@ export default {
         setIndustry({option}) {
             this.selectedIndustry = option;
         },
+        closeErrors() {
+            this.areErrorsExist = false;
+        },
+        async checkForErrors() {
+            this.errors = [];
+            if(!this.project.createdAt) this.errors.push("Please, set the start date.");
+            if(!this.project.deadline) this.errors.push("Please, set the deadline date.");
+            if(!this.project.customer.name) this.errors.push("Please, select a Client.");
+            if(!this.selectedIndustry) this.errors.push("Please, choose an industry.");
+            if(this.errors.length) {
+                this.areErrorsExist = true;
+                return
+            }
+            try {
+                await this.createProject();
+            } catch(err) {
+                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
+            }
+        },
         async createProject() {
             this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
             this.project.industry = this.selectedIndustry._id;
             const customer = {...this.project.customer};
             this.project.customer = customer._id;
-            const newProject = await this.$http.post("/pm-manage/new-project", this.project);
-            this.$emit('projectCreated', {project: newProject.body, customer: customer});
+            try {
+                const newProject = await this.$http.post("/pm-manage/new-project", this.project);
+                this.$emit('projectCreated', {project: newProject.body, customer: customer});
+                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
+            } catch(err) {
+                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
+            }
         },
         async getIndustries() {
             const industries = await this.$http.get('/api/industries');
@@ -157,7 +188,8 @@ export default {
         SelectMulti,
         Datepicker,
         LabelValue,
-        Button
+        Button,
+        ValidationErrors
     },
     mounted() {
         this.getIndustries();

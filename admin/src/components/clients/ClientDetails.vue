@@ -11,29 +11,32 @@
         .clients-wrap__gen-info
             .gen-info__block
                 .block-item
-                    label Company Name:
+                    label.block-item__label.block-item_relative Company Name:
+                        Asterisk(:customStyle="asteriskStyle")
                     input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'clients-wrap_error-shadow': !currentClient.name && isSaveClicked}")
                 .block-item
-                    label Website:
+                    label.block-item__label Website:
                     input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
                 .block-item
-                    label Industry:
+                    label.block-item__label.block-item_relative Industry:
+                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industry.length && isSaveClicked}")
                         MultiClientIndustrySelect(:selectedInd="currentClient.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                 .block-item
-                    label Status:
+                    label.block-item__label.block-item_relative Status:
+                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.status && isSaveClicked}")
                         ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
             .gen-info__block
                 .block-item
-                    label Contract:
+                    label.block-item__label Contract:
                     .contract
                         .contract__upload
                             input.upload(type="file" @change="contractLoad")
                         .contract__download
                             a(v-if="currentClient.contract" :href="currentClient.contract")
                                 img(src="../../assets/images/Other/Download-icon.png")
-                    label NDA:
+                    label.block-item__label NDA:
                     .nda
                         .nda__upload
                             input.upload(type="file" @change="ndaLoad")
@@ -41,15 +44,18 @@
                             a(v-if="currentClient.nda" :href="currentClient.nda")
                                 img(v-if="currentClient.nda" src="../../assets/images/Other/Download-icon.png")
                 .block-item
-                    label Account Manager:
+                    label.block-item__label.block-item_relative Account Manager:
+                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
                         AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
                 .block-item
-                    label Sales Manager:
+                    label.block-item__label.block-item_relative Sales Manager:
+                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
                         AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
                 .block-item
-                    label Project Manager:
+                    label.block-item__label.block-item_relative Project Manager:
+                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.projectManager && isSaveClicked}")
                         AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
         .title Contact Details
@@ -98,6 +104,7 @@
 
 <script>
 import Sidebar from '../Sidebar';
+import Asterisk from "../Asterisk";
 import ValidationErrors from "../ValidationErrors";
 import MultiClientIndustrySelect from './MultiClientIndustrySelect';
 import ClientStatusSelect from './ClientStatusSelect';
@@ -132,7 +139,8 @@ export default {
             isLeadEmpty: "",
             isSaveClicked: false,
             addSeveral: false,
-            addSeveralServiceTitle: ""
+            addSeveralServiceTitle: "",
+            asteriskStyle: {"top": "-4px"}
         }
     },
     methods: {
@@ -363,6 +371,7 @@ export default {
     },
     components: {
         Sidebar,
+        Asterisk,
         ValidationErrors,
         MultiClientIndustrySelect,
         ClientStatusSelect,
@@ -434,8 +443,11 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    label {
+    &__label {
         margin-bottom: 0;
+    }
+    &_relative {
+        position: relative;
     }
     input {
         font-size: 14px;

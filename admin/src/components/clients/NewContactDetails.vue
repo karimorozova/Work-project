@@ -17,13 +17,15 @@
                     img.photo-image(:src="contact.photo")    
                 .names-gender
                     .names-gender__item
-                        label Name:
+                        label.details_relative Name:
+                            Asterisk
                         input.personal(type="text" placeholder="Name" v-model="contact.firstName" :class="{'contact-wrap_error-shadow': !contact.firstName && isSaveClicked}")
                     .names-gender__item
                         label Surname:
                         input.personal(type="text" placeholder="Surname" v-model="contact.surname")
                     .names-gender__item
-                        label Email:
+                        label.details_relative Email:
+                            Asterisk
                         input.personal(type="text" placeholder="email" v-model="contact.email" :class="{'contact-wrap_error-shadow': !contact.email && !isEmailValid}")
                     .names-gender__item
                         label Gender:
@@ -45,7 +47,8 @@
                 label Lead Contact:
                 input.check(type="checkbox" v-model="contact.leadContact")
             .details__item
-                label Position:
+                label.details_relative Position:
+                    Asterisk
                 input.non-personal(type="text" placeholder="Position" v-model="contact.position" :class="{'contact-wrap_error-shadow': !contact.position && isSaveClicked}")
             .details__item
                 label Phone:
@@ -74,6 +77,7 @@
 
 <script>
 import ValidationErrors from "../ValidationErrors";
+import Asterisk from "../Asterisk";
 import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
@@ -177,7 +181,8 @@ export default {
     components: {
         CountriesSelect,
         TimezoneSelect,
-        ValidationErrors
+        ValidationErrors,
+        Asterisk
     },
     directives: {
         ClickOutside
@@ -257,6 +262,9 @@ export default {
     }
     &_no-space {
         justify-content: flex-start;
+    }
+    &_relative {
+        position: relative;
     }
 }
 

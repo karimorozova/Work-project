@@ -1,11 +1,13 @@
 <template lang="pug">
 .pair
     span.pair__label {{ label }}:
+        Asterisk(v-if="isRequired" :customStyle="{top: '-4px'}")
     slot 
         span.pair__value {{ value }}
 </template>
 
 <script>
+import Asterisk from "../Asterisk";
 export default {
     props: {
         label: {
@@ -13,8 +15,15 @@ export default {
         },
         value: {
             type: String
+        },
+        isRequired: {
+            type: Boolean,
+            default: false
         }
-    }    
+    },
+    components: {
+        Asterisk
+    } 
 }
 </script>
 
@@ -24,6 +33,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     &__label {
+        position: relative;
         .descriptors & {
             margin-bottom: 8px;
             opacity: 0.67;

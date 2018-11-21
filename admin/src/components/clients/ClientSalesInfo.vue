@@ -1,7 +1,8 @@
 <template lang="pug">
     .sales-info
         .lead-info
-            label Lead Source:
+            label.lead-info__label.lead-info_relative Lead Source:
+                Asterisk(:customStyle="{top: '-4px'}")
             .lead-info__menu(:class="{'sales-info_error-shadow': !client.leadSource && isEmpty}")
                 ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
         .status-info
@@ -12,6 +13,7 @@
 
 <script>
 import ClientLeadsourceSelect from './ClientLeadsourceSelect';
+import Asterisk from "../Asterisk";
 
 export default {
     props: {
@@ -33,7 +35,8 @@ export default {
         }
     },
     components: {
-        ClientLeadsourceSelect
+        ClientLeadsourceSelect,
+        Asterisk
     }
 }
 </script>
@@ -55,8 +58,11 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    label {
+    &__label {
         margin-bottom: 0;
+    }
+    &_relative {
+        position: relative;
     }
     &__data {
         display: flex;
