@@ -238,6 +238,9 @@ export default {
 <style lang="scss" scoped>
 .servicesWrapper {
   position: relative;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px #67573E;
   table {
     width: 100%;
     border: 1px solid #9a8f80;

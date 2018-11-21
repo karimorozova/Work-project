@@ -35,7 +35,7 @@ export default {
         async getSources() {
             try {
                 const result = await this.$http.get('/api/leadsources');
-                this.leadsources = result.body;
+                this.leadsources = result.body.map(item => item.source);
             } catch(err) {
                 throw err
             }

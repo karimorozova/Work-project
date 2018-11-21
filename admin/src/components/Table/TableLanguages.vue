@@ -141,7 +141,7 @@ export default {
         languageRem: this.languages[confirmRIndex]._id
       };
       this.$http
-        .post("api/removelanguages", remObj)
+        .post("/api/removelanguages", remObj)
         .then(result => {})
         .catch(err => {
           console.log(err);
@@ -158,7 +158,7 @@ export default {
     },
     async getLanguages() {
       await this.$http
-        .get("api/languages")
+        .get("/api/languages")
         .then(response => {
           let result = response.body; 
           this.languages = result.sort((a, b) => {
@@ -194,7 +194,7 @@ export default {
         langObj.append('lastModified', this.file[0].lastModified);
       }
       this.$http
-        .post("api/savelanguages", langObj)
+        .post("/api/savelanguages", langObj)
         .then(result => {
           console.log(result.data);
         })
@@ -260,6 +260,9 @@ export default {
 .langWrapper {
   position: relative;
   font-family: MyriadPro;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px #67573E;
   table {
     width: 100%;
     border: 1px solid #9a8f80;
@@ -323,7 +326,6 @@ export default {
         outline: none;
         width: 20px;
         height: 20px;
-        // margin-right: 25px;
       }
       .saveB {
         background-image: url("../../assets/images/Other/save-icon-qa-form.png");

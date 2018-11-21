@@ -2,7 +2,7 @@
 .sidebar
     span.sidebar__title(v-if="title") {{ title }}
     .sidebar__inner
-      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="linkClass") {{ link }}
+      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}") {{ link }}
 </template>
 
 <script>
@@ -16,6 +16,10 @@ export default {
         },
         linkClass: {
             type: String
+        },
+        activeIndex: {
+            type: Number,
+            default: -1
         }
     },
     methods: {
@@ -53,12 +57,14 @@ export default {
         display: flex;
         justify-content: center;
         border-top: 1px solid $beige;
-        border-bottom: 1px solid $beige;
         padding: 5px 0;
         cursor: pointer;
-        &:nth-child(2) {
-            border: none;
+        &:last-child {
+            border-bottom: 1px solid $beige;
         }
+    }
+    &_active-link {
+        background-color: $active-background;
     }
     .client-details {
         font-size: 16px;

@@ -47,7 +47,7 @@
                     .title
                       span {{ note.title }}
                 .balloons
-            router-view(:sliderBool="sliderBool"
+            router-view(:isSidebar="isSidebar"
               @refreshXtmCustomers="refreshXtmCustomers"
               @getCustomerLangs='getCustomerLangs'
               @refreshServices='refreshServices'
@@ -120,7 +120,7 @@ export default {
       quotes: [],
       path: "Language Settings",
       accountInfo: false,
-      sliderBool: false,
+      isSidebar: false,
       clientLanguages: [] 
     };
   },
@@ -199,7 +199,7 @@ export default {
           elem.active = false
         }
       }
-      this.sliderBool = true;
+      this.isSidebar = true;
     },
     hideAccountMenu() {
       this.accountMenuVisible = false;
@@ -224,7 +224,7 @@ export default {
       switch(index) {
         case 0:
           this.$router.push('/dashboard');
-          this.sliderBool = false;
+          this.isSidebar = false;
           break;
         case 1:
           this.$router.push('/recruitment');
@@ -342,6 +342,7 @@ export default {
       .imgwrap {
         display: flex;
         position: relative;
+        cursor: pointer;
         .spwrap {
           color: #fff;
           visibility: hidden;

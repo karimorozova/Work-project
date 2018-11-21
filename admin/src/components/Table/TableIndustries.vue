@@ -1,5 +1,5 @@
 <template lang="pug">
-.servicesWrapper
+.industries-wrapper
   table
     thead
       tr
@@ -89,7 +89,6 @@ export default {
   },
   methods: {
     async getIndustries() {
-      console.log('Getting industries...')
       const preData = await this.$http.get("api/industries");
       this.industries = preData.body;
       this.industries.sort((x, y) => {
@@ -225,8 +224,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.servicesWrapper {
+.industries-wrapper {
   position: relative;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px #67573E;
   table {
     width: 100%;
     border: 1px solid #9a8f80;

@@ -29,13 +29,13 @@ function saveTemplateTasks(object) {
     } : {'workflowId': object.workflowId}
     const filesObj = {};
     if(object.sourceFiles.length) {
-        for(let index in sourceFiles) {
-            filesObj[`translationFiles[${index}].file`] = sourceFiles[index];
+        for(let index in object.sourceFiles) {
+            filesObj[`translationFiles[${index}].file`] = object.sourceFiles[index];
         }
     }
-    if(object.refFiles.length) {
+    if(object.refFiles && object.refFiles.length) {
         for(let index in refFiles) {
-            filesObj[`referenceFiles[${index}].file`] = refFiles[index];
+            filesObj[`referenceFiles[${index}].file`] = object.refFiles[index];
         }
     }
     return new Promise((resolve, reject) => {

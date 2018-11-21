@@ -365,12 +365,39 @@ router.get('/countries', (req, res) => {
 router.get('/leadsources', async (req, res) => {
   try {
     const leadsources = await LeadSource.find({});
-    const result = leadsources.map(item => item.source);
-    res.send(result);
+    res.send(leadsources);
   } catch(err) {
     console.log(err);
     res.status(500).send("Error on getting lead sources from DB")
   }
 })
 
+router.post('/update-leadsource', async (req, res) => {
+  const { leadSource } = req.body;
+  try {
+    if(leadSource._id) {
+      await LeadSource.updateOne({"_id": leadSource._id}, leadSource);
+      return res.send("Updated");
+    }
+    await LeadSource.create(leadSource);
+    res.send("New lead source created");
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on creating a new lead source")
+  }
+})
+
+router.delete('/lead-source/:id', async (req, res) => {
+  const { id } = req.params;
+  if(!id) {
+    return res.send('Deleted unsaved lead source')
+  }
+  try {
+    await LeadSource.deleteOne({"_id": id});
+    res.send('Deleted');
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on deleting lead source");
+  }
+})
 module.exports = router;
