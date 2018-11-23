@@ -302,8 +302,6 @@ const industriesDefault = [
 
 const projectsDefault = [];
 
-const ratesduoDefault = [];
-
 const clientsDefault = [
     {name: "DDD", website: "www.ddd.com", status: "Active", contract: "", nda: "", accountManager: "aran.s", salesManager: "eirini.loi", projectManager: "illy.dim", leadSource: "Website", salesComission: "Passed threshold", officialName: "DDD LTD", contactName: "Jack Di", email: "ddd@ddd.com", vat: "", address: "345 DSD Street, Moscow, Russia", languageCombinations: [], industry: [{name: "Hotel & Real Estates"}], contacts: [{
         photo: "", firstName: "Sam", surname: "Nolan", email: "sam@ddd.com", gender: "Male", position: "Manager", phone: 12345678, skype: "samNol", country: "Australia", timezone: "(UTC+10:00) Canberra, Melbourne, Sydney", leadContact: true, notes: ""}]
@@ -438,7 +436,6 @@ const defaultValue = {
     usersDefault,
     servicesDefault,
     industriesDefault,
-    ratesduoDefault,
     timezonesDefault,
     clientsDefault,
     vendorsDefault,

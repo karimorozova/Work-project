@@ -5,7 +5,8 @@ const {
   User,
   Services,
   Industries,
-  Ratesduo,
+  Duorate,
+  Monorate,
   Timezones,
   LeadSource,
   Clients,
@@ -19,7 +20,6 @@ const {
   usersDefault,
   servicesDefault,
   industriesDefault,
-  ratesduoDefault,
   timezonesDefault,
   leadSourcesDefault,
   clientsDefault,
@@ -269,6 +269,21 @@ function users() {
   })
 }
 
+function industries() {
+  return Industries.find({}).then(async industries => {
+    if (!industries.length) {
+      for (var industry of industriesDefault) {
+        console.log(industry.name);
+        await new Industries(industry).save().then(industry => {
+          console.log(`industry ${industry.name} was saved!`);
+        }).catch(err => {
+          console.log(`Industry ${industry.name} wasn't saved. Because of ${err.message}`);
+        });
+      }
+    }
+  });
+}
+
 function services() {
   return Services.find({})
     .then(async (services) => {
@@ -359,19 +374,67 @@ async function serviceDuoLangs() {
   }  
 }
 
-function industries() {
-  return Industries.find({}).then(async industries => {
-    if (!industries.length) {
-      for (var industry of industriesDefault) {
-        console.log(industry.name);
-        await new Industries(industry).save().then(industry => {
-          console.log(`industry ${industry.name} was saved!`);
-        }).catch(err => {
-          console.log(`Industry ${industry.name} wasn't saved. Because of ${err.message}`);
-        });
+async function fillDuoServiceRates() {
+  const existedRates = await Duorate.find({});
+  try {
+    if(!existedRates.length) {
+      const services = await Services.find({"languageForm": "Duo"});
+      const translation = await Services.findOne({"symbol": "tr"});
+      const duoServices = services.reduce((init, cur) => {
+        let rate = 0;
+        if(cur.symbol === "tr") rate = 0.08;
+        if(cur.symbol === "pr") rate = 0.017;
+        if(cur.symbol === "qt") rate = 0.028;
+        const key = cur._id;
+        init[key] = {value: rate, active: true};
+        return {...init}
+      }, {});
+      const combs = translation.languageCombinations;
+      for(let comb of combs) {
+        const industries = comb.industries.map(item => {
+          return { industry: item.industry, rates: {...duoServices}}
+        })
+        await Duorate.create({
+          source: comb.source,
+          target: comb.target,
+          industries
+        })
       }
     }
-  });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+async function fillMonoServiceRates() {
+  const existedRates = await Monorate.find({});
+  try {
+    if(!existedRates.length) {
+      const services = await Services.find({"languageForm": "Mono"});
+      const copywriting = await Services.findOne({"symbol": "co"});
+      const monoServices = services.reduce((init, cur) => {
+        let rate = 0;
+        if(cur.symbol === "co") rate = 0.1; 
+        if(cur.symbol === "bl") rate = 0.11;
+        if(cur.symbol === "sw") rate = 0.12;
+        const key = cur._id;
+        init[key] = {value: rate, package: 200, active: true};
+        return {...init}
+      }, {});
+      const combs = copywriting.languageCombinations;
+      for(let comb of combs) {
+        const industries = comb.industries.map(item => {
+          return { industry: item.industry, rates: {...monoServices}}
+        })
+        await Monorate.create({
+          target: comb.target,
+          industries
+        })
+      }
+    }
+  } catch(err) {
+    console.log(err);
+  }
 }
 
 async function checkCollections() {
@@ -389,6 +452,8 @@ async function checkCollections() {
   await serviceDuoLangs();
   await clientLangs();
   await vendorLangs();
+  await fillDuoServiceRates();
+  await fillMonoServiceRates()
 }
 
 module.exports = checkCollections();
