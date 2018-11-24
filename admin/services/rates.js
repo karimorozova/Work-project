@@ -1,4 +1,106 @@
-const { Services } = require("../models/");
+const { Services, Industries, Duorate } = require("../models/");
+
+async function updateRate(rate, infoIndustries, languageForm) {
+  try {
+    let industries = await includeAllIndustries(rate.industries, languageForm);
+    if(infoIndustries[0].name == "All") {
+      const updatedIndustries = updateRateForAll(industries, infoIndustries[0].rates);
+      return { updatedIndustries };
+    }
+    for(let industry of industries) {
+      const index = infoIndustries.findIndex(item => item._id === industry.industry);
+      if(index !== -1) {
+        industry.rates = infoIndustries[index].rates; 
+      }
+    }
+    return { updatedIndustries: industries };
+  } catch(err) {
+    console.log("Error from updateRate!");
+    console.log(err);
+  }
+}
+
+function updateRateForAll(rateIdustries, rates) {
+  return rateIdustries.map(item => {
+    return  {...item, rates}
+  })
+}
+
+async function createNewRate(info) {
+  const { sourceLanguage, targetLanguage, industries, languageForm } = info;
+  try {
+    if(info.industries[0].name === "All") {
+      return await createNewForAllIndustries({ sourceLanguage, targetLanguage, industries, languageForm });
+    }
+    const modifiedIndustries = industries.map(item => {
+      const industry = {...item, id: item._id}
+      return {industry, rates: item.rates}
+    })
+    const allIndustries = await includeAllIndustries(modifiedIndustries, languageForm);
+    await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+  } catch(err) {
+    console.log("Error from createNewRate");
+    console.log(err);
+  }
+}
+
+async function createNewForAllIndustries({ sourceLanguage, targetLanguage, industries, languageForm }) {
+  try {
+    const rateIndustries = await defaultRates(languageForm);
+    const allIndustries = rateIndustries.map(item => {
+      return {industry: item, rates: industries[0].rates}
+    });
+    await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+  } catch(err) {
+    console.log("Error from createNewForAllIndustries");
+    console.log(err);
+  }
+}
+
+async function includeAllIndustries(rateIndustries, languageForm) {
+  try {
+    let industries = await defaultRates(languageForm);
+    let allIndustries = [];
+    for(let elem of industries) {
+      const index = rateIndustries.findIndex(item => item.industry.id === elem.id);
+      if(index !== -1) {
+        allIndustries.push({
+          'industry': elem.id,
+          'rates': rateIndustries[index].rates
+        })
+      } else {
+        allIndustries.push({
+          'industry': elem.id,
+          'rates': elem.rates
+        })
+      }
+    }
+    return allIndustries;
+  } catch(err) {
+    console.log("Error from includeAllIndustries");
+    console.log(err);
+  }
+}
+
+async function defaultRates(languageForm) {
+  try {
+    const industries = await Industries.find();
+    const services = await Services.find({languageForm: languageForm});
+    const serviceRate = languageForm === "Duo" ? {value: 0, active: true} : {value: 0, package: 200, active: true};
+    const rates = services.reduce((init, cur) => {
+        const key = cur._id;
+        init[key] = {...serviceRate};
+        return {...init}
+    }, {});
+    for(let industry of industries) {
+      industry["rates"] = {...rates}; 
+    }
+    return industries;
+  } catch(err) {
+    console.log("Error from defaultrates");
+    console.log(err);
+  }
+}
 
 async function checkServiceRatesMatches(service, industries, rate) {
     if(service.languageForm === 'Mono') {
@@ -143,4 +245,4 @@ function addCombinations({comb, serviceCombinations, industries}) {
   return updatedCombinations;
 }
 
-module.exports = { checkServiceRatesMatches, deleteServiceRate, updateLangCombs };
+module.exports = { updateRate, createNewRate, checkServiceRatesMatches, deleteServiceRate, updateLangCombs };

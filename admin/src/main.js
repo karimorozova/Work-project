@@ -30,12 +30,10 @@ axios.interceptors.request.use(config => {
 Vue.use(VueResource);
 
 Vue.http.interceptors.push((request, next) => {
-  store.dispatch('loadingToggle', true);
   store.dispatch('incrementRequestCounter');
   next((response) => {
     store.dispatch('decrementRequestCounter');
     if(store.state.requestCounter === 0); {
-      store.dispatch('loadingToggle', false);
     }
   })
 })

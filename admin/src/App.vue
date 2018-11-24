@@ -2,7 +2,7 @@
   #app
     //-  a.b-log-out(href='/logout') Log out
     //-  a.b-log-in(href='/login') Log in
-    Loading(v-if="isLoading")
+    Loading(v-if="requestCounter > 0")
     transition(name="slide-fade")
       AlertMessage(v-if="isAlert" :text="alertMessage" :type="alertType")
     router-view
@@ -20,7 +20,8 @@ export default {
       isLoading: 'loading',
       isAlert: 'isAlert',
       alertType: 'alertType',
-      alertMessage: 'alertMessage'
+      alertMessage: 'alertMessage',
+      requestCounter: 'getRequestCounter'
     })
   },
   components: {

@@ -17,14 +17,14 @@ export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payl
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
 export const updateMatrix = async ({ commit }, payload) => {
+  commit('startRequest')
   commit('updateMatrixData', payload);
-  commit('loadingValue', true);  
   try {
     const updatedProject = await axios.post('/xtm/update-matrix', {...payload});
     await commit('storeCurrentProject', updatedProject.data);
-    commit('loadingValue', false);
+    commit('endRequest');
   } catch(err) {
-    commit('loadingValue', false);
+    commit('endRequest');
     throw new Error(err.message);
   }
 };
@@ -36,6 +36,7 @@ export const alertToggle = ({ commit }, payload) => {
 }
 export const login = ({ commit }, token) => {
     commit("LOGIN");
+    commit('startRequest')
     return new Promise(resolve => {
       setTimeout(() => {
         let currentDate = Date.now();
@@ -43,6 +44,7 @@ export const login = ({ commit }, token) => {
         let object = {value: token, timestamp: expiryTime}
         localStorage.setItem("token", JSON.stringify(object));
         commit("LOGIN_SUCCESS");
+        commit('endRequest');
         resolve();
       }, 1000);
     });

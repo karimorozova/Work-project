@@ -1,4 +1,4 @@
-export const getCount = state => state.count;
+export const getRequestCounter = state => state.requestCounter;
 export const isLoggedIn = state => state.isLoggedIn;
 export const loading = state => state.isLoading; 
 export const isAlert = state => state.isAlert;

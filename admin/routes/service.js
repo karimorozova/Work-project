@@ -2,9 +2,10 @@ const router = require('express').Router();
 const multer = require('multer');
 const mv = require('mv');
 const { upload } = require('../utils/');
-const { Services, Industries } = require('../models');
-const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, updateLangCombs } = require('../services/');
+const { Services, Industries, Duorate, Monorate } = require('../models');
+const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, createNewRate, updateRate, updateLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
+const { getAllDuoRates } = require('../services/getRates'); 
 
 function moveServiceIcon(oldFile, date) {
   var newFile = './dist/static/services/' + date + '-' + oldFile.filename
@@ -119,32 +120,42 @@ router.post('/step-payables', async (req, res) => {
 
 router.post('/rates', async (req, res) => {
   try {
-    let rate = req.body;
-    let industries = await Industries.find();
-    let service = await getOneService({'title': rate.title});
-
-    for(let indus of rate.industry) {
-      for(let industry of industries) {
-        if(industry.name == indus.name || indus.name == 'All') {
-          if(service.languageForm === 'Duo') {
-            industry.rate = indus.rate;
-            industry.active = indus.active;
-          } else {
-            industry.rate = indus.rate;
-            industry.active = indus.active;
-            industry.package = indus.package;
-          }
-        }
-      }
+    const { info } = req.body;
+    let duoRate = await Duorate.findOne({"source": info.sourceLanguage._id, "target": info.targetLanguage._id})
+      .populate("industries.industry");
+    if(duoRate) {
+      const { updatedIndustries } = await updateRate(duoRate, info.industries, info.languageForm);
+      const result = await Duorate.findOneAndUpdate({"_id": duoRate._id}, {'industries': updatedIndustries});
+      return res.send(result);
     }
-    industries = industries.map(item => {
-      if(service.languageForm === 'Duo') {
-        return {industry: item._id, active: item.active, rate: item.rate}
-      } 
-      return {industry: item._id, active: item.active, rate: item.rate, package: item.package}
-    })
-    const result = await checkServiceRatesMatches(service, industries, rate);
-    res.send(result);  
+    const result = await createNewRate(info);
+    res.send(result);
+    // let rate = req.body;
+    // let industries = await Industries.find();
+    // let service = await getOneService({'title': rate.title});
+
+    // for(let indus of rate.industry) {
+    //   for(let industry of industries) {
+    //     if(industry.name == indus.name || indus.name == 'All') {
+    //       if(service.languageForm === 'Duo') {
+    //         industry.rate = indus.rate;
+    //         industry.active = indus.active;
+    //       } else {
+    //         industry.rate = indus.rate;
+    //         industry.active = indus.active;
+    //         industry.package = indus.package;
+    //       }
+    //     }
+    //   }
+    // }
+    // industries = industries.map(item => {
+    //   if(service.languageForm === 'Duo') {
+    //     return {industry: item._id, active: item.active, rate: item.rate}
+    //   } 
+    //   return {industry: item._id, active: item.active, rate: item.rate, package: item.package}
+    // })
+    // const result = await checkServiceRatesMatches(service, industries, rate);
+    // res.send(result);  
   } catch(err) {
       console.log(err)
       res.status(500).send('Error on adding/updating the rate');
@@ -190,40 +201,50 @@ router.delete('/rate/:id', async (req, res) => {
   }
 })
 
-router.get('/parsed-rates', async (req, res) => {
-  try{
-    let service = await getOneService({title: req.query.title, languageForm: req.query.form});
-    let rates = [];
-    for(let comb of service.languageCombinations) {
-      for(let elem of comb.industries) {
-        if(elem.rate > 0) {
-          let industry = {...elem.industry._doc};
-          industry.rate = elem.rate;
-          industry.active = elem.active;
-          if(req.query.form === "Duo") {
-            rates.push({
-              id: comb._id,
-              title: service.title,
-              sourceLanguage: comb.source,
-              targetLanguage: comb.target,
-              industry: [industry]
-            })
-          } else {
-            industry.package = elem.package;
-            rates.push({
-              id: comb._id,
-              title: service.title,
-              targetLanguage: comb.target,
-              industry: [industry]
-            })
-          }
-        }
-      }
-    }
-    res.send(rates);
+// router.get('/parsed-rates', async (req, res) => {
+//   try{
+//     let service = await getOneService({title: req.query.title, languageForm: req.query.form});
+//     let rates = [];
+//     for(let comb of service.languageCombinations) {
+//       for(let elem of comb.industries) {
+//         if(elem.rate > 0) {
+//           let industry = {...elem.industry._doc};
+//           industry.rate = elem.rate;
+//           industry.active = elem.active;
+//           if(req.query.form === "Duo") {
+//             rates.push({
+//               id: comb._id,
+//               title: service.title,
+//               sourceLanguage: comb.source,
+//               targetLanguage: comb.target,
+//               industry: [industry]
+//             })
+//           } else {
+//             industry.package = elem.package;
+//             rates.push({
+//               id: comb._id,
+//               title: service.title,
+//               targetLanguage: comb.target,
+//               industry: [industry]
+//             })
+//           }
+//         }
+//       }
+//     }
+//     res.send(rates);
+//   } catch(err) {
+//     console.log(err);
+//     res.status(500).send('Error on getting rates!')
+//   }
+// })
+
+router.get("/parsed-rates",  async (req, res) => {
+  try {
+    const rates = await getAllDuoRates();
+    res.send(rates); 
   } catch(err) {
     console.log(err);
-    res.status(500).send('Error on getting rates!')
+    res.send("error");
   }
 })
 
