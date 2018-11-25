@@ -23,7 +23,8 @@ function parseIndustries(rate, serviceIds) {
         let industry = {...elem.industry._doc, _id: elem.industry._id};
         industry.rates = {...allServRates};
         rates.push({
-            id: elem._id,
+            id: rate.id,
+            ratesId: elem._id,
             sourceLanguage: rate.source,
             targetLanguage: rate.target,
             industry: industry

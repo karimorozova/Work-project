@@ -3,9 +3,10 @@ const multer = require('multer');
 const mv = require('mv');
 const { upload } = require('../utils/');
 const { Services, Industries, Duorate, Monorate } = require('../models');
-const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, createNewRate, updateRate, updateLangCombs } = require('../services/');
+const { getOneService, getManyServices, checkServiceRatesMatches, deleteServiceRate, createNewRate, updateRate, deleteDuoRate, updateLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
 const { getAllDuoRates } = require('../services/getRates'); 
+const { getDuoRate } = require('../rates');
 
 function moveServiceIcon(oldFile, date) {
   var newFile = './dist/static/services/' + date + '-' + oldFile.filename
@@ -186,15 +187,18 @@ router.post('/several-langs', async (req, res) => {
 })
 
 router.delete('/rate/:id', async (req, res) => {
-  const { serviceId, industries } = req.body;
+  // const { serviceId, industries } = req.body;
+  const { industries, servicesIds } = req.body;
   const { id } = req.params;
   if(id === "undefined") {
     return res.send('Empty row deleted');
   }
   try {
-    const service = await getOneService({'_id': serviceId});
-    const result = await deleteServiceRate(service, industries, id);
-    res.send(result);
+    const rate = await getDuoRate({"_id": id});
+    const result = await deleteDuoRate(rate, industries, servicesIds);
+    // const service = await getOneService({'_id': serviceId});
+    // const result = await deleteServiceRate(service, industries, id);
+    res.send("deleted");
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on deleting the rate');

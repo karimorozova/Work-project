@@ -22,14 +22,14 @@
           th(v-for="head in tableHeader")
             .table__head-title {{ head.title }}
       tbody.duo-tbody
-        template(v-for="(info, index) in fullInfo" v-if="(sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == 'All') && (targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == 'All')")
-          tr(v-if="filterIndustry.indexOf(info.industry.name) != -1 || industryFilter[0].name == 'All'")
+        template(v-for="(info, index) in fullInfo" v-if="isSourceFilter(info) && isTargetFilter(info)")
+          tr(v-if="isIndustryFilter(info) && isAllRatesZero(info) && isCurrentServiceRateZero(info)")
             td.drop-option 
-              template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || sourceSelect[0] == "All")') {{ info.sourceLanguage.lang }}
+              template(v-if='currentActive !== index && isSourceFilter(info)') {{ info.sourceLanguage.lang }}
               .inner-component(v-if="currentActive === index")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
             td.drop-option 
-              template(v-if='currentActive !== index && (sourceSelect.indexOf(info.sourceLanguage.symbol) != -1 || targetSelect[0] == "All" || sourceSelect[0] == "All")') {{ info.targetLanguage.lang }}
+              template(v-if='currentActive !== index && isSourceFilter(info) || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .inner-component(v-if="currentActive === index")
                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td.drop-option              
@@ -39,9 +39,6 @@
                 span.title-tooltip {{ info.industry.name }}
               .inner-component(v-if="currentActive === index")
                 IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
-            //- td
-            //-   input(v-if="currentActive !== index" type="checkbox" :checked="indus.active" :value="indus.active" disabled)
-            //-   input(v-else type="checkbox" :checked="isIndustryActive" v-model="isIndustryActive")
             template(v-for="(service, servKey) in info.industry.rates")
                 td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
                     .rates-column
@@ -127,6 +124,29 @@ export default {
             if(this.currentActive !== index) {
                 return key === "edit" || key === "delete";
             }
+        },
+        isAllRatesZero(info) {
+            const { rates } = info.industry;
+            return Object.keys(rates).reduce((init, cur) => {
+                return init + rates[cur].value;
+            }, 0)
+        },
+        isCurrentServiceRateZero(info) {
+            for(let key in info.industry.rates) {
+                if(this.servicesIds.indexOf(key) !== -1 && info.industry.rates[key].value) {
+                    return true
+                }
+            }
+            return false;
+        },
+        isSourceFilter(info) {
+            return (this.sourceSelect.indexOf(info.sourceLanguage.symbol) !== -1 || this.sourceSelect[0] === 'All');
+        },
+        isTargetFilter(info) {
+            return (this.targetSelect.indexOf(info.targetLanguage.symbol) !== -1 || this.targetSelect[0] === 'All');
+        },
+        isIndustryFilter(info) {
+            return (this.filterIndustry.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
         },
         addSevLangs() {
         //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
@@ -335,7 +355,7 @@ export default {
                 };
                 try {
                     await this.$http.post('/service/rates', { info });
-                    await this.getAllCombinations();
+                    await this.getDuoCombinations();
                     this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
                 } catch(err) {
                     this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
@@ -351,10 +371,11 @@ export default {
             this.changedRate = this.fullInfo[index].industry.rates;  
         },
         async deleteRate(index) {
+            const industries = this.currentActive === index ? this.industrySelected : [this.fullInfo[index].industry];
             try {
                 const deletedRate = {
-                serviceId: this.serviceSelect._id,
-                industries: this.fullInfo[index].industry,
+                    servicesIds: this.servicesIds,
+                    industries
                 }
                 await this.deleteServiceRate({ id: this.fullInfo[index].id, deletedRate });
                 await this.getDuoCombinations();
@@ -380,11 +401,11 @@ export default {
             }, 0)
         },
         async getAllCombinations() {
-        try {
-            await this.getDuoCombinations();
-        } catch(err) {
-            this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
-        }
+            try {
+                await this.getDuoCombinations();
+            } catch(err) {
+                this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
+            }
         },
         defaultService() {
             let defaultServ = this.vuexServices.find(item => {
@@ -394,8 +415,9 @@ export default {
         },
         defaultRates() {
             const duoServices = this.vuexServices.filter(item => item.languageForm === "Duo");
+            const serviceSelectIds = this.serviceSelect.map(item => item._id);
             return duoServices.reduce((init, cur) => {
-                let rate = 0;
+                let rate = serviceSelectIds.indexOf(cur._id) !== -1 ? 0.01 : 0;
                 const key = cur._id;
                 init[key] = {value: rate, active: true};
                 return {...init}
@@ -409,64 +431,67 @@ export default {
             deleteServiceRate: "deleteServiceRate"
         })
     },
-  computed: {
-    ...mapGetters({
-        vuexServices: "getVuexServices",
-        fullInfo: "getDuoRates"
-    }),
-    servicesIds() {
-        return this.serviceSelect.map(item => item._id);
-    },
-    filterIndustry() {
-        let result = [];
-        if(this.industryFilter.length) {
-            for(let elem of this.industryFilter) {
-            result.push(elem.name)
+    computed: {
+        ...mapGetters({
+            vuexServices: "getVuexServices",
+            fullInfo: "getDuoRates"
+        }),
+        servicesIds() {
+            return this.serviceSelect.map(item => item._id);
+        },
+        filterIndustry() {
+            let result = [];
+            if(this.industryFilter.length) {
+                for(let elem of this.industryFilter) {
+                result.push(elem.name)
+                }
             }
-        }
-        return result;
-    },
-    infoIndustries() {
-        let result = [];
-        if(this.industrySelected.length) {
-            for(let elem of this.industrySelected) {
-            result.push(elem.name);
+            return result;
+        },
+        infoIndustries() {
+            let result = [];
+            if(this.industrySelected.length) {
+                for(let elem of this.industrySelected) {
+                result.push(elem.name);
+                }
             }
+            return result;
+        },
+        tableHeader() {
+            let result = [];
+            for(let i = 0; i < 4; i++) {
+                result.push(this.heads[i])
+            }
+            if(this.serviceSelect.length) {
+                this.serviceSelect.sort((a, b) => { return a.sortIndex - b.sortIndex});
+                result.splice(-1, 0, ...this.serviceSelect)
+            }
+            return result;
+        },
+        tableWidth() {
+            let result = 870;
+            let cols = this.tableHeader.length;
+            if(cols > 5) {
+                let count = cols - 5;
+                result += 164*count;
+            }
+            result += 'px';
+            return result;
         }
-        return result;
     },
-    tableHeader() {
-        let result = [];
-        for(let i = 0; i < 4; i++) {
-            result.push(this.heads[i])
-        }
-        if(this.serviceSelect.length) {
-            this.serviceSelect.sort((a, b) => { return a.sortIndex - b.sortIndex});
-            result.splice(-1, 0, ...this.serviceSelect)
-        }
-        return result;
+    components: {
+        LanguagesSelect,
+        IndustrySelect,
+        ServiceSingleSelect,
+        Toggler
     },
-    tableWidth() {
-        let result = 870;
-        let cols = this.tableHeader.length;
-        if(cols > 5) {
-            let count = cols - 5;
-            result += 164*count;
-        }
-        result += 'px';
-        return result;
+    created() {
+        this.defaultService();
+        this.getAllCombinations();
+    },
+    beforeDestroy() {
+        this.storeDuoRates([]);
     }
-  },
-  components: {
-    LanguagesSelect,
-    IndustrySelect,
-    ServiceSingleSelect,
-    Toggler
-  },
-  created() {
-    this.defaultService();
-    this.getAllCombinations();
-  }
 };
 </script>
 

@@ -102,6 +102,46 @@ async function defaultRates(languageForm) {
   }
 }
 
+async function deleteDuoRate(rate, industries, services) {
+  let updatedIndustries = [];
+  const industriesIds = industries.map(item => item._id);
+  try {
+    for(let elem of rate.industries) {
+      if(industries[0].name === "All" || industriesIds.indexOf(elem.industry.id) !== -1) {
+        updatedIndustries.push(deletedRates(elem, services))
+      } else {
+        updatedIndustries.push(elem);
+      }
+    }
+    if(isAllRatesDeleted(rate.industries)) {
+      return await Duorate.deleteOne({"_id": rate.id});
+    }
+    return await Duorate.updateOne({"_id": rate.id}, {industries: updatedIndustries});
+  } catch(err) {
+    console.log("Error from deleteDuoRate");
+    console.log(err);
+  }
+}
+
+function isAllRatesDeleted(industries) {
+  let sum = 0;
+  for(let elem of industries) {
+    sum += Object.keys(elem.rates).reduce((init, cur) => {
+      return init + elem.rates[cur].value;
+    }, 0)
+  }
+  return sum === 0
+}
+
+function deletedRates(elem, services) {
+  const { rates } = elem;
+  for(let id of services) {
+    rates[id].value = 0;
+    rates[id].active = false;
+  }
+  return { industry: elem.industry, rates };
+}
+
 async function checkServiceRatesMatches(service, industries, rate) {
     if(service.languageForm === 'Mono') {
         return await checkMonoRatesMatches(service, industries, rate);
@@ -245,4 +285,4 @@ function addCombinations({comb, serviceCombinations, industries}) {
   return updatedCombinations;
 }
 
-module.exports = { updateRate, createNewRate, checkServiceRatesMatches, deleteServiceRate, updateLangCombs };
+module.exports = { updateRate, createNewRate, checkServiceRatesMatches, deleteServiceRate, deleteDuoRate, updateLangCombs };

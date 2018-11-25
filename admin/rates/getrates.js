@@ -8,4 +8,12 @@ async function getDuoRates(obj) {
     return rates;
 }
 
-module.exports = { getDuoRates }
+async function getDuoRate(obj) {
+    const rate = await Duorate.findOne(obj)
+        .populate("source")
+        .populate("target")
+        .populate("industries.industry");
+    return rate;
+}
+
+module.exports = { getDuoRates, getDuoRate }

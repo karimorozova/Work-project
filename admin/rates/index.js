@@ -1,5 +1,6 @@
-const  { getDuoRates } = require("./getrates");
+const  { getDuoRates, getDuoRate } = require("./getrates");
 
 module.exports = {
-    getDuoRates
+    getDuoRates,
+    getDuoRate
 }
