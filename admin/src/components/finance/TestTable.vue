@@ -299,23 +299,28 @@ export default {
                 return this.deleteRate(index);
             }
         },
+        isAllRatesZero() {
+            return Object.keys(this.changedRate).reduce((init, cur) => {
+                return init + this.changedRate[cur].value;
+            }, 0);
+        },
         checkRatesValidation() {
             const rateRegex = /^\d{0,2}(\.\d{0,4})?/;
-            for(let elem of this.changedRate) {
-                if(!rateRegex.test(elem.value)) {
+            for(let key of Object.keys(this.changedRate)) {
+                if(!rateRegex.test(this.changedRate[key].value)) {
                     return false;
                 }
             }
-            return true;
+            return this.isAllRatesZero();
         },
         async checkErrors(index) {
             this.validError = [];
-            if(!this.currentSource) this.validError.push("Please, choose the source language!");
-            if(!this.currentTarget) this.validError.push("Please, choose the target language!");
-            if(!this.checkRatesValidation) this.validError.push("Please set the correct rate values!");
+            if(!this.currentSource._id) this.validError.push("Please, choose the source language!");
+            if(!this.currentTarget._id) this.validError.push("Please, choose the target language!");
+            if(!this.checkRatesValidation()) this.validError.push("Please set the correct rate values!");
             if(this.validError.length) {
             this.showValidError = true;
-            this.changedRate = this.fullInfo[index].industry[0].rates;
+            this.changedRate = this.fullInfo[index].industry.rates;
             return true;
             }
             await this.saveRates(index);
@@ -399,6 +404,7 @@ export default {
                 industry: {name: "All", rates: this.changedRate},
             });
             this.currentActive = this.fullInfo.length-1;
+            
             setTimeout(() => {
                 this.handleScroll();
             }, 0)
@@ -420,7 +426,7 @@ export default {
             const duoServices = this.vuexServices.filter(item => item.languageForm === "Duo");
             const serviceSelectIds = this.serviceSelect.map(item => item._id);
             return duoServices.reduce((init, cur) => {
-                let rate = serviceSelectIds.indexOf(cur._id) !== -1 ? 0.01 : 0;
+                let rate = 0;
                 const key = cur._id;
                 init[key] = {value: rate, active: true};
                 return {...init}
