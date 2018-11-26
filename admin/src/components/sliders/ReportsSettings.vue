@@ -26,7 +26,7 @@ export default {
   width: 100%;
   padding: 40px;
   &__table {
-    width: 980px;
+    width: 870px;
     padding: 20px;
     box-shadow: 0 0 10px #67573E;
   }

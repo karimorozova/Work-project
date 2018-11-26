@@ -12,7 +12,7 @@
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .filters__item
       label Service
-      ServiceSingleSelect(:selectedServ="serviceSelect[0]" langForm="Duo" @chosenServ="setServiceFilter")
+      ServiceMultiDuoSelect(:selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
   .add-button
     input(type="button" @click="addSevLangs" value="Add several languages")
   .table-data
@@ -23,7 +23,7 @@
             .table__head-title {{ head.title }}
       tbody.duo-tbody
         template(v-for="(info, index) in fullInfo" v-if="isSourceFilter(info) && isTargetFilter(info)")
-          tr(v-if="isIndustryFilter(info) && isAllRatesZero(info) && isCurrentServiceRateZero(info)")
+          tr(v-if="isIndustryFilter(info) && isCurrentServiceRateZero(info, index)")
             td.drop-option 
               template(v-if='currentActive !== index && isSourceFilter(info)') {{ info.sourceLanguage.lang }}
               .inner-component(v-if="currentActive === index")
@@ -76,7 +76,7 @@
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
-import ServiceSingleSelect from "../ServiceSingleSelect";
+import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -125,15 +125,12 @@ export default {
                 return key === "edit" || key === "delete";
             }
         },
-        isAllRatesZero(info) {
-            const { rates } = info.industry;
-            return Object.keys(rates).reduce((init, cur) => {
-                return init + rates[cur].value;
-            }, 0)
-        },
-        isCurrentServiceRateZero(info) {
+        isCurrentServiceRateZero(info, index) {
             for(let key in info.industry.rates) {
                 if(this.servicesIds.indexOf(key) !== -1 && info.industry.rates[key].value) {
+                    return true
+                }
+                if(!info.industry.rates[key].value && this.currentActive === index) {
                     return true
                 }
             }
@@ -213,12 +210,12 @@ export default {
                 })
             }
         },
-        setServiceFilter(data) {
-            const index = this.serviceSelect.findIndex(item => item._id === data._id);
+        setServiceFilter({service}) {
+            const index = this.serviceSelect.findIndex(item => item._id === service._id);
             if(index !== -1) {
                 this.serviceSelect.splice(index, 1);
             } else {
-                this.serviceSelect.push(data);
+                this.serviceSelect.push(service);
             }
             if(!this.serviceSelect.length) {
                 this.defaultService();
@@ -385,6 +382,12 @@ export default {
             }
                 this.currentActive = -1;
         },
+        setDefaultValues() {
+            this.currentActive = -1;
+            this.industrySelected = [{name: 'All'}];
+            this.currentSource = {};
+            this.currentTarget = {};
+        },
         async addNewRow() {
             this.sourceSelect = ["All"];
             this.targetSelect = ["All"];
@@ -439,6 +442,9 @@ export default {
         servicesIds() {
             return this.serviceSelect.map(item => item._id);
         },
+        filteredServices() {
+            return this.serviceSelect.map(item => item.title);
+        },
         filterIndustry() {
             let result = [];
             if(this.industryFilter.length) {
@@ -482,7 +488,7 @@ export default {
     components: {
         LanguagesSelect,
         IndustrySelect,
-        ServiceSingleSelect,
+        ServiceMultiDuoSelect,
         Toggler
     },
     created() {
@@ -625,7 +631,7 @@ td {
 .rates {
     border: none;
     outline: none;
-    width: 50px;
+    width: 65%;
 }
 .drop-option {
     position: relative;
