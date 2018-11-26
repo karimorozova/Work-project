@@ -205,43 +205,6 @@ router.delete('/rate/:id', async (req, res) => {
   }
 })
 
-// router.get('/parsed-rates', async (req, res) => {
-//   try{
-//     let service = await getOneService({title: req.query.title, languageForm: req.query.form});
-//     let rates = [];
-//     for(let comb of service.languageCombinations) {
-//       for(let elem of comb.industries) {
-//         if(elem.rate > 0) {
-//           let industry = {...elem.industry._doc};
-//           industry.rate = elem.rate;
-//           industry.active = elem.active;
-//           if(req.query.form === "Duo") {
-//             rates.push({
-//               id: comb._id,
-//               title: service.title,
-//               sourceLanguage: comb.source,
-//               targetLanguage: comb.target,
-//               industry: [industry]
-//             })
-//           } else {
-//             industry.package = elem.package;
-//             rates.push({
-//               id: comb._id,
-//               title: service.title,
-//               targetLanguage: comb.target,
-//               industry: [industry]
-//             })
-//           }
-//         }
-//       }
-//     }
-//     res.send(rates);
-//   } catch(err) {
-//     console.log(err);
-//     res.status(500).send('Error on getting rates!')
-//   }
-// })
-
 router.get("/parsed-rates",  async (req, res) => {
   try {
     const rates = await getAllDuoRates();

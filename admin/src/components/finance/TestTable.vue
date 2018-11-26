@@ -1,82 +1,85 @@
 <template lang="pug">
 .duo-wrap
-  .filters
-    .filters__item
-      label Source Language
-      LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
-    .filters__item
-      label Target Language
-      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
-    .filters__item
-      label Industry
-      IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
-    .filters__item
-      label Service
-      ServiceMultiDuoSelect(:selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
-  .add-button
-    input(type="button" @click="addSevLangs" value="Add several languages")
-  .table-data
-    table.duo-finance(:style="{width: tableWidth}")
-      thead
-        tr
-          th(v-for="head in tableHeader")
-            .table__head-title {{ head.title }}
-      tbody.duo-tbody
-        template(v-for="(info, index) in fullInfo" v-if="isSourceFilter(info) && isTargetFilter(info)")
-          tr(v-if="isIndustryFilter(info) && isCurrentServiceRateZero(info, index)")
-            td.drop-option 
-              template(v-if='currentActive !== index && isSourceFilter(info)') {{ info.sourceLanguage.lang }}
-              .inner-component(v-if="currentActive === index")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
-            td.drop-option 
-              template(v-if='currentActive !== index && isSourceFilter(info) || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
-              .inner-component(v-if="currentActive === index")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-            td.drop-option              
-              span(v-if="!info.industry.icon && currentActive !== index") {{ info.industry.name }}
-              .drop-option__image
-                img(v-if="info.industry.icon && currentActive !== index" :src="info.industry.icon")
-                span.title-tooltip {{ info.industry.name }}
-              .inner-component(v-if="currentActive === index")
-                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
-            template(v-for="(service, servKey) in info.industry.rates")
-                td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
-                    .rates-column
-                        input.rates(:value="service.value" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
-                        Toggler(:isActive="service.active" @toggle="toggleActive(index, servKey)" :isDisabled="currentActive !== index")
-            td.icons-field
-              template(v-for="(icon, key) in icons")
-                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': isActive(key, index)}") 
-  .add-row
-    .add-row__plus(@click="addNewRow")
-      span +
-  .unique-message(v-if="notUnique")
-    .message
-      p The combination you want to add already exists!
-      .message__info-list
-        li Source: 
-          span.info-item {{ uniqueComb.source }}
-        li Target: 
-          span.info-item {{ uniqueComb.target }}
-      span.close(@click="closeUnique") +
-  .edition-message(v-if="editing")
-    .message
-      p Please finish the current edition first!
-      span.close(@click="closeEditionMessage") +
-  .error-message(v-if="showValidError")
-    .message
-      p Please finish the current edition first!
-      .message__info-list
-        li(v-for="error in validError")
-          span.info-item {{ error }}
-      span.close(@click="closeErrorMessage") +
+    .filters
+        RatesFilters(
+            :sourceSelect="sourceSelect"
+            :targetSelect="targetSelect"
+            :serviceSelect="serviceSelect"
+            :industryFilter="industryFilter"
+            @setSourceFilter="setSourceFilter"
+            @setTargetFilter="setTargetFilter"
+            @setIndustryFilter="setIndustryFilter"
+            @setServiceFilter="setServiceFilter"
+        )
+    .add-button
+        input(type="button" @click="addSevLangs" value="Add several languages")
+    .table-data
+        table.duo-finance(:style="{width: tableWidth}")
+            thead
+                tr
+                    th.table__check
+                        input(type="checkbox" v-model="isAllChecked" @change="toggleAllCheck").table__check-input
+                    th(v-for="head in tableHeader")
+                        .table__head-title {{ head.title }}
+            tbody.duo-tbody
+                template(v-for="(info, index) in fullInfo" v-if="isSourceFilter(info) && isTargetFilter(info)")
+                    tr(v-if="isIndustryFilter(info) && isCurrentServiceRateZero(info, index)")
+                        td.table__check
+                            input(type="checkbox" v-model="info.check").table__check-input
+                        td.drop-option 
+                            template(v-if='currentActive !== index && isSourceFilter(info)') {{ info.sourceLanguage.lang }}
+                            .inner-component(v-if="currentActive === index")
+                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
+                        td.drop-option 
+                            template(v-if='currentActive !== index && isSourceFilter(info) || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
+                            .inner-component(v-if="currentActive === index")
+                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                        td.drop-option              
+                            span(v-if="!info.industry.icon && currentActive !== index") {{ info.industry.name }}
+                            .drop-option__image
+                                img(v-if="info.industry.icon && currentActive !== index" :src="info.industry.icon")
+                                span.title-tooltip {{ info.industry.name }}
+                            .inner-component(v-if="currentActive === index")
+                                IndustrySelect(:parentIndex="index" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
+                        template(v-for="(service, servKey) in info.industry.rates")
+                            td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
+                                .rates-column
+                                    input.rates(v-if="!service.value" value="-" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
+                                    input.rates(v-else :value="service.value" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
+                                    Toggler(:isActive="service.active" @toggle="toggleActive(index, servKey)" :isDisabled="currentActive !== index" :class="{'rates-column_transparent': currentActive !== index}")
+                        td.icons-field
+                            template(v-for="(icon, key) in icons")
+                                img.crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': isActive(key, index)}") 
+    .add-row
+        .add-row__plus(@click="addNewRow")
+            span +
+    .unique-message(v-if="notUnique")
+        .message
+            p The combination you want to add already exists!
+            .message__info-list
+                li Source: 
+                    span.info-item {{ uniqueComb.source }}
+                li Target: 
+                    span.info-item {{ uniqueComb.target }}
+            span.close(@click="closeUnique") +
+    .edition-message(v-if="editing")
+        .message
+            p Please finish the current edition first!
+            span.close(@click="closeEditionMessage") +
+    .error-message(v-if="showValidError")
+        .message
+            p Please finish the current edition first!
+            .message__info-list
+                li(v-for="error in validError")
+                    span.info-item {{ error }}
+            span.close(@click="closeErrorMessage") +
 </template>
 
 <script>
+import RatesFilters from "./RatesFilters";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
-import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -88,6 +91,7 @@ export default {
     },
     data() {
         return {
+            isAllChecked: false,
             sourceSelect: ["EN-GB"],
             targetSelect: ["All"],
             industryFilter: [{name: "All"}],
@@ -111,7 +115,8 @@ export default {
             isIndustryActive: true,
             icons: {
                 save: {image: require("../../assets/images/Other/save-icon-qa-form.png"), active: true}, 
-                edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false}, 
+                edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
+                cancel: {image: require("../../assets/images/cancel_icon.jpg"), active: false},
                 delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
             }
         }
@@ -119,7 +124,7 @@ export default {
     methods: {
         isActive(key, index) {
             if(this.currentActive === index) {
-                return key === "save" || key === "delete";
+                return key !== "edit";
             }
             if(this.currentActive !== index) {
                 return key === "edit" || key === "delete";
@@ -143,7 +148,18 @@ export default {
             return (this.targetSelect.indexOf(info.targetLanguage.symbol) !== -1 || this.targetSelect[0] === 'All');
         },
         isIndustryFilter(info) {
-            return (this.filterIndustry.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
+            let industriesNames = this.industryFilter.map(item => item.name);
+            return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
+        },
+        toggleAllCheck() {
+            for(let index in this.fullInfo) {
+                let info = this.fullInfo[index];
+                if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
+                && this.isSourceFilter(info) && this.isTargetFilter(info) 
+                && this.isIndustryFilter(info)) {
+                    this.fullInfo[index].check = this.isAllChecked;
+                }
+            }
         },
         addSevLangs() {
         //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
@@ -222,54 +238,54 @@ export default {
             }
             this.serviceSelect.sort((a, b) => {return a.sortIndex - b.sortIndex});
         },
-        setSourceFilter(data) {
+        setSourceFilter({lang}) {
             if(this.sourceSelect[0] == 'All') {
                 this.sourceSelect = [];
-                this.sourceSelect.push(data.lang.symbol)
+                this.sourceSelect.push(lang.symbol)
             } else {
-                let index = this.sourceSelect.indexOf(data.lang.symbol);
+                let index = this.sourceSelect.indexOf(lang.symbol);
                 if(index != -1) {
                     this.sourceSelect.splice(index, 1);
                 } else {
-                    this.sourceSelect.push(data.lang.symbol)
+                    this.sourceSelect.push(lang.symbol)
                 }
             }
-            if(data.lang.lang == 'All' || !this.sourceSelect.length) {
+            if(lang.lang == 'All' || !this.sourceSelect.length) {
                 this.sourceSelect = ['All'];
             }
         },
-        setTargetFilter(data) {
+        setTargetFilter({lang}) {
             if(this.targetSelect[0] == 'All') {
                 this.targetSelect = [];
-                this.targetSelect.push(data.lang.symbol)
+                this.targetSelect.push(lang.symbol)
             } else {
-                let index = this.targetSelect.indexOf(data.lang.symbol);
+                let index = this.targetSelect.indexOf(lang.symbol);
                 if(index != -1) {
                     this.targetSelect.splice(index, 1);
                 } else {
-                    this.targetSelect.push(data.lang.symbol)
+                    this.targetSelect.push(lang.symbol)
                 }
             }
-            if(data.lang.lang == 'All' || !this.targetSelect.length) {
+            if(lang.lang == 'All' || !this.targetSelect.length) {
                 this.targetSelect = ['All'];
             }
         },
-        setIndustryFilter(data) {
+        setIndustryFilter({industry}) {
             if(this.industryFilter[0].name == 'All') {
-                this.industryFilter.splice(0, 1, data.industry);
+                this.industryFilter.splice(0, 1, industry);
             } else {
                 let hasIndustry = false;
                 for(let i in this.industryFilter) {
-                if(this.industryFilter[i].name == data.industry.name) {
+                if(this.industryFilter[i].name == industry.name) {
                     this.industryFilter.splice(i, 1);
                     hasIndustry = true;
                 }
                 }
                 if(!hasIndustry) {
-                this.industryFilter.push(data.industry);
+                this.industryFilter.push(industry);
                 }
             }
-            if(!this.industryFilter.length || data.industry.name == 'All') {
+            if(!this.industryFilter.length || industry.name == 'All') {
                 this.industryFilter = [];
                 this.industryFilter.push({
                 name: 'All'
@@ -295,12 +311,18 @@ export default {
                 return this.editRate(index);
             }
 
+            if(key === 'cancel') {
+                return this.setDefaultValues();
+            }
+
             if(key === 'delete') {
                 return this.deleteRate(index);
             }
         },
         isAllRatesZero() {
-            return Object.keys(this.changedRate).reduce((init, cur) => {
+            return Object.keys(this.changedRate).filter(item => {
+                return this.servicesIds.indexOf(item) !== -1
+            }).reduce((init, cur) => {
                 return init + this.changedRate[cur].value;
             }, 0);
         },
@@ -448,18 +470,6 @@ export default {
         servicesIds() {
             return this.serviceSelect.map(item => item._id);
         },
-        filteredServices() {
-            return this.serviceSelect.map(item => item.title);
-        },
-        filterIndustry() {
-            let result = [];
-            if(this.industryFilter.length) {
-                for(let elem of this.industryFilter) {
-                result.push(elem.name)
-                }
-            }
-            return result;
-        },
         infoIndustries() {
             let result = [];
             if(this.industrySelected.length) {
@@ -492,9 +502,9 @@ export default {
         }
     },
     components: {
+        RatesFilters,
         LanguagesSelect,
         IndustrySelect,
-        ServiceMultiDuoSelect,
         Toggler
     },
     created() {
@@ -542,14 +552,14 @@ th, td {
     font-weight: normal;
     white-space: nowrap;
     width: 164px;
-    &:first-child, &:nth-of-type(2) {
-        width: 175px;
+    &:nth-of-type(2), &:nth-of-type(3) {
+        width: 172px;
     }
     &:last-child {
         width: 145px;
     }
-    &:nth-of-type(3) {
-        width: 195px;
+    &:nth-of-type(4) {
+        width: 178px;
     }
 }
 th {
@@ -565,6 +575,10 @@ td {
     border-right: 1px solid #BFB09D;
     border-bottom: 1px solid #BFB09D;
 }
+.table__check {
+    width: 10px;
+    padding: 5px 5px 0;
+}
 .icons-field{
     text-align: center;
 }
@@ -578,17 +592,6 @@ td {
 }
 .filters {
     margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    &__item {
-        width: 23%;
-        display: flex;
-        flex-direction: column;
-        label {
-            font-size: 12px;
-            margin-bottom: 0;
-        }
-    }
 }
 .rates-column {
     width: 100%;
@@ -597,11 +600,16 @@ td {
     justify-content: space-between;
     align-items: center;
     padding-right: 5px;
+    &_transparent {
+        opacity: 0.5;
+    }
 }
 .add-button {
     width: 100%;
     text-align: right;
     margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #67573E;
     input {
         color: white;
         font-size: 14px;

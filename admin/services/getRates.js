@@ -27,7 +27,8 @@ function parseIndustries(rate, serviceIds) {
             ratesId: elem._id,
             sourceLanguage: rate.source,
             targetLanguage: rate.target,
-            industry: industry
+            industry: industry,
+            check: false
         })
     }
     return rates;
