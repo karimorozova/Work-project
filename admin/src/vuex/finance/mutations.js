@@ -6,7 +6,7 @@ export const mutations = {
         state.duoRates = payload;
     },
     setMonoRates(state, payload) {
-        state.duoRates = payload;
+        state.monoRates = payload;
     },
     setServiceWhenAddSeveral(state, payload) {
         state.serviceWhenAddSeveral = payload

@@ -41,7 +41,7 @@
             .services
                 span.services__title Service
                 .services__inner-component
-                    ServiceMultiDuoSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
+                    ServiceMultiSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
             .industries
                 span Industry
                 .industries__inner-component
@@ -56,7 +56,7 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
-import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
+import ServiceMultiSelect from "../ServiceMultiSelect";
 import IndustrySelect from "../IndustrySelect";
 import { mapGetters, mapActions } from "vuex";
 
@@ -451,7 +451,7 @@ export default {
         }
     },
     components: {
-        ServiceMultiDuoSelect,
+        ServiceMultiSelect,
         IndustrySelect
     },
     directives: {

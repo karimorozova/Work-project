@@ -1,4 +1,4 @@
-const { Services, Industries, Duorate } = require("../models/");
+const { Services, Industries, Duorate, Monorate } = require("../models/");
 
 async function updateRate(rate, infoIndustries, languageForm) {
   try {
@@ -27,30 +27,38 @@ function updateRateForAll(rateIdustries, rates) {
 }
 
 async function createNewRate(info) {
-  const { sourceLanguage, targetLanguage, industries, languageForm } = info;
+  const { sourceLanguage, targetLanguage, package, industries, languageForm } = info;
   try {
     if(info.industries[0].name === "All") {
-      return await createNewForAllIndustries({ sourceLanguage, targetLanguage, industries, languageForm });
+      return await createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm });
     }
     const modifiedIndustries = industries.map(item => {
       const industry = {...item, id: item._id}
       return {industry, rates: item.rates}
     })
     const allIndustries = await includeAllIndustries(modifiedIndustries, languageForm);
-    await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+    if(info.languageForm === "Duo") {
+      await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+    } else {
+      await Monorate.create({"target": targetLanguage, "package": package, 'industries': allIndustries});
+    }
   } catch(err) {
     console.log("Error from createNewRate");
     console.log(err);
   }
 }
 
-async function createNewForAllIndustries({ sourceLanguage, targetLanguage, industries, languageForm }) {
+async function createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm }) {
   try {
     const rateIndustries = await defaultRates(languageForm);
     const allIndustries = rateIndustries.map(item => {
       return {industry: item, rates: industries[0].rates}
     });
-    await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+    if(languageForm === "Duo") {
+      await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+    } else {
+      await Monorate.create({"target": targetLanguage, package: package, 'industries': allIndustries});
+    }
   } catch(err) {
     console.log("Error from createNewForAllIndustries");
     console.log(err);
@@ -86,7 +94,7 @@ async function defaultRates(languageForm) {
   try {
     const industries = await Industries.find();
     const services = await Services.find({languageForm: languageForm});
-    const serviceRate = languageForm === "Duo" ? {value: 0, active: true} : {value: 0, package: 200, active: true};
+    const serviceRate = {value: 0, active: false};
     const rates = services.reduce((init, cur) => {
         const key = cur._id;
         init[key] = {...serviceRate};
@@ -102,7 +110,7 @@ async function defaultRates(languageForm) {
   }
 }
 
-async function deleteDuoRate(rate, industries, services) {
+async function deleteRate({rate, industries, services, languageForm}) {
   let updatedIndustries = [];
   const industriesIds = industries.map(item => item._id);
   try {
@@ -114,9 +122,11 @@ async function deleteDuoRate(rate, industries, services) {
       }
     }
     if(isAllRatesDeleted(rate.industries)) {
-      return await Duorate.deleteOne({"_id": rate.id});
+      return languageForm === "Duo" ? await Duorate.deleteOne({"_id": rate.id})
+      : await Monorate.deleteOne({"_id": rate.id});
     }
-    return await Duorate.updateOne({"_id": rate.id}, {industries: updatedIndustries});
+    return languageForm === "Duo" ? await Duorate.updateOne({"_id": rate.id}, {industries: updatedIndustries})
+    : await Monorate.updateOne({"_id": rate.id}, {industries: updatedIndustries});
   } catch(err) {
     console.log("Error from deleteDuoRate");
     console.log(err);
@@ -140,91 +150,6 @@ function deletedRates(elem, services) {
     rates[id].active = false;
   }
   return { industry: elem.industry, rates };
-}
-
-async function checkServiceRatesMatches(service, industries, rate) {
-    if(service.languageForm === 'Mono') {
-        return await checkMonoRatesMatches(service, industries, rate);
-    }
-    let exist = false;
-    for(let elem of rate.industry) {
-      for(let comb of service.languageCombinations) {
-        if(rate.sourceLanguage._id == comb.source.id &&
-          rate.targetLanguage._id == comb.target.id) {
-          exist = true;
-          for(let indus of comb.industries) {
-            if(elem._id == indus.industry.id || elem.name == 'All') {
-                indus.rate = elem.rate
-                indus.active = elem.active;
-            }
-          }
-        }
-      }
-      if(exist) {
-        break;
-      }
-    }
-    if(!exist || !service.languageCombinations.length) {
-        service.languageCombinations.push({
-            source: rate.sourceLanguage._id,
-            target: rate.targetLanguage._id,
-            industries: industries,
-        })
-    }
-    const result = await Services.updateOne({'title': rate.title}, {'languageCombinations': service.languageCombinations});
-    return result;
-}
-
-async function checkMonoRatesMatches(service, industries, rate) {
-    let exist = false;
-    for(let elem of rate.industry) {
-      for(let comb of service.languageCombinations) {
-        if(rate.targetLanguage._id == comb.target.id && !comb.source) {
-          exist = true;
-          for(let indus of comb.industries) {
-            if(elem._id == indus.industry.id || elem.name == 'All') {
-                indus.rate = elem.rate
-                indus.active = elem.active;
-                indus.package = elem.package
-            }
-          }
-        }
-      }
-      if(exist) {
-        break;
-      }
-    }
-    if(!exist || !service.languageCombinations.length) {
-        service.languageCombinations.push({
-            target: rate.targetLanguage._id,
-            industries: industries,
-        })
-    }
-    const result = await Services.updateOne({'title': rate.title}, {'languageCombinations': service.languageCombinations});
-    return result;
-}
-
-async function deleteServiceRate(service, industries, id) {
-    const combIndex = service.languageCombinations.findIndex(item => {
-        return item.id === id;
-      });
-      let combination = {...service.languageCombinations[combIndex]._doc};
-      let allZero = [];
-      for(let indus of combination.industries) {
-        for(let ind of industries) {
-          if(ind._id === indus.industry.id) {
-            indus.rate = 0
-            indus.industry.active = false;
-          }
-        }
-        allZero.push(indus.rate);
-      }
-      service.languageCombinations.splice(combIndex, 1, combination);
-      const sum = allZero.reduce((init, cur) => {return init + cur}, 0);
-      const updatedCombinations = sum ? service.languageCombinations 
-      : service.languageCombinations.filter(item => {return item.id !== id});
-    const result = await Services.updateOne({'_id': service.id}, {$set: {'languageCombinations': updatedCombinations}});
-    return result;
 }
 
 async function updateLangCombs({serviceId, comb, serviceCombinations, industries}) {
@@ -285,4 +210,4 @@ function addCombinations({comb, serviceCombinations, industries}) {
   return updatedCombinations;
 }
 
-module.exports = { updateRate, createNewRate, checkServiceRatesMatches, deleteServiceRate, deleteDuoRate, updateLangCombs };
+module.exports = { updateRate, createNewRate, deleteRate, updateLangCombs };

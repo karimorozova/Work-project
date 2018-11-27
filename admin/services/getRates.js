@@ -1,35 +1,46 @@
 const { Duorate, Services } = require("../models");
-const { getDuoRates } = require("../rates");
+const { getDuoRates, getMonoRates } = require("../rates");
 
-async function getAllDuoRates() {
+async function getAllRates(form) {
     try {
-        const duoRates = await getDuoRates({});
-        const duoServices = await Services.find({languageForm: "Duo"}, {"_id": 1});
-        const serviceIds = duoServices.map(item => item.id);
+        const rates = form === "Duo" ? await getDuoRates({}) : await getMonoRates({});
+        const ratesServices = await Services.find({languageForm: form});
+        const serviceIds = ratesServices.map(item => item.id);
         let fullInfo = [];
-        for(let rate of duoRates) {
-            fullInfo.push(...parseIndustries(rate, serviceIds));    
+        for(let rate of rates) {
+            fullInfo.push(...parseIndustries(rate, serviceIds, form));    
         }
         return fullInfo;
     } catch(err) {
-        console.log("from function getDuoRates " + err);   
+        console.log("from function getAllRates " + err);   
     }
 }
 
-function parseIndustries(rate, serviceIds) {
+function parseIndustries(rate, serviceIds, form) {
     let rates = []
     for(let elem of rate.industries) {
         const allServRates = includeAllServices(elem.rates, serviceIds);
         let industry = {...elem.industry._doc, _id: elem.industry._id};
         industry.rates = {...allServRates};
-        rates.push({
-            id: rate.id,
-            ratesId: elem._id,
-            sourceLanguage: rate.source,
-            targetLanguage: rate.target,
-            industry: industry,
-            check: false
-        })
+        if(form === "Duo") {
+            rates.push({
+                id: rate.id,
+                ratesId: elem._id,
+                sourceLanguage: rate.source,
+                targetLanguage: rate.target,
+                industry: industry,
+                check: false
+            })
+        } else {
+            rates.push({
+                id: rate.id,
+                ratesId: elem._id,
+                targetLanguage: rate.target,
+                package: rate.package,
+                industry: industry,
+                check: false
+            })
+        }
     }
     return rates;
 }
@@ -46,4 +57,4 @@ function includeAllServices(elemRates, serviceIds) {
     return rates;
 }
 
-module.exports = { getAllDuoRates }
+module.exports = { getAllRates }

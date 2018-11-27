@@ -2,17 +2,21 @@
 .duo-wrap
     .filters
         RatesFilters(
-            form="Mono"
+            :sourceSelect="sourceSelect"
             :targetSelect="targetSelect"
             :serviceSelect="serviceSelect"
             :industryFilter="industryFilter"
+            @setSourceFilter="setSourceFilter"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
             @setServiceFilter="setServiceFilter"
         )
-    TestMonoRatesTable(
+    .add-button
+        input(type="button" @click="addSevLangs" value="Add several languages")
+    DuoRateTable(
         origin="global"
         :fullInfo="fullInfo"
+        :sourceSelect="sourceSelect"
         :targetSelect="targetSelect"
         :industryFilter="industryFilter"
         :filterIndustry="filterIndustry"
@@ -26,6 +30,8 @@
         .message
             p The combination you want to add already exists!
             .message__info-list
+                li Source: 
+                    span.info-item {{ uniqueComb.source }}
                 li Target: 
                     span.info-item {{ uniqueComb.target }}
             span.close(@click="closeUnique") +
@@ -44,7 +50,7 @@
 
 <script>
 import RatesFilters from "./RatesFilters";
-import TestMonoRatesTable from "./TestMonoRatesTable";
+import DuoRateTable from "./DuoRateTable";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
@@ -57,16 +63,21 @@ export default {
     data() {
         return {
             isAllChecked: false,
+            sourceSelect: ["EN-GB"],
             targetSelect: ["All"],
             industryFilter: [{name: "All"}],
             industrySelected: [{name: 'All'}],
             serviceSelect: [{}],
             heads: [
-                { title: "Language" },
-                { title: "Package" },
+                { title: "Source Language" },
+                { title: "Target Language" },
                 { title: "Industry" },
                 { title: "" }
             ],
+            changedRate: '',
+            currentSource: {},
+            currentTarget: {},
+            currentActive: -1,
             isNotUnique: false,
             editing: false,
             uniqueComb: {source: "", target: ""},
@@ -115,11 +126,15 @@ export default {
             for(let index in this.fullInfo) {
                 let info = this.fullInfo[index];
                 if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
-                && this.isTargetFilter(info) 
+                && this.isSourceFilter(info) && this.isTargetFilter(info) 
                 && this.isIndustryFilter(info)) {
                     this.fullInfo[index].check = this.isAllChecked;
                 }
             }
+        },
+        addSevLangs() {
+        //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
+            this.$emit('addSevLangs', this.fullInfo);
         },
         closeErrorMessage() {
             this.showValidError = false;
@@ -147,6 +162,22 @@ export default {
                 this.defaultService();
             }
             this.serviceSelect.sort((a, b) => {return a.sortIndex - b.sortIndex});
+        },
+        setSourceFilter({lang}) {
+            if(this.sourceSelect[0] == 'All') {
+                this.sourceSelect = [];
+                this.sourceSelect.push(lang.symbol)
+            } else {
+                let index = this.sourceSelect.indexOf(lang.symbol);
+                if(index != -1) {
+                    this.sourceSelect.splice(index, 1);
+                } else {
+                    this.sourceSelect.push(lang.symbol)
+                }
+            }
+            if(lang.lang == 'All' || !this.sourceSelect.length) {
+                this.sourceSelect = ['All'];
+            }
         },
         setTargetFilter({lang}) {
             if(this.targetSelect[0] == 'All') {
@@ -216,48 +247,52 @@ export default {
         setDefaultValues() {
             this.currentActive = -1;
             this.industrySelected = [{name: 'All'}];
+            this.currentSource = {};
             this.currentTarget = {};
         },
         addNewRow() {
+            this.sourceSelect = ["All"];
             this.targetSelect = ["All"];
             this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
+                sourceLanguage: "", 
                 targetLanguage: "", 
                 industry: {name: "All", rates: {...this.defaultRates()}},
             });
         },
         async getAllCombinations() {
             try {
-                await this.getMonoCombinations();
+                await this.getDuoCombinations();
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
             }
         },
         defaultService() {
             let defaultServ = this.vuexServices.find(item => {
-                return item.symbol === 'co';
+                return item.symbol === 'tr';
             });
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {
-            const duoServices = this.vuexServices.filter(item => item.languageForm === "Mono");
+            const duoServices = this.vuexServices.filter(item => item.languageForm === "Duo");
             return duoServices.reduce((init, cur) => {
                 const key = cur._id;
-                init[key] = {value: 0, package: 0, active: false};
+                init[key] = {value: 0, active: false};
                 return {...init}
             }, {});
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            getMonoCombinations: "getMonoCombinations",
-            storeMonoRates: "storeMonoRates",
+            getDuoCombinations: "getDuoCombinations",
+            storeDuoRates: "storeDuoRates",
+            storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
             deleteServiceRate: "deleteServiceRate"
         })
     },
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getMonoRates"
+            fullInfo: "getDuoRates"
         }),
         servicesIds() {
             return this.serviceSelect.map(item => item._id);
@@ -295,7 +330,7 @@ export default {
     },
     components: {
         RatesFilters,
-        TestMonoRatesTable,
+        DuoRateTable,
         LanguagesSelect,
         IndustrySelect,
         Toggler
@@ -305,7 +340,7 @@ export default {
         this.getAllCombinations();
     },
     beforeDestroy() {
-        this.storeMonoRates([]);
+        this.storeDuoRates([]);
     }
 };
 </script>

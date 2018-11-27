@@ -1,26 +1,30 @@
 <template lang="pug">
 .rates-filters
-    .rates-filters__item
+    .rates-filters__item(v-if="form !== 'Mono'")
         label.rates-filters__title Source Language
         LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
     .rates-filters__item
-        label.rates-filters__title Target Language
+        label.rates-filters__title(v-if="form !== 'Mono'") Target Language
+        label.rates-filters__title(v-else) Language
         LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
     .rates-filters__item
         label.rates-filters__title Industry
         IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .rates-filters__item
         label.rates-filters__title Service
-        ServiceMultiDuoSelect(:selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
+        ServiceMultiSelect(:form="form" :selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
 </template>
 
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceMultiDuoSelect from "../ServiceMultiDuoSelect";
+import ServiceMultiSelect from "../ServiceMultiSelect";
 
 export default {
     props: {
+        form: {
+            type: String
+        },
         sourceSelect: {
             type: Array
         },
@@ -70,7 +74,7 @@ export default {
     components: {
         LanguagesSelect,
         IndustrySelect,
-        ServiceMultiDuoSelect
+        ServiceMultiSelect
     }
 }
 </script>

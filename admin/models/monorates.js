@@ -5,6 +5,9 @@ const MonorateSchema = new mongoose.Schema({
   target: {
     type: Schema.Types.ObjectId, ref: 'Language'
   },
+  package: {
+    type: String
+  },
   industries: [{
     industry: {
       type: Schema.Types.ObjectId, ref: 'Industries'

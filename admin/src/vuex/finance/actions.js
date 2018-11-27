@@ -9,8 +9,7 @@ export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServ
 export const getDuoCombinations = async ({commit}, payload) => {
     commit('startRequest');
     try {
-    // const result = await Vue.http.get(`/service/parsed-rates?title=${payload}&form=Duo`);
-    const result = await Vue.http.get(`/service/parsed-rates`);
+    const result = await Vue.http.get('/service/parsed-rates?form=Duo');
     commit('setDuoRates', result.body);
     commit('endRequest');
     } catch(err) {
@@ -21,7 +20,7 @@ export const getDuoCombinations = async ({commit}, payload) => {
 export const getMonoCombinations = async ({commit}, payload) => {
     commit('startRequest');
     try {
-    const result = await Vue.http.get(`/service/parsed-rates?title=${payload}&form=Mono`);
+    const result = await Vue.http.get('/service/parsed-rates?form=Mono');
     commit('setMonoRates', result.body);
     commit('endRequest');
     } catch(err) {
@@ -29,10 +28,23 @@ export const getMonoCombinations = async ({commit}, payload) => {
         throw new Error("Error on getting Mono rates");
     }
 }
-export const deleteServiceRate = async ({commit}, payload) => {
+export const saveGlobalRates = async ({commit, dispatch}, payload) => {
+    commit('startRequest');
+    try {
+        await Vue.http.post('/service/rates', {info: payload});
+        payload.languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
+        commit('endRequest');
+    } catch(err) {
+        commit('endRequest');
+        throw new Error("Error on saving rate");
+    }
+}
+export const deleteServiceRate = async ({commit, dispatch}, payload) => {
     commit('startRequest');
     try {
         await Vue.http.delete(`/service/rate/${payload.id}`, {body: payload.deletedRate});
+        const { languageForm } = payload.deletedRate;
+        languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
         commit('endRequest');
     } catch(err) {
         commit('endRequest');

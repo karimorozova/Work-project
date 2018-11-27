@@ -418,7 +418,7 @@ async function fillMonoServiceRates() {
         if(cur.symbol === "bl") rate = 0.11;
         if(cur.symbol === "sw") rate = 0.12;
         const key = cur._id;
-        init[key] = {value: rate, package: 200, active: true};
+        init[key] = {value: rate, active: true};
         return {...init}
       }, {});
       const combs = copywriting.languageCombinations;
@@ -428,6 +428,7 @@ async function fillMonoServiceRates() {
         })
         await Monorate.create({
           target: comb.target,
+          package: 200,
           industries
         })
       }

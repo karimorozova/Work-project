@@ -1,4 +1,4 @@
-const  { Duorate } = require("../models");
+const  { Duorate, Monorate } = require("../models");
 
 async function getDuoRates(obj) {
     const rates = await Duorate.find(obj)
@@ -16,4 +16,18 @@ async function getDuoRate(obj) {
     return rate;
 }
 
-module.exports = { getDuoRates, getDuoRate }
+async function getMonoRates(obj) {
+    const rate = await Monorate.find(obj)
+        .populate("target")
+        .populate("industries.industry");
+    return rate;
+}
+
+async function getMonoRate(obj) {
+    const rate = await Monorate.findOne(obj)
+        .populate("target")
+        .populate("industries.industry");
+    return rate;
+}
+
+module.exports = { getDuoRates, getDuoRate, getMonoRates, getMonoRate }

@@ -21,7 +21,7 @@
               span Duo
               img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
             .rates-drop(v-if="duoDrop")
-              RatesDuo(:services="services" @refreshServices="refreshServices" @addSevLangs="addSevLangs")
+              DuoRates(@addSevLangs="addSevLangs")
       Addseverallangs(v-if="addSeveral"
         origin="rates"
         @severalLangsResult="severalLangsResult"
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import RatesDuo from "../finance/RatesDuo";
+import DuoRates from "../finance/DuoRates";
 import RatesMono from "../finance/RatesMono";
 import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
@@ -84,7 +84,7 @@ export default {
   },
   components: {
     RatesMono,
-    RatesDuo,
+    DuoRates,
     Addseverallangs
   },
   mounted() {

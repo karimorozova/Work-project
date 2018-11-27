@@ -21,6 +21,9 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
+        form: {
+            type: String
+        },
         selectedServ: {
             type: Array
         },
@@ -65,16 +68,17 @@ export default {
                 if(a.title < b.title) return -1;
                 if(a.title > b.title) return 1;
             });
-            this.services = this.services.filter(item => {
-                if(item.languageForm == 'Duo') {
+            if(this.form === "Mono") {
+                this.services = this.services.filter(item => item.languageForm === "Mono")
+            } else {
+                this.services = this.services.filter(item => {
                     if(item.title == 'Translation' ||
                         item.title == 'Proofing' || 
                         item.title == 'QA and Testing') {
-                            return item
-                    }
-                }
-                
-            })
+                        return item
+                    }    
+                })
+            }
         },
         outClick() {
             this.droppedServ = false;
