@@ -99,14 +99,12 @@ export default {
     border: 1px solid #67573E;
     border-radius: 5px;
     overflow: hidden;
-    display: flex;
     flex-direction: column;
     .drop {
         width: 100%;
         max-height: 100px;
-        overflow-y: auto;
+        overflow-y: overlay;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: #FFF;
         border-top: 1px solid #67573E;    

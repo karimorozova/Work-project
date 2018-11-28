@@ -14,7 +14,7 @@
               span Mono
               img(src="../../assets/images/Other/open.png" :class="{reverse: monoDrop}") 
             .rates-drop(v-if="monoDrop")
-              RatesMono(:services="services" @refreshServices="refreshServices")
+              MonoRates(:services="services" @refreshServices="refreshServices")
         .duoRates(:class="{straightAngle: duoDrop}")
           .duoRates__open
             .select(@click="openDuo")
@@ -31,7 +31,7 @@
 
 <script>
 import DuoRates from "../finance/DuoRates";
-import RatesMono from "../finance/RatesMono";
+import MonoRates from "../finance/MonoRates";
 import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
 
@@ -83,7 +83,7 @@ export default {
     }) 
   },
   components: {
-    RatesMono,
+    MonoRates,
     DuoRates,
     Addseverallangs
   },
@@ -123,7 +123,7 @@ export default {
 
 .monoRates, .duoRates {
     width: 100%;
-    max-height: 450px;
+    max-height: 500px;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
@@ -154,7 +154,7 @@ export default {
 }
 
 .rates-drop {
-    height: 400px;
+    max-height: 450px;
     padding: 5px 2px;
     border-top: 1px solid rgba(103, 87, 62, 0.5);
 }

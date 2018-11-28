@@ -122,14 +122,11 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    border: 1px solid #BFB09D;
-    border-radius: 5px;
     width: 100%;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
     .all-projects__filters &, .project-info__drop-menu & {
-        border: 1px solid #67573E;
         height: 28px;
     }
     .selected {
@@ -197,22 +194,20 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
-    .all-projects__filters &, .project-info__drop-menu & {
-        position: absolute;
-        width: 100%;
-    }
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    z-index: 5;
+    border: 1px solid #BFB09D;
+    border-radius: 5px;
     .drop {
         font-size: 14px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: scroll;
+        overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
-        z-index: 15;
-        padding-top: 29px;
         &__item {
             display: flex;
             align-items: center;
@@ -235,31 +230,31 @@ export default {
         }
         .inner-component & {
             max-height: 118px;
-            padding-top: 28px;
+            border-bottom: 1px solid #BFB09D;
             span {
                 width: 88%;
             }
         }
     }
     .inner-component & {
+        border: none;
+        border-radius: 0;
         height: 100%;
+        z-index: 4;
+    }
+    .all-projects__filters &, .project-info__drop-menu & {
+        border: 1px solid #67573E;
+        overflow: hidden;
     }
     .search {
-        position: absolute;
-        z-index: 50;
-        width: 90%;
+        width: 100%;
+        box-sizing: border-box;
         padding: 5px 3px;
         color: #67573E;
         outline: none;
-        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
-        border: 1px solid rgba(125, 138, 180, 0.466);
+        box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
+        border: 1px solid rgba(104, 87, 62, 0.3);
         border-right: none;
-        .inner-component &, .all-projects__filters & {
-            width: 88%;
-        }
-        .project-info__drop-menu & {
-            width: 90%;
-        }
     }
 }
 .checkbox {

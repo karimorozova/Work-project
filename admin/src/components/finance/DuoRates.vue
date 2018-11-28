@@ -1,5 +1,5 @@
 <template lang="pug">
-.duo-wrap
+.duo-rates
     .filters
         RatesFilters(
             :sourceSelect="sourceSelect"
@@ -13,6 +13,8 @@
         )
     .add-button
         input(type="button" @click="addSevLangs" value="Add several languages")
+    .duo-rates__action(v-if="isAnyChecked")
+        SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
     DuoRateTable(
         origin="global"
         :fullInfo="fullInfo"
@@ -51,6 +53,7 @@
 <script>
 import RatesFilters from "./RatesFilters";
 import DuoRateTable from "./DuoRateTable";
+import SelectSingle from "../SelectSingle";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
@@ -74,10 +77,8 @@ export default {
                 { title: "Industry" },
                 { title: "" }
             ],
-            changedRate: '',
-            currentSource: {},
-            currentTarget: {},
-            currentActive: -1,
+            actions: ["Delete"],
+            selectedAction: "",
             isNotUnique: false,
             editing: false,
             uniqueComb: {source: "", target: ""},
@@ -93,44 +94,8 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key === "edit" || key === "delete";
-            }
-        },
-        isCurrentServiceRateZero(info, index) {
-            for(let key in info.industry.rates) {
-                if(this.servicesIds.indexOf(key) !== -1 && info.industry.rates[key].value) {
-                    return true
-                }
-                if(!info.industry.rates[key].value && this.currentActive === index) {
-                    return true
-                }
-            }
-            return false;
-        },
-        isSourceFilter(info) {
-            return (this.sourceSelect.indexOf(info.sourceLanguage.symbol) !== -1 || this.sourceSelect[0] === 'All');
-        },
-        isTargetFilter(info) {
-            return (this.targetSelect.indexOf(info.targetLanguage.symbol) !== -1 || this.targetSelect[0] === 'All');
-        },
-        isIndustryFilter(info) {
-            let industriesNames = this.industryFilter.map(item => item.name);
-            return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
-        },
-        toggleAllCheck() {
-            for(let index in this.fullInfo) {
-                let info = this.fullInfo[index];
-                if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
-                && this.isSourceFilter(info) && this.isTargetFilter(info) 
-                && this.isIndustryFilter(info)) {
-                    this.fullInfo[index].check = this.isAllChecked;
-                }
-            }
+        setAction({option}) {
+            this.selectedAction = option;
         },
         addSevLangs() {
         //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
@@ -144,12 +109,6 @@ export default {
         },
         closeEditionMessage() {
             this.editing = false
-        },
-        changeRate(e, servKey) {
-            this.changedRate[servKey].value = +event.target.value
-        },
-        toggleActive(index, key) {
-            this.changedRate[key].active = !this.changedRate[key].active;
         },
         setServiceFilter({service}) {
             const index = this.serviceSelect.findIndex(item => item._id === service._id);
@@ -217,22 +176,6 @@ export default {
                 })
             }
         },
-        isAllRatesZero() {
-            return Object.keys(this.changedRate).filter(item => {
-                return this.servicesIds.indexOf(item) !== -1
-            }).reduce((init, cur) => {
-                return init + this.changedRate[cur].value;
-            }, 0);
-        },
-        checkRatesValidation() {
-            const rateRegex = /^\d{0,2}(\.\d{0,4})?/;
-            for(let key of Object.keys(this.changedRate)) {
-                if(!rateRegex.test(this.changedRate[key].value)) {
-                    return false;
-                }
-            }
-            return this.isAllRatesZero();
-        },
         showEditingError() {
             this.editing = true;
         },
@@ -243,12 +186,6 @@ export default {
         showNotUniqueWarning({source, target}) {
             this.uniqueComb = {source, target}; 
             this.isNotUnique = true;    
-        },
-        setDefaultValues() {
-            this.currentActive = -1;
-            this.industrySelected = [{name: 'All'}];
-            this.currentSource = {};
-            this.currentTarget = {};
         },
         addNewRow() {
             this.sourceSelect = ["All"];
@@ -326,11 +263,22 @@ export default {
             }
             result += 'px';
             return result;
+        },
+        isAnyChecked() {
+            let result = false;
+            for(let info of this.fullInfo) {
+                if(info.check) {
+                    result = true;
+                    return result;
+                }
+            }
+            return result;
         }
     },
     components: {
         RatesFilters,
         DuoRateTable,
+        SelectSingle,
         LanguagesSelect,
         IndustrySelect,
         Toggler
@@ -346,14 +294,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.duo-wrap {
+.duo-rates {
     position: relative;
     font-family: MyriadPro;
-    min-width: 872px; 
+    width: 872px;
+    &__action {
+        position: relative;
+        height: 28px;
+        width: 20%;
+        margin-bottom: 15px;
+    }
 }
 
 .filters {
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .add-button {

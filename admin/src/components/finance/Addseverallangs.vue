@@ -476,6 +476,7 @@ export default {
     justify-content: center;
     align-items: center;
     font-size: 14px;
+    z-index: 50;
 }
 
 .add-several {
@@ -562,7 +563,9 @@ export default {
     width: 50%;
     margin-bottom: 30px;
     &__inner-component {
+        position: relative;
         width: 192px;
+        height: 35px;
         margin-left: 20px;
     }
 }

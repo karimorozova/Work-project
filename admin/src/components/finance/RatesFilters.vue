@@ -2,17 +2,21 @@
 .rates-filters
     .rates-filters__item(v-if="form !== 'Mono'")
         label.rates-filters__title Source Language
-        LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
+        .rates-filters__drop-menu
+            LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
     .rates-filters__item
         label.rates-filters__title(v-if="form !== 'Mono'") Target Language
         label.rates-filters__title(v-else) Language
-        LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
+        .rates-filters__drop-menu
+            LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
     .rates-filters__item
         label.rates-filters__title Industry
-        IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
+        .rates-filters__drop-menu
+            IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .rates-filters__item
         label.rates-filters__title Service
-        ServiceMultiSelect(:form="form" :selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
+        .rates-filters__drop-menu
+            ServiceMultiSelect(:form="form" :selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
 </template>
 
 <script>
@@ -86,12 +90,17 @@ export default {
     justify-content: space-between;
     &__item {
         width: 23%;
+        height: 50px;
         display: flex;
         flex-direction: column;
     }
     &__title {
         font-size: 12px;
         margin-bottom: 0;
+    }
+    &__drop-menu {
+        position: relative;
+        width: 100%;
     }
 }
 </style>

@@ -102,8 +102,6 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    border: 1px solid #BFB09D;
-    border-radius: 5px;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -122,6 +120,7 @@ export default {
         img {
             max-width: 21px;
             max-height: 21px;
+            margin-right: 3px;
         }
     }
     .arrow-button {
@@ -146,23 +145,25 @@ export default {
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
         height: 100%;
         .selected {
-            padding-top: 5px;
             opacity: 1;
         }
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    z-index: 5;
+    border: 1px solid #BFB09D;
+    border-radius: 5px;
     .drop {
         font-size: 14px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: scroll;
+        overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
-        z-index: 6;
         &__item {
             display: flex;
             align-items: center;
@@ -182,10 +183,14 @@ export default {
         }
         .inner-component & {
             max-height: 130px;
+            border-bottom: 1px solid #BFB09D;
         }
     }
     .inner-component & {
+        border: none;
+        border-radius: 0;
         height: 100%;
+        z-index: 4;
     }
 }
 .checkbox {

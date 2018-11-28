@@ -490,7 +490,7 @@ td {
         left: 0;
         bottom: 0;
         right: 0;
-        z-index: 5;
+        z-index: 3;
     }
     .monorates-table__image {
         max-height: 21px;

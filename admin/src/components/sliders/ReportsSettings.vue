@@ -1,11 +1,11 @@
 <template lang="pug">
 .reports
   .reports__table
-    TestTable
+    MonoRates
 </template>
 
 <script>
-import TestTable from "../finance/TestTable";
+import MonoRates from "../finance/MonoRates";
 export default {
   data() {
     return {
@@ -16,7 +16,7 @@ export default {
     
   },
   components: {
-    TestTable
+    MonoRates
   }
 };
 </script>

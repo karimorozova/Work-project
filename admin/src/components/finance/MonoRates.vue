@@ -1,5 +1,5 @@
 <template lang="pug">
-.duo-wrap
+.mono-rates
     .filters
         RatesFilters(
             form="Mono"
@@ -10,7 +10,9 @@
             @setIndustryFilter="setIndustryFilter"
             @setServiceFilter="setServiceFilter"
         )
-    TestMonoRatesTable(
+    .mono-rates__action(v-if="isAnyChecked")
+        SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
+    MonoRateTable(
         origin="global"
         :fullInfo="fullInfo"
         :targetSelect="targetSelect"
@@ -44,7 +46,8 @@
 
 <script>
 import RatesFilters from "./RatesFilters";
-import TestMonoRatesTable from "./TestMonoRatesTable";
+import MonoRateTable from "./MonoRateTable";
+import SelectSingle from "../SelectSingle";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
@@ -67,6 +70,8 @@ export default {
                 { title: "Industry" },
                 { title: "" }
             ],
+            actions: ["Delete"],
+            selectedAction: "",
             isNotUnique: false,
             editing: false,
             uniqueComb: {source: "", target: ""},
@@ -82,44 +87,8 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key === "edit" || key === "delete";
-            }
-        },
-        isCurrentServiceRateZero(info, index) {
-            for(let key in info.industry.rates) {
-                if(this.servicesIds.indexOf(key) !== -1 && info.industry.rates[key].value) {
-                    return true
-                }
-                if(!info.industry.rates[key].value && this.currentActive === index) {
-                    return true
-                }
-            }
-            return false;
-        },
-        isSourceFilter(info) {
-            return (this.sourceSelect.indexOf(info.sourceLanguage.symbol) !== -1 || this.sourceSelect[0] === 'All');
-        },
-        isTargetFilter(info) {
-            return (this.targetSelect.indexOf(info.targetLanguage.symbol) !== -1 || this.targetSelect[0] === 'All');
-        },
-        isIndustryFilter(info) {
-            let industriesNames = this.industryFilter.map(item => item.name);
-            return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
-        },
-        toggleAllCheck() {
-            for(let index in this.fullInfo) {
-                let info = this.fullInfo[index];
-                if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
-                && this.isTargetFilter(info) 
-                && this.isIndustryFilter(info)) {
-                    this.fullInfo[index].check = this.isAllChecked;
-                }
-            }
+        setAction({option}) {
+            this.selectedAction = option;
         },
         closeErrorMessage() {
             this.showValidError = false;
@@ -185,22 +154,6 @@ export default {
                 name: 'All'
                 })
             }
-        },
-        isAllRatesZero() {
-            return Object.keys(this.changedRate).filter(item => {
-                return this.servicesIds.indexOf(item) !== -1
-            }).reduce((init, cur) => {
-                return init + this.changedRate[cur].value;
-            }, 0);
-        },
-        checkRatesValidation() {
-            const rateRegex = /^\d{0,2}(\.\d{0,4})?/;
-            for(let key of Object.keys(this.changedRate)) {
-                if(!rateRegex.test(this.changedRate[key].value)) {
-                    return false;
-                }
-            }
-            return this.isAllRatesZero();
         },
         showEditingError() {
             this.editing = true;
@@ -291,11 +244,22 @@ export default {
             }
             result += 'px';
             return result;
+        },
+        isAnyChecked() {
+            let result = false;
+            for(let info of this.fullInfo) {
+                if(info.check) {
+                    result = true;
+                    return result;
+                }
+            }
+            return result;
         }
     },
     components: {
         RatesFilters,
-        TestMonoRatesTable,
+        MonoRateTable,
+        SelectSingle,
         LanguagesSelect,
         IndustrySelect,
         Toggler
@@ -311,14 +275,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.duo-wrap {
+.mono-rates {
     position: relative;
     font-family: MyriadPro;
-    min-width: 872px; 
+    width: 872px;
+    &__action {
+        position: relative;
+        height: 28px;
+        width: 20%;
+        margin-bottom: 15px;
+    }
 }
 
 .filters {
     margin-bottom: 20px;
+    margin-top: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #67573E;
 }
 
 .add-button {

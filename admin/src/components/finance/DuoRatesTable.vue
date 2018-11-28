@@ -368,15 +368,14 @@ td {
     width: 114px;
 }
 .drop-option {
-    position: relative;
     .inner-component {
-        position: absolute;
+        position: relative;
         background-color: #fff;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
-        z-index: 5;
+        z-index: 3;
     }
     &__image {
         max-height: 21px;

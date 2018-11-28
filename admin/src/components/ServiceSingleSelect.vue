@@ -111,7 +111,7 @@ export default {
         width: 100%;
         border: 1px solid #BFB09D;
         max-height: 150px;
-        overflow-y: scroll;
+        overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
         z-index: 5;

@@ -98,7 +98,6 @@ export default {
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;
