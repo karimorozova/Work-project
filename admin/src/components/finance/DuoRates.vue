@@ -28,6 +28,15 @@
         @showNotUniqueWarning="showNotUniqueWarning"
         @addNewRow="addNewRow"
     )
+    .duo-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
+        ApproveModal(
+            text="Are you sure?"
+            approveValue="Yes"
+            notApproveValue="Cancel"
+            @approve="approveAction"
+            @notApprove="closeModal"
+            @close="closeModal"
+        )
     .unique-message(v-if="isNotUnique")
         .message
             p The combination you want to add already exists!
@@ -51,9 +60,11 @@
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
 import RatesFilters from "./RatesFilters";
 import DuoRateTable from "./DuoRateTable";
 import SelectSingle from "../SelectSingle";
+import ApproveModal from "../ApproveModal";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
@@ -96,6 +107,13 @@ export default {
     methods: {
         setAction({option}) {
             this.selectedAction = option;
+        },
+        closeModal() {
+            this.selectedAction = "";
+        },
+        approveAction() {
+            console.log("Approve action");
+            this.closeModal();
         },
         addSevLangs() {
         //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
@@ -279,9 +297,13 @@ export default {
         RatesFilters,
         DuoRateTable,
         SelectSingle,
+        ApproveModal,
         LanguagesSelect,
         IndustrySelect,
         Toggler
+    },
+    directives: {
+        ClickOutside
     },
     created() {
         this.defaultService();
@@ -303,6 +325,14 @@ export default {
         height: 28px;
         width: 20%;
         margin-bottom: 15px;
+    }
+    &__approve-action {
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        margin-left: -150px;
+        background-color: #FFF;
+        z-index: 30;
     }
 }
 

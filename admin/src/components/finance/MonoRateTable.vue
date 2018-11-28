@@ -137,6 +137,12 @@ export default {
                 }
             }
         },
+        uncheckAll() {
+            this.isAllChecked = false;
+            for(let info of this.fullInfo) {
+                info.check = false;
+            }
+        },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
         },
@@ -323,6 +329,10 @@ export default {
             saveGlobalRates: "saveGlobalRates",
             deleteServiceRate: "deleteServiceRate"
         })
+    },
+    watch: {
+        targetSelect: function(val) { this.uncheckAll() },
+        industryFilter: function(val) { this.uncheckAll() }
     },
     computed: {
         servicesIds() {
