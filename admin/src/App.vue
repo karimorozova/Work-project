@@ -61,31 +61,32 @@ body {
   }
   ::-webkit-scrollbar-track {
     background: rgba(103, 87, 62, 0.1);
-    border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:vertical {
     background-color: rgba(103, 87, 62, 0.3);
-    border-left: 2px solid transparent;
-    border-right: 2px solid transparent;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
     background-clip: content-box;
     border-radius: 6px;
     min-height: 25px;
     &:hover {
-      background-color: rgba(103, 87, 62, 0.5);
+      background-color: rgba(103, 87, 62, 0.6);
       background-clip: content-box;
     }
   }
   ::-webkit-scrollbar-thumb:horizontal {
     background-color: rgba(103, 87, 62, 0.3);
-    border-top: 2px solid transparent;
-    border-bottom: 2px solid transparent;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
     background-clip: content-box;
     border-radius: 7px;
     &:hover {
-      background-color: rgba(103, 87, 62, 0.5);
+      background-color: rgba(103, 87, 62, 0.6);
       background-clip: content-box;
     }
   }
+  /* ------- If buttons needed ---------
+
   ::-webkit-scrollbar-button:vertical:decrement {
 	  border-bottom: 14px solid rgba(103, 87, 62, 0.3);
     border-left: 8px solid transparent;
@@ -122,5 +123,7 @@ body {
       border-left: 14px solid rgba(103, 87, 62, 0.6);
     }
   }
+
+  -----------  */
 }
 </style>
