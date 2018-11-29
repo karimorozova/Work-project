@@ -42,9 +42,19 @@ export const saveGlobalRates = async ({commit, dispatch}, payload) => {
 export const deleteServiceRate = async ({commit, dispatch}, payload) => {
     commit('startRequest');
     try {
-        await Vue.http.delete(`/service/rate/${payload.id}`, {body: payload.deletedRate});
+        await dispatch('deleteCheckedRate', payload);
         const { languageForm } = payload.deletedRate;
         languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
+        commit('endRequest');
+    } catch(err) {
+        commit('endRequest');
+        throw new Error("Error on deleting rate");
+    }
+}
+export const deleteCheckedRate = async ({commit}, payload) => {
+    commit('startRequest');
+    try {
+        await Vue.http.delete(`/service/rate/${payload.id}`, {body: payload.deletedRate});
         commit('endRequest');
     } catch(err) {
         commit('endRequest');

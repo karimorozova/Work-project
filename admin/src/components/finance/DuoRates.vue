@@ -111,9 +111,40 @@ export default {
         closeModal() {
             this.selectedAction = "";
         },
-        approveAction() {
-            console.log("Approve action");
+        async approveAction() {
+            if(this.selectedAction === "Delete") {
+                try {
+                    await this.deleteChecked();
+                } catch(err) {
+                    this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+                }
+            }
             this.closeModal();
+        },
+        async deleteChecked() {
+            try {
+                for(let info of this.fullInfo) {
+                    if(info.check) {
+                        await this.deleteRate(info);
+                    } 
+                }
+                await this.getDuoCombinations();
+                this.alertToggle({message: 'Rates deleted.', isShow: true, type: 'success'});
+            } catch(err) {
+                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+            }
+        },
+        async deleteRate(info) {
+            const deletedRate = {
+                servicesIds: this.servicesIds,
+                industries: [info.industry],
+                languageForm: "Duo"
+            }
+            try {
+                await this.deleteCheckedRate({ id: info.id, deletedRate });
+            } catch(err) {
+                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+            }
         },
         addSevLangs() {
         //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
@@ -241,7 +272,8 @@ export default {
             getDuoCombinations: "getDuoCombinations",
             storeDuoRates: "storeDuoRates",
             storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
-            deleteServiceRate: "deleteServiceRate"
+            deleteServiceRate: "deleteServiceRate",
+            deleteCheckedRate: "deleteCheckedRate"
         })
     },
     computed: {

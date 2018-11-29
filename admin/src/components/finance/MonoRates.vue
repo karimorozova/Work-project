@@ -104,9 +104,40 @@ export default {
         closeModal() {
             this.selectedAction = "";
         },
-        approveAction() {
-            console.log("Approve action");
+        async approveAction() {
+            if(this.selectedAction === "Delete") {
+                try {
+                    await this.deleteChecked();
+                } catch(err) {
+                    this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+                }
+            }
             this.closeModal();
+        },
+        async deleteChecked() {
+            try {
+                for(let info of this.fullInfo) {
+                    if(info.check) {
+                        await this.deleteRate(info);
+                    } 
+                }
+                await this.getMonoCombinations();
+                this.alertToggle({message: 'Rates deleted.', isShow: true, type: 'success'});
+            } catch(err) {
+                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+            }
+        },
+        async deleteRate(info) {
+            const deletedRate = {
+                servicesIds: this.servicesIds,
+                industries: [info.industry],
+                languageForm: "Mono"
+            }
+            try {
+                await this.deleteCheckedRate({ id: info.id, deletedRate });
+            } catch(err) {
+                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+            }
         },
         closeErrorMessage() {
             this.showValidError = false;
@@ -222,7 +253,8 @@ export default {
             alertToggle: "alertToggle",
             getMonoCombinations: "getMonoCombinations",
             storeMonoRates: "storeMonoRates",
-            deleteServiceRate: "deleteServiceRate"
+            deleteServiceRate: "deleteServiceRate",
+            deleteCheckedRate: "deleteCheckedRate"
         })
     },
     computed: {
