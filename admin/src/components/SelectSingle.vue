@@ -1,9 +1,9 @@
 <template lang="pug">
     .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
-        .select(@click="toggleOptions")
+        .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
-            .arrow-button
+            .arrow-button(@click="toggleOptions")
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
             input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
@@ -40,14 +40,31 @@ export default {
         }
     },
     methods: {
+        showOptions(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr") {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
+            }
+            this.droppedLang = !this.droppedLang;
+            this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: top, offsetHeight: height});
+        },
         showOption(opt) {
             return (typeof opt === "string") ? opt: opt.name;
         },
         outOptions() {
             this.isDropped = false;
         },
-        toggleOptions() {
+        toggleOptions(event) {
             this.isDropped = !this.isDropped;
+            this.showOptions(event);
         },
         chooseOption(index) {
             this.$emit("chooseOption", {option: this.filteredOptions[index], refersTo: this.refersTo});
@@ -105,7 +122,6 @@ export default {
         max-height: 100px;
         overflow-y: overlay;
         overflow-x: hidden;
-        flex-direction: column;
         background-color: #FFF;
         border-top: 1px solid #67573E;    
         z-index: 10;
@@ -142,9 +158,20 @@ export default {
         .filters & {
             max-height: 220px;
         }
+        .inner-component & {
+            max-height: 135px;
+            border-top: none;
+            border-bottom: 1px solid #BFB09D;
+        }
     }
     .filters &, .project-finance__drop-menu & {
         width: 100%;
+    }
+    .inner-component & {
+        border: none;
+        border-radius: 0;
+        height: 100%;
+        overflow: visible;
     }
 }
 
@@ -190,6 +217,20 @@ export default {
         }
         .filters_short-menu & {
             width: 28%;
+        }
+        .inner-component & {
+            background-color: white;
+            box-shadow: inset -1px 0 5px #bfb09d;
+            border-left: 1px solid #bfb09d;
+        }
+    }
+    .inner-component & {
+        border: none;
+        border-radius: 0;
+        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
+        height: 100%;
+        .selected {
+            padding: 2px 5px;
         }
     }
 }

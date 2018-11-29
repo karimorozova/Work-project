@@ -152,7 +152,7 @@ export default {
         serviceRem: this.services[indexToRemove]._id
       };
       this.$http
-        .post("service/removeservices", remObj)
+        .post("/service/removeservices", remObj)
         .then(result => {
           this.showRemoveWarning = false;
           this.services.splice(indexToRemove, 1);
@@ -186,7 +186,7 @@ export default {
       formData.append("uploadedFileIcon", this.uploadedFileIcon);
 
       this.$http
-        .post("service/saveservices", formData)
+        .post("/service/saveservices", formData)
         .then(result => {
           setTimeout(() => {
             this.getServices()
@@ -198,7 +198,7 @@ export default {
       this.services[idx].crud = false;
     },
     async getServices() {
-      const preData = await this.$http.get("api/services");
+      const preData = await this.$http.get("/api/services");
       this.services = preData.body;
       this.services.sort((x, y) => {
         if (x.title > y.title) return 1;

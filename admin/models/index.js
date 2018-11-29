@@ -11,6 +11,7 @@ const Timezones = require('./timezones');
 const Clients = require('./clients');
 const Vendors = require('./vendors');
 const LeadSource = require('./leadSource');
+const Package = require('./packages');
 
 const Models = {
     Languages,
@@ -24,6 +25,7 @@ const Models = {
     Monorate,
     Timezones,
     LeadSource,
+    Package,
     Clients,
     Vendors
 };

@@ -12,6 +12,11 @@ import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
+import TableLeadsources from '@/components/Table/TableLeadsources'
+import TablePackages from '@/components/Table/TablePackages'
+import TableLanguages from '@/components/Table/TableLanguages'
+import TableServices from '@/components/Table/TableServices'
+import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
 import NewClient from '@/components/clients/NewClient'
@@ -64,7 +69,34 @@ const router = new Router({
           path: 'dashboard',
           name: 'dashboard',
           props: true,
-          component: DashboardSettings
+          component: DashboardSettings,
+          children: [
+            {
+              path: 'leadsources',
+              name: 'leadsources',
+              component: TableLeadsources
+            },
+            {
+              path: 'packages',
+              name: 'packages',
+              component: TablePackages
+            },
+            {
+              path: 'langs',
+              name: 'langs',
+              component: TableLanguages
+            },
+            {
+              path: 'services',
+              name: 'services',
+              component: TableServices
+            },
+            {
+              path: 'industries',
+              name: 'industries',
+              component: TableIndustries
+            },  
+          ]
         },
         {
           path: 'recruitment',

@@ -9,6 +9,7 @@ const {
   Monorate,
   Timezones,
   LeadSource,
+  Package,
   Clients,
   Vendors
 } = require('../models');
@@ -22,6 +23,7 @@ const {
   industriesDefault,
   timezonesDefault,
   leadSourcesDefault,
+  packagesDefault,
   clientsDefault,
   vendorsDefault
 } = require('./dbDefaultValue');
@@ -34,6 +36,20 @@ var instance = axios.create({
     'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj'
   }
 });
+
+async function fillPackages() {
+  try {
+    const packages = await Package.find();
+    if(!packages.length) {
+      for(let package of packagesDefault) {
+        await new Package(package).save();
+      }
+    }
+  } catch(err) {
+    console.log("Error on filling default Packages");
+    console.log(err);
+  }
+}
 
 function fillLeadSources() {
   return LeadSource.find({})
@@ -439,6 +455,7 @@ async function fillMonoServiceRates() {
 }
 
 async function checkCollections() {
+  await fillPackages();
   await fillLeadSources();
   await timeZones();
   await languages();

@@ -6,7 +6,7 @@ const ClientApi = require('../models/xtrf/client');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
-const { Requests, Projects, Languages, Services, Industries, Timezones, LeadSource, Vendors } = require('../models');
+const { Requests, Languages, Industries, Timezones, LeadSource, Package } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
@@ -383,7 +383,7 @@ router.post('/update-leadsource', async (req, res) => {
     res.send("New lead source created");
   } catch(err) {
     console.log(err);
-    res.status(500).send("Error on creating a new lead source")
+    res.status(500).send("Error on updating/creating a lead source")
   }
 })
 
@@ -400,4 +400,44 @@ router.delete('/lead-source/:id', async (req, res) => {
     res.status(500).send("Error on deleting lead source");
   }
 })
+
+router.get('/packages', async (req, res) => {
+  try {
+    const packages = await Package.find({});
+    res.send(packages);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on getting packages from DB")
+  }
+})
+
+router.post('/update-package', async (req, res) => {
+  const { package } = req.body;
+  try {
+    if(package._id) {
+      await Package.updateOne({"_id": package._id}, package);
+      return res.send('Updated');
+    }
+    await Package.create(package);
+    res.send('New package saved.');
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on updating/creating a package")
+  }
+})
+
+router.delete('/package/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    if(!id) {
+      return res.send("Deleted unsaved package");
+    }
+    await Package.deleteOne({"_id": id});
+    res.send("Package deleted");
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on deleting package")
+  }
+})
+
 module.exports = router;

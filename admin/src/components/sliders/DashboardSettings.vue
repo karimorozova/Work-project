@@ -8,14 +8,8 @@
         @onLinkClick="onLinkClick"
       )
     .settings__inner(v-if="isSidebar" :class='{"settings__open": slidebarVisible}')
-      .settings__table(v-if="islanguages")
-        TableLanguages
-      .settings__table(v-if="isServices")
-        TableServices
-      .settings__table(v-if="isIndusties") 
-        TableIndustries
-      .settings__table(v-if="isLeadsource")
-        TableLeadsources
+      .settings__table
+        router-view
     Blanket(title='Welcome to the Pangea Admin' v-if="!isSidebar")    
 </template>
 
@@ -26,6 +20,7 @@ import TableLanguages from "../Table/TableLanguages";
 import TableServices from "../Table/TableServices.vue";
 import TableIndustries from "../Table/TableIndustries";
 import TableLeadsources from "../Table/TableLeadsources";
+import TablePackages from "../Table/TablePackages";
 
 export default {
   props: {
@@ -36,12 +31,8 @@ export default {
   },
   data() {
     return {
-      islanguages: false,
-      isServices: false,
-      isIndusties: false,
-      isLeadsource: false,
       openQuotes: true,
-      sidebarLinks: ["Languages", "Services", "Industries", "Lead Sources"],
+      sidebarLinks: ["Languages", "Services", "Industries", "Lead Sources", "Packages"],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
     };
@@ -52,28 +43,19 @@ export default {
       this.activeLinkIndex = index;
       switch(link) {
         case "Languages": 
-          this.islanguages = true;
-          this.isIndusties = false;
-          this.isServices = false;
-          this.isLeadsource = false;
+          this.$router.push("/dashboard/langs");
           break;
         case "Services":
-          this.islanguages = false;
-          this.isIndusties = false;
-          this.isServices = true;
-          this.isLeadsource = false;
+          this.$router.push("/dashboard/services");
           break;
         case "Industries":
-          this.islanguages = false;
-          this.isIndusties = true;
-          this.isServices = false;
-          this.isLeadsource = false;
+          this.$router.push("/dashboard/industries");
           break;
         case "Lead Sources":
-          this.islanguages = false;
-          this.isIndusties = false;
-          this.isServices = false;
-          this.isLeadsource = true;
+          this.$router.push("/dashboard/leadsources");
+          break;
+        case "Packages":
+          this.$router.push("/dashboard/packages");
       }
     }
   },
@@ -83,7 +65,8 @@ export default {
     TableLanguages,
     TableServices,
     TableIndustries,
-    TableLeadsources
+    TableLeadsources,
+    TablePackages
   }
 };
 </script>

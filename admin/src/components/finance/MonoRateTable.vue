@@ -17,9 +17,10 @@
                             template(v-if='currentActive !== index || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
                             .inner-component(v-if="currentActive === index")
                                 LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
-                        td.monorates-table__package(:class="{'add-shadow': currentActive === index}")
-                            input.monorates-table__package-input(v-if="currentActive === index" type="text" v-model="changedPackage" :readonly="currentActive !== index")
-                            input.monorates-table__package-input(v-else type="text" :value="info.package" @input="(e) => changePackage(e)" :readonly="currentActive !== index")
+                        td.monorates-table__drop-option
+                            template(v-if='currentActive !== index') {{ info.package }}
+                            .inner-component(v-if="currentActive === index")
+                                SelectSingle(:options="packageSizes" :selectedOption="changedPackage" @chooseOption="changePackage" @scrollDrop="scrollDrop")
                         td.monorates-table__drop-option              
                             span(v-if="!info.industry.icon && currentActive !== index") {{ info.industry.name }}
                             .monorates-table__image
@@ -43,6 +44,7 @@
 
 <script>
 import LanguagesSelect from "../LanguagesSelect";
+import SelectSingle from "../SelectSingle";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
 import { mapGetters, mapActions } from "vuex";
@@ -88,6 +90,7 @@ export default {
                 { title: "Industry" },
                 { title: "" }
             ],
+            packages: [],
             changedRate: '',
             changedPackage: '',
             currentTarget: {},
@@ -142,12 +145,13 @@ export default {
             for(let info of this.fullInfo) {
                 info.check = false;
             }
+            this.setDefaultValues();
         },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
         },
-        changePackage(e) {
-            this.changedPackage = +event.target.value
+        changePackage({option}) {
+            this.changedPackage = option; 
         },
         toggleActive(index, key) {
             this.changedRate[key].active = !this.changedRate[key].active;
@@ -156,14 +160,14 @@ export default {
             let element = document.querySelector('.monorates-table__tbody');
             element.scrollTop = element.scrollHeight;
         },
-        scrollDrop(data) {
-            if(data.drop) {
+        scrollDrop({drop, offsetTop, offsetHeight}) {
+            if(drop) {
                 let tbody = document.querySelector('.monorates-table__tbody');
                 setTimeout(() => {
-                const offsetBottom = data.offsetTop + data.offsetHeight*2;
+                const offsetBottom = offsetTop + offsetHeight*2;
                 const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
                 if (offsetBottom > scrollBottom) {
-                    tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
+                    tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
                 }
                 }, 100)
             }
@@ -324,6 +328,14 @@ export default {
                 this.handleScroll();
             }, 0);
         },
+        async getPackages() {
+            try {
+                const result = await this.$http.get("/api/packages");
+                this.packages = result.body;
+            } catch(err) {
+                this.alertToggle({message: 'Internal serer error. Cannot get packages.', isShow: true, type: 'error'});
+            }
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             saveGlobalRates: "saveGlobalRates",
@@ -367,12 +379,19 @@ export default {
             }
             result += 'px';
             return result;
+        },
+        packageSizes() {
+            return this.packages.map(item => item.size);
         }
     },
     components: {
         LanguagesSelect,
+        SelectSingle,
         IndustrySelect,
         Toggler
+    },
+    created() {
+        this.getPackages();
     }
 };
 </script>
@@ -381,7 +400,7 @@ export default {
 
 .monorates-table__table-data {
     max-width: 872px;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 .monorates-table__duo-finance {
     border-collapse: collapse;

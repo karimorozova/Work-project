@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     async getIndustries() {
-      const preData = await this.$http.get("api/industries");
+      const preData = await this.$http.get("/api/industries");
       this.industries = preData.body;
       this.industries.sort((x, y) => {
         if (x.name > y.name) return 1;
@@ -152,7 +152,7 @@ export default {
         industryRem: this.industries[this.indexToRemove]._id
       };
       this.$http
-        .post("industry/removeindustries", remObj)
+        .post("/industry/removeindustries", remObj)
         .then(result => {})
         .catch(err => {
           console.log(err);
@@ -184,7 +184,7 @@ export default {
       formData.append("uploadedFile", this.uploadedFile);
       
       this.$http
-        .post("industry/saveindustries", formData)
+        .post("/industry/saveindustries", formData)
         .then(result => {
           setTimeout(() => {
             this.getIndustries();

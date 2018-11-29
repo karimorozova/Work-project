@@ -27,13 +27,14 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Source", headerKey: "headerTitle", key: "title", width: "70%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "30%", padding: "0"},
+                {label: "Source", headerKey: "headerTitle", key: "title", width: "65%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "35%", padding: "0"},
             ],
             sources: [],
             icons: {
                 save: {icon: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png"), active: true}, 
+                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
+                cancel: {icon: require("../../assets/images/cancel_icon.jpg"), active: true},
                 delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
             },
             currentActive: -1,
@@ -46,7 +47,7 @@ export default {
                 return key !== "edit";
             }
             if(this.currentActive !== index) {
-                return key !== "save";
+                return key !== "save" && key !== "cancel";
             }
         },
         async makeAction(index, key) {
@@ -61,17 +62,29 @@ export default {
                 this.currentActive = -1;
                 await this.saveSource(index)
             }
+            if(key === "cancel") {
+                this.cancelEdition(index);
+            }
             if(key === "delete") {
                 await this.deleteSource(index);
             }
         },
+        cancelEdition(index) {
+            if(!this.sources[index]._id) {
+                this.sources.splice(index, 1);
+            }
+            this.setDefaults();
+        },
+        setDefaults() {
+            this.currentActive = -1;
+            this.currentSourceName = "";
+        },
         async saveSource(index) {
             this.sources[index].source = this.currentSourceName;
-            const leadSource = this.sources[index];
             try {
                 await this.$http.post("/api/update-leadsource", {leadSource: this.sources[index]});
                 await this.getSources();
-                this.alertToggle({message: "New lead source added", isShow: true, type: 'success'})
+                this.alertToggle({message: "Lead source saved", isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: "Error on creating new lead source", isShow: true, type: 'error'})
             }
@@ -137,12 +150,13 @@ export default {
     &__icons {
         padding-top: 3px;
         display: flex;
-        justify-content: space-around;
-        width: 85%;
+        justify-content: center;
+        align-items: center;
     }
     &__icon {
         cursor: pointer;
-        opacity: 0.5
+        opacity: 0.5;
+        margin-right: 8px;
     }
     &_opacity {
         opacity: 1;

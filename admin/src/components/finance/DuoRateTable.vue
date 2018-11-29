@@ -149,6 +149,7 @@ export default {
             for(let info of this.fullInfo) {
                 info.check = false;
             }
+            this.setDefaultValues();
         },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
@@ -386,7 +387,7 @@ export default {
 
 .duorates-table__table-data {
     max-width: 872px;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 .duorates-table__duo-finance {
     border-collapse: collapse;
