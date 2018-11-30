@@ -78,7 +78,7 @@ export default {
                     this.errors.push(e)
                 })
             } else {
-                let industries = JSON.stringify(this.who.industry);
+                let industries = JSON.stringify(this.who.industries);
                 industries = JSON.parse(industries);
                 this.industries = industries;
                 this.industries.unshift({name: "All"})
@@ -128,6 +128,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -164,6 +165,7 @@ export default {
         overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
+        box-sizing: border-box;
         &__item {
             display: flex;
             align-items: center;
@@ -183,7 +185,8 @@ export default {
         }
         .inner-component & {
             max-height: 130px;
-            border-bottom: 1px solid #BFB09D;
+            border: 1px solid #BFB09D;
+            border-top: none;
         }
     }
     .inner-component & {

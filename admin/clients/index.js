@@ -1,9 +1,11 @@
 const { getClient, getClients, getAfterUpdate } = require('./getClients');
-const { checkRatesMatch, deleteRate, addClientsSeveralLangs } = require('./clientRates');
+const { getClientRates, updateClientRates, checkRatesMatch, deleteRate, addClientsSeveralLangs } = require('./clientRates');
 
 const clients = {
     getClient,
     getClients,
+    getClientRates,
+    updateClientRates,
     getAfterUpdate,
     checkRatesMatch,
     deleteRate,

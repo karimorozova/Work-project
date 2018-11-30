@@ -19,8 +19,8 @@
                     .block-item
                         label.block-item__label.block-item_relative Industry:
                             Asterisk(:customStyle="asteriskStyle")
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !client.industry.length && isSaveClicked}")
-                            MultiClientIndustrySelect(:selectedInd="client.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                        .block-item__drop(:class="{'clients-wrap_error-shadow': !client.industries.length && isSaveClicked}")
+                            MultiClientIndustrySelect(:selectedInd="client.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                     .block-item
                         label.block-item__label.block-item_relative Status:
                             Asterisk(:customStyle="asteriskStyle")
@@ -133,7 +133,7 @@ export default {
                 vat: "",
                 address: "",
                 languageCombinations: [],
-                industry: [],
+                industries: [],
                 contacts: []
             },
             sidebarShow: true,
@@ -167,14 +167,14 @@ export default {
             }
         },
         chosenInd({industry}) {
-            if(!this.client.industry.length) {
-                return this.client.industry.push(industry);
+            if(!this.client.industries.length) {
+                return this.client.industries.push(industry);
             }
-            const position = this.client.industry.findIndex(item => item._id === industry._id);
+            const position = this.client.industries.findIndex(item => item._id === industry._id);
             if(position !== -1) {
-                return this.client.industry.splice(position, 1);
+                return this.client.industries.splice(position, 1);
             }
-            this.client.industry.push(industry);
+            this.client.industries.push(industry);
         },
         setLeadSource({leadSource}) {
             this.client.leadSource = leadSource;
@@ -223,7 +223,7 @@ export default {
             this.clearErrors();
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             if(!this.client.name) this.errors.push('Company name cannot be empty.');
-            if(!this.client.industry.length) this.errors.push('Please, choose at least one industry.');
+            if(!this.client.industries.length) this.errors.push('Please, choose at least one industry.');
             if(!this.client.contacts.length) this.errors.push('Please, add at least one contact.');
             if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');
             if(!this.client.status) this.errors.push('Please, choose status.');
@@ -301,8 +301,8 @@ export default {
         }),
         selectedIndNames() {
             let result = [];
-            if(this.client.industry.length) {
-                for(let ind of this.client.industry) {
+            if(this.client.industries.length) {
+                for(let ind of this.client.industries) {
                     result.push(ind.name);
                 }
             }

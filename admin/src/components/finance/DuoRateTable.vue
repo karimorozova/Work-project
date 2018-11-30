@@ -1,5 +1,5 @@
 <template lang="pug">
-.duorates-table
+.duorates-table(v-click-outside="outClick")
     .duorates-table__table-data
         table.duorates-table__duo-finance(:style="{width: tableWidth}")
             thead
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
@@ -74,10 +75,7 @@ export default {
         serviceSelect: {
             type: Array
         },
-        isEditing: {
-            type: Boolean
-        },
-        isValidationError: {
+        isErrors: {
             type: Boolean
         }
     },
@@ -149,7 +147,15 @@ export default {
             for(let info of this.fullInfo) {
                 info.check = false;
             }
+            if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
+                return
+            }
             this.setDefaultValues();
+        },
+        outClick() {
+            if(!this.isErrors) {
+                this.setDefaultValues();
+            }
         },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
@@ -280,11 +286,17 @@ export default {
                     if(this.origin === "global") {
                         await this.saveGlobalRates(info);
                     }
+                    if(this.origin === "client") {
+                        await this.saveClientRates(info);
+                    }
+                    if(this.origin === "vendor") {
+                        await this.saveVendorRates(info);
+                    }
                     this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
                 } catch(err) {
                     this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
                 }
-                this.currentActive = -1;
+                this.setDefaultValues();
             } else {
                 this.$emit('showNotUniqueWarning', {source: this.currentSource.lang, target: this.currentTarget.lang});
             }
@@ -314,6 +326,9 @@ export default {
             this.currentActive = -1;
         },
         setDefaultValues() {
+            if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
+                this.fullInfo.splice(this.currentActive, 1);
+            }
             this.currentActive = -1;
             this.industrySelected = [{name: 'All'}];
             this.currentSource = {};
@@ -332,6 +347,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             saveGlobalRates: "saveGlobalDuoRates",
+            saveClientRates: "saveClientRates",
             deleteServiceRate: "deleteServiceRate"
         })
     },
@@ -379,6 +395,9 @@ export default {
         LanguagesSelect,
         IndustrySelect,
         Toggler
+    },
+    directives: {
+        ClickOutside
     }
 };
 </script>
@@ -470,8 +489,7 @@ td {
     }
 }
 .add-row {
-    margin-top: 10px;
-    margin-left: 25px; 
+    margin: 10px 0 10px 25px; 
     &__plus {
         width: 28px;
         height: 28px;

@@ -38,7 +38,7 @@
                     @chosenInd="setIndustry"
                 )
             .clients-table__data-cell(v-else)
-                img.clients-table__industry-icon(v-for="industry in row.industry" :src="industry.icon")
+                img.clients-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
         template(slot="web" slot-scope="{ row, index }")
             .clients-table__active-cell(v-if="currentEditingIndex === index")
                 input.clients-table__input(type="text" v-model="currentWebsite" @click.stop="stopPropagation")
@@ -149,7 +149,7 @@ export default {
         },
         setCurrentEditionValues(index) {
             this.currentEditingIndex = index;
-            this.industrySelected = this.filteredClients[index].industry;
+            this.industrySelected = this.filteredClients[index].industries;
             this.selectedStatus = this.filteredClients[index].status;
             this.selectedLeadsource = this.filteredClients[index].leadSource;
             this.currentWebsite = this.filteredClients[index].website;
@@ -171,7 +171,7 @@ export default {
                 website: this.currentWebsite,
                 status: this.selectedStatus,
                 leadSource: this.selectedLeadsource,
-                industry: this.industrySelected
+                industries: this.industrySelected
             }
             sendData.append("client", JSON.stringify(updatingClient));
             try{
@@ -254,7 +254,7 @@ export default {
             }
             if(this.filterIndustry && this.filterIndustry.name !== "All") {
                 result = result.filter(item => {
-                    const industryIds = item.industry.map(industry => industry._id);
+                    const industryIds = item.industries.map(industry => industry._id);
                     return industryIds.indexOf(this.filterIndustry._id) !== -1
                 })
             }

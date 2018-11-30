@@ -20,8 +20,8 @@ async function updateRate(rate, infoIndustries, languageForm) {
   }
 }
 
-function updateRateForAll(rateIdustries, rates) {
-  return rateIdustries.map(item => {
+function updateRateForAll(industries, rates) {
+  return industries.map(item => {
     return  {...item, rates}
   })
 }

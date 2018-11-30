@@ -16,6 +16,7 @@
   .add-button
     input(type="button" value="Add several languages" @click="addSevLangs")           
   DuoRatesTable(
+    origin="client"
     :entity="client"
     :fullInfo="fullInfo"
     :sourceSelect="sourceSelect"
@@ -23,14 +24,11 @@
     :filterIndustry="filterIndustry"
     :industryFilter="industryFilter"
     :serviceSelect="serviceSelect"
-    :isEditing="isEditing"
-    :isValidationError="isValidationError"
+    :isErrors="isAnyError"
     @showEditingError="showEditingError"
     @showValidationErrors="showValidationErrors"
-    @saveCombination="saveCombination"
-    @deleteCombination="deleteCombination"
+    @showNotUniqueWarning="showNotUniqueWarning"
     @addNewRow="addNewRow"
-    @deleteUnsavedAddedRow="deleteUnsavedAddedRow"
   )
   .edition-message(v-if="isEditing")
     .message

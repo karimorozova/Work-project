@@ -9,9 +9,9 @@ export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServ
 export const getDuoCombinations = async ({commit}, payload) => {
     commit('startRequest');
     try {
-    const result = await Vue.http.get('/service/parsed-rates?form=Duo');
-    commit('setDuoRates', result.body);
-    commit('endRequest');
+        const result = await Vue.http.get('/service/parsed-rates?form=Duo');
+        commit('setDuoRates', result.body);
+        commit('endRequest');
     } catch(err) {
         commit('endRequest');
         throw new Error("Error on getting Duo rates");
@@ -20,9 +20,13 @@ export const getDuoCombinations = async ({commit}, payload) => {
 export const getMonoCombinations = async ({commit}, payload) => {
     commit('startRequest');
     try {
-    const result = await Vue.http.get('/service/parsed-rates?form=Mono');
-    commit('setMonoRates', result.body);
-    commit('endRequest');
+        const result = await Vue.http.get('/service/parsed-rates?form=Mono');
+        const rates = result.body.sort((a, b) => {
+            if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
+            if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;
+        })
+        commit('setMonoRates', rates);
+        commit('endRequest');
     } catch(err) {
         commit('endRequest');
         throw new Error("Error on getting Mono rates");

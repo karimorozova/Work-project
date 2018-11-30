@@ -16,7 +16,8 @@
     .duo-rates__action(v-if="isAnyChecked")
         SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
     DuoRateTable(
-        origin="global"
+        origin="client"
+        :entity="client"
         :fullInfo="fullInfo"
         :sourceSelect="sourceSelect"
         :targetSelect="targetSelect"
@@ -62,18 +63,24 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
-import RatesFilters from "./RatesFilters";
-import DuoRateTable from "./DuoRateTable";
-import SelectSingle from "../SelectSingle";
-import ApproveModal from "../ApproveModal";
-import LanguagesSelect from "../LanguagesSelect";
-import Toggler from "../Toggler";
-import IndustrySelect from "../IndustrySelect";
+import RatesFilters from "../../finance/RatesFilters";
+import DuoRateTable from "../../finance/DuoRateTable";
+import SelectSingle from "../../SelectSingle";
+import ApproveModal from "../../ApproveModal";
+import LanguagesSelect from "../../LanguagesSelect";
+import Toggler from "../../Toggler";
+import IndustrySelect from "../../IndustrySelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        
+        client: {
+            type: Object
+        },
+        sevLangs: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {
@@ -263,17 +270,17 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            getDuoCombinations: "getDuoCombinations",
-            storeDuoRates: "storeDuoRates",
-            storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
-            deleteServiceRate: "deleteServiceRate",
-            deleteCheckedRate: "deleteCheckedRate"
+            getDuoCombinations: "getClientDuoCombinations",
+            storeClient: "storeClient",
+            storeDuoRates: "storeClientDuoRates",
+            deleteServiceRate: "deleteClientsServiceRate",
+            deleteCheckedRate: "deleteClientsCheckedRate"
         })
     },
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getDuoRates"
+            fullInfo: "getClientDuoCombs"
         }),
         servicesIds() {
             return this.serviceSelect.map(item => item._id);
@@ -310,12 +317,12 @@ export default {
         },
         isAnyChecked() {
             let result = false;
-            for(let info of this.fullInfo) {
-                if(info.check) {
-                    result = true;
-                    return result;
-                }
-            }
+            // for(let info of this.fullInfo) {
+            //     if(info.check) {
+            //         result = true;
+            //         return result;
+            //     }
+            // }
             return result;
         },
         isAnyError() {

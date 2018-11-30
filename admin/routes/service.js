@@ -125,11 +125,11 @@ router.post('/rates', async (req, res) => {
     const { languageForm } = info;
     let rate = languageForm === "Duo" ? await Duorate.findOne({"source": info.sourceLanguage._id, "target": info.targetLanguage._id})
       .populate("industries.industry") 
-    : await Monorate.findOne({"target": info.targetLanguage._id}).populate("industries.industry");
+    : await Monorate.findOne({"target": info.targetLanguage._id, "package": info.package}).populate("industries.industry");
     if(rate) {
       const { updatedIndustries } = await updateRate(rate, info.industries, info.languageForm);
       const result = languageForm === "Duo" ? await Duorate.findOneAndUpdate({"_id": rate._id}, {"industries": updatedIndustries})
-      : await Monorate.findOneAndUpdate({"_id": rate._id}, {"package": info.package, "industries": updatedIndustries});
+      : await Monorate.findOneAndUpdate({"_id": rate._id}, {"industries": updatedIndustries});
       return res.send(result);
     }
     const result = await createNewRate(info);

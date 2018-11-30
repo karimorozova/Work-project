@@ -96,9 +96,9 @@ function clients() {
           for(const client of clientsDefault) {
             let industries = await Industries.find({});
             for(let industry of industries) {
-              for(let ind in client.industry) {
-                if(industry.name == client.industry[ind].name) {
-                  client.industry[ind] = industry._id;
+              for(let ind in client.industries) {
+                if(industry.name == client.industries[ind].name) {
+                  client.industries[ind] = industry._id;
                 }
               }
             }
@@ -116,28 +116,35 @@ function clients() {
 }
 
 async function clientLangs() {
-  let clients = await Clients.find().populate('industry');
-  let service = await Services.findOne({title: "Translation"})
-          .populate('languageCombinations.source')
-          .populate('languageCombinations.target');
-
-  let randomRates = [0.1, 0.12, 0.15];
-  let combs = service.languageCombinations;
-
-  for(let client of clients) {
-    if(!client.languageCombinations.length  && !client._id) {
-      let industry = {industry: client.industry[0]._id, active: true};
-        for(let i = 0; i < 5; i++) {
-          industry.rate = randomRates[Math.floor(Math.random()*3)];
-          client.languageCombinations.push({
-            source: combs[i].source._id,
-            target: combs[i].target._id,
-            service: service._id,
-            industry: industry,
-          })
+  try {
+    let clients = await Clients.find().populate('industries');
+    let duoRates = await Duorate.find().populate('industries.industry');
+    let monoRates = await Monorate.find().populate('industries.industry');
+    for(let client of clients) {
+      if(!client.languageCombinations.length) {
+        client.languageCombinations = [];
+            for(let i = 0; i < 5; i++) {
+              const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));
+              const monoIndex = Math.floor(Math.random() * (monoRates.length - 1));
+              const duoIndustries = duoRates[i].industries.filter(item => item.industry.id === client.industries[0].id);
+              const monoIndustries = monoRates[monoIndex].industries.filter(item => item.industry.id === client.industries[0].id);
+              client.languageCombinations.push({
+                source: duoRates[duoIndex].source,
+                target: duoRates[duoIndex].target,
+                industries: duoIndustries
+              });
+              client.languageCombinations.push({
+                target: monoRates[monoIndex].target,
+                package: monoRates[monoIndex].package,
+                industries: monoIndustries
+              });
+            }
+          await Clients.updateOne({name: client.name}, client);
         }
-      await Clients.updateOne({name: client.name}, client)
-    } 
+    }
+  } catch(err) {
+    console.log(err);
+    console.log("Error on filling clients language combinations");
   }
 }
 

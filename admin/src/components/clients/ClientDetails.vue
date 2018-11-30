@@ -20,8 +20,8 @@
                 .block-item
                     label.block-item__label.block-item_relative Industry:
                         Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industry.length && isSaveClicked}")
-                        MultiClientIndustrySelect(:selectedInd="currentClient.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industries.length && isSaveClicked}")
+                        MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                 .block-item
                     label.block-item__label.block-item_relative Status:
                         Asterisk(:customStyle="asteriskStyle")
@@ -217,14 +217,14 @@ export default {
             this.approveShow = false;
         },
         chosenInd({industry}) {
-            let industries = [...this.currentClient.industry];
+            let industries = [...this.currentClient.industries];
             const position = industries.findIndex(item => item._id === industry._id);
             if(position !== -1) {
                 industries.splice(position, 1);
             } else {
                 industries.push(industry);
             }
-            this.storeClientProperty({prop: 'industry', value: industries});
+            this.storeClientProperty({prop: 'industries', value: industries});
         },
         setStatus({status}) {
             this.storeClientProperty({prop: 'status', value: status})
@@ -264,7 +264,7 @@ export default {
             this.clearErrors();
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             if(!this.currentClient.name) this.errors.push('Company name cannot be empty.');
-            if(!this.currentClient.industry.length) this.errors.push('Please, choose at least one industry.');
+            if(!this.currentClient.industries.length) this.errors.push('Please, choose at least one industry.');
             if(!this.currentClient.contacts.length) this.errors.push('Please, add at least one contact.');
             if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');            
             if(!this.currentClient.status) this.errors.push('Please, choose status.');
@@ -361,8 +361,8 @@ export default {
         }),
         selectedIndNames() {
             let result = [];
-            if(this.currentClient.industry.length) {
-                for(let ind of this.currentClient.industry) {
+            if(this.currentClient.industries.length) {
+                for(let ind of this.currentClient.industries) {
                     result.push(ind.name);
                 }
             }

@@ -13,9 +13,10 @@
                     span.client-rates__label Duo
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
                 .client-rates__drop(v-if="isDuoRatesShow")
-                    DuoClientRates(
-                        :client="client" 
-                        @addSevLangs="addSevLangs")
+                    DuoRates(:client="client")
+                    //- DuoClientRates(
+                    //-     :client="client" 
+                    //-     @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open
                 .client-rates__select(@click="matrixToggler")
@@ -27,6 +28,7 @@
 
 <script>
 import DuoClientRates from "./DuoClientRates";
+import DuoRates from "./rates/DuoRates";
 import MonoClientRates from "./MonoClientRates";
 import FinanceMatrix from "../FinanceMatrix";
 
@@ -64,7 +66,7 @@ export default {
         }
     },
     components: {
-        DuoClientRates,
+        DuoRates,
         MonoClientRates,
         FinanceMatrix
     }

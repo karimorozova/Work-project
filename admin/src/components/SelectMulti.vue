@@ -94,7 +94,8 @@ export default {
         flex-direction: column;
         background-color: white;
         z-index: 10;
-        border-top: 1px solid #67573E;  
+        border-top: 1px solid #67573E; 
+        box-sizing: border-box; 
         &__item {
             display: flex;
             align-items: center;

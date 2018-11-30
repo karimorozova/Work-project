@@ -123,7 +123,8 @@ export default {
         overflow-y: overlay;
         overflow-x: hidden;
         background-color: #FFF;
-        border-top: 1px solid #67573E;    
+        border-top: 1px solid #67573E;
+        box-sizing: border-box; 
         z-index: 10;
         &__search {
             color: #67573E;
@@ -160,8 +161,8 @@ export default {
         }
         .inner-component & {
             max-height: 135px;
+            border: 1px solid #BFB09D;
             border-top: none;
-            border-bottom: 1px solid #BFB09D;
         }
     }
     .filters &, .project-finance__drop-menu & {
@@ -199,6 +200,9 @@ export default {
         .filters_short-menu & {
             width: 72%;
         }
+        .inner-component & {
+            width: 83%;
+        }
     }
     .no-choice {
         opacity: 0.5;
@@ -222,6 +226,7 @@ export default {
             background-color: white;
             box-shadow: inset -1px 0 5px #bfb09d;
             border-left: 1px solid #bfb09d;
+            width: 17%;
         }
     }
     .inner-component & {

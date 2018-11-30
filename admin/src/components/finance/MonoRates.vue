@@ -19,6 +19,7 @@
         :industryFilter="industryFilter"
         :filterIndustry="filterIndustry"
         :serviceSelect="serviceSelect"
+        :isErrors="isAnyError"
         @showEditingError="showEditingError"
         @showValidationErrors="showValidationErrors"
         @showNotUniqueWarning="showNotUniqueWarning"
@@ -40,7 +41,7 @@
                 li Target: 
                     span.info-item {{ uniqueComb.target }}
             span.close(@click="closeUnique") +
-    .edition-message(v-if="editing")
+    .edition-message(v-if="isEditing")
         .message
             p Please finish the current edition first!
             span.close(@click="closeEditionMessage") +
@@ -84,7 +85,7 @@ export default {
             actions: ["Delete"],
             selectedAction: "",
             isNotUnique: false,
-            editing: false,
+            isEditing: false,
             uniqueComb: {source: "", target: ""},
             showValidError: false,
             validErrors: [],
@@ -146,7 +147,7 @@ export default {
             this.isNotUnique = false;
         },
         closeEditionMessage() {
-            this.editing = false
+            this.isEditing = false
         },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
@@ -205,7 +206,7 @@ export default {
             }
         },
         showEditingError() {
-            this.editing = true;
+            this.isEditing = true;
         },
         showValidationErrors({validErrors}) {
             this.validErrors = [...validErrors];
@@ -215,16 +216,12 @@ export default {
             this.uniqueComb = {source, target}; 
             this.isNotUnique = true;    
         },
-        setDefaultValues() {
-            this.currentActive = -1;
-            this.industrySelected = [{name: 'All'}];
-            this.currentTarget = {};
-        },
         addNewRow() {
             this.targetSelect = ["All"];
             this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
-                targetLanguage: "", 
+                targetLanguage: "",
+                package: "",
                 industry: {name: "All", rates: {...this.defaultRates()}},
             });
         },
@@ -245,7 +242,7 @@ export default {
             const duoServices = this.vuexServices.filter(item => item.languageForm === "Mono");
             return duoServices.reduce((init, cur) => {
                 const key = cur._id;
-                init[key] = {value: 0, package: 0, active: false};
+                init[key] = {value: 0, active: false};
                 return {...init}
             }, {});
         },
@@ -304,6 +301,9 @@ export default {
                 }
             }
             return result;
+        },
+        isAnyError() {
+            return this.isEditing || this.isNotUnique || this.showValidError;
         }
     },
     components: {
@@ -378,30 +378,32 @@ export default {
 
 .unique-message, .edition-message, .error-message {
     position: absolute;
-    border: 1px solid #D15F45;
-    background-color: #FFF;
-    box-shadow: 0 0 15px #D15F45;
-    width: 300px;
-    top: 50%;
-    left: 50%;
-    margin-left: -150px;
+    background-color: transparent;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     padding: 0 15px;
     z-index: 50;
     display: flex;
+    justify-content: center;
     align-items: center;
     .close {
         position: absolute;
         font-size: 24px;
         font-weight: 700;
-        top: -2px;
-        right: -9px;
+        top: 0;
+        right: 7px;
         transform: rotate(45deg);
         cursor: pointer;
     }
     .message {
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 40%;
+        padding: 10px 20px;
+        border: 1px solid #D15F45;
+        box-shadow: 0 0 15px #D15F45;
+        background-color: #FFF;
         &__info-list {
             li {
                 list-style: none;
@@ -417,16 +419,6 @@ export default {
         font-size: 18px;
         font-weight: 700;
     }
-}
-
-.unique-message, .error-message {
-    height: 150px;
-    margin-top: -75px; 
-}
-
-.edition-message {
-    height: 70px;
-    margin-top: -35px;
 }
 
 </style>

@@ -4,7 +4,7 @@ const fs = require('fs');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, getAfterUpdate, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
+const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
 const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
 const { getProject } = require('../projects');
 const { emitter } = require('../events');
@@ -120,38 +120,11 @@ router.get('/declinequote', async (req, res) => {
     }
 })
 
-router.get('/get-rates', async (req, res) => {
-    const { clientId, service, form } = req.query;
+router.get('/rates', async (req, res) => {
+    const { clientId, form } = req.query;
     try {
         let client = await getClient({"_id": clientId});
-        let rates = [];
-        for(let comb of client.languageCombinations) {
-            if(comb.service.title === service) {
-                for(let elem of comb.industry) {
-                    let industry = {...elem.industry._doc};
-                    industry.rate = elem.rate;
-                    industry.active = elem.active;
-                    if(form === "Duo") {
-                        rates.push({
-                            id: comb.id,
-                            service: comb.service,
-                            sourceLanguage: comb.source,
-                            targetLanguage: comb.target,
-                            industry: [industry]
-                        })
-                    } else {
-                        industry.package = elem.package;
-                        rates.push({
-                            id: comb.id,
-                            service: comb.service,
-                            targetLanguage: comb.target,
-                            industry: [industry]
-                        })
-                    }
-                    
-                }
-            }
-        }
+        const rates = await getClientRates({client, form});
         res.send(rates);
     } catch(err) {
         console.log(err);
@@ -159,30 +132,10 @@ router.get('/get-rates', async (req, res) => {
     }
 })
 
-router.post('/client-rates', async (req, res) => {
-    let rate = req.body;
-    const id = rate.client;
+router.post('/rates', async (req, res) => {
+    const { ratesInfo } = req.body;
     try {
-        let client = await getClient({"_id": id});
-        for(let indus of rate.industry) {
-            for(let ind of client.industry) {
-                if(ind.id === indus._id || indus.name == "All") {
-                    ind.rate = indus.rate;
-                    ind.active = indus.active;
-                    if(rate.form === "Mono") {
-                        ind.package = indus.package;
-                    }
-                }
-            }
-        }
-        const industries = client.industry.map(item => {
-            const active = item.rate > 0;
-            if(rate.form === 'Duo') {
-                return {industry: item.id, active: active, rate: item.rate}
-            }
-            return {industry: item.id, active: active, rate: item.rate, package: item.package}
-        })
-        const updatedClient = await checkRatesMatch(client, industries, rate);
+        const updatedClient = await updateClientRates(ratesInfo);
         res.send(updatedClient);
     } catch(err) {
         console.log(err);

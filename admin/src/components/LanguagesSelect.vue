@@ -158,6 +158,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         .all-projects__filters & {
             border-left: 1px solid #68573E;
             width: 24%;
@@ -208,6 +209,7 @@ export default {
         overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
+        box-sizing: border-box;
         &__item {
             display: flex;
             align-items: center;
@@ -230,7 +232,8 @@ export default {
         }
         .inner-component & {
             max-height: 118px;
-            border-bottom: 1px solid #BFB09D;
+            border: 1px solid #BFB09D;
+            border-top: none;
             span {
                 width: 88%;
             }

@@ -124,6 +124,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }

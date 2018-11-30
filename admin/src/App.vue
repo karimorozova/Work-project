@@ -56,8 +56,8 @@ body {
 /* Custom scroll-bar */
 #app {
   ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
   ::-webkit-scrollbar-track {
     background: rgba(103, 87, 62, 0.1);

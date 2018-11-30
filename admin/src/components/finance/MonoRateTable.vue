@@ -1,5 +1,5 @@
 <template lang="pug">
-.monorates-table
+.monorates-table(v-click-outside="outClick")
     .monorates-table__table-data
         table.monorates-table__duo-finance(:style="{width: tableWidth}")
             thead
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
 import LanguagesSelect from "../LanguagesSelect";
 import SelectSingle from "../SelectSingle";
 import Toggler from "../Toggler";
@@ -72,10 +73,7 @@ export default {
         serviceSelect: {
             type: Array
         },
-        isEditing: {
-            type: Boolean
-        },
-        isValidationError: {
+        isErrors: {
             type: Boolean
         }
     },
@@ -145,7 +143,15 @@ export default {
             for(let info of this.fullInfo) {
                 info.check = false;
             }
+            if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
+                return
+            }
             this.setDefaultValues();
+        },
+        outClick() {
+            if(!this.isErrors) {
+                this.setDefaultValues();
+            }
         },
         changeRate(e, servKey) {
             this.changedRate[servKey].value = +event.target.value
@@ -205,7 +211,6 @@ export default {
             }
 
             if(key === 'edit') {
-                this.currentTarget = this.fullInfo[index].targetLanguage;
                 return this.editRate(index);
             }
 
@@ -233,15 +238,10 @@ export default {
             }
             return this.isAllRatesZero();
         },
-        checkPackagesValidation() {
-            const packageRegex = /^\d{1,4}-\d*$/;
-            return packageRegex.test(this.changedPackage);
-        },
         async checkErrors(index) {
             let validErrors = [];
             if(!this.currentTarget._id) validErrors.push("Please, choose the target language!");
             if(!this.checkRatesValidation()) validErrors.push("Please set the correct rate values!");
-            // if(!this.checkPackagesValidation()) validErrors.push("Please set the correct package value!");
             if(validErrors.length) {
                 this.$emit('showValidationErrors', { validErrors });
                 this.changedRate = this.fullInfo[index].industry.rates;
@@ -312,6 +312,9 @@ export default {
             this.currentActive = -1;
         },
         setDefaultValues() {
+            if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
+                this.fullInfo.splice(this.currentActive, 1);
+            }
             this.currentActive = -1;
             this.industrySelected = [{name: 'All'}];
             this.currentTarget = {};
@@ -389,6 +392,9 @@ export default {
         SelectSingle,
         IndustrySelect,
         Toggler
+    },
+    directives: {
+        ClickOutside
     },
     created() {
         this.getPackages();
@@ -483,8 +489,7 @@ td {
     }
 }
 .add-row {
-    margin-top: 10px;
-    margin-left: 25px; 
+    margin: 10px 0 10px 25px;
     &__plus {
         width: 28px;
         height: 28px;
