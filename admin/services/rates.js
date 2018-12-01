@@ -96,7 +96,7 @@ async function defaultRates(languageForm) {
     const services = await Services.find({languageForm: languageForm});
     const serviceRate = {value: 0, active: false};
     const rates = services.reduce((init, cur) => {
-        const key = cur._id;
+        const key = cur.id;
         init[key] = {...serviceRate};
         return {...init}
     }, {});

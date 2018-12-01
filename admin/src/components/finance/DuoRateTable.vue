@@ -29,10 +29,10 @@
                             .inner-component(v-if="currentActive === index")
                                 IndustrySelect(:parentIndex="index" :who="entity" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
                         template(v-for="(service, servKey) in info.industry.rates")
-                            td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
+                            td(v-if="servIndex(servKey) !== -1")
                                 .duorates-table__rates-column
-                                    input.duorates-table__rates(v-if="!service.value" type="text" :value="zeroValue" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
-                                    input.duorates-table__rates(v-else type="text" :value="service.value" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
+                                    input.duorates-table__rates(v-if="!service.value" type="text" :value="zeroValue(index, servKey)"  @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
+                                    input.duorates-table__rates(v-else type="text" :value="service.value"  @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
                                     Toggler(:isActive="service.active" @toggle="toggleActive(index, servKey)" :isDisabled="currentActive !== index" :class="{'duorates-table_transparent': currentActive !== index}")
                         td.duorates-table__icons-field
                             template(v-for="(icon, key) in icons")
@@ -81,7 +81,6 @@ export default {
     },
     data() {
         return {
-            zeroValue: "-",
             isAllChecked: false,
             industrySelected: [{name: 'All'}],
             heads: [
@@ -103,6 +102,15 @@ export default {
         }
     },
     methods: {
+        servIndex(servKey) {
+            return this.servicesIds.indexOf(servKey);
+        },
+        zeroValue(index, servKey) {
+            if(this.currentActive !== index) {
+                return "-"
+            }
+            return this.changedRate[servKey].value;
+        },
         isActive(key, index) {
             if(this.currentActive === index) {
                 return key !== "edit";
@@ -158,7 +166,8 @@ export default {
             }
         },
         changeRate(e, servKey) {
-            this.changedRate[servKey].value = +event.target.value
+            const value = +event.target.value;
+            this.changedRate[servKey].value = value;
         },
         toggleActive(index, key) {
             this.changedRate[key].active = !this.changedRate[key].active;
@@ -215,8 +224,6 @@ export default {
             }
 
             if(key === 'edit') {
-                this.currentSource = this.fullInfo[index].sourceLanguage;
-                this.currentTarget = this.fullInfo[index].targetLanguage;
                 return this.editRate(index);
             }
 
@@ -306,7 +313,7 @@ export default {
             this.currentSource = this.fullInfo[index].sourceLanguage;
             this.currentTarget = this.fullInfo[index].targetLanguage;
             this.industrySelected = [this.fullInfo[index].industry];
-            this.changedRate = this.fullInfo[index].industry.rates;  
+            this.changedRate = {...this.fullInfo[index].industry.rates};
         },
         async deleteRate(index) {
             const industries = this.currentActive === index ? this.industrySelected : [this.fullInfo[index].industry];
@@ -318,6 +325,9 @@ export default {
                 }
                 if(this.origin === "global") {
                     await this.deleteServiceRate({ id: this.fullInfo[index].id, deletedRate });
+                }
+                if(this.origin === "client") {
+                    await this.deleteClientRate({ id: this.fullInfo[index].id, deletedRate });
                 }
                 this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
             } catch(err) {
@@ -333,6 +343,7 @@ export default {
             this.industrySelected = [{name: 'All'}];
             this.currentSource = {};
             this.currentTarget = {};
+            this.changedRate = "";
         },
         addNewRow() {
             if(this.currentActive !== -1) {
@@ -346,9 +357,10 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            saveGlobalRates: "saveGlobalDuoRates",
+            saveGlobalRates: "saveGlobalRates",
             saveClientRates: "saveClientRates",
-            deleteServiceRate: "deleteServiceRate"
+            deleteServiceRate: "deleteServiceRate",
+            deleteClientRate: "deleteClientRate"
         })
     },
     watch: {

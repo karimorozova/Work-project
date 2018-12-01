@@ -4,8 +4,8 @@ const fs = require('fs');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, checkRatesMatch, deleteRate, addClientsSeveralLangs} = require('../clients/');
-const { Clients, Projects, User, Languages, Services, Industries } = require('../models');
+const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addClientsSeveralLangs} = require('../clients/');
+const { Clients, Projects, User } = require('../models');
 const { getProject } = require('../projects');
 const { emitter } = require('../events');
 
@@ -144,14 +144,13 @@ router.post('/rates', async (req, res) => {
 })
 
 router.delete('/rate/:id', async (req, res) => {
-    let  { clientId, industry } = req.body;
+    const deleteInfo = {...req.body};
     const { id } = req.params;
     if(id === "undefined") {
         return res.send("Deleted");
     }
     try {
-        let client = await getClient({"_id": clientId})
-        const updatedClient = await deleteRate(client, industry, id);
+        const updatedClient = await deleteRate(deleteInfo, id);
         res.send(updatedClient);
     } catch(err) {
         console.log(err);

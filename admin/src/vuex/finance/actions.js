@@ -10,7 +10,11 @@ export const getDuoCombinations = async ({commit}, payload) => {
     commit('startRequest');
     try {
         const result = await Vue.http.get('/service/parsed-rates?form=Duo');
-        commit('setDuoRates', result.body);
+        const rates = result.body.sort((a, b) => {
+            if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
+            if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
+        })
+        commit('setDuoRates', rates);
         commit('endRequest');
     } catch(err) {
         commit('endRequest');

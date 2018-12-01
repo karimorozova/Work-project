@@ -254,7 +254,10 @@ export default {
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {
-            const duoServices = this.vuexServices.filter(item => item.languageForm === "Duo");
+            const duoServices = this.vuexServices.sort((a, b) => { 
+                if(a.sortIndex < b.sortIndex) return -1; 
+                if(a.sortIndex > b.sortIndex) return 1;
+            }).filter(item => item.languageForm === "Duo");
             return duoServices.reduce((init, cur) => {
                 const key = cur._id;
                 init[key] = {value: 0, active: false};

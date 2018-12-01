@@ -261,7 +261,10 @@ export default {
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {
-            const duoServices = this.vuexServices.filter(item => item.languageForm === "Duo");
+            const duoServices = this.vuexServices.sort((a, b) => { 
+                if(a.sortIndex < b.sortIndex) return -1; 
+                if(a.sortIndex > b.sortIndex) return 1;
+            }).filter(item => item.languageForm === "Duo");
             return duoServices.reduce((init, cur) => {
                 const key = cur._id;
                 init[key] = {value: 0, active: false};
@@ -273,7 +276,6 @@ export default {
             getDuoCombinations: "getClientDuoCombinations",
             storeClient: "storeClient",
             storeDuoRates: "storeClientDuoRates",
-            deleteServiceRate: "deleteClientsServiceRate",
             deleteCheckedRate: "deleteClientsCheckedRate"
         })
     },
@@ -317,12 +319,12 @@ export default {
         },
         isAnyChecked() {
             let result = false;
-            // for(let info of this.fullInfo) {
-            //     if(info.check) {
-            //         result = true;
-            //         return result;
-            //     }
-            // }
+            for(let info of this.fullInfo) {
+                if(info.check) {
+                    result = true;
+                    return result;
+                }
+            }
             return result;
         },
         isAnyError() {

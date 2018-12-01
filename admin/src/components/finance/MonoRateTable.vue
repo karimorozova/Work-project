@@ -31,7 +31,7 @@
                         template(v-for="(service, servKey) in info.industry.rates")
                             td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
                                 .monorates-table__rates-column
-                                    input.monorates-table__rates(v-if="!service.value" type="text" :value="zeroValue" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
+                                    input.monorates-table__rates(v-if="!service.value" type="text" :value="zeroValue(index, servKey)" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
                                     input.monorates-table__rates(v-else type="text" :value="service.value" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
                                     Toggler(:isActive="service.active" @toggle="toggleActive(index, servKey)" :isDisabled="currentActive !== index" :class="{'monorates-table_transparent': currentActive !== index}")
                         td.monorates-table__icons-field
@@ -79,7 +79,6 @@ export default {
     },
     data() {
         return {
-            zeroValue: "-",
             isAllChecked: false,
             industrySelected: [{name: 'All'}],
             heads: [
@@ -102,6 +101,12 @@ export default {
         }
     },
     methods: {
+         zeroValue(index, servKey) {
+            if(this.currentActive !== index) {
+                return "-"
+            }
+            return this.changedRate[servKey].value;
+        },
         isActive(key, index) {
             if(this.currentActive === index) {
                 return key !== "edit";
