@@ -81,7 +81,7 @@ export default {
     },
     data() {
         return {
-            isAllChecked: false,
+            // isAllChecked: false,
             industrySelected: [{name: 'All'}],
             heads: [
                 { title: "Source Language" },
@@ -140,12 +140,15 @@ export default {
             let industriesNames = this.industryFilter.map(item => item.name);
             return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
         },
+        isAllFiters(info, index) {
+            return this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
+                && this.isSourceFilter(info) && this.isTargetFilter(info) 
+                && this.isIndustryFilter(info)
+        },
         toggleAllCheck() {
             for(let index in this.fullInfo) {
                 let info = this.fullInfo[index];
-                if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
-                && this.isSourceFilter(info) && this.isTargetFilter(info) 
-                && this.isIndustryFilter(info)) {
+                if(this.isAllFiters(info, index)) {
                     this.fullInfo[index].check = this.isAllChecked;
                 }
             }
@@ -366,7 +369,10 @@ export default {
     watch: {
         sourceSelect: function(val) { this.uncheckAll() },
         targetSelect: function(val) { this.uncheckAll() },
-        industryFilter: function(val) { this.uncheckAll() }
+        industryFilter: function(val) { this.uncheckAll() },
+        isNoChecked: function(val) {
+            this.isAllChecked = !val;
+        }
     },
     computed: {
         servicesIds() {
@@ -401,6 +407,15 @@ export default {
             }
             result += 'px';
             return result;
+        },
+        isNoChecked() {
+            for(let index in this.fullInfo) {
+                let info = this.fullInfo[index];
+                if(this.isAllFiters(info, index) && !info.check) {
+                    return true;
+                }
+            }
+            return false;
         }
     },
     components: {

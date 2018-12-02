@@ -141,21 +141,9 @@ router.post('/rates', async (req, res) => {
 })
 
 router.post('/several-langs', async (req, res) => {
-  let langCombs = req.body;
+  let { combinations } = req.body;
   try {
-    let industries = await Industries.find();
-    let services = await getManyServices({languageForm: "Duo"});
-    for(let comb of langCombs) {
-      let service = services.find(item => {
-        return item.id === comb.service._id
-      });
-      await updateLangCombs({
-        serviceId: service.id,
-        comb: comb,
-        serviceCombinations: service.languageCombinations,
-        industries: industries
-      })
-    }
+      await updateLangCombs(combinations);
     res.send('Several langs added..');
   } catch(err) {
     console.log(err)

@@ -148,7 +148,6 @@ export default {
             }
         },
         addSevLangs() {
-        //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
             this.$emit('addSevLangs', this.fullInfo);
         },
         closeErrorMessage() {

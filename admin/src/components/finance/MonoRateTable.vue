@@ -29,7 +29,7 @@
                             .inner-component(v-if="currentActive === index")
                                 IndustrySelect(:parentIndex="index" :who="entity" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
                         template(v-for="(service, servKey) in info.industry.rates")
-                            td(v-if="servicesIds.indexOf(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
+                            td(v-if="servIndex(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
                                 .monorates-table__rates-column
                                     input.monorates-table__rates(v-if="!service.value" type="text" :value="zeroValue(index, servKey)" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
                                     input.monorates-table__rates(v-else type="text" :value="service.value" @input="(e) => changeRate(e, servKey)" :readonly="currentActive !== index")
@@ -101,7 +101,10 @@ export default {
         }
     },
     methods: {
-         zeroValue(index, servKey) {
+        servIndex(servKey) {
+            return this.servicesIds.indexOf(servKey);
+        },
+        zeroValue(index, servKey) {
             if(this.currentActive !== index) {
                 return "-"
             }
@@ -133,12 +136,15 @@ export default {
             let industriesNames = this.industryFilter.map(item => item.name);
             return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
         },
+        isAllFiters(info, index) {
+            return this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
+                && this.isTargetFilter(info) 
+                && this.isIndustryFilter(info)
+        },
         toggleAllCheck() {
             for(let index in this.fullInfo) {
                 let info = this.fullInfo[index];
-                if(this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
-                && this.isTargetFilter(info) 
-                && this.isIndustryFilter(info)) {
+                if(this.isAllFiters(info, index)) {
                     this.fullInfo[index].check = this.isAllChecked;
                 }
             }
@@ -258,7 +264,8 @@ export default {
             let isExist = false;
             for(let ind in this.fullInfo) {
                 if(ind !== index && !this.fullInfo[index].id) {
-                    if(this.currentTarget._id === this.fullInfo[ind].targetLanguage._id) {
+                    if(this.currentTarget._id === this.fullInfo[ind].targetLanguage._id 
+                    && this.changedPackage === this.fullInfo[ind].package) {
                         isExist = true;
                         break;
                     }
@@ -283,13 +290,19 @@ export default {
                     if(this.origin === "global") {
                         await this.saveGlobalRates(info);
                     }
+                    if(this.origin === "client") {
+                        await this.saveClientRates(info);
+                    }
+                    if(this.origin === "vendor") {
+                        await this.saveVendorRates(info);
+                    }
                     this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
                 } catch(err) {
                     this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
                 }
                 this.setDefaultValues();
             } else {
-                this.$emit('showNotUniqueWarning', {target: this.currentTarget.lang});
+                this.$emit('showNotUniqueWarning', {target: this.currentTarget.lang, package: this.changedPackage});
             }
         },
         editRate(index) {
@@ -347,12 +360,17 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             saveGlobalRates: "saveGlobalRates",
-            deleteServiceRate: "deleteServiceRate"
+            saveClientRates: "saveClientRates",
+            deleteServiceRate: "deleteServiceRate",
+            deleteClientRate: "deleteClientRate"
         })
     },
     watch: {
         targetSelect: function(val) { this.uncheckAll() },
-        industryFilter: function(val) { this.uncheckAll() }
+        industryFilter: function(val) { this.uncheckAll() },
+        isNoChecked: function(val) {
+            this.isAllChecked = !val;
+        }
     },
     computed: {
         servicesIds() {
@@ -390,6 +408,15 @@ export default {
         },
         packageSizes() {
             return this.packages.map(item => item.size);
+        },
+        isNoChecked() {
+            for(let index in this.fullInfo) {
+                let info = this.fullInfo[index];
+                if(this.isAllFiters(info, index) && !info.check) {
+                    return true;
+                }
+            }
+            return false;
         }
     },
     components: {

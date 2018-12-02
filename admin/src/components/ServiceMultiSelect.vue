@@ -72,9 +72,9 @@ export default {
                 this.services = this.services.filter(item => item.languageForm === "Mono")
             } else {
                 this.services = this.services.filter(item => {
-                    if(item.title == 'Translation' ||
-                        item.title == 'Proofing' || 
-                        item.title == 'QA and Testing') {
+                    if(item.symbol == 'tr' ||
+                        item.symbol == 'pr' || 
+                        item.symbol == 'qt') {
                         return item
                     }    
                 })
@@ -154,6 +154,7 @@ export default {
     z-index: 5;
     border: 1px solid #BFB09D;
     border-radius: 5px;
+    box-sizing: border-box;
     .drop {
         font-size: 14px;
         width: 100%;

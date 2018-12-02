@@ -54,11 +54,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
 .finance-matrix {
     margin-top: 5px;
     &__rate {
         width: 22px;
         padding-left: 2px;
+        color: $main-color;
         &::-webkit-inner-spin-button,
         &::-webkit-outer-spin-button, {
             -webkit-appearance: none;

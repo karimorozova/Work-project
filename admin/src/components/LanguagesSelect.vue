@@ -201,6 +201,7 @@ export default {
     z-index: 5;
     border: 1px solid #BFB09D;
     border-radius: 5px;
+    box-sizing: border-box;
     .drop {
         font-size: 14px;
         width: 100%;

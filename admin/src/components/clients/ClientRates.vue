@@ -6,17 +6,14 @@
                     span.client-rates__label Mono
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMonoRatesShow}") 
                 .client-rates__drop(v-if="isMonoRatesShow")
-                    MonoClientRates(:client="client")
+                    MonoRates(:client="client")
         .client-rates__block(:class="{'client-rates_straight-angle': isDuoRatesShow}")
             .client-rates__open
                 .client-rates__select(@click="duoRatesToggler")
                     span.client-rates__label Duo
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
                 .client-rates__drop(v-if="isDuoRatesShow")
-                    DuoRates(:client="client")
-                    //- DuoClientRates(
-                    //-     :client="client" 
-                    //-     @addSevLangs="addSevLangs")
+                    DuoRates(:client="client" @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open
                 .client-rates__select(@click="matrixToggler")
@@ -27,9 +24,8 @@
 </template>
 
 <script>
-import DuoClientRates from "./DuoClientRates";
 import DuoRates from "./rates/DuoRates";
-import MonoClientRates from "./MonoClientRates";
+import MonoRates from "./rates/MonoRates";
 import FinanceMatrix from "../FinanceMatrix";
 
 export default {
@@ -67,7 +63,7 @@ export default {
     },
     components: {
         DuoRates,
-        MonoClientRates,
+        MonoRates,
         FinanceMatrix
     }
 }
@@ -77,18 +73,18 @@ export default {
 <style lang="scss" scoped>
 
 .client-rates {
-    width: 856px;
     display: flex;
     flex-direction: column;
     &__block {
         width: 100%;
-        max-height: 450px;
+        max-height: 500px;
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
         border-radius: 10px;
-        padding: 0 3px;
+        padding: 0 2px;
         margin-bottom: 60px;
+        box-sizing: border-box;
         &:last-child {
             margin-bottom: 0;
         }

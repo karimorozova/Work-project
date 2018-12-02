@@ -70,17 +70,33 @@ async function updateClientRates(ratesInfo) {
     }
 }
 
+async function updateMonoRates(client, info) {
+    const combinations = client.languageCombinations.filter(item => item.package);
+    const { industries, package, targetLanguage } = info;
+    try {
+        const updatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
+        const pairIndex = combinations.findIndex(item => item.target.id === info.targetLanguage._id && item.package === package);
+        if(pairIndex !== -1) {
+            combinations[pairIndex].industries = updatedIndustries;
+        } else {
+            combinations.push({
+                target: targetLanguage._id,
+                package,
+                industries: updatedIndustries
+            })
+        }
+        return await getAfterUpdate({"_id": client.id}, {languageCombinations: combinations});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateMonoRates");
+    }
+}
+
 async function updateDuoRates(client, info) {
     const combinations = client.languageCombinations.filter(item => item.source);
     const { industries, sourceLanguage, targetLanguage } = info;
     try {
-        const allIndustries = await includeAllIndustries(industries, client.industries, info.languageForm);
-        let updatedIndustries = [];
-        if(industries[0].name === "All") {
-            updatedIndustries = updateRatesForAll(allIndustries, industries[0].rates);
-        } else {
-            updatedIndustries = updateRates(industries, allIndustries); 
-        }
+        const updatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
         const pairIndex = combinations.findIndex(item => item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
         if(pairIndex !== -1) {
             combinations[pairIndex].industries = updatedIndustries;
@@ -95,6 +111,22 @@ async function updateDuoRates(client, info) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateDuoRates");
+    }
+}
+
+async function getAllUpdatedIndustries(industries, clientIndustries, languageForm) {
+    let updatedIndustries = [];
+    try {
+        const allIndustries = await includeAllIndustries(industries, clientIndustries, languageForm);
+        if(industries[0].name === "All") {
+            updatedIndustries = updateRatesForAll(allIndustries, industries[0].rates);
+        } else {
+            updatedIndustries = updateRates(industries, allIndustries); 
+        }
+        return updatedIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAllUpdatedIndustries");
     }
 }
 
@@ -207,55 +239,28 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-async function addClientsSeveralLangs({clientId, comb, clientCombinations, industry}) {
-    let industries = comb.industry[0].name === "All" ? addAllIndustries(comb.industry[0], industry) : comb.industry;
-    let langPairExist = false;
-    let updatedCombinations = [...clientCombinations];
-    for(let clientComb of updatedCombinations) {
-        if(comb.source._id === clientComb.source.id && comb.target._id === clientComb.target.id
-            && comb.service._id === clientComb.service.id) {
-            clientComb.industry = updateCombination(industries, clientComb.industry);
-            langPairExist = true;
-        }
-    }
-    if(!langPairExist) {
-        industries = industries.map(item => {
-            return {industry: item._id, rate: item.rate, active: item.active}
-        })
-        updatedCombinations.push({...comb, industry: industries});
-        await Clients.updateOne({"_id": clientId}, {$push: {languageCombinations: {...comb, industry: industries}}})
-    } else {
-        await Clients.updateOne({"_id": clientId}, {$set: {languageCombinations: updatedCombinations}})
-    }
-}
-
-function addAllIndustries(combIndustry, clientIndustry) {
-    let industries = [];
-    for(let indus of clientIndustry) {
-        industries.push({
-            ...indus._doc,
-            id: indus.id,
-            rate: combIndustry.rate
-        })
-    }
-    return industries
-}
-
-function updateCombination(combIndustries, clientIndustries) {
-    let updatedIndustries = [...clientIndustries];
-    for(let indus of combIndustries) {
-        let industryExist = false;
-        for(let ind of updatedIndustries) {
-            if(ind.industry.id === indus._id) {
-                ind.rate = indus.rate;
-                industryExist = true;
+async function updateClientCombinations({clientId, combinations}) {
+    try {
+        const client = await getClient({"_id": clientId});
+        let clientCombs = [...client.languageCombinations];
+        for(let {source, target, industries} of combinations) {
+            const updatedIndustries = await getAllUpdatedIndustries(industries, client.industries, "Duo");
+            const rateIndex = clientCombs.findIndex(item => item.source.id === source._id && item.target.id === target._id)
+            if(rateIndex !== -1) {
+                clientCombs[rateIndex].industries = updatedIndustries;
+            } else {
+                clientCombs.push({
+                    source,
+                    target,
+                    industries: updatedIndustries
+                })
             }
         }
-        if(!industryExist) {
-            updatedIndustries.push(indus);
-        }
-    }
-    return updatedIndustries;
+        return getAfterUpdate({"_id": clientId}, {languageCombinations: clientCombs});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateClientCombinations");
+    } 
 }
 
-module.exports= { getClientRates, updateClientRates, deleteRate, addClientsSeveralLangs };
+module.exports= { getClientRates, updateClientRates, deleteRate, updateClientCombinations };

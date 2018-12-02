@@ -13,7 +13,8 @@
     .mono-rates__action(v-if="isAnyChecked")
         SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
     MonoRateTable(
-        origin="global"
+        origin="client"
+        :entity="client"
         :fullInfo="fullInfo"
         :targetSelect="targetSelect"
         :industryFilter="industryFilter"
@@ -58,18 +59,20 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
-import RatesFilters from "./RatesFilters";
-import MonoRateTable from "./MonoRateTable";
-import SelectSingle from "../SelectSingle";
-import ApproveModal from "../ApproveModal";
-import LanguagesSelect from "../LanguagesSelect";
-import Toggler from "../Toggler";
-import IndustrySelect from "../IndustrySelect";
+import RatesFilters from "../../finance/RatesFilters";
+import MonoRateTable from "../../finance/MonoRateTable";
+import SelectSingle from "../../SelectSingle";
+import ApproveModal from "../../ApproveModal";
+import LanguagesSelect from "../../LanguagesSelect";
+import Toggler from "../../Toggler";
+import IndustrySelect from "../../IndustrySelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        
+        client: {
+            type: Object
+        },
     },
     data() {
         return {
@@ -90,7 +93,7 @@ export default {
             isEditing: false,
             uniqueComb: {source: "", package: ""},
             showValidError: false,
-            validErrors: []
+            validErrors: [],
         }
     },
     methods: {
@@ -246,16 +249,15 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            getMonoCombinations: "getMonoCombinations",
-            storeMonoRates: "storeMonoRates",
-            deleteServiceRate: "deleteServiceRate",
-            deleteCheckedRate: "deleteCheckedRate"
+            getMonoCombinations: "getClientMonoCombinations",
+            storeMonoRates: "storeClientDuoRates",
+            deleteCheckedRate: "deleteClientsCheckedRate"
         })
     },
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getMonoRates"
+            fullInfo: "getClientMonoCombs"
         }),
         servicesIds() {
             return this.serviceSelect.map(item => item._id);

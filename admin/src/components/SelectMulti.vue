@@ -85,6 +85,7 @@ export default {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     .drop {
         width: 100%;
         max-height: 100px;

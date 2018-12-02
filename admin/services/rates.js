@@ -152,62 +152,46 @@ function deletedRates(elem, services) {
   return { industry: elem.industry, rates };
 }
 
-async function updateLangCombs({serviceId, comb, serviceCombinations, industries}) {
-  let exist = false;
-  let updatedServCombinations = [...serviceCombinations];
-  for(let servComb of updatedServCombinations) {
-    if(comb.source._id === servComb.source.id && comb.target._id === servComb.target.id) {
-      servComb.industries = updateIndustryRates(comb.industry, servComb.industries);
-      exist = true;
-    }
-  }
-  if(!exist) {
-    const updatedCombs = addCombinations({comb, serviceCombinations: updatedServCombinations, industries}) 
-    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedCombs}})
-  } else {
-    await Services.updateOne({"_id": serviceId}, {$set: {languageCombinations: updatedServCombinations}})
-  }
-}
-
-function updateIndustryRates(combIndustries, servIndustries) {
-  let updatedServIndustries = [...servIndustries];
-  for(let indus of updatedServIndustries) {
-    for(let ind of combIndustries) {
-      if(indus.industry.id === ind._id) {
-        indus.rate = ind.rate
-      }
-    }
-  }
-  return updatedServIndustries;
-}
-
-function addCombinations({comb, serviceCombinations, industries}) {
-  let updatedCombinations = [...serviceCombinations];
-  let updatingIndustries = [];
-  for(let indus of industries) {
-    for(let ind of comb.industry) {
-      if(indus.id == ind._id) {
-        updatingIndustries.push({
-          industry: indus.id,
-          active: ind.active, 
-          rate: ind.rate
-        })
+async function updateLangCombs(combinations) {
+  try {
+    for(let {source, target, industries} of combinations) {
+      const rate = await Duorate.findOne({"source": source._id, "target": target._id});
+      if(rate) {
+        await updateExistingCombination(industries, rate);
       } else {
-        updatingIndustries.push({
-          industry: indus.id,
-          active: false, 
-          rate: 0
+        await createNewRate({
+          sourceLanguage: source,
+          targetLanguage: target,
+          industries,
+          languageForm: "Duo"
         })
       }
     }
+  } catch(err) {
+    console.log(err);
+    console.log("Error in updateLangCombs");
   }
-  updatedCombinations.push({
-    source: comb.source,
-    target: comb.target,
-    industries: updatingIndustries,
-    active: true
-  })
-  return updatedCombinations;
 }
+
+async function updateExistingCombination(industries, rate) {
+  try {
+    let allIndustries = await includeAllIndustries(rate.industries, "Duo");
+    if(industries[0].name === "All") {
+      const updatedIndustries = updateRateForAll(allIndustries, industries[0].rates);
+      return await Duorate.updateOne({"_id": rate._id}, {industries: updatedIndustries});
+    }
+    for(let industry of allIndustries) {
+      const index = industries.findIndex(item => item._id === industry.industry);
+      if(index !== -1) {
+        industry.rates = industries[index].rates
+      }
+    }
+    await Duorate.updateOne({"_id": rate._id}, {industries: allIndustries})
+  } catch(err) {
+    console.log(err);
+    console.log("Error in updateExistingCombination");
+  }
+}
+
 
 module.exports = { updateRate, createNewRate, deleteRate, updateLangCombs };

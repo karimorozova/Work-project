@@ -4,7 +4,7 @@ const fs = require('fs');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const mv = require('mv');
-const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addClientsSeveralLangs} = require('../clients/');
+const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, updateClientCombinations} = require('../clients/');
 const { Clients, Projects, User } = require('../models');
 const { getProject } = require('../projects');
 const { emitter } = require('../events');
@@ -159,22 +159,9 @@ router.delete('/rate/:id', async (req, res) => {
 })
 
 router.post('/several-langs', async (req, res) => {
-    const clientId = req.body.client;
-    let langCombs = JSON.parse(req.body.langs);
+    const { combinations, clientId } = req.body;
     try {
-        let client = await getClient({"_id": clientId});
-        const clientCombinations = client.languageCombinations.filter(item => {
-            return item.source
-        }) 
-        for(let comb of langCombs) {
-            await addClientsSeveralLangs({
-                clientId: clientId,
-                comb: comb,
-                clientCombinations: clientCombinations,
-                industry: client.industry
-            })
-        }
-        const updatedClient = await getClient({"_id": clientId});
+        const updatedClient = await updateClientCombinations({clientId, combinations});
         res.send(updatedClient);
     } catch(err) {
         console.log(err);

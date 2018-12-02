@@ -406,11 +406,11 @@ export default {
         margin: 20px 10px 40px 10px;
         padding: 40px;
         box-shadow: 0 0 15px #67573e9d;
-        width: 800px;
+        width: 900px;
+        box-sizing: border-box;
     }
     &__rates {
         padding: 10px;
-        width: 860px;
     }
     &__gen-info {
         display: flex;
@@ -426,7 +426,7 @@ export default {
 
 .client-info, .contact-info {
     padding: 40px;
-    width: 55%;
+    width: 52%;
 }
 
 .client-info {
@@ -501,6 +501,8 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    margin-left: 10px;
+    width: 900px;
 }
 
 .button {

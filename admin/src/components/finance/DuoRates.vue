@@ -136,12 +136,12 @@ export default {
             }
             try {
                 await this.deleteCheckedRate({ id: info.id, deletedRate });
+                await this.uncheckAllRates("clientDuoRates");
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
             }
         },
         addSevLangs() {
-        //   this.storeServiceWhenAddSeveral(this.serviceSelect.title);
             this.$emit('addSevLangs', this.fullInfo);
         },
         closeErrorMessage() {
@@ -270,7 +270,8 @@ export default {
             storeDuoRates: "storeDuoRates",
             storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
             deleteServiceRate: "deleteServiceRate",
-            deleteCheckedRate: "deleteCheckedRate"
+            deleteCheckedRate: "deleteCheckedRate",
+            uncheckAllRates: "uncheckAllRates"
         })
     },
     computed: {

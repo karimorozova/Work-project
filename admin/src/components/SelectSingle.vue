@@ -117,6 +117,7 @@ export default {
     border-radius: 5px;
     overflow: hidden;
     flex-direction: column;
+    box-sizing: border-box;
     .drop {
         width: 100%;
         max-height: 100px;

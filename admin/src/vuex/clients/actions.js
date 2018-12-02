@@ -27,7 +27,7 @@ export const updateLeadContact = ({commit}, payload) => commit('setLeadContact',
 export const storeClientDuoRates = ({commit}, payload) => commit('setClientDuoRates', payload);
 export const storeClientMonoRates = ({commit}, payload) => commit('setClientMonoRates', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
-export const getClientDuoCombinations = async ({commit, dispatch, state}, payload) => {
+export const getClientDuoCombinations = async ({commit, dispatch, state}) => {
     commit("startRequest");
     try {
         const id = state.currentClient._id;
@@ -43,7 +43,7 @@ export const getClientDuoCombinations = async ({commit, dispatch, state}, payloa
         throw new Error("Error on getting Duo rates")
     }
 }
-export const getClientMonoCombinations = async ({commit, dispatch, state}, payload) => {
+export const getClientMonoCombinations = async ({commit, dispatch, state}) => {
     commit("startRequest");
     try {
         const id = state.currentClient._id;

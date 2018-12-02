@@ -193,46 +193,60 @@ export default {
                 this.langsAddition();
             }
         },
+        defaultRates() {
+            const duoServices = this.vuexServices.sort((a, b) => { 
+                if(a.sortIndex < b.sortIndex) return -1; 
+                if(a.sortIndex > b.sortIndex) return 1;
+            }).filter(item => item.languageForm === "Duo");
+            return duoServices.reduce((init, cur) => {
+                const key = cur._id;
+                init[key] = {value: 0, active: false};
+                return {...init}
+            }, {});
+        },
+        getAddingRates() {
+            let rates = this.defaultRates();
+            for(let service of this.selectedServ) {
+                rates[service._id].value = +service.rate
+                rates[service._id].active = true;
+            }
+            return rates;
+        },
         collectCombinations() {
             let combinations = [];
-            for(let sourLang of this.source.chosen) {
-                for(let targLang of this.target.chosen) {
-                    if(sourLang.lang !== targLang.lang) {
-                        for(let serv of this.selectedServ) {
-                            let indus = JSON.stringify(this.selectedInd);
-                            indus = JSON.parse(indus);
-                            for(let ind in indus) {
-                                indus[ind].rate = +serv.rate;
-                            }
-                            combinations.push({
-                                source: sourLang,
-                                target: targLang,
-                                service: serv,
-                                industry: indus,
-                                active:true
-                            })
-                        }
+            const rates = this.getAddingRates();
+            const industries = this.selectedInd.map(item => {
+                return {...item, rates}
+            });
+            for(let source of this.source.chosen) {
+                for(let target of this.target.chosen) {
+                    if(source._id !== target._id) {
+                        combinations.push({
+                            source,
+                            target,
+                            industries,
+                        })
                     }
                 }
             }
             return combinations;
         },
         async langsAddition() {
-            let languageCombinations = this.collectCombinations();
+            let combinations = this.collectCombinations();
             try {
                 if(this.origin == 'rates') {
-                    const result = await this.$http.post('/service/several-langs', JSON.stringify(languageCombinations));
+                    const result = await this.$http.post('/service/several-langs', { combinations });
                 }
                 if(this.origin == 'vendor') {
                     const id = this.who._id;
-                    const updatedVendors = await this.$http.post('/vendorsapi/several-langs', {langs: JSON.stringify(languageCombinations), vendor: id});
+                    const updatedVendors = await this.$http.post('/vendorsapi/several-langs', {combinations, vendor: id});
                     await this.storeVendors(updatedVendors.body);
                     const updatedVendor = updatedVendors.body.find(item => item._id === this.who._id);
                     await this.storeCurrentVendor(updatedVendor);
                 }
                 if(this.origin == 'client') {
                     const id = this.who._id;
-                    const clientResult = await this.$http.post('/clientsapi/several-langs', {langs: JSON.stringify(languageCombinations), client: id});
+                    const clientResult = await this.$http.post('/clientsapi/several-langs', {combinations, clientId: id});
                     const updatedClient = {...clientResult.body};
                     await this.storeClient(updatedClient);
                 }
@@ -417,6 +431,9 @@ export default {
         }
     },
     computed: {
+        ...mapGetters({
+            vuexServices: "getVuexServices"
+        }),
         checkedIndustries() {
             let result = [];
             if(this.selectedInd.length) {
