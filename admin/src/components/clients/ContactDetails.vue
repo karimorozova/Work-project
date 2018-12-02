@@ -222,6 +222,8 @@ export default {
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        margin-left: 10px;
+        width: 900px;
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
