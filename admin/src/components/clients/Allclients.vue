@@ -6,17 +6,20 @@
                 .filters__block
                     .filters-item
                         label Name
-                        input.filter-field(type="text" placeholder="Company Name" v-model="filterName")
+                        input.filter__input-field(type="text" placeholder="Company Name" v-model="filterName")
                     .filters-item
                         label Status
-                        ClientStatusSelect(:isAllExist="isAllStatusExist" :selectedStatus="filterStatus" @chosenStatus="chosenStatus")
+                        .filters__drop-menu
+                            ClientStatusSelect(:isAllExist="isAllStatusExist" :selectedStatus="filterStatus" @chosenStatus="chosenStatus")
                 .filters__block
                     .filters-item
                         label Industry
-                        ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
+                        .filters__drop-menu.filters_high-index
+                            ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
                     .filters-item
                         label Lead Source
-                        ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
+                        .filters__drop-menu
+                            ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
                 .filters__block
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
@@ -171,6 +174,14 @@ label {
             width: 19%;
         }
     }
+    &__drop-menu {
+        width: 191px;
+        height: 28px;
+        position: relative;
+    }
+    &_high-index {
+        z-index: 10;
+    }
 }
 
 .filters-item {
@@ -198,13 +209,14 @@ label {
     cursor: pointer;
 }
 
-.filter-field {
-    width: 188px;
+.filter__input-field {
+    width: 191px;
     height: 28px;
-    padding-left: 3px;
+    padding-left: 5px;
     border: 1px solid #67573E;
     border-radius: 5px;
     outline: none;
+    box-sizing: border-box;
 }
 
 .all-clients__table {

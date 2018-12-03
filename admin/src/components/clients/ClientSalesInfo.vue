@@ -75,6 +75,9 @@ export default {
     &__menu {
         display: flex;
         justify-content: flex-start;
+        position: relative;
+        width: 191px;
+        height: 28px;
     }
     
 }

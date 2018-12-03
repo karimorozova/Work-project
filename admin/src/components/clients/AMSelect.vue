@@ -60,8 +60,6 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 191px;
     height: 28px;
     display: flex;
@@ -96,17 +94,19 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    border: 1px solid #67573E;
+    border-radius: 5px;
+    width: 100%;
+    overflow: hidden;
+    z-index: 6;
     .drop {
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        flex-direction: column;
         background-color: white;
-        z-index: 6;
         &__item {
             display: flex;
             align-items: center;

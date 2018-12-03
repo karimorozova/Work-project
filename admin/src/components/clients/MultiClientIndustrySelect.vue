@@ -90,8 +90,6 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 191px;
     height: 28px;
     display: flex;
@@ -168,18 +166,22 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    border: 1px solid #67573E;
+    border-radius: 5px;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 6;
     .drop {
         font-size: 14px;
         box-sizing: border-box;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
-        z-index: 6;
         &__item {
             display: flex;
             align-items: center;
@@ -201,6 +203,13 @@ export default {
         .chosen {
             background-color: rgba(191, 176, 157, 0.5);
         }
+        .clients-table__drop-menu & {
+            border: 1px solid #BFB09D;
+        }
+    }
+    .clients-table__drop-menu & {
+        border: none;
+        z-index: 1;
     }
 }
 .checkbox {

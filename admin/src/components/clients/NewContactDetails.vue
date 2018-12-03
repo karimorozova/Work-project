@@ -29,20 +29,21 @@
                         input.personal(type="text" placeholder="email" v-model="contact.email" :class="{'contact-wrap_error-shadow': !contact.email && !isEmailValid}")
                     .names-gender__item
                         label Gender:
-                        .drop-select(v-click-outside="outGenders")
-                            .select
-                                template(v-if="contact.gender")
-                                    .selected
-                                        span {{ contact.gender }}
-                                template(v-if="!contact.gender")
-                                    span.selected.no-gender Gender
-                                .arrow-button(@click="openGenders")
-                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
-                            .drop(v-if="genderDropped")
-                                .drop__item(@click="setGender('Male')")
-                                    span Male
-                                .drop__item(@click="setGender('Female')")
-                                    span Female
+                        .names-gender__drop-menu
+                            .drop-select(v-click-outside="outGenders")
+                                .select
+                                    template(v-if="contact.gender")
+                                        .selected
+                                            span {{ contact.gender }}
+                                    template(v-if="!contact.gender")
+                                        span.selected.no-gender Gender
+                                    .arrow-button(@click="openGenders")
+                                        img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
+                                .drop(v-if="genderDropped")
+                                    .drop__item(@click="setGender('Male')")
+                                        span Male
+                                    .drop__item(@click="setGender('Female')")
+                                        span Female
             .details__item.details_no-space
                 label Lead Contact:
                 input.check(type="checkbox" v-model="contact.leadContact")
@@ -58,10 +59,12 @@
                 input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
             .details__item
                 label Country:
-                CountriesSelect(:countrySelected="contact.country" @chosenCountry="chosenCountry")
+                .details__drop-menu
+                    CountriesSelect(:countrySelected="contact.country" @chosenCountry="chosenCountry")
             .details__item
                 label Time Zone:
-                TimezoneSelect(:timezoneSelected="contact.timezone" @chosenZone="chosenZone")
+                .details__drop-menu
+                    TimezoneSelect(:timezoneSelected="contact.timezone" @chosenZone="chosenZone")
             .details__item
                 label Notes:
                 textarea.non-personal(type="text" placeholder="Type" v-model="contact.notes")
@@ -262,6 +265,11 @@ export default {
             }
         }
     }
+    &__drop-menu {
+        position: relative;
+        width: 470px;
+        height: 28px;
+    }
     &_no-space {
         justify-content: flex-start;
     }
@@ -308,6 +316,11 @@ export default {
             margin-bottom: 0;
         }
     }
+    &__drop-menu {
+        position: relative;
+        width: 240px;
+        height: 28px;
+    }
 }
 
 .check {
@@ -318,7 +331,8 @@ export default {
 }
 
 .personal, .non-personal {
-    width: 230px;
+    box-sizing: border-box;
+    width: 240px;
     height: 28px;
     padding: 0 5px;
     border: 1px solid #67573E;
@@ -327,7 +341,7 @@ export default {
 }
 
 .non-personal {
-    width: 460px;
+    width: 470px;
 }
 
 textarea.non-personal {
@@ -342,18 +356,19 @@ textarea.non-personal {
 }
 
 .drop-select {
-    position: relative;
+    position: absolute;
+    width: 100%;
+    border: 1px solid #67573E;
+    border-radius: 5px;
+    overflow: hidden;
+    z-index: 6;
+    box-sizing: border-box;
     .drop {
-        position: absolute;
-        width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: white;
-        z-index: 6;
         &__item {
             padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
@@ -374,8 +389,6 @@ textarea.non-personal {
 }
 
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 240px;
     height: 28px;
     display: flex;

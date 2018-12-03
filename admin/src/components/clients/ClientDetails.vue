@@ -20,7 +20,7 @@
                 .block-item
                     label.block-item__label.block-item_relative Industry:
                         Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.industries.length && isSaveClicked}")
+                    .block-item__drop.block-item_high-index(:class="{'clients-wrap_error-shadow': !currentClient.industries.length && isSaveClicked}")
                         MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
                 .block-item
                     label.block-item__label.block-item_relative Status:
@@ -46,12 +46,12 @@
                 .block-item
                     label.block-item__label.block-item_relative Account Manager:
                         Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
+                    .block-item__drop.block-item_high-index(:class="{'clients-wrap_error-shadow': !currentClient.accountManager && isSaveClicked}")
                         AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
                 .block-item
                     label.block-item__label.block-item_relative Sales Manager:
                         Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
+                    .block-item__drop.block-item_medium-index(:class="{'clients-wrap_error-shadow': !currentClient.salesManager && isSaveClicked}")
                         AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
                 .block-item
                     label.block-item__label.block-item_relative Project Manager:
@@ -449,14 +449,26 @@ export default {
     &_relative {
         position: relative;
     }
+    &__drop {
+        position: relative;
+        width: 191px;
+        height: 28px;
+    }
+    &_high-index {
+        z-index: 10;
+    }
+    &_medium-index {
+        z-index: 8;
+    }
     input {
         font-size: 14px;
         color: #67573e;
         border: 1px solid #67573e;
         border-radius: 5px;
-        padding: 0 3px;
+        box-sizing: border-box;
+        padding: 0 5px;
         outline: none;
-        width: 185px;
+        width: 191px;
         height: 28px;
     }
     ::-webkit-input-placeholder {

@@ -150,8 +150,9 @@ export default {
     display: flex;
     align-items: center;
 }
-.vendors-table__body {
-    max-height: 500px;
+.vendors-table__body, .clients__table {
+    min-height: 300px;
+    max-height: 600px;
 }
 .vendors-table_scroll-y {
     overflow-y: auto;

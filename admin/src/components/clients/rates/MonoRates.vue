@@ -250,7 +250,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             getMonoCombinations: "getClientMonoCombinations",
-            storeMonoRates: "storeClientDuoRates",
+            storeMonoRates: "storeClientMonoRates",
             deleteCheckedRate: "deleteClientsCheckedRate"
         })
     },

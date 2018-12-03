@@ -77,30 +77,36 @@ export default {
 <style lang="scss" scoped>
 
 .drop-select {
-    position: relative;
+    position: absolute;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #67573E;
+    border-radius: 5px;
+    box-sizing: border-box;
+    z-index: 6;
     .search-country {
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
-        z-index: 10;
+        border-top: 1px solid #BFB09D;
+        box-sizing: border-box;
         .search {
-            width: 99%;
+            box-sizing: border-box;
+            width: 100%;
             outline: none;
             border: none;
             padding: 5px 2px;
+            color: #67573E;
+            &:focus {
+                box-shadow: inset 0 0 5px #67573E;
+            }
         }
     }
     .drop {
-        margin-top: 27px;
-        position: absolute;
         width: 100%;
-        border: 1px solid #BFB09D;
+        border-top: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
-        flex-direction: column;
         background-color: white;
-        z-index: 6;
         &__item {
             padding: 5px 2px;
             border-bottom: .5px solid #BFB09D;
@@ -121,8 +127,6 @@ export default {
 }
 
 .select {
-    border: 1px solid #67573E;
-    border-radius: 5px;
     width: 470px;
     height: 28px;
     display: flex;

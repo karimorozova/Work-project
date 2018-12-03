@@ -94,10 +94,11 @@ export default {
         }
     }
     &__input-field {
+        box-sizing: border-box;
         color: $main-color;
         width: 191px;
-        height: 28px;
-        padding-left: 3px;
+        height: 31px;
+        padding-left: 5px;
         border: 1px solid $main-color;
         border-radius: 5px;
         outline: none;
@@ -106,6 +107,7 @@ export default {
     &__drop-menu {
         position: relative;
         width: 191px;
+        height: 31px;
         z-index: 1;
     }
 }

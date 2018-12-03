@@ -4,6 +4,7 @@
         :fields="fields"
         :tableData="filteredClients"
         @onRowClicked="onRowClicked"
+        bodyClass="clients__table"
     )
         template(slot="headerName" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
@@ -286,6 +287,9 @@ export default {
     &__data-cell {
         padding: 6px 0 0 5px;
         max-height: 28px;
+    }
+    &__drop-menu {
+        position: relative;
     }
     &__industry-icon {
         width: 19px;

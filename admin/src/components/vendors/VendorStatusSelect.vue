@@ -78,7 +78,7 @@ export default {
         height: 30px;
     }
     .gen-info__block & {
-        border:   1px solid $main-color;     
+        border: 1px solid $main-color;     
     }
     .selected {
         border-right: 1px solid $light-brown;

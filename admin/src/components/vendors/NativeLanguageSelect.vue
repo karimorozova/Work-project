@@ -158,15 +158,14 @@ export default {
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
         background-color: $white;
         z-index: 15;
         padding-top: 29px;
+        box-sizing: border-box;
         &__item {
             display: flex;
             align-items: center;
-            padding: 12px 2px;
+            padding: 5px 2px;
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             transition: all 0.4s;
@@ -191,13 +190,13 @@ export default {
     .search {
         position: absolute;
         z-index: 50;
-        width: 90%;
+        width: 100%;
         padding: 5px 3px;
-        color: #67573E;
+        color: $main-color;
         outline: none;
-        box-shadow: inset 0 0 5px $search-shadow;
-        border: 1px solid $search-border;
-        border-right: none;
+        box-shadow: inset 0 0 5px $brown-shadow;
+        border: 1px solid $light-brown;
+        box-sizing: border-box;
         .inner-component & {
             width: 88%;
         }

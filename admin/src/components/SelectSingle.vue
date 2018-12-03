@@ -187,10 +187,9 @@ export default {
     height: 28px;
     display: flex;
     justify-content: space-between;
-    cursor: pointer;
     .selected {
         width: 80%;
-        padding: 3px 10px;
+        padding-left: 5px;
         font-size: 14px;
         max-height: 40px;
         display: flex;
@@ -214,6 +213,7 @@ export default {
         justify-content: center;
         align-items: center;
         border-left: 0.5px solid #68573E;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }

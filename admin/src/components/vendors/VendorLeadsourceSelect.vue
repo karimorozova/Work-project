@@ -61,7 +61,6 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid $light-brown;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -94,6 +93,7 @@ export default {
         opacity: 0.5;
     }
     .arrow-button {
+        border-left: 1px solid $main-color;
         width: 18%;
         display: flex;
         justify-content: center;
