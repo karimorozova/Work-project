@@ -6,14 +6,14 @@
                 span.vendor-rates__label Mono
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMonoRatesShow}") 
             .vendor-rates__drop(v-if="isMonoRatesShow")
-                MonoVendorRates(:vendor="vendor")
+                MonoRates(:vendor="vendor")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isDuoRatesShow}")
         .vendor-rates__open
             .vendor-rates__select(@click="duoRatesToggler")
                 span.vendor-rates__label Duo
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
             .vendor-rates__drop(v-if="isDuoRatesShow")
-                DuoVendorRates(:vendor="vendor" 
+                DuoRates(:vendor="vendor" 
                     @ratesUpdate="ratesUpdate"
                     @addSevLangs="addSevLangs")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import DuoVendorRates from "./DuoVendorRates";
-import MonoVendorRates from "./MonoVendorRates";
+import DuoRates from "./rates/DuoRates";
+import MonoRates from "./rates/MonoRates";
 import FinanceMatrix from "../FinanceMatrix";
 
 export default {
@@ -61,8 +61,8 @@ export default {
         }
     },
     components: {
-        DuoVendorRates,
-        MonoVendorRates,
+        DuoRates,
+        MonoRates,
         FinanceMatrix
     }
 }
@@ -72,17 +72,18 @@ export default {
 <style lang="scss" scoped>
 
 .vendor-rates {
-    width: 856px;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     &__block {
+        box-sizing: border-box;
         width: 100%;
-        max-height: 450px;
+        max-height: 500px;
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
         border-radius: 10px;
-        padding: 0 3px;
+        padding: 0 2px;
         margin-bottom: 60px;
         &:last-child {
             margin-bottom: 0;

@@ -5,9 +5,8 @@ async function getVendor(obj) {
             .populate('native')
             .populate('languageCombinations.source')
             .populate('languageCombinations.target')
-            .populate('languageCombinations.service')
-            .populate('languageCombinations.industry.industry')
-            .populate('industry')
+            .populate('languageCombinations.industries.industry')
+            .populate('industries')
             .populate('languagePairs.source')
             .populate('languagePairs.target')
     return vendor;
@@ -18,12 +17,22 @@ async function getVendors(obj) {
             .populate('native')
             .populate('languageCombinations.source')
             .populate('languageCombinations.target')
-            .populate('languageCombinations.service')
-            .populate('languageCombinations.industry.industry')
-            .populate('industry')
+            .populate('languageCombinations.industries.industry')
+            .populate('industries')
             .populate('languagePairs.source')
             .populate('languagePairs.target')
     return vendors;
 }
 
-module.exports = { getVendor, getVendors }
+async function getVendorAfterUpdate(query, update) {
+    return await Vendors.findOneAndUpdate(query, update, {new: true})
+            .populate('native')
+            .populate('languageCombinations.source')
+            .populate('languageCombinations.target')
+            .populate('languageCombinations.industries.industry')
+            .populate('industries')
+            .populate('languagePairs.source')
+            .populate('languagePairs.target')
+}
+
+module.exports = { getVendor, getVendors, getVendorAfterUpdate }

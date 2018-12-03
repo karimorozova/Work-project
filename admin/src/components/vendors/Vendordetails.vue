@@ -32,7 +32,8 @@
                         input(type="text" placeholder="Phone" :value="vendor.phone" @change="(e) => updateProp(e,'phone')")
                     .block-item
                         label Time Zone:
-                        TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
+                        .block-item__drop-menu
+                            TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
                     .block-item
                         label Native Language:
                         NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
@@ -73,7 +74,7 @@
                         VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
                     .block-item
                         label Industries:
-                        MultiVendorIndustrySelect(:selectedInd="vendor.industry" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                        MultiVendorIndustrySelect(:selectedInd="vendor.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             .title(v-if="vendor._id") Rates    
             .rates(v-if="vendor._id")
                 VendorRates(:vendor="vendor" 
@@ -238,8 +239,8 @@ export default {
     computed: {
         selectedIndNames() {
             let result = [];
-            if(this.vendor.industry.length) {
-                for(let ind of this.vendor.industry) {
+            if(this.vendor.industries.length) {
+                for(let ind of this.vendor.industries) {
                     result.push(ind.name);
                 }
             }
@@ -266,23 +267,25 @@ export default {
 
 .vendor-wrap {
     position: relative;
+    width: 100%;
 }
 
 .title {
     font-size: 22px;
 }
 .gen-info, .rates {
+    box-sizing: border-box;
     margin: 20px 10px 40px 10px;
     padding: 20px;
     box-shadow: 0 0 15px #67573e9d;
-    width: 860px;
+    width: 900px;
 }
 
 .gen-info {
     display: flex;
     justify-content: space-between;
     &__block {
-        width: 35%;
+        width: 36%;
         &:first-child {
             width: 22%;
             text-align: center;
@@ -290,12 +293,22 @@ export default {
     }
     
 }
+
+.rates {
+    padding: 10px;
+}
+
 .block-item {
     font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    &__drop-menu {
+        position: relative;
+        width: 191px;
+        height: 28px;
+    }
     label {
         margin-bottom: 0;
     }
@@ -385,10 +398,11 @@ export default {
 }
 
 .buttons {
-  width: 99%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: 10px;
+    width: 900px;
 }
 
 .button {
@@ -470,6 +484,5 @@ export default {
         margin-bottom: 15px;
     }
 }
-
 
 </style>

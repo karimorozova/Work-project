@@ -48,7 +48,6 @@
             p Are you sure you want to delete?
             Button.contacts-info__button(value="Cancel" @clicked="cancelDelete")
             Button.contacts-info__button(value="Delete" @clicked="approveDelete")
-        .contacts-info__cancel-edition(v-if="currentEditingIndex !== -1" @click="cancelEdition") Cancel edition
         ValidationErrors(v-if="areErrorsExist"
             :errors="errors"
             :customStyles="errorsStyle"
@@ -82,6 +81,7 @@ export default {
             icons: {
                 save: {name: 'save', active: false, icon: require('../../assets/images/Other/save-icon-qa-form.png')},
                 edit: {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                cancel: {icon: require('../../assets/images/cancel-icon.png')},
                 delete: {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
             },
             currentEditingIndex: -1,
@@ -105,9 +105,6 @@ export default {
         cancelDelete() {
             this.isDeleteMessageShow = false;
         },
-        cancelEdition() {
-            this.setCurrentDefaults();
-        },
         closeErrorMessage() {
             this.isErrorShow = false;
         },
@@ -120,7 +117,7 @@ export default {
         },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
-                return key === 'save';
+                return key === 'save' || key === 'cancel';
             }
             if(this.currentEditingIndex === index) {
                 return key === 'edit'
@@ -147,6 +144,9 @@ export default {
             }
             if(key === 'save') {
                 this.checkForValidation(index);
+            }
+            if(key === 'cancel') {
+                this.setCurrentDefaults();
             }
             if(key === 'delete') {
                 this.deletingContactIndex = index;

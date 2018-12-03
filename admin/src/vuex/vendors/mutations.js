@@ -12,5 +12,11 @@ export const mutations = {
         } else {
             state.currentVendor.industry.push(payload);
         }
+    },
+    setVendorDuoRates(state, payload) {
+        state.vendorDuoRates = payload;
+    },
+    setVendorMonoRates(state, payload) {
+        state.vendorMonoRates = payload;
     }
 }

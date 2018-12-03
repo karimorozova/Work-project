@@ -1,18 +1,195 @@
-const { Vendors } = require("../../models/");
+const { Vendors, Services } = require("../../models/");
 const { getVendor } = require("./getVendors");
 
-function getUpdatedLangPairs({ source, target, langPairs }) {
-    let pairs = [...langPairs];
-    let isPairExist = false;
-    for(let pair of pairs) {
-        if(pair.source.id === source._id && pair.target.id === target._id) {
-            isPairExist = true
+async function getVendorRates({vendor, form}) {
+    const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
+    : vendor.languageCombinations.filter(item => !item.source);
+    try {
+        const ratesServices = await Services.find({languageForm: form});
+        const serviceIds = ratesServices.map(item => item.id);
+        let fullInfo = [];
+        for(let rate of combinations) {
+            fullInfo.push(...parseIndustries(rate, serviceIds, form));    
+        }
+        return fullInfo;
+    } catch(err) {
+        console.log("from function getVendorRates " + err);   
+    }
+}
+
+function parseIndustries(rate, serviceIds, form) {
+    let rates = []
+    for(let elem of rate.industries) {
+        const allServRates = includeAllServices(elem.rates, serviceIds);
+        let industry = {...elem.industry._doc, _id: elem.industry._id};
+        industry.rates = {...allServRates};
+        if(form === "Duo") {
+            rates.push({
+                id: rate.id,
+                ratesId: elem._id,
+                sourceLanguage: rate.source,
+                targetLanguage: rate.target,
+                industry: industry,
+                check: false
+            })
+        } else {
+            rates.push({
+                id: rate.id,
+                ratesId: elem._id,
+                targetLanguage: rate.target,
+                package: rate.package,
+                industry: industry,
+                check: false
+            })
         }
     }
-    if(!isPairExist) {
-        pairs.push({source, target})
+    return rates;
+}
+
+function includeAllServices(elemRates, serviceIds) {
+    let rates = {};
+    for(let id of serviceIds) {
+        if(Object.keys(elemRates).indexOf(id) !== -1) {
+            rates[id] = elemRates[id];
+        } else {
+            rates[id] = {value: 0, active: false};
+        }
     }
-    return pairs;
+    return rates;
+}
+
+async function updateVendorRates(ratesInfo) {
+    const { languageForm, vendorId } = ratesInfo;
+    try {
+        const vendor = await getVendor({"_id": vendorId});
+        const result = languageForm === "Duo" ? await updateDuoRates(vendor, ratesInfo) : await updateMonoRates(vendor, ratesInfo);
+        return result;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateVendorRates");
+    }
+}
+
+async function updateMonoRates(vendor, info) {
+    const combinations = vendor.languageCombinations.filter(item => item.package);
+    const { industries, package, targetLanguage } = info;
+    try {
+        const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+        const pairIndex = combinations.findIndex(item => item.target.id === info.targetLanguage._id && item.package === package);
+        if(pairIndex !== -1) {
+            combinations[pairIndex].industries = updatedIndustries;
+        } else {
+            combinations.push({
+                target: targetLanguage._id,
+                package,
+                industries: updatedIndustries
+            })
+        }
+        return await getAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateMonoRates");
+    }
+}
+
+async function updateDuoRates(vendor, info) {
+    const combinations = vendor.languageCombinations.filter(item => item.source);
+    const { industries, sourceLanguage, targetLanguage } = info;
+    try {
+        const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+        const pairIndex = combinations.findIndex(item => item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
+        if(pairIndex !== -1) {
+            combinations[pairIndex].industries = updatedIndustries;
+        } else {
+            combinations.push({
+                source: sourceLanguage._id,
+                target: targetLanguage._id,
+                industries: updatedIndustries
+            })
+        }
+        return await getAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateDuoRates");
+    }
+}
+
+async function getAllUpdatedIndustries(industries, vendorIndustries, languageForm) {
+    let updatedIndustries = [];
+    try {
+        const allIndustries = await includeAllIndustries(industries, vendorIndustries, languageForm);
+        if(industries[0].name === "All") {
+            updatedIndustries = updateRatesForAll(allIndustries, industries[0].rates);
+        } else {
+            updatedIndustries = updateRates(industries, allIndustries); 
+        }
+        return updatedIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAllUpdatedIndustries");
+    }
+}
+
+function updateRatesForAll(allIndustries, rates) {
+    return allIndustries.map(item => {
+      return  {...item, rates}
+    })
+}
+
+function updateRates(industries, allIndustries) {
+    let updatedIndustries = [...allIndustries];
+    for(let industry of updatedIndustries) {
+        const index = industries.findIndex(item => item._id === industry.industry);
+        if(index !== -1) {
+            industry.rates = industries[index].rates;
+        }
+    }
+    return updatedIndustries;
+}
+
+async function includeAllIndustries(industries, vendorIndustries, languageForm) {
+    try {
+        const allIndustries = await defaultRates(vendorIndustries, languageForm);
+        let updatedIndustries = [];
+        for(let elem of allIndustries) {
+            const index = industries.findIndex(item => item._id === elem.id);
+            if(index !== -1) {
+                updatedIndustries.push({
+                    'industry': elem.id,
+                    'rates': industries[index].rates
+                })
+            } else {
+                updatedIndustries.push({
+                    'industry': elem.id,
+                    'rates': elem.rates
+                })
+            }
+        }
+        return updatedIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in includeAllIndustries");
+    }
+}
+
+async function defaultRates(vendorIndustries, languageForm) {
+    const industries = [...vendorIndustries];
+    try {
+        const services = await Services.find({"languageForm": languageForm});
+        const serviceRate = {value: 0, active: false};
+        const rates = services.reduce((init, cur) => {
+            const key = cur.id;
+            init[key] = {...serviceRate};
+            return {...init};
+        }, {});
+        for(let industry of industries) {
+            industry["rates"] = {...rates};
+        }
+        return industries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in defaultRates");
+    }
 }
 
 function deletePair({ langPairs, combination}) {
@@ -23,70 +200,7 @@ function deletePair({ langPairs, combination}) {
     return pairs;
 }
 
-async function checkRatesMatch(vendor, industries, rate) {
-    if(rate.form === "Mono") {
-        return await checkMonoRatesMatches(vendor, industries, rate);
-    }
-    let exist = false;
-    let languageCombinations = [...vendor.languageCombinations];
-    let languagePairs = [...vendor.languagePairs];
-    if(languageCombinations.length) {
-        for(let comb of languageCombinations) {
-        if(comb.service.id === rate.service._id && comb.source.id === rate.sourceLanguage._id &&
-            comb.target.id === rate.targetLanguage._id) {
-                for(let ind of comb.industry) {
-                    for(let indus of rate.industry) {
-                        if(ind.industry.id == indus._id || indus.name == "All") {
-                            ind.rate = indus.rate;
-                            ind.active = indus.active;
-                        }
-                    }
-                }
-                exist = true;
-            }
-        }
-    }
-    if(!exist || !languageCombinations.length) {
-        languageCombinations.push({
-            source: rate.sourceLanguage._id,
-            target: rate.targetLanguage._id,
-            service: rate.service._id,
-            industry: industries,
-        })
-        languagePairs = getUpdatedLangPairs({ source: rate.sourceLanguage, target: rate.targetLanguage, langPairs: vendor.languagePairs })
-    }
-    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: languageCombinations, languagePairs: languagePairs}});
-    return result;
-}
 
-async function checkMonoRatesMatches(vendor, industries, rate) {
-    let exist = false;
-    if(vendor.languageCombinations.length) {
-        for(let elem of rate.industry) {
-            for(let comb of vendor.languageCombinations) {
-                if(rate.targetLanguage._id == comb.target.id && !comb.source) {
-                    exist = true;
-                    for(let indus of comb.industry) {
-                        if(elem._id == indus.industry.id || elem.name == 'All') {
-                            indus.rate = elem.rate
-                            indus.active = elem.active;
-                            indus.package = elem.package
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if(!exist || !vendor.languageCombinations.length) {
-        vendor.languageCombinations.push({
-            target: rate.targetLanguage._id,
-            service: rate.service._id,
-            industry: industries,
-        })
-    }
-    const result = await Vendors.updateOne({"_id": vendor.id}, {'languageCombinations': vendor.languageCombinations});
-    return result;
-}
 
 async function deleteRate(vendor, industry, id) {
     let allZero = [];
@@ -135,9 +249,9 @@ async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, indus
     }
 }
 
-function addAllIndustries(combIndustry, clientIndustry) {
+function addAllIndustries(combIndustry, vendorIndustry) {
     let industries = [];
-    for(let indus of clientIndustry) {
+    for(let indus of vendorIndustry) {
         industries.push({
             ...indus._doc,
             _id: indus.id,
@@ -168,4 +282,4 @@ function updateCombination(combIndustries, vendorIndustries) {
     return updatedIndustries;
 }
 
-module.exports= { checkRatesMatch, deleteRate, addVendorsSeveralLangs };
+module.exports= { getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs };

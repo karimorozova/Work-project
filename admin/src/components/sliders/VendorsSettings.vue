@@ -43,6 +43,7 @@ export default {
 
 .vendors {
   display: flex;
+  width: calc(100% - 150px);
 }
 
 </style>

@@ -139,7 +139,7 @@ async function clientLangs() {
                 industries: monoIndustries
               });
             }
-          await Clients.updateOne({name: client.name}, client);
+          await Clients.updateOne({name: client.name}, {languageCombinations: client.languageCombinations});
         }
     }
   } catch(err) {
@@ -157,9 +157,9 @@ function vendors() {
         const language = await Languages.findOne({"lang": vendor.native});
         vendor.native = language._id;
         for(let industry of industries) {
-          for(let ind in vendor.industry) {
-            if(industry.name == vendor.industry[ind].name) {
-              vendor.industry[ind] = industry._id;
+          for(let ind in vendor.industries) {
+            if(industry.name == vendor.industries[ind].name) {
+              vendor.industries[ind] = industry._id;
             }
           }
         }
@@ -177,25 +177,35 @@ function vendors() {
 }
 
 async function vendorLangs() {
-  let vendors = await Vendors.find().populate('industry');
-  let service = await Services.findOne({title: "Translation"})
-        .populate('languageCombinations.source')
-        .populate('languageCombinations.target');
-  let combs = service.languageCombinations;
-  for(let vendor of vendors) {
-    let random = Math.round(Math.random()*50);
-    if(!vendor.languageCombinations.length && !vendor._id) {
-      let industries = {industry: vendor.industry[0]._id, rate: 0.04, active: true};
-      for(let i = random; i < random + 5; i++) {
-        vendor.languageCombinations.push({
-          source: combs[i].source._id,
-          target: combs[i].target._id,
-          service: service._id,
-          industry: industries,
-        })
-      }
-      await Vendors.update({"_id": vendor._id}, vendor);
+  try {
+    let vendors = await Vendors.find().populate('industries');
+    let duoRates = await Duorate.find().populate('industries.industry');
+    let monoRates = await Monorate.find().populate('industries.industry');
+    for(let vendor of vendors) {
+      if(!vendor.languageCombinations.length) {
+        vendor.languageCombinations = [];
+            for(let i = 0; i < 5; i++) {
+              const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));
+              const monoIndex = Math.floor(Math.random() * (monoRates.length - 1));
+              const duoIndustries = duoRates[i].industries.filter(item => item.industry.id === vendor.industries[0].id);
+              const monoIndustries = monoRates[monoIndex].industries.filter(item => item.industry.id === vendor.industries[0].id);
+              vendor.languageCombinations.push({
+                source: duoRates[duoIndex].source,
+                target: duoRates[duoIndex].target,
+                industries: duoIndustries
+              });
+              vendor.languageCombinations.push({
+                target: monoRates[monoIndex].target,
+                package: monoRates[monoIndex].package,
+                industries: monoIndustries
+              });
+            }
+          await Vendors.updateOne({name: vendor.name}, {languageCombinations: vendor.languageCombinations});
+        }
     }
+  } catch(err) {
+    console.log(err);
+    console.log("Error on filling vendors language combinations");
   }
 }
 

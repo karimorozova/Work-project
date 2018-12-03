@@ -1,10 +1,12 @@
-const { getVendor, getVendors } = require("./getVendors");
-const { checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require("./vendorRates");
+const { getVendor, getVendors, getVendorAfterUpdate } = require("./getVendors");
+const { getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require("./vendorRates");
 
 const vendors = {
     getVendor,
     getVendors,
-    checkRatesMatch,
+    getVendorRates,
+    getVendorAfterUpdate,
+    updateVendorRates,
     deleteRate,
     addVendorsSeveralLangs
 }

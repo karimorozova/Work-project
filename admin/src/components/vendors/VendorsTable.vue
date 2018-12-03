@@ -53,7 +53,7 @@
                     @chosenInd="setIndustry"
                 )
             .vendors-table__no-drop(v-else)
-                img.vendors-table__industry-icon(v-for="industry in row.industry" :src="industry.icon") 
+                img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon") 
         template(slot="basicRate" slot-scope="{ row, index }")
             .vendors-table__active(v-if="currentEditingIndex === index")
                 input.vendors-table__input(type="text" v-model="currentBasicRate" @click.stop="stopPropagation")
@@ -167,7 +167,7 @@ export default {
             this.currentEditingIndex = index;
             this.currentBasicRate = this.filteredVendors[index].basicRate;
             this.currentTqi = this.filteredVendors[index].tqi;
-            this.industrySelected = this.filteredVendors[index].industry;
+            this.industrySelected = this.filteredVendors[index].industries;
             this.selectedStatus = this.filteredVendors[index].status;
             this.selectedNative = this.filteredVendors[index].native;
         },
@@ -185,7 +185,7 @@ export default {
                 ...this.filteredVendors[index],
                 basicRate: this.currentBasicRate,
                 tqi: this.currentTqi,
-                industry: this.industrySelected,
+                industries: this.industrySelected,
                 status: this.selectedStatus,
                 native: this.selectedNative
             }
@@ -285,7 +285,7 @@ export default {
             }
             if(this.industryFilter && this.industryFilter.name !== 'All') {
                 result = result.filter(item => {
-                    const industryIds = item.industry.map(indus => indus._id);
+                    const industryIds = item.industries.map(indus => indus._id);
                     return industryIds.indexOf(this.industryFilter._id) !== -1;
                 })
             }

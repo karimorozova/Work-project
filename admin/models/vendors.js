@@ -87,27 +87,20 @@ const VendorSchema = new mongoose.Schema({
         target: {
             type: Schema.Types.ObjectId, ref: 'Language'
         },
-        service: {
-            type: Schema.Types.ObjectId, ref: 'Services'
+        package: {
+            type: String,
+            trim: true
         },
-        industry: [{
+        industries: [{
             industry: {
                 type: Schema.Types.ObjectId, ref: 'Industries',
             },
-            rate: {
-                type: Number,
-                default: 0
-            },
-            active: {
-                type: Boolean,
-                default: true
-            },
-            package: {
-                type: Number
-            }
+            rates: {
+                type: Object
+            }            
         }]
     }],
-    industry: [
+    industries: [
         {type: Schema.Types.ObjectId, ref: 'Industries'}
     ],
     languagePairs: [{

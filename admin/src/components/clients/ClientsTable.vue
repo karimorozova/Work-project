@@ -63,7 +63,6 @@
             p Are you sure you want to delete?
             Button.clients-table__button(value="Cancel" @clicked="cancelDelete")
             Button.clients-table__button(value="Delete" @clicked="approveDelete")
-    .clients-table__cancel-edition(v-if="currentEditingIndex !== -1" @click="cancelEdition") Cancel edition
 </template>
 
 <script>
@@ -101,9 +100,10 @@ export default {
                 {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
             ],
             icons: {
-                save: {name: 'save', active: false, icon: require('../../assets/images/Other/save-icon-qa-form.png')},
-                edit: {name: 'edit', active: true, icon: require('../../assets/images/Other/edit-icon-qa.png')},
-                delete: {name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
+                save: {icon: require('../../assets/images/Other/save-icon-qa-form.png')},
+                edit: {icon: require('../../assets/images/Other/edit-icon-qa.png')},
+                cancel: {icon: require('../../assets/images/cancel-icon.png')},
+                delete: {active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
             },
             currentEditingIndex: -1,
             isErrorShow: false,
@@ -127,7 +127,7 @@ export default {
         },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
-                return key === 'save';
+                return key === 'save' || key === 'cancel';
             }
             if(this.currentEditingIndex === index) {
                 return key === 'edit'
@@ -195,6 +195,9 @@ export default {
                 await this.updateClient(index);
                 this.setCurrentDefaults();
             }
+            if(key === 'cancel') {
+                this.setCurrentDefaults();
+            }
             if(key === 'delete') {
                 this.deletingClientIndex = index;
                 this.isDeleteMessageShow = true;
@@ -211,9 +214,6 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot delete the Client", isShow: true, type: "error"});
             }
-        },
-        cancelEdition() {
-            this.setCurrentDefaults();
         },
         cancelDelete() {
             this.deletingClientIndex = -1;
@@ -324,22 +324,24 @@ export default {
     }
     &__error {
         position: absolute;
-        border: 1px solid $orange;
-        background-color: $white;
-        box-shadow: 0 0 15px $orange;
-        width: 300px;
-        top: 50%;
-        left: 50%;
-        margin-left: -150px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: transparent;
         padding: 0 15px;
         z-index: 50;
         display: flex;
         align-items: center;
+        justify-content: center;
     }
     &__error-message {
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 300px;
+        padding: 0 20px;
+        border: 1px solid $orange;
+        box-shadow: 0 0 5px $orange;
+        background-color: $white;
         font-weight: bolder;
         font-size: 14px;
     }
@@ -348,7 +350,7 @@ export default {
         font-size: 24px;
         font-weight: 700;
         top: -2px;
-        right: -9px;
+        right: 5px;
         transform: rotate(45deg);
         cursor: pointer;
     }

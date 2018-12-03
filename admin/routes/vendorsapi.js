@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendors, checkRatesMatch, deleteRate, addVendorsSeveralLangs } = require('./vendors');
+const { getVendor, getVendors, getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require('./vendors');
 const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -43,37 +43,10 @@ router.post('/step-email', async (req, res) => {
 })
 
 router.get('/rates', async (req, res) => {
-    const { vendorId, service, form } = req.query;
+    const { vendorId, form } = req.query;
     try {
-        const vendor = await getVendor({"_id": vendorId});
-        let rates = [];
-        for(let comb of vendor.languageCombinations) {
-            if(comb.service.title === service) {
-                for(let elem of comb.industry) {
-                    let industry = {...elem.industry._doc};
-                    industry.rate = elem.rate;
-                    industry.active = elem.active;
-                    if(form === "Duo") {
-                        rates.push({
-                            id: comb.id,
-                            service: comb.service,
-                            sourceLanguage: comb.source,
-                            targetLanguage: comb.target,
-                            industry: [industry]
-                        })
-                    } else {
-                        industry.package = elem.package;
-                        rates.push({
-                            id: comb.id,
-                            service: comb.service,
-                            targetLanguage: comb.target,
-                            industry: [industry]
-                        })
-                    }
-                    
-                }
-            }
-        }
+        let vendor = await getVendor({"_id": vendorId});
+        const rates = await getVendorRates({vendor, form});
         res.send(rates);
     } catch(err) {
         console.log(err);
@@ -81,32 +54,11 @@ router.get('/rates', async (req, res) => {
     }
 })
 
-router.post('/vendor-rates', async (req, res) => {
-    let rate = req.body;
-    const id = rate.vendor;
+router.post('/rates', async (req, res) => {
+    const { ratesInfo } = req.body;
     try {
-        let vendor = await getVendor({"_id": id})
-        for(let indus of rate.industry) {
-            for(let ind of vendor.industry) {
-                if(ind.id === indus._id || indus.name == "All") {
-                    ind.rate = indus.rate;
-                    ind.active = indus.active;
-                    if(rate.form === "Mono") {
-                        ind.package = indus.package;
-                    }
-                }
-            }
-        }
-        const industries = vendor.industry.map(item => {
-            const active = item.rate > 0;
-            if(rate.form === 'Duo') {
-                return {industry: item.id, active: active, rate: item.rate}
-            }
-            return {industry: item.id, active: active, rate: item.rate, package: item.package}
-        })
-        const result = await checkRatesMatch(vendor, industries, rate);
-        const updatedVendors = await getVendors({});
-        res.send(updatedVendors);
+        const updatedVendor = await updateVendorRates(ratesInfo);
+        res.send(updatedVendor);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating rates of Vendor");
