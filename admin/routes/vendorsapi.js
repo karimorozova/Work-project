@@ -146,8 +146,7 @@ router.delete('/deletevendor/:id', async (req, res) => {
     try { 
         await Vendors.deleteOne({"_id": id});
         await fse.remove('./dist/vendorsDocs/' + id);
-        const updatedVendors = await getVendors({});
-        res.send(updatedVendors);
+        res.send("Vendor deleted");
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting Vendor");

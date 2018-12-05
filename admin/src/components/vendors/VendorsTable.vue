@@ -141,6 +141,7 @@ export default {
             storeVendors: "vendorsSetting",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry",
+            deleteCurrentVendor: "deleteCurrentVendor"
         }),
         stopPropagation() {
             return
@@ -223,8 +224,7 @@ export default {
             this.currentEditingIndex = -1;
             const vendor = this.filteredVendors[this.deletingVendorIndex];
             try {
-                const result = await this.$http.delete(`/vendorsapi/deletevendor/${vendor._id}`);
-                await this.storeVendors(result.data);
+                await this.deleteCurrentVendor({id: vendor._id});
                 this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot delete the Vendor", isShow: true, type: "error"});

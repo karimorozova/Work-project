@@ -75,3 +75,17 @@ export const deleteVendorsCheckedRate = async ({commit, dispatch, state}, payloa
         throw new Error("Error on deleting rate");
     }
 }
+
+export const deleteCurrentVendor = async ({commit, rootState}, payload) => {
+    commit("startRequest");
+    try {
+        const  { id } = payload;
+        await Vue.http.delete(`/vendorsapi/deletevendor/${id}`);
+        const index = rootState.a.vendors.findIndex(item => item._id === id);
+        rootState.a.vendors.splice(index, 1);
+        commit("endRequest");
+    } catch(err) {
+        commit("endRequest");
+        throw new Error("Error on deleting Vendor");
+    }
+}

@@ -1,6 +1,6 @@
 export const mutations = {
     setCurrentVendor(state, payload) {
-        state.currentVendor = payload;
+        state.currentVendor = {...payload};
     },
     setVendorProp(state, payload) {
         state.currentVendor[payload.prop] = payload.value;
