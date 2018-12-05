@@ -37,7 +37,7 @@ export const getVendorMonoCombinations = async ({commit, dispatch, state}) => {
         throw new Error("Error on getting Mono rates")
     }
 }
-export const saveVenodrRates = async ({commit, dispatch, state}, payload) => {
+export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
         const ratesInfo = { ...payload, vendorId: state.currentVendor._id}

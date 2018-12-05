@@ -1,6 +1,6 @@
 <template lang="pug">
     .vendors-data
-        .vendors-data__title(v-if="!vendorData") All Vendors
+        .vendors-data__title All Vendors
         AllVendorsInfo(v-if="isAllVendorsShow"
             statusExcluded="any"
             :statuses="statuses"

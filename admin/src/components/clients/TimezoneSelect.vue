@@ -99,9 +99,7 @@ export default {
             padding: 5px 2px;
             color: #67573E;
             box-sizing: border-box;
-            &:focus {
-                box-shadow: inset 0 0 5px #67573E;
-            }
+            box-shadow: inset 0 0 5px #67573E;
         }
     }
     .drop {
@@ -128,12 +126,12 @@ export default {
         }
     }
     .block-item & {
-        width: 193px;
+        width: 191px;
     }
 }
 
 .select {
-    width: 470px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -171,9 +169,6 @@ export default {
         .block-item & {
             width: 18%;
         }
-    }
-    .block-item & {
-        width: 193px;
     }
 }
 

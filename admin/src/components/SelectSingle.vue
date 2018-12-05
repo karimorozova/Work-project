@@ -119,7 +119,6 @@ export default {
     flex-direction: column;
     box-sizing: border-box;
     .drop {
-        width: 100%;
         max-height: 100px;
         overflow-y: overlay;
         overflow-x: hidden;
@@ -137,9 +136,6 @@ export default {
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
-            &:first-child {
-                border-top: .5px solid #BFB09D;
-            }
             &:last-child {
                 border: none;
             }
@@ -182,14 +178,13 @@ export default {
 }
 
 .select {
-    border-radius: 15px;
     width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
     .selected {
         width: 80%;
-        padding-left: 5px;
+        padding: 0 5px;
         font-size: 14px;
         max-height: 40px;
         display: flex;
@@ -200,8 +195,14 @@ export default {
         .filters_short-menu & {
             width: 72%;
         }
+        .filters__drop-menu & {
+            width: 82%;
+        }
         .inner-component & {
             width: 83%;
+        }
+        .block-item__drop-menu & {
+            width: 82%;
         }
     }
     .no-choice {
@@ -223,11 +224,18 @@ export default {
         .filters_short-menu & {
             width: 28%;
         }
+        .filters__drop-menu & {
+            width: 18%;
+        }
         .inner-component & {
             background-color: white;
             box-shadow: inset -1px 0 5px #bfb09d;
             border-left: 1px solid #bfb09d;
             width: 17%;
+        }
+        .block-item__drop-menu & {
+            width: 18%;
+            border-left: 1px solid #bfb09d;
         }
     }
     .inner-component & {

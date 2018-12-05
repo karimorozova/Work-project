@@ -62,7 +62,7 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -168,6 +168,7 @@ export default {
     .clients-table__drop-menu & {
         border: none;
         z-index: 1;
+        border-radius: 0;
     }
 }
 

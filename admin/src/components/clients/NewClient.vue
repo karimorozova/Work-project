@@ -1,7 +1,7 @@
 <template lang="pug">
     .clients-wrap
         .clients-wrap__sidebar(v-if="sidebarShow")
-            Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
+            Sidebar(title="CLIENTS" :links="sidebarLinks" linkClass="client-details")
         .client-info(v-if="clientShow")
             .buttons
                 input.button(type="button" value="Save" @click="checkForErrors")

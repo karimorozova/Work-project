@@ -19,6 +19,8 @@ import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
+import Vendordetails from '@/components/vendors/Vendordetails'
+import NewVendor from '@/components/vendors/NewVendor'
 import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
@@ -107,6 +109,16 @@ const router = new Router({
           path: 'vendors',
           name: 'vendors',
           component: VendorsSettings
+        },
+        {
+          path: 'vendors/:id',
+          name: 'vendor-details',
+          component: Vendordetails
+        },
+        {
+          path: 'new-vendor',
+          name: 'new-vendor',
+          component: NewVendor
         },
         {
           path: 'languages',

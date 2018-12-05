@@ -6,11 +6,11 @@ export const mutations = {
         state.currentVendor[payload.prop] = payload.value;
     },
     updateVendorIndustry(state, payload) {
-        const position = state.currentVendor.industry.findIndex(item => item._id === payload._id);
+        const position = state.currentVendor.industries.findIndex(item => item._id === payload._id);
         if(position !== -1) {
-            state.currentVendor.industry.splice(position, 1)
+            state.currentVendor.industries.splice(position, 1)
         } else {
-            state.currentVendor.industry.push(payload);
+            state.currentVendor.industries.push(payload);
         }
     },
     setVendorDuoRates(state, payload) {

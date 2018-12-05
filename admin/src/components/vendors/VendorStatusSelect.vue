@@ -67,8 +67,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .select {
-    border-radius: 5px;
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -76,9 +75,6 @@ export default {
     .vendors-table__drop-menu & {
         width: 100%;
         height: 30px;
-    }
-    .gen-info__block & {
-        border: 1px solid $main-color;     
     }
     .selected {
         border-right: 1px solid $light-brown;
@@ -127,28 +123,22 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
-    .filters__drop-menu & {
-        position: absolute;
-        border-radius: 5px;
-        border: 1px solid $main-color;
-        overflow: hidden;
-        width: 100%;
-    }
+    width: 100%;
+    position: absolute;
+    border-radius: 5px;
+    border: 1px solid $main-color;
+    overflow: hidden;
+    z-index: 6;
+    box-sizing: border-box;
     .drop {
-        position: absolute;
-        width: 100%;
-        border: 1px solid $light-brown;
+        border-top: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
         background-color: $white;
-        z-index: 6;
         .filters__drop-menu & {
-            position: relative;
-            border: none;
             border-top: 1px solid $main-color;
         }
         &__item {
@@ -169,9 +159,16 @@ export default {
         .chosen {
             background-color: $active-background;
         }
+        .vendors-table__drop-menu & {
+            border: 1px solid $light-brown;
+        }
     }
     .inner-component & {
         height: 100%;
+    }
+    .vendors-table__drop-menu & {
+        border: none;
+        border-radius: 0;
     }
 }
 

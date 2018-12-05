@@ -2,7 +2,8 @@
 .sidebar
     span.sidebar__title(v-if="title") {{ title }}
     .sidebar__inner
-      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}") {{ link }}
+      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}")
+        p.sidebar__link {{ link }}
 </template>
 
 <script>
@@ -62,6 +63,10 @@ export default {
         &:last-child {
             border-bottom: 1px solid $beige;
         }
+    }
+    &__link {
+        margin: 0;
+        text-align: center;
     }
     &_active-link {
         background-color: $active-background;

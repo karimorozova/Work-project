@@ -60,7 +60,7 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -85,6 +85,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         img {
             padding-right: 2px;
         }
@@ -100,6 +101,7 @@ export default {
     width: 100%;
     overflow: hidden;
     z-index: 6;
+    box-sizing: border-box;
     .drop {
         width: 100%;
         border-top: 1px solid #BFB09D;

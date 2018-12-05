@@ -95,13 +95,10 @@ export default {
             border: none;
             padding: 5px 2px;
             color: #67573E;
-            &:focus {
-                box-shadow: inset 0 0 5px #67573E;
-            }
+            box-shadow: inset 0 0 5px #67573E;
         }
     }
     .drop {
-        width: 100%;
         border-top: 1px solid #BFB09D;
         max-height: 150px;
         overflow-y: auto;
@@ -127,7 +124,7 @@ export default {
 }
 
 .select {
-    width: 470px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;

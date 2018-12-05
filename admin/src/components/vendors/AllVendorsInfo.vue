@@ -1,6 +1,6 @@
 <template lang="pug">
 .all-vendors
-    .all-vendors__table(v-if="!isVendorDetails")
+    .all-vendors__table
         VendorFilters(
             :statusExcluded="statusExcluded"
             :statusFilter="statusFilter"
@@ -21,11 +21,6 @@
             :statusFilter="statusFilter"
             :statusExcluded="statusExcluded"
             @showVendorDetails="showVendorDetails"
-        )
-    .all-vendors__details(v-if="isVendorDetails")
-        Vendordetails(
-            :vendor="currentVendor"
-            @cancelVendor="closeVendorDetails"
         )
 </template>
 
@@ -49,7 +44,6 @@ export default {
     },
     data() {
         return {
-            isVendorDetails: false,
             statusFilter: "",
             industryFilter: "",
             leadFilter: "",
@@ -62,31 +56,7 @@ export default {
             this.storeCurrentVendor(vendor);
         },
         addVendor() {
-            const newVendor = {
-                basicRate: "",
-                companyName: "",
-                email: "",
-                firstName: "",
-                surname: "",
-                gender: "",
-                linkedin: "",
-                native: {},
-                phone: "",
-                photo: "",
-                skype: "",
-                status: "",
-                timezone: "",
-                tqi: "",
-                website: "",
-                whatsapp: "",
-                languageCombinations: [],
-                languagePairs: [],
-                industry: [],
-                test: false,
-                position: []
-            }
-            this.storeCurrentVendor(newVendor);
-            this.isVendorDetails = true;
+            this.$router.push("/new-vendor");
         },
         closeVendorDetails() {
             this.isVendorDetails = false;

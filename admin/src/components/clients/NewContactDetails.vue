@@ -30,20 +30,12 @@
                     .names-gender__item
                         label Gender:
                         .names-gender__drop-menu
-                            .drop-select(v-click-outside="outGenders")
-                                .select
-                                    template(v-if="contact.gender")
-                                        .selected
-                                            span {{ contact.gender }}
-                                    template(v-if="!contact.gender")
-                                        span.selected.no-gender Gender
-                                    .arrow-button(@click="openGenders")
-                                        img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
-                                .drop(v-if="genderDropped")
-                                    .drop__item(@click="setGender('Male')")
-                                        span Male
-                                    .drop__item(@click="setGender('Female')")
-                                        span Female
+                            SelectSingle(
+                                :options="genders"
+                                :selectedOption="contact.gender"
+                                placeholder="Gender"
+                                @chooseOption="setGender"
+                            )
             .details__item.details_no-space
                 label Lead Contact:
                 input.check(type="checkbox" v-model="contact.leadContact")
@@ -81,6 +73,7 @@
 <script>
 import ValidationErrors from "../ValidationErrors";
 import Asterisk from "../Asterisk";
+import SelectSingle from "../SelectSingle";
 import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
@@ -108,7 +101,8 @@ export default {
             approveShow: false,
             photoFile: [],
             errors: [],
-            isSaveClicked: false
+            isSaveClicked: false,
+            genders: ["Male", "Female"] 
         }
     },
     methods: {
@@ -131,9 +125,8 @@ export default {
         outGenders() {
             this.genderDropped = false;
         },
-        setGender(gen) {
-            this.contact.gender = gen;
-            this.outGenders();
+        setGender({option}) {
+            this.contact.gender = option;
         },
         cancel() {
             this.$emit('cancel');
@@ -185,7 +178,8 @@ export default {
         CountriesSelect,
         TimezoneSelect,
         ValidationErrors,
-        Asterisk
+        Asterisk,
+        SelectSingle
     },
     directives: {
         ClickOutside
@@ -353,74 +347,6 @@ textarea.non-personal {
 
 ::-webkit-input-placeholder {
     opacity: 0.5;
-}
-
-.drop-select {
-    position: absolute;
-    width: 100%;
-    border: 1px solid #67573E;
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 6;
-    box-sizing: border-box;
-    .drop {
-        border-top: 1px solid #BFB09D;
-        max-height: 150px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background-color: white;
-        &__item {
-            padding: 5px 2px;
-            border-bottom: .5px solid #BFB09D;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.4s;
-            &:last-child {
-                border: none;
-            }
-            &:hover {
-                background-color: rgba(191, 176, 157, 0.5);
-            }
-        }
-        .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
-        }
-    }
-}
-
-.select {
-    width: 240px;
-    height: 28px;
-    display: flex;
-    justify-content: space-between;
-    overflow: hidden;
-    .selected {
-        border-right: 1px solid #BFB09D;
-        width: 84%;
-        padding: 0 5px;
-        font-size: 14px;
-        max-height: 28px;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        overflow: auto;
-        position: relative;
-    }
-    .no-gender {
-        opacity: 0.5;
-    }
-    .arrow-button {
-        width: 18%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        img {
-            padding-right: 2px;
-        }
-        .reverseIcon {
-            transform: rotate(180deg);
-        }
-    }
 }
 
 .delete-approve {

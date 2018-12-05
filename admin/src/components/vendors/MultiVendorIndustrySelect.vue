@@ -56,7 +56,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            await this.$http.get('api/industries')
+            await this.$http.get('/api/industries')
             .then(response => {
                 let sortedArray = response.data.filter(item => {
                     if (item.name != 'More') {
@@ -93,22 +93,18 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .select {
-    border: 1px solid $main-color;
-    border-radius: 5px;
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
     .inner-component & {
         width: 174px;
-        border: none;
         border-radius: 0;
         box-shadow: inset 0 0 6px $brown-shadow;
     }
     .vendors-table__drop-menu & {
         width: 100%;
-        border: none;
         height: 30px;
     }
     .selected {
@@ -157,6 +153,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         .vendors-table__drop-menu & {
             width: 20%;
         }
@@ -169,17 +166,21 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;    
+    border: 1px solid $main-color;
+    border-radius: 5px;
+    width: 100%;
+    overflow-x: hidden;
+    z-index: 6;
+    box-sizing: border-box;
     .drop {
         font-size: 14px;
-        position: absolute;
-        width: 100%;
-        border: 1px solid $light-brown;
+        border-top: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
-        z-index: 6;
+        box-sizing: border-box;
         &__item {
             display: flex;
             align-items: center;
@@ -198,12 +199,19 @@ export default {
         .chosen {
             background-color: $active-background;
         }
+        .vendors-table__drop-menu & {
+            border: 1px solid $light-brown;
+        }
         &__name {
             max-width: 90%;
             .vendors-table__drop-menu & {
                 max-width: 85%;
             }
         }
+    }
+    .vendors-table__drop-menu & {
+        border: none;
+        border-radius: 0;
     }
 }
 .checkbox {

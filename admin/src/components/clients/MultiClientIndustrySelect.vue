@@ -90,7 +90,7 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -119,7 +119,6 @@ export default {
         overflow: auto;
         position: relative;
         .clients-table__drop-menu & {
-            width: 80%;
             max-height: 30px;
         }
         .industry-tooltip {
@@ -154,9 +153,6 @@ export default {
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .clients-table__drop-menu & {
-            width: 20%;
-        }
         img {
             padding-right: 2px;
         }
@@ -210,6 +206,7 @@ export default {
     .clients-table__drop-menu & {
         border: none;
         z-index: 1;
+        border-radius: 0;
     }
 }
 .checkbox {

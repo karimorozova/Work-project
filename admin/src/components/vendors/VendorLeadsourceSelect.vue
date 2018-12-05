@@ -55,7 +55,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .select {
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;

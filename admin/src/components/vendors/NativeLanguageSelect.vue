@@ -94,8 +94,6 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .select {
-    border: 1px solid $main-color;
-    border-radius: 5px;
     width: 100%;
     height: 28px;
     display: flex;
@@ -126,6 +124,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
         .vendors-table__drop-menu & {
             width: 20%;
         }
@@ -149,18 +148,20 @@ export default {
     }
 }
 .drop-select {
-    position: relative;
+    position: absolute;
+    border: 1px solid $main-color;
+    border-radius: 5px;
+    width: 100%;
+    overflow: hidden;
+    z-index: 6;
+    box-sizing: border-box;
     .drop {
-        font-size: 14px;
-        position: absolute;
-        width: 100%;
-        border: 1px solid $light-brown;
+        font-size: 14px;        
+        border-top: 1px solid $light-brown;
         max-height: 150px;
         overflow-y: scroll;
         overflow-x: hidden;
         background-color: $white;
-        z-index: 15;
-        padding-top: 29px;
         box-sizing: border-box;
         &__item {
             display: flex;
@@ -178,25 +179,30 @@ export default {
         }
         .inner-component & {
             max-height: 118px;
-            padding-top: 28px;
+            border: 1px solid #BFB09D;
             span {
                 width: 88%;
             }
+        }
+        .vendors-table__drop-menu & {
+            border: 1px solid $light-brown;
         }
     }
     .inner-component & {
         height: 100%;
     }
+    .vendors-table__drop-menu & {
+        border: none;
+        border-radius: 0;
+    }
     .search {
-        position: absolute;
-        z-index: 50;
         width: 100%;
-        padding: 5px 3px;
-        color: $main-color;
         outline: none;
-        box-shadow: inset 0 0 5px $brown-shadow;
-        border: 1px solid $light-brown;
+        border: none;
+        padding: 5px 2px;
+        color: $main-color;
         box-sizing: border-box;
+        box-shadow: inset 0 0 5px $main-color;
         .inner-component & {
             width: 88%;
         }

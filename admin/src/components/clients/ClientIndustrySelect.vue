@@ -94,7 +94,7 @@ export default {
 
 <style lang="scss" scoped>
 .select {
-    width: 191px;
+    width: 100%;
     height: 28px;
     display: flex;
     justify-content: space-between;
@@ -164,6 +164,7 @@ export default {
     width: 100%;
     z-index: 6;
     overflow: hidden;
+    box-sizing: border-box;
     .drop {
         font-size: 14px;
         box-sizing: border-box;

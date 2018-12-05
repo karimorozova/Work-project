@@ -1,6 +1,8 @@
 <template lang="pug">
     .vendor-wrap
-        .vendor-info(v-if="vendorShow")
+        .vendor-wrap__sidebar
+            Sidebar(:title="sidebarTitle" :links="sidebarLinks" linkClass="vendor-details")
+        .vendor-info
             .buttons
                 input.button(type="button" value="Save" @click="updateVendor")
                 input.button(type="button" value="Cancel" @click="cancel")
@@ -8,77 +10,72 @@
             .title General Information
             .gen-info
                 .gen-info__block
-                    .photo-wrap(v-if="!vendor.photo")
+                    .photo-wrap(v-if="!currentVendor.photo")
                         input.photo-file(type="file" @change="previewPhoto")
                         .photo-text(v-if="!imageExist")
                             p upload your photo                          
                         img.photo-image(v-if="imageExist")
-                    .photo-wrap(v-if="vendor.photo")
+                    .photo-wrap(v-if="currentVendor.photo")
                         input.photo-file(type="file" @change="previewPhoto")                       
-                        img.photo-image(:src="vendor.photo")
+                        img.photo-image(:src="currentVendor.photo")
                     label.job-title Job title
                 .gen-info__block
                     .block-item
                         label First Name:
-                        input(type="text" placeholder="First Name" :value="vendor.firstName" @change="(e) => updateProp(e,'firstName')")
+                        input.block-item__input-filed(type="text" placeholder="First Name" :value="currentVendor.firstName" @change="(e) => updateProp(e,'firstName')")
                     .block-item
                         label Surname:
-                        input(type="text" placeholder="Surname" :value="vendor.surname" @change="(e) => updateProp(e,'surname')")
+                        input.block-item__input-filed(type="text" placeholder="Surname" :value="currentVendor.surname" @change="(e) => updateProp(e,'surname')")
                     .block-item
                         label Email:
-                        input(type="text" placeholder="Email" :value="vendor.email" @change="(e) => updateProp(e,'email')")
+                        input.block-item__input-filed(type="text" placeholder="Email" :value="currentVendor.email" @change="(e) => updateProp(e,'email')")
                     .block-item
                         label Phone:
-                        input(type="text" placeholder="Phone" :value="vendor.phone" @change="(e) => updateProp(e,'phone')")
+                        input.block-item__input-filed(type="text" placeholder="Phone" :value="currentVendor.phone" @change="(e) => updateProp(e,'phone')")
                     .block-item
                         label Time Zone:
-                        .block-item__drop-menu
-                            TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
+                        .block-item__drop-menu.block-item_high-index
+                            TimezoneSelect(:timezoneSelected="currentVendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
                     .block-item
                         label Native Language:
-                        NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
+                        .block-item__drop-menu.block-item_medium-index
+                            NativeLanguageSelect(:selectedLang="currentVendor.native" @chosenLang="setNative")
                     .block-item
                         label Gender:
-                        .drop-select(v-click-outside="outGenders")
-                            .select
-                                template(v-if="vendor.gender")
-                                    .selected
-                                        span {{ vendor.gender }}
-                                template(v-if="!vendor.gender")
-                                    span.selected.no-gender Gender
-                                .arrow-button(@click="toggleGenders")
-                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: genderDropped}")
-                            .drop(v-if="genderDropped")
-                                .drop__item(@click="updateGender('Male')")
-                                    span Male
-                                .drop__item(@click="updateGender('Female')")
-                                    span Female
+                        .block-item__drop-menu
+                            SelectSingle(
+                                :options="genders"
+                                :selectedOption="currentVendor.gender"
+                                placeholder="Gender"
+                                @chooseOption="updateGender"
+                            )
                 .gen-info__block
                     .block-item
                         label Company Name:
-                        input(type="text" placeholder="Company Name" :value="vendor.companyName" @change="(e) => updateProp(e,'companyName')")
+                        input.block-item__input-filed(type="text" placeholder="Company Name" :value="currentVendor.companyName" @change="(e) => updateProp(e,'companyName')")
                     .block-item
                         label Website:
-                        input(type="text" placeholder="Website" :value="vendor.website" @change="(e) => updateProp(e,'website')")
+                        input.block-item__input-filed(type="text" placeholder="Website" :value="currentVendor.website" @change="(e) => updateProp(e,'website')")
                     .block-item
                         label Skype:
-                        input(type="text" placeholder="Skype" :value="vendor.skype" @change="(e) => updateProp(e,'skype')")
+                        input.block-item__input-filed(type="text" placeholder="Skype" :value="currentVendor.skype" @change="(e) => updateProp(e,'skype')")
                     .block-item
                         label Linkedin:
-                        input(type="text" placeholder="Linkedin" :value="vendor.linkedin" @change="(e) => updateProp(e,'linkedin')")
+                        input.block-item__input-filed(type="text" placeholder="Linkedin" :value="currentVendor.linkedin" @change="(e) => updateProp(e,'linkedin')")
                     .block-item
                         label WhatsApp:
-                        input(type="text" placeholder="WhatsApp" :value="vendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
+                        input.block-item__input-filed(type="text" placeholder="WhatsApp" :value="currentVendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
                     .block-item
                         label Vendor Status:
-                        VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
+                        .block-item__drop-menu.block-item_high-index
+                            VendorStatusSelect(isAllExist="no" :selectedStatus="currentVendor.status" @chosenStatus="chosenStatus")
                     .block-item
                         label Industries:
-                        MultiVendorIndustrySelect(:selectedInd="vendor.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-            .title(v-if="vendor._id") Rates    
-            .rates(v-if="vendor._id")
-                VendorRates(:vendor="vendor" 
-                    @ratesUpdate="ratesUpdate"
+                        .block-item__drop-menu
+                            MultiVendorIndustrySelect(:selectedInd="currentVendor.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+            .title(v-if="currentVendor._id") Rates    
+            .rates(v-if="currentVendor._id")
+                VendorRates(:vendor="currentVendor"
                     @addSevLangs="addSevLangs")
             .delete-approve(v-if="approveShow")
                 p Are you sure you want to delete?
@@ -86,7 +83,7 @@
                 input.button(type="button" value="Delete" @click="approveVendorDelete")
         Addseverallangs(v-if="isAddSeveral"
             origin="vendor"
-            :who="vendor"
+            :who="currentVendor"
             @closeSeveral="closeSevLangs"
             @severalLangsResult="severalLangsResult"
         )
@@ -99,25 +96,24 @@ import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import TimezoneSelect from "../clients/TimezoneSelect";
+import SelectSingle from "../SelectSingle";
+import Sidebar from "../Sidebar";
 import VendorRates from "./VendorRates";
 import Addseverallangs from "../finance/Addseverallangs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    props: {
-        vendor: {
-            type: Object
-        }
-    },
     data() {
         return {
             vendorShow: true,
             imageExist: false,
             timezones: [],
-            genderDropped: false,
             approveShow: false,
             photoFile: [],
-            isAddSeveral: false
+            isAddSeveral: false,
+            genders: ["Male", "Female"],
+            sidebarLinks: ["General Information"],
+            sidebarTitle: "VENDORS"
         }
     },
     methods: {
@@ -150,24 +146,15 @@ export default {
         },
         async updateVendor() {
             let sendData = new FormData();
-            sendData.append('vendor', JSON.stringify(this.vendor));
+            sendData.append('vendor', JSON.stringify(this.currentVendor));
             sendData.append('photo', this.photoFile[0]);
             try {
-                if(!this.vendor._id) {
-                    const saveResult = await this.$http.post("/vendorsapi/new-vendor", sendData);
-                    const { vendorId, vendors } = saveResult.data;
-                    const updatedVendor = vendors.find(item => item._id === vendorId);
-                    await this.storeVendors(vendors);
-                    await this.storeCurrentVendor(updatedVendor);
-                    this.alertToggle({message: "New Vendor saved", isShow: true, type: "success"});
-                } else {
-                    const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
-                    const vendors = updatedVendors.data;
-                    const updatedVendor = vendors.find(item => item._id === this.vendor._id);
-                    await this.storeVendors(vendors);
-                    await this.storeCurrentVendor(updatedVendor);
-                    this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
-                }
+                const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
+                const vendors = updatedVendors.data;
+                const updatedVendor = vendors.find(item => item._id === this.currentVendor._id);
+                await this.storeVendors(vendors);
+                await this.storeCurrentVendor(updatedVendor);
+                this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
             }
@@ -176,9 +163,8 @@ export default {
             const value = e.target.value;
             this.updateVendorProp({prop, value});
         },
-        updateGender(value) {
-            this.updateVendorProp({prop: 'gender', value});
-            this.genderDropped = false;
+        updateGender({option}) {
+            this.updateVendorProp({prop: 'gender', value: option});
         },
         setTimezone(data) {
             this.updateVendorProp({prop: "timezone", value: data})
@@ -189,41 +175,24 @@ export default {
         chosenStatus({option}) {
             this.updateVendorProp({prop: "status", value: option})
         },
-        ratesUpdate(data) {
-            this.$emit('ratesUpdate');
-        },
         cancel() {
-            this.$emit('cancelVendor')
+            this.$router.go(-1);
         },
         async approveVendorDelete() {
             this.approveShow = false;
-            if(!this.vendor._id) {
+            if(!this.currentVendor._id) {
                 return this.cancel();
             }
             try {
-                const updatedVendors = await this.$http.delete(`/vendorsapi/deletevendor/${this.vendor._id}`);
+                const updatedVendors = await this.$http.delete(`/vendorsapi/deletevendor/${this.currentVendor._id}`);
                 await this.storeVendors(updatedVendors.data);
                 this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot delete the Vendor", isShow: true, type: "error"});
             }
         },
-        toggleGenders() {
-            this.genderDropped = !this.genderDropped;
-        },
-        outGenders() {
-            this.genderDropped = false;
-        },
         chosenInd({industry}) {
             this.updateIndustry(industry);
-        },
-        async getTimezones() {
-            try {
-                const timezones = await this.$http.get('/api/timezones');
-                this.timezones = timezones.body;
-            } catch(err) {
-                this.alertToggle({message: "Server error / Cannot get timezones", isSHow: true, type: "error"})
-            }
         },
         ...mapActions({
             alertToggle: "alertToggle",
@@ -233,14 +202,17 @@ export default {
             updateIndustry: "updateIndustry"
         })
     },
-    mounted() {
-        this.getTimezones();
+    beforeDestroy() {
+        this.storeCurrentVendor({});
     },
     computed: {
+        ...mapGetters({
+            currentVendor: "getCurrentVendor"
+        }),
         selectedIndNames() {
             let result = [];
-            if(this.vendor.industries.length) {
-                for(let ind of this.vendor.industries) {
+            if(this.currentVendor.industries.length) {
+                for(let ind of this.currentVendor.industries) {
                     result.push(ind.name);
                 }
             }
@@ -254,11 +226,20 @@ export default {
         NativeLanguageSelect,
         TimezoneSelect,
         VendorRates,
-        Addseverallangs
+        Addseverallangs,
+        SelectSingle,
+        Sidebar
     },
     directives: {
         ClickOutside
     },
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            if(from.path === '/recruitment') {
+                vm.sidebarTitle = "RECRUITMENT";
+            }
+        })
+    }
 }
 </script>
 
@@ -268,6 +249,12 @@ export default {
 .vendor-wrap {
     position: relative;
     width: 100%;
+    display: flex;
+}
+
+.vendor-info {
+    padding: 40px;
+    box-sizing: border-box;
 }
 
 .title {
@@ -308,92 +295,31 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
+        box-sizing: border-box;
+    }
+    &_high-index {
+        z-index: 10;
+    }
+    &_medium-index {
+        z-index: 8;
     }
     label {
         margin-bottom: 0;
     }
-    input {
+    &__input-filed {
         font-size: 14px;
         color: #67573e;
         border: 1px solid #67573e;
         border-radius: 5px;
-        padding: 0 3px;
+        padding: 0 5px;
         outline: none;
-        width: 185px;
+        width: 191px;
         height: 28px;
+        box-sizing: border-box;
     }
     ::-webkit-input-placeholder {
         padding: 10px 5px;
         opacity: 0.5;
-    }
-}
-
-.drop-select {
-    width: 191px;
-    position: relative;
-    .drop {
-        position: absolute;
-        width: 100%;
-        border: 1px solid #BFB09D;
-        max-height: 150px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        background-color: white;
-        z-index: 6;
-        &__item {
-            padding: 5px 2px;
-            border-bottom: .5px solid #BFB09D;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.4s;
-            &:last-child {
-                border: none;
-            }
-            &:hover {
-                background-color: rgba(191, 176, 157, 0.5);
-            }
-        }
-        .chosen {
-            background-color: rgba(191, 176, 157, 0.5);
-        }
-    }
-    .select {
-        border: 1px solid #67573E;
-        border-radius: 5px;
-        width: 191px;
-        height: 28px;
-        display: flex;
-        justify-content: space-between;
-        overflow: hidden;
-        .selected {
-            border-right: 1px solid #BFB09D;
-            width: 84%;
-            padding: 0 5px;
-            font-size: 14px;
-            max-height: 28px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            overflow: auto;
-            position: relative;
-        }
-        .no-gender {
-            opacity: 0.5;
-        }
-        .arrow-button {
-            width: 18%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            img {
-                padding-right: 2px;
-            }
-            .reverseIcon {
-                transform: rotate(180deg);
-            }
-        }
     }
 }
 
