@@ -136,3 +136,20 @@ export const updateCurrentVendor = async ({commit, rootState}, payload) => {
         throw new Error("Error on updating Vendor information");
     }
 }
+
+export const setVendorsMatrixData = async ({commit, dispatch, rootState, state}, payload) => {
+    commit("startRequest");
+    try {
+        const { _id, matrix } = state.currentVendor;
+        matrix[payload.key].rate = payload.value;
+        const updatedVendor = await Vue.http.post('/vendorsapi/update-matrix', {_id, matrix});
+        rootState.a.vendors.forEach(item => { 
+            if(item._id === _id) item.matrix = matrix
+        });
+        dispatch("storeCurrentVendor", updatedVendor.body)
+        commit("endRequest");
+    } catch(err) {
+        commit("endRequest");
+        throw new Error("Error on updating matrix data");
+    }
+}

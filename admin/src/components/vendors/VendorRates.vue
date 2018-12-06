@@ -14,7 +14,6 @@
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
             .vendor-rates__drop(v-if="isDuoRatesShow")
                 DuoRates(:vendor="vendor" 
-                    @ratesUpdate="ratesUpdate"
                     @addSevLangs="addSevLangs")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
             .vendor-rates____open
@@ -22,13 +21,14 @@
                     span.vendor-rates__label Matrix
                     img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMatrixShow}") 
                 .vendor-rates__drop(v-if="isMatrixShow")
-                    FinanceMatrix(:entity="vendor")
+                    FinanceMatrix(:entity="vendor" @setMatrixData="setMatrixData")
 </template>
 
 <script>
 import DuoRates from "./rates/DuoRates";
 import MonoRates from "./rates/MonoRates";
 import FinanceMatrix from "../FinanceMatrix";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     props: {
@@ -56,9 +56,18 @@ export default {
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
         },
-        ratesUpdate(data) {
-            this.$emit("ratesUpdate")
-        }
+        async setMatrixData({value, key}) {
+            try {
+                await this.setVendorsMatrixData({value, key});
+                this.alertToggle({message: "Matrix data updated", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Error on setting matrix data", isShow: true, type: "error"})
+            }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle",
+            setVendorsMatrixData: "setVendorsMatrixData"
+        })
     },
     components: {
         DuoRates,

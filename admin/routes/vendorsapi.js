@@ -165,4 +165,14 @@ router.get('/step-decision', async (req, res) => {
     }
 })
 
+router.post('/update-matrix', async (req, res) => {
+    const { _id, matrix } = req.body;
+    try {
+        const updatedVendor = await getVendorAfterUpdate({"_id": _id}, {matrix: matrix});
+        res.send(updatedVendor);
+    } catch(err) {
+        res.status(500).send("Error on updating Vendor's matrix");
+    }
+})
+
 module.exports = router;
