@@ -81,26 +81,13 @@ router.delete('/rate/:id', async (req,res) => {
 })
 
 router.post('/several-langs', async (req, res) => {
-    const vendorId = req.body.vendor;
-    let langCombs = JSON.parse(req.body.langs);
+    const { combinations, vendorId } = req.body;
     try {
-        let vendor = await getVendor({"_id": vendorId});
-        const vendorCombinations = vendor.languageCombinations.filter(item => {
-            return item.source;
-        }) 
-        for(let comb of langCombs) {
-            await addVendorsSeveralLangs({
-                vendorId: vendorId,
-                comb: comb,
-                vendorCombinations: vendorCombinations,
-                industry: vendor.industry
-            })
-        }
-        const updatedVendors = await getVendors({});
-        res.send(updatedVendors);
+        const updatedVendor = await addVendorsSeveralLangs({vendorId, combinations});
+        res.send(updatedVendor);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several langs for Vendor");
+        res.status(500).send("Error on adding several languages for Vendor");
     }
 })
 

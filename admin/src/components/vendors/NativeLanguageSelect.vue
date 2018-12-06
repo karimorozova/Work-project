@@ -2,7 +2,7 @@
     .drop-select(v-click-outside="outClick")
         .select
             span.selected(v-if="selectedLang") {{ selectedLang.lang }}
-            span.selected(v-else) Options
+            span.selected.no-choice(v-else) Options
             .arrow-button(@click.stop="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search" @click.stop="stopPropagation")        
@@ -108,7 +108,6 @@ export default {
         width: 82%;
         padding: 3px 5px;
         font-size: 14px;
-        opacity: 0.7;
         max-height: 28px;
         display: flex;
         align-items: center;
@@ -142,9 +141,11 @@ export default {
         height: 26px;
         border: 1px solid #BFB09D;
         .selected {
-            opacity: 1;
             padding: 2px 5px;
         }
+    }
+    .no-choice {
+        opacity: 0.5;
     }
 }
 .drop-select {

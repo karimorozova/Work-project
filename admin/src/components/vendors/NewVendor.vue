@@ -38,9 +38,8 @@
                     .block-item__drop-menu.block-item_high-index
                         TimezoneSelect(:timezoneSelected="vendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
                 .block-item
-                    label.block-item__label.block-item_relative Native Language:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop-menu.block-item_medium-index(:class="{'block-item_error-shadow': !vendor.native && isSaveClicked}")
+                    label.block-item__label Native Language:
+                    .block-item__drop-menu.block-item_medium-index
                         NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
                 .block-item
                     label Gender:
@@ -125,7 +124,7 @@ export default {
                 surname: "",
                 gender: "",
                 linkedin: "",
-                native: {},
+                native: "",
                 phone: "",
                 photo: "",
                 skype: "",

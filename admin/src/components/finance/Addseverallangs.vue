@@ -88,8 +88,7 @@ export default {
     methods: {
         ...mapActions({
             alertToggle: "alertToggle",
-            storeVendors: "vendorsSetting",
-            storeCurrentVendor: "storeCurrentVendor",
+            addSeveralVendorRates: "addSeveralVendorRates",
             storeClient: "storeClient"
         }),
         clearSearchValue(prop, subProp) {
@@ -234,17 +233,14 @@ export default {
         async langsAddition() {
             let combinations = this.collectCombinations();
             try {
-                if(this.origin == 'rates') {
+                if(this.origin === 'rates') {
                     const result = await this.$http.post('/service/several-langs', { combinations });
                 }
-                if(this.origin == 'vendor') {
+                if(this.origin === 'vendor') {
                     const id = this.who._id;
-                    const updatedVendors = await this.$http.post('/vendorsapi/several-langs', {combinations, vendor: id});
-                    await this.storeVendors(updatedVendors.body);
-                    const updatedVendor = updatedVendors.body.find(item => item._id === this.who._id);
-                    await this.storeCurrentVendor(updatedVendor);
+                    await this.addSeveralVendorRates({combinations, vendorId: id});
                 }
-                if(this.origin == 'client') {
+                if(this.origin === 'client') {
                     const id = this.who._id;
                     const clientResult = await this.$http.post('/clientsapi/several-langs', {combinations, clientId: id});
                     const updatedClient = {...clientResult.body};

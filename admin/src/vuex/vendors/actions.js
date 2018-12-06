@@ -37,6 +37,7 @@ export const getVendorMonoCombinations = async ({commit, dispatch, state}) => {
         throw new Error("Error on getting Mono rates")
     }
 }
+
 export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
@@ -50,6 +51,23 @@ export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
         throw new Error("Error on saving rate");
     }
 }
+
+export const addSeveralVendorRates = async ({commit, dispatch, rootState}, payload) => {
+    commit("startRequest");
+    try {
+        const { combinations, vendorId } = payload;
+        const updatedVendor = await Vue.http.post('/vendorsapi/several-langs', {combinations, vendorId});
+        const index = rootState.a.vendors.findIndex(item => item._id === vendorId);
+        rootState.a.vendors.splice(index, 1, updatedVendor.body);
+        dispatch('storeCurrentVendor', updatedVendor.body);
+        await dispatch('getVendorDuoCombinations');
+        commit("endRequest");
+    } catch(err) {
+        commit("endRequest");
+        throw new Error("Error on adding sveral langs for Vendor")
+    }
+}
+
 export const deleteVendorRate = async ({commit, dispatch}, payload) => {
     commit("startRequest");
     try {

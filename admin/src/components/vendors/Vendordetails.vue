@@ -85,12 +85,12 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
-    Addseverallangs(v-if="isAddSeveral"
-        origin="vendor"
-        :who="currentVendor"
-        @closeSeveral="closeSevLangs"
-        @severalLangsResult="severalLangsResult"
-    )
+        Addseverallangs(v-if="isAddSeveral"
+            origin="vendor"
+            :who="currentVendor"
+            @closeSeveral="closeSevLangs"
+            @severalLangsResult="severalLangsResult"
+        )
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
@@ -291,6 +291,7 @@ export default {
 .vendor-info {
     padding: 40px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .title {

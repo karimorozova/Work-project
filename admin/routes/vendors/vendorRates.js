@@ -249,60 +249,28 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, industry}) {
-    let industries = comb.industry[0].name === "All" ? addAllIndustries(comb.industry[0], industry) : comb.industry;
-    let isExist = false;
-    let updatedCombinations = [...vendorCombinations];
-    for(let vendorComb of updatedCombinations) {
-        if(comb.source._id === vendorComb.source.id && comb.target._id === vendorComb.target.id
-            && comb.service._id === vendorComb.service.id) {
-            vendorComb.industry = updateCombination(industries, vendorComb.industry);
-            isExist = true;
-        }
-    }
-    if(!isExist) {
-        industries = industries.map(item => {
-            return {industry: item._id, rate: item.rate, active: item.active}
-        })
+async function addVendorsSeveralLangs({vendorId, combinations}) {
+    try {
         const vendor = await getVendor({"_id": vendorId});
-        let updatedLanguagePairs = getUpdatedLangPairs({source: comb.source, target: comb.target, langPairs: vendor.languagePairs});
-        await Vendors.updateOne({"_id": vendorId}, {$push: {languageCombinations: {...comb, industry: industries}}, $set: {languagePairs: updatedLanguagePairs}})
-    } else {
-        await Vendors.updateOne({"_id": vendorId}, {$set: {languageCombinations: updatedCombinations}})
-    }
-}
-
-function addAllIndustries(combIndustry, vendorIndustry) {
-    let industries = [];
-    for(let indus of vendorIndustry) {
-        industries.push({
-            ...indus._doc,
-            _id: indus.id,
-            rate: combIndustry.rate
-        })
-    }
-    return industries
-}
-
-function updateCombination(combIndustries, vendorIndustries) {
-    let updatedIndustries = [...vendorIndustries];
-    for(let indus of combIndustries) {
-        let industryExist = false;
-        for(let ind of updatedIndustries) {
-            if(ind.industry.id === indus._id) {
-                ind.rate = indus.rate;
-                industryExist = true;
+        let vendorCombs = [...vendor.languageCombinations];
+        for(let {source, target, industries} of combinations) {
+            const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, "Duo");
+            const rateIndex = vendorCombs.findIndex(item => item.source.id === source._id && item.target.id === target._id)
+            if(rateIndex !== -1) {
+                vendorCombs[rateIndex].industries = updatedIndustries;
+            } else {
+                vendorCombs.push({
+                    source,
+                    target,
+                    industries: updatedIndustries
+                })
             }
         }
-        if(!industryExist) {
-            updatedIndustries.push({
-                industry: indus._id,
-                rate: indus.rate,
-                active: indus.active,
-            });
-        }
-    }
-    return updatedIndustries;
+        return getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: vendorCombs});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in addVendorsSeveralLangs");
+    }   
 }
 
 module.exports= { getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs };
