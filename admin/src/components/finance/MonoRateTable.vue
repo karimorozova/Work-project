@@ -323,6 +323,12 @@ export default {
                 if(this.origin === "global") {
                     await this.deleteServiceRate({ id: this.fullInfo[index].id, deletedRate });
                 }
+                if(this.origin === "client") {
+                    await this.deleteClientRate({ id: this.fullInfo[index].id, deletedRate });
+                }
+                if(this.origin === "vendor") {
+                    await this.deleteVendorRate({ id: this.fullInfo[index].id, deletedRate });
+                }
                 this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
@@ -361,8 +367,10 @@ export default {
             alertToggle: "alertToggle",
             saveGlobalRates: "saveGlobalRates",
             saveClientRates: "saveClientRates",
+            saveVendorRates: "saveVendorRates",
             deleteServiceRate: "deleteServiceRate",
-            deleteClientRate: "deleteClientRate"
+            deleteClientRate: "deleteClientRate",
+            deleteVendorRate: "deleteVendorRate"
         })
     },
     watch: {

@@ -40,9 +40,9 @@ export const getVendorMonoCombinations = async ({commit, dispatch, state}) => {
 export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
-        const ratesInfo = { ...payload, vendorId: state.currentVendor._id}
+        const ratesInfo = { ...payload, vendorId: state.currentVendor._id};
         const result = await Vue.http.post('/vendorsapi/rates', { ratesInfo });
-        dispatch('storecurrentVendor', result.body);
+        dispatch('storeCurrentVendor', result.body);
         ratesInfo.languageForm === "Duo" ? await dispatch('getVendorDuoCombinations') : await dispatch('getVendorMonoCombinations');
         commit("endRequest");
     } catch(err) {
@@ -68,7 +68,7 @@ export const deleteVendorsCheckedRate = async ({commit, dispatch, state}, payloa
     try {
         const deletedRate = { ...payload.deletedRate, vendorId: state.currentVendor._id};
         const result = await Vue.http.delete(`/vendorsapi/rate/${payload.id}`, {body: deletedRate});
-        dispatch('storecurrentVendor', result.body);
+        dispatch('storeCurrentVendor', result.body);
         commit("endRequest");
     } catch(err) {
         commit("endRequest");
@@ -87,5 +87,34 @@ export const deleteCurrentVendor = async ({commit, rootState}, payload) => {
     } catch(err) {
         commit("endRequest");
         throw new Error("Error on deleting Vendor");
+    }
+}
+
+export const saveNewVendor = async ({commit, rootState}, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post("/vendorsapi/new-vendor", payload);
+        const newVendor = result.body;
+        rootState.a.vendors.push(newVendor);
+        commit('setCurrentVendor', newVendor);
+        commit("endRequest");
+    } catch(err) {
+        commit("endRequest");
+        throw new Error("Error on saving Vendor");
+    }
+}
+
+export const updateCurrentVendor = async ({commit, rootState}, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post("/vendorsapi/update-vendor", payload);
+        const updatedVendor = result.body;
+        const index = rootState.a.vendors.findIndex(item => item._id === updatedVendor._id);
+        rootState.a.vendors.splice(index, 1, updatedVendor);
+        commit('setCurrentVendor', updatedVendor);
+        commit("endRequest");
+    } catch(err) {
+        commit("endRequest");
+        throw new Error("Error on updating Vendor information");
     }
 }

@@ -175,19 +175,16 @@ export default {
                 this.isSaveClicked = true;
                 return
             }
-            await this.updateVendor();
+            await this.saveVendor();
         }, 
-        async updateVendor() {
+        async saveVendor() {
             let sendData = new FormData();
             sendData.append('vendor', JSON.stringify(this.vendor));
             sendData.append('photo', this.photoFile[0]);
             try {
-                const saveResult = await this.$http.post("/vendorsapi/new-vendor", sendData);
-                const { vendorId, vendors } = saveResult.data;
-                const updatedVendor = vendors.find(item => item._id === vendorId);
-                await this.storeVendors(vendors);
-                await this.storeCurrentVendor(updatedVendor);
+                await this.saveNewVendor(sendData);
                 this.alertToggle({message: "New Vendor saved", isShow: true, type: "success"});
+                this.$router.push(`/vendors/${this.currentVendor._id}`);
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
             }
@@ -220,9 +217,13 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
+            saveNewVendor: "saveNewVendor"
         })
     },
     computed: {
+        ...mapGetters({
+            currentVendor: "getCurrentVendor"
+        }),
         selectedIndNames() {
             let result = [];
             if(this.vendor.industries.length) {

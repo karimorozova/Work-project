@@ -3,8 +3,8 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendors, getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require('./vendors');
-const { Vendors, Projects, User, Languages, Services, Industries } = require('../models');
+const { getVendor, getVendors, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require('./vendors');
+const { Vendors, Projects } = require('../models');
 
 function moveFile(oldFile, vendorId) {
 
@@ -66,15 +66,14 @@ router.post('/rates', async (req, res) => {
 })
 
 router.delete('/rate/:id', async (req,res) => {
-    let  { vendorId, industry } = req.body;
+    let  deleteInfo = {...req.body};
     const { id } = req.params;
     if(id === "undefined") {
         return res.send("Deleted");
     }
     try {
-        let vendor = await getVendor({"_id": vendorId})
-        const result = await deleteRate(vendor, industry, id);
-        res.send('rate deleted');
+        const updatedVendor = await deleteRate(deleteInfo, id);
+        res.send(updatedVendor);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting rates of Vendor");
@@ -115,9 +114,8 @@ router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) 
             await moveFile(photoFile[0], id)
             vendor.photo = `/vendorsDocs/${id}/${photoFile[0].filename}`;
         }
-        const updatedVendor = await Vendors.findOneAndUpdate({"_id": id}, vendor);
-        const vendors = await getVendors({});
-        res.send({vendors, vendorId: updatedVendor.id});
+        const updatedVendor = await getVendorAfterUpdate({"_id": id}, {photo: vendor.photo});
+        res.send(updatedVendor);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on creating Vendor");
@@ -132,9 +130,8 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
             await moveFile(photoFile[0], vendor._id);
             vendor.photo = `/vendorsDocs/${vendor._id}/${photoFile[0].filename}`;
         }
-        await Vendors.updateOne({"_id": vendor._id}, vendor);
-        const vendors = await getVendors({});
-        res.send(vendors);
+        const updatedVendor = await getVendorAfterUpdate({"_id": vendor._id}, vendor);
+        res.send(updatedVendor);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating Vendor");

@@ -1,5 +1,5 @@
 const { Vendors, Services } = require("../../models/");
-const { getVendor } = require("./getVendors");
+const { getVendor, getVendorAfterUpdate } = require("./getVendors");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
@@ -85,7 +85,7 @@ async function updateMonoRates(vendor, info) {
                 industries: updatedIndustries
             })
         }
-        return await getAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+        return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
     } catch(err) {
         console.log(err);
         console.log("Error in updateMonoRates");
@@ -107,7 +107,7 @@ async function updateDuoRates(vendor, info) {
                 industries: updatedIndustries
             })
         }
-        return await getAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+        return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
     } catch(err) {
         console.log(err);
         console.log("Error in updateDuoRates");
@@ -202,28 +202,51 @@ function deletePair({ langPairs, combination}) {
 
 
 
-async function deleteRate(vendor, industry, id) {
-    let allZero = [];
-    const combIndex = vendor.languageCombinations.findIndex(item => {
-        return item.id === id;
-    })
-    let combination = {...vendor.languageCombinations[combIndex]._doc};
-    for(let indus of combination.industry) {
-        for(let ind of industry) {
-            if(ind._id === indus.industry.id) {
-                indus.rate = 0;
-                indus.industry.active = false;
-            }
-        }
-        allZero.push(indus.rate);
+async function deleteRate(deleteInfo, id) {
+    const {vendorId, industries, servicesIds} = deleteInfo;
+    try {
+        const vendor = await getVendor({"_id": vendorId});
+        const combinations = [...vendor.languageCombinations];
+        const updatedCombinations = getAfterDeleteRates({industries, servicesIds, combinations, id});
+        return await getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: updatedCombinations});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in deleteRate");
     }
-    vendor.languageCombinations.splice(combIndex, 1, combination);
-    const sum = allZero.reduce((init, cur) => {return init + cur}, 0);
-    const updatedCombinations = sum ? vendor.languageCombinations
-     : vendor.languageCombinations.filter(item => { return item.id !== id});
-    const updatetLangPairs = sum ? vendor.languagePairs : deletePair({langPairs: vendor.languagePairs, combination});
-    const result = await Vendors.updateOne({"_id": vendor.id}, {$set: {languageCombinations: updatedCombinations, languagePairs: updatetLangPairs}});
-    return result;
+}
+
+function getAfterDeleteRates({industries, servicesIds, combinations, id}) {
+    const industriesIds = industries.map(item => item._id);
+    const updatedCombinations = [...combinations];
+    const rateIndex = updatedCombinations.findIndex(item => item.id === id);
+    for(let elem of updatedCombinations[rateIndex].industries) {
+        if(industries[0].name === "All" || industriesIds.indexOf(elem.industry.id) !== -1) {
+            elem.rates = getDeletedRates(elem, servicesIds);
+        }
+    }
+    if(isAllRatesDeleted(updatedCombinations[rateIndex].industries)) {
+        updatedCombinations.splice(rateIndex, 1);
+    }
+    return updatedCombinations;
+}
+
+function getDeletedRates(industry, servicesIds) {
+    const { rates } = industry;
+    for(let id of servicesIds) {
+        rates[id].value = 0;
+        rates[id].active = false;
+    }
+    return rates;
+}
+
+function isAllRatesDeleted(industries) {
+    let sum = 0;
+    for(let elem of industries) {
+      sum += Object.keys(elem.rates).reduce((init, cur) => {
+        return init + elem.rates[cur].value;
+      }, 0)
+    }
+    return sum === 0
 }
 
 async function addVendorsSeveralLangs({vendorId, comb, vendorCombinations, industry}) {

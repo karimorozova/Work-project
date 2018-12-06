@@ -127,7 +127,8 @@ export default {
             genders: ["Male", "Female"],
             sidebarLinks: ["General Information"],
             sidebarTitle: "VENDORS",
-            errors: []
+            errors: [],
+            backPath: "/vendors"
         }
     },
     methods: {
@@ -185,11 +186,7 @@ export default {
             sendData.append('vendor', JSON.stringify(this.currentVendor));
             sendData.append('photo', this.photoFile[0]);
             try {
-                const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
-                const vendors = updatedVendors.data;
-                const updatedVendor = vendors.find(item => item._id === this.currentVendor._id);
-                await this.storeVendors(vendors);
-                await this.storeCurrentVendor(updatedVendor);
+                await this.updateCurrentVendor(sendData);
                 this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
@@ -212,7 +209,7 @@ export default {
             this.updateVendorProp({prop: "status", value: option})
         },
         cancel() {
-            this.$router.go(-1);
+            this.$router.push(this.backPath);
         },
         async approveVendorDelete() {
             this.approveShow = false;
@@ -275,6 +272,7 @@ export default {
         next(vm => {
             if(from.path === '/recruitment') {
                 vm.sidebarTitle = "RECRUITMENT";
+                vm.backPath = form.path
             }
         })
     }
