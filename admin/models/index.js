@@ -5,6 +5,7 @@ const User = require('./user');
 const Services = require('./services');
 const Reports = require('./reports');
 const Industries = require('./industries');
+const Pricelist = require('./pricelist');
 const Duorate = require('./duorates');
 const Monorate = require('./monorates');
 const Timezones = require('./timezones');
@@ -21,6 +22,7 @@ const Models = {
     Services,
     Reports,
     Industries,
+    Pricelist,
     Duorate,
     Monorate,
     Timezones,

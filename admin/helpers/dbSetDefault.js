@@ -5,6 +5,7 @@ const {
   User,
   Services,
   Industries,
+  Pricelist,
   Duorate,
   Monorate,
   Timezones,
@@ -471,6 +472,24 @@ async function fillMonoServiceRates() {
   }
 }
 
+async function fillPricelist() {
+  try {
+    const duoRates = await Duorate.find();
+    let pricelists = await Pricelist.find();
+    if(!pricelists.length) {
+      await Pricelist.create({
+        name: 'Basic',
+        default: true,
+        active: true,
+        combinations: duoRates
+      });
+    }
+  } catch(err) {
+    console.log(err);
+    console.log("Error in fillPricelist");
+  }
+}
+
 async function checkCollections() {
   await fillPackages();
   await fillLeadSources();
@@ -488,7 +507,8 @@ async function checkCollections() {
   await clientLangs();
   await vendorLangs();
   await fillDuoServiceRates();
-  await fillMonoServiceRates()
+  await fillMonoServiceRates();
+  await fillPricelist();
 }
 
 module.exports = checkCollections();

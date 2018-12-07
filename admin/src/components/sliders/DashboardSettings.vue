@@ -21,6 +21,7 @@ import TableServices from "../Table/TableServices.vue";
 import TableIndustries from "../Table/TableIndustries";
 import TableLeadsources from "../Table/TableLeadsources";
 import TablePackages from "../Table/TablePackages";
+import TablePricelists from "../Table/TablePricelists";
 
 export default {
   props: {
@@ -32,7 +33,7 @@ export default {
   data() {
     return {
       openQuotes: true,
-      sidebarLinks: ["Languages", "Services", "Industries", "Lead Sources", "Packages"],
+      sidebarLinks: ["Languages", "Services", "Industries", "Lead Sources", "Packages", "Pricelists"],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
     };
@@ -56,6 +57,9 @@ export default {
           break;
         case "Packages":
           this.$router.push("/dashboard/packages");
+          break;
+        case "Pricelists":
+          this.$router.push("/dashboard/pricelists");
       }
     }
   },
@@ -66,7 +70,8 @@ export default {
     TableServices,
     TableIndustries,
     TableLeadsources,
-    TablePackages
+    TablePackages,
+    TablePricelists
   }
 };
 </script>
