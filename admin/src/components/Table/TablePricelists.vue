@@ -82,7 +82,7 @@ export default {
                 await this.cancelEdition(index)
             }
             if(key === "delete") {
-                // await this.deletePackage(index);
+                await this.deletePricelist(index);
             }
         },
         isNameUnique(index) {
@@ -110,6 +110,18 @@ export default {
                 this.alertToggle({message: "Pricelist saved.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on saving pricelist.", isShow: true, type: "error"});
+            }
+        },
+        async deletePricelist(index) {
+            const id = this.pricelists[index]._id;
+            if(!id) {
+                return this.pricelists.slice(index, 1);
+            }
+            try {
+                await this.$http.delete(`/prices/pricelist/${id}`);
+                this.alertToggle({message: "Pricelist deleted.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on deleting pricelist.", isShow: true, type: "error"});
             }
         },
         cancelEdition(index) {
