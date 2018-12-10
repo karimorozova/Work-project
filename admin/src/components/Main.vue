@@ -8,14 +8,14 @@
                   .sel_project_block
                     .sel_project_block__proj
                       span New Project
+                      .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
+                        .additional__listItem(target="_newtab" v-for='(proj, projIndex) in newProject' @click='gotoRequestPage(projIndex)') {{ proj.title }}
                     .sel_project_block__img-wrapper(@click="showDropdown")
-                      img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
-                  .clients-top__dropdown
-                    .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-                      .additional__listItem(target="_newtab" v-for='(proj, projIndex) in newProject' @click='gotoRequestPage(projIndex)') {{ proj.title }}
+                      .sel_project_block__image
+                        img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
                 .dropdown-wrapper
                   .imgwrap(@click="showSlider")
-                    img(src="../assets/images/Other/andmin-button-icon.png" )
+                    img(src="../assets/images/Other/admin-button-icon.png" )
                     span.spwrap settings
                 .woman-wrapper
                   img.woman-wrapper__photo(src="../assets/images/client-icon_image.png")
@@ -356,48 +356,6 @@ export default {
           }
         }
       }
-
-      .sel_project_block {
-        margin-right: 150px;
-        width: 239px;
-        width: 33%;
-        background-color: #D15F45;
-        border-radius: 14px;
-        width: 100%;
-        height: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-
-        &__proj {
-          border-right: 1px solid #fff;
-          line-height: 100%;
-          color: #fff;
-          padding-right: 60px;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          span {
-            padding-right: 33px;
-            padding-left: 14px;
-            white-space: nowrap;
-          }
-        }
-
-        &__img-wrapper {
-          display: flex;
-          img {
-            height: 14px;
-            transform: rotate(180deg);
-            padding: 10px 17px;
-            cursor: pointer;
-          }
-          .rotate {
-            transform: rotate(0deg);
-          }
-        }
-      }
     }
 
     .woman-wrapper {
@@ -633,15 +591,6 @@ export default {
   }
 }
 
-@font-face {
-  font-family: MyriadPro;
-  src: url("../assets/fonts/MyriadPro-Regular.otf");
-}
-@font-face {
-  font-family: MyriadBold;
-  src: url("../assets/fonts/MyriadPro-Bold.otf");
-}
-
 .new-request {
   height: 34px;
   width: 239px;
@@ -665,59 +614,67 @@ export default {
       border-right: 1px solid #fff;
       line-height: 100%;
       color: #fff;
-      padding-right: 60px;
+      width: 80%;
       height: 100%;
       display: flex;
       align-items: center;
+      position: relative;
       span {
-        padding-right: 33px;
         padding-left: 14px;
-        white-space: nowrap;
       }
     }
 
     &__img-wrapper {
       display: flex;
-      height: 33px;
-      width: 48px;
+      height: 100%;
+      width: 20%;
+      justify-content: center;
+      align-items: center;
       img {
-        transform: rotate(180deg);
-        padding: 10px 17px;
         cursor: pointer;
-        width: 14px;
       }
       .rotate {
-        transform: rotate(0deg);
-        padding-left: 14px;
+        transform: rotate(180deg);
       }
     }
-  }
-
-  .clients-top__dropdown {
-    z-index: -1;
-    position: absolute;
-    right: 50px;
-    top: 22px;
-
-    .additional {
-      padding-top: 10px;
-      border: 2px solid #978d7e;
-      color: #67573e;
-      background-color: #fff;
-      font-size: 16px;
-      width: 185px;
-
-      &__listItem,
-      {
-        padding: 13px;
-        font-family: MyriadPro;
-        border-bottom: 0.2px solid #978d7e;
-        cursor: pointer;
-        &:hover {
-          background-color: #ddd3c8;
-        }
-      }
+    &__image {
+      padding: 5px;
+      cursor: pointer;
     }
   }
 }
+
+.additional {
+  position: absolute;
+  border: 2px solid #978d7e;
+  color: #67573e;
+  background-color: #fff;
+  font-size: 16px;
+  width: 100%;
+  top: 25px;
+  z-index: -1;
+  box-sizing: border-box;
+  &__listItem {
+    padding: 13px;
+    font-family: MyriadPro;
+    border-bottom: 0.2px solid #978d7e;
+    cursor: pointer;
+    &:hover {
+      background-color: #ddd3c8;
+    }
+    &:first-child {
+      padding-top: 20px;
+    }
+  }
+}
+
+@font-face {
+  font-family: MyriadPro;
+  src: url("../assets/fonts/MyriadPro-Regular.otf");
+}
+@font-face {
+  font-family: MyriadBold;
+  src: url("../assets/fonts/MyriadPro-Bold.otf");
+}
+
 </style>

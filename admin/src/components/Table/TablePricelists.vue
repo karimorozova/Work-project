@@ -1,36 +1,40 @@
 <template lang="pug">
 .pricelists
-    SettingsTable(
-        :fields="fields"
-        :tableData="pricelists"
-    )
-        template(slot="headerName" slot-scope="{ field }")
-            .pricelists__head-title {{ field.label }}
-        template(slot="headerDefault" slot-scope="{ field }")
-            .pricelists__head-title {{ field.label }}
-        template(slot="headerActive" slot-scope="{ field }")
-            .pricelists__head-title {{ field.label }}
-        template(slot="headerIcons" slot-scope="{ field }")
-            .pricelists__head-title {{ field.label }}
-        template(slot="name" slot-scope="{ row, index }")
-            .pricelists__data(v-if="currentActive !== index") {{ row.name }}
-            .pricelists__editing-data(v-else)
-                input.pricelists__text(type="text" v-model="currentName")
-        template(slot="default" slot-scope="{ row, index }")
-            .pricelists__data.pricelists_centered
-                input.pricelists__check(type="checkbox" v-model="row.default" :disabled="currentActive !== index")
-        template(slot="active" slot-scope="{ row, index }")
-            .pricelists__data.pricelists_centered
-                input.pricelists__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
-        template(slot="icons" slot-scope="{ row, index }")
-            .pricelists__icons
-                img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
-    Add(@add="addPricelist")
+    .pricelists__table
+        SettingsTable(
+            :fields="fields"
+            :tableData="pricelists"
+        )
+            template(slot="headerName" slot-scope="{ field }")
+                .pricelists__head-title {{ field.label }}
+            template(slot="headerDefault" slot-scope="{ field }")
+                .pricelists__head-title {{ field.label }}
+            template(slot="headerActive" slot-scope="{ field }")
+                .pricelists__head-title {{ field.label }}
+            template(slot="headerIcons" slot-scope="{ field }")
+                .pricelists__head-title {{ field.label }}
+            template(slot="name" slot-scope="{ row, index }")
+                .pricelists__data(v-if="currentActive !== index") {{ row.name }}
+                .pricelists__editing-data(v-else)
+                    input.pricelists__text(type="text" v-model="currentName")
+            template(slot="default" slot-scope="{ row, index }")
+                .pricelists__data.pricelists_centered
+                    input.pricelists__check(type="checkbox" v-model="row.default" :disabled="currentActive !== index")
+            template(slot="active" slot-scope="{ row, index }")
+                .pricelists__data.pricelists_centered
+                    input.pricelists__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
+            template(slot="icons" slot-scope="{ row, index }")
+                .pricelists__icons
+                    img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
+        Add(@add="addPricelist")
+    .pricelists__new(v-if="isNewPricelist")
+        NewPricelist
 </template>
 
 <script>
 import SettingsTable from "./SettingsTable";
 import Add from "../Add";
+import NewPricelist from "./pricelists/NewPricelist";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -151,7 +155,8 @@ export default {
     },
     components: {
         SettingsTable,
-        Add
+        Add,
+        NewPricelist
     },
     mounted() {
         this.getPricelists();
@@ -163,9 +168,11 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .pricelists {
-    width: 700px;
-    box-shadow: 0 0 10px $main-color;
-    padding: 20px;
+    &__table {
+        width: 700px;
+        box-shadow: 0 0 10px $main-color;
+        padding: 20px;
+    }
     &__data {
         padding: 5px 3px;
     }
@@ -198,6 +205,12 @@ export default {
     &_centered {
         display: flex;
         justify-content: center;
+    }
+    &__new {
+        width: 600px;
+        margin-top: 20px;
+        padding: 20px;
+        box-shadow: 0 0 10px $main-color;
     }
 }
 </style>
