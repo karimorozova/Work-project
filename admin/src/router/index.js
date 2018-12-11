@@ -11,13 +11,14 @@ import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
+import Pricelists from '@/components/finance/Pricelists'
+import PricelistRates from '@/components/finance/PricelistRates'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
-import TablePricelists from '@/components/Table/TablePricelists'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
 import Vendordetails from '@/components/vendors/Vendordetails'
@@ -98,12 +99,7 @@ const router = new Router({
               path: 'industries',
               name: 'industries',
               component: TableIndustries
-            },
-            {
-              path: 'pricelists',
-              name: 'pricelists',
-              component: TablePricelists
-            } 
+            }
           ]
         },
         {
@@ -165,7 +161,20 @@ const router = new Router({
         {
           path: 'finance',
           name: 'finance',
-          component: FinanceSettings
+          component: FinanceSettings,
+          redirect: '/finance/pricelists',
+          children: [
+            {
+              path: 'pricelists',
+              name: 'pricelists',
+              component: Pricelists
+            },
+            {
+              path: 'rates',
+              name: 'rates',
+              component: PricelistRates
+            },
+          ]
         },
         {
           path: 'reports',

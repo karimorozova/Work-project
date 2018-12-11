@@ -1,93 +1,31 @@
 <template lang="pug">
 .finance-settings
-  .adminNavbar__slider
-    span FINANCE
-    .slider-inner
-        .slider-col Rates
-  .rates-block
-    .title Rates
-    .rates
-      .quotesComponent
-        .monoRates(:class="{straightAngle: monoDrop}")
-          .monoRates__open 
-            .select(@click="openMono")
-              span Mono
-              img(src="../../assets/images/Other/open.png" :class="{reverse: monoDrop}") 
-            .rates-drop(v-if="monoDrop")
-              MonoRates(:services="services" @refreshServices="refreshServices")
-        .duoRates(:class="{straightAngle: duoDrop}")
-          .duoRates__open
-            .select(@click="openDuo")
-              span Duo
-              img(src="../../assets/images/Other/open.png" :class="{reverse: duoDrop}") 
-            .rates-drop(v-if="duoDrop")
-              DuoRates(@addSevLangs="addSevLangs")
-      Addseverallangs(v-if="addSeveral"
-        origin="rates"
-        @severalLangsResult="severalLangsResult"
-        @refreshServices="refreshServices"
-        @closeSeveral="closeSevLangs")
+  Sidebar(title="FINANCE")
+  router-view
 </template>
 
 <script>
-import DuoRates from "../finance/DuoRates";
-import MonoRates from "../finance/MonoRates";
-import Addseverallangs from "../finance/Addseverallangs";
+import Sidebar from "../Sidebar";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  props: {
-  },
   data() {
     return {
-      monoDrop: false,
-      duoDrop: false,
-      addSeveral: false,
+
     };
   },
   methods: {
-    refreshServices(data) {
-      this.$emit('refreshServices', data);
-    },
-    addSevLangs(data) {
-      this.addSeveral = true;
-    },
-    closeSevLangs(data) {
-      this.addSeveral = false;
-    },
-    async severalLangsResult({message, isShow, type}) {
-      await this.getDuoCombinations(this.serviceAfterAddSeveral);
-      this.alertToggle({message, isShow, type});
-    },
-    openMono() {
-      if(!this.monoDrop) {
-      }
-      this.monoDrop = !this.monoDrop;
-    },
-    openDuo() {
-      if(this.duoDrop) {
-        this.storeDuoRates({});
-      }
-      this.duoDrop = !this.duoDrop;
-    },
     ...mapActions({
       alertToggle: "alertToggle",
-      storeDuoRates: "storeDuoRates",
-      getDuoCombinations: "getDuoCombinations"
     })
   },
   computed: {
     ...mapGetters({
-      services: "getVuexServices",
-      serviceAfterAddSeveral: "getServiceAfterAddSeveral"
+
     }) 
   },
   components: {
-    MonoRates,
-    DuoRates,
-    Addseverallangs
-  },
-  mounted() {
+    Sidebar
   }
 };
 </script>
@@ -99,98 +37,6 @@ export default {
   display: flex;
   min-height: 94vh;
 }
-
-.rates-block {
-  margin: 20px;
-  .title {
-    font-size: 24px;
-  }
-}
-
-.rates {
-  margin: 20px 10px;
-  padding: 20px 10px;
-  box-shadow: 0 0 15px #67573e9d;
-  width: 886px;
-  position: relative;
-}
-
-.quotesComponent {
-    width: 880px;
-    display: flex;
-    flex-direction: column;
-}
-
-.monoRates, .duoRates {
-    width: 100%;
-    max-height: 500px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
-    border-radius: 10px;
-    padding: 0 3px;
-}
-
-.monoRates {
-    margin-bottom: 60px;
-}
-
-.straightAngle {
-    border-radius: 0;
-}
-
-.select {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 7px;
-    cursor: pointer;
-    .reverse {
-        transform: rotate(180deg); 
-    }
-    img {
-        opacity: 0.5;
-    }
-}
-
-.rates-drop {
-    max-height: 450px;
-    padding: 5px 2px;
-    border-top: 1px solid rgba(103, 87, 62, 0.5);
-}
-
-.adminNavbar {
-  position: relative;
-  display: flex;
-  min-height: 94vh;
-  &__slider {
-    background-color: #fff;
-    width: 175px;
-    box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
-    font-family: MyriadPro;
-    color: #67573e;
-    font-size: 22px;
-    transition: all 1s;
-    span {
-      display: flex;
-      justify-content: center;
-      padding: 44px 0;
-      font-weight: 700;
-    }
-
-    .slider-inner {
-      .slider-col {
-        display: flex;
-        justify-content: center;
-        background-color: #c4beb6;
-        border-top: 1px solid #c4beb6;
-        border-bottom: 1px solid #c4beb6;
-        padding: 5px 30px;
-      }
-    }
-  }
-}
-
 
 @font-face {
   font-family: MyriadPro;

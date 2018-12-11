@@ -6,10 +6,10 @@ const PricelistSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    default: {
+    isDefault: {
         type: Boolean
     },
-    active: {
+    isActive: {
         type: Boolean
     },
     combinations: [{ 

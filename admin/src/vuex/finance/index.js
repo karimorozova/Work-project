@@ -6,7 +6,8 @@ const state = {
     counter: 0,
     duoRates: [],
     monoRates: [],
-    serviceWhenAddSeveral: ""
+    serviceWhenAddSeveral: "",
+    currentPrice: {},
 }
 
 export const finance = {

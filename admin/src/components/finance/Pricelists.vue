@@ -14,25 +14,26 @@
             template(slot="headerIcons" slot-scope="{ field }")
                 .pricelists__head-title {{ field.label }}
             template(slot="name" slot-scope="{ row, index }")
-                .pricelists__data(v-if="currentActive !== index") {{ row.name }}
+                .pricelists__data.pricelists_pointer(v-if="currentActive !== index" @click="showRates(index)")
+                    .pricelists__rates-link {{ row.name }}
                 .pricelists__editing-data(v-else)
                     input.pricelists__text(type="text" v-model="currentName")
             template(slot="default" slot-scope="{ row, index }")
                 .pricelists__data.pricelists_centered
-                    input.pricelists__check(type="checkbox" v-model="row.default" :disabled="currentActive !== index")
+                    input.pricelists__check(type="checkbox" :checked="row.isDefault" :disabled="row.isDefault" @change="(e) => setDefaultPricelist(e, index)")
             template(slot="active" slot-scope="{ row, index }")
                 .pricelists__data.pricelists_centered
-                    input.pricelists__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
+                    input.pricelists__check(type="checkbox" :checked="row.isActive" :disabled="currentActive !== index")
             template(slot="icons" slot-scope="{ row, index }")
                 .pricelists__icons
                     img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
         Add(@add="addPricelist")
     .pricelists__new(v-if="isNewPricelist")
-        NewPricelist
+        NewPricelist(:prices="pricelists" @cancel="cancelNewPricelist" @saved="refreshPricelists")
 </template>
 
 <script>
-import SettingsTable from "./SettingsTable";
+import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
 import NewPricelist from "./pricelists/NewPricelist";
 import { mapGetters, mapActions } from "vuex";
@@ -69,6 +70,10 @@ export default {
             if(this.currentActive !== index) {
                 return key !== "save" && key !== "cancel";
             }
+        },
+        showRates(index) {
+            this.storeCurrentPrice(this.pricelists[index]);
+            this.$router.push("/finance/rates");
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
@@ -123,10 +128,29 @@ export default {
             }
             try {
                 await this.$http.delete(`/prices/pricelist/${id}`);
-                this.alertToggle({message: "Pricelist deleted.", isShow: true, type: "success"});
+                await this.getPricelists();
+                this.alertToggle({message: "Changes saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on deleting pricelist.", isShow: true, type: "error"});
             }
+        },
+        async setDefaultPricelist(e, index) {
+            const isDefault = e.target.checked;
+            if(!isDefault) return;
+            try {
+                await this.$http.post("/prices/set-default", {id: this.pricelists[index]._id, isDefault});
+                await this.getPricelists();
+                this.alertToggle({message: "Pricelist deleted.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error: Cannot set the default pricelist", isShow: true, type: "error"});
+            }
+        },
+        async refreshPricelists() {
+            await this.getPricelists();
+            this.cancelNewPricelist();
+        },
+        cancelNewPricelist() {
+            this.isNewPricelist = false;
         },
         cancelEdition(index) {
             if(!this.pricelists[index]._id) {
@@ -150,7 +174,8 @@ export default {
             }
         },
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            storeCurrentPrice: "storeCurrentPrice"
         })
     },
     components: {
@@ -168,6 +193,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .pricelists {
+    margin: 20px;
     &__table {
         width: 700px;
         box-shadow: 0 0 10px $main-color;
@@ -175,6 +201,15 @@ export default {
     }
     &__data {
         padding: 5px 3px;
+    }
+    &_pointer {
+        cursor: pointer;
+        &:hover {
+            .pricelists__rates-link {
+                transition: all 0.3s;
+                text-shadow: 0 0 5px $brown-shadow;
+            }
+        }
     }
     &__editing-data {
         padding: 4px 0;

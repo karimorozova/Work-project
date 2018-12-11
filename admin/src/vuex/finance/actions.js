@@ -69,3 +69,4 @@ export const deleteCheckedRate = async ({commit}, payload) => {
         throw new Error("Error on deleting rate");
     }
 }
+export const storeCurrentPrice = ({commit}, payload) => commit('setCurrentPrice', payload);

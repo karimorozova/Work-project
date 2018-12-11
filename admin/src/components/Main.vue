@@ -144,14 +144,14 @@ export default {
       this.$store.dispatch('customersGetting', result.body);
     },
     async getXtmCustomers() {
-      let result = await this.$http.get('xtm/xtm-customers');
+      let result = await this.$http.get('/xtm/xtm-customers');
       this.$store.dispatch('xtmCustomersGetting', result.body);
     },
     refreshXtmCustomers(data) {
       this.getXtmCustomers();
     },
     async getLanguages() {
-      let result = await this.$http.get('api/languages');
+      let result = await this.$http.get('/api/languages');
       let allLangs = result.body;
       this.$store.dispatch('allLanguages', allLangs);
     },

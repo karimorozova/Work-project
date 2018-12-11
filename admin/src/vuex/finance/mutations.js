@@ -1,7 +1,4 @@
 export const mutations = {
-    // setFinanceProperty(state, rootState) {
-    //     rootState.a.currentProject.finance.Select = {receivables: ""};
-    // }
     setDuoRates(state, payload) {
         state.duoRates = payload;
     },
@@ -10,5 +7,8 @@ export const mutations = {
     },
     setServiceWhenAddSeveral(state, payload) {
         state.serviceWhenAddSeveral = payload
+    },
+    setCurrentPrice(state, payload) {
+        state.currentPrice = {...payload};
     }
 }
