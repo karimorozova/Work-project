@@ -249,15 +249,16 @@ export default {
         },
         checkForLanguages(vendor, index) {
             return vendor.languageCombinations.find(item => {
-                return item.source.symbol === this.allSteps[index].source && 
+                return item.source && item.source.symbol === this.allSteps[index].source && 
                     item.target.symbol === this.allSteps[index].target
             })
         },
         extendedVendors(index) {
+            let result = [];
             if(this.isAllShow) {
                 return this.vendors.filter(item => item.status === 'Active');
             }
-            const result = this.vendors.filter(item => this.checkForLanguages(item, index));
+            result = this.vendors.filter(item => this.checkForLanguages(item, index));
             return result;
         },
         ...mapActions({

@@ -111,8 +111,8 @@ export default {
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});
-            if(refersTo === 'customer' && this.project.customer.industry.length == 1) {
-                this.selectedIndustry = this.project.customer.industry[0];
+            if(refersTo === 'customer' && this.project.customer.industries.length == 1) {
+                this.selectedIndustry = this.project.customer.industries[0];
             }
         },
         setIndustry({option}) {
@@ -145,7 +145,7 @@ export default {
             try {
                 const newProject = await this.$http.post("/pm-manage/new-project", this.project);
                 this.$emit('projectCreated', {project: newProject.body, customer: customer});
-                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
+                this.alertToggle({message: "New Project has been created", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
             }
@@ -171,11 +171,11 @@ export default {
         industriesList() {
             let result = this.industries;
             if(this.project.customer.name) {
-                const industry = this.project.customer.industry;
-                if(industry[0].name) {
-                    return result = industry;
+                const industries = this.project.customer.industries;
+                if(industries[0].name) {
+                    return result = industries;
                 }
-                return result = result.filter(item => industry.indexOf(item._id) !== -1);
+                return result = result.filter(item => industries.indexOf(item._id) !== -1);
             }
             return result;
         },

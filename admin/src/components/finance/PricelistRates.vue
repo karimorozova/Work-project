@@ -1,6 +1,9 @@
 <template lang="pug">
 .finance-rates
-    .finance-rates__title {{ currentPrice.name }}
+    .finance-rates__price-info 
+        .finance-rates__title {{ currentPrice.name }}
+        .finance-rates__return
+            Button(value="Back" @clicked="goBack")
     .finance-rates__rates
         .finance-rates__drop-menus
             .finance-rates__mono(:class="{'finance-rates_straight-angle': monoDrop}")
@@ -28,6 +31,7 @@ import Sidebar from "../Sidebar";
 import DuoRates from "./DuoRates";
 import MonoRates from "./MonoRates";
 import Addseverallangs from "./Addseverallangs";
+import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -63,6 +67,9 @@ export default {
             }
             this.duoDrop = !this.duoDrop;
         },
+        goBack() {
+            this.$router.go(-1);
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             storeDuoRates: "storeDuoRates",
@@ -80,7 +87,8 @@ export default {
         Sidebar,
         MonoRates,
         DuoRates,
-        Addseverallangs
+        Addseverallangs,
+        Button
     },
     mounted() {
     }
@@ -91,11 +99,15 @@ export default {
 
 .finance-rates {
     margin: 20px;
+    &__price-info {
+        display: flex;
+        justify-content: space-between;
+    }
     &__title {
         font-size: 24px;
     }
     &__rates {
-        margin: 20px 10px;
+        margin: 20px 0;
         padding: 20px 10px;
         box-shadow: 0 0 15px #67573e9d;
         width: 886px;

@@ -453,11 +453,11 @@ export default {
             let result = {source: [], target: []};
             const combs = this.currentProject.customer.languageCombinations;
             for(let comb of combs) {
-                result.source.push(comb.source);
-                result.target.push(comb.target);
+                if(comb.source) {
+                    result.source.push(comb.source);
+                    result.target.push(comb.target);
+                }
             }
-            result.source.filter((elem, i, arr) => arr.indexOf(elem) === i);
-            result.target.filter((elem, i, arr) => arr.indexOf(elem) === i);
             return result;
         }
     },

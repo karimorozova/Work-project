@@ -22,7 +22,7 @@
                         .icon
                           img(src="../assets/images/man.png")
                         .personal_data
-                          .name {{ user.name }}
+                          .name {{ user.firstName }}
                           .email {{ user.email }}
                       .accountBlock__myaccount(@click="showAccountInfo")
                         .human_icon
@@ -48,8 +48,8 @@
                 .balloons(v-else)
             .clientsMainWrapper__inner
               .breadCrumbs 
-                span.accountName {{ user.name }} 
-                span.arrows(v-if="user.name") >> 
+                span.accountName {{ user.firstName }} 
+                span.arrows(v-if="user.firstName") >> 
                 span {{ path }}
                 span.arrows(v-if="clientRequestShow") >>
                 span(v-if="clientRequestShow") {{ serviceType }}
@@ -198,9 +198,9 @@ export default {
         window.location.replace("/");        
       }
       this.user = result.data.user;
-      this.projects = result.data.projects;
-      this.quotes = result.data.quotes;
-      this.languageCombinations = result.data.languageCombinations;
+      this.projects = [];
+      this.quotes = [];
+      this.languageCombinations = this.client.languageCombinations;
       this.$store.dispatch('loadLangs', this.languageCombinations);
     },
     expandBar() {
@@ -320,16 +320,16 @@ export default {
       this.dropdownVisible = !this.dropdownVisible;
     },
     dataForRequest(ind) {     
-      if(this.projects.length && this.user) {        
+      if(this.user) {        
         let formData = {
-          name: this.user.name,
+          name: this.user.firstName,
           email: this.user.email,
-          companyName: this.projects[0].office.name,
-          www: this.user.contact.www,
-          phone: this.user.contact.mobile,
+          companyName: this.client.name,
+          www: "test.com",
+          phone: this.user.phone,
           skype: "",
           service: this.newProject[ind].title,
-          industry: this.projects[0].specialization
+          industry: this.client.industries[0].name
         }
         this.$store.dispatch('requestInfo', formData);
         this.$store.dispatch('loadLangs', this.languageCombinations);

@@ -12,7 +12,7 @@
                         p {{ client.name }}
                     .web
                         p.name__title Website
-                        p {{ client.contact.www }}
+                        p {{ client.website }}
             .contactDetails
                 .contactDetails__title.blockTitle
                     span Contact Details
@@ -27,7 +27,7 @@
                         .authData.credBlock
                             .name.item
                                 label Name
-                                input(type="text" :value="user.name" :readonly="readonly" :class="{focus: !readonly}")
+                                input(type="text" :value="user.firstName" :readonly="readonly" :class="{focus: !readonly}")
                             .pass.item
                                 label Password
                                 input(placeholder="********" type="password" v-model="password" value="password" :readonly="readonly" :class="{focus: !readonly}")
@@ -41,10 +41,10 @@
                                 input(type="text" :value="user.email" :readonly="readonly" :class="{focus: !readonly}")
                             .phone.item
                                 label Phone Number
-                                input(type="text" :value="user.contact.phones[0]" :readonly="readonly" :class="{focus: !readonly}")
+                                input(type="text" :value="user.phone" :readonly="readonly" :class="{focus: !readonly}")
                             .skype.item
                                 label Skype Name
-                                input(type="text" :value="skypeContact" :readonly="readonly" :class="{focus: !readonly}")
+                                input(type="text" :value="user.skype" :readonly="readonly" :class="{focus: !readonly}")
                 .contactDetails__buttons(v-if="!readonly")
                     input.button(type="submit" value="SAVE")
                     input.button(type="button" value="CANCEL" @click="cancelEdit")

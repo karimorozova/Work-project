@@ -1,4 +1,5 @@
 const { ClientApi, HomeApi } = require('../models/xtrf');
+const { getClients } = require('../clients');
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const router = require('express').Router();
 const fs = require('fs');
@@ -11,14 +12,16 @@ router.get('/', (req, res) => {
 router.post('/auth', async (req, res, next) => {
     try{ 
         if (req.body.logemail && req.body.logpassword) {
-            var jsessionId = await (ClientApi.authUser(req.body.logemail, req.body.logpassword));
-            var customer = new ClientApi("",jsessionId);
-            var userInfo = await (customer.userInfo());
-            var userdata = await (customer.getName());
-            res.statusCode = 200;
-            req.session.name = userdata.data.name;
-            req.session.jsessionId = jsessionId; 
-            res.send(jsessionId);
+            if(req.body.logemail === "admin" && req.body.logpassword === "12345");
+            const jsessionId = Math.random(100) + (12345 * 12345);
+            // var jsessionId = await (ClientApi.authUser(req.body.logemail, req.body.logpassword));
+            // var customer = new ClientApi("",jsessionId);
+            // var userInfo = await (customer.userInfo());
+            // var userdata = await (customer.getName());
+            // res.statusCode = 200;
+            // req.session.name = userdata.data.name;
+            // req.session.jsessionId = jsessionId; 
+            res.send({ jsessionId });
         } else {
             let err = new Error('All fields required.');
             err.status = 400;
@@ -54,20 +57,11 @@ router.get('/customer-info', async (req, res) => {
 })
 
 router.get('/clientinfo', async (req, res) => {
-    let customer = new ClientApi("", req.cookies.ses);
     try {
-        const userId = await (customer.userInfo());   
-        const userInfo = await (customer.fullUserInfo(userId.data.parentId, userId.data.id));
-        const fullInfo = await (customer.projectsInfo());
-        const quotesInfo = await (customer.quotesInfo());
-        const companyInfo = await (customer.companyInfo(userId.data.parentId));
-        const clientLanguages = await (customer.languageComb(userId.data.parentId));
-        const projects = fullInfo.data;
-        const quotes = quotesInfo.data;
-        const client = companyInfo.data;
-        const user = userInfo.data;
-        const languageCombinations = clientLanguages.data;
-        res.send({user, client, projects, quotes, languageCombinations});
+        const clients = await getClients();
+        const client = clients[0];
+        const user = client.contacts[0];
+        res.send({client, user});
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on getting clientinfo');

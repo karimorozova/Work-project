@@ -241,15 +241,12 @@ export default {
   },
   methods: {
     thankProof(data) {
-      // console.log(data);
       this.$emit('thankProof', data);
     },
     thankCopy(data){
-      // console.log(data);
       this.$emit('thankCopy', data);
     },
     thankMark(data){
-      // console.log(data);
       this.$emit('thankMark', data);
     },
     outsideLangs() {
@@ -280,7 +277,6 @@ export default {
       for(var i = 0; i < event.target.files.length; i++){
         this.detailFiles.push(event.target.files[i]);
       }      
-      console.log(this.detailFiles);
     },
     detailRemove(event) {   
       this.detailFiles.splice(this.detailFiles.indexOf(event),1)
@@ -290,7 +286,6 @@ export default {
     },
     changeRefFiles(event) {
       this.refFiles = event.target.files[0];
-      console.log(this.refFiles);
     },
     showSourceLang() {
       this.toggleSource()
@@ -432,7 +427,7 @@ export default {
         //End Comment because of XTM testing
         ////////////////////////////////////
 
-        const result = await this.$axios.$post('xtm/request', sendForm);
+        const result = await this.$axios.$post('/xtm/request', sendForm);
         console.log(result);
         this.xtmProjects = result;
         this.clearForm();
@@ -489,7 +484,7 @@ export default {
       }
     },
     async getLanguages() {
-      let result = await this.$axios.$get('api/languages');
+      let result = await this.$axios.$get('/api/languages');
       this.languages = result;
     },
   },
@@ -498,7 +493,7 @@ export default {
       let result = [];
       if(this.clientLanguages.length) {
         for(let i = 0; i < this.clientLanguages.length; i++) {
-          result.push({name: this.clientLanguages[i].sourceLanguage.name, lang: this.clientLanguages[i].sourceLanguage.name, symbol: this.clientLanguages[i].sourceLanguage.symbol, id: this.clientLanguages[i].sourceLanguage.id, xtrf: this.clientLanguages[i].sourceLanguage.id, check: false})   
+          result.push({name: this.clientLanguages[i].source.lang, lang: this.clientLanguages[i].source.lang, symbol: this.clientLanguages[i].source.symbol, id: this.clientLanguages[i].source.id, xtrf: this.clientLanguages[i].source.id, check: false})   
         }
       }
       result = result.filter((obj, pos, arr) => {
@@ -525,8 +520,9 @@ export default {
       let result = [];
       if(this.clientLanguages.length) {
         for(let i = 0; i < this.clientLanguages.length; i++) {
-          if (this.clientLanguages[i].sourceLanguage.name == this.sourceSelect.name)
-          result.push({name: this.clientLanguages[i].targetLanguage.name, lang: this.clientLanguages[i].targetLanguage.name, symbol: this.clientLanguages[i].targetLanguage.symbol, id: this.clientLanguages[i].targetLanguage.id, xtrf: this.clientLanguages[i].targetLanguage.id, check: false})   
+          if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
+            result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+          }
         }
       }
       result = result.filter((obj, pos, arr) => {

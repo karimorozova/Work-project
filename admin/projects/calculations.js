@@ -48,23 +48,16 @@ async function updateTaskMetrics(metrics, vendorId) {
     return updatedMetrics
 }
 
-async function receivablesCalc({task, project, step, combs}) {
+async function receivablesCalc({task, project, step}) {
     if(step.name !== "translate1") {
         const { cost, rate } = await calcProofingStep({task: task, project: project, words: task.metrics.totalWords});
         return {cost, rate};
     } 
     const metrics = task.metrics;
     const customerCost = await getCustomerRate({task: task, industry: project.industry.id, customerId: project.customer.id});
-    const comb = combs.find(item => {
-        return item.source.symbol === task.sourceLanguage &&
-                item.target.symbol === task.targetLanguage
-    });
-    const wordCost = comb.industries.find(item => {
-        return item.industry.id === project.industry.id
-    })
-    const { rate } = customerCost || wordCost;
+    const rate = customerCost;
     const cost = calcCost(metrics, 'client', rate);
-    return {cost: cost, rate: rate};
+    return { cost, rate };
 }
 
 async function payablesCalc({task, project, step}) {
@@ -99,17 +92,18 @@ function calcCost(metrics, field, rate) {
 async function getCustomerRate({task, industry, customerId}) {
     const service = await Services.findOne({"_id": task.service});
     const customer = await getClient({"_id": customerId});
-    const comb = getCombination({combs: customer.languageCombinations, service: service, task: task});
-    const wordCost = comb ? comb.industry.find(item => {
-        return item.id === industry
+    const comb = getCombination({combs: customer.languageCombinations, service, task});
+    const rateIndustry = comb ? comb.industries.find(item => {
+        return item.industry === industry
     }) : "";
+    const wordCost = rateIndustry ? rateIndustry.rates[task.service].value : "";
     return wordCost;
 }
 
 async function calcProofingStep({task, project, words}) {
     try{
         const service = await getOneService({symbol: 'pr'});
-        const clientCombs = await getCustomerRate({task: task, industry: project.industry.id, customerId: project.customer.id});
+        const clientCombs = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});
         const comb = service.languageCombinations.find(item => {
             return item.source.symbol === task.sourceLanguage &&
                     item.target.symbol === task.targetLanguage
@@ -173,11 +167,10 @@ function getCombination({combs, service, task}) {
     }).find(item => {
         if(service.languageForm === "Duo") {
             return item.source.symbol === task.sourceLanguage &&
-                    item.target.symbol === task.targetLanguage &&
-                    item.service.id === service.id
+                    item.target.symbol === task.targetLanguage
             }
         return item.target.symbol === task.targetLanguage &&
-        item.service.id === service.id
+        item.package === task.package
     })
 }
 

@@ -72,7 +72,7 @@ export default {
 
     },
     async getLanguages() {
-        const result = await this.$axios.$get('api/languages')
+        const result = await this.$axios.$get('/api/languages')
         .then(response => {
             this.languages = response;
         })

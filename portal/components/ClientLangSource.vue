@@ -1,7 +1,7 @@
 <template lang="pug">
     .langsList
         input(type="text" v-model="search" placeholder="Search")
-        span(v-for="lang in filteredLanguages" @click="chooseLang(lang)") {{ lang.name }}
+        span(v-for="lang in filteredLanguages" @click="chooseLang(lang)") {{ lang.lang }}
 </template>
 
 <script>
@@ -17,23 +17,25 @@ export default {
             let array = this.$store.state.clientLanguages;
             if (array.length) {
                 for(let i = 0; i < array.length; i++) {
-                    this.sourceLanguages.push(array[i].sourceLanguage)
+                    if(array[i].source) {
+                        this.sourceLanguages.push(array[i].source);
+                    }
                 }
             }
         },
         chooseLang(lang) {
-            this.$emit('chooseLang', lang.name)
+            this.$emit('chooseLang', lang.lang)
         }
     },
     computed: {
         filteredLanguages() {
             let array = this.sourceLanguages.filter( item => {
-                if(item.name.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
+                if(item.lang.toUpperCase().indexOf(this.search.toUpperCase()) >= 0) return item;
             });
             array = array.filter((obj, pos, arr) => {
-                return arr.map( mapObj => mapObj.name).indexOf(obj.name) === pos;
+                return arr.map( mapObj => mapObj.lang).indexOf(obj.lang) === pos;
             });
-            array.sort( (a, b) => { return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0) });
+            array.sort( (a, b) => { return (a.lang > b.lang) ? 1 : ((b.lang > a.lang) ? -1 : 0) });
             return array;
         }
     },
