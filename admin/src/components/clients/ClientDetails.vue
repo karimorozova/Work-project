@@ -86,7 +86,11 @@
             :who="currentClient"
             :origin="'client'"
             @closeSeveral="closeSevLangs"
-            @severalLangsResult="severalLangsResult")  
+            @severalLangsResult="severalLangsResult")
+        ValidationErrors(v-if="areErrorsExist"
+            :errors="errors"
+            @closeErrors="closeErrorsBlock"
+        )
     .contact-info(v-if="contactShow")
         ContactDetails(v-if="!newContact" 
             @cancel="contactCancel"
@@ -95,11 +99,7 @@
             :index="contactInd")
         NewContactDetails(v-if="newContact" 
             @contactSave="contactSave"
-            @cancel="contactCancel")
-    ValidationErrors(v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
-    )        
+            @cancel="contactCancel")        
 </template>
 
 <script>

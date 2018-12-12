@@ -1,9 +1,10 @@
 <template lang="pug">
-.validation__errors(:style="customStyles")
-    .validation__messages
-        .validation__errors-title Errors:
-        li.validation__error(v-for="error in errors") {{ error }}
-        span.validation__close(@click="closeErrors") +
+.validation(:class="{'validation_absolute': isAbsolute}")
+    .validation__errors(:style="customStyles")
+        .validation__messages
+            .validation__errors-title Errors:
+            li.validation__error(v-for="error in errors") {{ error }}
+            span.validation__close(@click="closeErrors") +
 </template>
 
 <script>
@@ -14,6 +15,10 @@ export default {
         },
         customStyles: {
             type: Object
+        },
+        isAbsolute: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
@@ -33,10 +38,11 @@ export default {
         top: 45%;
         left: 50%;
         margin-left: -300px;
-        width: 300px;
+        width: 320px;
         padding: 15px;
         box-shadow: 0 0 10px $brown-shadow;
         background-color: $white;
+        box-sizing: border-box;
         z-index: 50;
     }
     &__errors-title {
@@ -57,6 +63,39 @@ export default {
         position: absolute;
         top: -12px;
         right: -8px;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+}
+
+.validation_absolute {
+    .validation__errors {
+        position: absolute;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: none;
+        width: 100%;
+        margin-left: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: transparent;
+        z-index: 50;
+    }
+    .validation__messages {
+        box-shadow: 0 0 5px $red;
+        background-color: white;
+        padding: 20px;
+    }
+    .validation__close {
+        transform: rotate(45deg);
+        position: absolute;
+        top: 0;
+        right: 8px;
         font-size: 24px;
         font-weight: 700;
         cursor: pointer;

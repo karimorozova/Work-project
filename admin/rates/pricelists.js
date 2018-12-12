@@ -25,4 +25,21 @@ async function createNewPricelist({name, isActive, isDefault, combinations}) {
     }
 }
 
-module.exports = { saveNewPricelist };
+async function deletePricelist(id, isDefault) {
+    try {
+        if(!isDefault) {
+            return await Pricelist.deleteOne({"_id": id});
+        }
+        const firstPrice = await Pricelist.find().limit(1);
+        if(firstPrice.length) {
+            const defaultId = firstPrice[0].id;
+            await Pricelist.deleteOne({"_id": id});
+            await Pricelist.updateOne({"_id": defaultId}, {isDefault: isDefault});
+        } 
+    } catch(err) {
+        console.log(err);
+        console.log("Error in deletePricelist");
+    }
+}
+
+module.exports = { saveNewPricelist, deletePricelist };

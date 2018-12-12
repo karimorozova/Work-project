@@ -1,10 +1,11 @@
 const { getDuoRates, getDuoRate, getMonoRates, getMonoRate } = require("./getrates");
-const { saveNewPricelist} = require("./pricelists");
+const { saveNewPricelist, deletePricelist } = require("./pricelists");
 
 module.exports = {
     getDuoRates,
     getDuoRate,
     getMonoRates,
     getMonoRate,
-    saveNewPricelist
+    saveNewPricelist,
+    deletePricelist
 }

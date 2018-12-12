@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { saveNewPricelist } = require('../../rates');
+const { saveNewPricelist, deletePricelist } = require('../../rates');
 
 router.get('/pricelists', async (req, res) => {
     try {
@@ -25,11 +25,13 @@ router.post('/pricelist', async (req, res) => {
 
 router.delete('/pricelist/:id', async (req, res) => {
   const { id } = req.params;
+  const { isDefault } = req.body;
   if(!id) {
     return res.send("Deleted");
   }
   try {
-    await Pricelist.deleteOne({"_id": id});
+    await deletePricelist(id, isDefault);
+    // await Pricelist.deleteOne({"_id": id});
     res.send("Deleted");
   } catch(err) {
     console.log(err);

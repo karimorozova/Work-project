@@ -28,13 +28,18 @@
                 .pricelists__icons
                     img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
         Add(@add="addPricelist")
+        ValidationErrors(v-if="isErrorExist" 
+            :errors="errors" 
+            :isAbsolute="isErrorExist"
+            @closeErrors="closeErrors")
     .pricelists__new(v-if="isNewPricelist")
-        NewPricelist(:prices="pricelists" @cancel="cancelNewPricelist" @saved="refreshPricelists")
+        NewPricelist(:pricelists="pricelists" @cancel="cancelNewPricelist" @saved="refreshPricelists")
 </template>
 
 <script>
 import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
+import ValidationErrors from "../ValidationErrors";
 import NewPricelist from "./pricelists/NewPricelist";
 import { mapGetters, mapActions } from "vuex";
 
@@ -84,7 +89,6 @@ export default {
                 this.currentName = this.pricelists[index].name;
             }
             if(key === "save") {
-                this.currentActive = -1;
                 await this.checkErrors(index);
             }
             if(key === "cancel") {
@@ -102,7 +106,7 @@ export default {
         },
         async checkErrors(index) {
             this.errors = [];
-            if(!this.currentName && !this.isNameUnique) this.errors.push("The name should be unique and not empty.");
+            if(!this.currentName || !this.isNameUnique()) this.errors.push("The name should be unique and not empty.");
             if(this.errors.length) {
                 return this.isErrorExist = true;
             }
@@ -116,6 +120,7 @@ export default {
             try {
                 await this.$http.post("/prices/pricelist", { pricelist });
                 await this.getPricelists();
+                this.setDefaults();
                 this.alertToggle({message: "Pricelist saved.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on saving pricelist.", isShow: true, type: "error"});
@@ -127,7 +132,7 @@ export default {
                 return this.pricelists.slice(index, 1);
             }
             try {
-                await this.$http.delete(`/prices/pricelist/${id}`);
+                await this.$http.delete(`/prices/pricelist/${id}`, {body: {isDefault: this.pricelists[index].isDefault}});
                 await this.getPricelists();
                 this.alertToggle({message: "Changes saved", isShow: true, type: "success"});
             } catch(err) {
@@ -148,6 +153,9 @@ export default {
         async refreshPricelists() {
             await this.getPricelists();
             this.cancelNewPricelist();
+        },
+        closeErrors() {
+            this.isErrorExist = false;
         },
         cancelNewPricelist() {
             this.isNewPricelist = false;
@@ -181,6 +189,7 @@ export default {
     components: {
         SettingsTable,
         Add,
+        ValidationErrors,
         NewPricelist
     },
     mounted() {
@@ -198,6 +207,7 @@ export default {
         width: 700px;
         box-shadow: 0 0 10px $main-color;
         padding: 20px;
+        position: relative;
     }
     &__data {
         padding: 5px 3px;

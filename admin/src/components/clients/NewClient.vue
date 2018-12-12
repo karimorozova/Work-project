@@ -70,6 +70,10 @@
             .title Billing Informations
             .clients-wrap__billing
                 ClientBillInfo(:client="client" :errorFields="billErrors" @changeProperty="setBillInfo")
+            ValidationErrors(v-if="areErrorsExist"
+                :errors="errors"
+                @closeErrors="closeErrorsBlock"
+            )
         .contact-info(v-if="contactShow")
             ContactDetails(v-if="!newContact"
                 :isNewClient="contactShow"
@@ -81,10 +85,6 @@
             NewContactDetails(v-if="newContact"                 
                 @contactSave="contactSave"
                 @cancel="contactCancel")
-        ValidationErrors(v-if="areErrorsExist"
-            :errors="errors"
-            @closeErrors="closeErrorsBlock"
-        )
 </template>
 
 <script>

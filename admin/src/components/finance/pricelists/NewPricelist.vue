@@ -30,21 +30,26 @@
                         @toggle="toggleActive")
     .new-price__buttons
         .new-price__save
-            Button(value="Save" @clicked="savePricelist")
+            Button(value="Save" @clicked="checkForErrors")
         .new-price__cancel
             Button(value="Cancel" @clicked="cancel")
+    ValidationErrors(v-if="isErrorExist" 
+        :errors="errors"
+        :isAbsolute="isAbsolute"
+        @closeErrors="closeErrors")
 </template>
 
 <script>
 import LabelVal from "../../LabelVal";
 import Toggler from "../../Toggler";
 import SelectSingle from "../../SelectSingle";
+import ValidationErrors from "../../ValidationErrors";
 import Button from "../../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        prices: {
+        pricelists: {
             type: Array
         }
     },
@@ -54,7 +59,10 @@ export default {
             isTogglerDisabled: false,
             isPricelistDefault: false,
             isPricelistActive: false,
-            selectedPircelist: ""
+            selectedPircelist: "",
+            isErrorExist: "",
+            errors: [],
+            isAbsolute: true
         }
     },
     methods: {
@@ -63,6 +71,23 @@ export default {
         },
         toggleActive() {
             this.isPricelistActive = !this.isPricelistActive;
+        },
+        isNameUnique() {
+            const duplicateName = this.pricelists.find(item => {
+                return (item.name === this.pricelistName);
+            })
+            return duplicateName;
+        },
+        closeErrors() {
+            this.isErrorExist = false;
+        },
+        async checkForErrors() {
+            this.errors = [];
+            if(!this.pricelistName || this.isNameUnique()) this.errors.push("The name should be unique and not empty.");
+            if(this.errors.length) {
+                return this.isErrorExist = true;
+            }
+            await this.savePricelist();
         },
         async savePricelist() {
             const pricelist = {
@@ -92,13 +117,14 @@ export default {
     },
     computed: {
         pricesNames() {
-            return this.prices.map(item => item.name);
+            return this.pricelists.map(item => item.name);
         }
     },
     components: {
         LabelVal,
         Toggler,
         SelectSingle,
+        ValidationErrors,
         Button
     }
 }
@@ -110,6 +136,7 @@ export default {
 .new-price {
     display: flex;
     flex-direction: column;
+    position: relative;
     &__title {
         font-size: 24px;
         margin-bottom: 20px;
