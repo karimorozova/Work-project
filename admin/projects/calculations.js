@@ -50,12 +50,11 @@ async function updateTaskMetrics(metrics, vendorId) {
 
 async function receivablesCalc({task, project, step}) {
     if(step.name !== "translate1") {
-        const { cost, rate } = await calcProofingStep({task: task, project: project, words: task.metrics.totalWords});
+        const { cost, rate } = await calcProofingStep({task, project, words: task.metrics.totalWords});
         return {cost, rate};
     } 
     const metrics = task.metrics;
-    const customerCost = await getCustomerRate({task: task, industry: project.industry.id, customerId: project.customer.id});
-    const rate = customerCost;
+    const rate = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});;
     const cost = calcCost(metrics, 'client', rate);
     return { cost, rate };
 }
@@ -80,7 +79,7 @@ function calcCost(metrics, field, rate) {
     let cost = 0;
     let wordsSum = 0;
     for(let key in metrics) {
-        if(key != 'totalWords' && key != "nonTranslatable" && key != "__proto__") {
+        if(key !== 'totalWords' && key !== "nonTranslatable" && key !== "__proto__") {
             cost+= metrics[key].value*metrics[key][field]*rate;
             wordsSum += metrics[key].value;
         }
@@ -94,27 +93,33 @@ async function getCustomerRate({task, industry, customerId}) {
     const customer = await getClient({"_id": customerId});
     const comb = getCombination({combs: customer.languageCombinations, service, task});
     const rateIndustry = comb ? comb.industries.find(item => {
-        return item.industry === industry
+        return item.industry.id === industry
     }) : "";
     const wordCost = rateIndustry ? rateIndustry.rates[task.service].value : "";
     return wordCost;
 }
 
+function getCombination({combs, service, task}) {
+    return combs.filter(item => {
+        return service.languageForm === "Duo" ? item.source : !item.source
+    }).find(item => {
+        if(service.languageForm === "Duo") {
+            return item.source.symbol === task.sourceLanguage &&
+                    item.target.symbol === task.targetLanguage
+            }
+        return item.target.symbol === task.targetLanguage &&
+        item.package === task.package
+    })
+}
+
 async function calcProofingStep({task, project, words}) {
     try{
         const service = await getOneService({symbol: 'pr'});
-        const clientCombs = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});
-        const comb = service.languageCombinations.find(item => {
-            return item.source.symbol === task.sourceLanguage &&
-                    item.target.symbol === task.targetLanguage
-        });
-        const wordCost = clientCombs || comb.industries.find(item => {
-            return item.industry.id === project.industry.id
-        })
-        const cost = (words*wordCost.rate).toFixed(2);
-        return {cost: cost, rate: wordCost.rate}
+        const rate = await getCustomerRate({task: {...task, "service": service.id}, industry: project.industry.id, customerId: project.customer.id});
+        const cost = (words*rate).toFixed(2);
+        return { cost, rate }
     } catch(err) {
-    console.log('Get One Service: ' + err);
+        console.log('Error in calcProofingStep: ' + err);
     }
 }
 
@@ -159,19 +164,6 @@ function  wordsCalculation(task) {
         return init + task.metrics[cur].value;
     }, 0)
     return words;
-}
-
-function getCombination({combs, service, task}) {
-    return combs.filter(item => {
-        return service.languageForm === "Duo" ? item.source : !item.source
-    }).find(item => {
-        if(service.languageForm === "Duo") {
-            return item.source.symbol === task.sourceLanguage &&
-                    item.target.symbol === task.targetLanguage
-            }
-        return item.target.symbol === task.targetLanguage &&
-        item.package === task.package
-    })
 }
 
 module.exports = { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc };
