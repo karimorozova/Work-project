@@ -64,11 +64,11 @@ async function payablesCalc({task, project, step}) {
     : await Services.findOne({"_id": task.service});
     const metrics = task.metrics;
     const vendor = await getVendor({"_id": step.vendor._id});
-    const comb = getCombination({combs: vendor.languageCombinations, service: service, task: task});
-    const wordCost = comb ? comb.industry.find(item => {
+    const comb = getCombination({combs: vendor.languageCombinations, service, task});
+    const rateIndustry = comb ? comb.industries.find(item => {
         return item.industry.id === project.industry.id
     }) : "";
-    const rate = wordCost ? wordCost.rate : vendor.basicRate;
+    const rate = rateIndustry ? rateIndustry.rates[service.id].value : vendor.basicRate;
     step.finance['Price'].payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
     : calcCost(metrics, 'vendor', rate);
     step.vendorRate = rate;
@@ -95,8 +95,8 @@ async function getCustomerRate({task, industry, customerId}) {
     const rateIndustry = comb ? comb.industries.find(item => {
         return item.industry.id === industry
     }) : "";
-    const wordCost = rateIndustry ? rateIndustry.rates[task.service].value : "";
-    return wordCost;
+    const customerRate = rateIndustry ? rateIndustry.rates[task.service].value : "";
+    return customerRate;
 }
 
 function getCombination({combs, service, task}) {
