@@ -16,11 +16,6 @@
 <script>
 import Sidebar from "../Sidebar";
 import Blanket from "../Blanket/Blanket";
-import TableLanguages from "../Table/TableLanguages";
-import TableServices from "../Table/TableServices.vue";
-import TableIndustries from "../Table/TableIndustries";
-import TableLeadsources from "../Table/TableLeadsources";
-import TablePackages from "../Table/TablePackages";
 
 export default {
   props: {
@@ -61,12 +56,7 @@ export default {
   },
   components: {
     Sidebar,
-    Blanket,
-    TableLanguages,
-    TableServices,
-    TableIndustries,
-    TableLeadsources,
-    TablePackages
+    Blanket
   }
 };
 </script>

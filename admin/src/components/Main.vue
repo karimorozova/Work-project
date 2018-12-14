@@ -165,23 +165,35 @@ export default {
       this.hideAdditional();
     },
     mainPageRender() {
-      if(window.location.toString().indexOf('pm-') != -1) {
+      this.toggleSideBar(true);
+    },
+    checkForSpecifiedSideBar(address, title) {
+      if (window.location.toString().indexOf(address) !== -1) {
         this.navbarList.forEach(item => {
-          item.active = (item.title === 'PM AREA') ? true: false
+          item.active = (item.title == title) ? true: false
         })
-      } else if (window.location.toString().indexOf('new-client') != -1) {
-        this.navbarList.forEach(item => {
-          item.active = (item.title === 'CLIENTS') ? true: false
-        })
+      }
+    },
+    toggleSideBar(isFirstRender) {
+      const location = window.location.toString();
+      if(location.indexOf('pm-') !== -1) {
+        this.checkForSpecifiedSideBar('pm-', 'PM AREA');
+      } else if(location.indexOf('new-client') !== -1) {
+        this.checkForSpecifiedSideBar('new-client', 'CLIENTS');
       } else {
-        for(let elem of this.navbarList) {
-          if(window.location.toString().indexOf(elem.title.toLowerCase()) != -1) {
-            let path = '/' + elem.title.toLowerCase()
+        this.checkAddressForSideBar(isFirstRender);
+      }
+    },
+    checkAddressForSideBar(isFirstRender) {
+      for(let elem of this.navbarList) {
+        if(window.location.toString().indexOf(elem.title.toLowerCase()) !== -1) {
+          elem.active = true;
+          if(isFirstRender) {
+            const path = '/' + elem.title.toLowerCase()
             this.$router.push(path);
-            elem.active = true;
-          } else {
-            elem.active = false
           }
+        } else {
+          elem.active = false
         }
       }
     },
@@ -292,6 +304,9 @@ export default {
     await this.getCustomers();
     await this.getXtmCustomers();
     await this.getLanguages();
+  },
+  updated() {
+    this.toggleSideBar(false);
   },
   directives: {
     ClickOutside

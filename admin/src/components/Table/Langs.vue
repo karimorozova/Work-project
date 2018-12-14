@@ -1,0 +1,289 @@
+<template lang="pug">
+.languages
+    .languages__table
+        SettingsTable(
+            :fields="fields"
+            :tableData="langPaging[currentPage-1]"
+        )
+            template(slot="headerIcon" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerName" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerSymbol" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIso1" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIso2" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerActive" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIcons" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="icon" slot-scope="{ row, index }")
+                .languages__data.languages_centered
+                    img.languages__flag(:src="row.icon")
+                    .languages__upload(v-if="currentActive === index")
+                        input.languages__load-file(type="file" @change="uploadFile")
+                        img.languages__file-preview(v-if="imageData" :src="imageData")
+            template(slot="name" slot-scope="{ row, index }")
+                .languages__data {{ row.lang }}
+            template(slot="symbol" slot-scope="{ row, index }")
+                .languages__data {{ row.symbol }}
+            template(slot="iso1" slot-scope="{ row, index }")
+                .languages__data {{ row.iso1 }}
+            template(slot="iso2" slot-scope="{ row, index }")
+                .languages__data {{ row.iso2 }}
+            template(slot="active" slot-scope="{ row, index }")
+                .languages__data.languages_centered
+                    input.languages__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
+            template(slot="icons" slot-scope="{ row, index }")
+                .languages__icons
+                    img.languages__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'languages_opacity': isActive(key, index)}")
+    .languages__pagination
+        .languages__prev(@click="prevPage" :class="{'languages_non-active': !hasPrev}")
+            span.languages__title Previous page
+        .languages__page-numbers(v-for="(arr, num) in langPaging")
+            span.languages__page-number(@click="toPage(num)" :class="{'languages_current': num === currentPage-1}") {{ num + 1 }}
+        .languages__next(@click="nextPage" :class="{'languages_non-active': !hasNext}") 
+            span.languages__title Next page
+</template>
+
+<script>
+import SettingsTable from "./SettingsTable";
+import { mapGetters, mapActions } from "vuex";
+
+export default {
+    data() {
+        return {
+            fields: [
+                {label: "Icon", headerKey: "headerIcon", key: "icon", width: "12%", padding: "0"},
+                {label: "Name", headerKey: "headerName", key: "name", width: "28%", padding: "0"},
+                {label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "12%", padding: "0"},
+                {label: "Iso 639-1", headerKey: "headerIso1", key: "iso1", width: "12%", padding: "0"},
+                {label: "Iso 639-2", headerKey: "headerIso2", key: "iso2", width: "12%", padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+            ],
+            languages: [],
+            currentPage: 1,
+            currentActive: -1,
+            file: [],
+            imageData: "",
+            icons: {
+                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
+                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
+                cancel: {icon: require("../../assets/images/cancel_icon.jpg")}
+            },
+
+        }
+    },
+    methods: {
+        isActive(key, index) {
+            if(this.currentActive === index) {
+                return key !== "edit";
+            }
+            if(this.currentActive !== index) {
+                return key !== "save" && key !== "cancel";
+            }
+        },
+        toPage(num) {
+            if(this.isEditing()) return;
+            this.currentPage = num + 1;
+        },
+        nextPage() {
+            if(this.isEditing()) return;
+            if (this.currentPage < this.pagesTotal) {
+                this.currentPage = this.currentPage + 1;
+            }
+        },
+        prevPage() {
+            if(this.isEditing()) return;
+            if (this.currentPage > 1) {
+                this.currentPage = this.currentPage - 1;
+            } else {
+                return true;
+            }
+        },
+        isEditing() {
+            return this.currentActive !== -1;
+        },
+        makeAction(index, key) {
+            if(this.isEditing() && this.currentActive !== index) {
+                return
+            }
+            if(key === "edit") {
+                this.currentActive = index
+            }
+            if(key === "cancel") {
+                this.currentActive = -1
+            }
+        },
+        uploadFile(event) {
+            this.file.push(event.target.files[0]);
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                this.imageData = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        },
+        async getLanguages() {
+            try {
+                const result = await this.$http.get("/api/languages"); 
+                this.languages = result.body.sort((a, b) => {
+                    if (a.lang < b.lang) return -1;
+                    if (a.lang > b.lang) return 1;
+                });    
+            } catch(err) {
+                this.alertToggle({message: "Error on getting languages.", isShow: true, type: "error"})
+            }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle"
+        }),
+    },
+    computed: {
+        hasNext() {
+            return this.currentPage < this.pagesTotal ? 1 : 0;
+        },
+        hasPrev() {
+            return this.currentPage > 1 ? 1 : 0;
+        },
+        pagesTotal() {
+            let number = 0;
+            if (this.langPaging.length) {
+                number = this.langPaging.length;
+            }
+            return number;
+        },
+        langPaging() {
+            let result = [];
+            let page = [];
+            if (this.languages.length) {
+                for (let i = 14; i < this.languages.length; i = i + 15) {
+                page = [];
+                for (let j = i - 14; j <= i; j++) {
+                    page.push(this.languages[j]);
+                }
+                result.push(page);
+                if (i + 15 > this.languages.length) {
+                    page = [];
+                    for (let m = i + 1; m < this.languages.length; m++) {
+                    page.push(this.languages[m]);
+                    }
+                    result.push(page);
+                }
+                }
+            }
+            return result;
+        }
+    },
+    components: {
+        SettingsTable
+    },
+    mounted() {
+        this.getLanguages();
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
+
+.languages {
+    width: 920px;
+    background-color: $white;
+    padding: 20px;
+    box-shadow: 0 0 10px $main-color;
+    &__table {
+        height: 550px;
+    }
+    &__data {
+        height: 32px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    &_centered {
+        justify-content: center;
+    }
+    &__flag, &__file-preview {
+        width: 32px;
+        height: 22px;
+    }
+    &__pagination {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;        
+    }
+    &__prev, &__next {
+        text-align: center;
+        padding: 5px;
+        width: 130px;
+        border: 1px solid green;
+        margin: 5px;
+        cursor: pointer;
+    }
+    &_non-active {
+        opacity: 0.4;
+    }
+    &__page-numbers {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    &__page-number {
+        cursor: pointer;
+        margin-right: 5px;
+        &:first-child {
+            margin-left: 5px;
+        }
+    }
+    &_current {
+        border: 1px solid gold;
+        padding: 4px;
+    }
+    &__icons {
+        padding-top: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__icon {
+        cursor: pointer;
+        opacity: 0.5;
+        margin-right: 8px;
+    }
+    &_opacity {
+        opacity: 1;
+    }
+    &__upload {
+        position: relative;
+        background: url("../../assets/images/Other/upload-icon.png");
+        background-position-x: right;
+        background-repeat: no-repeat;
+        width: 40%;
+        height: 22px;
+        overflow: hidden;
+    }
+    &__load-file {
+        width: 33px;
+        height: 22px;
+        border: none;
+        outline: none;
+        opacity: 0;
+        z-index: 2;
+        position: absolute;
+        left: 15px;
+        cursor: pointer;
+    }
+    &__file-preview {
+        margin-left: 10px;
+    }
+}
+
+</style>

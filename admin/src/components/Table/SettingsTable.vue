@@ -44,9 +44,9 @@ export default {
         }
     }
     &__tbody {
-    max-height: 580px;
-    overflow-y: overlay;
-    margin-bottom: 20px;
+        max-height: 600px;
+        overflow-y: overlay;
+        margin-bottom: 20px;
     }
     &__thead-cell {
         box-sizing: border-box;
