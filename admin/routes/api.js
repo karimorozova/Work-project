@@ -6,7 +6,7 @@ const ClientApi = require('../models/xtrf/client');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
-const { Requests, Languages, Industries, Timezones, LeadSource, Package, Pricelist } = require('../models');
+const { Requests, Languages, Industries, Timezones, LeadSource, Package } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
@@ -23,7 +23,7 @@ function moveFile(oldFile, requestId) {
     mkdirp: true
   }, function (err) {
     if(err) {
-      console.log("moveFile error in posting request" + err);
+      console.log("moveFile error in posting request: " + err);
     }
   });
 
@@ -112,14 +112,22 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   await request.save();
   if (detailFiles) {
     for (let i = 0; i < detailFiles.length; i += 1) {
-      let storedFile = await moveFile(detailFiles[i], request.id);
-      request.detailFiles.push(storedFile);
+      try {
+        let storedFile = await moveFile(detailFiles[i], request.id);
+        request.detailFiles.push(storedFile);
+      } catch(err) {
+        console.log(err);
+      }
     }
   }
   if (refFiles) {
     for (let i = 0; i < refFiles.length; i += 1) {
-      let storedFile = await moveFile(refFiles[i], request.id);
-      request.refFiles.push(storedFile);
+      try {
+        let storedFile = await moveFile(refFiles[i], request.id);
+        request.refFiles.push(storedFile);
+      } catch(err) {
+        console.log(err);
+      }
     }
   }
 
@@ -307,34 +315,25 @@ router.post('/token-session', async (req, res) => {
   
 })
 
-router.post("/savelanguages", upload.fields([{name: "flag"}]), async (req, res) => {
+router.put("/languages/:id", upload.fields([{name: "flag"}]), async (req, res) => {
+  const { active, icon } = req.body;
   const flag = req.files["flag"];
-  let langID = req.body.dbIndex;
+  const { id }= req.params;
+  const isActive = active ? true : false;
   try {
-    let languageIcon = await Languages.find({'_id': langID});
-    let existIcon = languageIcon[0].icon;
-    let old = './dist' + languageIcon[0].icon;
-    let date = new Date().getTime();
-    if (flag) {
-      await fs.unlink(old, (err) => {
-        if(err) {
-          console.log("Error on file deleting " + err)
-        }
-        console.log('old file removed');
-      });
-      await moveLangIcon(flag[0], date);
-      existIcon = `/static/flags31x21pix/${date}-` + flag[0].filename; 
+    if(!flag) {
+      await Languages.updateOne({"_id": id}, {"active": isActive});
+      return res.send("Updated");
     }
-    let objForUpdate = {
-      lang: req.body.languageName,
-      symbol: req.body.languageSymbol,
-      iso1: req.body.languageIso1,
-      iso2: req.body.languageIso2,
-      active: req.body.languageActive,
-      icon: existIcon
-    };
-    const result = await Languages.update({"_id": langID}, objForUpdate);
-    res.send(result);
+    const date = new Date();
+    const formattedDate = `${date.getDay()}-${date.getMonth()+1}-${date.getFullYear()}`;
+    await moveLangIcon(flag[0], formattedDate);
+    const newIcon = `/static/flags31x21pix/${formattedDate}-` + flag[0].filename;
+    await fs.unlink(`./dist${icon}`, (err) => {
+      if(err) console.log("Error on file deleting " + err);
+    });
+    await Languages.updateOne({"_id": id}, {"active": isActive, "icon": newIcon});
+    res.send('Updated');
   } catch(err) {
     console.log(err);
     res.status(500).send('Something went wrong while Language saving');

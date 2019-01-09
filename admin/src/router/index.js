@@ -16,8 +16,7 @@ import PricelistRates from '@/components/finance/PricelistRates'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TablePackages from '@/components/Table/TablePackages'
-import Langs from '@/components/Table/Langs'
-// import TableLanguages from '@/components/Table/TableLanguages'
+import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
@@ -89,7 +88,7 @@ const router = new Router({
             {
               path: 'langs',
               name: 'langs',
-              component: Langs
+              component: TableLanguages
             },
             {
               path: 'services',

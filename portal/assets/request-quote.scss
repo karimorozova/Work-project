@@ -38,8 +38,6 @@ body {
     }
     margin-left: 30px;
     padding-bottom: 20px;
-    border: 1px solid #66563D;
-    border-radius: 15px;
     position: sticky;
     top: 7px;
     right: 20px;
@@ -47,7 +45,18 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    &__info {
+      border: 1px solid #66563D;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      max-width: 250px;
+      box-sizing: border-box;
+      @media (max-width: 1023px) {
+        display: none;
+      }
+    }
     &__title {
       width: 100%;
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
@@ -95,6 +104,56 @@ body {
         }
       }       
     }
+    &__help {
+      border: 1px solid #66563D;
+      border-radius: 15px;
+      max-width: 250px;
+      box-sizing: border-box;
+      @media (max-width: 1023px) {
+        display: none;
+      }
+    }
+    &__text {
+      padding: 0 20px;
+      text-align: center;
+    }
+    &__help-link {
+      font-weight: bold;
+      margin: 0 5px;
+      font-size: 18px;
+      color: #66563D;
+    }
+    &_help-slide {
+      @media (max-width: 1023px) {
+        transition: all 0.3s;
+        display: flex;
+        transform: translateX(0);
+        background-color: white;
+        position: fixed;
+        right: 3px;
+        top: 168px;
+        z-index: 200;
+      }
+    }
+    .slideToShow {
+      @media (max-width: 1023px) {
+        transition: all 0.3s;
+        display: flex;
+        transform: translateX(0);
+        background-color: white;
+        position: fixed;
+        right: 3px;
+        top: 68px;
+        z-index: 200;
+      }
+    }
+    &_block {
+      @media (max-width: 1023px) {
+        display: block;
+        position: fixed;
+        z-index: 200;
+      }
+    }
   }
   .slideToShow {
     @media (max-width: 1023px) {
@@ -111,14 +170,14 @@ body {
 }
 .container {
   margin-bottom: 45px;
-    .slideInInfo {
+    .slideInInfo, .slideInHelp {
       display: none;
       @media (max-width: 1023px) {
         display: block;
       }
       font-size: 16px;
       font-weight: 700;
-      transition: all 1s;
+      transition: all 0.2s;
       position: fixed;;
       top: 38px;
       right: -27px;
@@ -132,6 +191,10 @@ body {
       background: #d15f45;
       color: white;
       cursor: pointer;
+    }
+    .slideInHelp {
+      top: 138px;
+      right: -29px;
     }
     .positionChange {
       transform: rotate(0);
@@ -448,6 +511,9 @@ body {
   }
   .service-type {
     padding-top: 20px;
+    .select {
+      cursor: pointer;
+    }
     &__drop {
       display: flex;
       justify-content: space-around;
@@ -1063,6 +1129,7 @@ body {
     bottom: 0;
     z-index: 10;
     color: rgba(0, 0, 0, 0);
+    cursor: pointer;
   }
 
   .clarify {
@@ -1108,13 +1175,11 @@ body {
 
   .logo {
     box-shadow: 0 5px 30px rgba(92, 46, 26, 0.4);
-    z-index: 5;
+    z-index: 1;
     &__image {
       margin-left: 20%;
       img {
         padding: 6px 0 12px 0;
-        // width: 240px;
-        // height: 67px;
       }
     }
     @media (max-width: 1600px) {

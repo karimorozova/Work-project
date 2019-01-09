@@ -1,580 +1,312 @@
 <template lang="pug">
-.langWrapper
-  table
-    tr
-      th(v-for="(headItem, key) in table.head" :class='"th__col-" + (key + 1)') {{ headItem.title }}
-        ISO(v-if="key == 3" :titlesp1="titlesp1Value" titlesp2="(two letters)")
-        ISO1(v-if="key == 4" :titlesp3="titlesp2Value" titlesp4="(three letters)")
-    .bodyWrapper
-      tr.rbody(v-for="(language, ind) in langPaging[currentPage-1]" :class='"tr__row-" + (ind + 1)' )
-        td.data1(:class="{outliner: language.crud}")
-          button.languageicons(:style='{backgroundImage: "url(" + language.icon + ")"}' :class="[{icos_special: ind == 3},{video_special: ind == 5},{more_special: ind == 6}]")
-          button.upload1(v-if="language.crud")
-          .iconPreview(v-if="language.crud")
-            input.upload(v-if="language.crud" @change="uploadFile" :readonly="true" type="file" name="uploadedFileIcon")
-            .preview(v-if="imageData.length > 0")
-              img(:src="imageData")
-        td.data2(:class="{outliner: language.crud}")
-          input.inprow2(v-model="language.lang" :readonly="!language.crud" )
-          input.inprow2(v-model="language._id" type="hidden")
-        td.data3
-          input.inprow2(v-model="language.symbol" :readonly="true" )
-        td.data4
-          input.inprow2(v-model="language.iso1" :readonly="true")
-        td.data5
-          input.inprow2(v-model="language.iso2" :readonly="true")
-        td.data6(:class="{outliner: language.crud}")
-          input.inprow2(type="checkbox" :disabled="!language.crud" v-model="language.active" :checked="language.crud")
-        td.data7
-          button.saveB(@click="sendData(ind)" :disabled="!language.crud" :class="{data5_active: !language.crud}")
-          button.editB(@click="edit(ind, language)" :class="{data5_active: language.crud}" :disabled="language.crud")
-  .paging
-    .prev(@click="prevPage" :class='{nonActive: !hasPrev}') 
-      span Previous page
-    .pageNums(v-for="(arr, num) in langPaging")
-      span.pageNums__number(@click="toPage(num)" :class='{current: num == currentPage-1}') {{ num + 1 }}
-    .next(@click="nextPage" :class='{nonActive: !hasNext}') 
-      span Next page
-  .errorsMessage(v-if="showEditWarning")
-    .message
-      span {{ dataForEditAction.spanTitle }}
-      .buttonsBlock
-        button.confirm(@click="confirmEdit(indexToEdit)") Save
-        button.cancel(@click="cancelEdit(indexToEdit)") Cancel
+.languages
+    .languages__table
+        SettingsTable(
+            :fields="fields"
+            :tableData="langPaging[currentPage-1]"
+        )
+            template(slot="headerIcon" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerName" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerSymbol" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIso1" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIso2" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerActive" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="headerIcons" slot-scope="{ field }")
+                .languages__header {{ field.label }}
+            template(slot="icon" slot-scope="{ row, index }")
+                .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
+                    img.languages__flag(:src="row.icon")
+                    .languages__upload(v-if="currentActive === index")
+                        input.languages__load-file(type="file" @change="uploadFile")
+                        img.languages__file-preview(v-if="imageData" :src="imageData")
+            template(slot="name" slot-scope="{ row, index }")
+                .languages__data {{ row.lang }}
+            template(slot="symbol" slot-scope="{ row, index }")
+                .languages__data {{ row.symbol }}
+            template(slot="iso1" slot-scope="{ row, index }")
+                .languages__data {{ row.iso1 }}
+            template(slot="iso2" slot-scope="{ row, index }")
+                .languages__data {{ row.iso2 }}
+            template(slot="active" slot-scope="{ row, index }")
+                .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
+                    input.languages__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
+            template(slot="icons" slot-scope="{ row, index }")
+                .languages__icons
+                    img.languages__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'languages_opacity': isActive(key, index)}")
+    .languages__pagination
+        .languages__prev(@click="prevPage" :class="{'languages_non-active': !hasPrev}")
+            span.languages__title Previous page
+        .languages__page-numbers(v-for="(arr, num) in langPaging")
+            span.languages__page-number(@click="toPage(num)" :class="{'languages_current': num === currentPage-1}") {{ num + 1 }}
+        .languages__next(@click="nextPage" :class="{'languages_non-active': !hasNext}") 
+            span.languages__title Next page
 </template>
 
 <script>
-import ISO from "./rows/ISO";
-import ISO1 from "./rows/ISO1";
+import SettingsTable from "./SettingsTable";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
-  props: {},
-  data() {
-    return {
-      currentPage: 1,
-      table: {
-        head: [
-          { title: "Icon" },
-          { title: "Name" },
-          { title: "Symbol" },
-          { title: "" },
-          { title: "" },
-          { title: "Active" },
-          { title: "" }
-        ]
-      },
-      titlesp1Value: "ISO 639-1",
-      titlesp2Value: "ISO 639-2",
-      disableAddLang: false,
-      languages: [],
-      erroes: [],
-      activeTools: [],
-      declineReadonly: [],
-      isActiveUpload: [],
-      showRemoveWarning: false,
-      showEditWarning: false,
-      dataForEditAction: {
-        spanTitle: "Data weren't saved. Do you want to save them?",
-        buttonConf: "Confirm",
-        buttonCanc: "Cancel"
-      },
-      titlesp1Value: "ISO 639-1",
-      titlesp2Value: "ISO 639-2",
-      languageName: "",
-      languageSymbol: "",
-      languageIso1: "",
-      languageIso2: "",
-      languageActive: "",
-      dbIndex: "",
-      indexToEdit: 0,
-      indexToRemove: 0,
-      file: [],
-      imageData: ''
-    };
-  },
-  methods: {
-    toPage(num) {
-      this.currentPage = num + 1;
-    },
-    nextPage() {
-      if (this.currentPage < this.pagesTotal) {
-        this.currentPage = this.currentPage + 1;
-      }
-    },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage = this.currentPage - 1;
-      } else {
-        return true;
-      }
-    },
-    edit(ind) {
-      for (let i = 0; i < this.languages.length; i++) {
-        if (this.languages[i].crud) {
-          this.showEditWarning = true;
-          this.indexToEdit = i;
-        }
-      }
+    data() {
+        return {
+            fields: [
+                {label: "Icon", headerKey: "headerIcon", key: "icon", width: "12%", padding: "0"},
+                {label: "Name", headerKey: "headerName", key: "name", width: "28%", padding: "0"},
+                {label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "12%", padding: "0"},
+                {label: "Iso 639-1", headerKey: "headerIso1", key: "iso1", width: "12%", padding: "0"},
+                {label: "Iso 639-2", headerKey: "headerIso2", key: "iso2", width: "12%", padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+            ],
+            languages: [],
+            currentPage: 1,
+            currentActive: -1,
+            file: [],
+            imageData: "",
+            icons: {
+                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
+                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
+                cancel: {icon: require("../../assets/images/cancel_icon.jpg")}
+            },
 
-      this.languages[ind].crud = true;
-    },
-    confirmEdit(indexToEdit) {
-      let confirmIndex = this.indexToEdit;
-      this.showEditWarning = false;
-      this.languages[confirmIndex].crud = false;
-      this.sendData(confirmIndex);
-    },
-    cancelEdit(indexToEdit) {
-      let cancelIndex = this.indexToEdit;
-      this.showEditWarning = false;
-      this.languages[cancelIndex].crud = false;
-    },
-    remove(ind) {
-      this.showRemoveWarning = true;
-      this.indexToRemove = ind;
-    },
-    confirmRemove(indexToRemove) {
-      let confirmRIndex = this.indexToRemove;
-      this.languages[confirmRIndex].crud = false;
-      let formData = new FormData();
-      let remObj = {
-        languageRem: this.languages[confirmRIndex]._id
-      };
-      this.$http
-        .post("/api/removelanguages", remObj)
-        .then(result => {})
-        .catch(err => {
-          console.log(err);
-        });
-      this.showRemoveWarning = false;
-      this.languages = this.languages.filter(
-        (s, i) => i !== this.indexToRemove
-      );
-    },
-    cancelRemove(indexToRemove) {
-      let cancelRIndex = this.indexToRemove;
-      this.languages[cancelRIndex].crud = false;
-      this.showRemoveWarning = false;
-    },
-    async getLanguages() {
-      await this.$http
-        .get("/api/languages")
-        .then(response => {
-          let result = response.body; 
-          this.languages = result.sort((a, b) => {
-            if (a.lang < b.lang) return -1;
-            if (a.lang > b.lang) return 1;
-          });
-        })
-        .catch(e => {
-          this.errors.push(e);
-        });
-    },
-    uploadFile(event) {
-      this.file.push(event.target.files[0]);
-      var input = event.target;
-      if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = (e) => {
-          this.imageData = e.target.result;
         }
-        reader.readAsDataURL(input.files[0]);
-      }
     },
-    async sendData(ind) {
-      let langObj = new FormData();
-      langObj.append('languageName', this.languages[ind].lang)
-      langObj.append('languageSymbol', this.languages[ind].symbol)
-      langObj.append('languageIso1', this.languages[ind].iso1)
-      langObj.append('languageIso2', this.languages[ind].iso2)
-      langObj.append('languageActive', this.languages[ind].active)
-      langObj.append('dbIndex', this.languages[ind]._id)
-      langObj.append("flag", this.file[0]);
-      if(this.file[0]) {
-        langObj.append('lastModified', this.file[0].lastModified);
-      }
-      this.$http
-        .post("/api/savelanguages", langObj)
-        .then(result => {
-          console.log(result.data);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-      this.languages[ind].crud = false;
-      setTimeout(()=> {
-        this.languages = [];
-        this.getLanguages();
-        this.imageData = "";
-      }, 1000)
-      
-    }
-  },
-  computed: {
-    hasNext() {
-      return this.currentPage < this.pagesTotal ? 1 : 0;
-    },
-    hasPrev() {
-      return this.currentPage > 1 ? 1 : 0;
-    },
-    pagesTotal() {
-      let number = 0;
-      if (this.langPaging.length) {
-        number = this.langPaging.length;
-      }
-      return number;
-    },
-    langPaging() {
-      let result = [];
-      let page = [];
-      if (this.languages.length) {
-        for (let i = 14; i < this.languages.length; i = i + 15) {
-          page = [];
-          for (let j = i - 14; j <= i; j++) {
-            page.push(this.languages[j]);
-          }
-          result.push(page);
-          if (i + 15 > this.languages.length) {
-            page = [];
-            for (let m = i + 1; m < this.languages.length; m++) {
-              page.push(this.languages[m]);
+    methods: {
+        isActive(key, index) {
+            if(this.currentActive === index) {
+                return key !== "edit";
             }
-            result.push(page);
-          }
+            if(this.currentActive !== index) {
+                return key !== "save" && key !== "cancel";
+            }
+        },
+        toPage(num) {
+            if(this.isEditing()) return;
+            this.currentPage = num + 1;
+        },
+        nextPage() {
+            if(this.isEditing()) return;
+            if (this.currentPage < this.pagesTotal) {
+                this.currentPage = this.currentPage + 1;
+            }
+        },
+        prevPage() {
+            if(this.isEditing()) return;
+            if (this.currentPage > 1) {
+                this.currentPage = this.currentPage - 1;
+            } else {
+                return true;
+            }
+        },
+        isEditing() {
+            return this.currentActive !== -1;
+        },
+        async makeAction(index, key) {
+            if(this.isEditing() && this.currentActive !== index) {
+                return
+            }
+            if(key === "save") {
+                await this.saveLanguage(index);
+                this.currentActive = -1;
+            }
+            if(key === "edit") {
+                this.currentActive = index;
+            }
+            if(key === "cancel") {
+                this.currentActive = -1;
+                await this.getLanguages();
+            }
+        },
+        async saveLanguage(index) {
+            const id = this.languages[this.currentActive]._id;
+            let newData = new FormData();
+            const isActive = this.languages[this.currentActive].active ? 1 : "";
+            newData.append("flag", this.file[0]);
+            newData.append("icon", this.languages[this.currentActive].icon);
+            newData.append("active", isActive);
+            try {
+                await this.$http.put(`/api/languages/${id}`, newData);
+                await this.getLanguages();
+                this.alertToggle({message: "Information updated.", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Error on saving language.", isShow: true, type: "error"});
+            }
+        },
+        uploadFile(event) {
+            this.file.push(event.target.files[0]);
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                this.imageData = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        },
+        async getLanguages() {
+            try {
+                const result = await this.$http.get("/api/languages"); 
+                this.languages = result.body.sort((a, b) => {
+                    if (a.lang < b.lang) return -1;
+                    if (a.lang > b.lang) return 1;
+                });    
+            } catch(err) {
+                this.alertToggle({message: "Error on getting languages.", isShow: true, type: "error"});
+            }
+        },
+        ...mapActions({
+            alertToggle: "alertToggle"
+        }),
+    },
+    computed: {
+        hasNext() {
+            return this.currentPage < this.pagesTotal ? 1 : 0;
+        },
+        hasPrev() {
+            return this.currentPage > 1 ? 1 : 0;
+        },
+        pagesTotal() {
+            let number = 0;
+            if (this.langPaging.length) {
+                number = this.langPaging.length;
+            }
+            return number;
+        },
+        langPaging() {
+            let result = [];
+            let page = [];
+            if (this.languages.length) {
+                for (let i = 14; i < this.languages.length; i = i + 15) {
+                page = [];
+                for (let j = i - 14; j <= i; j++) {
+                    page.push(this.languages[j]);
+                }
+                result.push(page);
+                if (i + 15 > this.languages.length) {
+                    page = [];
+                    for (let m = i + 1; m < this.languages.length; m++) {
+                    page.push(this.languages[m]);
+                    }
+                    result.push(page);
+                }
+                }
+            }
+            return result;
         }
-      }
-      return result;
+    },
+    components: {
+        SettingsTable
+    },
+    mounted() {
+        this.getLanguages();
     }
-  },
-  components: {
-    ISO,
-    ISO1
-  },
-  mounted() {
-    this.getLanguages();
-  }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-.langWrapper {
-  position: relative;
-  font-family: MyriadPro;
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0 0 10px #67573E;
-  table {
-    width: 100%;
-    border: 1px solid #9a8f80;
-    font-size: 14px;
-    border-collapse: collapse;
-    tr {
-      display: flex;
-      th {
-        background-color: #9a8f80;
-        color: #fff;
-        font-size: 14px;
-        border-right: 2px solid #fff;
-        padding: 5px 0 5px 10px;
-        font-weight: normal;
-      }
-      .th__col-1 {
-        flex-basis: 15%;
-      }
-      .th__col-2 {
-        flex-basis: 21%;
-      }
-      .th__col-3 {
-        flex-basis: 10%;
-      }
-      .th__col-4 {
-        flex-basis: 12%;
-      }
-      .th__col-5 {
-        flex-basis: 12%;
-      }
-      .th__col-6 {
-        flex-basis: 14%;
-      }
-      .th__col-7 {
-        flex-basis: 16%;
-        border-right: none;
-      }
-      .upload {
-        background: url("../../assets/images/Other/upload-icon.png");
-        padding-left: 0;
-        padding-right: 0;
-        background-repeat: no-repeat;
-        width: 94px;
-        height: 35px;
-        border: none;
-        outline: none;
-        margin-top: -3px;
-        margin-right: 2px;
-        cursor: pointer;
-        overflow: hidden;
-        opacity: 0;
-        position: absolute;
-        left: -100px;
-        top: -10px;
-      }
-      .upload1 {
-        background-image: url("../../assets/images/Other/upload-icon.png");
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
-        outline: none;
-        width: 20px;
-        height: 20px;
-      }
-      .saveB {
-        background-image: url("../../assets/images/Other/save-icon-qa-form.png");
-        height: 22px;
-      }
-      .editB {
-        background-image: url("../../assets/images/Other/edit-icon-qa.png");
-        height: 22px;
-      }
-      .removeB {
-        background-image: url("../../assets/images/Other/delete-icon-qa-form.png");
-        height: 22px;
-      }
-      .download {
-        width: 19px;
-        height: 17px;
-        margin-right: 37px;
-      }
-      .languageicons {
-        height: 24px;
-      }
-      .video_special {
-        height: 25px;
-      }
-      .more_special {
-        height: 22px;
-      }
-      td {
-        border: 1px solid #9a8f80;
-        height: 46px;
-        padding-left: 10px;
-      }
-      .data1 {
-        display: flex;
-        flex-basis: 15.2%;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        .iconPreview {
-          position: relative;
-          .preview {
-            max-width: 31px;
-            max-height: 21px;
-            overflow: hidden;
-          }
-        }
-      }
-      .data2 {
-        flex-basis: 21.8%;
-        white-space: nowrap;
-        overflow-x: hidden;
+@import "../../assets/scss/colors.scss";
+
+.languages {
+    width: 920px;
+    background-color: $white;
+    padding: 20px;
+    box-shadow: 0 0 10px $main-color;
+    &__table {
+        height: 550px;
+    }
+    &__data {
+        height: 32px;
+        padding: 0 5px;
         display: flex;
         align-items: center;
-      }
-      .data3 {
-        flex-basis: 10.2%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        position: relative;
-        .uploadd3 {
-          padding-left: 0;
-          padding-right: 0;
-          width: 22px;
-          border: none;
-          outline: none;
-          margin-top: -3px;
-          margin-right: 2px;
-          cursor: pointer;
-          overflow: hidden;
-          opacity: 0;
-          position: absolute;
-          top: 12px;
-          left: 9px;
-        }
-        .uploadud3 {
-          padding-left: 0;
-          padding-right: 0;
-          width: 22px;
-          border: none;
-          outline: none;
-          margin-top: -3px;
-          margin-right: 2px;
-          cursor: pointer;
-          overflow: hidden;
-          opacity: 0;
-          position: absolute;
-          top: 12px;
-          left: 65px;
-        }
-      }
-      .data4 {
-        flex-basis: 12.4%;
-        display: flex;
-      }
-      .data5 {
-        flex-basis: 12.2%;
-        display: flex;
+        box-sizing: border-box;
+    }
+    &_centered {
         justify-content: center;
-        align-items: center;
-      }
-      .data6 {
-        flex-basis: 14.4%;
-        display: flex;
-        align-items: center;
-      }
-      .data7 {
-        flex-basis: 16.5%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-      }
-      .inprow2 {
-        outline: none;
-        border: none;
-        font-size: 14px;
-        color: #67573e;
+    }
+    &__flag, &__file-preview {
+        width: 32px;
+        height: 22px;
+    }
+    &__pagination {
         width: 100%;
-      }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;        
     }
-    .bodyWrapper {
-      height: 750px;
-    }
-    .data5_active {
-      opacity: 0.5;
-      position: relative;
-    }
-  }
-
-  button {
-    width: 31px;
-    height: 34px;
-    background-color: #fff;
-    border: none;
-    background-repeat: no-repeat;
-    outline: none;
-    cursor: pointer;
-  }
-  .set_bottom_border {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: #675842;
-  }
-  .withoutBorder {
-    border-right: none;
-  }
-}
-::-webkit-scrollbar {
-  width: 27px;
-  background-color: #e7e0e0;
-}
-::-webkit-scrollbar-thumb {
-  border-color: #675842;
-  background-color: #675842;
-  border-right: solid 9px #e7e0e0;
-  border-left: solid 9px #e7e0e0;
-}
-::-webkit-scrollbar-thumb:vertical {
-  height: 12px;
-}
-
-.errorsMessage {
-  width: 300px;
-  max-height: 160px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  margin: auto;
-  background-color: white;
-  color: red;
-  z-index: 20;
-  border: 1px solid red;
-  box-shadow: 0 0 15px red;
-  text-align: center;
-  padding-bottom: 15px;
-  padding-top: 0;
-  font-size: 18px;
-  .message {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    span {
-      margin-top: 28px;
-      margin-bottom: 24px;
-    }
-    .buttonsBlock {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      .confirm,
-      .cancel {
-        border: 0;
-        width: 114px;
-        height: 40px;
-        border-radius: 12px;
-        background-color: #D15F45;
-        -webkit-box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-        box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
-        font-size: 14px;
-        color: #fff;
-        outline: none;
+    &__prev, &__next {
+        text-align: center;
+        padding: 5px;
+        width: 130px;
+        border: 1px solid $main-color;
+        margin: 5px;
         cursor: pointer;
-      }
     }
-  }
-}
-
-.outliner {
-  box-shadow: -1px 3px 12px #22b6e6;
-}
-
-.paging {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  .prev,
-  .next {
-    text-align: center;
-    padding: 5px;
-    width: 130px;
-    border: 1px solid green;
-    margin: 5px;
-    cursor: pointer;
-  }
-  .nonActive {
-    opacity: 0.4;
-  }
-}
-
-.pageNums {
-  margin-left: 10px;
-  margin-right: 10px;
-  &__number {
-    cursor: pointer;
-    margin-right: 5px;
-    &:first-child {
-      margin-left: 5px;
+    &_non-active {
+        opacity: 0.4;
     }
-  }
-  .current {
-    border: 1px solid gold;
-    padding: 4px;
-  }
+    &__page-numbers {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    &__page-number {
+        cursor: pointer;
+        margin-right: 5px;
+        &:first-child {
+            margin-left: 5px;
+        }
+    }
+    &_current {
+        border: 1px solid gold;
+        padding: 4px;
+    }
+    &__icons {
+        padding-top: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__icon {
+        cursor: pointer;
+        opacity: 0.5;
+        margin-right: 8px;
+    }
+    &_opacity {
+        opacity: 1;
+    }
+    &__upload {
+        position: relative;
+        background: url("../../assets/images/Other/upload-icon.png");
+        background-position-x: right;
+        background-repeat: no-repeat;
+        width: 40%;
+        height: 22px;
+        overflow: hidden;
+    }
+    &__load-file {
+        width: 33px;
+        height: 22px;
+        border: none;
+        outline: none;
+        opacity: 0;
+        z-index: 2;
+        position: absolute;
+        left: 15px;
+        cursor: pointer;
+    }
+    &__file-preview {
+        margin-left: 10px;
+    }
+    &_active {
+        box-shadow: inset 0 0 8px $brown-shadow;
+    }
 }
+
 </style>

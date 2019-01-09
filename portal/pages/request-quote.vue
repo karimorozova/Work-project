@@ -13,7 +13,8 @@
           span Request a Quote
     .mainWrapper  
       .container
-        .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide}") Your Order
+        .slideInInfo(@click="orderSlide" :class="{positionChange: infoSlide && !isHelpSlide}") Your Order
+        .slideInHelp(@click="helpSlide" :class="{positionChange: isHelpSlide && !infoSlide}") Need Help?
         .successAlert(v-if="success")
           .successAlert__message
             p Thanks for your request.
@@ -217,7 +218,8 @@
                 | Please, fill all the required fields (marked with red 
                 span.asterisk asterisk
                 | )
-      .orderInfo(:class="{slideToShow: infoSlide}")
+      .orderInfo(:class="{'orderInfo_block': infoSlide || isHelpSlide}")
+        .orderInfo__info(:class="{slideToShow: infoSlide}")
           .orderInfo__title
             h3 YOUR ORDER
           .orderInfo__summary
@@ -241,6 +243,14 @@
             .orderInfo__summary-deadline
               label SUGGESTED DEADLINE
               p.choice {{ deadlineDate }}
+        .orderInfo__help(:class="{'orderInfo_help-slide': isHelpSlide}")
+          .orderInfo__contacts-link
+            .orderInfo__title
+              h3 NEED HELP?
+            .orderInfo__help-message
+              p.orderInfo__text Having problems submitting a form? <br> Access our
+                a.orderInfo__help-link(href="https://www.pangea.global/contact-us") Contact Us 
+                | page for assistance.
       transition(name="slide-fade")
         .server-err(v-if="isServerError")
           ServerError(:errorMessage="serverErrMessage")
@@ -333,6 +343,7 @@ export default {
         }
       },
       infoSlide: false,
+      isHelpSlide: false,
       deadlineDate: '',
       detailFiles: [],
       refFiles: [],
@@ -459,7 +470,12 @@ export default {
       }
     },
     orderSlide() {
-      this.infoSlide = !this.infoSlide
+      this.infoSlide = !this.infoSlide;
+      if(this.infoSlide) this.isHelpSlide = false;
+    },
+    helpSlide() {
+      this.isHelpSlide = !this.isHelpSlide;
+      if(this.isHelpSlide) this.infoSlide = false;
     },
     showServices() {
       this.toggleServices()
@@ -682,12 +698,11 @@ export default {
         sendForm.append("brief", this.request.brief);
         sendForm.append("createdAt", this.request.createdAt);
         for(var i = 0; i < this.detailFiles.length; i++){
-          console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
         try {
-          const result = await this.$axios.$post('api/request', sendForm);
+          const result = await this.$axios.$post('/api/request', sendForm);
         } catch(err) {
           this.isServerError = true;
           this.serverErrMessage = 'Error on sending the request form (sendForm func)';
@@ -699,7 +714,7 @@ export default {
     },
     async getServices() {
       try {
-        const result = await this.$axios.$get('api/services')
+        const result = await this.$axios.$get('/api/services')
         result.sort((a, b) => {return a.sortIndex - b.sortIndex});
         for (let i = 0; i < result.length; i++) {
           this.services.push(result[i])
@@ -715,7 +730,7 @@ export default {
     },
     async getLanguages() {
       try {
-        const result = await this.$axios.$get('api/languages');
+        const result = await this.$axios.$get('/api/languages');
         this.languages = result.filter(item => {
           return item.active
         });
@@ -744,7 +759,7 @@ export default {
     },
     async getIndustries() {
       try {
-        const result = await this.$axios.$get('api/industries');
+        const result = await this.$axios.$get('/api/industries');
         this.industries = result;
       } catch(err) {
         this.isServerError = true;
