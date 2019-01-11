@@ -83,7 +83,7 @@ export default {
             if(this.currentActive === -1) return;
             this.sources[index].source = this.currentSourceName;
             try {
-                await this.$http.post("/api/update-leadsource", {leadSource: this.sources[index]});
+                await this.$http.post("/api/leadsource", {leadSource: this.sources[index]});
                 await this.getSources();
                 this.alertToggle({message: "Lead source saved", isShow: true, type: 'success'})
             } catch(err) {
@@ -92,7 +92,7 @@ export default {
         },
         async deleteSource(index) {
             try {
-                await this.$http.delete(`/api/lead-source/${this.sources[index]._id}`);
+                await this.$http.delete(`/api/leadsource/${this.sources[index]._id}`);
                 this.sources.splice(index, 1);
                 this.alertToggle({message: "Lead source deleted", isShow: true, type: 'success'})
             } catch(err) {

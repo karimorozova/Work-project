@@ -83,7 +83,7 @@ export default {
             this.packages[index].name = this.currentName;
             this.packages[index].size = this.currentSize;
             try {
-                await this.$http.post("/api/update-package", {package: this.packages[index]});
+                await this.$http.post("/api/package", {package: this.packages[index]});
                 this.setDefaults();
                 await this.getPackages();
                 this.alertToggle({message: "Package saved", isShow: true, type: 'success'})
