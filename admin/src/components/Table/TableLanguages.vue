@@ -22,7 +22,7 @@
             template(slot="icon" slot-scope="{ row, index }")
                 .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
                     img.languages__flag(:src="row.icon")
-                    .languages__upload(v-if="currentActive === index")
+                    .languages__upload(v-if="currentActive === index" :class="{'languages_no-back': imageData}")
                         input.languages__load-file(type="file" @change="uploadFile")
                         img.languages__file-preview(v-if="imageData" :src="imageData")
             template(slot="name" slot-scope="{ row, index }")
@@ -74,7 +74,6 @@ export default {
                 edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
                 cancel: {icon: require("../../assets/images/cancel_icon.jpg")}
             },
-
         }
     },
     methods: {
@@ -112,18 +111,20 @@ export default {
                 return
             }
             if(key === "save") {
-                await this.saveLanguage(index);
-                this.currentActive = -1;
+                await this.saveChanges(index);
+                this.cancel();
             }
             if(key === "edit") {
                 this.currentActive = index;
             }
             if(key === "cancel") {
-                this.currentActive = -1;
+                if(this.currentActive === -1) return;
+                this.cancel();
                 await this.getLanguages();
             }
         },
-        async saveLanguage(index) {
+        async saveChanges(index) {
+            if(this.currentActive === -1) return;
             const id = this.languages[this.currentActive]._id;
             let newData = new FormData();
             const isActive = this.languages[this.currentActive].active ? 1 : "";
@@ -148,6 +149,11 @@ export default {
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        },
+        cancel() {
+          this.currentActive = -1;
+          this.file = [];
+          this.imageData = "";
         },
         async getLanguages() {
             try {
@@ -300,6 +306,9 @@ export default {
         position: absolute;
         left: 15px;
         cursor: pointer;
+    }
+    &_no-back {
+        background: none;
     }
     &__file-preview {
         margin-left: 10px;

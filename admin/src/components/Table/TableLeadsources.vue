@@ -59,8 +59,8 @@ export default {
                 this.currentSourceName = this.sources[index].source;
             }
             if(key === "save") {
-                this.currentActive = -1;
-                await this.saveSource(index)
+                await this.saveSource(index);
+                this.setDefaults();
             }
             if(key === "cancel") {
                 this.cancelEdition(index);
@@ -80,6 +80,7 @@ export default {
             this.currentSourceName = "";
         },
         async saveSource(index) {
+            if(this.currentActive === -1) return;
             this.sources[index].source = this.currentSourceName;
             try {
                 await this.$http.post("/api/update-leadsource", {leadSource: this.sources[index]});
@@ -132,16 +133,18 @@ export default {
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
-    &__data {
-        padding: 5px 3px;
+    &__data, &__editing-data {
+        height: 32px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
     }
     &__editing-data {
-        padding: 4px 0;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__input {
         box-sizing: border-box;
-        padding-left: 3px;
         width: 100%;
         border: none;
         outline: none;

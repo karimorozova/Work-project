@@ -68,8 +68,8 @@ export default {
                 this.currentSize = this.packages[index].size
             }
             if(key === "save") {
-                this.currentActive = -1;
-                await this.savePackage(index)
+                await this.savePackage(index);
+                this.setDefaults();
             }
             if(key === "cancel") {
                 this.cancelEdition(index)
@@ -79,6 +79,7 @@ export default {
             }
         },
         async savePackage(index) {
+            if(this.currentActive === -1) return;
             this.packages[index].name = this.currentName;
             this.packages[index].size = this.currentSize;
             try {
@@ -145,16 +146,18 @@ export default {
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
-    &__data {
-        padding: 5px 3px;
+    &__data, &__editing-data {
+        height: 32px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
     }
     &__editing-data {
-        padding: 4px 0;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__data-input {
         box-sizing: border-box;
-        padding-left: 3px;
         width: 100%;
         border: none;
         outline: none;

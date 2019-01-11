@@ -290,14 +290,14 @@ const servicesDefault = [
 ];
 
 const industriesDefault = [
-    {name: 'iGaming (Casino, Slot games, Gambling, etc.)', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'Poker', rate: 0, icon: '/static/industries/casino-poker-igaming.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'CFDs & Online Trading', rate: 0,  icon: '/static/industries/cfds-online-tranding.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx',active: true},
-    {name: 'Hotel & Real Estates', rate: 0,  icon: '/static/industries/hotel-real-estates.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'ICOs & Cryptocurrency', rate: 0,  icon: '/static/industries/icos-cryptocurrency.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'Legal', rate: 0,  icon: '/static/industries/legal-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true},
-    {name: 'Video Games', rate: 0,  icon: '/static/industries/video-games.png', "crud": false, download: '/static/Download-icon.png', generic: ['/static/example.xlsx'], active: true},
-    {name: 'More', rate: 0,  icon: '/static/industries/more-icon.png', "crud": false, download: '/static/Download-icon.png', generic: '/static/example.xlsx', active: true}
+    {name: 'iGaming (Casino, Slot games, Gambling, etc.)', rate: 0, icon: '/static/industries/casino-poker-igaming.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Poker', rate: 0, icon: '/static/industries/casino-poker-igaming.png', generic: '/static/example.xlsx', active: true},
+    {name: 'CFDs & Online Trading', rate: 0,  icon: '/static/industries/cfds-online-tranding.png', generic: '/static/example.xlsx',active: true},
+    {name: 'Hotel & Real Estates', rate: 0,  icon: '/static/industries/hotel-real-estates.png', generic: '/static/example.xlsx', active: true},
+    {name: 'ICOs & Cryptocurrency', rate: 0,  icon: '/static/industries/icos-cryptocurrency.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Legal', rate: 0,  icon: '/static/industries/legal-icon.png', generic: '/static/example.xlsx', active: true},
+    {name: 'Video Games', rate: 0,  icon: '/static/industries/video-games.png', generic: ['/static/example.xlsx'], active: true},
+    {name: 'More', rate: 0,  icon: '/static/industries/more-icon.png', generic: '/static/example.xlsx', active: true}
 ];
 
 const packagesDefault = [

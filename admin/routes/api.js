@@ -326,7 +326,7 @@ router.put("/languages/:id", upload.fields([{name: "flag"}]), async (req, res) =
       return res.send("Updated");
     }
     const date = new Date();
-    const formattedDate = `${date.getDay()}-${date.getMonth()+1}-${date.getFullYear()}`;
+    const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
     await moveLangIcon(flag[0], formattedDate);
     const newIcon = `/static/flags31x21pix/${formattedDate}-` + flag[0].filename;
     await fs.unlink(`./dist${icon}`, (err) => {

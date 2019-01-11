@@ -1,73 +1,33 @@
 const router = require('express').Router();
-const mv = require('mv');
 const { Industries } = require('../models');
 const { upload } = require('../utils/');
+const { createNewIndustry, updateIndustry, deleteIndustryFiles } = require('../settings');
 
-function moveIndustryIcon(oldFile, date) {
-  let newFile = './dist/static/industries/' + date + '-' + oldFile.filename
-  mv(oldFile.path, newFile, {
-    mkdirp: true
-  }, function (err) {
-    if(err) {
-      console.log(err);
-    }
-  });
-  console.log('Flag icon moved!')
-}
-
-function moveExcelFile(oldFile, date) {
-  let newFile = './dist/static/industries/exel/' + date + '-' + oldFile.filename
-  mv(oldFile.path, newFile, {
-    mkdirp: true
-  }, function (err) {
-    if(err) {
-      console.log(err);
-    }
-  });
-}
-
-router.post("/saveindustries", upload.fields([{ name: "uploadedFileIcon" }, { name: "uploadedFile" }]), async (req, res) => {
-  const industryID = req.body.dbIndex;
-  let iconsArray = req.files["uploadedFileIcon"];
-  let iconPath = "";
-  const date = new Date().getTime();
+router.post("/industry/:id", upload.fields([{ name: "icon" }, { name: "generic" }]), async (req, res) => {
+  const { name, active } = req.body;
+  const { id } = req.params;
+  const isActive = active === "true" ? true : false;
+  const iconFile = req.files["icon"];
+  const genericFile = req.files["generic"];
   try {
-    if(iconsArray) {
-      await moveIndustryIcon(iconsArray[0], date);
-      iconPath = `/static/industries/${date}-` + iconsArray[0].filename;
+    if(id === "new") {
+      await createNewIndustry({name, active: isActive, iconFile, genericFile});
+    } else {
+      await updateIndustry({id, name, active: isActive, iconFile, genericFile});
     }
-    let genericArray = req.files["uploadedFile"];
-    let genericPath = "";
-    if (genericArray) {
-      await moveExcelFile(genericArray[0], date);
-      genericPath = `/static/industries/exel/${date}` + '-' + genericArray[0].filename;    
-    }
-    let nameVal = req.body.nameTitle;
-
-    let objForUpdate = {
-      active: req.body.activeFormValue
-    };
-    if(nameVal.length ) {
-      objForUpdate.name = nameVal
-    }
-    if(iconPath) {
-      objForUpdate.icon = iconPath
-    }
-    if(genericPath) {
-      objForUpdate.generic = genericPath
-    }
-    await Industries.update({ "_id": industryID }, objForUpdate);
-    res.send('done');
+    res.send('Saved');
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something wrong on Industry saving');
+    res.status(500).send('Something wrong on Industry creating');
   }
 });
 
-router.post("/removeindustries", async (req, res) => {
-  const industryID = req.body.industryRem;
+router.delete("/industry/:id", async (req, res) => {
+  const { id } = req.params;
+  const { icon, generic } = req.body;
   try {
-    await Industries.deleteOne({ "_id": industryID });
+    await Industries.deleteOne({"_id": id});
+    await deleteIndustryFiles(icon, generic);
     res.send('Removed'); 
     } catch(err) {
       console.log(err);
