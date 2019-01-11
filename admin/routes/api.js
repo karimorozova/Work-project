@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const axios = require('axios');
 const unirest = require('unirest');
-const HomeApi = require('../models/xtrf/home');
-const ClientApi = require('../models/xtrf/client');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
@@ -13,6 +11,7 @@ const { getManyServices } = require('../services/');
 const reqq = require('request');
 const writeFile = require('write');
 const { getAllCountries } = require('../helpers/countries');
+const { updateLanguage } = require('../settings');
 
 
 function moveFile(oldFile, requestId) {
@@ -28,18 +27,6 @@ function moveFile(oldFile, requestId) {
   });
 
   return oldFile.filename;
-}
-
-function moveLangIcon(oldFile, date) {
-  let newFile = './dist/static/flags31x21pix/' + date + '-' + oldFile.filename;
-  mv(oldFile.path, newFile, {
-    mkdirp: true
-  }, function (err) {
-    if(err) {
-      console.log(err);
-    }
-  });
-  console.log('Flag icon moved!')
 }
 
 router.get('/wordcount', async (req, res) => {
@@ -269,85 +256,17 @@ router.get('/timezones', async (req, res) => {
   }
 })
 
-router.get('/customers', async (req, res) => {
-  try{
-    let customers = await HomeApi.getAllCustomers();
-    res.send(customers)
-  } catch(err) {
-    console.log(err);
-    res.statusCode(500);
-    res.send('Error / Cannot get Customers from XTRF');
-  }
-})
-
-router.get('/person', async (req, res) => {
-  try{
-    let person = await HomeApi.getPerson(req.query.customerId);
-    let email = {'email': person};
-    res.send(email);
-  } catch(err) {
-    res.statusCode(500);
-    res.send('Error / Cannot get Person from XTRF');
-  }
-})
-
-router.post('/get-token', async (req, res) => {
-  let email = {'email': req.body.email};
-  try {
-    let token = await HomeApi.getTokenCircular(email);
-    res.send(token);
-  } catch (err) {
-    console.log(err);
-    res.statusCode(500);
-    res.send('Error / Cannot get Token from XTRF');
-  }
-})
-
-router.post('/token-session', async (req, res) => {
-  try {
-    let sessionId = await ClientApi.login(req.body.token.body);
-      res.send(sessionId);
-  } catch(err) {
-    console.log(err);
-    res.statusCode(500);
-    res.send('Error / Cannot open Token-session in XTRF');
-  }
-  
-})
-
-router.put("/languages/:id", upload.fields([{name: "flag"}]), async (req, res) => {
+router.put('/languages/:id', upload.fields([{name: "flag"}]), async (req, res) => {
   const { active, icon } = req.body;
   const flag = req.files["flag"];
   const { id }= req.params;
   const isActive = active ? true : false;
   try {
-    if(!flag) {
-      await Languages.updateOne({"_id": id}, {"active": isActive});
-      return res.send("Updated");
-    }
-    const date = new Date();
-    const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
-    await moveLangIcon(flag[0], formattedDate);
-    const newIcon = `/static/flags31x21pix/${formattedDate}-` + flag[0].filename;
-    await fs.unlink(`./dist${icon}`, (err) => {
-      if(err) console.log("Error on file deleting " + err);
-    });
-    await Languages.updateOne({"_id": id}, {"active": isActive, "icon": newIcon});
+    await updateLanguage({id, icon, isActive, flag});
     res.send('Updated');
   } catch(err) {
     console.log(err);
     res.status(500).send('Something went wrong while Language saving');
-  }
-});
-
-router.post("/removelanguages", async(req, res) => {
-  const langID = req.body.languageRem;
-  try {
-    await Languages.deleteOne({"_id": langID})
-    res.send('Removed')
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Something is wrong with Language removing')
   }
 });
 
@@ -371,7 +290,7 @@ router.get('/leadsources', async (req, res) => {
   }
 })
 
-router.post('/update-leadsource', async (req, res) => {
+router.post('/leadsource', async (req, res) => {
   const { leadSource } = req.body;
   try {
     if(leadSource._id) {
@@ -386,7 +305,7 @@ router.post('/update-leadsource', async (req, res) => {
   }
 })
 
-router.delete('/lead-source/:id', async (req, res) => {
+router.delete('/leadsource/:id', async (req, res) => {
   const { id } = req.params;
   if(!id) {
     return res.send('Deleted unsaved lead source')
@@ -410,7 +329,7 @@ router.get('/packages', async (req, res) => {
   }
 })
 
-router.post('/update-package', async (req, res) => {
+router.post('/package', async (req, res) => {
   const { package } = req.body;
   try {
     if(package._id) {
