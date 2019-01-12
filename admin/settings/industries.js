@@ -47,7 +47,7 @@ async function getFilesInfo(obj) {
         return { icon, generic };
     } catch(err) {
         console.log(err);
-        console.log("Error in gatherData function");
+        console.log("Error in getFilesInfo function");
     }
 }
 

@@ -13,8 +13,14 @@
                 .languages__header {{ field.label }}
             template(slot="headerIso1" slot-scope="{ field }")
                 .languages__header {{ field.label }}
+                    .languages__header-icon(@click="toggleTooltip('iso1')" v-click-outside="() => closeTooltip('isTooltip1')")
+                        img.languages__info-icon(src="../../assets/images/info-icon-white.png")
+                        .languages__tooltip(v-if="isTooltip1") (two letters)
             template(slot="headerIso2" slot-scope="{ field }")
                 .languages__header {{ field.label }}
+                    .languages__header-icon(@click="toggleTooltip('iso2')" v-click-outside="() => closeTooltip('isTooltip2')")
+                        img.languages__info-icon(src="../../assets/images/info-icon-white.png")
+                        .languages__tooltip(v-if="isTooltip2") (three letters)
             template(slot="headerActive" slot-scope="{ field }")
                 .languages__header {{ field.label }}
             template(slot="headerIcons" slot-scope="{ field }")
@@ -35,7 +41,8 @@
                 .languages__data {{ row.iso2 }}
             template(slot="active" slot-scope="{ row, index }")
                 .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
-                    input.languages__check(type="checkbox" v-model="row.active" :disabled="currentActive !== index")
+                    img.languages__checkbox(v-if="row.active" src="../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'languages_opacity': currentActive === index}")
+                    img.languages__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'languages_opacity': currentActive === index}")
             template(slot="icons" slot-scope="{ row, index }")
                 .languages__icons
                     img.languages__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'languages_opacity': isActive(key, index)}")
@@ -51,6 +58,7 @@
 <script>
 import SettingsTable from "./SettingsTable";
 import { mapGetters, mapActions } from "vuex";
+import ClickOutside from "vue-click-outside";
 
 export default {
     data() {
@@ -59,8 +67,8 @@ export default {
                 {label: "Icon", headerKey: "headerIcon", key: "icon", width: "12%", padding: "0"},
                 {label: "Name", headerKey: "headerName", key: "name", width: "28%", padding: "0"},
                 {label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "12%", padding: "0"},
-                {label: "Iso 639-1", headerKey: "headerIso1", key: "iso1", width: "12%", padding: "0"},
-                {label: "Iso 639-2", headerKey: "headerIso2", key: "iso2", width: "12%", padding: "0"},
+                {label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "12%", padding: "0"},
+                {label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "12%", padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: "12%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
             ],
@@ -69,6 +77,8 @@ export default {
             currentActive: -1,
             file: [],
             imageData: "",
+            isTooltip1: false,
+            isTooltip2: false,
             icons: {
                 save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
                 edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
@@ -102,6 +112,22 @@ export default {
             } else {
                 return true;
             }
+        },
+        toggleTooltip(iso) {
+            if(iso === "iso1") {
+                this.isTooltip1 = !this.isTooltip1;
+                this.isTooltip2 = false;
+            } else {
+                this.isTooltip2 = !this.isTooltip2;
+                this.isTooltip1 = false;
+            }
+        },
+        closeTooltip(prop) {
+            this[prop] = false;
+        },
+        toggleActive(index) {
+            if(this.currentActive !== index) return;
+            this.languages[index].active = !this.languages[index].active;
         },
         isEditing() {
             return this.currentActive !== -1;
@@ -209,6 +235,9 @@ export default {
     components: {
         SettingsTable
     },
+    directives: {
+        ClickOutside
+    },
     mounted() {
         this.getLanguages();
     }
@@ -226,12 +255,35 @@ export default {
     &__table {
         height: 550px;
     }
+    &__header {
+        position: relative;
+    }
+    &__header-icon {
+        position: absolute;
+        top: -2px;
+        left: 60%;
+        cursor: pointer;
+    }
+    &__tooltip {
+        position: relative;
+        top: -42px;
+        left: -50%;
+        color: $orange;
+        width: 100px;
+    }
     &__data {
         height: 32px;
         padding: 0 5px;
         display: flex;
         align-items: center;
         box-sizing: border-box;
+        position: relative;
+    }
+    &__checkbox {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        opacity: 0.5;
     }
     &_centered {
         justify-content: center;

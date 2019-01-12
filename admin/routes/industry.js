@@ -18,7 +18,7 @@ router.post("/industry/:id", upload.fields([{ name: "icon" }, { name: "generic" 
     res.send('Saved');
   } catch(err) {
     console.log(err);
-    res.status(500).send('Something wrong on Industry creating');
+    res.status(500).send('Something wrong on Industry creating/updating');
   }
 });
 

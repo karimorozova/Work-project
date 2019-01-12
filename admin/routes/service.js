@@ -1,64 +1,38 @@
 const router = require('express').Router();
-const multer = require('multer');
-const mv = require('mv');
 const { upload } = require('../utils/');
 const { Services, Industries, Duorate, Monorate } = require('../models');
 const { getOneService, getManyServices, createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
 const { getDuoRate, getMonoRate } = require('../rates');
+const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
-function moveServiceIcon(oldFile, date) {
-  var newFile = './dist/static/services/' + date + '-' + oldFile.filename
-  mv(oldFile.path, newFile, {
-    mkdirp: true
-  }, function (err) {
-    if(err) {
-      console.log(err);
-    }
-  });
-  console.log('Flag icon moved!')
-}
-
-router.post("/saveservices", upload.fields([{name: "uploadedFileIcon"}]), async (req, res) => {
-  const serviceId = req.body.dbIndex;
-  const serviceIcon = req.files["uploadedFileIcon"];
-  let iconPath = "";
-  const  date = new Date().getTime();
+router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
+  const { title, languageForm, calculationUnit, active, symbol, sortIndex, projectType } = req.body;
+  const  { id } = req.params;
+  const isActive = active === "true" ? true : false;
+  const iconFile = req.files["icon"];
   try {
-    if (serviceIcon) {
-      await moveServiceIcon(serviceIcon[0], date);
-      iconPath = `/static/services/${date}-` + serviceIcon[0].filename;
+    if(id === "new") {
+      await createNewService({
+        title, active: isActive, iconFile, languageForm, calculationUnit, symbol, sortIndex, projectType
+      });
+    } else {
+      await updateService({id, title, active: isActive, iconFile, languageForm, calculationUnit});
     }
-
-    let objForUpdate = {
-      active: req.body.activeFormValue,
-      languageForm: req.body.languageFormValue,
-      calculationUnit: req.body.calcFormValue
-    };
-    
-    const nameVal = req.body.nameTitle;
-    
-    if (nameVal.length) {
-      objForUpdate.title = nameVal;
-    }
-
-    if(iconPath.length) {
-      objForUpdate.icon = iconPath;
-    }
-
-    await Services.update({ "_id": serviceId }, objForUpdate);
-    res.send('Service updated')
+    res.send('Saved');
   } catch(err) {
     console.log(err);
-    res.status(500).send('Error / Cannot save Service')
+    res.status(500).send('Something wrong on Service creating/updating');
   }
 });
 
-router.post("/removeservices", async (req, res) => {
-  const serviceId = req.body.serviceRem;
+router.delete("/service/:id", async (req, res) => {
+  const { id } = req.params;
+  const { icon } = req.body;
   try {
-    await Services.deleteOne({ "_id": serviceId });
+    await Services.deleteOne({"_id": id});
+    await deleteServiceIcon(icon);
     res.send('Removed');
   } catch(err) {
       console.log(err);

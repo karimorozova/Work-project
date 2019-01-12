@@ -36,7 +36,6 @@ export default {
 
 .table {
     width: 100%;
-    overflow: hidden;
     &__thead {
         .table__thead-row {
             background-color: $thead-background;

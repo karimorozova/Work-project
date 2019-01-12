@@ -43,7 +43,7 @@ export default {
         showOptions(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr") {
+                if(item.localName == "tr" || item.className == "table__tbody-row") {
                     return item;
                 }
             });
@@ -53,7 +53,6 @@ export default {
                 top = tr.offsetTop;
                 height = tr.offsetHeight;
             }
-            this.droppedLang = !this.droppedLang;
             this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: top, offsetHeight: height});
         },
         showOption(opt) {
@@ -161,11 +160,14 @@ export default {
             border: 1px solid #BFB09D;
             border-top: none;
         }
+        .services__drop-menu & {
+            border: 1px solid #BFB09D;
+        }
     }
     .filters &, .project-finance__drop-menu & {
         width: 100%;
     }
-    .inner-component & {
+    .inner-component &, .services__drop-menu & {
         border: none;
         border-radius: 0;
         height: 100%;
@@ -246,6 +248,10 @@ export default {
         .selected {
             padding: 2px 5px;
         }
+    }
+    .services__drop-menu & {
+        height: 32px;
+        box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }
 
