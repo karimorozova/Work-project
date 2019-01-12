@@ -17,8 +17,7 @@ import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
-import Services from '@/components/Table/Services'
-// import TableServices from '@/components/Table/TableServices'
+import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
@@ -94,7 +93,7 @@ const router = new Router({
             {
               path: 'services',
               name: 'services',
-              component: Services
+              component: TableServices
             },
             {
               path: 'industries',
