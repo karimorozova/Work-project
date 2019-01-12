@@ -44,7 +44,7 @@ export default {
     },
     methods: {
         onClick(index) {
-            this.$emit("onRowClicked", {index: index})
+            this.$emit("onRowClicked", { index })
         }
     }
 }

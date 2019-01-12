@@ -49,7 +49,7 @@
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
                 input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep")
-                .steps__expander(@click="expandRow(index)")
+                .steps__expander(@click="expandRow(index)" :class="{'steps_rotated': isExpand && activeIndex === index}")
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
@@ -61,11 +61,14 @@
                         :selectedPerson="vendorName(row.vendor)"
                         :isExtended="isAllShow"
                         :isAdditionalShow="isAdditionalShow"
+                        @isOpened="(e) => showAllStepInfo(index)"
                         @setPerson="(person) => setVendor(person, index)"
                         @togglePersonsData="toggleVendors"
                     )
             template(slot="start" slot-scope="{ row, index }")
-                Datepicker(@selected="(e) => changeDate(e, 'start', index)" 
+                Datepicker(
+                    @isOpened="(e) => showAllStepInfo(index)"
+                    @selected="(e) => changeDate(e, 'start', index)" 
                     v-model="row.start"
                     inputClass="steps__custom-input" 
                     calendarClass="steps__calendar-custom" 
@@ -73,7 +76,9 @@
                     monday-first=true
                     :highlighted="highlighted")
             template(slot="deadline" slot-scope="{ row, index }")
-                Datepicker(@selected="(e) => changeDate(e, 'deadline', index)" 
+                Datepicker(
+                    @isOpened="(e) => showAllStepInfo(index)"
+                    @selected="(e) => changeDate(e, 'deadline', index)" 
                     v-model="row.deadline"
                     inputClass="steps__custom-input" 
                     calendarClass="steps__calendar-custom" 
@@ -184,11 +189,15 @@ export default {
                 this.activeIndex = -1;
                 this.isExpand = false;
             }
-            this.$emit("onRowClicked", {index: index})
+            this.$emit("onRowClicked", { index })
+        },
+        showAllStepInfo(index) {
+            this.activeIndex = index;
+            this.isExpand = true;
         },
         setVendor({person}, index) {
             const { _id, firstName, surname, email } = person;
-            this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index: index});
+            this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index});
         },
         async setAction({option}) {
             this.selectedAction = option;
@@ -327,6 +336,9 @@ export default {
             transform: rotate(-60deg);
         }
     }
+    &_rotated {
+        transform: rotate(180deg);
+    };
     &__progress-tooltip {
         position: absolute;
         opacity: 0;

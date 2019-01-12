@@ -41,6 +41,9 @@ export default {
     methods: {
         togglePersons() {
             this.isDropped = !this.isDropped;
+            if(this.isDropped) {
+                this.$emit('isOpened')
+            }
         },
         outClick() {
             this.isDropped = false;

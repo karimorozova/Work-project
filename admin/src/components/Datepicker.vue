@@ -352,6 +352,9 @@ export default {
      * @return {mixed} [description]
      */
     showCalendar () {
+      if(!this.isOpen) {
+        this.$emit('isOpened');
+      }
       if (this.disabledPicker || this.isInline) {
         return false
       }
@@ -1092,8 +1095,8 @@ export default {
 
 .steps__calendar-custom {
   width: 200px;
-  right: -175px;
-  top: -6px;
+  right: -6px;
+  top: 24px;
 }
 
 .filters .datepicker-custom {
@@ -1103,7 +1106,7 @@ export default {
 
 .calendar-custom {
   width: 220px;
-  left: -21px;
+  right: 0;
 }
 .calendar-custom .cell,
 .steps__calendar-custom .cell {

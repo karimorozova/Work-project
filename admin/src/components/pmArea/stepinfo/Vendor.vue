@@ -65,7 +65,7 @@ export default {
         },
         checkForLanguages(vendor) {
             return vendor.languageCombinations.find(item => {
-                return item.source.symbol === this.step.source && 
+                return item.source && item.source.symbol === this.step.source && 
                     item.target.symbol === this.step.target
             })
         },

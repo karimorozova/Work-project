@@ -32,7 +32,6 @@ export default {
       },
       isLogin: false,
       isLoginWarning: false,
-      // isLoginWarning: true
       forgotLink: true
       };
   },

@@ -272,7 +272,7 @@ export default {
         next(vm => {
             if(from.path === '/recruitment') {
                 vm.sidebarTitle = "RECRUITMENT";
-                vm.backPath = form.path
+                vm.backPath = from.path
             }
         })
     }
