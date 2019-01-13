@@ -324,13 +324,13 @@ export default {
         color: #67573e;
         border: 1px solid #67573e;
         border-radius: 5px;
-        padding: 0 3px;
+        padding: 0 5px;
         outline: none;
-        width: 185px;
-        height: 28px;
+        width: 191px;
+        height: 30px;
+        box-sizing: border-box;
     }
     ::-webkit-input-placeholder {
-        padding: 10px 5px;
         opacity: 0.5;
     }
     &_error-shadow {

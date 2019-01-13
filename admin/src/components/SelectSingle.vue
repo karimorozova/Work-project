@@ -130,7 +130,7 @@ export default {
             padding-left: 3px;
         }
         &__item {
-            padding: 5px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;

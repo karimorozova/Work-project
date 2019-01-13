@@ -13,7 +13,7 @@ export const addNewClient = ({commit, rootState}, payload) => {
 }
 export const storeClient = ({commit, rootState}, payload) => {
     const index = rootState.a.customers.findIndex(item => item._id === payload._id);
-    rootState.a.customers[index] = payload;
+    rootState.a.customers.splice(index, 1, payload);
 }
 export const removeClient = ({commit, rootState}, payload) => {
     const index = rootState.a.customers.findIndex(item => item._id === payload);

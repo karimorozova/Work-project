@@ -230,6 +230,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             updateVendorProp: "updateVendorProp",
+            updateCurrentVendor: "updateCurrentVendor",
             deleteCurrentVendor: "deleteCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry"
@@ -357,11 +358,10 @@ export default {
         padding: 0 5px;
         outline: none;
         width: 191px;
-        height: 28px;
+        height: 30px;
         box-sizing: border-box;
     }
     ::-webkit-input-placeholder {
-        padding: 10px 5px;
         opacity: 0.5;
     }
     &_error-shadow {

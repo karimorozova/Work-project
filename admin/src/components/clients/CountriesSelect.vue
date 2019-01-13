@@ -93,7 +93,7 @@ export default {
             width: 100%;
             outline: none;
             border: none;
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             color: #67573E;
             box-shadow: inset 0 0 5px #67573E;
         }
@@ -105,7 +105,7 @@ export default {
         overflow-x: hidden;
         background-color: white;
         &__item {
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;

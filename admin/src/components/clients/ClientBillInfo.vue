@@ -68,10 +68,11 @@ export default {
             color: rgba(103, 87, 62, 0.5);
             border: 1px solid #67573e;
             border-radius: 5px;
-            padding: 0 3px;
+            padding: 0 5px;
             outline: none;
-            width: 185px;
-            height: 28px;
+            width: 191px;
+            height: 30px;
+            box-sizing: border-box;
             &:focus {
                 color: #67573e;
             }
@@ -107,13 +108,16 @@ export default {
         width: 185px;
         border: 1px solid #67573e;
         border-radius: 5px;
-        padding: 3px;
+        padding: 5px;
         outline: none;
         resize: none;
         &:focus {
             color: #67573E;
         }
-    }
+        &::-webkit-input-placeholder {
+            opacity: 0.5;
+        }
+    }    
 }
 
 </style>

@@ -87,7 +87,7 @@ export default {
 
 .all-vendors {
   position: relative;
-  margin: 40px;
+  margin: 40px 40px 40px 0;
     &__table {
         padding: 20px;
         width: 1100px;

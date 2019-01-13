@@ -220,7 +220,7 @@ label {
 }
 
 .all-clients__table {
-    margin: 40px;
+    margin: 40px 40px 40px 0;
     padding: 20px;
     font-size: 14px;
     font-weight: normal;

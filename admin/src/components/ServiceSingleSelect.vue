@@ -117,7 +117,7 @@ export default {
         background-color: white;
         z-index: 5;
         &__item {
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;

@@ -149,7 +149,6 @@ export default {
             width: 80%;
             height: 23px;
             border-right: none;
-            padding: 3px 10px;
             opacity: 0.5;
         }
     }
@@ -214,7 +213,7 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -253,7 +252,7 @@ export default {
     .search {
         width: 100%;
         box-sizing: border-box;
-        padding: 5px 3px;
+        padding: 5px 0 5px 5px;
         color: #67573E;
         outline: none;
         box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);

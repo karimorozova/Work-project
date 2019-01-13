@@ -139,6 +139,7 @@ export default {
             alertToggle: "alertToggle",
             updateVendorProp: "updateVendorProp",
             storeVendors: "vendorsSetting",
+            updateCurrentVendor: "updateCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry",
             deleteCurrentVendor: "deleteCurrentVendor"
@@ -193,8 +194,7 @@ export default {
             }
             sendData.append('vendor', JSON.stringify(updatingVendor));
             try {
-                const updatedVendors = await this.$http.post("/vendorsapi/update-vendor", sendData);
-                await this.storeVendors(updatedVendors.data);
+                await this.updateCurrentVendor(sendData);
                 this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"}); 
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})

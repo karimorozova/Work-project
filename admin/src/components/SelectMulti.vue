@@ -101,7 +101,7 @@ export default {
             display: flex;
             align-items: center;
             height: 27px;
-            padding: 7px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
@@ -114,15 +114,6 @@ export default {
             }
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
-            }
-            .project & {
-                padding: 5px;
-            }
-            .project-info__tasks &, .filters & {
-                padding: 12px 0;
-            }
-            .filters & {
-                font-size: 12px;
             }
         }
         .domain__options & {
@@ -152,7 +143,7 @@ export default {
     cursor: pointer;
     .selected {
         width: 80%;
-        padding: 3px 10px;
+        padding: 3px 5px;
         font-size: 14px;
         max-height: 40px;
         display: flex;

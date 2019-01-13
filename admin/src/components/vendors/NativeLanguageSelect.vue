@@ -167,7 +167,7 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             transition: all 0.4s;
@@ -195,12 +195,13 @@ export default {
     .vendors-table__drop-menu & {
         border: none;
         border-radius: 0;
+        z-index: 0;
     }
     .search {
         width: 100%;
         outline: none;
         border: none;
-        padding: 5px 2px;
+        padding: 5px 0 5px 5px;
         color: $main-color;
         box-sizing: border-box;
         box-shadow: inset 0 0 5px $main-color;

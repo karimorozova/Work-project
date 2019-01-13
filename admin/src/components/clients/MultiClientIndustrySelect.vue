@@ -181,7 +181,7 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            padding: 5px 2px;
+            padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;

@@ -6,7 +6,7 @@
             .lead-info__menu(:class="{'sales-info_error-shadow': !client.leadSource && isEmpty}")
                 ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
         .status-info
-            label Sales comission status:
+            label.lead-info__label Sales comission status:
             .status-info__data    
                 span {{ client.salesComission }}
 </template>

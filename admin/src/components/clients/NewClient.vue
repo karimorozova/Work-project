@@ -43,8 +43,8 @@
                     .block-item
                         label.block-item__label.block-item_relative Account Manager:
                             Asterisk(:customStyle="asteriskStyle")
-                        .block-item__drop(:class="{'clients-wrap_error-shadow': !client.accountManager && isSaveClicked}")
-                            AMSelect.block-item_high-index(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
+                        .block-item__drop.block-item_high-index(:class="{'clients-wrap_error-shadow': !client.accountManager && isSaveClicked}")
+                            AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
                     .block-item
                         label.block-item__label.block-item_relative Sales Manager:
                             Asterisk(:customStyle="asteriskStyle")
@@ -393,13 +393,13 @@ export default {
         color: #67573e;
         border: 1px solid #67573e;
         border-radius: 5px;
-        padding: 0 3px;
+        padding: 0 5px;
         outline: none;
-        width: 185px;
-        height: 28px;
+        width: 191px;
+        height: 30px;
+        box-sizing: border-box;
     }
     ::-webkit-input-placeholder {
-        padding: 10px 5px;
         opacity: 0.5;
     }
 }

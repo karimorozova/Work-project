@@ -469,10 +469,9 @@ export default {
         padding: 0 5px;
         outline: none;
         width: 191px;
-        height: 28px;
+        height: 30px;
     }
     ::-webkit-input-placeholder {
-        padding: 10px 5px;
         opacity: 0.5;
     }
 }
