@@ -479,8 +479,8 @@ async function fillPricelist() {
     if(!pricelists.length) {
       await Pricelist.create({
         name: 'Basic',
-        default: true,
-        active: true,
+        isDefault: true,
+        isActive: true,
         combinations: duoRates
       });
     }

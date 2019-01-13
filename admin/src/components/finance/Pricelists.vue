@@ -209,8 +209,12 @@ export default {
         padding: 20px;
         position: relative;
     }
-    &__data {
-        padding: 5px 3px;
+    &__data, &__editing-data {
+        box-sizing: border-box;
+        padding: 5px;
+        height: 28px;
+        display: flex;
+        align-items: center;
     }
     &_pointer {
         cursor: pointer;
@@ -222,7 +226,6 @@ export default {
         }
     }
     &__editing-data {
-        padding: 4px 0;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__text {
