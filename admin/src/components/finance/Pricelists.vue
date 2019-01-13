@@ -106,7 +106,7 @@ export default {
         },
         async checkErrors(index) {
             this.errors = [];
-            if(!this.currentName || !this.isNameUnique()) this.errors.push("The name should be unique and not empty.");
+            if(!this.currentName || !this.isNameUnique(index)) this.errors.push("The name should be unique and not empty.");
             if(this.errors.length) {
                 return this.isErrorExist = true;
             }
