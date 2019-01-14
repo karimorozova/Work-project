@@ -301,7 +301,7 @@ const industriesDefault = [
 ];
 
 const packagesDefault = [
-    {name: "Up to 200", size: "200"},{name: "201 to 300", size: "300"},{name: "301 to 400", size: "400"},{name: "401 to 699", size: "700"},{name: "700 to 100", size: "1000"}, 
+    {name: "Up to 200", size: "200"},{name: "201 to 300", size: "300"},{name: "301 to 400", size: "400"},{name: "401 to 699", size: "700"},{name: "700 to 1000", size: "1000"}, 
 ]
 
 const projectsDefault = [];

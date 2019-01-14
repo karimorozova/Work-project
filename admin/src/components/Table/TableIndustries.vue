@@ -4,6 +4,13 @@
         SettingsTable(
             :fields="fields"
             :tableData="industries"
+            :errors="errors"
+            :areErrors="areErrors"
+            :isApproveModal="isDeleting"
+            @closeErrors="closeErrors"
+            @approve="deleteIndustry"
+            @notApprove="cancel"
+            @closeModal="cancel"
         )
             template(slot="headerIcon" slot-scope="{ field }")
                 .industries__header {{ field.label }}
@@ -72,6 +79,10 @@ export default {
                 cancel: {icon: require("../../assets/images/cancel_icon.jpg")},
                 delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
             },
+            areErrors: false,
+            errors: [],
+            isDeleting: false,
+            deleteIndex: -1
         }
     },
     methods: {
@@ -105,15 +116,15 @@ export default {
             this.industries[index].active = !this.industries[index].active;
         },
         isEditing() {
-            return this.currentActive !== -1;
+            this.errors = ["Please, finish current edition first."];
+            this.areErrors = true;
         },
         async makeAction(index, key) {
-            if(this.isEditing() && this.currentActive !== index) {
-                return
+            if(this.currentActive !== -1 && this.currentActive !== index) {
+                return this.isEditing();
             }
             if(key === "save") {
-                await this.saveChanges(index);
-                this.cancel();
+                await this.checkErrors(index);
             }
             if(key === "edit") {
                 this.setEditionData(index);
@@ -124,12 +135,38 @@ export default {
                 await this.getIndustries();
             }
             if(key === "delete") {
-                await this.deleteIndustry(index);
+                if(!this.industries[index]._id) {
+                    this.industries.splice(index, 1);
+                    return this.cancel();
+                }
+                this.deleteIndex = index;
+                this.isDeleting = true;
             }
         },
         setEditionData(index) {
             this.currentActive = index;
             this.currentName= this.industries[index].name;
+        },
+        async checkErrors(index) {
+            this.errors = [];
+            if(!this.currentName || !this.isNameUnique(index)) this.errors.push("Name should not be empty and be unique!");
+            if(this.errors.length) {
+                this.areErrors = true;
+                return
+            }
+            await this.saveChanges(index);
+            this.cancel();
+        },
+        isNameUnique(index) {
+            const duplicateIndex = this.industries.findIndex((item, ind) => {
+                if(index !== ind && item.name === this.industries[index].name) {
+                    return item;
+                }
+            })
+            return duplicateIndex === -1;
+        },
+        closeErrors() {
+            this.areErrors = false;
         },
         async saveChanges(index) {
             if(this.currentActive === -1) return;
@@ -169,11 +206,9 @@ export default {
                 this.alertToggle({message: "Erorr on saving Industry info", isShow: true, type: "error"});
             }
         },
-        async deleteIndustry(index) {
+        async deleteIndustry() {
+            const index = this.deleteIndex;
             const id = this.industries[index]._id;
-            if(!id) {
-                return this.industries.splice(index, 1);
-            }
             const { icon, generic } = this.industries[index];
             try {
                 await this.$http.delete(`/industry/industry/${id}`, {body: {icon, generic}});
@@ -182,14 +217,19 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Erorr on removing Industry", isShow: true, type: "error"});
             }
+            this.cancel();
         }, 
         cancel() {
             this.currentActive = -1;
             this.imageData = "";
             this.iconFile = [];
             this.genericFile = [];
+            this.isDeleting = false;
         },
         addIndustry() {
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
             this.industries.push({
                 icon: "",
                 name: "",
@@ -234,6 +274,7 @@ export default {
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
+    position: relative;
     &__data, &__editing-data {
         height: 32px;
         padding: 0 5px;

@@ -3,6 +3,13 @@
     SettingsTable(
         :fields="fields"
         :tableData="packages"
+        :errors="errors"
+        :areErrors="areErrors"
+        :isApproveModal="isDeleting"
+        @closeErrors="closeErrors"
+        @approve="deletePackage"
+        @notApprove="setDefaults"
+        @closeModal="setDefaults"
     )
         template(slot="headerName" slot-scope="{ field }")
             .packages__head-title {{ field.label }}
@@ -46,7 +53,11 @@ export default {
             },
             currentActive: -1,
             currentName: "",
-            currentSize: ""
+            currentSize: "",
+            areErrors: false,
+            errors: [],
+            isDeleting: false,
+            deleteIndex: -1
         }
     },
     methods: {
@@ -58,9 +69,13 @@ export default {
                 return key !== "save" && key !== "cancel";
             }
         },
+        isEditing() {
+            this.errors = ["Please, finish current edition first."];
+            this.areErrors = true;
+        },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
-                return
+                return this.isEditing();
             }
             if(key === "edit") {
                 this.currentActive = index;
@@ -68,15 +83,41 @@ export default {
                 this.currentSize = this.packages[index].size
             }
             if(key === "save") {
-                await this.savePackage(index);
-                this.setDefaults();
+                await this.checkErrors(index);
             }
             if(key === "cancel") {
                 this.cancelEdition(index)
             }
             if(key === "delete") {
-                await this.deletePackage(index);
+                if(!this.packages[index]._id) {
+                    this.packages.splice(index, 1);
+                    return this.setDefaults();
+                }
+                this.deleteIndex = index;
+                this.isDeleting = true;
             }
+        },
+        async checkErrors(index) {
+            this.errors = [];
+            if(!this.currentName || !this.isTitleUnique(index)) this.errors.push("Name should not be empty and be unique!");
+            if(!this.currentSize) this.errors.push("Please, set the size of the package.");
+            if(this.errors.length) {
+                this.areErrors = true;
+                return
+            }
+            await this.savePackage(index);
+            this.setDefaults();
+        },
+        isTitleUnique(index) {
+            const duplicateIndex = this.packages.findIndex((item, ind) => {
+                if(index !== ind && item.name === this.packages[index].name) {
+                    return item;
+                }
+            })
+            return duplicateIndex === -1;
+        },
+        closeErrors() {
+            this.areErrors = false;
         },
         async savePackage(index) {
             if(this.currentActive === -1) return;
@@ -91,15 +132,18 @@ export default {
                 this.alertToggle({message: "Error on creating a new package", isShow: true, type: 'error'})
             }
         },
-        async deletePackage(index) {
+        async deletePackage() {
+            const index = this.deleteIndex;
+            const id = this.packages[index]._id;
             try {
-                await this.$http.delete(`/api/package/${this.packages[index]._id}`);
+                await this.$http.delete(`/api/package/${id}`);
                 this.packages.splice(index, 1);
                 this.setDefaults();
                 this.alertToggle({message: "Package deleted", isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: "Error on package deleting", isShow: true, type: 'error'})
             }
+            this.setDefaults();
         },
         cancelEdition(index) {
             if(!this.packages[index]._id) {
@@ -111,9 +155,13 @@ export default {
             this.currentActive = -1;
             this.currentName = "";
             this.currentSize = "";
+            this.isDeleting = false;
         },
         addPackage() {
-            this.packages.push({source: ""});
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
+            this.packages.push({name: "", size: ""});
             this.currentActive = this.packages.length - 1;
         },
         async getPackages() {
@@ -146,6 +194,7 @@ export default {
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
+    position: relative;
     &__data, &__editing-data {
         height: 32px;
         padding: 0 5px;

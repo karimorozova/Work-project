@@ -4,6 +4,9 @@
         SettingsTable(
             :fields="fields"
             :tableData="langPaging[currentPage-1]"
+            :errors="errors"
+            :areErrors="areErrors"
+            @closeErrors="closeErrors"
         )
             template(slot="headerIcon" slot-scope="{ field }")
                 .languages__header {{ field.label }}
@@ -84,6 +87,8 @@ export default {
                 edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
                 cancel: {icon: require("../../assets/images/cancel_icon.jpg")}
             },
+            areErrors: false,
+            errors: []
         }
     },
     methods: {
@@ -96,17 +101,23 @@ export default {
             }
         },
         toPage(num) {
-            if(this.isEditing()) return;
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
             this.currentPage = num + 1;
         },
         nextPage() {
-            if(this.isEditing()) return;
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
             if (this.currentPage < this.pagesTotal) {
                 this.currentPage = this.currentPage + 1;
             }
         },
         prevPage() {
-            if(this.isEditing()) return;
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
             if (this.currentPage > 1) {
                 this.currentPage = this.currentPage - 1;
             } else {
@@ -130,11 +141,12 @@ export default {
             this.languages[index].active = !this.languages[index].active;
         },
         isEditing() {
-            return this.currentActive !== -1;
+            this.errors = ["Please, finish current edition first."];
+            this.areErrors = true;
         },
         async makeAction(index, key) {
-            if(this.isEditing() && this.currentActive !== index) {
-                return
+            if(this.currentActive !== -1 && this.currentActive !== index) {
+                return this.isEditing();
             }
             if(key === "save") {
                 await this.saveChanges(index);
@@ -148,6 +160,9 @@ export default {
                 this.cancel();
                 await this.getLanguages();
             }
+        },
+        closeErrors() {
+            this.areErrors = false;
         },
         async saveChanges(index) {
             if(this.currentActive === -1) return;
@@ -233,7 +248,7 @@ export default {
         }
     },
     components: {
-        SettingsTable
+        SettingsTable,
     },
     directives: {
         ClickOutside
@@ -252,6 +267,7 @@ export default {
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
+    position: relative;
     &__table {
         height: 550px;
     }

@@ -56,6 +56,8 @@ export default {
     align-items: center;
     padding: 15px;
     box-shadow: 0 0 5px $brown-shadow;
+    background-color: $white;
+    max-width: 300px;
     &__buttons {
         margin-top: 10px;
         display: flex;

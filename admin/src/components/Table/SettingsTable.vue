@@ -8,9 +8,25 @@
         .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
                 slot(:name="field.key" :row="row" :index="index")
+    ValidationErrors(v-if="areErrors"
+        :errors="errors"
+        :isAbsolute="isAbsolute"
+        @closeErrors="closeErrors")
+    .table__approve(v-if="isApproveModal")
+        ApproveModal(
+            text="Are you sure?"
+            approveValue="Yes"
+            notApproveValue="Cancel"
+            @approve="approve"
+            @notApprove="notApprove"
+            @close="closeModal"
+        )
 </template>
 
 <script>
+import ValidationErrors from "../ValidationErrors";
+import ApproveModal from "../ApproveModal";
+
 export default {
     props: {
         fields: {
@@ -21,12 +37,44 @@ export default {
         },
         activeIndex: {
             type: Number
-        }        
+        },
+        errors: {
+            type: Array
+        },
+        areErrors: {
+            type: Boolean,
+            default: false
+        },
+        isApproveModal: {
+            type: Boolean,
+            default: false
+        }
     },
-     methods: {
+    data() {
+        return {
+            isAbsolute: true
+        }
+    },
+    methods: {
         onClick(index) {
             this.$emit("onRowClicked", {index: index})
+        },
+        closeErrors() {
+            this.$emit("closeErrors");
+        },
+        approve() {
+            this.$emit("approve");
+        },
+        notApprove() {
+            this.$emit("notApprove");
+        },
+        closeModal() {
+            this.$emit("closeModal");
         }
+    },
+    components: {
+        ValidationErrors,
+        ApproveModal
     }
 }
 </script>
@@ -82,6 +130,18 @@ export default {
     }
     &_bottom-bordered {
         border-bottom: 0.5px solid $cell-border;
+    }
+    &__approve {
+        position: absolute;
+        z-index: 50;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 </style>
