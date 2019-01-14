@@ -31,7 +31,7 @@ const {
 
 const axios = require('axios');
 
-var instance = axios.create({
+let instance = axios.create({
   baseURL: 'https://pangea.s.xtrf.eu/home-api/',
   headers: {
     'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj'
@@ -342,6 +342,7 @@ async function serviceMonoLangs() {
   let languages = await Languages.find({});
   let services = await Services.find({"languageForm": "Mono"});
   let industries = await Industries.find({});
+  let languageCombinations = [];
   let rate = 0.12;
   for(let serv of services) {
     if(serv.title == 'Blogging') {
@@ -353,24 +354,24 @@ async function serviceMonoLangs() {
     const addIndustries = industries.map(item => {
       return {industry: item._id, rate: rate, package: 200, active: true}
     })
-    if(!serv.languageCombinations.length) {
-      for(let lang of languages) {
-        if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
-          serv.languageCombinations.push({
-            target: lang._id,
-            industries: addIndustries
-          })
-        }
+    for(let lang of languages) {
+      if(serv.languages[0].target.indexOf(lang.symbol) != -1) { 
+        languageCombinations.push({
+          service: serv.symbol,
+          target: lang._id,
+          industries: addIndustries
+        })
       }
-      await Services.updateOne({"title": serv.title}, serv);
     }
   }
+  return languageCombinations;
 }
 
 async function serviceDuoLangs() {
   let languages = await Languages.find({});
   let services = await Services.find({"languageForm": "Duo"});
   let industries = await Industries.find({});
+  let languageCombinations = [];
   let rate = 0.1;
   let englishLang = languages.find(item => {
     return item.symbol == "EN-GB"
@@ -386,26 +387,26 @@ async function serviceDuoLangs() {
     const addIndustries = industries.map(item => {
       return {industry: item._id, rate: rate, active: true}
     })
-    if(!serv.languageCombinations.length) {
     for(let lang of languages) {
       if(serv.languages[0].target.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
-        serv.languageCombinations.push({
+        languageCombinations.push({
+          service: serv.symbol,
           source: englishLang._id,
           target: lang._id,
           industries: addIndustries
         })
       }
       if(serv.languages[0].source.indexOf(lang.symbol) != -1 && lang.lang.indexOf('English') == -1) {
-        serv.languageCombinations.push({
+        languageCombinations.push({
+          service: serv.symbol,
           source: lang._id,
           target: englishLang._id,
           industries: addIndustries
         })
       }
     }
-    await Services.update({"title": serv.title}, serv);
-    }
-  }  
+  }
+  return languageCombinations;  
 }
 
 async function fillDuoServiceRates() {
@@ -413,7 +414,8 @@ async function fillDuoServiceRates() {
   try {
     if(!existedRates.length) {
       const services = await Services.find({"languageForm": "Duo"});
-      const translation = await Services.findOne({"symbol": "tr"});
+      const duoCombinations = await serviceDuoLangs();
+      const translation = duoCombinations.filter(item => item.service === "tr");
       const duoServices = services.reduce((init, cur) => {
         let rate = 0;
         if(cur.symbol === "tr") rate = 0.08;
@@ -423,7 +425,7 @@ async function fillDuoServiceRates() {
         init[key] = {value: rate, active: true};
         return {...init}
       }, {});
-      const combs = translation.languageCombinations;
+      const combs = translation;
       for(let comb of combs) {
         const industries = comb.industries.map(item => {
           return { industry: item.industry, rates: {...duoServices}}
@@ -445,7 +447,8 @@ async function fillMonoServiceRates() {
   try {
     if(!existedRates.length) {
       const services = await Services.find({"languageForm": "Mono"});
-      const copywriting = await Services.findOne({"symbol": "co"});
+      const monoCombinations = await serviceMonoLangs();
+      const copywriting = monoCombinations.filter(item => item.service === "co");
       const monoServices = services.reduce((init, cur) => {
         let rate = 0;
         if(cur.symbol === "co") rate = 0.1; 
@@ -455,7 +458,7 @@ async function fillMonoServiceRates() {
         init[key] = {value: rate, active: true};
         return {...init}
       }, {});
-      const combs = copywriting.languageCombinations;
+      const combs = copywriting;
       for(let comb of combs) {
         const industries = comb.industries.map(item => {
           return { industry: item.industry, rates: {...monoServices}}
@@ -504,10 +507,10 @@ async function checkCollections() {
   await users();
   await serviceMonoLangs();
   await serviceDuoLangs();
-  await clientLangs();
-  await vendorLangs();
   await fillDuoServiceRates();
   await fillMonoServiceRates();
+  await clientLangs();
+  await vendorLangs();
   await fillPricelist();
 }
 
