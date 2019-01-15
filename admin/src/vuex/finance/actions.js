@@ -6,10 +6,11 @@ export const addFinanceProperty = ({commit, rootState}, payload) => {
 export const storeDuoRates = ({commit}, payload) => commit('setDuoRates', payload);
 export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
-export const getDuoCombinations = async ({commit}, payload) => {
+export const getDuoCombinations = async ({commit, state}, payload) => {
     commit('startRequest');
     try {
-        const result = await Vue.http.get('/service/parsed-rates?form=Duo');
+        const id = state.currentPrice._id;
+        const result = await Vue.http.get(`/service/parsed-rates?form=Duo&id=${id}`);
         const rates = result.body.sort((a, b) => {
             if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
             if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
@@ -21,10 +22,11 @@ export const getDuoCombinations = async ({commit}, payload) => {
         throw new Error("Error on getting Duo rates");
     }
 }
-export const getMonoCombinations = async ({commit}, payload) => {
+export const getMonoCombinations = async ({commit, state}, payload) => {
     commit('startRequest');
     try {
-        const result = await Vue.http.get('/service/parsed-rates?form=Mono');
+        const id = state.currentPrice._id;
+        const result = await Vue.http.get(`/service/parsed-rates?form=Mono&id=${id}`);
         const rates = result.body.sort((a, b) => {
             if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
             if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;

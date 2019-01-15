@@ -139,10 +139,21 @@ router.delete('/rate/:id', async (req, res) => {
   }
 })
 
+// router.get("/parsed-rates",  async (req, res) => {
+//   const { form } = req.query;
+//   try {
+//     const rates = await getAllRates(form);
+//     res.send(rates); 
+//   } catch(err) {
+//     console.log(err);
+//     res.send("error");
+//   }
+// })
+
 router.get("/parsed-rates",  async (req, res) => {
-  const { form } = req.query;
+  const { id, form } = req.query;
   try {
-    const rates = await getAllRates(form);
+    const rates = await getAllRates(form, id);
     res.send(rates); 
   } catch(err) {
     console.log(err);

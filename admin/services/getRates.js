@@ -1,13 +1,15 @@
-const { Duorate, Services } = require("../models");
-const { getDuoRates, getMonoRates } = require("../rates");
+const { Services } = require("../models");
+const { getPricelist } = require("../rates");
 
-async function getAllRates(form) {
+async function getAllRates(form, id) {
     try {
-        const rates = form === "Duo" ? await getDuoRates({}) : await getMonoRates({});
+        const pricelist = await getPricelist({"_id": id});
+        const combinations = form === "Duo" ? pricelist[0].combinations.filter(item => item.source)
+        : pricelist[0].combinations.filter(item => !item.source);
         const ratesServices = await Services.find({languageForm: form});
         const serviceIds = ratesServices.map(item => item.id);
         let fullInfo = [];
-        for(let rate of rates) {
+        for(let rate of combinations) {
             fullInfo.push(...parseIndustries(rate, serviceIds, form));    
         }
         return fullInfo;

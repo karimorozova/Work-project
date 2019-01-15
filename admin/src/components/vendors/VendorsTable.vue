@@ -308,7 +308,7 @@ export default {
                 result.push(ind.name);
             }
             return result;
-        },
+        }
     },
     components: {
         DataTable,

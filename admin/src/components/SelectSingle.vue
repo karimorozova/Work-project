@@ -60,9 +60,11 @@ export default {
         },
         outOptions() {
             this.isDropped = false;
+            this.searchValue = "";
         },
         toggleOptions(event) {
             this.isDropped = !this.isDropped;
+            this.searchValue = "";
             this.showOptions(event);
         },
         chooseOption(index) {
@@ -126,8 +128,14 @@ export default {
         box-sizing: border-box; 
         z-index: 10;
         &__search {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px 0 5px 5px;
             color: #67573E;
-            padding-left: 3px;
+            outline: none;
+            box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
+            border: 1px solid rgba(104, 87, 62, 0.3);
+            border-right: none;
         }
         &__item {
             padding: 5px 0 5px 5px;
