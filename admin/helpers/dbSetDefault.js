@@ -116,13 +116,17 @@ function clients() {
       })
 }
 
+function defaultClient(client) {
+  return client.name.indexOf('default') !== -1;
+}
+
 async function clientLangs() {
   try {
     let clients = await Clients.find().populate('industries');
     let duoRates = await Duorate.find().populate('industries.industry');
     let monoRates = await Monorate.find().populate('industries.industry');
     for(let client of clients) {
-      if(!client.languageCombinations.length) {
+      if(!client.languageCombinations.length && defaultClient(client)) {
         client.languageCombinations = [];
             for(let i = 0; i < 5; i++) {
               const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));
@@ -177,13 +181,17 @@ function vendors() {
   })
 }
 
+function defaultVendor(vendor) {
+  return vendor.firstName.indexOf('default') !== -1;
+}
+
 async function vendorLangs() {
   try {
     let vendors = await Vendors.find().populate('industries');
     let duoRates = await Duorate.find().populate('industries.industry');
     let monoRates = await Monorate.find().populate('industries.industry');
     for(let vendor of vendors) {
-      if(!vendor.languageCombinations.length) {
+      if(!vendor.languageCombinations.length && defaultVendor(vendor)) {
         vendor.languageCombinations = [];
             for(let i = 0; i < 5; i++) {
               const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));

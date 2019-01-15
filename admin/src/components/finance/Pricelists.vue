@@ -91,6 +91,9 @@ export default {
             if(key === "save") {
                 await this.checkErrors(index);
             }
+            if(key === "copy") {
+                await this.addPriceCopy(index);
+            }
             if(key === "cancel") {
                 await this.cancelEdition(index)
             }
@@ -110,9 +113,9 @@ export default {
             if(this.errors.length) {
                 return this.isErrorExist = true;
             }
-            await this.savePackage(index);
+            await this.savePricelist(index);
         },
-        async savePackage(index) {
+        async savePricelist(index) {
             const pricelist = {
                 ...this.pricelists[index],
                 name: this.currentName
@@ -125,6 +128,30 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error on saving pricelist.", isShow: true, type: "error"});
             }
+        },
+        async addPriceCopy(index) {
+            const name = this.setCopyPriceName(index);
+            const pricelist = {
+                name,
+                copyName: this.pricelists[index].name,
+                isDefault: false,
+                isActive: false
+            }
+            try {
+                await this.$http.post("/prices/new-pricelist", pricelist);
+                await this.getPricelists();
+                this.alertToggle({message: "Pricelist saved.", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on copying pricelist.", isShow: true, type: "error"});
+            }
+        },
+        setCopyPriceName(index) {
+            const name = this.pricelists[index].name;
+            const priceCopies = this.pricelists.filter((item, ind) => {
+                return ind !== index && item.name.indexOf(`${name}-copy`) !== -1;
+            });
+            const copyQuantity = priceCopies.length ? priceCopies.length : "";
+            return `${name}-copy${copyQuantity}`;
         },
         async deletePricelist(index) {
             const id = this.pricelists[index]._id;

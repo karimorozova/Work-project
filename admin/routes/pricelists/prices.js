@@ -31,7 +31,6 @@ router.delete('/pricelist/:id', async (req, res) => {
   }
   try {
     await deletePricelist(id, isDefault);
-    // await Pricelist.deleteOne({"_id": id});
     res.send("Deleted");
   } catch(err) {
     console.log(err);

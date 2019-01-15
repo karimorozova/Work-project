@@ -334,14 +334,17 @@ export default {
         height: 22px;
     }
     &__industry-icon {
-        width: 19px;
-        height: 19px;
+        width: 20px;
+        height: 20px;
         margin-right: 3px;
     }
     &__no-drop, &__data {
-        padding: 6px 0 0 5px;
-        max-height: 28px;
+        padding-left: 5px;
+        display: flex;
+        align-items: center;
+        height: 30px;
         overflow-y: overlay;
+        box-sizing: border-box;
     }
     &__icons {
         margin-right: 16px;

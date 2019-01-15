@@ -221,7 +221,7 @@ export default {
             width: 6px;
             border: 1px solid #67573E;
             top: 5px;
-            left: 3px;
+            left: 4px;
             transform: rotate(-58deg);
         }
     }

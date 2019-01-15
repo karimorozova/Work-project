@@ -11,7 +11,7 @@
                     .new-price__drop-menu
                         SelectSingle(
                             :options="pricesNames"
-                            :selectedOption="selectedPircelist"
+                            :selectedOption="selectedPricelist"
                             @chooseOption="setPricelistForCopy"
                             placeholder="Select"
                         )
@@ -59,7 +59,7 @@ export default {
             isTogglerDisabled: false,
             isPricelistDefault: false,
             isPricelistActive: false,
-            selectedPircelist: "",
+            selectedPricelist: "",
             isErrorExist: "",
             errors: [],
             isAbsolute: true
@@ -92,7 +92,7 @@ export default {
         async savePricelist() {
             const pricelist = {
                 name: this.pricelistName,
-                copyName: this.selectedPircelist,
+                copyName: this.selectedPricelist,
                 isDefault: this.isPricelistDefault,
                 isActive: this.isPricelistActive
             } 
@@ -108,7 +108,7 @@ export default {
             this.$emit('cancel');
         },
         setPricelistForCopy({option}) {
-            this.selectedPircelist = option;
+            this.selectedPricelist = option;
         },
         ...mapActions({
             alertToggle: "alertToggle",
