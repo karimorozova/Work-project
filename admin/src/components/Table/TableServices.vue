@@ -326,7 +326,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .services {
-    width: 920px;
+    width: 933px;
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;
