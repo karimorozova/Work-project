@@ -67,6 +67,7 @@ export default {
         overflow-y: overlay;
         margin-bottom: 20px;
         border: 0.5px solid $cell-border;
+        border-bottom: 1px solid $cell-border;
         border-top: none;
         .table__body-row {
             cursor: pointer;
