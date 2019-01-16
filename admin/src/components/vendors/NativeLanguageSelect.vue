@@ -3,7 +3,7 @@
         .select
             span.selected(v-if="selectedLang") {{ selectedLang.lang }}
             span.selected.no-choice(v-else) Options
-            .arrow-button(@click.stop="showLangs")
+            .arrow-button(@click="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search" @click.stop="stopPropagation")        
         .drop(v-if="droppedLang")
@@ -40,7 +40,7 @@ export default {
         showLangs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr") {
+                if(item.localName == "tr" || item.className.indexOf("table__body-row") !== -1) {
                     return item;
                 }
             });

@@ -94,6 +94,7 @@ export default {
         max-height: 600px;
         overflow-y: overlay;
         margin-bottom: 20px;
+        border: 0.5px solid $cell-border;
     }
     &__thead-cell {
         box-sizing: border-box;

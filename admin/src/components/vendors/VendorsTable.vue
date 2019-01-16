@@ -32,6 +32,7 @@
                     :selectedStatus="selectedStatus"
                     :parentInd="index"
                     @chosenStatus="setStatus"
+                    @scrollDrop="scrollDrop"
                 )
             .vendors-table__no-drop(v-else) {{ row.status }}
         template(slot="languageCombination" slot-scope="{ row }")
@@ -42,8 +43,9 @@
                     :selectedLang="selectedNative"
                     :parentIndex="index"
                     @chosenLang="setNative"
+                    @scrollDrop="scrollDrop"
                 )
-            .vendors-table__no-drop(v-else) {{ row.native.lang }}
+            .vendors-table__no-drop(v-if="row.native && currentEditingIndex !== index") {{ row.native.lang }}
         template(slot="industry" slot-scope="{ row, index }")
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
                 MultiVendorIndustrySelect(
@@ -51,6 +53,7 @@
                     :filteredIndustries="selectedIndNames" 
                     :parentInd="index" 
                     @chosenInd="setIndustry"
+                    @scrollDrop="scrollDrop"
                 )
             .vendors-table__no-drop(v-else)
                 img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon") 
@@ -131,7 +134,8 @@ export default {
             selectedNative: {},
             selectedStatus: "",
             isErrorShow: false,
-            isDeleteMessageShow: false
+            isDeleteMessageShow: false,
+            currentTableHeight: 0
         }
     },
     methods: {
@@ -144,6 +148,28 @@ export default {
             updateIndustry: "updateIndustry",
             deleteCurrentVendor: "deleteCurrentVendor"
         }),
+        getCurrentTableHeight() {
+            const tbody = document.querySelector('.table__tbody');
+            this.currentTableHeight = tbody.clientHeight;
+        },
+        scrollDrop({drop, offsetTop, offsetHeight}) {
+            let tbody = document.querySelector('.table__tbody');
+            if(drop) {
+                setTimeout(() => {
+                    const offsetBottom = offsetTop + offsetHeight*2;
+                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+                    if (offsetBottom > scrollBottom) {
+                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
+                        if(this.currentTableHeight < 220) {
+                            tbody.style.minHeight = '220px';
+                        }
+                    }
+                }, 100);
+            }
+            if(!drop) {
+                tbody.style.minHeight = this.currentTableHeight + 'px';
+            }
+        },
         stopPropagation() {
             return
         },
@@ -181,6 +207,8 @@ export default {
             this.industrySelected = [];
             this.selectedStatus = "";
             this.selectedNative = {};
+            const tbody = document.querySelector('.table__tbody');
+            tbody.style.minHeight = this.currentTableHeight + 'px';
         },
         async updateVendor(index) {
             let sendData = new FormData();
@@ -256,7 +284,7 @@ export default {
             }
         },
         onRowClicked({index}) {
-            if(this.currentEditingIndex === index) {
+            if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
             this.storeCurrentVendor(this.filteredVendors[index])
@@ -284,7 +312,7 @@ export default {
                     return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
                 })
             }
-            if(this.statusFilter) {
+            if(this.statusFilter && this.statusFilter !== 'All') {
                 result = result.filter(item => {
                     return item.status == this.statusFilter;
                 })
@@ -295,7 +323,7 @@ export default {
                     return industryIds.indexOf(this.industryFilter._id) !== -1;
                 })
             }
-            if(this.leadFilter) {
+            if(this.leadFilter && this.leadFilter !== 'All') {
                 result = result.filter(item => {
                     return item.leadSource == this.leadFilter;
                 })
@@ -319,8 +347,9 @@ export default {
         Button
     },
     mounted() {
-        this.getVendors()
-    },
+        this.getVendors();
+        this.getCurrentTableHeight();
+    }
 }
 </script>
 

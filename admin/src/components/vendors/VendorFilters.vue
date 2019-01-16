@@ -10,7 +10,7 @@
     .filters__item(v-if="statusExcluded !== 'Potential'")
         label.filters__filter-title Status
         .filters__drop-menu
-            SelectSingle(:selectedOption="statusFilter" :options="statuses" @chooseOption="chosenStatus" placeholder="Options")
+            VendorStatusSelect(:selectedStatus="statusFilter" :isAllExist="isAllForStatusExist" @chosenStatus="chosenStatus")
     .filters__item
         label.filters__filter-title Lead Source
         .filters__drop-menu
@@ -18,9 +18,9 @@
 </template>
 
 <script>
-import SelectSingle from "../SelectSingle";
 import VendorIndustrySelect from "./VendorIndustrySelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
+import VendorStatusSelect from "./VendorStatusSelect";
 
 export default {
     props: {
@@ -45,6 +45,7 @@ export default {
         return {
             nameFilter: "",
             isAllForIndustryExist: true,
+            isAllForStatusExist: true
         }
     },
     methods: {
@@ -52,8 +53,7 @@ export default {
             this.$emit("setNameFilter", { option: this.nameFilter })
         },
         chosenStatus({option}) {
-            const statusOption = option === "All" ? "" : option
-            this.$emit("setStatusFilter", { option: statusOption })
+            this.$emit("setStatusFilter", { option })
         },
         chosenLead({option}) {
             this.$emit("setLeadFilter", { option });
@@ -63,9 +63,9 @@ export default {
         }
     },
     components: {
-        SelectSingle,
         VendorIndustrySelect,
-        VendorLeadsourceSelect
+        VendorLeadsourceSelect,
+        VendorStatusSelect
     }
 }
 </script>

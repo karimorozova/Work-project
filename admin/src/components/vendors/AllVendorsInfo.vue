@@ -44,9 +44,9 @@ export default {
     },
     data() {
         return {
-            statusFilter: "",
-            industryFilter: "",
-            leadFilter: "",
+            statusFilter: "All",
+            industryFilter: {name: "All"},
+            leadFilter: "All",
             nameFilter: ""
         }
     },

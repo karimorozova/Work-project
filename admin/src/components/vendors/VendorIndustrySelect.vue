@@ -6,7 +6,9 @@
                     .industry-tooltip
                         img(:src="selectedInd.icon")
                         span.toolTip {{ selectedInd.name }}
-            template(v-if="!selectedInd || selectedInd.name === 'All' ") 
+            template(v-if="selectedInd.name === 'All'")
+                .selected(v-if="!selectedInd.icon") {{ selectedInd.name }}
+            template(v-if="!selectedInd") 
                 span.selected.no-industry Options
             .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")

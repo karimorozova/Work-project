@@ -5,9 +5,11 @@
                 .selected
                     .industry-tooltip(v-for="item in selectedInd")
                         img(:src="item.icon")
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
+            template(v-if="selectedInd.length && selectedInd[0].name === 'All'")
+                .selected {{ selectedInd[0].name }}
+            template(v-if="!selectedInd.length") 
                 span.selected.no-industry Options
-            .arrow-button(@click.stop="showInds")
+            .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
             .drop__item(v-for="(industry, index) in industries" @click.stop="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
@@ -42,7 +44,7 @@ export default {
         showInds(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr") {
+                if(item.localName == "tr" || item.className.indexOf("table__body-row") !== -1) {
                     return item;
                 }
             });

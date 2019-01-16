@@ -4,7 +4,7 @@
         .table__head-row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
                 slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="[{'table_bottom-bordered': hasScroll}, bodyClass]")
+    .table__tbody(:class="bodyClass")
         .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
                 slot(:name="field.key" :row="row" :index="index")
@@ -63,9 +63,11 @@ export default {
         }
     }
     &__tbody {
-    max-height: 180px;
-    overflow-y: overlay;
-    margin-bottom: 20px;
+        max-height: 180px;
+        overflow-y: overlay;
+        margin-bottom: 20px;
+        border: 0.5px solid $cell-border;
+        border-top: none;
         .table__body-row {
             cursor: pointer;
             &:nth-of-type(odd) {
@@ -136,12 +138,6 @@ export default {
             }
         }
     }
-    &_scroll-padding {
-        padding-right: 15px;
-    }
-    &_bottom-bordered {
-        border-bottom: 0.5px solid $cell-border;
-    }
 }
 .steps-table-body {
     max-height: 300px;
@@ -151,7 +147,7 @@ export default {
     align-items: center;
 }
 .vendors-table__body, .clients__table {
-    min-height: 300px;
+    // min-height: 300px;
     max-height: 600px;
 }
 .vendors-table_scroll-y {

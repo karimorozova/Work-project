@@ -1,17 +1,19 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
+            template(v-if="selectedInd.length && selectedInd[0].name !== 'All'")
                 .selected
                     .industry-tooltip
                         img(:src="selectedInd[0].icon")
                         span.toolTip {{ selectedInd[0].name }}
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
+            template(v-if="selectedInd.length && selectedInd[0].name === 'All' ")
+                .selected {{ selectedInd[0].name }}
+            template(v-if="!selectedInd.length") 
                 span.selected.no-industry Options
             .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name == selectedInd[0].name}")
                 span.drop__name {{ industry.name }}
 </template>
 

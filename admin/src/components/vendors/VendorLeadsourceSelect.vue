@@ -37,7 +37,7 @@ export default {
             this.dropped = false;
         },
         changeLeadsource(index) {
-            const option = this.leadsources[index] === 'All' ? "" : this.leadsources[index];
+            const option = this.leadsources[index];
             this.$emit("chosenLeadsource", { option });
             this.outClick();
         }

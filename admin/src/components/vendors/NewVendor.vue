@@ -124,7 +124,7 @@ export default {
                 surname: "",
                 gender: "",
                 linkedin: "",
-                native: "",
+                native: null,
                 phone: "",
                 photo: "",
                 skype: "",

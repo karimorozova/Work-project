@@ -6,7 +6,7 @@
                     span {{ selectedStatus }}
             template(v-if="!selectedStatus") 
                 span.selected.no-industry Options
-            .arrow-button(@click.stop="showStatuses")
+            .arrow-button(@click="showStatuses")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(status, index) in allStatuses" @click.stop="changeStatus(index)" :class="{chosen: status == selectedStatus}")
@@ -33,14 +33,27 @@ export default {
         }
     },
     methods: {
-        showStatuses() {
+        showStatuses(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr" || (item.className && item.className.indexOf("table__body-row") !== -1)) {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
+            }
             this.dropped = !this.dropped;
+            this.$emit('scrollDrop', {drop: this.dropped, offsetTop: top, offsetHeight: height})
         },
         outClick() {
             this.dropped = false;
         },
         changeStatus(index) {
-            const option = this.allStatuses[index] === "All" ? "": this.allStatuses[index];
+            const option = this.allStatuses[index];
             this.$emit("chosenStatus", {status: option});
             this.outClick();
         }

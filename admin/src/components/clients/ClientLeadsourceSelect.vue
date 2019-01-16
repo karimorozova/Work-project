@@ -6,7 +6,7 @@
                     span {{ selectedLeadsource }}
             template(v-if="!selectedLeadsource") 
                 span.selected.no-industry Options
-            .arrow-button(@click.stop="showLeadsources")
+            .arrow-button(@click="showLeadsources")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
             .drop__item(v-for="(leadsource, index) in allLeadsources" @click.stop="changeLeadsource(index)" :class="{chosen: leadsource == selectedLeadsource}")
@@ -40,14 +40,27 @@ export default {
                 throw err
             }
         },
-        showLeadsources() {
+        showLeadsources(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr" || (item.className && item.className.indexOf("table__body-row") !== -1)) {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
+            }
             this.dropped = !this.dropped;
+            this.$emit('scrollDrop', {drop: this.dropped, offsetTop: top, offsetHeight: height})
         },
         outClick() {
             this.dropped = false;
         },
         changeLeadsource(index) {
-            const option = this.allLeadsources[index] === "All" ? "": this.allLeadsources[index];
+            const option = this.allLeadsources[index];
             this.$emit("chosenLeadsource", {leadSource: option});
             this.outClick();
         }

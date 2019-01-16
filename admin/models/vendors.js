@@ -43,7 +43,8 @@ const VendorSchema = new mongoose.Schema({
         trim : true 
     },
     native: { 
-        type : Schema.Types.ObjectId, ref: 'Language' 
+        type : Schema.Types.ObjectId, ref: 'Language',
+        default: null
     },
     gender: {
         type: String,

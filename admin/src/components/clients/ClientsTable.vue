@@ -28,6 +28,7 @@
                     :isAllExist="isAllStatusExist"
                     :selectedStatus="selectedStatus"
                     @chosenStatus="setStatus"
+                    @scrollDrop="scrollDrop"
                 )
             .clients-table__data-cell(v-else) {{ row.status }}
         template(slot="industry" slot-scope="{ row, index }")
@@ -37,6 +38,7 @@
                     :filteredIndustries="selectedIndNames" 
                     :parentInd="index" 
                     @chosenInd="setIndustry"
+                    @scrollDrop="scrollDrop"
                 )
             .clients-table__data-cell(v-else)
                 img.clients-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
@@ -50,6 +52,7 @@
                     :isAllExist="isAllLeadExist"
                     :selectedLeadsource="selectedLeadsource"
                     @chosenLeadsource="setLeadsource"
+                    @scrollDrop="scrollDrop"
                 )
             .clients-table__data-cell(v-else) {{ row.leadSource }}
         template(slot="icons" slot-scope="{ row, index }")
@@ -116,7 +119,8 @@ export default {
             currentWebsite: "",
             isErrorShow: false,
             isAllLeadExist: false,
-            isAllStatusExist: false
+            isAllStatusExist: false,
+            currentTebleHeight: 0
         }
     },
     methods: {
@@ -131,6 +135,28 @@ export default {
             }
             if(this.currentEditingIndex === index) {
                 return key === 'edit'
+            }
+        },
+        getCurrentTableHeight() {
+            const tbody = document.querySelector('.table__tbody');
+            this.currentTableHeight = tbody.clientHeight;
+        },
+        scrollDrop({drop, offsetTop, offsetHeight}) {
+            let tbody = document.querySelector('.table__tbody');
+            if(drop) {
+                setTimeout(() => {
+                    const offsetBottom = offsetTop + offsetHeight*2;
+                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+                    if (offsetBottom > scrollBottom) {
+                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
+                        if(this.currentTableHeight < 220) {
+                            tbody.style.minHeight = '220px';
+                        }
+                    }
+                }, 100);
+            }
+            if(!drop) {
+                tbody.style.minHeight = this.currentTableHeight + 'px';
             }
         },
         setStatus({status}) {
@@ -163,6 +189,8 @@ export default {
             this.selectedLeadsource = "";
             this.currentWebsite = "";
             this.currentName = "";
+            const tbody = document.querySelector('.table__tbody');
+            tbody.style.minHeight = this.currentTableHeight + 'px';
         },
         async updateClient(index) {
             let sendData = new FormData();
@@ -220,7 +248,7 @@ export default {
             this.isDeleteMessageShow = false;
         },
         onRowClicked({index}) {
-            if(this.currentEditingIndex === index) {
+            if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
             this.$emit('showClientDetails', {id: this.filteredClients[index]._id});
@@ -247,10 +275,10 @@ export default {
             if(this.filterName) {
                 result = result.filter(item => item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) !== -1);
             }
-            if(this.filterStatus) {
+            if(this.filterStatus && this.filterStatus !== "All") {
                 result = result.filter(item => item.status === this.filterStatus);
             }
-            if(this.filterLeadsource) {
+            if(this.filterLeadsource && this.filterLeadsource !== "All") {
                 result = result.filter(item => item.leadSource === this.filterLeadsource);
             }
             if(this.filterIndustry && this.filterIndustry.name !== "All") {
@@ -275,7 +303,10 @@ export default {
         ClientLeadsourceSelect,
         MultiClientIndustrySelect,
         Button
-    }    
+    },
+    mounted() {
+        this.getCurrentTableHeight();
+    }   
 }
 </script>
 

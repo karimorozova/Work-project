@@ -40,7 +40,6 @@
                         TimezoneSelect(:timezoneSelected="currentVendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
                 .block-item
                     label.block-item__label.block-item_relative Native Language:
-                        Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop-menu.block-item_medium-index(:class="{'block-item_error-shadow': !currentVendor.native && isSaveClicked}")
                         NativeLanguageSelect(:selectedLang="currentVendor.native" @chosenLang="setNative")
                 .block-item

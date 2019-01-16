@@ -44,9 +44,9 @@ export default {
         return {
             clientData: false,
             filterName: "",
-            filterStatus: "",
+            filterStatus: "All",
             industryFilter: {name: 'All'},
-            filterLeadsource: "",
+            filterLeadsource: "All",
             industrySelected: [],
             isAllIndustyFilter: true,
             isAllStatusExist: true,
