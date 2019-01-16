@@ -10,7 +10,7 @@
     .filters__item(v-if="statusExcluded !== 'Potential'")
         label.filters__filter-title Status
         .filters__drop-menu
-            VendorStatusSelect(:selectedStatus="statusFilter" :isAllExist="isAllForStatusExist" @chosenStatus="chosenStatus")
+            VendorStatusSelect(:selectedStatus="statusFilter" isAllExist="yes" @chosenStatus="chosenStatus")
     .filters__item
         label.filters__filter-title Lead Source
         .filters__drop-menu
@@ -45,7 +45,6 @@ export default {
         return {
             nameFilter: "",
             isAllForIndustryExist: true,
-            isAllForStatusExist: true
         }
     },
     methods: {
