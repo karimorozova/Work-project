@@ -18,7 +18,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    z-index: 1000;
+    z-index: 10000;
     &__message {
         position: fixed;
         top: 0;

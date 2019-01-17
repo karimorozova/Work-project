@@ -321,8 +321,10 @@ export default {
   align-items: center;
   justify-content: space-between;
   background-color: #67573e;
-  position: relative;
+  position: fixed;
   height: 6vh;
+  width: 100%;
+  z-index: 1000;
   &__admin-name {
     width: 35%;
     display: flex;
@@ -522,6 +524,9 @@ export default {
 }
 
 .admin-main-wrapper {
+  box-sizing: border-box;
+  padding-top: 6vh;
+  padding-left: 150px;
   display: flex;
   height: 100%;
   position: relative;
@@ -530,11 +535,13 @@ export default {
   }
   .admin-navbar {
     font-family: MyriadPro;
-    position: relative;
+    position: fixed;
+    left: 0;
+    z-index: 999;
     display: flex;
     min-height: 94vh;
     &__sidebar {
-      padding: 35px 0;
+      padding: 25px 0;
       background-color: #998e7e;
       width: 150px;
       display: flex;
@@ -551,6 +558,9 @@ export default {
       font-weight: bold;
       padding: 0;
       width: 100%;
+      height: 75vh;
+      overflow-y: auto;
+      direction: rtl;
       &_item {
         padding-bottom: 10px;
         display: flex;
@@ -563,10 +573,7 @@ export default {
         cursor: pointer;
         transition: all 0.4s;
         &:last-child {
-          margin-bottom: 40px;
-          @media (max-height: 768px) {
-            margin-bottom: 57px;
-          }
+          margin-bottom: 0;
         }
         .title {
           transition: all 0.3s;
@@ -600,8 +607,7 @@ export default {
       background-size: contain;
       background-repeat: no-repeat;
       width: 80px;
-      height: 100px;
-      padding-bottom: 41px;
+      height: 80px;
     }
   }
 }
