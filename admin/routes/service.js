@@ -126,9 +126,6 @@ router.post('/several-langs', async (req, res) => {
 router.delete('/rate/:priceId', async (req, res) => {
   const { industries, servicesIds, id } = req.body;
   const { priceId } = req.params;
-  if(id === "undefined") {
-    return res.send('Empty row deleted');
-  }
   try {
     await deleteRate({
       priceId,
