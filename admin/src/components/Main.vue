@@ -551,16 +551,17 @@ export default {
       box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
       transition: all 0.5s;
       z-index: 2;
+      overflow: hidden;
     }
     .navbar__menu {
       list-style: none;
       font-size: 15px;
       font-weight: bold;
       padding: 0;
-      width: 100%;
-      height: 75vh;
-      overflow-y: auto;
-      direction: rtl;
+      width: 177px;
+      height: 77vh;
+      margin-bottom: 0;
+      overflow-y: overlay;
       &_item {
         padding-bottom: 10px;
         display: flex;
@@ -604,10 +605,11 @@ export default {
       justify-content: center;
       align-items: center;
       background-image: url("../assets/images/balloons.png");
-      background-size: contain;
       background-repeat: no-repeat;
-      width: 80px;
-      height: 80px;
+      background-position-x: center;
+      width: 100%;
+      height: 100px;
+      box-shadow: -2px -5px 5px rgba(103, 87, 62, 0.4);
     }
   }
 }
