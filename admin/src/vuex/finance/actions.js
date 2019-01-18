@@ -38,10 +38,11 @@ export const getMonoCombinations = async ({commit, state}, payload) => {
         throw new Error("Error on getting Mono rates");
     }
 }
-export const saveGlobalRates = async ({commit, dispatch}, payload) => {
+export const saveGlobalRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
-        await Vue.http.post('/service/rates', {info: payload});
+        const priceId = state.currentPrice._id;
+        await Vue.http.post('/service/rates', {info: payload, priceId});
         payload.languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
         commit('endRequest');
     } catch(err) {
@@ -49,10 +50,11 @@ export const saveGlobalRates = async ({commit, dispatch}, payload) => {
         throw new Error("Error on saving rate");
     }
 }
-export const deleteServiceRate = async ({commit, dispatch}, payload) => {
+export const deleteServiceRate = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
-        await dispatch('deleteCheckedRate', payload);
+        const priceId = state.currentPrice._id;
+        await dispatch('deleteCheckedRate', {...payload, priceId});
         const { languageForm } = payload.deletedRate;
         languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
         commit('endRequest');
@@ -64,11 +66,12 @@ export const deleteServiceRate = async ({commit, dispatch}, payload) => {
 export const deleteCheckedRate = async ({commit}, payload) => {
     commit('startRequest');
     try {
-        await Vue.http.delete(`/service/rate/${payload.id}`, {body: payload.deletedRate});
+        await Vue.http.delete(`/service/rate/${payload.priceId}`, {body: {...payload.deletedRate, id: payload.id}});
         commit('endRequest');
     } catch(err) {
         commit('endRequest');
         throw new Error("Error on deleting rate");
     }
+    commit('endRequest');
 }
 export const storeCurrentPrice = ({commit}, payload) => commit('setCurrentPrice', payload);

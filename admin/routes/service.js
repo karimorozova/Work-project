@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { Services, Industries, Duorate, Monorate } = require('../models');
+const { Services, Industries, Pricelist } = require('../models');
 const { getOneService, getManyServices, createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
 const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
@@ -93,18 +93,19 @@ router.post('/step-payables', async (req, res) => {
 
 router.post('/rates', async (req, res) => {
   try {
-    const { info } = req.body;
-    const { languageForm } = info;
-    let rate = languageForm === "Duo" ? await Duorate.findOne({"source": info.sourceLanguage._id, "target": info.targetLanguage._id})
-      .populate("industries.industry") 
-    : await Monorate.findOne({"target": info.targetLanguage._id, "package": info.package}).populate("industries.industry");
-    if(rate) {
-      const { updatedIndustries } = await updateRate(rate, info.industries, info.languageForm);
-      const result = languageForm === "Duo" ? await Duorate.findOneAndUpdate({"_id": rate._id}, {"industries": updatedIndustries})
-      : await Monorate.findOneAndUpdate({"_id": rate._id}, {"industries": updatedIndustries});
-      return res.send(result);
+    const { info, priceId } = req.body;
+    const { industries, languageForm, id } = info;
+    const priceList = await Pricelist.findOne({"_id": priceId}).populate("combinations.industries.industry");
+    let { combinations } = priceList;
+    let rateIndex = id ? combinations.findIndex(item => item.id === id) : -1;
+    if(rateIndex !== -1) {
+      const rate = combinations[rateIndex];
+      const { updatedIndustries } = await updateRate(rate, industries, languageForm);
+      combinations[rateIndex].industries = updatedIndustries;
+      await Pricelist.updateOne({"_id": priceId}, {"combinations": combinations});
+      return res.send("Prcielist's rate Updated");
     }
-    const result = await createNewRate(info);
+    const result = await createNewRate(info, priceId);
     res.send(result);
   } catch(err) {
       console.log(err)
@@ -123,32 +124,25 @@ router.post('/several-langs', async (req, res) => {
   }
 })
 
-router.delete('/rate/:id', async (req, res) => {
-  const { industries, servicesIds, languageForm } = req.body;
-  const { id } = req.params;
+router.delete('/rate/:priceId', async (req, res) => {
+  const { industries, servicesIds, id } = req.body;
+  const { priceId } = req.params;
   if(id === "undefined") {
     return res.send('Empty row deleted');
   }
   try {
-    const rate = languageForm === "Duo" ? await getDuoRate({"_id": id}) : await getMonoRate({"_id": id});
-    const result = await deleteRate({rate, industries, services: servicesIds, languageForm});
+    await deleteRate({
+      priceId,
+      rateId: id, 
+      industries, 
+      services: servicesIds
+    });
     res.send("deleted");
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on deleting the rate');
   }
 })
-
-// router.get("/parsed-rates",  async (req, res) => {
-//   const { form } = req.query;
-//   try {
-//     const rates = await getAllRates(form);
-//     res.send(rates); 
-//   } catch(err) {
-//     console.log(err);
-//     res.send("error");
-//   }
-// })
 
 router.get("/parsed-rates",  async (req, res) => {
   const { id, form } = req.query;

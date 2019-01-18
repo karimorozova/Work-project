@@ -283,6 +283,7 @@ export default {
         async saveRates(index) {
             if(!this.uniqueCheck(index)) {
                 let info = {
+                    id: this.fullInfo[index].id,
                     sourceLanguage: this.currentSource,
                     targetLanguage: this.currentTarget,
                     industries: [],

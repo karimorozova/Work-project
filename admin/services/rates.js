@@ -1,4 +1,4 @@
-const { Services, Industries, Duorate, Monorate } = require("../models/");
+const { Services, Industries, Pricelist, Duorate, Monorate } = require("../models/");
 
 async function updateRate(rate, infoIndustries, languageForm) {
   try {
@@ -26,7 +26,7 @@ function updateRateForAll(industries, rates) {
   })
 }
 
-async function createNewRate(info) {
+async function createNewRate(info, priceId) {
   const { sourceLanguage, targetLanguage, package, industries, languageForm } = info;
   try {
     if(info.industries[0].name === "All") {
@@ -38,9 +38,13 @@ async function createNewRate(info) {
     })
     const allIndustries = await includeAllIndustries(modifiedIndustries, languageForm);
     if(info.languageForm === "Duo") {
-      await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+      await Pricelist.updateOne({"_id": priceId}, {
+        $push: {combinations: {source: sourceLanguage, target: targetLanguage, industries: allIndustries}}
+      });
     } else {
-      await Monorate.create({"target": targetLanguage, "package": package, 'industries': allIndustries});
+      await Pricelist.updateOne({"_id": priceId}, {
+        $push: {combinations: {target: targetLanguage, package, industries: allIndustries}}
+      });
     }
   } catch(err) {
     console.log("Error from createNewRate");
@@ -55,9 +59,13 @@ async function createNewForAllIndustries({ sourceLanguage, targetLanguage, packa
       return {industry: item, rates: industries[0].rates}
     });
     if(languageForm === "Duo") {
-      await Duorate.create({"source": sourceLanguage, "target": targetLanguage, 'industries': allIndustries});
+      await Pricelist.updateOne({"_id": priceId}, {
+        $push: {combinations: {source: sourceLanguage, target: targetLanguage, industries: allIndustries}}
+      });
     } else {
-      await Monorate.create({"target": targetLanguage, package: package, 'industries': allIndustries});
+      await Pricelist.updateOne({"_id": priceId}, {
+        $push: {combinations: {target: targetLanguage,package, industries: allIndustries}}
+      });
     }
   } catch(err) {
     console.log("Error from createNewForAllIndustries");
@@ -110,25 +118,26 @@ async function defaultRates(languageForm) {
   }
 }
 
-async function deleteRate({rate, industries, services, languageForm}) {
+async function deleteRate({priceId, rateId, industries, services}) {
   let updatedIndustries = [];
   const industriesIds = industries.map(item => item._id);
   try {
-    for(let elem of rate.industries) {
+    const priceList = await Pricelist.findOne({"_id": priceId}).populate("combinations.industries.industry");
+    const { combinations } = priceList;
+    const rateIndex = combinations.findIndex(item => item.id === rateId);
+    for(let elem of combinations[rateIndex].industries) {
       if(industries[0].name === "All" || industriesIds.indexOf(elem.industry.id) !== -1) {
         updatedIndustries.push(deletedRates(elem, services))
       } else {
         updatedIndustries.push(elem);
       }
     }
-    if(isAllRatesDeleted(rate.industries)) {
-      return languageForm === "Duo" ? await Duorate.deleteOne({"_id": rate.id})
-      : await Monorate.deleteOne({"_id": rate.id});
+    if(isAllRatesDeleted(combinations[rateIndex].industries)) {
+      combinations.splice(rateIndex, 1);
     }
-    return languageForm === "Duo" ? await Duorate.updateOne({"_id": rate.id}, {industries: updatedIndustries})
-    : await Monorate.updateOne({"_id": rate.id}, {industries: updatedIndustries});
+    return await Pricelist.updateOne({"_id": priceId}, { combinations });
   } catch(err) {
-    console.log("Error from deleteDuoRate");
+    console.log("Error from deleteRate");
     console.log(err);
   }
 }
