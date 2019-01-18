@@ -1,10 +1,9 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { Services, Industries, Pricelist } = require('../models');
-const { getOneService, getManyServices, createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
-const { receivablesCalc, payablesCalc, updateProjectCosts, getProjects, getProject, updateTaskMetrics } = require('../projects/');
+const { Services, Pricelist } = require('../models');
+const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
+const { receivablesCalc, payablesCalc, updateProjectCosts, getProject, updateTaskMetrics } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
-const { getDuoRate, getMonoRate } = require('../rates');
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {

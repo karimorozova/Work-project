@@ -321,26 +321,31 @@ export default {
         },
         async deleteRate(index) {
             const industries = this.currentActive === index ? this.industrySelected : [this.fullInfo[index].industry];
-            try {
-                const deletedRate = {
-                    servicesIds: this.servicesIds,
-                    industries,
-                    languageForm: "Duo"
+            const id = this.fullInfo[index].id;
+            if(!id) {
+                return this.setDefaultValues();
+            } else {
+                try {
+                    const deletedRate = {
+                        servicesIds: this.servicesIds,
+                        industries,
+                        languageForm: "Duo"
+                    }
+                    if(this.origin === "global") {
+                        await this.deleteServiceRate({ id, deletedRate });
+                    }
+                    if(this.origin === "client") {
+                        await this.deleteClientRate({ id, deletedRate });
+                    }
+                    if(this.origin === "vendor") {
+                        await this.deleteVendorRate({ id, deletedRate });
+                    }
+                    this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
+                } catch(err) {
+                    this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
                 }
-                if(this.origin === "global") {
-                    await this.deleteServiceRate({ id: this.fullInfo[index].id, deletedRate });
-                }
-                if(this.origin === "client") {
-                    await this.deleteClientRate({ id: this.fullInfo[index].id, deletedRate });
-                }
-                if(this.origin === "vendor") {
-                    await this.deleteVendorRate({ id: this.fullInfo[index].id, deletedRate });
-                }
-                this.alertToggle({message: 'The rate has been deleted.', isShow: true, type: 'success'});
-            } catch(err) {
-                this.alertToggle({message: 'Internal serer error. Cannot delete the rate.', isShow: true, type: 'error'});
             }
-            this.currentActive = -1;
+            this.setDefaultValues();
         },
         setDefaultValues() {
             if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {

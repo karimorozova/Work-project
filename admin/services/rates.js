@@ -1,4 +1,4 @@
-const { Services, Industries, Pricelist, Duorate, Monorate } = require("../models/");
+const { Services, Industries, Pricelist, Duorate } = require("../models/");
 
 async function updateRate(rate, infoIndustries, languageForm) {
   try {
