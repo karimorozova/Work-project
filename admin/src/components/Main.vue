@@ -40,13 +40,13 @@
         .admin-main-wrapper
             .admin-navbar
               .admin-navbar__sidebar
-                ul.navbar__menu
-                  li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
-                    .image
-                      img(:src="note.imgBrown")
-                    .title
-                      span {{ note.title }}
-                .balloons
+                  ul.navbar__menu
+                    li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
+                      .image
+                        img(:src="note.imgBrown")
+                      .title
+                        span {{ note.title }}
+                  .balloons
             router-view(:isSidebar="isSidebar"
               @refreshXtmCustomers="refreshXtmCustomers"
               @getCustomerLangs='getCustomerLangs'
@@ -606,7 +606,7 @@ export default {
       align-items: center;
       background-image: url("../assets/images/balloons.png");
       background-repeat: no-repeat;
-      background-position-x: center;
+      background-position: center;
       width: 100%;
       height: 100px;
       box-shadow: -2px -5px 5px rgba(103, 87, 62, 0.4);

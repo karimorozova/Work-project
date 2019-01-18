@@ -1,9 +1,10 @@
 <template lang="pug">
 .sidebar
-    span.sidebar__title(v-if="title") {{ title }}
-    .sidebar__inner
-      .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}")
-        p.sidebar__link {{ link }}
+    .sidebar__links
+        span.sidebar__title(v-if="title") {{ title }}
+        .sidebar__inner
+        .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}")
+            p.sidebar__link {{ link }}
 </template>
 
 <script>
@@ -35,7 +36,7 @@ export default {
 @import "../assets/scss/colors.scss";
 
 .sidebar {
-    height: 100%;
+    min-height: 100%;
     background-color: #fff;
     width: 175px;
     box-shadow: 7px 1px 10px $brown-shadow;
@@ -44,6 +45,11 @@ export default {
     color: $main-color;
     font-size: 22px;
     transition: all 1s;
+    position: relative;
+    &__links {
+        position: fixed;
+        width: 175px;
+    }
     &__title {
         display: flex;
         justify-content: center;
