@@ -4,8 +4,8 @@ const { getPricelist } = require("../rates");
 async function getAllRates(form, id) {
     try {
         const pricelist = await getPricelist({"_id": id});
-        const combinations = form === "Duo" ? pricelist[0].combinations.filter(item => item.source)
-        : pricelist[0].combinations.filter(item => !item.source);
+        const combinations = form === "Duo" ? pricelist.combinations.filter(item => item.source)
+        : pricelist.combinations.filter(item => !item.source);
         const ratesServices = await Services.find({languageForm: form});
         const serviceIds = ratesServices.map(item => item.id);
         let fullInfo = [];

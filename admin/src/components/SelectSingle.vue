@@ -261,6 +261,9 @@ export default {
         height: 32px;
         box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
+    .add-several__drop-menu & {
+        height: 34px;
+    }
 }
 
 </style>

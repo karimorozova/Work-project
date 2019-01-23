@@ -31,6 +31,14 @@ async function getMonoRate(obj) {
 }
 
 async function getPricelist(obj) {
+    const pricelist = await Pricelist.findOne(obj)
+        .populate("combinations.source")
+        .populate("combinations.target")
+        .populate("combinations.industries.industry");
+    return pricelist;
+}
+
+async function getPricelists(obj) {
     const pricelist = await Pricelist.find(obj)
         .populate("combinations.source")
         .populate("combinations.target")
@@ -38,5 +46,4 @@ async function getPricelist(obj) {
     return pricelist;
 }
 
-
-module.exports = { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist }
+module.exports = { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist, getPricelists }

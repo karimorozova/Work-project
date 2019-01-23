@@ -204,13 +204,22 @@ export default {
             try {
                 const result = await this.$http.get("/prices/pricelists");
                 this.pricelists = result.body;
+                if(!this.vuexPricelists.length) {
+                    await this.storePricelists(result.body);
+                }
             } catch(err) {
                 this.alertToggle({message: "Error on getting pricelists.", isShow: true, type: "error"});
             }
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            storeCurrentPrice: "storeCurrentPrice"
+            storeCurrentPrice: "storeCurrentPrice",
+            storePricelists: "storePricelists"
+        })
+    },
+    computed: {
+        ...mapGetters({
+            vuexPricelists: "getPricelists"
         })
     },
     components: {

@@ -5,6 +5,7 @@ export const addFinanceProperty = ({commit, rootState}, payload) => {
 };
 export const storeDuoRates = ({commit}, payload) => commit('setDuoRates', payload);
 export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
+export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
 export const getDuoCombinations = async ({commit, state}, payload) => {
     commit('startRequest');

@@ -1,63 +1,51 @@
 <template lang="pug">
-.addSeveral-wrap(v-click-outside="closeSeveral")
-    .add-several
+.add-several(v-click-outside="closeSeveral")
+    .add-several__main
         .add-several__close
             span.add-several__close-icon(@click="closeSeveral") +
-        .add-several__language
-            .title
-                span Source language        
-            .add-several__clear-all(v-if="hasCheckedAllSource" @click="clearAllChecks('source')") Clear
-            span.add-several__all-search-value(v-model="langSearchValue" v-if="isSourceSearch && langSearchValue") {{ langSearchValue }}
-            .languages
-                .list(tabindex="0" @keydown="(e) => findLanguage(e, 'source', 'all')" @blur="clearSearchValue('source', 'all')")
-                    .list__item(v-for="(language, i) in source.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'source', 'all')" @dblclick="forceMoveTo(i, 'source')" :class="{chosen: language.check}") {{ language.lang }}
-            .arrows
-                .arrows__right
-                    img(src="../../assets/images/right.png" @click="toChosenSource")
-                .arrows__left
-                    img(src="../../assets/images/left.png" @click="toAllSource")
-            .add-several__clear-chosen(v-if="hasCheckedChosenSource" @click="clearChosenChecks('source')") Clear
-            .languages
-                .list
-                    .list__item(v-for="(language, i) in source.chosen" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiBack(e, i, 'source', 'chosen')" @dblclick="forceMoveFrom(i, 'source')" :class="{chosen: language.check}") {{ language.lang }}
-        .add-several__language
-            .title
-                span.title-target Target language
-            .add-several__clear-all(v-if="hasCheckedAllTarget" @click="clearAllChecks('target')") Clear
-            span.add-several__all-search-value(v-model="langSearchValue" v-if="!isSourceSearch && langSearchValue") {{ langSearchValue }}
-            .languages
-                .list(tabindex="3" @keydown="(e) => findLanguage(e, 'target', 'all')" @blur="clearSearchValue('target', 'all')")
-                    .list__item(v-for="(language, i) in target.all" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiTo(e, i, 'target', 'all')" @dblclick="forceMoveTo(i, 'target')" :class="{chosen: language.check}") {{ language.lang }}
-            .arrows
-                .arrows__right
-                    img(src="../../assets/images/right.png" @click="toChosenTarget")
-                .arrows__left
-                    img(src="../../assets/images/left.png" @click="toAllTarget")
-            .add-several__clear-chosen(v-if="hasCheckedChosenTarget" @click="clearChosenChecks('target')") Clear
-            .languages    
-                .list
-                    .list__item(v-for="(language, i) in target.chosen" @mousedown="(e)=>preventShift(e)" @mouseup="(e) => selectAllMultiBack(e, i, 'target', 'chosen')" @dblclick="forceMoveFrom(i, 'target')" :class="{chosen: language.check}") {{ language.lang }}
-        .add-several__service-industry                 
-            .services
-                span.services__title Service
-                .services__inner-component
+        .add-several__select-block
+            span.add-several__title Pricelist
+            .add-several__drop-menu
+                SelectSingle(placeholder="Select" :options="vuexPricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
+        LangsManage(
+            title="Source languages"
+            :all="source.all" 
+            :chosen="source.chosen" 
+            @toChosen="(e) => toChosen(e, 'source')" 
+            @toAll="(e) => toAll(e, 'source')"
+            @forceMoveTo="(e) => forceMoveTo(e, 'source')"
+            @forceMoveBack="(e) => forceMoveBack(e, 'source')"
+            @sortBySearch="(e) => sortBySearch(e, 'source')"
+            @sortLangs="(e) => sortLangs(e, 'source')")
+        LangsManage(
+            title="Target languages"
+            :all="target.all" 
+            :chosen="target.chosen" 
+            @toChosen="(e) => toChosen(e, 'target')" 
+            @toAll="(e) => toAll(e, 'target')"
+            @forceMoveTo="(e) => forceMoveTo(e, 'target')"
+            @forceMoveBack="(e) => forceMoveBack(e, 'target')"
+            @sortBySearch="(e) => sortBySearch(e, 'target')"
+            @sortLangs="(e) => sortLangs(e, 'target')")
+        .add-several__service-industry
+            .add-several__select-block
+                span.add-several__title Services
+                .add-several__drop-menu
                     ServiceMultiSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
-            .industries
-                span Industry
-                .industries__inner-component
+            .add-several__select-block
+                span.add-several__title Industries
+                .add-several__drop-menu
                     IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
-        .add-several__service-rates(v-if="selectedServ[0].title != 'Select' && selectedServ[0].title != 'All'")
-            .chosen-services(v-for="serv in selectedServ")
-                span.chosen-services__title {{ serv.title }}:
-                input.chosen-services__rate(type="text" v-model="serv.rate") 
-        .submit-button
-            input.submit-button__button(type="button" @click="checkErrors" value="Submit")
+        .add-several__submit
+            input.add-several__button(type="button" @click="checkErrors" value="Submit")
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
 import ServiceMultiSelect from "../ServiceMultiSelect";
 import IndustrySelect from "../IndustrySelect";
+import SelectSingle from "../SelectSingle";
+import LangsManage from "./langs/LangsManage";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -78,118 +66,43 @@ export default {
             target: {
                 all: [], chosen: []
             },
-            selectedInd: [{name: 'Select'}],
-            selectedServ: [{title: 'Select'}],
+            selectedInd: [],
+            selectedServ: [],
             errors: [],
             langSearchValue: "",
-            isSourceSearch: true
+            isSourceSearch: true,
+            selectedPrice: {name: ""}
         }
     },
     methods: {
         ...mapActions({
             alertToggle: "alertToggle",
             addSeveralVendorRates: "addSeveralVendorRates",
-            storeClient: "storeClient"
+            storeClient: "storeClient",
+            storePricelists: "storePricelists"
         }),
-        clearSearchValue(prop, subProp) {
-            this.langSearchValue = "";
-            this.sortLangArray(this[prop][subProp]);
-        },
-        sortBySearch({val, prop, subProp}) {
-            const value = val.toLowerCase();
-            for(let index in this[prop][subProp]) {
-                const n = value.length;
-                if(this[prop][subProp][index].lang.toLowerCase().slice(0, n) === value) {
-                    let replaceLang = this[prop][subProp].splice(index, 1);
-                    this[prop][subProp].unshift(replaceLang[0]);
+        sortBySearch({value, prop }, mainProp) {
+            if(!value) return this.sortLangArray(this[mainProp][prop]);
+            const val = value.toLowerCase();
+            for(let index in this[mainProp][prop]) {
+                const n = val.length;
+                if(this[mainProp][prop][index].lang.toLowerCase().slice(0, n) === val) {
+                    let replaceLang = this[mainProp][prop].splice(index, 1);
+                    this[mainProp][prop].unshift(replaceLang[0]);
                 }
             }
-        },
-        findLanguage(e, prop, subProp) {
-            this.isSourceSearch = true;
-            if(prop === "target") {
-                this.isSourceSearch = false;
-            }
-            if(e.keyCode === 27) {
-                this.clearAllChecks(prop);
-            } 
-            if(e.keyCode <= 90 && e.keyCode >= 65) {
-                this.langSearchValue += e.key;
-            }
-            if(e.keyCode === 8) {
-                this.langSearchValue = this.langSearchValue.slice(0, -1);
-            }
-            if(this.langSearchValue) {
-                this.sortBySearch({val: this.langSearchValue, prop, subProp});
-            } else {
-                this.sortLangArray(this[prop][subProp]);
-            }
-        },
-        preventShift(e) {
-            if(e.shiftKey) e.preventDefault();
-        },
-        clearAllChecks(prop) {
-            this[prop].all.forEach(item => item.check = false);
-        },
-        clearChosenChecks(prop) {
-            this[prop].chosen.forEach(item => item.check = false);
-        },
-        checkAllBefore({prop, subProp, index, i}) {
-            for(let j = index; j < i; j++ ) {
-                this[prop][subProp][j].check = true;   
-            };
-        },
-        checkAllAfter({prop, subProp, index, i}) {
-            for(let j = index; j > i; j-- ) {
-                this[prop][subProp][j].check = true;   
-            };
-        },
-        selectMany({e, i, prop, subProp}) {
-            if(e.shiftKey) {
-                e.preventDefault();
-                for(let index in this[prop][subProp]) {
-                    if(this[prop][subProp][index].check && index < i) {
-                        return this.checkAllBefore({prop, subProp, index, i});
-                    }
-                    if(this[prop][subProp][index].check && index > i) {
-                        return this.checkAllAfter({prop, subProp, index, i});
-                    }
-                }
-            }
-        },
-        selectAllMultiTo(e, i, prop, subProp) {
-            if(prop === 'source') {
-                this.sourceTo(i);
-            } else {
-                this.targetTo(i);
-            }
-            this.selectMany({e, i, prop, subProp})
-        },
-        selectAllMultiBack(e, i, prop, subProp) {
-            if(prop === 'source') {
-                this.sourceBack(i);
-            } else {
-                this.targetBack(i);
-            }
-            this.selectMany({e, i, prop, subProp})
         },
         checkErrors() {
             this.errors = [];
-            if(this.selectedInd[0].name == 'Select') this.errors.push('Choose industry');
-            if(this.selectedServ[0].title == 'Select') this.errors.push('Choose service');
+            if(!this.selectedPrice._id) this.errors.push('Please, select pricelist');
+            if(!this.selectedInd.length) this.errors.push('Please, select industries');
+            if(!this.selectedServ.length) this.errors.push('Please, select services');
             if(!this.source.chosen.length) this.errors.push('Choose source languages');
             if(!this.target.chosen.length) this.errors.push('Choose target languages');
-            if(this.selectedServ.length) {
-                for(let serv of this.selectedServ) {
-                    if(+serv.rate <= 0 || !serv.rate) {
-                        this.errors.push(`Enter correct rate value for service ${serv.title}`)
-                    }
-                }
-            }
             if(this.errors.length) {
                 return true;
             } else {
-                this.langsAddition();
+                this.addLangCombinations();
             }
         },
         defaultRates() {
@@ -203,17 +116,28 @@ export default {
                 return {...init}
             }, {});
         },
-        getAddingRates() {
-            let rates = this.defaultRates();
-            for(let service of this.selectedServ) {
-                rates[service._id].value = +service.rate
-                rates[service._id].active = true;
-            }
-            return rates;
+        setPrice({option}) {
+            this.selectedPrice = option;
+            this.priceLangs();
+            this.sortLangArray(this.source.all);
+            this.sortLangArray(this.target.all);
+        },
+        priceLangs() {
+            const allCombs = this.selectedPrice.combinations.filter(item => item.source);
+            const notUniqueSource = allCombs.map(item => {
+                return item.source;
+            });
+            const notUniqueTarget = allCombs.map(item => {
+                return item.target;
+            });
+            this.source.all = notUniqueSource.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);            
+            this.target.all = notUniqueTarget.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
+            this.source.chosen = [];            
+            this.target.chosen = [];            
         },
         collectCombinations() {
             let combinations = [];
-            const rates = this.getAddingRates();
+            const rates = this.defaultRates();
             const industries = this.selectedInd.map(item => {
                 return {...item, rates}
             });
@@ -230,19 +154,20 @@ export default {
             }
             return combinations;
         },
-        async langsAddition() {
-            let combinations = this.collectCombinations();
+        async addLangCombinations() {
+            const combinations = this.collectCombinations();
+            const priceId = this.selectedPrice._id;
             try {
                 if(this.origin === 'rates') {
                     const result = await this.$http.post('/service/several-langs', { combinations });
                 }
                 if(this.origin === 'vendor') {
                     const id = this.who._id;
-                    await this.addSeveralVendorRates({combinations, vendorId: id});
+                    await this.addSeveralVendorRates({priceId, combinations, vendorId: id});
                 }
                 if(this.origin === 'client') {
                     const id = this.who._id;
-                    const clientResult = await this.$http.post('/clientsapi/several-langs', {combinations, clientId: id});
+                    const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId, combinations, clientId: id});
                     const updatedClient = {...clientResult.body};
                     await this.storeClient(updatedClient);
                 }
@@ -253,9 +178,12 @@ export default {
             this.closeSeveral();
         },
         closeSeveral() {
-            this.selectedInd = [{name: 'Select'}];
-            this.selectedServ = [{title: 'Select'}];
+            this.selectedInd = [];
+            this.selectedServ = [];
             this.$emit('closeSeveral')
+        },
+        sortLangs({ prop }, mainProp) {
+            this.sortLangArray(this[mainProp][prop]);
         },
         sortLangArray(arr) {
             arr.sort((a, b) => {
@@ -263,172 +191,85 @@ export default {
                 if(a.lang > b.lang) return 1;
             })
         },
-        forceMoveTo(i, prop) {
-            const language = this[prop].all.splice(i, 1);
+        forceMoveTo({ index }, prop) {
+            const language = this[prop].all.splice(index, 1);
             this[prop].chosen.push(language[0]);
             this[prop].chosen.forEach(item => {
                 item.check = false
             })
             this.sortLangArray(this[prop].chosen);
         },
-        forceMoveFrom(i, prop) {
-            const language = this[prop].chosen.splice(i, 1);
+        forceMoveBack({ index }, prop) {
+            const language = this[prop].chosen.splice(index, 1);
             this[prop].all.push(language[0]);
             this[prop].all.forEach(item => {
                 item.check = false
             })
             this.sortLangArray(this[prop].all);
         },
-        toChosenSource() {
-            for(let lang of this.source.all) {
+        toChosen(e, mainProp) {
+            for(let lang of this[mainProp].all) {
                 if(lang.check) {
-                    this.source.chosen.push(lang)
+                    this[mainProp].chosen.push(lang)
                 }
             }
-            this.source.all = this.source.all.filter(item => {
+            this[mainProp].all = this[mainProp].all.filter(item => {
                 return !item.check;
             })
-            this.source.chosen.forEach(item => {
+            this[mainProp].chosen.forEach(item => {
                 item.check = false
             })
-            this.sortLangArray(this.source.chosen);
+            this.sortLangArray(this[mainProp].chosen);
         },
-        toAllSource() {
-            for(let lang of this.source.chosen) {
+        toAll(e, mainProp) {
+            for(let lang of this[mainProp].chosen) {
                 if(lang.check) {
-                    this.source.all.push(lang)
+                    this[mainProp].all.push(lang)
                 }
             }
-            this.source.chosen = this.source.chosen.filter(item => {
+            this[mainProp].chosen = this[mainProp].chosen.filter(item => {
                 return !item.check;
             })
-            this.source.all.forEach(item => {
+            this[mainProp].all.forEach(item => {
                 item.check = false
             })
-            this.source.all.sort((a, b) => {
-                if(a.lang < b.lang) return -1;
-                if(a.lang > b.lang) return 1;
-            })
+            this.sortLangArray(this[mainProp].all);
         },
-        toChosenTarget() {
-            for(let lang of this.target.all) {
-                if(lang.check) {
-                    this.target.chosen.push(lang)
-                }
+        changeIndustry({industry}) {
+            if(industry.name === "All") {
+                return this.selectedInd = [{name: 'All'}];
             }
-            this.target.all = this.target.all.filter(item => {
-                return !item.check;
-            })
-            this.target.chosen.forEach(item => {
-                item.check = false
-            })
-            this.target.chosen.sort((a, b) => {
-                if(a.lang < b.lang) return -1;
-                if(a.lang > b.lang) return 1;
-            })
-        },
-        toAllTarget() {
-            for(let lang of this.target.chosen) {
-                if(lang.check) {
-                    this.target.all.push(lang)
-                }
+            const position = this.selectedInd.findIndex(item => item.name === industry.name);
+            if(position !== -1) {
+                 return this.selectedInd.splice(position, 1);
             }
-            this.target.chosen = this.target.chosen.filter(item => {
-                return !item.check;
-            })
-            this.target.all.forEach(item => {
-                item.check = false
-            })
-            this.target.all.sort((a, b) => {
-                if(a.lang < b.lang) return -1;
-                if(a.lang > b.lang) return 1;
-            })
-        },
-        sourceTo(i) {
-            if(this.source.all.length) {
-                this.source.all[i].check = !this.source.all[i].check;
-            }
-        },
-        sourceBack(i) {
-            if(this.source.chosen.length) {
-                this.source.chosen[i].check = !this.source.chosen[i].check;
-            }
-        },
-        targetTo(i) {
-            if(this.target.all.length) {
-                this.target.all[i].check = !this.target.all[i].check;
-            }
-        },
-        targetBack(i) {
-            if(this.target.chosen.length) {
-                this.target.chosen[i].check = !this.target.chosen[i].check;
-            }
-        },
-        changeIndustry(data) {
-            if(this.selectedInd[0].name == 'Select' || this.selectedInd[0].name == 'All') {
-                this.selectedInd.splice(0, 1, data.industry)
-            } else {
-                let hasIndustry = false;
-                for(let i in this.selectedInd) {
-                if(this.selectedInd[i].name == data.industry.name) {
-                    this.selectedInd.splice(i, 1);
-                    hasIndustry = true;
-                }
-                }
-                if(!hasIndustry) {
-                this.selectedInd.push(data.industry);
-                }
-            }
-            if(!this.selectedInd.length || data.industry.name == 'All') {
-                this.selectedInd = [];
-                this.selectedInd.push({
-                crud: true,
-                name: 'All'
-                })
-            }
+            if(this.selectedInd.length && this.selectedInd[0].name === "All") {
+                this.selectedInd = []
+            };
+            this.selectedInd.push(industry);
         },
         changeService({service}) {
-            if(this.selectedServ[0].title == 'Select' || this.selectedServ[0].title == 'All') {
-                this.selectedServ.splice(0, 1, {...service})
-            } else {
-                let hasService = false;
-                for(let i in this.selectedServ) {
-                if(this.selectedServ[i].title == service.title) {
-                    this.selectedServ.splice(i, 1);
-                    hasService = true;
-                }
-                }
-                if(!hasService) {
-                this.selectedServ.push({...service});
-                }
+            const position = this.selectedServ.findIndex(item => item.title === service.title);
+            if(position !== -1) {
+                 return this.selectedServ.splice(position, 1);
             }
-            if(!this.selectedServ.length || service.title == 'All') {
-                this.selectedServ = [];
-                this.selectedServ.push({
-                crud: true,
-                title: 'Select'
-                })
+            this.selectedServ.push(service);
+        },
+        async getPricelists() {
+            try {
+                if(!this.vuexPricelists.length) {
+                    const result = await this.$http.get("/prices/pricelists");
+                    await this.storePricelists(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on getting pricelists.", isShow: true, type: "error"});
             }
         },
-        getLanguages() {
-            this.$http.get('../api/languages')
-            .then(res => {
-                this.languages = res.data.sort( (a, b) => {
-                    if(a.lang < b.lang) return -1;
-                    if(a.lang > b.lang) return 1;
-                });
-                for(let lang of this.languages) {
-                    lang.check = false;
-                }
-                let langs = JSON.stringify(this.languages);
-                this.source.all = JSON.parse(langs);
-                this.target.all = JSON.parse(langs);
-            })
-        }
     },
     computed: {
         ...mapGetters({
-            vuexServices: "getVuexServices"
+            vuexServices: "getVuexServices",
+            vuexPricelists: "getPricelists"
         }),
         checkedIndustries() {
             let result = [];
@@ -447,38 +288,26 @@ export default {
                 }
             }
             return result;
-        },
-        hasCheckedAllSource() {
-            return this.source.all.find(item => item.check);
-        },
-        hasCheckedChosenSource() {
-            return this.source.chosen.find(item => item.check);
-
-        },
-        hasCheckedAllTarget() {
-            return this.target.all.find(item => item.check);
-        },
-        hasCheckedChosenTarget() {
-            return this.target.chosen.find(item => item.check);
-
         }
     },
     components: {
         ServiceMultiSelect,
-        IndustrySelect
+        IndustrySelect,
+        SelectSingle,
+        LangsManage
     },
     directives: {
         ClickOutside
     },
     mounted() {
-        this.getLanguages();
+        this.getPricelists();
     }
 }
 </script>
 
 <style lang="scss" scoped>
 
-.addSeveral-wrap {
+.add-several {
     position: absolute;
     top: 0;
     left: 0;
@@ -490,18 +319,17 @@ export default {
     align-items: center;
     font-size: 14px;
     z-index: 50;
-}
-
-.add-several {
-    padding: 40px 40px 20px 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 5px 15px rgba(85, 55, 0, 0.5);
-    border-radius: 3px;
-    background-color: #FFF;
-    width: 690px;
+    &__main {
+        padding: 40px 40px 20px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 15px rgba(85, 55, 0, 0.5);
+        border-radius: 3px;
+        background-color: #FFF;
+        width: 690px;
+    }
     &__language {
         width: 100%;
         display: flex;
@@ -564,116 +392,19 @@ export default {
         background: #FFF;
         z-index: 20;
     }
-}
-
-.title-target {
-    padding-right: 3px; 
-}
-
-.services, .industries {
-    display: flex;
-    align-items: center;
-    width: 50%;
-    margin-bottom: 30px;
-    &__inner-component {
+    &__select-block {
+        display: flex;
+        align-items: center;
+        align-self: flex-start;
+        width: 40%;
+        margin-bottom: 30px;
+    }
+    &__drop-menu {
         position: relative;
-        width: 192px;
-        height: 35px;
-        margin-left: 20px;
+        width: 191px;
+        height: 34px;
+        margin-left: 25px;
     }
-}
-
-.chosen-services {
-    width: 45%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    &__rate {
-        margin-right: 5px;
-        width: 181px;
-        height: 29px;
-        border-radius: 5px;
-        border: 1px solid #67573E;
-        outline: none;
-        padding: 0 5px;
-    }
-}
-
-.services {
-    justify-content: space-between;
-    &__title {
-        margin-left: 40px;
-    }
-}
-
-.industries {
-    justify-content: flex-end;
-}
-
-.languages {
-    height: 187px;
-    width: 191px;
-    border: 1px solid #67573E;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.list {
-    width: 100%;
-    height: 95%;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding: 5px 0;
-    &__item {
-        font-size: 14px;
-        padding: 3px 10px;
-        cursor: pointer;
-        transition: all 0.3s;
-        &:hover {
-            background-color: rgb(245, 238, 229);
-        }
-    }
-    .chosen {
-        background-color: #DFD7CD;
-    }
-    // ::-webkit-scrollbar {
-    //     width: 16px;
-    // }
-    // ::-webkit-scrollbar-thumb {
-    //     background-color: #67573E;
-    //     border: 4px solid transparent;
-    //     border-radius: 15px;
-    //     background-clip: content-box;
-    // }
-}
-
-.arrows {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 80px;
-    &__left, &__right {
-        img {
-            cursor: pointer;
-            border-radius: 50%;
-            &:active {
-                background-color: #DFD7CD;
-            }
-        }
-    }
-}
-
-.drop-menu {
-    width: 191px;
-    height: 22px;
-    border-radius: 4px;
-    border: 1px solid #67573E;
-}
-
-.submit-button {
     &__button {
         background-color: #D15F45;
         color: white;
@@ -687,7 +418,7 @@ export default {
         border: none;
         outline: none;
         box-shadow: 0 5px 10px rgba(103, 87, 62, 0.6);
-        margin-top: 15px;
+        margin-bottom: 25px;
         cursor: pointer;
         &:active {
             box-shadow: 0 0 5px rgba(103, 87, 62, 0.6);

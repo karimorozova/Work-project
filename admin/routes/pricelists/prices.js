@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { saveNewPricelist, deletePricelist } = require('../../rates');
+const { saveNewPricelist, deletePricelist, getPricelists } = require('../../rates');
 
 router.get('/pricelists', async (req, res) => {
     try {
-      const pricelists = await Pricelist.find({});
+      const pricelists = await getPricelists({});
       res.send(pricelists);
     } catch(err) {
       console.log(err);

@@ -10,5 +10,8 @@ export const mutations = {
     },
     setCurrentPrice(state, payload) {
         state.currentPrice = {...payload};
+    },
+    setPricelists(state, payload) {
+        state.pricelists = payload;
     }
 }

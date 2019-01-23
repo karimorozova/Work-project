@@ -159,9 +159,9 @@ router.delete('/rate/:id', async (req, res) => {
 })
 
 router.post('/several-langs', async (req, res) => {
-    const { combinations, clientId } = req.body;
+    const { priceId, combinations, clientId } = req.body;
     try {
-        const updatedClient = await updateClientCombinations({clientId, combinations});
+        const updatedClient = await updateClientCombinations({priceId, clientId, combinations});
         res.send(updatedClient);
     } catch(err) {
         console.log(err);

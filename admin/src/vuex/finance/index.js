@@ -7,6 +7,7 @@ const state = {
     duoRates: [],
     monoRates: [],
     serviceWhenAddSeveral: "",
+    pricelists: [],
     currentPrice: {},
 }
 

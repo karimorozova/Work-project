@@ -130,7 +130,7 @@ export default {
         height: 28px;
     }
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid #67573E;
         width: 82%;
         padding: 3px 5px;
         font-size: 14px;
@@ -150,6 +150,9 @@ export default {
             height: 23px;
             border-right: none;
             opacity: 0.5;
+        }
+        .inner-component & {
+            border-right: 1px solid #bfb09d;
         }
     }
     .arrow-button {
@@ -187,10 +190,8 @@ export default {
             padding: 2px 5px;
         }
     }
-    .project-info__drop-menu & {
-        .no-opacity {
-            opacity: 1;
-        }
+    .no-opacity {
+        opacity: 1;
     }
 }
 .drop-select {
@@ -198,7 +199,7 @@ export default {
     width: 100%;
     background-color: white;
     z-index: 5;
-    border: 1px solid #BFB09D;
+    border: 1px solid #67573E;
     border-radius: 5px;
     box-sizing: border-box;
     .drop {
@@ -210,6 +211,8 @@ export default {
         overflow-x: hidden;
         background-color: white;
         box-sizing: border-box;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
         &__item {
             display: flex;
             align-items: center;

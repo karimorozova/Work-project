@@ -1,5 +1,6 @@
-const { Clients, Services } = require("../models/");
+const { Clients, Services, Pricelist } = require("../models/");
 const { getAfterUpdate, getClient } = require("./getClients");
+const { getPricelist } = require("../rates");
 
 async function getClientRates({client, form}) {
     const combinations = form === "Duo" ? client.languageCombinations.filter(item => item.source)
@@ -239,8 +240,10 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-async function updateClientCombinations({clientId, combinations}) {
+async function updateClientCombinations({priceId, clientId, combinations}) {
     try {
+        const pricelist = await getPricelist({"_id": priceId});
+        const priceCombs = [...pricelist.combinations];
         const client = await getClient({"_id": clientId});
         let clientCombs = [...client.languageCombinations];
         for(let {source, target, industries} of combinations) {

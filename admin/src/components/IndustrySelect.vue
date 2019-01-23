@@ -1,11 +1,13 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All' && selectedInd[0].name != 'Select'")
+            template(v-if="selectedInd.length && selectedInd[0].name !== 'All'")
                 .selected
                     img(v-for="name in selectedInd" :src="name.icon") 
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' || selectedInd[0].name == 'Select'") 
-                span.selected {{ selectedInd[0].name }}
+            template(v-if="selectedInd.length && selectedInd[0].name === 'All'") 
+                span.selected All
+            template(v-if="!selectedInd.length") 
+                span.selected.no-choice Select
             .arrow-button(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
@@ -107,11 +109,10 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid #67573E;
         width: 82%;
         padding: 3px 5px;
         font-size: 14px;
-        opacity: 0.7;
         height: 31px;
         display: flex;
         align-items: center;
@@ -121,6 +122,12 @@ export default {
             max-width: 21px;
             max-height: 21px;
             margin-right: 3px;
+        }
+        .inner-component & {
+            border-right: 1px solid #bfb09d;
+        }
+        .industries__drop-menu {
+            height: 28px;
         }
     }
     .arrow-button {
@@ -145,9 +152,9 @@ export default {
         border-radius: 0;
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
         height: 100%;
-        .selected {
-            opacity: 1;
-        }
+    }
+    .no-choice {
+        opacity: 0.6;
     }
 }
 .drop-select {
@@ -155,7 +162,7 @@ export default {
     width: 100%;
     background-color: white;
     z-index: 5;
-    border: 1px solid #BFB09D;
+    border: 1px solid #67573E;
     border-radius: 5px;
     box-sizing: border-box;
     .drop {
@@ -167,6 +174,8 @@ export default {
         overflow-x: hidden;
         background-color: white;
         box-sizing: border-box;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
         &__item {
             display: flex;
             align-items: center;

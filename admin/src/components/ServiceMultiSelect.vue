@@ -1,11 +1,11 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            template(v-if="selectedServ.length && selectedServ[0].title != 'All' && selectedServ[0].title != 'Select'")
+            template(v-if="selectedServ.length && selectedServ[0].title != 'Select'")
                 .selected
                     span(v-for="serv in selectedServ") {{ serv.title }}; 
-            template(v-if="!selectedServ.length || selectedServ[0].title == 'All' || selectedServ[0].title == 'Select'") 
-                span.selected {{ selectedServ[0].title }}
+            template(v-if="!selectedServ.length || selectedServ[0].title == 'Select'") 
+                span.selected.no-choice Select
             .arrow-button(@click="showServs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedServ}")
         .drop(v-if="droppedServ")
@@ -108,16 +108,18 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid #BFB09D;
+        border-right: 1px solid #67573E;
         width: 82%;
         padding: 3px 5px;
         font-size: 14px;
-        opacity: 0.7;
         height: 31px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
+        .services__drop-menu & {
+            height: 28px;
+        }
     }
     .arrow-button {
         width: 18%;
@@ -143,8 +145,10 @@ export default {
         height: 100%;
         .selected {
             padding-top: 5px;
-            opacity: 1;
         }
+    }
+    .no-choice {
+        opacity: 0.6;
     }
 }
 .drop-select {
@@ -152,7 +156,7 @@ export default {
     width: 100%;
     background-color: white;
     z-index: 5;
-    border: 1px solid #BFB09D;
+    border: 1px solid #67573E;
     border-radius: 5px;
     box-sizing: border-box;
     .drop {
@@ -163,6 +167,8 @@ export default {
         overflow-y: overlay;
         overflow-x: hidden;
         background-color: white;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
         &__item {
             display: flex;
             align-items: center;

@@ -193,6 +193,7 @@ export default {
             tbody.style.minHeight = this.currentTableHeight + 'px';
         },
         async updateClient(index) {
+            if(this.currentEditingIndex === -1) return;
             let sendData = new FormData();
             const updatingClient = {
                 ...this.filteredClients[index],
