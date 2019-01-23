@@ -1,4 +1,5 @@
 const { Pricelist } = require("../models");
+const { getPricelist } = require("./getrates");
 
 async function saveNewPricelist(pricelist) {
     const { name, isActive, isDefault, copyName } = pricelist;
@@ -42,4 +43,27 @@ async function deletePricelist(id, isDefault) {
     }
 }
 
-module.exports = { saveNewPricelist, deletePricelist };
+async function checkPriceForPairs(priceId, combinations) {
+    let result = [];
+    try {
+        const pricelist = await getPricelist({"_id": priceId});
+        const priceCombs = [...pricelist.combinations];
+        for(let comb of combinations) {
+            const pairIndex = priceCombs.findIndex(item => {
+                return item.source && item.source.id === comb.source._id && item.target.id === comb.target._id;
+            })
+            if(pairIndex !== -1) {
+                result.push({
+                    source: comb.source.lang,
+                    target: comb.target.lang
+                })
+            }
+        }
+        return result;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in checkPriceForPairs");
+    }
+}
+
+module.exports = { saveNewPricelist, deletePricelist, checkPriceForPairs };

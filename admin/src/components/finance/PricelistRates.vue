@@ -20,10 +20,16 @@
                         img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': duoDrop}") 
                     .finance-rates__rates-drop(v-if="duoDrop")
                         DuoRates(@addSevLangs="addSevLangs")
-        Addseverallangs(v-if="addSeveral"
-            origin="rates"
+        Addseverallangs(v-if="isAddSeveral"
+            origin="global"
+            :isAvailablePairs="isAvailablePairs"
+            @checkCombinations="checkCombinations"
             @severalLangsResult="severalLangsResult"
             @closeSeveral="closeSevLangs")
+        AvailablePairs(v-if="isAvailablePairs"
+        :list="langPairs"
+        @addLangs="addCombinations"
+        @closeList="closeLangPairs")
 </template>
 
 <script>
@@ -32,6 +38,7 @@ import DuoRates from "./DuoRates";
 import MonoRates from "./MonoRates";
 import Addseverallangs from "./Addseverallangs";
 import Button from "../Button";
+import AvailablePairs from "./pricelists/AvailablePairs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -42,15 +49,32 @@ export default {
         return {
             monoDrop: false,
             duoDrop: false,
-            addSeveral: false,
+            isAddSeveral: false,
+            isAvailablePairs: false,
+            langPairs: []
         };
     },
     methods: {
+        async checkCombinations({ priceId, combinations }) {
+            try {
+                const result = await this.$http.post("/prices/combinations", { priceId, combinations });
+                this.langPairs = [...result.body];
+                this.isAvailablePairs = true;
+            } catch(err) {
+                this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
+            }
+        },
+        closeLangPairs() {
+            this.isAvailablePairs = false;
+        },
+        addCombinations() {
+            this.isAvailablePairs = false;
+        },
         addSevLangs(data) {
-            this.addSeveral = true;
+            this.isAddSeveral = true;
         },
         closeSevLangs(data) {
-            this.addSeveral = false;
+            this.isAddSeveral = false;
         },
         async severalLangsResult({message, isShow, type}) {
             await this.getDuoCombinations(this.serviceAfterAddSeveral);
@@ -88,7 +112,8 @@ export default {
         MonoRates,
         DuoRates,
         Addseverallangs,
-        Button
+        Button,
+        AvailablePairs
     },
     mounted() {
     }

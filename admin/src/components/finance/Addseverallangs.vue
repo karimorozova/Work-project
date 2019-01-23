@@ -6,7 +6,7 @@
         .add-several__select-block
             span.add-several__title Pricelist
             .add-several__drop-menu
-                SelectSingle(placeholder="Select" :options="vuexPricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
+                SelectSingle(placeholder="Select" :options="pricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
         LangsManage(
             title="Source languages"
             :all="source.all" 
@@ -55,6 +55,9 @@ export default {
         },
         who: {
             type: Object
+        },
+        isAvailablePairs: {
+            type: Boolean
         }
     },
     data() {
@@ -157,27 +160,33 @@ export default {
         async addLangCombinations() {
             const combinations = this.collectCombinations();
             const priceId = this.selectedPrice._id;
-            try {
-                if(this.origin === 'rates') {
-                    const result = await this.$http.post('/service/several-langs', { combinations });
-                }
-                if(this.origin === 'vendor') {
-                    const id = this.who._id;
-                    await this.addSeveralVendorRates({priceId, combinations, vendorId: id});
-                }
-                if(this.origin === 'client') {
-                    const id = this.who._id;
-                    const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId, combinations, clientId: id});
-                    const updatedClient = {...clientResult.body};
-                    await this.storeClient(updatedClient);
-                }
-                this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})
-            } catch(err) {
-                this.alertToggle({message: 'Internal server error. Cannot add several languages.', isShow: true, type: 'error'});
-            }
-            this.closeSeveral();
+            this.$emit("checkCombinations", { priceId, combinations });
         },
+        // async addLangCombinations() {
+            // const combinations = this.collectCombinations();
+            // const priceId = this.selectedPrice._id;
+            // try {
+            //     if(this.origin === 'global') {
+            //         const result = await this.$http.post('/service/several-langs', { combinations });
+            //     }
+            //     if(this.origin === 'vendor') {
+            //         const id = this.who._id;
+            //         await this.addSeveralVendorRates({priceId, combinations, vendorId: id});
+            //     }
+            //     if(this.origin === 'client') {
+            //         const id = this.who._id;
+            //         const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId, combinations, clientId: id});
+            //         const updatedClient = {...clientResult.body};
+            //         await this.storeClient(updatedClient);
+            //     }
+            //     this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})
+            // } catch(err) {
+            //     this.alertToggle({message: 'Internal server error. Cannot add several languages.', isShow: true, type: 'error'});
+            // }
+            // this.closeSeveral();
+        // },
         closeSeveral() {
+            if(this.isAvailablePairs) return;
             this.selectedInd = [];
             this.selectedServ = [];
             this.$emit('closeSeveral')
@@ -269,8 +278,13 @@ export default {
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            vuexPricelists: "getPricelists"
+            vuexPricelists: "getPricelists",
+            currentPrice: "getCurrentPrice"
         }),
+        pricelists() {
+            return this.origin !== "global" ? this.vuexPricelists 
+                : this.vuexPricelists.filter(item => item._id !== this.currentPrice._id);
+        },
         checkedIndustries() {
             let result = [];
             if(this.selectedInd.length) {

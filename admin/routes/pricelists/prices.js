@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { saveNewPricelist, deletePricelist, getPricelists } = require('../../rates');
+const { saveNewPricelist, deletePricelist, getPricelists, checkPriceForPairs } = require('../../rates');
 
 router.get('/pricelists', async (req, res) => {
     try {
@@ -58,6 +58,17 @@ router.post('/set-default', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send("Error on saving default pricelist");
+  }
+})
+
+router.post('/combinations', async (req, res) => {
+  const { priceId, combinations } = req.body;
+  try {
+    const availablePairs = await checkPriceForPairs(priceId, combinations);
+    res.send(availablePairs);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on checking combinations");
   }
 })
 
