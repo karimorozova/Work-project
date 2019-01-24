@@ -51,11 +51,13 @@ export default {
             duoDrop: false,
             isAddSeveral: false,
             isAvailablePairs: false,
-            langPairs: []
+            langPairs: [],
+            addSeveralPriceId: ""
         };
     },
     methods: {
         async checkCombinations({ priceId, combinations }) {
+            this.addSeveralPriceId = priceId;
             try {
                 const result = await this.$http.post("/prices/combinations", { priceId, combinations });
                 this.langPairs = [...result.body];
@@ -67,8 +69,19 @@ export default {
         closeLangPairs() {
             this.isAvailablePairs = false;
         },
-        addCombinations() {
+        async addCombinations() {
             this.isAvailablePairs = false;
+            try {
+                const result = await this.$http.post('/prices/several-langs', { 
+                    combinations: this.langPairs, 
+                    sourcePriceId: this.addSeveralPriceId, 
+                    currentPriceId: this.currentPrice._id });
+                await this.getDuoCombinations();
+                this.isAddSeveral = false;
+                this.alertToggle({message: "Saved", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});
+            }
         },
         addSevLangs(data) {
             this.isAddSeveral = true;

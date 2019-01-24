@@ -38,6 +38,7 @@
                     IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
         .add-several__submit
             input.add-several__button(type="button" @click="checkErrors" value="Submit")
+    ValidationErrors(v-if="areErrors" isAbsolute :errors="errors" @closeErrors="closeErrors")
 </template>
 
 <script>
@@ -46,6 +47,7 @@ import ServiceMultiSelect from "../ServiceMultiSelect";
 import IndustrySelect from "../IndustrySelect";
 import SelectSingle from "../SelectSingle";
 import LangsManage from "./langs/LangsManage";
+import ValidationErrors from "../ValidationErrors";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -71,6 +73,7 @@ export default {
             },
             selectedInd: [],
             selectedServ: [],
+            areErrors: false,
             errors: [],
             langSearchValue: "",
             isSourceSearch: true,
@@ -98,27 +101,30 @@ export default {
         checkErrors() {
             this.errors = [];
             if(!this.selectedPrice._id) this.errors.push('Please, select pricelist');
-            if(!this.selectedInd.length) this.errors.push('Please, select industries');
-            if(!this.selectedServ.length) this.errors.push('Please, select services');
             if(!this.source.chosen.length) this.errors.push('Choose source languages');
             if(!this.target.chosen.length) this.errors.push('Choose target languages');
+            if(!this.selectedServ.length) this.errors.push('Please, select services');
+            if(!this.selectedInd.length) this.errors.push('Please, select industries');
             if(this.errors.length) {
-                return true;
+                return this.areErrors = true;
             } else {
                 this.addLangCombinations();
             }
         },
-        defaultRates() {
-            const duoServices = this.vuexServices.sort((a, b) => { 
-                if(a.sortIndex < b.sortIndex) return -1; 
-                if(a.sortIndex > b.sortIndex) return 1;
-            }).filter(item => item.languageForm === "Duo");
-            return duoServices.reduce((init, cur) => {
-                const key = cur._id;
-                init[key] = {value: 0, active: false};
-                return {...init}
-            }, {});
+        closeErrors() {
+            this.areErrors = false;
         },
+        // defaultRates() {
+        //     const duoServices = this.vuexServices.sort((a, b) => { 
+        //         if(a.sortIndex < b.sortIndex) return -1; 
+        //         if(a.sortIndex > b.sortIndex) return 1;
+        //     }).filter(item => item.languageForm === "Duo");
+        //     return duoServices.reduce((init, cur) => {
+        //         const key = cur._id;
+        //         init[key] = {value: 0, active: false};
+        //         return {...init}
+        //     }, {});
+        // },
         setPrice({option}) {
             this.selectedPrice = option;
             this.priceLangs();
@@ -140,10 +146,8 @@ export default {
         },
         collectCombinations() {
             let combinations = [];
-            const rates = this.defaultRates();
-            const industries = this.selectedInd.map(item => {
-                return {...item, rates}
-            });
+            const industries = this.selectedInd.map(item => item._id);
+            const services = this.selectedServ.map(item => item._id);
             for(let source of this.source.chosen) {
                 for(let target of this.target.chosen) {
                     if(source._id !== target._id) {
@@ -151,6 +155,7 @@ export default {
                             source,
                             target,
                             industries,
+                            services
                         })
                     }
                 }
@@ -308,6 +313,7 @@ export default {
         ServiceMultiSelect,
         IndustrySelect,
         SelectSingle,
+        ValidationErrors,
         LangsManage
     },
     directives: {

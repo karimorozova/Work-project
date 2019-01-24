@@ -5,7 +5,7 @@
                 span.available-pairs__close-icon(@click.stop="closeList") +
         .available-pairs__list(v-if="list.length")
             .available-pairs__title Next language pairs will be added: 
-            .available-pairs__item(v-for="(pair, index) in list") {{ index + 1 }}. {{ pair.source }} --&#62; {{ pair.target }}
+            .available-pairs__item(v-for="(pair, index) in list") {{ index + 1 }}. {{ pair.source.lang }} --&#62; {{ pair.target.lang }}
         .available-pairs__empty(v-if="!list.length")
             .available-pairs__message There are no available combinations in chosen pricelist. Please, select another source or target languages.
         .available-pairs__button(v-if="list.length")
