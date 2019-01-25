@@ -3,10 +3,11 @@
     .add-several__main
         .add-several__close
             span.add-several__close-icon(@click="closeSeveral") +
-        .add-several__select-block
-            span.add-several__title Pricelist
-            .add-several__drop-menu
-                SelectSingle(placeholder="Select" :options="pricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
+        .add-several__prices
+            span.add-several__title.add-several_width-22 Pricelist
+            .add-several_width-78
+                .add-several__drop-menu
+                    SelectSingle(placeholder="Select" :options="pricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
         LangsManage(
             title="Source languages"
             :all="source.all" 
@@ -28,14 +29,15 @@
             @sortBySearch="(e) => sortBySearch(e, 'target')"
             @sortLangs="(e) => sortLangs(e, 'target')")
         .add-several__service-industry
-            .add-several__select-block
-                span.add-several__title Services
-                .add-several__drop-menu
-                    ServiceMultiSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
-            .add-several__select-block
-                span.add-several__title Industries
-                .add-several__drop-menu
-                    IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
+            span.add-several__title.add-several_width-22 Services
+            .add-several_width-78
+                .add-several__select-block
+                    .add-several__drop-menu
+                        ServiceMultiSelect(:selectedServ="selectedServ" :filteredServices="checkedServices" @chosenServ="changeService")
+                .add-several__select-block
+                    span.add-several__title Industries
+                    .add-several__drop-menu
+                        IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="changeIndustry" :who="who")
         .add-several__submit
             input.add-several__button(type="button" @click="checkErrors" value="Submit")
     ValidationErrors(v-if="areErrors" isAbsolute :errors="errors" @closeErrors="closeErrors")
@@ -135,7 +137,7 @@ export default {
         },
         collectCombinations() {
             let combinations = [];
-            const industries = this.selectedInd.map(item => item._id);
+            const industries = this.selectedInd[0].name === 'All' ? ['All'] : this.selectedInd.map(item => item._id);
             const services = this.selectedServ.map(item => item._id);
             for(let source of this.source.chosen) {
                 for(let target of this.target.chosen) {
@@ -345,10 +347,12 @@ export default {
         margin-bottom: 30px;
         position: relative;
     }
-    &__service-industry {
+    &__service-industry, &__prices {
         width: 100%;
         display: flex;
+        align-items: center;
         justify-content: space-between;
+        margin-bottom: 30px;
     }
     &__service-rates {
         width: 100%;
@@ -403,15 +407,30 @@ export default {
         display: flex;
         align-items: center;
         align-self: flex-start;
-        justify-content: flex-end;
-        width: 50%;
-        margin-bottom: 30px;
+        justify-content: flex-start;
+        width: 45%;
+        &:last-child, &:first-child {
+            justify-content: space-between;
+        }
+         &:last-child {
+             width: 55%;
+         }
+    }
+    &_width-22 {
+        width: 22%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+    }
+    &_width-78 {
+        width: 78%;
+        display: flex;
+        justify-content: space-between;
     }
     &__drop-menu {
         position: relative;
         width: 191px;
         height: 34px;
-        margin-left: 35px;
     }
     &__button {
         background-color: #D15F45;

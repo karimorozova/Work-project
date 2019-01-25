@@ -82,11 +82,15 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveClientDelete")
-        Addseverallangs(v-if="addSeveral"
+        Addseverallangs(v-if="isAddSeveral"
             :who="currentClient"
-            :origin="'client'"
-            @closeSeveral="closeSevLangs"
-            @severalLangsResult="severalLangsResult")
+            origin="client"
+            @checkCombinations="checkCombinations"
+            @closeSeveral="closeSevLangs")
+        AvailablePairs(v-if="isAvailablePairs"
+            :list="langPairs"
+            @addLangs="addCombinations"
+            @closeList="closeLangPairs")
         ValidationErrors(v-if="areErrorsExist"
             :errors="errors"
             @closeErrors="closeErrorsBlock"
@@ -116,6 +120,7 @@ import ClientBillInfo from './ClientBillInfo';
 import ContactDetails from '../clients/ContactDetails';
 import NewContactDetails from '../clients/NewContactDetails';
 import Addseverallangs from "../finance/Addseverallangs";
+import AvailablePairs from "../finance/pricelists/AvailablePairs";
 import { mapGetters, mapActions} from "vuex";
 
 export default {
@@ -138,9 +143,12 @@ export default {
             billErrors: [],
             isLeadEmpty: "",
             isSaveClicked: false,
-            addSeveral: false,
+            isAddSeveral: false,
             addSeveralServiceTitle: "",
-            asteriskStyle: {"top": "-4px"}
+            asteriskStyle: {"top": "-4px"},
+            isAvailablePairs: false,
+            langPairs: [],
+            addSeveralPriceId: ""
         }
     },
     methods: {
@@ -155,15 +163,39 @@ export default {
             }
         },
         addSevLangs({serviceTitle}) {
-            this.addSeveral = true;
+            this.isAddSeveral = true;
             this.addSeveralServiceTitle = serviceTitle;
         },
         closeSevLangs() {
-            this.addSeveral = false;
+            this.isAddSeveral = false;
         },
-        async severalLangsResult({message, isShow, type}) {
-            await this.getDuoCombinations({clientId: this.currentClient._id, serviceTitle: this.addSeveralServiceTitle});
-            this.alertToggle({message, isShow, type});
+        closeLangPairs() {
+            this.isAvailablePairs = false;
+        },
+        async checkCombinations({ priceId, combinations }) {
+            this.addSeveralPriceId = priceId;
+            try {
+                const result = await this.$http.post("/prices/combinations", { priceId, combinations });
+                this.langPairs = [...result.body];
+                console.log(this.langPairs);
+                console.log(result);
+                this.isAvailablePairs = true;
+            } catch(err) {
+                this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
+            }
+        },
+        async addCombinations() {
+            this.closeLangPairs();
+            try {
+                const id = this.currentClient._id;
+                const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId: this.addSeveralPriceId, combinations: this.langPairs, clientId: id});
+                const updatedClient = {...clientResult.body};
+                await this.storeClient(updatedClient);
+                await this.getDuoCombinations();
+                this.alertToggle({message: "Saved", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});
+            }
         },
         async setMatrixData({value, key}) {
             let matrix = {...this.currentClient.matrix};
@@ -382,7 +414,8 @@ export default {
         ClientBillInfo,
         ContactDetails,
         NewContactDetails,
-        Addseverallangs
+        Addseverallangs,
+        AvailablePairs
     },
     created() {
         this.getClientInfo();

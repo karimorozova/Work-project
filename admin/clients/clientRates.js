@@ -153,7 +153,9 @@ async function includeAllIndustries(industries, clientIndustries, languageForm) 
         const allIndustries = await defaultRates(clientIndustries, languageForm);
         let updatedIndustries = [];
         for(let elem of allIndustries) {
-            const index = industries.findIndex(item => item._id === elem.id);
+            const index = industries.findIndex(item => {
+                 return item._id === elem.id || item.industry.id === elem.id
+                 });
             if(index !== -1) {
                 updatedIndustries.push({
                     'industry': elem.id,
@@ -240,30 +242,104 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-async function updateClientCombinations({priceId, clientId, combinations}) {
+async function addSeveralCombinations({priceId, clientId, combinations}) {
     try {
         const pricelist = await getPricelist({"_id": priceId});
         const priceCombs = [...pricelist.combinations];
         const client = await getClient({"_id": clientId});
         let clientCombs = [...client.languageCombinations];
-        for(let {source, target, industries} of combinations) {
-            const updatedIndustries = await getAllUpdatedIndustries(industries, client.industries, "Duo");
-            const rateIndex = clientCombs.findIndex(item => item.source.id === source._id && item.target.id === target._id)
-            if(rateIndex !== -1) {
-                clientCombs[rateIndex].industries = updatedIndustries;
+        let newRates = [];
+        for(let comb of combinations) {
+            const initRate = priceCombs.find(item => item.id === comb.id);
+            const goalRateIndex = clientCombs.findIndex(item => {
+                return item.source && item.source.id === comb.source._id && item.target.id === comb.target._id
+            });
+            if(goalRateIndex === -1) {
+                const newRateIndustries = await getNewFromPrice(initRate, comb, client.industries);
+                newRates.push({
+                    source: comb.source, target: comb.target, industries: newRateIndustries
+                });
             } else {
-                clientCombs.push({
-                    source,
-                    target,
-                    industries: updatedIndustries
-                })
+                clientCombs[goalRateIndex].industries = await copyFromPrice({
+                    curIndustries: clientCombs[goalRateIndex].industries,
+                    initRate,
+                    comb,
+                    clientIndustries: client.industries
+                }) 
             }
         }
-        return getAfterUpdate({"_id": clientId}, {languageCombinations: clientCombs});
+        return await getAfterUpdate({"_id": clientId}, {languageCombinations: [...clientCombs, ...newRates]});
     } catch(err) {
         console.log(err);
         console.log("Error in updateClientCombinations");
     } 
 }
 
-module.exports= { getClientRates, updateClientRates, deleteRate, updateClientCombinations };
+async function copyFromPrice(obj) {
+    const { curIndustries, initRate, clientIndustries, comb } = obj;
+    const { services, industries } = comb;
+    try {
+        const initIndustries = [...initRate.industries];
+        let currentWithAllIndustries = await includeAllIndustries(curIndustries, clientIndustries, "Duo");
+    for(let industry of currentWithAllIndustries) {
+        const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
+        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
+            industry.rates = replaceFromPrice({
+                curRates: industry.rates, 
+                initRates: initIndustries[initIndex].rates,
+                services
+            })
+        }
+    }
+    return currentWithAllIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log('Error in copyFromPrice');
+    }
+}
+
+function replaceFromPrice({ curRates, initRates, services }) {
+    const copiedRates = Object.keys(curRates).reduce((init, curKey) => {
+        if(services.indexOf(curKey) !== -1) {
+            init[curKey] = {...initRates[curKey]}
+        } else {
+            init[curKey] = {...curRates[curKey]}
+        }
+        return {...init};
+    }, {})
+    return copiedRates;
+}
+
+async function getNewFromPrice(initRate, comb, clientIndustries) {
+    const { industries, services } = comb;
+    const initIndustries = [...initRate.industries];
+    let newRateIndustries = [];
+    try {
+        let ratesWithAllIndustries = await defaultRates(clientIndustries, "Duo");
+        for(let industry of ratesWithAllIndustries) {
+            const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
+            if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
+                industry.rates = raplaceRates(initIndustries[initIndex].rates, services);
+            }
+            newRateIndustries.push({ industry: industry.id, rates: industry.rates });
+        }
+        return newRateIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getNewFromPrice");
+    }
+}
+
+function raplaceRates(industryRates, services) {
+    let rates = Object.keys(industryRates).reduce((init, curKey) => {
+        if(services.indexOf(curKey) !== -1) {
+            init[curKey] = {...industryRates[curKey]};
+        } else {
+            init[curKey] = {value: 0, active: false};
+        }
+        return {...init}
+    }, {})
+    return rates;
+}
+
+module.exports= { getClientRates, updateClientRates, deleteRate, addSeveralCombinations };

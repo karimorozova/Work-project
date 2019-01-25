@@ -104,7 +104,7 @@ async function copyFromPrice(obj) {
     const initIndustries = [...initRate.industries];
     for(let industry of currentWithAllIndustries) {
         const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
-        if(initIndex !== -1 && industries.indexOf(industry.industry) !== -1) {
+        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
             industry.rates = replaceFromPrice({
                 curRates: industry.rates, 
                 initRates: initIndustries[initIndex].rates,
@@ -138,7 +138,7 @@ async function getNewFromPrice(initRate, comb) {
     try {
         let initWithAllIndustries = await includeAllIndustries(initIndustries, "Duo");
         for(let industry of initWithAllIndustries) {
-            if(industries.indexOf(industry.industry) !== -1) {
+            if(industries.indexOf(industry.industry) !== -1 || industries[0] === 'All') {
                 industry.rates = raplaceRates(industry.rates, services);
             } else {
                 industry.rates = resetRates(industry.rates);
@@ -216,4 +216,4 @@ async function includeAllIndustries(rateIndustries, languageForm) {
     }
   }
 
-module.exports = { saveNewPricelist, deletePricelist, checkPriceForPairs, addSeveralLangs };
+module.exports = { saveNewPricelist, deletePricelist, checkPriceForPairs, addSeveralLangs, getNewFromPrice };

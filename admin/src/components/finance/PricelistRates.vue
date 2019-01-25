@@ -24,7 +24,6 @@
             origin="global"
             :isAvailablePairs="isAvailablePairs"
             @checkCombinations="checkCombinations"
-            @severalLangsResult="severalLangsResult"
             @closeSeveral="closeSevLangs")
         AvailablePairs(v-if="isAvailablePairs"
         :list="langPairs"
@@ -70,7 +69,7 @@ export default {
             this.isAvailablePairs = false;
         },
         async addCombinations() {
-            this.isAvailablePairs = false;
+            this.closeLangPairs();
             try {
                 const result = await this.$http.post('/prices/several-langs', { 
                     combinations: this.langPairs, 

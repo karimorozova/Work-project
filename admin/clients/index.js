@@ -1,5 +1,5 @@
 const { getClient, getClients, getAfterUpdate } = require('./getClients');
-const { getClientRates, updateClientRates, deleteRate, updateClientCombinations } = require('./clientRates');
+const { getClientRates, updateClientRates, deleteRate, addSeveralCombinations } = require('./clientRates');
 
 const clients = {
     getClient,
@@ -8,7 +8,7 @@ const clients = {
     updateClientRates,
     getAfterUpdate,
     deleteRate,
-    updateClientCombinations
+    addSeveralCombinations
 }
 
 module.exports = clients;
