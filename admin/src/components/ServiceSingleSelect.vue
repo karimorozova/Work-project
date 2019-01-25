@@ -82,10 +82,10 @@ export default {
     .selected {
         border-right: 1px solid #BFB09D;
         width: 82%;
-        padding: 3px 5px;
+        padding: 0 5px;
         font-size: 14px;
         opacity: 0.7;
-        height: 31px;
+        height: 32px;
         overflow: auto;
         display: flex;
         align-items: center;

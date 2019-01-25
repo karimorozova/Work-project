@@ -90,7 +90,7 @@ export default {
         height: 30px;
     }
     .selected {
-        border-right: 1px solid $light-brown;
+        border-right: 1px solid $main-color;
         width: 82%;
         padding: 0 5px;
         font-size: 14px;
@@ -103,6 +103,7 @@ export default {
         .vendors-table__drop-menu & {
             width: 75%;
             max-height: 30px;
+            border-right: 1px solid $light-brown;
         }
     }
     .arrow-button {

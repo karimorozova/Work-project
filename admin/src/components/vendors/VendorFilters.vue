@@ -96,7 +96,7 @@ export default {
         box-sizing: border-box;
         color: $main-color;
         width: 191px;
-        height: 31px;
+        height: 30px;
         padding-left: 5px;
         border: 1px solid $main-color;
         border-radius: 5px;

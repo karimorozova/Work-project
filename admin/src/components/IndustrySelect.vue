@@ -111,9 +111,9 @@ export default {
     .selected {
         border-right: 1px solid #67573E;
         width: 82%;
-        padding: 3px 5px;
+        padding: 0 5px;
         font-size: 14px;
-        height: 31px;
+        height: 32px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -125,6 +125,7 @@ export default {
         }
         .inner-component & {
             border-right: 1px solid #bfb09d;
+            padding: 2px 5px;
         }
         .industries__drop-menu {
             height: 28px;

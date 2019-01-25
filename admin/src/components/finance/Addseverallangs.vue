@@ -403,14 +403,15 @@ export default {
         display: flex;
         align-items: center;
         align-self: flex-start;
-        width: 40%;
+        justify-content: flex-end;
+        width: 50%;
         margin-bottom: 30px;
     }
     &__drop-menu {
         position: relative;
         width: 191px;
         height: 34px;
-        margin-left: 25px;
+        margin-left: 35px;
     }
     &__button {
         background-color: #D15F45;
