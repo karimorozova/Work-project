@@ -135,8 +135,7 @@ export default {
                 languageForm: "Duo"
             }
             try {
-                await this.deleteCheckedRate({ id: info.id, deletedRate });
-                await this.uncheckAllRates("clientDuoRates");
+                await this.deleteCheckedRate({ id: info.id, priceId: this.currentPrice._id, deletedRate });
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
             }
@@ -270,14 +269,14 @@ export default {
             storeDuoRates: "storeDuoRates",
             storeServiceWhenAddSeveral: "storeServiceWhenAddSeveral",
             deleteServiceRate: "deleteServiceRate",
-            deleteCheckedRate: "deleteCheckedRate",
-            uncheckAllRates: "uncheckAllRates"
+            deleteCheckedRate: "deleteCheckedRate"
         })
     },
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getDuoRates"
+            fullInfo: "getDuoRates",
+            currentPrice: "getCurrentPrice"
         }),
         servicesIds() {
             return this.serviceSelect.map(item => item._id);

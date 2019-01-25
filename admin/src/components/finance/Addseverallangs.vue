@@ -114,17 +114,6 @@ export default {
         closeErrors() {
             this.areErrors = false;
         },
-        // defaultRates() {
-        //     const duoServices = this.vuexServices.sort((a, b) => { 
-        //         if(a.sortIndex < b.sortIndex) return -1; 
-        //         if(a.sortIndex > b.sortIndex) return 1;
-        //     }).filter(item => item.languageForm === "Duo");
-        //     return duoServices.reduce((init, cur) => {
-        //         const key = cur._id;
-        //         init[key] = {value: 0, active: false};
-        //         return {...init}
-        //     }, {});
-        // },
         setPrice({option}) {
             this.selectedPrice = option;
             this.priceLangs();
@@ -271,10 +260,8 @@ export default {
         },
         async getPricelists() {
             try {
-                if(!this.vuexPricelists.length) {
-                    const result = await this.$http.get("/prices/pricelists");
-                    await this.storePricelists(result.body);
-                }
+                const result = await this.$http.get("/prices/pricelists");
+                await this.storePricelists(result.body);
             } catch(err) {
                 this.alertToggle({message: "Error on getting pricelists.", isShow: true, type: "error"});
             }

@@ -130,7 +130,7 @@ export default {
                 languageForm: "Mono"
             }
             try {
-                await this.deleteCheckedRate({ id: info.id, deletedRate });
+                await this.deleteCheckedRate({ id: info.id, priceId: this.currentPrice._id, deletedRate });
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
             }
@@ -255,7 +255,8 @@ export default {
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getMonoRates"
+            fullInfo: "getMonoRates",
+            currentPrice: "getCurrentPrice"
         }),
         servicesIds() {
             return this.serviceSelect.map(item => item._id);
