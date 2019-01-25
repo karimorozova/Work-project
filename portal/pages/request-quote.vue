@@ -189,7 +189,7 @@
                 span.asterisk Email
                 input(type='text' name='formContactsMail' v-model='contactEmail')
               .contact__col-item.phones
-                span Phone Number
+                span.asterisk Phone Number
                 input(type='text' v-model='phone')
             .contact__col
               .contact__col-item.company-name
@@ -796,6 +796,7 @@ export default {
       if(!this.request.contactName) this.errors.push("Name required");
       if(!this.request.contactEmail) this.errors.push("Email required");
       if(!this.request.companyName) this.errors.push("Company Name required");
+      if(!this.request.phone) this.errors.push("Contact Phone required");
       if(this.serviceSelect == 'Select' || this.industrySelect == 'Select' || (this.source == 'Select' && this.target == 'Select')) {
         this.errors.push("Please, fill the required fields (with red asterisk).")
       }
