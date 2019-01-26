@@ -139,7 +139,7 @@ async function getNewFromPrice(initRate, comb) {
         let initWithAllIndustries = await includeAllIndustries(initIndustries, "Duo");
         for(let industry of initWithAllIndustries) {
             if(industries.indexOf(industry.industry) !== -1 || industries[0] === 'All') {
-                industry.rates = raplaceRates(industry.rates, services);
+                industry.rates = replaceRates(industry.rates, services);
             } else {
                 industry.rates = resetRates(industry.rates);
             }
@@ -159,7 +159,7 @@ function resetRates(rates) {
     }, {});
 };
 
-function raplaceRates(industryRates, services) {
+function replaceRates(industryRates, services) {
     let rates = Object.keys(industryRates).reduce((init, curKey) => {
         if(services.indexOf(curKey) !== -1) {
             init[curKey] = {...industryRates[curKey]};
@@ -216,4 +216,4 @@ async function includeAllIndustries(rateIndustries, languageForm) {
     }
   }
 
-module.exports = { saveNewPricelist, deletePricelist, checkPriceForPairs, addSeveralLangs, getNewFromPrice };
+module.exports = { saveNewPricelist, deletePricelist, checkPriceForPairs, addSeveralLangs, replaceRates, replaceFromPrice };

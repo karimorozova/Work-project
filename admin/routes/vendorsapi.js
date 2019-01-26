@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendors, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require('./vendors');
+const { getVendor, getVendors, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require('./vendors');
 const { Vendors, Projects } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -81,9 +81,9 @@ router.delete('/rate/:id', async (req,res) => {
 })
 
 router.post('/several-langs', async (req, res) => {
-    const { combinations, vendorId } = req.body;
+    const { priceId, combinations, vendorId } = req.body;
     try {
-        const updatedVendor = await addVendorsSeveralLangs({vendorId, combinations});
+        const updatedVendor = await addSeveralCombinations({priceId, vendorId, combinations});
         res.send(updatedVendor);
     } catch(err) {
         console.log(err);

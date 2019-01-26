@@ -1,5 +1,5 @@
 const { getVendor, getVendors, getVendorAfterUpdate } = require("./getVendors");
-const { getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs } = require("./vendorRates");
+const { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require("./vendorRates");
 
 const vendors = {
     getVendor,
@@ -8,7 +8,7 @@ const vendors = {
     getVendorAfterUpdate,
     updateVendorRates,
     deleteRate,
-    addVendorsSeveralLangs
+    addSeveralCombinations
 }
 
 module.exports = vendors;

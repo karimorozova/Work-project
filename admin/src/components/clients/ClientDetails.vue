@@ -177,8 +177,6 @@ export default {
             try {
                 const result = await this.$http.post("/prices/combinations", { priceId, combinations });
                 this.langPairs = [...result.body];
-                console.log(this.langPairs);
-                console.log(result);
                 this.isAvailablePairs = true;
             } catch(err) {
                 this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
@@ -192,6 +190,7 @@ export default {
                 const updatedClient = {...clientResult.body};
                 await this.storeClient(updatedClient);
                 await this.getDuoCombinations();
+                this.closeSevLangs();
                 this.alertToggle({message: "Saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});

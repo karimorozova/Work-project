@@ -87,9 +87,13 @@
         Addseverallangs(v-if="isAddSeveral"
             origin="vendor"
             :who="currentVendor"
+            @checkCombinations="checkCombinations"
             @closeSeveral="closeSevLangs"
-            @severalLangsResult="severalLangsResult"
         )
+        AvailablePairs(v-if="isAvailablePairs"
+            :list="langPairs"
+            @addLangs="addCombinations"
+            @closeList="closeLangPairs")
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
@@ -109,6 +113,7 @@ import Sidebar from "../Sidebar";
 import Asterisk from "../Asterisk";
 import VendorRates from "./VendorRates";
 import Addseverallangs from "../finance/Addseverallangs";
+import AvailablePairs from "../finance/pricelists/AvailablePairs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -127,7 +132,10 @@ export default {
             sidebarLinks: ["General Information"],
             sidebarTitle: "VENDORS",
             errors: [],
-            backPath: "/vendors"
+            backPath: "/vendors",
+            isAvailablePairs: false,
+            langPairs: [],
+            addSeveralPriceId: ""
         }
     },
     methods: {
@@ -137,8 +145,32 @@ export default {
         closeSevLangs() {
             this.isAddSeveral = false;
         },
-        severalLangsResult({message, isShow, type}) {
-            this.alertToggle({message, isShow, type});
+        closeLangPairs() {
+            this.isAvailablePairs = false;
+        },
+        async checkCombinations({ priceId, combinations }) {
+            this.addSeveralPriceId = priceId;
+            try {
+                const result = await this.$http.post("/prices/combinations", { priceId, combinations });
+                this.langPairs = [...result.body];
+                this.isAvailablePairs = true;
+            } catch(err) {
+                this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
+            }
+        },
+        async addCombinations() {
+            this.closeLangPairs();
+            try {
+                const id = this.currentVendor._id;
+                const vendorResult = await this.$http.post('/vendorsapi/several-langs', {priceId: this.addSeveralPriceId, combinations: this.langPairs, vendorId: id});
+                const updatedVendor = {...vendorResult.body};
+                await this.storeCurrentVendor(updatedVendor);
+                await this.getDuoCombinations();
+                this.closeSevLangs();
+                this.alertToggle({message: "Saved", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});
+            }
         },
         deleteVendor() {
             this.approveShow = true;
@@ -232,7 +264,8 @@ export default {
             updateCurrentVendor: "updateCurrentVendor",
             deleteCurrentVendor: "deleteCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
-            updateIndustry: "updateIndustry"
+            updateIndustry: "updateIndustry",
+            getDuoCombinations: "getVendorDuoCombinations"
         })
     },
     beforeDestroy() {
@@ -262,6 +295,7 @@ export default {
         VendorRates,
         Asterisk,
         Addseverallangs,
+        AvailablePairs,
         SelectSingle,
         Sidebar
     },

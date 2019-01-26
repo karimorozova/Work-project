@@ -1,5 +1,6 @@
 const { Vendors, Services } = require("../../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
+const { getPricelist, replaceRates, replaceFromPrice, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates } = require("../../rates");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
@@ -114,94 +115,6 @@ async function updateDuoRates(vendor, info) {
     }
 }
 
-async function getAllUpdatedIndustries(industries, vendorIndustries, languageForm) {
-    let updatedIndustries = [];
-    try {
-        const allIndustries = await includeAllIndustries(industries, vendorIndustries, languageForm);
-        if(industries[0].name === "All") {
-            updatedIndustries = updateRatesForAll(allIndustries, industries[0].rates);
-        } else {
-            updatedIndustries = updateRates(industries, allIndustries); 
-        }
-        return updatedIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getAllUpdatedIndustries");
-    }
-}
-
-function updateRatesForAll(allIndustries, rates) {
-    return allIndustries.map(item => {
-      return  {...item, rates}
-    })
-}
-
-function updateRates(industries, allIndustries) {
-    let updatedIndustries = [...allIndustries];
-    for(let industry of updatedIndustries) {
-        const index = industries.findIndex(item => item._id === industry.industry);
-        if(index !== -1) {
-            industry.rates = industries[index].rates;
-        }
-    }
-    return updatedIndustries;
-}
-
-async function includeAllIndustries(industries, vendorIndustries, languageForm) {
-    try {
-        const allIndustries = await defaultRates(vendorIndustries, languageForm);
-        let updatedIndustries = [];
-        for(let elem of allIndustries) {
-            const index = industries.findIndex(item => item._id === elem.id);
-            if(index !== -1) {
-                updatedIndustries.push({
-                    'industry': elem.id,
-                    'rates': industries[index].rates
-                })
-            } else {
-                updatedIndustries.push({
-                    'industry': elem.id,
-                    'rates': elem.rates
-                })
-            }
-        }
-        return updatedIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in includeAllIndustries");
-    }
-}
-
-async function defaultRates(vendorIndustries, languageForm) {
-    const industries = [...vendorIndustries];
-    try {
-        const services = await Services.find({"languageForm": languageForm});
-        const serviceRate = {value: 0, active: false};
-        const rates = services.reduce((init, cur) => {
-            const key = cur.id;
-            init[key] = {...serviceRate};
-            return {...init};
-        }, {});
-        for(let industry of industries) {
-            industry["rates"] = {...rates};
-        }
-        return industries;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in defaultRates");
-    }
-}
-
-function deletePair({ langPairs, combination}) {
-    const { source, target } = combination;
-    let pairIndex = langPairs.findIndex(item => item.source.id === source.id && item.target.id === target.id);
-    const pairs = [...langPairs];
-    pairs.splice(pairIndex, 1);
-    return pairs;
-}
-
-
-
 async function deleteRate(deleteInfo, id) {
     const {vendorId, industries, servicesIds} = deleteInfo;
     try {
@@ -215,62 +128,80 @@ async function deleteRate(deleteInfo, id) {
     }
 }
 
-function getAfterDeleteRates({industries, servicesIds, combinations, id}) {
-    const industriesIds = industries.map(item => item._id);
-    const updatedCombinations = [...combinations];
-    const rateIndex = updatedCombinations.findIndex(item => item.id === id);
-    for(let elem of updatedCombinations[rateIndex].industries) {
-        if(industries[0].name === "All" || industriesIds.indexOf(elem.industry.id) !== -1) {
-            elem.rates = getDeletedRates(elem, servicesIds);
-        }
-    }
-    if(isAllRatesDeleted(updatedCombinations[rateIndex].industries)) {
-        updatedCombinations.splice(rateIndex, 1);
-    }
-    return updatedCombinations;
-}
-
-function getDeletedRates(industry, servicesIds) {
-    const { rates } = industry;
-    for(let id of servicesIds) {
-        rates[id].value = 0;
-        rates[id].active = false;
-    }
-    return rates;
-}
-
-function isAllRatesDeleted(industries) {
-    let sum = 0;
-    for(let elem of industries) {
-      sum += Object.keys(elem.rates).reduce((init, cur) => {
-        return init + elem.rates[cur].value;
-      }, 0)
-    }
-    return sum === 0
-}
-
-async function addVendorsSeveralLangs({vendorId, combinations}) {
+async function addSeveralCombinations({priceId,vendorId, combinations}) {
     try {
+        const pricelist = await getPricelist({"_id": priceId});
+        const priceCombs = [...pricelist.combinations];
         const vendor = await getVendor({"_id": vendorId});
         let vendorCombs = [...vendor.languageCombinations];
-        for(let {source, target, industries} of combinations) {
-            const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, "Duo");
-            const rateIndex = vendorCombs.findIndex(item => item.source.id === source._id && item.target.id === target._id)
-            if(rateIndex !== -1) {
-                vendorCombs[rateIndex].industries = updatedIndustries;
+        let newRates = [];
+        for(let comb of combinations) {
+            const initRate = priceCombs.find(item => item.id === comb.id);
+            const goalRateIndex = vendorCombs.findIndex(item => {
+                return item.source && item.source.id === comb.source._id && item.target.id === comb.target._id
+            });
+            if(goalRateIndex === -1) {
+                const newRateIndustries = await getNewFromPrice(initRate, comb, vendor.industries);
+                newRates.push({
+                    source: comb.source, target: comb.target, industries: newRateIndustries
+                });
             } else {
-                vendorCombs.push({
-                    source,
-                    target,
-                    industries: updatedIndustries
-                })
+                vendorCombs[goalRateIndex].industries = await copyFromPrice({
+                    curIndustries: vendorCombs[goalRateIndex].industries,
+                    initRate,
+                    comb,
+                    vendorIndustries: vendor.industries
+                }) 
             }
         }
-        return getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: vendorCombs});
+        return await getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: [...vendorCombs, ...newRates]});
     } catch(err) {
         console.log(err);
-        console.log("Error in addVendorsSeveralLangs");
+        console.log("Error in addSeveralCombinations of vendor");
     }   
 }
 
-module.exports= { getVendorRates, updateVendorRates, deleteRate, addVendorsSeveralLangs };
+async function copyFromPrice(obj) {
+    const { curIndustries, initRate, vendorIndustries, comb } = obj;
+    const { services, industries } = comb;
+    try {
+        const initIndustries = [...initRate.industries];
+        let currentWithAllIndustries = await includeAllIndustries(curIndustries, vendorIndustries, "Duo");
+    for(let industry of currentWithAllIndustries) {
+        const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
+        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
+            industry.rates = replaceFromPrice({
+                curRates: industry.rates, 
+                initRates: initIndustries[initIndex].rates,
+                services
+            })
+        }
+    }
+    return currentWithAllIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log('Error in copyFromPrice');
+    }
+}
+
+async function getNewFromPrice(initRate, comb, vendorIndustries) {
+    const { industries, services } = comb;
+    const initIndustries = [...initRate.industries];
+    let newRateIndustries = [];
+    try {
+        let ratesWithAllIndustries = await defaultRates(vendorIndustries, "Duo");
+        for(let industry of ratesWithAllIndustries) {
+            const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
+            if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
+                industry.rates = replaceRates(initIndustries[initIndex].rates, services);
+            }
+            newRateIndustries.push({ industry: industry.id, rates: industry.rates });
+        }
+        return newRateIndustries;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getNewFromPrice");
+    }
+}
+
+module.exports= { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations };
