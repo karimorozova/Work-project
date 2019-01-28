@@ -61,11 +61,12 @@ export default {
             this.clientData = false;
             this.$emit('clientCancel');
         },
-        showClientDetails({id}) {
+        async showClientDetails({id}) {
+            const client = this.allClients.find(item => item._id === id);
+            let str = JSON.stringify(client);
+            const currentClient = JSON.parse(str);
+            await this.storeCurrentClient(currentClient);
             this.$router.push(`/clients/${id}`);
-        },
-        clientDetails(ind) {
-            this.$router.push(`/clients/${this.allClients[ind]._id}`);
         },
         addClient() {
             this.$router.push('/new-client');
@@ -90,25 +91,6 @@ export default {
         chosenInd({industry}) {
             this.industryFilter = industry;
         },
-        action(ind, i) {
-            if(i == 0) {
-                for(let client of this.allClients) {
-                    client.icons[0].active = true;
-                }
-                this.allClients[ind].icons[0].active = false;
-            }
-            if(i == 1) {
-                let id = this.allClients[ind]._id;
-                this.allClients.splice(ind, 1);
-                this.$http.post('clientsapi/deleteclient', {id: id})
-                .then(res => {
-                    console.log('deleted')
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-            }
-        },
         clientDelete(data) {
             let id = data._id;
             this.$http.post('clientsapi/deleteclient', {id: id})
@@ -126,6 +108,11 @@ export default {
             alertToggle: "alertToggle",
             storeCurrentClient: "storeCurrentClient"
         })
+    },
+    computed: {
+        ...mapGetters({
+            allClients: "getClients"
+        }),
     },
     components: {
         ClientsTable,

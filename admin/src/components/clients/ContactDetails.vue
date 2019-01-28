@@ -83,7 +83,7 @@ import { mapGetters } from 'vuex';
 export default {
     props: {
         index: {
-            type: Number
+            type: [Number, String]
         },
         newClient: {
             type: Object
@@ -104,7 +104,8 @@ export default {
             areErrorsExist: false,
             errors: [],
             isSaveClicked: false,
-            genders: ["Male", "Female"]
+            genders: ["Male", "Female"],
+            fromRoute: ""
         }
     },
     methods: {
@@ -131,7 +132,7 @@ export default {
             this.contact.gender = option;
         },
         cancel() {
-            this.$emit('cancel');
+            this.$router.push({path: this.fromRoute});
         },
         cancelApprove() {
             this.approveShow = false;
@@ -201,6 +202,11 @@ export default {
     },
     directives: {
         ClickOutside
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.fromRoute = from.path;
+        })
     }
 }
 </script>
@@ -211,6 +217,7 @@ export default {
 .contact-wrap {
     font-size: 14px;
     position: relative;
+    padding: 40px;
     label {
         margin-bottom: 0;
     }

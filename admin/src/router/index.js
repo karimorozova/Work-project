@@ -21,6 +21,9 @@ import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
+import ClientInfo from '@/components/clients/ClientInfo'
+import ContactDetails from '@/components/clients/ContactDetails'
+import NewContactDetails from '@/components/clients/NewContactDetails'
 import Vendordetails from '@/components/vendors/Vendordetails'
 import NewVendor from '@/components/vendors/NewVendor'
 import NewClient from '@/components/clients/NewClient'
@@ -141,7 +144,28 @@ const router = new Router({
           path: 'clients/:id',
           name: 'client-details',
           component: ClientDetails,
-          props: true
+          redirect: {name: 'client-info'},
+          props: true,
+          children: [
+            {
+              path: '',
+              name: 'client-info',
+              component: ClientInfo,
+              props: true
+            },
+            {
+              path: 'new-contact',
+              name: 'new-contact',
+              component: NewContactDetails,
+              props: true
+            },
+            {
+              path: 'contact/:index',
+              name: 'contact',
+              component: ContactDetails,
+              props: true
+            }
+          ]
         },
         {
           path: 'pm-projects',
