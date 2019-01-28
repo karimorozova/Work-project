@@ -22,6 +22,7 @@ import TableIndustries from '@/components/Table/TableIndustries'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
 import ClientInfo from '@/components/clients/ClientInfo'
+import NewClientInfo from '@/components/clients/NewClientInfo'
 import ContactDetails from '@/components/clients/ContactDetails'
 import NewContactDetails from '@/components/clients/NewContactDetails'
 import Vendordetails from '@/components/vendors/Vendordetails'
@@ -138,7 +139,29 @@ const router = new Router({
         {
           path: 'new-client',
           name: 'new-client',
-          component: NewClient
+          component: NewClient,
+          redirect: {name: 'new-client-info'},
+          props: true,
+          children: [
+            {
+              path: '',
+              name: 'new-client-info',
+              component: NewClientInfo,
+              props: true
+            },
+            {
+              path: 'new_contact',
+              name: 'new_contact',
+              component: NewContactDetails,
+              props: true
+            },
+            {
+              path: '_contact/:index',
+              name: '_contact',
+              component: ContactDetails,
+              props: true
+            }
+          ]
         },
         {
           path: 'clients/:id',

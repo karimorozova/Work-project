@@ -6,7 +6,7 @@ async function includeAllIndustries(industries, entityIndustries, languageForm) 
         let updatedIndustries = [];
         for(let elem of allIndustries) {
             const index = industries.findIndex(item => {
-                item._id === elem.id || (item.industry && item.industry.id === elem.id)
+                return item._id === elem.id || (item.industry && item.industry.id === elem.id)
                 || item.name === "All"
             });
             if(index !== -1) {
@@ -81,6 +81,19 @@ function updateRates(industries, allIndustries) {
     return updatedIndustries;
 }
 
+function updateCombIndustries(combIndustries, industries) {
+    let updatedIndustries = [...combIndustries];
+    for(let industry of industries) {
+        const rateIndex = updatedIndustries.findIndex(item => {
+            return item.industry.id === industry._id || item.industry === industry._id}
+        );
+        if(rateIndex !== -1) {
+            updatedIndustries[rateIndex].rates = industry.rates;
+        }
+    }
+    return updatedIndustries;
+}
+
 function getAfterDeleteRates({industries, servicesIds, combinations, id}) {
     const industriesIds = industries.map(item => item._id);
     const updatedCombinations = [...combinations];
@@ -115,4 +128,4 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-module.exports = { includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates }
+module.exports = { includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }

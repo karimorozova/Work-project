@@ -25,9 +25,6 @@ export default {
         }
     },
     methods: {
-        saveContactUpdates({index, contact}) {
-            this.updateClientContact({index, contact});
-        },
         async approveContactDelete({index}) {
             this.clientShow = true;
             this.contactShow = false;
@@ -50,10 +47,6 @@ export default {
                 contacts[0].leadContact = true;
             } 
             return contacts;
-        },
-        contactDetails({contactIndex}) {
-            this.contactInd = contactIndex;
-            this.$router.push({name: "contact"});
         },
         contactUpdate({index, file, contact}) {
             this.contactsPhotos.push(file);

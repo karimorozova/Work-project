@@ -10,11 +10,14 @@ export const mutations = {
     },
     updateContact(state, payload) {
         state.currentClient.contacts[payload.index] = payload.contact;
+        const lead = state.currentClient.contacts.find(item => item.leadContact);
         if(payload.contact.leadContact) {
             for(let index in state.currentClient.contacts) {
                 state.currentClient.contacts[index].leadContact = false;
             }
             state.currentClient.contacts[payload.index].leadContact = true;    
+        } else if(!payload.contact.leadContact && !lead) {
+            state.currentClient.contacts[0].leadContact = true;
         }
     },
     setLeadContact(state, payload) {

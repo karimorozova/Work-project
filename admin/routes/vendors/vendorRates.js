@@ -1,6 +1,8 @@
 const { Vendors, Services } = require("../../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
-const { getPricelist, replaceRates, replaceFromPrice, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates } = require("../../rates");
+const { getPricelist, replaceRates, replaceFromPrice, 
+    includeAllIndustries, defaultRates, getAllUpdatedIndustries, 
+    getAfterDeleteRates, updateCombIndustries } = require("../../rates");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
@@ -72,18 +74,19 @@ async function updateVendorRates(ratesInfo) {
 }
 
 async function updateMonoRates(vendor, info) {
-    const combinations = vendor.languageCombinations.filter(item => item.package);
+    const combinations = vendor.languageCombinations;
     const { industries, package, targetLanguage } = info;
     try {
-        const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.target.id === info.targetLanguage._id && item.package === package);
+        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+        const pairIndex = combinations.findIndex(item => item.package && item.target.id === info.targetLanguage._id && item.package === package);
         if(pairIndex !== -1) {
-            combinations[pairIndex].industries = updatedIndustries;
+            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
+            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
         } else {
             combinations.push({
                 target: targetLanguage._id,
                 package,
-                industries: updatedIndustries
+                industries: allUpdatedIndustries
             })
         }
         return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
@@ -94,18 +97,19 @@ async function updateMonoRates(vendor, info) {
 }
 
 async function updateDuoRates(vendor, info) {
-    const combinations = vendor.languageCombinations.filter(item => item.source);
+    const combinations = vendor.languageCombinations;
     const { industries, sourceLanguage, targetLanguage } = info;
     try {
-        const updatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
+        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+        const pairIndex = combinations.findIndex(item => item.source && item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
         if(pairIndex !== -1) {
-            combinations[pairIndex].industries = updatedIndustries;
+            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
+            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
         } else {
             combinations.push({
                 source: sourceLanguage._id,
                 target: targetLanguage._id,
-                industries: updatedIndustries
+                industries: allUpdatedIndustries
             })
         }
         return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});

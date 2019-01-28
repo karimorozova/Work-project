@@ -85,8 +85,6 @@ export default {
     methods: {
         ...mapActions({
             alertToggle: "alertToggle",
-            addSeveralVendorRates: "addSeveralVendorRates",
-            storeClient: "storeClient",
             storePricelists: "storePricelists"
         }),
         sortBySearch({value, prop }, mainProp) {
@@ -158,29 +156,6 @@ export default {
             const priceId = this.selectedPrice._id;
             this.$emit("checkCombinations", { priceId, combinations });
         },
-        // async addLangCombinations() {
-            // const combinations = this.collectCombinations();
-            // const priceId = this.selectedPrice._id;
-            // try {
-            //     if(this.origin === 'global') {
-            //         const result = await this.$http.post('/service/several-langs', { combinations });
-            //     }
-            //     if(this.origin === 'vendor') {
-            //         const id = this.who._id;
-            //         await this.addSeveralVendorRates({priceId, combinations, vendorId: id});
-            //     }
-            //     if(this.origin === 'client') {
-            //         const id = this.who._id;
-            //         const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId, combinations, clientId: id});
-            //         const updatedClient = {...clientResult.body};
-            //         await this.storeClient(updatedClient);
-            //     }
-            //     this.$emit('severalLangsResult', {message: 'Several language combinations added.', isShow: true, type: 'success'})
-            // } catch(err) {
-            //     this.alertToggle({message: 'Internal server error. Cannot add several languages.', isShow: true, type: 'error'});
-            // }
-            // this.closeSeveral();
-        // },
         closeSeveral() {
             if(this.isAvailablePairs) return;
             this.selectedInd = [];
