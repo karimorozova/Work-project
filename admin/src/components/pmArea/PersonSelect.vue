@@ -142,6 +142,7 @@ export default {
         overflow-x: hidden;
         flex-direction: column;
         background-color: $white;
+        box-sizing: border-box;
         z-index: 10;
         &__item {
             align-items: center;

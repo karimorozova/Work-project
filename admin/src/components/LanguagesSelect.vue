@@ -143,13 +143,12 @@ export default {
         .all-projects__filters & {
             border-right: none;
             width: 76%;
-            height: 23px;
+            height: 28px;
         }
         .project-info__drop-menu & {
             width: 80%;
-            height: 23px;
             border-right: none;
-            opacity: 0.5;
+            height: 28px;
         }
         .inner-component & {
             border-right: 1px solid #bfb09d;

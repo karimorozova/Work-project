@@ -158,6 +158,7 @@ export default {
             removeStepVendor: 'removeStepVendor',
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate',
+            updateCurrentProject: "updateCurrentProject"
         }),
         async toggleProjectOption({key}) {
             try {
@@ -194,7 +195,8 @@ export default {
         },
         async setDate({date, prop, index}) {
             await this.setStepDate({value: date, prop, index});
-            this.getMetrics();
+            await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
+            await this.getMetrics();
         },
         setStatus({option}) {
            this.setProjectValue({value: option, prop: "status"}) 
@@ -453,9 +455,12 @@ export default {
             let result = {source: [], target: []};
             const combs = this.currentProject.customer.languageCombinations;
             for(let comb of combs) {
-                if(comb.source) {
+                if(comb.source && !comb.source._id) {
                     result.source.push(comb.source);
                     result.target.push(comb.target);
+                } else if (comb.source && comb.source._id) {
+                    result.source.push(comb.source._id);
+                    result.target.push(comb.target._id);
                 }
             }
             return result;

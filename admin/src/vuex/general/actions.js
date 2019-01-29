@@ -1,4 +1,4 @@
-import axios from "axios";
+import Vue from "vue";
 
 export const incrementRequestCounter = ({ commit }) => commit('startRequest');
 export const decrementRequestCounter = ({ commit }) => commit('endRequest');
@@ -16,11 +16,25 @@ export const setStepVendor = ({ commit }, payload) => commit('stepVendorStore', 
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+export const updateCurrentProject = async ({ commit, state }, payload) => {
+  commit('startRequest')
+  try {
+    const updatedProject = await Vue.http.post('/xtm/update-project', {...payload});
+    console.log(updatedProject);
+    const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
+    state.projects[index] = updatedProject.data;
+    await commit('storeCurrentProject', updatedProject.data);
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.message);
+  }
+}
 export const updateMatrix = async ({ commit }, payload) => {
   commit('startRequest')
   commit('updateMatrixData', payload);
   try {
-    const updatedProject = await axios.post('/xtm/update-matrix', {...payload});
+    const updatedProject = await Vue.http.post('/xtm/update-matrix', {...payload});
     await commit('storeCurrentProject', updatedProject.data);
     commit('endRequest');
   } catch(err) {

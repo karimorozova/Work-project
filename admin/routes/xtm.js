@@ -246,8 +246,8 @@ router.post('/saveproject', async (req, res) => {
 router.post('/update-project', async (req, res) => {
     const project = { ...req.body };
     try {
-        const savedProject = await Projects.updateOne({"_id": project.id}, {$set: {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist}});
-        res.send('Project updated!');
+        const savedProject = await updateProject({"_id": project.id}, {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
+        res.send(savedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send('Something wrong with project saving... ' + err);
