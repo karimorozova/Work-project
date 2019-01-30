@@ -82,85 +82,9 @@ const languagesDefault = [
     {"lang":"Chinese (Macao)", "icon":"/static/flags31x21pix/Chinese[ZH-MO].png", "symbol":"ZH-MO", "xtm": "zh_TW", "iso1":"zh-MO", "iso2":"zho-MO", "direction":"in", "crud": false, "active": true, parent: "ZH-CN", china: "traditional"},
     {"lang":"Chinese (Taiwan)","icon":"/static/flags31x21pix/Chinese[ZH-TW].png", "symbol":"ZH-TW", "xtm": "goyu", "iso1":"zh-TW", "iso2":"zho-TW", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"}
 ];
-const requestsDefault = [
-    {
-        date: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-        contactName: "Jhon",
-        contactEmail: "jhon@email.com", 
-        service: {title: "Translation"}, 
-        industry: "Games", 
-        status: "Open", 
-        accountManager: "manager1", 
-        web: "ap.com", 
-        skype: "asd", 
-        phone: "123456789", 
-        companyName: "Apple"
-    },
-    { 
-        date: new Date(new Date().setMonth(new Date().getMonth() - 2)), 
-        contactName: "Elen", 
-        contactEmail: "elen@email.com", 
-        service: {title: "Design"}, 
-        industry: "Real Estate", 
-        status: "Canceled", 
-        accountManager: "manager2", 
-        web: "sam.com", 
-        skype: "qwe", 
-        phone: "123456789", 
-        companyName: "Samsung" 
-    },
-    { 
-        date: new Date(new Date().setMonth(new Date().getMonth() - 3)), 
-        contactName: "Andrew", 
-        contactEmail: "andrew@email.com", 
-        service: {title: "Translation"}, 
-        industry: "Casino", 
-        status: "Assigned", 
-        accountManager: "manager2", 
-        web: "ea.com", 
-        skype: "gfd", 
-        phone: "123456789", 
-        companyName: "EA-Sports" 
-    },
-    { 
-        date: new Date(new Date().setMonth(new Date().getMonth() - 4)), 
-        contactName: "George", 
-        contactEmail: "george@email.com", 
-        service: {title: "Copywriting"}, 
-        industry: "Other", 
-        status: "Close", 
-        accountManager: "manager1", 
-        web: "vul.com", 
-        skype: "hgfd", 
-        phone: "123456789", 
-        companyName: "Vulcan" 
-    },
-    { 
-        date: new Date(new Date().setMonth(new Date().getMonth() - 5)), 
-        contactName: "Mike", 
-        contactEmail: "mike@email.com", 
-        service: {title: "Graphic design"}, 
-        industry: "Cryptocurrency", 
-        status: "Assigned", 
-        accountManager: "manager1", 
-        web: "cont.com", 
-        skype: "rty", 
-        phone: "123456879", 
-        companyName: "Continental" },
-    { 
-        date: new Date(new Date().setMonth(new Date().getMonth())), 
-        contactName: "Nathan", 
-        contactEmail: "nathan@email.com", 
-        service: {title: "Copywriting"}, 
-        industry: "Games", 
-        status: "New", 
-        accountManager: "manager3", 
-        web: "ms.com", 
-        skype: "uyuyu", 
-        phone: "123456789", 
-        companyName: "Microsoft" 
-    }            
-];
+
+const requestsDefault = [];
+
 const usersDefault = [
     {
       "email" : "illy@pangea.global",

@@ -300,7 +300,7 @@ function emailMessageForContact(obj) {
                         <td>${langPairs}</td>
                     </tr>
                     <tr>
-                        <td>Specializtion:</td>
+                        <td>Specialization:</td>
                         <td>${obj.industry.name}</td>
                     </tr>
                     <tr>

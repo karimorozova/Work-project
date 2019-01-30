@@ -404,6 +404,7 @@ export default {
             'resx', 'ini'
           ]    
       },
+      allLangs: [],
       languages: [],
       linksArray: [
         [
@@ -731,9 +732,9 @@ export default {
     async getLanguages() {
       try {
         const result = await this.$axios.$get('/api/languages');
-        this.languages = result.filter(item => {
-          return item.active
-        });
+        let langs = result.filter(item => item.active);
+        this.allLangs = JSON.parse(JSON.stringify(langs));
+        this.languages = [...langs];
         for(let lang of this.languages) {
           if(lang.children) {
             lang.dialects = [];
@@ -836,6 +837,24 @@ export default {
     },
     go(sb) {
       console.log('Cookies are set! Your current source is: ' + sb.current.src);
+    },
+    getServiceSourceLangs(serv, languages) {
+      let result = [];
+      for(let lang of languages) {
+        if(serv.languages[0].source.indexOf(lang.symbol) !== -1) {
+          result.push(lang);
+        }
+      }
+      return result;
+    },
+    getServiceTargetLangs(serv, languages) {
+      let result = [];
+      for(let lang of languages) {
+        if(serv.languages[0].target.indexOf(lang.symbol) !== -1) {
+          result.push(lang);
+        }
+      }
+      return result;
     }
   },
   computed: {
@@ -873,16 +892,11 @@ export default {
     },
     sourceLangsArray() {
       let result = this.languages;
-      
       if(this.serviceSelect.title != 'Select') {
         result = [];
         for(let serv of this.services) {
-          if(serv.title == this.serviceSelect.title) {
-            if(serv.languageForm == 'Duo') {
-              for(let lang of serv.languageCombinations) {
-                result.push(lang.source);
-              }
-            }
+          if(serv.title == this.serviceSelect.title && serv.languageForm == 'Duo') {
+            result = this.getServiceSourceLangs(serv, this.allLangs);
           }
         }
       }
@@ -905,22 +919,18 @@ export default {
         result = [];
         for(let serv of this.services) {
           if(serv.title == this.serviceSelect.title) {
-            if(serv.languageForm == 'Duo') {
-              for(let lang of serv.languageCombinations) {
-                if( (this.sourceSelect.lang == lang.source.lang && this.sourceSelect.lang != lang.target.lang) || this.sourceSelect.lang == 'Select' ) {
-                  result.push(lang.target);
-                }
-              }
-            }
-            if(serv.languageForm == 'Mono') {
-              for(let lang of serv.languageCombinations) {
-                result.push(lang.target);
-              }
-            }
+            result = this.getServiceTargetLangs(serv, this.allLangs);
           }
         }
       }
-
+      result = result.filter(item => {
+        if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.symbol.indexOf("EN") !== -1) {
+          return item.symbol.indexOf("EN") === -1
+        } else if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.symbol.indexOf("EN") === -1) {
+          return item.symbol.indexOf("EN") !== -1
+        }
+        return item;
+      })
       result = result.filter((obj, pos, arr) => {
         return arr.map( mapObj => mapObj.lang).indexOf(obj.lang) === pos;
       });

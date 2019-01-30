@@ -126,7 +126,7 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    .all-projects__filters &, .project-info__drop-menu & {
+    .all-projects__filters &, .tasks-steps__drop-menu & {
         height: 28px;
     }
     .selected {
@@ -145,7 +145,7 @@ export default {
             width: 76%;
             height: 28px;
         }
-        .project-info__drop-menu & {
+        .tasks-steps__drop-menu & {
             width: 80%;
             border-right: none;
             height: 28px;
@@ -164,7 +164,7 @@ export default {
             border-left: 1px solid #68573E;
             width: 24%;
         }
-        .project-info__drop-menu & {
+        .tasks-steps__drop-menu & {
             width: 20%;
             border-left: 1px solid #68573E;
         }
@@ -247,7 +247,7 @@ export default {
         height: 100%;
         z-index: 4;
     }
-    .all-projects__filters &, .project-info__drop-menu & {
+    .all-projects__filters &, .tasks-steps__drop-menu & {
         border: 1px solid #67573E;
         overflow: hidden;
     }
