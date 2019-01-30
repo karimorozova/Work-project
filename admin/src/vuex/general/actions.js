@@ -20,9 +20,19 @@ export const updateCurrentProject = async ({ commit, state }, payload) => {
   commit('startRequest')
   try {
     const updatedProject = await Vue.http.post('/xtm/update-project', {...payload});
-    console.log(updatedProject);
     const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
     state.projects[index] = updatedProject.data;
+    await commit('storeCurrentProject', updatedProject.data);
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.message);
+  }
+}
+export const addProjectTasks = async ({ commit }, payload) => {
+  commit('startRequest');
+  try {
+    const updatedProject = await Vue.http.post('/xtm/add-tasks', payload);
     await commit('storeCurrentProject', updatedProject.data);
     commit('endRequest');
   } catch(err) {
