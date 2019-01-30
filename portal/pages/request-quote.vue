@@ -924,9 +924,9 @@ export default {
         }
       }
       result = result.filter(item => {
-        if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.symbol.indexOf("EN") !== -1) {
+        if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.lang.indexOf("English") !== -1) {
           return item.symbol.indexOf("EN") === -1
-        } else if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.symbol.indexOf("EN") === -1) {
+        } else if(this.sourceSelect.lang !== 'Select' && this.sourceSelect.lang.indexOf("English") === -1) {
           return item.symbol.indexOf("EN") !== -1
         }
         return item;
