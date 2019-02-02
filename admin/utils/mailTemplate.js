@@ -23,7 +23,7 @@ const sendEmail = function (obj, msg) {
 const clientQuoteEmail = function (obj, msg) {
     return new Promise( (res, rej) => {
         let mailOptions = {
-            from: 'translation@pangea.global',
+            from: 'Michal <michal@pangea.global>',
             to: obj.email, 
             subject: obj.subject,
             text: "plain text",

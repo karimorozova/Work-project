@@ -1,4 +1,6 @@
 const apiUrl = require("../helpers/apiurl");
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('../configs');
 
 function applicationMessage(obj) {
     let cvFiles = "";
@@ -101,11 +103,12 @@ function messageForClient(obj) {
         const expiryDate = new Date(date + 900000);
         let langPairs = obj.tasks.reduce((init, current) => {
             return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
-        }, "")
-        const acceptQuote = '<a href=' + `${apiUrl}/clientsapi/acceptquote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
-        const declineQuote = '<a href=' + `${apiUrl}/clientsapi/declinequote?projectId=${obj._id}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
+        }, "");
+        const token = jwt.sign({id: obj.id}, secretKey, { expiresIn: '2h'});
+        const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj._id}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
+        const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj._id}&to=${date}t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
         
-        return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+        return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: overlay">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.customer.contactName},</h3>
         <div class="all-info" style="padding: 0 15px 0 30px;">
             <p class="description" style="font-size: 18px;">
@@ -137,7 +140,7 @@ function messageForClient(obj) {
                     <td>${langPairs}</td>
                 </tr>
                 <tr>
-                    <td>Specializtion:</td>
+                    <td>Specialization:</td>
                     <td>${obj.industry.name}</td>
                 </tr>
                 <tr>
@@ -159,7 +162,7 @@ function messageForClient(obj) {
             </p>
             <h4 style="width: 35px;border-bottom: 1px solid rgb(29, 29, 29);">T&C:</h4>
             <ol style="padding-left: 0;">
-                <li>The rstimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
+                <li>The estimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
                 <li>Should you agree to a QA service, we cannot accept responsibility if you fail to send us the finished files upon completion. Please note the QA service expires in 30 days after the quote approval.</li>
             </ol>
             <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea TRanslation Services (Cyprus) LTD</h2>
@@ -177,7 +180,7 @@ function requestMessageForVendor(obj) {
     const start = obj.start.split('T')[0].split('-').reverse().join('-');
     const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
 
-    return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
         <div class="all-info" style="padding: 0 15px 0 30px;">
             <p class="description" style="font-size: 18px;">
@@ -209,7 +212,7 @@ function requestMessageForVendor(obj) {
                     <td>${langPair}</td>
                 </tr>
                 <tr>
-                    <td>Specializtion:</td>
+                    <td>Specialization:</td>
                     <td>${obj.industry}</td>
                 </tr>
                 <tr>
@@ -231,7 +234,7 @@ function requestMessageForVendor(obj) {
             </p>
             <h4 style="width: 35px;border-bottom: 1px solid rgb(29, 29, 29);">T&C:</h4>
             <ol style="padding-left: 0;">
-                <li>The rstimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
+                <li>The estimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
                 <li>Should you agree to a QA service, we cannot accept responsibility if you fail to send us the finished files upon completion. Please note the QA service expires in 30 days after the quote approval.</li>
             </ol>
             <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea TRanslation Services (Cyprus) LTD</h2>
@@ -241,7 +244,7 @@ function requestMessageForVendor(obj) {
 }
 
 function managerAssignmentNotifyingMessage(obj) {
-    return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.user.firstName},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
                 <p class="description" style="font-size: 18px;">
@@ -275,7 +278,7 @@ function emailMessageForContact(obj) {
     const langPairs = obj.tasks.reduce((init, current) => {
         return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
     }, "")
-    return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.firstName} ${surname},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
                 <p class="description" style="font-size: 18px;">

@@ -9,7 +9,7 @@
             @chooseOption="setAction"
         )
     .project-action__confirm(v-if="selectedAction")
-        Button(value="Confirm" @clicked="makeAction")
+        Button(:value="value" @clicked="makeAction")
 </template>
 
 <script>
@@ -26,17 +26,23 @@ export default {
     data() {
         return {
             selectedAction: "",
-            actions: ["Send a Quote", "Send Project Details", "Cancel", "Deliver"]
+            actions: ["Send a Quote", "Send Project Details", "Cancel", "Deliver"],
+            value: "Confirm"
         }
     },
     methods: {
         setAction({option}) {
             this.selectedAction = option;
+            if(this.selectedAction === "Send a Quote") {
+                this.value = "Edit & Send"
+            }
         },
         async makeAction() {
             try {
                 if(this.selectedAction === "Send a Quote") {
-                    await this.sendQuote();
+                    const message = await this.$http.get(`/pm-manage/quote-message?projectId=${this.project._id}`);
+                    console.log(message);
+                    this.$emit("editAndSend", { message });
                 }
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot execute chosen action.', isShow: true, type: 'error'})

@@ -12,13 +12,17 @@
             @setDate="setDate"
             @showErrors="showErrors")
         .project-info__action
-            ProjectAction(:project="currentProject")
+            ProjectAction(
+                :project="currentProject"
+                @editAndSend="editAndSend")
     .project-info__all-info
         ProjectFinance
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrorsBlock"
     )
+    .project-info__preview(v-if="isEditAndSend")
+        QuotePreview(@closePreview="closePreview" :message="message" @editMessage="editMessage")
 </template>
 
 <script>
@@ -28,6 +32,7 @@ import ProjectShortDetails from "./ProjectShortDetails";
 import ProjectAction from "./ProjectAction";
 import ProjectFinance from "./ProjectFinance";
 import TasksAndSteps from "./TasksAndSteps";
+import QuotePreview from "./QuotePreview";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -37,6 +42,8 @@ export default {
             excludeKeys: ["nonTranslatable", "totalWords"],
             errors: [],
             areErrorsExist: false,
+            isEditAndSend: false,
+            message: ""
         }
     },
     methods: {
@@ -187,6 +194,16 @@ export default {
         closeErrorsBlock() {
             this.areErrorsExist = false;
             this.errors = [];
+        },
+        editAndSend({message}) {
+            this.isEditAndSend = true;
+            this.message = message.data.message;
+        },
+        editMessage({message}) {
+            this.message = message;
+        },
+        closePreview() {
+            this.isEditAndSend = false;
         }
     },
     computed: {
@@ -201,7 +218,8 @@ export default {
         ProjectShortDetails,
         ProjectAction,
         TasksAndSteps,
-        ProjectFinance
+        ProjectFinance,
+        QuotePreview
     },
     mounted() {
         this.getVendors();
@@ -243,6 +261,14 @@ export default {
         @media (max-width: 1600px) {
             width: 23%;
         }
+    }
+    &__preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 100
     }
 }
 </style>

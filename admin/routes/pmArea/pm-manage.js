@@ -45,15 +45,25 @@ router.put("/project-option", async (req, res) => {
     }
 })
 
-router.post("/send-quote", async (req, res) => {
-    const { id } = req.body;
+router.get("/quote-message", async (req, res) => {
+    const { projectId } = req.query;
     try {
-        const project = await getProject({"_id": id});
+        const project = await getProject({"_id": projectId});
         const service = await getOneService({"_id": project.tasks[0].service});
-        let quote = {...project._doc};
+        let quote = {...project._doc, id: project.id};
         quote.service = service.title;
         const message = messageForClient(quote);
-        const subject = quote.isUrgent ? "URGENT! Quote Details" : "Quote Details";
+        res.send({message});
+    } catch(err) {
+        res.status(500).send("Error on getting quote message")
+    }
+})
+
+router.post("/send-quote", async (req, res) => {
+    const { id, message } = req.body;
+    try {
+        const project = await getProject({"_id": id});
+        const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
         await clientQuoteEmail({...project.customer._doc, subject: subject}, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);

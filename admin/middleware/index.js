@@ -30,6 +30,27 @@ const middleware = {
         }
     },
 
+    getProjectManageToken(req, res, next) {
+        if(req.query['t']) {
+            try {
+                const token = req.query['t'];
+                jwt.verify(token, secretKey, async (err, decoded) => {
+                    if(err) {
+                        return res.status(403).send(err);
+                    }
+                    return next()
+                })
+            } catch(err) {
+                res.status(401).send(err.message);
+            }
+        } else {
+            const err = new Error('Seems like you using wrong link.');
+            err.status = 401;
+            res.status(401);
+            res.send(err.message);
+        }
+    },
+
     checkRoutes(req, res, next) {
         let routesArray = [
             '/register',
