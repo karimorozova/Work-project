@@ -70,7 +70,7 @@
                 span.tasks__money(v-if="+marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
-                img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../assets/images/download-big-b.png")
+                img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../../assets/images/download-big-b.png")
     .tasks__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
@@ -82,10 +82,10 @@
 </template>
 
 <script>
-import DataTable from "../DataTable";
-import Tabs from "../Tabs";
-import SelectSingle from "../SelectSingle";
-import ApproveModal from "../ApproveModal";
+import DataTable from "../../DataTable";
+import Tabs from "../../Tabs";
+import SelectSingle from "../../SelectSingle";
+import ApproveModal from "../../ApproveModal";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -221,7 +221,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+@import "../../../assets/scss/colors.scss";
 
 .tasks {
     display: flex;

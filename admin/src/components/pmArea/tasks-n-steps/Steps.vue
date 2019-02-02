@@ -113,12 +113,12 @@
 </template>
 
 <script>
-import DataTable from "../DataTable";
-import Tabs from "../Tabs";
-import PersonSelect from "./PersonSelect";
-import StepInfo from "./StepInfo";
-import SelectSingle from "../SelectSingle";
-import Datepicker from "../Datepicker";
+import DataTable from "../../DataTable";
+import Tabs from "../../Tabs";
+import PersonSelect from "../PersonSelect";
+import StepInfo from "../StepInfo";
+import SelectSingle from "../../SelectSingle";
+import Datepicker from "../../Datepicker";
 import moment from "moment";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -294,7 +294,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+@import "../../../assets/scss/colors.scss";
 
 .steps {
     display: flex;

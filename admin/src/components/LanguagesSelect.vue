@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick" :class="customClass")
         .select
             span.selected(v-if="selectedLang.length == 1" :class="{'no-opacity': selectedLang.length}") {{ selectedLang[0] }}
             span.selected(v-if="!selectedLang.length") {{ placeholder }}
@@ -42,6 +42,9 @@ export default {
         langFilter: {
             type: Array,
             default: () => []
+        },
+        customClass: {
+            type: String
         }
     },
     data() {
@@ -126,7 +129,7 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    .all-projects__filters &, .tasks-steps__drop-menu & {
+    .all-projects__filters & {
         height: 28px;
     }
     .selected {
@@ -145,11 +148,6 @@ export default {
             width: 76%;
             height: 28px;
         }
-        .tasks-steps__drop-menu & {
-            width: 80%;
-            border-right: none;
-            height: 28px;
-        }
         .inner-component & {
             border-right: 1px solid #bfb09d;
         }
@@ -163,10 +161,6 @@ export default {
         .all-projects__filters & {
             border-left: 1px solid #68573E;
             width: 24%;
-        }
-        .tasks-steps__drop-menu & {
-            width: 20%;
-            border-left: 1px solid #68573E;
         }
         img {
             padding-right: 2px;
@@ -247,7 +241,7 @@ export default {
         height: 100%;
         z-index: 4;
     }
-    .all-projects__filters &, .tasks-steps__drop-menu & {
+    .all-projects__filters & {
         border: 1px solid #67573E;
         overflow: hidden;
     }
@@ -288,6 +282,22 @@ export default {
             top: 5px;
             left: 4px;
             transform: rotate(-58deg);
+        }
+    }
+}
+
+.tasks-data__langs {
+    overflow: hidden;
+    .select {
+        height: 28px;
+        .selected {
+            width: 80%;
+            border-right: none;
+            height: 28px;
+        }
+        .arrow-button {
+            width: 20%;
+            border-left: 1px solid #68573E;
         }
     }
 }
