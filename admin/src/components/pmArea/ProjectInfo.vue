@@ -130,8 +130,9 @@ export default {
                             return item.taskId === task.taskId && item.name === key
                         })
                         if(!existedTask) {
-                            const startDate = key === 'translate1' ? new Date() : "";
-                            const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
+                            const startDate = key === 'translate1' ? task.stepsDates[0].requestOn : task.stepsDates[1].requestOn;
+                            const deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
+                            // const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
                             project.steps.push({
                                 taskId: task.taskId,
                                 name: key,

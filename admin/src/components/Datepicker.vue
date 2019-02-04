@@ -14,15 +14,15 @@
         :class="inputClass"
         :name="name"
         :ref="refName"
+        @change="setDateManually"
         :id="id"
-        @click="showCalendar"
         :value="formattedValue"
         :open-date="openDate"
         :placeholder="placeholder"
         :clear-button="clearButton"
         :disabled="disabledPicker"
         :required="required"
-        readonly>
+        :readonly="isReadonly">
       <!-- Clear Button -->
       <span v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()">
         <i :class="clearButtonIcon">
@@ -135,6 +135,10 @@ export default {
     highlighted: Object,
     placeholder: String,
     inline: Boolean,
+    isReadonly: {
+      type: Boolean,
+      default: true
+    },
     calendarClass: [String, Object],
     inputClass: [String, Object],
     wrapperClass: [String, Object],
@@ -366,6 +370,19 @@ export default {
         this.$emit('opened')
       }
     },
+    // Setting date manually by input
+    setDateManually(e) {
+      const value = e.target.value;
+      const dateParts = value.split(", ");
+      const dateString = dateParts[0].split("-").reverse().join("-") + "T" + dateParts[1];
+      const newDate = new Date(moment(dateString));
+      if(isNaN(newDate.getTime())) {
+        return this.$emit("invalidDate",  {message: "Please set valid date"})
+      }
+      this.$emit('selected', newDate)
+      this.$emit('input', newDate)
+    },
+    //
     setInitialView () {
       const initialView = this.computedInitialView
 
@@ -1083,6 +1100,7 @@ export default {
   height: 28px;
   color: #68573E;
   padding-left: 5px;
+  outline: none;
 }
 
 .steps__custom-input {

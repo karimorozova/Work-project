@@ -107,7 +107,7 @@ export default {
             alertToggle: "alertToggle"
         }),
         customFormatter(date) {
-            return moment(date).format('DD-MM-YYYY, h:mm:ss');
+            return moment(date).format('DD-MM-YYYY, HH:mm');
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});

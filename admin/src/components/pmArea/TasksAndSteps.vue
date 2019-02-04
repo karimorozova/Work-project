@@ -11,6 +11,7 @@
         @setSource="setSource"
         @setTargets="setTargets"
         @showErrors="showErrors"
+        @addTasks="addTasks"
     )
     .tasks-steps__tables
         Tasks(v-if="currentProject.tasks.length && isTasksShow"
@@ -86,12 +87,14 @@ export default {
         setDate({date, prop, index}) {
             this.$emit("setDate", {date, prop, index});
         },
-        async addTasks({fourceFiles, refFiles, isJoinfiles, xtmId, template, source, service}) {
+        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service}) {
+            console.log({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service})
             let tasksData = new FormData()
             tasksData.append('customerId', xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', template.id);
             tasksData.append('workflow', this.selectedWorkflow.id);
+            tasksData.append('stepsDates', JSON.stringify(stepsDates));
             tasksData.append('service', service._id);
             tasksData.append('source', JSON.stringify(source));
             tasksData.append('targets', JSON.stringify(this.targetLanguages));
@@ -99,17 +102,17 @@ export default {
             tasksData.append('projectName', this.currentProject.projectName);
             tasksData.append('join', isJoinfiles);
             if(sourceFiles.length) {
-                for(let file of this.sourceFiles) {
-                    form.append('sourceFiles', file)
+                for(let file of sourceFiles) {
+                    tasksData.append('sourceFiles', file)
                 }
             }
             if(refFiles.length) {
-                for(let file of this.refFiles) {
-                    form.append('refFiles', file)
+                for(let file of refFiles) {
+                    tasksData.append('refFiles', file)
                 }
             }
             try {
-                await this.addProjectTasks(form);
+                await this.addProjectTasks(tasksData);
                 this.$emit("tasksAdded", {id: this.currentProject._id});
                 this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
                 this.clearTasksFormData()

@@ -74,6 +74,14 @@
         .tasks-data__join-files
             input.tasks-data__check(type="checkbox" v-model="isJoinFiles")
             span.tasks-data__check-title Join Files
+    .tasks-data__default-dates
+        StepsDefaultDate(
+            v-for="count in stepsCounter"
+            :stepCounter="count"
+            :requestOn="stepsDates[count-1].requestOn"
+            :deadline="stepsDates[count-1].deadline"
+            @setDate="(e) => setDate(e, count)"
+        )
     .tasks-data__add-tasks
             Button(value="Add tasks" @clicked="checkForErrors")
 </template>
@@ -83,6 +91,7 @@ import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
 import LanguagesSelect from "../../LanguagesSelect";
 import UploadFileButton from "../../UploadFileButton";
+import StepsDefaultDate from "./StepsDefaultDate";
 import Button from "../../Button";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -112,6 +121,8 @@ export default {
                 {name: 'Standard processing', id: '247336FD'},        
             ],
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
+            stepsCounter: 2,
+            stepsDates: [{requestOn: new Date(), deadline: new Date()}, {requestOn: new Date(), deadline: new Date()}],
             sourceFiles: [],
             refFiles: [],
             isStepsShow: false,
@@ -130,9 +141,30 @@ export default {
         setValue({option, refersTo}) {
             this.$emit("setValue", { option, refersTo })
         },
+        setDate({date, prop}, count) {
+            this.stepsDates[count-1][prop] = date;
+        },
         setWorkflow({option}) {
             const workFlow = this.workflowSteps.find(item => item.name === option);
+            this.stepsCounter = workFlow.id === 2890 ? 1 : 2;
+            this.getStepsDates(this.stepsCounter);
             this.$emit("setValue", { option: workFlow, refersTo: 'selectedWorkflow' });
+        },
+        getStepsDates(counter) {
+            if(counter === 1 && this.stepsDates.length === 2) {
+                this.stepsDates.pop();
+            } else {
+                this.stepsDates.push({
+                    requestOn: this.currentProject.createdAt,
+                    deadline: this.currentProject.deadline
+                })
+            }
+        },
+        defaultStepDates() {
+            this.stepsDates = [
+                {requestOn: this.currentProject.createdAt, deadline: this.currentProject.deadline},
+                {requestOn: this.currentProject.createdAt, deadline: this.currentProject.deadline}
+            ]
         },
         setSource({lang}) {
             this.$emit("setSource", { lang })
@@ -198,11 +230,11 @@ export default {
         },
         async addTasks() {
             const { xtmId, template, source, service } = this.getTasksData();
-            let form = new FormData();
             this.$emit("addTasks", { 
                 isJoinfiles: this.isJoinFiles, 
                 sourceFiles: this.sourceFiles,
                 refFiles: this.refFiles,
+                stepsDates: this.stepsDates,
                 xtmId, template, source, service });
         }
     },
@@ -247,8 +279,12 @@ export default {
         SelectSingle,
         LanguagesSelect,
         UploadFileButton,
+        StepsDefaultDate,
         Button,
         Asterisk
+    },
+    mounted() {
+        this.defaultStepDates();
     }
 }
 </script>
@@ -285,6 +321,9 @@ export default {
         &:nth-of-type(4) {
             height: 117px;
         }
+    }
+    &__default-dates {
+        margin-bottom: 30px;
     }
     &__add-tasks {
         display: flex;

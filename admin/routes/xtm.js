@@ -11,13 +11,14 @@ const https = require('https');
 const { xtmAuth } = require('../configs/');
 
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
-    let tasksInfo = {...req.body};
-    tasksInfo.source = JSON.parse(tasksInfo.source);
-    tasksInfo.targets = JSON.parse(tasksInfo.targets);
-    const { sourceFiles, refFiles } = req.files;
-    let template = tasksInfo.template || '247336FD';
-    let workflow = tasksInfo.workflow || 2917;
     try {
+        let tasksInfo = {...req.body};
+        tasksInfo.source = JSON.parse(tasksInfo.source);
+        tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        let stepsDates = JSON.parse(tasksInfo.stepsDates);
+        const { sourceFiles, refFiles } = req.files;
+        let template = tasksInfo.template || '247336FD';
+        let workflow = tasksInfo.workflow || 2917;
         let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
         const filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
         const referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
@@ -42,8 +43,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             let taskId = project.projectId + ` ${idNumber}`;
             await Projects.updateOne({"_id": project._id}, 
             {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles, isMetricsExist: false}, 
-            $push: {tasks: {taskId: taskId, xtmJobs: jobIds, service: tasksInfo.service, projectId: xtmProject.projectId, start: new Date(), 
-                deadline: project.deadline, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
+            $push: {tasks: {taskId: taskId, xtmJobs: jobIds, service: tasksInfo.service, projectId: xtmProject.projectId, start: project.createdAt, deadline: project.deadline, 
+                stepsDates, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
                 receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
             );
             tasksLength++

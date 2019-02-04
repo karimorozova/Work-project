@@ -53,8 +53,8 @@ export default {
         @media (max-width: 450px) {
             width: 100px;
         }
-        .project-info & {
-            width: 186px;
+        .tasks-data & {
+            width: 191px;
             height: 30px;
             padding: 0;
             margin-bottom: 0;
@@ -67,7 +67,7 @@ export default {
         font-size: 15px;
         font-family: MyriadPro;
         text-align: center;
-        .project-info & {
+        .tasks-data & {
             padding-top: 7px;
         }
     }
