@@ -173,6 +173,9 @@ export default {
     @media (max-width: 1600px) {
         width: 70%;
     }
+    &__tasks-title {
+        margin-bottom: 20px;
+    }
     &__menu-title {
         font-size: 14px;
     }
