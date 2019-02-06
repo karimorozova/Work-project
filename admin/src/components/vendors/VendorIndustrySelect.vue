@@ -79,6 +79,7 @@ export default {
         },
         outClick() {
             this.droppedInd = false;
+            this.$emit('scrollDrop', {drop: this.droppedInd, offsetTop: 0, offsetHeight: 0})
         },
         changeInd(index) {
             this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd});

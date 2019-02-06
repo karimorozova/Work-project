@@ -14,6 +14,7 @@
         :class="inputClass"
         :name="name"
         :ref="refName"
+        @click="showCalendarReadonly"
         @change="setDateManually"
         :id="id"
         :value="formattedValue"
@@ -369,6 +370,37 @@ export default {
       if (!this.isInline) {
         this.$emit('opened')
       }
+    },
+    showCalendarReadonly(event) {
+      if(!this.isReadonly) {
+        return
+      }
+      this.scrollDrop(event);
+      if (this.disabledPicker || this.isInline) {
+        return false
+      }
+      if (this.isOpen) {
+        return this.close(true)
+      }
+      this.setInitialView()
+      if (!this.isInline) {
+        this.$emit('opened')
+      }
+    },
+    scrollDrop(event) {
+      let elementsObj = event.composedPath();
+      let tr = elementsObj.find(item => {
+          if(item.localName == "tr" || (item.className && item.className.indexOf("table__body-row") !== -1)) {
+              return item;
+          }
+      });
+      let top = 0;
+      let height = 0;
+      if(tr) {
+          top = tr.offsetTop;
+          height = tr.offsetHeight;
+      }
+      this.$emit('scrollDrop', {drop: !this.isOpen, offsetTop: top, offsetHeight: height})
     },
     // Setting date manually by input
     setDateManually(e) {
@@ -857,6 +889,7 @@ export default {
         this.close(true)
         document.removeEventListener('click', this.clickOutside, false)
       }
+      this.$emit('scrollDrop', {drop: this.isOpen, offsetTop: 0, offsetHeight: 0})
     },
     dayClasses (day) {
       return {

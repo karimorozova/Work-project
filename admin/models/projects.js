@@ -27,10 +27,28 @@ const ProjectsSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
-  steps: {
-    type: Array,
-    default: []
-  },
+  steps: [{
+    vendor: {type: Schema.Types.ObjectId, ref: 'Vendors'},
+    taskId: "",
+    name: "",
+    source: "",
+    target: "",
+    start: {},
+    deadline: {},
+    progress: "",
+    status: "",
+    receivables: "",
+    payables: "",
+    clientRate: "",
+    finance: {
+        'Wordcount': {receivables: "", payables: ""},
+        'Price': {receivables: "", payables: ""}
+    },
+    vendorRate: "",
+    margin: "",
+    check: Boolean,
+    vendorsClickedOffer: Array
+  }],
   totalCost: {
     type: String,
     default: '',
@@ -129,7 +147,7 @@ const ProjectsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   } 
-},{ minimize: false });
+},{ minimize: false, strict: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);
 

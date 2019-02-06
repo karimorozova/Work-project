@@ -1,5 +1,6 @@
 <template lang="pug">
 .step-info
+    span.step-info__close(@click="closeInfo") +
     .step-info__block
         Vendor(
             :step="step"
@@ -142,6 +143,9 @@ export default {
             return costs === 'receivables' ? this.getMatrixData('clientRate', 'client')
             : this.getMatrixData('vendorRate', 'vendor')
         },
+        closeInfo() {
+            this.$emit("closeStepInfo");
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             updateMatrix: "updateMatrix"
@@ -180,8 +184,18 @@ export default {
 <style lang="scss" scoped>
 .step-info {
     padding: 25px;
+    position: relative;
     &__block {
         margin-bottom: 10px;
+    }
+    &__close {
+        position: absolute;
+        top: 3px;
+        right: 8px;
+        transform: rotate(45deg);
+        font-size: 24px;
+        font-weight: 600;
+        cursor: pointer;
     }
 }
 </style>

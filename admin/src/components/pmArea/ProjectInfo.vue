@@ -74,10 +74,7 @@ export default {
                     return
             }
             try {
-                await this.setStepVendor({value: vendor, index});
-                const step = this.currentProject.steps[index];
-                const updatedProject = await this.$http.post('/service/step-payables', {projectId: this.currentProject._id, step: step});
-                await this.storeProject(updatedProject.body);
+                await this.setStepVendor({vendor, index});
                 this.$emit("refreshProjects");
                 this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
             } catch(err) {
@@ -132,13 +129,12 @@ export default {
                         if(!existedTask) {
                             const startDate = key === 'translate1' ? task.stepsDates[0].requestOn : task.stepsDates[1].requestOn;
                             const deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
-                            // const deadline = keysArr.indexOf(key) === keysArr.length-1 ? project.deadline : ""
                             project.steps.push({
                                 taskId: task.taskId,
                                 name: key,
                                 source: task.sourceLanguage,
                                 target: task.targetLanguage,
-                                vendor: "",
+                                vendor: null,
                                 start: startDate,
                                 deadline: deadline,
                                 progress: progress[key],

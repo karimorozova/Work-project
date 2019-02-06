@@ -74,6 +74,7 @@ export default {
         },
         async sendEmail() {
             try {
+                if(!this.step.vendor) return;
                 await this.$http.post("/vendorsapi/step-email", {projectId: this.currentProject._id, step : this.step});
                 this.alertToggle({message: "Email hase been sent", isShow: true, type: "success"});
             } catch(err) {

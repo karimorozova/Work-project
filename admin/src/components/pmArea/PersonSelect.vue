@@ -30,6 +30,9 @@ export default {
         isAdditionalShow: {
             type: Boolean,
             default: false
+        },
+        index: {
+            type: Number
         }
     },
     data() {
@@ -39,14 +42,25 @@ export default {
         }
     },
     methods: {
-        togglePersons() {
-            this.isDropped = !this.isDropped;
-            if(this.isDropped) {
-                this.$emit('isOpened')
+        togglePersons(event) {
+            let elementsObj = event.composedPath();
+            let tr = elementsObj.find(item => {
+                if(item.localName == "tr" || (item.className && item.className.indexOf("table__body-row") !== -1)) {
+                    return item;
+                }
+            });
+            let top = 0;
+            let height = 0;
+            if(tr) {
+                top = tr.offsetTop;
+                height = tr.offsetHeight;
             }
+            this.isDropped = !this.isDropped;
+            this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: top, offsetHeight: height})
         },
-        outClick() {
+        outClick(){
             this.isDropped = false;
+            this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: 0, offsetHeight: 0})
         },
         getPersonFullName(person) {
             return person.firstName + ' ' + person.surname;

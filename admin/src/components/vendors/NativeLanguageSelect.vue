@@ -55,6 +55,7 @@ export default {
         },
         outClick() {
             this.droppedLang = false;
+            this.$emit('scrollDrop', {drop: this.droppedLang, offsetTop: 0, offsetHeight: 0})
         },
         changeLang(index) {
             this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex});

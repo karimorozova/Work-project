@@ -57,6 +57,8 @@ export default {
     width: 100%;
     overflow: hidden;
     &__thead {
+        border: .5px solid #938676;
+        border-bottom: none;
         .table__head-row {
             background-color: $thead-background;
             color: $white;

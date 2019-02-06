@@ -6,7 +6,7 @@
             .project-details__drop-menu
                 SelectSingle(
                     :selectedOption="project.status"
-                    :options="statuses"
+                    :options="filteredStatuses"
                     @chooseOption="setStatus"
                 )
     .project-details__additional
@@ -105,6 +105,31 @@ export default {
         selectedPerson() {
             return this.selectedContact ? this.selectedContact.firstName + " " + this.selectedContact.surname
             : "";
+        },
+        filteredStatuses() {
+            let result = this.statuses;
+            switch(this.project.status) {
+                case "Draft":
+                    result = ["Quote sent", "Started", "Cancelled"];
+                    break
+                case "Quote sent":
+                    result = ["Started", "Cancelled", "Rejected"];
+                    break
+                case "Started":
+                    result = ["Closed", "Cancelled"];
+                    break
+                case "Closed":
+                    result = ["Closed"];
+                    break
+                case "Cancelled":
+                case "Rejected":
+                    result = ['Draft', "Started"];
+                    break
+                case "Requested":
+                    result = ["Quote sent", "Started", "Cancelled"];
+                    break
+            }
+            return result;
         }
     },
     components: {

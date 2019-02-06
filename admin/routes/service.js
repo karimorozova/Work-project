@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services, Pricelist } = require('../models');
 const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
-const { receivablesCalc, payablesCalc, updateProjectCosts, getProject, updateTaskMetrics } = require('../projects/');
+const { receivablesCalc, payablesCalc, updateProjectCosts, getProject, updateProject, updateTaskMetrics } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
@@ -65,9 +65,10 @@ router.get('/costs', async (req, res) => {
 })
 
 router.post('/step-payables', async (req, res) => {
-  let { projectId, step } = req.body;
+  let { projectId, step, index } = req.body;
   try {
-    let project = await getProject({"_id": projectId});
+    const queryStr = `steps.${index}`;
+    let project = await updateProject({"_id": projectId}, {$set: {[queryStr]: step}});
     let projectToUpdate = {...project._doc, id: projectId};
     const taskIndex = project.tasks.findIndex(item => {
       return item.taskId == step.taskId;

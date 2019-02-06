@@ -88,7 +88,6 @@ export default {
             this.$emit("setDate", {date, prop, index});
         },
         async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service}) {
-            console.log({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service})
             let tasksData = new FormData()
             tasksData.append('customerId', xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
@@ -115,7 +114,7 @@ export default {
                 await this.addProjectTasks(tasksData);
                 this.$emit("tasksAdded", {id: this.currentProject._id});
                 this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
-                this.clearTasksFormData()
+                this.clearTasksFormData();
             } catch(err) {
                 this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
             }
@@ -125,7 +124,6 @@ export default {
             this.targetLanguages = [];
             this.sourceFiles = [];
             this.refFiles = [];
-            this.clearInputFiles(".project-info__file-input");
         },
         getMetrics() {
             this.$emit("getMetrics");

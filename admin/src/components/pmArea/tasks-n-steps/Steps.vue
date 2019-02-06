@@ -9,7 +9,7 @@
                 placeholder="Select Action"
                 @chooseOption="setAction"
             )
-    .steps__table
+    .steps__table(v-click-outside="closeStepInfo")
         .steps__tabs
             Tabs(
                 :tabs="tabs"
@@ -49,7 +49,8 @@
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
                 input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep")
-                .steps__expander(@click="expandRow(index)" :class="{'steps_rotated': isExpand && activeIndex === index}")
+                .steps__info-icon(@click="showStepDetails(index)")
+                    i.fa.fa-info-circle
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
@@ -61,23 +62,22 @@
                         :selectedPerson="vendorName(row.vendor)"
                         :isExtended="isAllShow"
                         :isAdditionalShow="isAdditionalShow"
-                        @isOpened="(e) => showAllStepInfo(index)"
                         @setPerson="(person) => setVendor(person, index)"
                         @togglePersonsData="toggleVendors"
+                        @scrollDrop="scrollDrop"
                     )
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
-                    @isOpened="(e) => showAllStepInfo(index)"
                     @selected="(e) => changeDate(e, 'start', index)" 
                     v-model="row.start"
                     inputClass="steps__custom-input" 
                     calendarClass="steps__calendar-custom" 
                     :format="customFormatter" 
                     monday-first=true
-                    :highlighted="highlighted")
+                    :highlighted="highlighted"
+                    @scrollDrop="scrollDrop")
             template(slot="deadline" slot-scope="{ row, index }")
                 Datepicker(
-                    @isOpened="(e) => showAllStepInfo(index)"
                     @selected="(e) => changeDate(e, 'deadline', index)" 
                     v-model="row.deadline"
                     inputClass="steps__custom-input" 
@@ -85,7 +85,8 @@
                     :format="customFormatter" 
                     monday-first=true
                     :disabled="disabled"
-                    :highlighted="highlighted")
+                    :highlighted="highlighted"
+                    @scrollDrop="scrollDrop")
             template(slot="progress" slot-scope="{ row }")
                 span.steps__step-data(v-if="!progress(row.progress)") {{ progress(row.progress) }}
                 .steps__progress-bar(v-if="progress(row.progress)")
@@ -102,13 +103,15 @@
             template(slot="margin" slot-scope="{ row }")
                 span.steps__money(v-if="+marginCalc(row.finance.Price)") &euro;
                 span.steps__step-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
-            template(slot="expanded" slot-scope="{ row, index }")
+        transition(name="fade")
+            .steps__info(v-if="isStepInfo")
                 StepInfo(
-                    :step="row"
-                    :index="index"
+                    :step="allSteps[infoIndex]"
+                    :index="infoIndex"
                     :vendors="vendors"
-                    :task="getTask(index)"
-                    @setStepVendor="(person) => setVendor(person, index)"
+                    :task="getTask(infoIndex)"
+                    @setStepVendor="(person) => setVendor(person, infoIndex)"
+                    @closeStepInfo="closeStepInfo"
                 )
 </template>
 
@@ -120,6 +123,7 @@ import StepInfo from "./StepInfo";
 import SelectSingle from "../../SelectSingle";
 import Datepicker from "../../Datepicker";
 import moment from "moment";
+import ClickOutside from "vue-click-outside";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -159,12 +163,38 @@ export default {
             isExpand: false,
             activeIndex: -1,
             isAllShow: false,
-            isAdditionalShow: true
+            isAdditionalShow: true,
+            chosenStep: {},
+            infoIndex: -1,
+            isStepInfo: false,
+            currentTableHeight: 0
         }
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
+        },
+        getCurrentTableHeight() {
+            const tbody = document.querySelector('.table__tbody');
+            this.currentTableHeight = tbody.clientHeight;
+        },
+        scrollDrop({drop, offsetTop, offsetHeight}) {
+            let tbody = document.querySelector('.table__tbody');
+            if(drop) {
+                setTimeout(() => {
+                    const offsetBottom = offsetTop + offsetHeight*2;
+                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
+                    if (offsetBottom > scrollBottom) {
+                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
+                        if(this.currentTableHeight < 220) {
+                            tbody.style.minHeight = '220px';
+                        }
+                    }
+                }, 100);
+            }
+            if(!drop) {
+                tbody.style.minHeight = this.currentTableHeight + 'px';
+            }
         },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
@@ -181,23 +211,16 @@ export default {
                 return item.taskId === this.allSteps[index].taskId
             })
         },
-        expandRow(index) {
-            if(this.activeIndex !== index) {
-                this.activeIndex = index;
-                this.isExpand = true;    
-            } else {
-                this.activeIndex = -1;
-                this.isExpand = false;
-            }
-            this.$emit("onRowClicked", { index })
+        showStepDetails(index) {
+            this.infoIndex = index;
+            this.isStepInfo = true;
         },
-        showAllStepInfo(index) {
-            this.activeIndex = index;
-            this.isExpand = true;
+        closeStepInfo() {
+            this.isStepInfo = false;
+            this.infoIndex = -1;
         },
         setVendor({person}, index) {
-            const { _id, firstName, surname, email } = person;
-            this.$emit("setVendor", {vendor: { _id, firstName, surname, email }, index});
+            this.$emit("setVendor", {vendor: { _id: person._id }, index});
         },
         async setAction({option}) {
             this.selectedAction = option;
@@ -251,7 +274,8 @@ export default {
             await this.setProjectValue({value: this.allSteps, prop: 'steps'});
         },
         vendorName(vendor) {
-            return vendor ? vendor.firstName + ' ' + vendor.surname : "";
+            const surname = vendor && (vendor.surname && vendor.surname !== "undefined") ? vendor.surname : "";
+            return vendor ? vendor.firstName + ' ' + surname : "";
         },
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
@@ -289,7 +313,13 @@ export default {
         Datepicker,
         StepInfo,
         Tabs
-    }    
+    },
+    directives: {
+        ClickOutside
+    },
+    mounted() {
+        this.getCurrentTableHeight();
+    }
 }
 </script>
 
@@ -299,6 +329,9 @@ export default {
 .steps {
     display: flex;
     flex-direction: column;
+    &__table {
+        position: relative;
+    }
     &__action {
         align-self: flex-end;
     }
@@ -310,6 +343,29 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
+    }
+    &__info {
+        position: absolute;
+        top: -300px;
+        left: 10%;
+        width: 80%;
+        z-index: 50;
+        background-color: $white;
+        box-shadow: 0 0 10px $brown-shadow;
+    }
+    &__info-icon {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin-left: 4px;
+        i {
+            color: $main-color;
+            opacity: 0.7;
+            transition: all 0.3s;
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
     &__expander {
         position: relative;
@@ -373,4 +429,12 @@ export default {
         height: 29px;
     }
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 </style>

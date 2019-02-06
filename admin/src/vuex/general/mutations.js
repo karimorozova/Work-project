@@ -57,9 +57,6 @@ export const mutations = {
     storeProjectValue(state, payload) {
         state.currentProject[payload.prop] = payload.value;
     },
-    stepVendorStore(state, payload) {
-        state.currentProject.steps[payload.index].vendor = payload.value;
-    },
     stepDateStore(state, payload) {
         state.currentProject.steps[payload.index][payload.prop] = payload.value;
         if(payload.prop === 'deadline' && 

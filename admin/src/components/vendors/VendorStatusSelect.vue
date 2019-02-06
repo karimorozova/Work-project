@@ -54,6 +54,7 @@ export default {
         },
         outClick() {
             this.dropped = false;
+            this.$emit('scrollDrop', {drop: this.dropped, offsetTop: 0, offsetHeight: 0})
         },
         changeStatus(index) {
             const option = this.allStatuses[index];

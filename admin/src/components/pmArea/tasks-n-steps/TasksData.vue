@@ -189,10 +189,10 @@ export default {
             if(!this[prop].length) {
                 if(prop === "sourceFiles") {
                     this.isSourceFilesShow = false;
-                    return this.clearInputFiles(".project-info__source-file");
+                    return this.clearInputFiles(".tasks-data__source-file");
                 }
                 this.isRefFilesShow = false;
-                return this.clearInputFiles(".project-info__ref-file");
+                return this.clearInputFiles(".tasks-data__ref-file");
             }
         },
         clearInputFiles(str) {
@@ -201,7 +201,7 @@ export default {
                 elem.value = "";
             }
         },
-        async checkForErrors() {
+        checkForErrors() {
             let errors = [];
             if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
             if(!this.template) errors.push("Please, select Template.");
@@ -210,7 +210,7 @@ export default {
             if(errors.length) {
                 return this.$emit("showErrors", { errors });
             }
-            await this.addTasks();
+            this.addTasks();
         },
         getTasksData() {
             const xtmCustomer = this.xtmCustomers.find(item => {
@@ -228,7 +228,7 @@ export default {
             })
             return { xtmId, template, source, service };
         },
-        async addTasks() {
+        addTasks() {
             const { xtmId, template, source, service } = this.getTasksData();
             this.$emit("addTasks", { 
                 isJoinfiles: this.isJoinFiles, 
@@ -236,6 +236,10 @@ export default {
                 refFiles: this.refFiles,
                 stepsDates: this.stepsDates,
                 xtmId, template, source, service });
+            this.clearInputFiles(".tasks-data__source-file");
+            this.clearInputFiles(".tasks-data__ref-file");
+            this.sourceFiles = [];
+            this.refFiles = [];
         }
     },
     computed: {
