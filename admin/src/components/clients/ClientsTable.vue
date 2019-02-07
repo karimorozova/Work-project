@@ -4,7 +4,7 @@
         :fields="fields"
         :tableData="filteredClients"
         @onRowClicked="onRowClicked"
-        bodyClass="clients__table"
+        :bodyClass="['clients__table', {'tbody_visible-overflow': filteredClients.length < 36}]"
     )
         template(slot="headerName" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
@@ -119,8 +119,7 @@ export default {
             currentWebsite: "",
             isErrorShow: false,
             isAllLeadExist: false,
-            isAllStatusExist: false,
-            currentTebleHeight: 0
+            isAllStatusExist: false
         }
     },
     methods: {
@@ -137,26 +136,16 @@ export default {
                 return key === 'edit'
             }
         },
-        getCurrentTableHeight() {
-            const tbody = document.querySelector('.table__tbody');
-            this.currentTableHeight = tbody.clientHeight;
-        },
         scrollDrop({drop, offsetTop, offsetHeight}) {
             let tbody = document.querySelector('.table__tbody');
-            if(drop) {
+            if(drop && tbody.clientHeight >= 600) {
                 setTimeout(() => {
                     const offsetBottom = offsetTop + offsetHeight*2;
                     const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
                     if (offsetBottom > scrollBottom) {
                         tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                        if(this.currentTableHeight < 220) {
-                            tbody.style.minHeight = '220px';
-                        }
                     }
                 }, 100);
-            }
-            if(!drop) {
-                tbody.style.minHeight = this.currentTableHeight + 'px';
             }
         },
         setStatus({status}) {
@@ -304,10 +293,7 @@ export default {
         ClientLeadsourceSelect,
         MultiClientIndustrySelect,
         Button
-    },
-    mounted() {
-        this.getCurrentTableHeight();
-    }   
+    } 
 }
 </script>
 

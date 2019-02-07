@@ -21,10 +21,11 @@ const sendEmail = function (obj, msg) {
 }
 
 const clientQuoteEmail = function (obj, msg) {
+    const contact = obj.contacts.find(item => item.leadContact);
     return new Promise( (res, rej) => {
         let mailOptions = {
             from: 'Michal <michal@pangea.global>',
-            to: obj.email, 
+            to: contact.email, 
             subject: obj.subject,
             text: "plain text",
             html: msg,

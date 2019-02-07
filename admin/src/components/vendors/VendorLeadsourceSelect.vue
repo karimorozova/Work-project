@@ -113,6 +113,7 @@ export default {
     border: 1px solid $main-color;
     overflow: hidden;
     width: 100%;
+    box-sizing: border-box;
     .drop {
         border-top: 1px solid $main-color;
         font-size: 14px;

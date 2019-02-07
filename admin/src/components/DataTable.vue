@@ -33,7 +33,7 @@ export default {
             type: Number
         },
         bodyClass: {
-            type: String
+            type: [String, Array]
         },
         bodyRowClass: {
             type: String
@@ -55,7 +55,6 @@ export default {
 
 .table {
     width: 100%;
-    overflow: hidden;
     &__thead {
         border: .5px solid #938676;
         border-bottom: none;
@@ -143,14 +142,13 @@ export default {
     }
 }
 .steps-table-body {
-    max-height: 300px;
+    max-height: 320px;
 }
 .steps-table-cell {
     display: flex;
     align-items: center;
 }
 .vendors-table__body, .clients__table {
-    // min-height: 300px;
     max-height: 600px;
 }
 .vendors-table_scroll-y {
@@ -170,6 +168,9 @@ export default {
 }
 .project-finance_no-padding {
     padding: 0;
+}
+.tbody_visible-overflow {
+    overflow: visible;
 }
 .slide-fade-enter-active {
   transition: all .3s ease;

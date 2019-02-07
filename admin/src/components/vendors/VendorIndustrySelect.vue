@@ -165,6 +165,7 @@ export default {
     border: 1px solid #67573E;
     overflow: hidden;
     width: 100%;
+    box-sizing: border-box;
     .drop {
         border-top: 1px solid #67573E;
         font-size: 14px;

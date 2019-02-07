@@ -158,7 +158,7 @@ label {
             width: 28%;
         }
         &:last-child {
-            width: 19%;
+            width: 20%;
         }
     }
     &__drop-menu {

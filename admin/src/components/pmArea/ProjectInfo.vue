@@ -11,7 +11,7 @@
             @setVendor="setVendor"
             @setDate="setDate"
             @showErrors="showErrors")
-        .project-info__action
+        .project-info__action(v-if="currentProject.status !== 'Closed'")
             ProjectAction(
                 :project="currentProject"
                 @editAndSend="editAndSend")
@@ -49,6 +49,7 @@ export default {
     methods: {
         ...mapActions({
             setProjectValue: "setProjectValue",
+            setProjectStatus: "setProjectStatus",
             storeProject: "setCurrentProject",
             vendorsSetting: "vendorsSetting",
             alertToggle: 'alertToggle',
@@ -86,8 +87,13 @@ export default {
             await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
             await this.getMetrics();
         },
-        setStatus({option}) {
-           this.setProjectValue({value: option, prop: "status"}) 
+        async setStatus({option}) {
+            try {
+                await this.setProjectStatus({status: option});
+                this.alertToggle({message: "Project's status changed", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
         },
         wordsCalculation(metrics) {
             const repetitions = Object.keys(metrics).filter(item => {

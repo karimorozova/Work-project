@@ -31,7 +31,7 @@ router.get("/all-managers", async (req, res) => {
         res.send(users);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on getting managers " + err);
+        res.status(500).send("Error on getting managers ");
     }
 })
 
@@ -41,7 +41,17 @@ router.put("/project-option", async (req, res) => {
         const result = await changeProjectProp(projectId, property);
         res.send(result);
     } catch(err) {
-        res.status(500).send("Internal server error / Cannot change Project's property")
+        res.status(500).send("Internal server error / Cannot change Project's property");
+    }
+})
+
+router.put("/project-status", async (req, res) => {
+    const { id, status } = req.body;
+    try {
+        const result = await updateProject({"_id": id}, { status });
+        res.send(result);
+    } catch(err) {
+        res.status(500).send("Internal server error / Cannot change Project's status");
     }
 })
 
@@ -55,7 +65,7 @@ router.get("/quote-message", async (req, res) => {
         const message = messageForClient(quote);
         res.send({message});
     } catch(err) {
-        res.status(500).send("Error on getting quote message")
+        res.status(500).send("Error on getting quote message");
     }
 })
 

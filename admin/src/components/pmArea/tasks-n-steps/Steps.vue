@@ -21,7 +21,7 @@
             :tableData="allSteps"
             :isExpand="isExpand"
             :activeIndex="activeIndex"
-            bodyClass="steps-table-body"
+            :bodyClass="['steps-table-body', {'tbody_visible-overflow': allSteps.length < 10}]"
             bodyCellClass="steps-table-cell"
             bodyRowClass="steps-table-row"
         )
@@ -166,34 +166,23 @@ export default {
             isAdditionalShow: true,
             chosenStep: {},
             infoIndex: -1,
-            isStepInfo: false,
-            currentTableHeight: 0
+            isStepInfo: false
         }
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
         },
-        getCurrentTableHeight() {
-            const tbody = document.querySelector('.table__tbody');
-            this.currentTableHeight = tbody.clientHeight;
-        },
         scrollDrop({drop, offsetTop, offsetHeight}) {
             let tbody = document.querySelector('.table__tbody');
-            if(drop) {
+            if(drop && tbody.clientHeight >= 320) {
                 setTimeout(() => {
                     const offsetBottom = offsetTop + offsetHeight*2;
                     const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
                     if (offsetBottom > scrollBottom) {
                         tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                        if(this.currentTableHeight < 220) {
-                            tbody.style.minHeight = '220px';
-                        }
                     }
                 }, 100);
-            }
-            if(!drop) {
-                tbody.style.minHeight = this.currentTableHeight + 'px';
             }
         },
         toggleVendors({isAll}) {
@@ -316,9 +305,6 @@ export default {
     },
     directives: {
         ClickOutside
-    },
-    mounted() {
-        this.getCurrentTableHeight();
     }
 }
 </script>

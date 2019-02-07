@@ -26,7 +26,7 @@ export default {
     data() {
         return {
             selectedAction: "",
-            actions: ["Send a Quote", "Send Project Details", "Cancel", "Deliver"],
+            actions: ["Cancel"],
             value: "Confirm"
         }
     },
@@ -41,7 +41,6 @@ export default {
             try {
                 if(this.selectedAction === "Send a Quote") {
                     const message = await this.$http.get(`/pm-manage/quote-message?projectId=${this.project._id}`);
-                    console.log(message);
                     this.$emit("editAndSend", { message });
                 }
             } catch(err) {
@@ -57,6 +56,9 @@ export default {
                 this.alertToggle({message: 'Internal server error. Cannot send the Quote.', isShow: true, type: 'error'})
             }
         },
+        isAnyTaskReady() {
+            return this.project.tasks.find(item => item.status === "Ready for Delivery");
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             storeProject: "setCurrentProject"
@@ -65,8 +67,14 @@ export default {
     computed: {
         filteredActions() {
             let result = this.actions;
-            if(!this.project.finance.Price.receivables) {
-                result = ["Cancel"];
+            if(this.project.finance.Price.receivables) {
+                result = ["Send a Quote", "Cancel"];
+            }
+            if(this.project.status === "Started") {
+                result = ["Send Project Details", "Cancel"];
+            }
+            if(this.isAnyTaskReady()) {
+                result = ["Deliver", "Cancel"];
             }
             return result;
         }

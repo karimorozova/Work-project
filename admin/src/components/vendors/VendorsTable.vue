@@ -3,7 +3,7 @@
     DataTable(
         :fields="fields"
         :tableData="filteredVendors"
-        bodyClass="vendors-table__body"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': filteredVendors.length < 36}]"
         bodyRowClass="vendors-table_height-28"
         @onRowClicked="onRowClicked"
     )
@@ -134,8 +134,7 @@ export default {
             selectedNative: {},
             selectedStatus: "",
             isErrorShow: false,
-            isDeleteMessageShow: false,
-            currentTableHeight: 0
+            isDeleteMessageShow: false
         }
     },
     methods: {
@@ -148,26 +147,16 @@ export default {
             updateIndustry: "updateIndustry",
             deleteCurrentVendor: "deleteCurrentVendor"
         }),
-        getCurrentTableHeight() {
-            const tbody = document.querySelector('.table__tbody');
-            this.currentTableHeight = tbody.clientHeight;
-        },
         scrollDrop({drop, offsetTop, offsetHeight}) {
             let tbody = document.querySelector('.table__tbody');
-            if(drop) {
+            if(drop && tbody.clientHeight >= 600) {
                 setTimeout(() => {
                     const offsetBottom = offsetTop + offsetHeight*2;
                     const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
                     if (offsetBottom > scrollBottom) {
                         tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                        if(this.currentTableHeight < 220) {
-                            tbody.style.minHeight = '220px';
-                        }
                     }
                 }, 100);
-            }
-            if(!drop) {
-                tbody.style.minHeight = this.currentTableHeight + 'px';
             }
         },
         stopPropagation() {
@@ -348,7 +337,6 @@ export default {
     },
     mounted() {
         this.getVendors();
-        this.getCurrentTableHeight();
     }
 }
 </script>

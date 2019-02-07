@@ -15,13 +15,25 @@ export const setProjectValue = ({ commit }, payload) => commit('storeProjectValu
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+export const setProjectStatus = async ({commit, state}, payload) => {
+  commit('startRequest')
+  try {
+    const { status } = payload;
+    const id = state.currentProject._id;
+    const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status });
+    await commit('storeCurrentProject', updatedProject.body);
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.body);
+  }
+}
 export const setStepVendor = async ({ commit, state }, payload) => {
   commit('startRequest')
   try {
     const { vendor, index } = payload;
     let step = state.currentProject.steps[index];
     const updatedProject = await Vue.http.post('/service/step-payables', {projectId: state.currentProject._id, step: {...step, vendor}, index});
-    console.log(updatedProject.body);
     await commit('storeCurrentProject', updatedProject.body);
     commit('endRequest');
   } catch(err) {
