@@ -84,16 +84,16 @@ export const alertToggle = ({ commit }, payload) => {
     commit('alertingMessage', {message: "", isShow: false, type: "success"});
   }, 5000)
 }
-export const login = ({ commit }, token) => {
-    commit("LOGIN");
+export const login = ({ commit, state }, payload) => {
     commit('startRequest')
     return new Promise(resolve => {
+      const {token, group} = payload;
+      state.userGroup = group;
       setTimeout(() => {
         let currentDate = Date.now();
         let expiryTime = currentDate + 60000*120;
         let object = {value: token, timestamp: expiryTime}
         localStorage.setItem("token", JSON.stringify(object));
-        commit("LOGIN_SUCCESS");
         commit('endRequest');
         resolve();
       }, 1000);
@@ -101,5 +101,4 @@ export const login = ({ commit }, token) => {
   };
 export const logout = ({ commit }) => {
     localStorage.removeItem("token");
-    commit("LOGOUT");
 }

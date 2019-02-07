@@ -12,6 +12,7 @@ const state = {
     duoRates: [],
     projects: [],
     currentProject: {},
+    userGroup: "",
     isLoggedIn: !!localStorage.getItem("token"),
     isLoading: false,
     isAlert: false,

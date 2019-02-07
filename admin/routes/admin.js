@@ -102,7 +102,7 @@ router.post('/login', (req, res, next) => {
                 const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h'});
                 req.session.userId = user._id;
                 res.statusCode = 200;
-                res.send(token);
+                res.send({token, group: user.group});
                 } catch(err) {
                     console.log(err);
                     return next(err);
