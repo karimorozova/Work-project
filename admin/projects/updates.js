@@ -1,5 +1,6 @@
 const { Projects } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
+const { notifyVendors } = require('./emails');
 
 async function changeProjectProp(projectId, property) {
     const project = await getProject({"_id": projectId});
@@ -14,7 +15,8 @@ function cancelTasks(tasks, project) {
     const tasksIds = tasks.map(item => item.taskId);
     const changedTasks = cancelledStatuses(tasksIds, projectTasks);
     const changedSteps = cancelledStatuses(tasksIds, projectSteps);
-    return { changedTasks, changedSteps }
+    const checkedSteps = project.steps.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+    return { changedTasks, changedSteps, checkedSteps };
 }
 
 function cancelSteps(checkedSteps, project) {
@@ -71,4 +73,20 @@ function cancelledStatuses(tasksIds, arr) {
     return updated;
 }
 
-module.exports = { changeProjectProp, cancelTasks, cancelSteps };
+async function updateProjectStatus(id, status) {
+    try {
+        if(status !== "Cancelled") {
+            return await updateProject({"_id": id}, { status });
+        }
+        const project = await getProject({"_id": id});
+        const { tasks } = project;
+        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        await notifyVendors(changedSteps);
+        return await updateProject({"_id": id}, { status, tasks: changedTasks, steps: changedSteps});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateProjectStatus");
+    }
+}
+
+module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus };

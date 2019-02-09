@@ -1,7 +1,8 @@
 const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTaskMetrics, calcCost, taskMetricsCalc } = require('./calculations');
 const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, deleteCopiedFiles } = require('./files');
-const { changeProjectProp, cancelTasks, cancelSteps } = require('./updates');
+const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus } = require('./updates');
+const { notifyVendors } = require('./emails');
 
 const projectFunctions = {
     metricsCalc,
@@ -18,7 +19,9 @@ const projectFunctions = {
     calcCost,
     changeProjectProp,
     cancelTasks,
-    cancelSteps
+    cancelSteps,
+    updateProjectStatus,
+    notifyVendors
 }
 
 module.exports = projectFunctions;

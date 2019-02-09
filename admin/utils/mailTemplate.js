@@ -1,4 +1,4 @@
-const { mailTransporter } = require("../services");
+const mailTransporter = require("../services/mailTransporter");
 
 const sendEmail = function (obj, msg) {
     return new Promise( (res, rej) => {

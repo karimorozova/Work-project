@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp, cancelTasks, cancelSteps } = require("../../projects/");
+const { getProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors } = require("../../projects/");
 const { getOneService } = require("../../services/");
 const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
@@ -48,7 +48,7 @@ router.put("/project-option", async (req, res) => {
 router.put("/project-status", async (req, res) => {
     const { id, status } = req.body;
     try {
-        const result = await updateProject({"_id": id}, { status });
+        const result = await updateProjectStatus(id, status);
         res.send(result);
     } catch(err) {
         res.status(500).send("Internal server error / Cannot change Project's status");
@@ -112,7 +112,8 @@ router.post("/cancel-tasks", async (req, res) => {
     const { tasks, projectId } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        const { changedTasks, changedSteps, checkedSteps } = cancelTasks(tasks, project);
+        await notifyVendors(checkedSteps);
         const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
         res.send(updatedProject);
     } catch(err) {
@@ -126,6 +127,7 @@ router.post("/cancel-steps", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         const { changedSteps, changedTasks } = cancelSteps(checkedSteps, project);
+        await notifyVendors(checkedSteps);
         const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
         res.send(updatedProject);
     } catch(err) {

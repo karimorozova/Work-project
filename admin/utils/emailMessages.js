@@ -321,10 +321,37 @@ function emailMessageForContact(obj) {
         </div>`;
 }
 
+function vendorNotificationMessage(obj) {
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
+                <div class="all-info" style="padding: 0 15px 0 30px;">
+                    <p class="description" style="font-size: 18px;">
+                        Please pay attention to the fact that there is a step that has been cancelled. 
+                    </p>
+                    <h3 class="detailsTitle">Step Details</h3>
+                    <table class="details">
+                        <tr>
+                            <td>Step</td>
+                            <td>${obj.name}</td>
+                        </tr>
+                        <tr>
+                            <td>Source language:</td>
+                            <td>${obj.source}</td>
+                        </tr>
+                        <tr>
+                            <td>Target language</td>
+                            <td>${obj.target}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>`;
+}
+
 module.exports = { 
     applicationMessage, 
     messageForClient, 
     requestMessageForVendor, 
     managerAssignmentNotifyingMessage,
-    emailMessageForContact
+    emailMessageForContact,
+    vendorNotificationMessage
 };

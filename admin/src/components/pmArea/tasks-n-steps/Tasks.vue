@@ -135,12 +135,13 @@ export default {
             const checkedTasks = this.allTasks.filter(item => item.check);
             try {
                 if(this.selectedAction === "Cancel") {
+                    this.closeApproveModal();
                     await this.cancelTasks(checkedTasks)
                 }
             } catch(err) {
-                this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"})
+                this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
+                this.closeApproveModal();
             }
-            this.closeApproveModal();
         },
         notApproveAction() {
             this.closeApproveModal();
