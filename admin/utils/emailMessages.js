@@ -105,8 +105,8 @@ function messageForClient(obj) {
             return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
         }, "");
         const token = jwt.sign({id: obj.id}, secretKey, { expiresIn: '2h'});
-        const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj._id}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
-        const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj._id}&to=${date}t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
+        const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
+        const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
         const contact = obj.customer.contacts.find(item => item.leadContact);
         return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: overlay">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${contact.firstName} ${contact.surname},</h3>
@@ -175,12 +175,14 @@ function requestMessageForVendor(obj) {
     const date = Date.now();
     const expiryDate = new Date(date + 900000);
     const langPair = obj.source + " >> " + obj.target + ";"
-    const acceptQuote = '<a href=' + `${apiUrl}/vendorsapi/step-decision?decision=accept&vendorId=${obj.vendor._id}&projectId=${obj.projectId}&taskId=${obj.taskId}&stepName=${obj.name}&to=${date}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
-    const declineQuote = '<a href=' + `${apiUrl}/vendorsapi/step-decision?decision=decline&vendorId=${obj.vendor._id}&projectId=${obj.projectId}&taskId=${obj.taskId}&stepName=${obj.name}&to=${date}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const token = jwt.sign({vendorId: obj.vendor.id}, secretKey, { expiresIn: '2h'});
+    const taskId = obj.taskId.replace(/ /g, '%20');
+    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&taskId=${taskId}&stepName=${obj.name}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=decline&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&taskId=${taskId}&stepName=${obj.name}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
     const start = obj.start.split('T')[0].split('-').reverse().join('-');
     const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
 
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+    return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
         <div class="all-info" style="padding: 0 15px 0 30px;">
             <p class="description" style="font-size: 18px;">
@@ -215,7 +217,7 @@ function requestMessageForVendor(obj) {
                     <td>Specialization:</td>
                     <td>${obj.industry}</td>
                 </tr>
-                <tr>
+                <tr contenteditable="false">
                     <td>Amount:</td>
                     <td>${obj.finance.Price.payables} &euro;</td>
                 </tr>

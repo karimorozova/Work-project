@@ -112,9 +112,6 @@ export default {
             selectedAction: "",
             actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
-            modalMainText: "",
-            approveText: "Send",
-            notApproveText: "Edit & Send",
             isAllSelected: false,
             isApproveActionShow: false
         }
@@ -125,10 +122,6 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
-            if(option === "Cancel") {
-                this.approveText = "Yes";
-                this.notApproveText = "No";
-            }
             this.isApproveActionShow = true;
         },
         async approveAction() {

@@ -71,7 +71,7 @@ async function stepEmailToVendor(project, step) {
 }
 
 async function sendRequestToVendor(project, step) {
-    let requestInfo = {...step};
+    let requestInfo = {...step._doc};
     requestInfo.projectId = project.id;
     requestInfo.projectName = project.projectName;
     requestInfo.industry = project.industry.name;

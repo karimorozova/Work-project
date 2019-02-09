@@ -22,7 +22,7 @@
         @closeErrors="closeErrorsBlock"
     )
     .project-info__preview(v-if="isEditAndSend")
-        QuotePreview(@closePreview="closePreview" :message="message" @editMessage="editMessage")
+        Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
 </template>
 
 <script>
@@ -32,7 +32,7 @@ import ProjectShortDetails from "./ProjectShortDetails";
 import ProjectAction from "./ProjectAction";
 import ProjectFinance from "./ProjectFinance";
 import TasksAndSteps from "./TasksAndSteps";
-import QuotePreview from "./QuotePreview";
+import Preview from "./Preview";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -56,7 +56,8 @@ export default {
             removeStepVendor: 'removeStepVendor',
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate',
-            updateCurrentProject: "updateCurrentProject"
+            updateCurrentProject: "updateCurrentProject",
+            sendClientQuote: "sendClientQuote"
         }),
         tasksAdded({id}) {
             this.$emit("tasksAdded", { id });
@@ -202,8 +203,14 @@ export default {
             this.isEditAndSend = true;
             this.message = message.data.message;
         },
-        editMessage({message}) {
-            this.message = message;
+        async sendQuote({message}) {
+            try {
+                await this.sendClientQuote({ message });
+                this.alertToggle({message: "Quote Details sent", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+            this.closePreview();
         },
         closePreview() {
             this.isEditAndSend = false;
@@ -222,7 +229,7 @@ export default {
         ProjectAction,
         TasksAndSteps,
         ProjectFinance,
-        QuotePreview
+        Preview
     },
     mounted() {
         this.getVendors();

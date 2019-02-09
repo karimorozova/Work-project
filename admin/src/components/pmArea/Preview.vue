@@ -5,13 +5,12 @@
     .preview__details
         .preview__message
     .preview__button
-        Button(value="Send" @clicked="sendQuote")
+        Button(value="Send" @clicked="send")
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
 import Button from "../Button";
-import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -19,38 +18,17 @@ export default {
             type: String
         }
     },
-    data() {
-        return {
-        }
-    },
     methods: {
         closePreview() {
             this.$emit("closePreview");
         },
-        editMessage(e) {
-            const message = e.target.value;
-            this.$emit("editMessage", { message });
+        send() {
+            const element = document.querySelector(".preview__message");
+            const message = element.innerHTML;
+            this.$emit("send", { message });
         },
-        async sendQuote() {
-            let element = document.querySelector(".preview__message");
-            try {
-                const result = await this.$http.post('/pm-manage/send-quote', {id: this.project._id, message: element.innerHTML});
-                await this.storeProject(result.body);
-                this.$emit("closePreview");
-                this.alertToggle({message: "Quote Details sent", isShow: true, type: "success"})
-            } catch(err) {
-                this.alertToggle({message: "Error on sending a quote details", isShow: true, type: "error"})
-            }
-        },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            storeProject: "setCurrentProject"
-        })
     },
     computed: {
-        ...mapGetters({
-            project: "getCurrentProject"
-        }),
         projectLanguages() {
             let result = this.project.tasks.reduce((init, cur) => {
                 return `${init}${cur.sourceLanguage}${cur.targetLanguage}; `

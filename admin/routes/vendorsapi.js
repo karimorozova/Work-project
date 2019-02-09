@@ -137,33 +137,33 @@ router.delete('/deletevendor/:id', async (req, res) => {
     }
 })
 
-router.get('/step-decision', async (req, res) => {
-    const { decision, vendorId, projectId, taskId, stepName, to } = req.query;
-    const date = Date.now();
-    try {
-        if((date - +to) > 900000) {
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
-        } else {
-            const project = await Projects.findOne({"_id": projectId});
-            const steps = [...project.steps];
-            let index = steps.findIndex(item => item.name === stepName && +item.taskId === +taskId);
-            if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
-                res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
-            }
-            steps[index].status = (decision === "accept") ? "Accepted" : "Rejected";
-            steps[index].vendorsClickedOffer.push(vendorId);
-            await Projects.updateOne({"_id": projectId}, {steps: steps});
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you.</p></body>`)
-        }
-    } catch(err) {
-        console.log(err);
-        res.set('Content-Type', 'text/html')
-        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
-    }
-})
+// router.get('/step-decision', async (req, res) => {
+//     const { decision, vendorId, projectId, taskId, stepName, to } = req.query;
+//     const date = Date.now();
+//     try {
+//         if((date - +to) > 900000) {
+//             res.set('Content-Type', 'text/html')
+//             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
+//         } else {
+//             const project = await Projects.findOne({"_id": projectId});
+//             const steps = [...project.steps];
+//             let index = steps.findIndex(item => item.name === stepName && +item.taskId === +taskId);
+//             if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
+//                 res.set('Content-Type', 'text/html');
+//                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
+//             }
+//             steps[index].status = (decision === "accept") ? "Accepted" : "Rejected";
+//             steps[index].vendorsClickedOffer.push(vendorId);
+//             await Projects.updateOne({"_id": projectId}, {steps: steps});
+//             res.set('Content-Type', 'text/html')
+//             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you.</p></body>`)
+//         }
+//     } catch(err) {
+//         console.log(err);
+//         res.set('Content-Type', 'text/html')
+//         res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
+//     }
+// })
 
 router.post('/update-matrix', async (req, res) => {
     const { _id, matrix } = req.body;

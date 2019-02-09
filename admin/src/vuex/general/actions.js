@@ -77,7 +77,21 @@ export const updateMatrix = async ({ commit }, payload) => {
     commit('endRequest');
     throw new Error(err.message);
   }
-};
+}
+
+export const sendClientQuote = async ({commit, state}, payload) => {
+  commit('startRequest');
+  try { 
+    const { message } = payload;
+    const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message});
+    await commit('storeCurrentProject', updatedProject.data);
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.message);
+  }
+}
+
 export const alertToggle = ({ commit }, payload) => {
   commit('alertingMessage', payload);
   setTimeout(() => {

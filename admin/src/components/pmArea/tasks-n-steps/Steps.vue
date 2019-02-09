@@ -19,7 +19,6 @@
         DataTable(
             :fields="fields"
             :tableData="allSteps"
-            :isExpand="isExpand"
             :activeIndex="activeIndex"
             :bodyClass="['steps-table-body', {'tbody_visible-overflow': allSteps.length < 10}]"
             bodyCellClass="steps-table-cell"
@@ -113,12 +112,21 @@
                     @setStepVendor="(person) => setVendor(person, infoIndex)"
                     @closeStepInfo="closeStepInfo"
                 )
+    .steps__approve-action(v-if="isApproveActionShow")
+        ApproveModal(
+            :text="modalTexts.main" 
+            :approveValue="modalTexts.approve"
+            :notApproveValue="modalTexts.notApprove"
+            @approve="approveAction"
+            @notApprove="notApproveAction"
+            @close="closeApproveModal")
 </template>
 
 <script>
 import DataTable from "../../DataTable";
 import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
+import ApproveModal from "../../ApproveModal";
 import StepInfo from "./StepInfo";
 import SelectSingle from "../../SelectSingle";
 import Datepicker from "../../Datepicker";
@@ -160,7 +168,7 @@ export default {
             selectedVendors: [],
             isAllSelected: false,
             actions: ["Request confirmation", "Mark as accept / reject", "Cancel"],
-            isExpand: false,
+            isApproveActionShow: false,
             activeIndex: -1,
             isAllShow: false,
             isAdditionalShow: true,
@@ -213,23 +221,36 @@ export default {
         },
         async setAction({option}) {
             this.selectedAction = option;
+            this.isApproveActionShow = true;
+        },
+        async approveAction() {
             const checkedSteps = this.allSteps.filter(item => {
                 return item.check 
             })
             if(!checkedSteps.length) {
-                return
+                return this.closeApproveModal();
             }
             try {
-                if(option === "Request confirmation") {
-                   return await this.requestConfirmation(checkedSteps);
+                if(this.selectedAction === "Request confirmation") {
+                    this.closeApproveModal();
+                    return await this.requestConfirmation(checkedSteps);
                 }
-                if(option === "Cancel") {
+                if(this.selectedAction === "Cancel") {
+                    this.closeApproveModal();
                     return await this.cancelSteps(checkedSteps);
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'})
             }
-
+        },
+        notApproveAction() {
+            if(modalTexts.notApprove !== "Edit & Send") {
+                return this.closeApproveModal(); 
+            }
+        },
+        closeApproveModal() {
+            this.isApproveActionShow = false;
+            this.selectedAction = "";
         },
         async requestConfirmation(steps) {
             try {
@@ -293,7 +314,22 @@ export default {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             vendors: "getVendors"
-        })
+        }),
+        modalTexts() {
+            if(this.selectedAction === "Cancel") {
+                return { 
+                    main: "Are you sure?",
+                    approve: "Yes",
+                    notApprove: "No"
+                }
+            } else {
+                return { 
+                    main: "Please, choose action:",
+                    approve: "Send",
+                    notApprove: "Edit & Send"
+                }
+            }
+        }
     },
     components: {
         DataTable,
@@ -301,6 +337,7 @@ export default {
         SelectSingle,
         Datepicker,
         StepInfo,
+        ApproveModal,
         Tabs
     },
     directives: {
@@ -353,31 +390,6 @@ export default {
             }
         }
     }
-    &__expander {
-        position: relative;
-        cursor: pointer;
-        opacity: 0.6;
-        padding: 5px;
-        margin-left: 5px;
-        &:before {
-            content: "";
-            position: absolute;
-            width: 7px;
-            border: 1px solid $brown-border;
-            top: 4px;
-            left: -2px;
-            transform: rotate(60deg);
-        }
-        &:after {
-            content: "";
-            position: absolute;
-            width: 7px;
-            border: 1px solid $brown-border;
-            top: 4px;
-            left: 2px;
-            transform: rotate(-60deg);
-        }
-    }
     &_rotated {
         transform: rotate(180deg);
     };
@@ -413,6 +425,12 @@ export default {
         position: relative;
         width: 100%;
         height: 29px;
+    }
+    &__approve-action {
+        position: absolute;
+        right: 0;
+        z-index: 50;
+        background-color: $white;
     }
 }
 
