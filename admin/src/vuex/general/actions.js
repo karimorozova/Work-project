@@ -116,3 +116,16 @@ export const login = ({ commit, state }, payload) => {
 export const logout = ({ commit }) => {
     localStorage.removeItem("token");
 }
+
+export const setUserGroup = async ({commit, state}) => {
+  commit('startRequest')
+  try {
+    const key = JSON.parse(localStorage.getItem("token"));
+    const result = await Vue.http.get(`/usergroup?key=${key.value}`);
+    state.userGroup = result.data;
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err)
+  }
+}

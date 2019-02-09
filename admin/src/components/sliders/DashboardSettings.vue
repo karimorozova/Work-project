@@ -3,7 +3,7 @@
     .settings__sidebar(:class="{'settings_visible': isSidebar}")
       Sidebar(
         :title="sidebarTitle"
-        :links="sidebarLinks"
+        :links="fullSideLinks"
         :activeIndex="activeLinkIndex"
         @onLinkClick="onLinkClick"
       )
@@ -16,6 +16,7 @@
 <script>
 import Sidebar from "../Sidebar";
 import Blanket from "../Blanket/Blanket";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -51,7 +52,24 @@ export default {
           break;
         case "Packages":
           this.$router.push("/dashboard/packages");
+          break;
+        case "Users":
+          if(this.userGroup === "Administrators" || this.userGroup === "Developers") {
+            this.$router.push("/dashboard/users");
+          }
       }
+    }
+  },
+  computed: {
+    ...mapGetters({
+      userGroup: "getUserGroup"
+    }),
+    fullSideLinks() {
+      let result = this.sidebarLinks;
+      if(this.userGroup === "Administrators" || this.userGroup === "Developers") {
+        result.push("Users");
+      }
+      return result;
     }
   },
   components: {

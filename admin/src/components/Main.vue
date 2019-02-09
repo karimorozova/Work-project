@@ -125,6 +125,15 @@ export default {
     };
   },
   methods: {
+    async getCurrentUserGroup() {
+      try {
+        if(!this.userGroup) {
+          await this.setUserGroup();
+        }
+      } catch(err) {
+        console.log("Cannot identify user group");
+      }
+    },
     async getCustomerLangs(data) {
       let person = await this.$http.get(`api/person?customerId=${data.id}`);
       let personEmail = person.body.email;
@@ -280,12 +289,13 @@ export default {
       this.getServices();
     },
     ...mapActions({
-      loadingToggle: "loadingToggle"
+      setUserGroup: "setUserGroup"
     })
   },
   computed: {
     ...mapGetters({
-      isLoading: "loading"
+      isLoading: "loading",
+      userGroup: "getUserGroup"
     })
   },
   components: {
@@ -300,6 +310,7 @@ export default {
   },
   async mounted() {
     this.mainPageRender();
+    await this.getCurrentUserGroup();
     await this.getServices();
     await this.getCustomers();
     await this.getXtmCustomers();

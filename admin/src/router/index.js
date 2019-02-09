@@ -19,6 +19,7 @@ import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
+import Users from '@/components/Table/Users'
 import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
 import ClientInfo from '@/components/clients/ClientInfo'
@@ -103,6 +104,11 @@ const router = new Router({
               path: 'industries',
               name: 'industries',
               component: TableIndustries
+            },
+            {
+              path: 'users',
+              name: 'users',
+              component: Users
             }
           ]
         },

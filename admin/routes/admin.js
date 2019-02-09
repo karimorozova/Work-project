@@ -46,7 +46,7 @@ router.get('/all-clients', requiresLogin, async (req, res, next) => {
         res.send(clients);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on gettin Clients from DB ");
+        res.status(500).send("Error on getting Clients from DB ");
     }
 })
 
@@ -56,7 +56,7 @@ router.get('/all-vendors', requiresLogin, async (req, res, next) => {
         res.send(vendors)
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on gettin Vendors from DB ");
+        res.status(500).send("Error on getting Vendors from DB ");
     }
 })
 
@@ -66,7 +66,29 @@ router.get('/users', requiresLogin, async (req, res, next) => {
         res.send(users)
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on gettin Users from DB");
+        res.status(500).send("Error on getting Users from DB");
+    }
+})
+
+router.get('/users-full', requiresLogin, async (req, res, next) => {
+    try {
+        const users = await User.find({},{password: 0});
+        res.send(users)
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting Users from DB");
+    }
+})
+
+router.get('/usergroup', requiresLogin, async (req, res, next) => {
+    try {
+        const key = req.query["key"];
+        const result = jwt.verify(key, secretKey);
+        const { group } = result.user;
+        res.send(group);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting Users from DB");
     }
 })
 
@@ -76,7 +98,7 @@ router.get('/requests', requiresLogin, async (req, res, next) => {
         res.send(requests)
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on gettin Requests from DB ");
+        res.status(500).send("Error on getting Requests from DB ");
     }
 });
 
