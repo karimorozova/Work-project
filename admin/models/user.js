@@ -42,7 +42,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true
   }
-});
+}, { minimize: false });
 
 UserSchema.statics.authenticate = function (email, password, callback) {
   User.findOne({ email: email })

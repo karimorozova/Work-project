@@ -110,7 +110,7 @@ export default {
             }
         },
         scrollDrop({drop, offsetTop, offsetHeight}) {
-            if(drop) {
+            if(drop && this.services.length >= 20) {
                 let tbody = document.querySelector('.table__tbody');
                 setTimeout(() => {
                     const offsetBottom = offsetTop + offsetHeight*2;

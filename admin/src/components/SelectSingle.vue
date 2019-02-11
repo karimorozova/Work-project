@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
+    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
@@ -29,6 +29,10 @@ export default {
             type: String
         },
         hasSearch: {
+            type: Boolean,
+            default: false
+        },
+        isTableDropMenu: {
             type: Boolean,
             default: false
         }
@@ -263,6 +267,20 @@ export default {
     }
     .add-several__drop-menu & {
         height: 34px;
+    }
+}
+
+.table-drop-menu {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    overflow: visible;
+    .drop {
+        border: 1px solid #BFB09D;
+    }
+    .select {
+        height: 32px;
+        box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }
 
