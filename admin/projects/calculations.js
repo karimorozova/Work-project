@@ -130,7 +130,8 @@ async function setDefaultStepVendors(project) {
         const vendors = await getVendors();
         for(let step of steps) {
             const task = project.tasks.find(item => item.taskId === step.taskId);
-            let matchedVendors = vendors.filter(item => item.active && checkForLanguages(item, step));
+            let activeVendors = vendors.filter(item => item.status === "Active");
+            let matchedVendors = await getMatchedVendors({activeVendors, step, project})
             if(matchedVendors.length === 1) {
                 step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 step = await payablesCalc({task, project, step});
@@ -143,13 +144,34 @@ async function setDefaultStepVendors(project) {
     }
 }
 
-function checkForLanguages(vendor, step) {
-    const matchedVendor = vendor.languageCombinations.find(item => {
-        return item.source && item.source.symbol === step.source && 
-            item.target.symbol === step.target
+async function getMatchedVendors({activeVendors, step, project}) {
+    let matchedVendors = [];
+    for(let vendor of activeVendors) {
+        const isMatching = await checkForLanguages({vendor, step, project});
+        if(isMatching) {
+            matchedVendors.push(vendor);
+        }
+    }
+    return matchedVendors;
+}
+
+async function checkForLanguages({vendor, step, project}) {
+    const service = step.name === "translate1" ? await Services.findOne({"symbol": "tr"}) : await Services.findOne({"symbol": "pr"});
+    return vendor.languageCombinations.find(item => {
+        if(item.source && item.source.symbol === step.source && 
+            item.target.symbol === step.target) {
+                return hasRateValue({
+                        service: service.id, 
+                        vendorIndustries: item.industries, 
+                        stepIndustry: project.industry.id
+                    });
+        }
     })
-    console.log(matchedVendor);
-    return matchedVendor;
+}
+
+function hasRateValue({service, vendorIndustries, stepIndustry}) {
+    const industry = vendorIndustries.find(item => item.industry.id === stepIndustry);
+    return industry ? industry.rates[service].value : false;
 }
 
 async function updateProjectCosts(project) {
