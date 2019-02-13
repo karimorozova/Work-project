@@ -64,10 +64,23 @@ export default {
             this[key] = !this[key];
         },
         checkForLanguages(vendor) {
+            const service = this.services.find(item => {
+                return this.step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
+            });
             return vendor.languageCombinations.find(item => {
-                return item.source && item.source.symbol === this.step.source && 
-                    item.target.symbol === this.step.target
+                if(item.source && item.source.symbol === this.step.source && 
+                    item.target.symbol === this.step.target) {
+                        return this.hasRateValue({
+                                service: service._id, 
+                                vendorIndustries: item.industries, 
+                                stepIndustry: this.currentProject.industry._id
+                            });
+                }
             })
+        },
+        hasRateValue({service, vendorIndustries, stepIndustry}) {
+            const industry = vendorIndustries.find(item => item.industry._id === stepIndustry);
+            return industry ? industry.rates[service].value : false;
         },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
@@ -88,7 +101,8 @@ export default {
     computed: {
         ...mapGetters({
             vendors: "getVendors",
-            currentProject: "getCurrentProject"
+            currentProject: "getCurrentProject",
+            services: "getVuexServices"
         }),
         filteredVendors() {
             if(this.isAllShow) {

@@ -217,7 +217,7 @@ function requestMessageForVendor(obj) {
                     <td>Specialization:</td>
                     <td>${obj.industry}</td>
                 </tr>
-                <tr contenteditable="false">
+                <tr>
                     <td>Amount:</td>
                     <td>${obj.finance.Price.payables} &euro;</td>
                 </tr>

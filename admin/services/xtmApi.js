@@ -6,7 +6,7 @@ const { metricsCalc } = require('../projects');
 function saveTasks(object) {
 
     return new Promise(resolve => {
-        unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
+        unirest.post('https://wstest2.xtm-intl.com/rest-api/projects')
         .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'multipart/form-data'})
         .field('customerId', object.customerId)
@@ -23,7 +23,7 @@ function saveTasks(object) {
 }
 
 function saveTemplateTasks(object) {
-    const withJoinObject = object.join ? {
+    const withJoinObject = object.join !== "false" ? {
         'workflowId': object.workflowId,
         'fileProcessType': 'JOIN'
     } : {'workflowId': object.workflowId}
@@ -39,7 +39,7 @@ function saveTemplateTasks(object) {
         }
     }
     return new Promise((resolve, reject) => {
-        unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
+        unirest.post('https://wstest2.xtm-intl.com/rest-api/projects')
         .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'multipart/form-data'})  
         .field('customerId', object.customerId)
@@ -60,7 +60,7 @@ function saveTemplateTasks(object) {
 
 function getMetrics(projectId) {
     return new Promise((resolve, reject) => {
-        unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
+        unirest.get(`https://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'application/json'})
         .end(response => {
@@ -95,7 +95,7 @@ function createNewXtmCustomer(name) {
         </soapenv:Body>
         </soapenv:Envelope>`;
         
-        let xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+        let xhr = createCORSRequest("POST", "https://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
         if(!xhr){
         console.log("XHR issue");
         return;
@@ -143,7 +143,7 @@ function getRequestOptions(obj) {
 
 function getTaskProgress(task) {
     return new Promise((resolve, reject) => {
-        unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${task.projectId}/metrics`)
+        unirest.get(`https://wstest2.xtm-intl.com/rest-api/projects/${task.projectId}/metrics`)
         .headers({"Authorization": xtmAuth.token,
         'Content-Type': 'application/json'})
         .end(async (response) => {

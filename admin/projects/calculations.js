@@ -1,5 +1,5 @@
 const { Projects, Services, Clients, Vendors } = require('../models');
-const { getVendor } = require('../routes/vendors/getVendors');
+const { getVendor, getVendors } = require('../routes/vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { getOneService } = require('../services/getServices');
 const { updateProject } = require('./getProjects');
@@ -68,7 +68,8 @@ async function payablesCalc({task, project, step}) {
     const rateIndustry = comb ? comb.industries.find(item => {
         return item.industry.id === project.industry.id
     }) : "";
-    const rate = rateIndustry ? rateIndustry.rates[service.id].value : vendor.basicRate;
+    const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
+    const rate = rateIndustry ? rateIndustry.rates[service.id].value : basicRate;
     step.finance['Price'].payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
     : calcCost(metrics, 'vendor', rate);
     step.vendorRate = rate;
@@ -123,6 +124,34 @@ async function calcProofingStep({task, project, words}) {
     }
 }
 
+async function setDefaultStepVendors(project) {
+    try {
+        const { steps } = project;
+        const vendors = await getVendors();
+        for(let step of steps) {
+            const task = project.tasks.find(item => item.taskId === step.taskId);
+            let matchedVendors = vendors.filter(item => item.active && checkForLanguages(item, step));
+            if(matchedVendors.length === 1) {
+                step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
+                step = await payablesCalc({task, project, step});
+            }
+        }
+        return steps;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setDefaultStepVendors");
+    }
+}
+
+function checkForLanguages(vendor, step) {
+    const matchedVendor = vendor.languageCombinations.find(item => {
+        return item.source && item.source.symbol === step.source && 
+            item.target.symbol === step.target
+    })
+    console.log(matchedVendor);
+    return matchedVendor;
+}
+
 async function updateProjectCosts(project) {
     let receivables = project.tasks.reduce((init, current) => {
         return +init + +current.finance['Price'].receivables
@@ -166,4 +195,4 @@ function  wordsCalculation(task) {
     return words;
 }
 
-module.exports = { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc };
+module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc };

@@ -5,7 +5,7 @@
         .steps__drop-menu
             SelectSingle(
                 :selectedOption="selectedAction"
-                :options="actions"
+                :options="stepActions"
                 placeholder="Select Action"
                 @chooseOption="setAction"
             )
@@ -167,7 +167,7 @@ export default {
             ],
             selectedVendors: [],
             isAllSelected: false,
-            actions: ["Request confirmation", "Mark as accept / reject", "Cancel"],
+            actions: ["Request confirmation", "Cancel"],
             isApproveActionShow: false,
             activeIndex: -1,
             isAllShow: false,
@@ -291,17 +291,32 @@ export default {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
         checkForLanguages(vendor, index) {
-            return vendor.languageCombinations.find(item => {
-                return item.source && item.source.symbol === this.allSteps[index].source && 
-                    item.target.symbol === this.allSteps[index].target
+            const step = this.allSteps[index];
+            const service = this.services.find(item => {
+                return step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
+            });
+            const matchedVendor = vendor.languageCombinations.find(item => {
+                if(item.source && item.source.symbol === step.source && 
+                    item.target.symbol === step.target) {
+                        return this.hasRateValue({
+                                service: service._id, 
+                                vendorIndustries: item.industries, 
+                                stepIndustry: this.currentProject.industry._id
+                            });
+                }
             })
+            return matchedVendor;
+        },
+        hasRateValue({service, vendorIndustries, stepIndustry}) {
+            const industry = vendorIndustries.find(item => item.industry._id === stepIndustry);
+            return industry ? industry.rates[service].value : false;
         },
         extendedVendors(index) {
             let result = [];
             if(this.isAllShow) {
                 return this.vendors.filter(item => item.status === 'Active');
             }
-            result = this.vendors.filter(item => this.checkForLanguages(item, index));
+            result = this.vendors.filter(item => item.status === 'Active' && this.checkForLanguages(item, index));
             return result;
         },
         ...mapActions({
@@ -313,7 +328,8 @@ export default {
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject',
-            vendors: "getVendors"
+            vendors: "getVendors",
+            services: "getVuexServices"
         }),
         modalTexts() {
             if(this.selectedAction === "Cancel") {
@@ -329,6 +345,14 @@ export default {
                     notApprove: "Edit & Send"
                 }
             }
+        },
+        stepActions() {
+            let result = this.actions;
+            const requestedStep = this.allSteps.find(item => item.status === "Request Sent");
+            if(requestedStep && result.indexOf("Mark as accept/reject") === -1) {
+                result.unshift("Mark as accept/reject");
+            }
+            return result;
         }
     },
     components: {
