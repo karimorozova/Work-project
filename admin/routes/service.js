@@ -56,7 +56,9 @@ router.get('/costs', async (req, res) => {
       task.finance['Price'].receivables = projectToUpdate.steps.filter(item => item.taskId === task.taskId)
       .reduce((init,cur) => init + +cur.finance['Price'].receivables, 0).toFixed(2);
     }
-    projectToUpdate.steps = await setDefaultStepVendors(projectToUpdate);
+    const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
+    projectToUpdate.steps = steps;
+    projectToUpdate.tasks = tasks;
     const updatedProject = await updateProjectCosts(projectToUpdate);
     res.send(updatedProject);
   } catch(err) {

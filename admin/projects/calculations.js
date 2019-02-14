@@ -126,18 +126,19 @@ async function calcProofingStep({task, project, words}) {
 
 async function setDefaultStepVendors(project) {
     try {
-        const { steps } = project;
+        let { steps, tasks } = project;
         const vendors = await getVendors();
         for(let step of steps) {
-            const task = project.tasks.find(item => item.taskId === step.taskId);
+            let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
             let activeVendors = vendors.filter(item => item.status === "Active");
             let matchedVendors = await getMatchedVendors({activeVendors, step, project})
             if(matchedVendors.length === 1) {
                 step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
-                step = await payablesCalc({task, project, step});
+                tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
+                step = await payablesCalc({task: tasks[taskIndex], project, step});
             }
         }
-        return steps;
+        return { steps, tasks };
     } catch(err) {
         console.log(err);
         console.log("Error in setDefaultStepVendors");

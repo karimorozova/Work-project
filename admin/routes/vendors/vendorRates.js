@@ -16,7 +16,8 @@ async function getVendorRates({vendor, form}) {
         }
         return fullInfo;
     } catch(err) {
-        console.log("from function getVendorRates " + err);   
+        console.log(err);
+        console.log("Error in getVendorRates");   
     }
 }
 
