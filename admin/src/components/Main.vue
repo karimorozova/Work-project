@@ -135,12 +135,12 @@ export default {
       }
     },
     async getCustomerLangs(data) {
-      let person = await this.$http.get(`api/person?customerId=${data.id}`);
+      let person = await this.$http.get(`/api/person?customerId=${data.id}`);
       let personEmail = person.body.email;
-      let token = await this.$http.post('api/get-token', {email: personEmail});
-      let sessionId = await this.$http.post('api/token-session', {token: token});
+      let token = await this.$http.post('/api/get-token', {email: personEmail});
+      let sessionId = await this.$http.post('/api/token-session', {token: token});
       document.cookie = "ses=" + sessionId.body + "; " + "maxAge=60;" 
-      let result = await this.$http.get(`portal/language-combinations?customerId=${data.id}`);
+      let result = await this.$http.get(`/portal/language-combinations?customerId=${data.id}`);
       this.$store.dispatch('gettingClientLangs', result.body);
       if(typeof result.body == 'string') {
         this.clientLanguages = []  
@@ -274,7 +274,7 @@ export default {
       this.accountMenuVisible = !this.accountMenuVisible;
     },
     showAccountInfo() {
-      this.$router.push('account-info');
+      this.$router.push('/account-info');
     },
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
