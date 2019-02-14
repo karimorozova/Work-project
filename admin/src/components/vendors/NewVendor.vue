@@ -257,6 +257,7 @@ export default {
     position: relative;
     width: 100%;
     display: flex;
+    min-height: 94vh;
 }
 
 .vendor-info {
