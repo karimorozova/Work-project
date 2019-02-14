@@ -123,12 +123,12 @@ export default {
             this.errors = ["Please, finish current edition first."];
             this.areErrors = true;
         },
-        makeAction(index, key) {
+        async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
                 return this.isEditing();
             }
             if(key === "save") {
-
+                await this.checkErrors(index);
             }
             if(key === "edit") {
                 this.setEditingData(index);
@@ -136,6 +136,25 @@ export default {
             if(key === "cancel") {
                 this.cancelEdition(index);
             }
+        },
+        async checkErrors(index) {
+            this.errors = [];
+            if(!this.currentFirstName) this.errors.push("Please, enter user's first name");
+            if(!this.currentLastName) this.errors.push("Please, enter user's last name");
+            if(!this.currentEmail || !this.isEmailValid() || !this.isEmailUnique()) this.errors.push("Email should be unique and not empty");
+            if(!this.currentPosition) this.errors.push("Please, enter user's position");
+            if(!this.currentGroup) this.errors.push("Please, select user's group");
+            if(this.errors.length) {
+                return this.areErrors = true;
+            }
+        },
+        isEmailValid() {
+            const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            return regex.test(this.currentEmail);
+        },
+        isEmailUnique() {
+            const emails = this.users.map(item => item.email);
+            return emails.indexOf(this.currentEmail.trim()) === -1;
         },
         setEditingData(index) {
             this.currentActive = index;

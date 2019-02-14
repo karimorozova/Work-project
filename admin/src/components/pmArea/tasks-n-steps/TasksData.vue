@@ -78,7 +78,7 @@
         StepsDefaultDate(
             v-for="count in stepsCounter"
             :stepCounter="count"
-            :requestOn="stepsDates[count-1].requestOn"
+            :start="stepsDates[count-1].start"
             :deadline="stepsDates[count-1].deadline"
             @setDate="(e) => setDate(e, count)"
         )
@@ -122,7 +122,7 @@ export default {
             ],
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
             stepsCounter: 2,
-            stepsDates: [{requestOn: new Date(), deadline: new Date()}, {requestOn: new Date(), deadline: new Date()}],
+            stepsDates: [{start: new Date(), deadline: new Date()}, {start: new Date(), deadline: new Date()}],
             sourceFiles: [],
             refFiles: [],
             isStepsShow: false,
@@ -143,6 +143,9 @@ export default {
         },
         setDate({date, prop}, count) {
             this.stepsDates[count-1][prop] = date;
+            if(this.stepsDates[count] && prop === "deadline") {
+                this.stepsDates[count].start = date;
+            }
         },
         setWorkflow({option}) {
             const workFlow = this.workflowSteps.find(item => item.name === option);
@@ -155,15 +158,15 @@ export default {
                 this.stepsDates.pop();
             } else {
                 this.stepsDates.push({
-                    requestOn: this.currentProject.createdAt,
+                    start: this.currentProject.createdAt,
                     deadline: this.currentProject.deadline
                 })
             }
         },
         defaultStepDates() {
             this.stepsDates = [
-                {requestOn: this.currentProject.createdAt, deadline: this.currentProject.deadline},
-                {requestOn: this.currentProject.createdAt, deadline: this.currentProject.deadline}
+                {start: this.currentProject.createdAt, deadline: ""},
+                {start: "", deadline: this.currentProject.deadline}
             ]
         },
         setSource({lang}) {

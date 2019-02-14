@@ -2,19 +2,19 @@
 .steps-date
     .steps-date__title Step {{ stepCounter }}:
     .steps-date__picker
-        .steps-date__label Requested On:
+        .steps-date__label Start date:
         .steps-date__input
             Datepicker(
                 ref="start"
                 :isReadonly="isReadonly"
-                :value="requestOn"
+                :value="start"
                 :format="customFormatter" 
                 monday-first=true
-                :disabled="disabled"
+                :disabled="disabledStart"
                 :highlighted="highlighted"
                 inputClass="datepicker-custom" 
                 calendarClass="calendar-custom"
-                @selected="(e) => setDate(e, 'requestOn')"
+                @selected="(e) => setDate(e, 'start')"
                 @invalidDate="invalidDateWarn"
             )
         img.steps-date__image(src="../../../assets/images/calendar.png" @click="showStartCalendar")
@@ -27,7 +27,7 @@
                 :value="deadline"
                 :format="customFormatter"
                 monday-first=true
-                :disabled="disabled"
+                :disabled="disabledDeadline"
                 :highlighted="highlighted"
                 inputClass="datepicker-custom" 
                 calendarClass="calendar-custom"
@@ -48,7 +48,7 @@ export default {
         stepCounter: {
             type: Number
         },
-        requestOn: {
+        start: {
             type: [Date, String]
         },
         deadline: {
@@ -81,6 +81,31 @@ export default {
         },
         invalidDateWarn({message}) {
             console.log(message);
+        }
+    },
+    computed: {
+        disabledStart() {
+            let result = {
+                to: moment().add(-1, 'day').endOf('day').toDate()
+            };
+            if(this.deadline) {
+                result = {
+                    to: moment().add(-1, 'day').endOf('day').toDate(),
+                    from: moment(this.deadline).add(-1, 'hour').endOf('day').toDate()
+                }
+            }
+            return result;
+        },
+        disabledDeadline() {
+            let result = {
+                to: moment().add(-1, 'day').endOf('day').toDate()
+            };
+            if(this.start) {
+                result = {
+                    to: moment(this.start).add(-1, 'day').endOf('day').toDate()
+                }
+            }
+            return result;
         }
     },
     components: {

@@ -275,6 +275,7 @@ export default {
     },
     showAccountInfo() {
       this.$router.push('/account-info');
+      this.accountMenuVisible = false;
     },
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
