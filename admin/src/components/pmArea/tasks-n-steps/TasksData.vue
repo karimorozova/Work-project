@@ -145,6 +145,10 @@ export default {
             this.stepsDates[count-1][prop] = date;
             if(this.stepsDates[count] && prop === "deadline") {
                 this.stepsDates[count].start = date;
+                const deadline = new Date(this.stepsDates[count].deadline);
+                if(date - deadline > 0) {
+                    this.stepsDates[count].deadline = date;
+                }
             }
         },
         setWorkflow({option}) {
