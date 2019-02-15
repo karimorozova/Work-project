@@ -168,6 +168,7 @@ export default {
             selectedVendors: [],
             isAllSelected: false,
             actions: ["Request confirmation", "Cancel"],
+            modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             activeIndex: -1,
             isAllShow: false,
@@ -221,7 +222,18 @@ export default {
         },
         async setAction({option}) {
             this.selectedAction = option;
+            this.setModalTexts(option);
             this.isApproveActionShow = true;
+        },
+        setModalTexts(option) {
+            this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
+            switch (this.selectedAction) {
+                case "Request confirmation":
+                    this.modalTexts.main = "Please, choose action:";
+                    this.modalTexts.approve = "Send";
+                    this.modalTexts.notApprove = "Cancel";
+                    break    
+            }
         },
         async approveAction() {
             const checkedSteps = this.allSteps.filter(item => {
@@ -244,7 +256,7 @@ export default {
             }
         },
         notApproveAction() {
-            if(modalTexts.notApprove !== "Edit & Send") {
+            if(this.modalTexts.notApprove !== "Edit & Send") {
                 return this.closeApproveModal(); 
             }
         },
@@ -331,21 +343,6 @@ export default {
             vendors: "getVendors",
             services: "getVuexServices"
         }),
-        modalTexts() {
-            if(this.selectedAction === "Cancel") {
-                return { 
-                    main: "Are you sure?",
-                    approve: "Yes",
-                    notApprove: "No"
-                }
-            } else {
-                return { 
-                    main: "Please, choose action:",
-                    approve: "Send",
-                    notApprove: "Edit & Send"
-                }
-            }
-        },
         stepActions() {
             let result = this.actions;
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent");

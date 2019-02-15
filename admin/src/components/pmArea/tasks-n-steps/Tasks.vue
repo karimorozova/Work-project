@@ -113,6 +113,7 @@ export default {
             actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
             isAllSelected: false,
+            modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false
         }
     },
@@ -122,7 +123,11 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
+            this.setModalTexts(option);
             this.isApproveActionShow = true;
+        },
+        setModalTexts(option) {
+            this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
         },
         async approveAction() {
             const checkedTasks = this.allTasks.filter(item => item.check);
@@ -188,22 +193,7 @@ export default {
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject' 
-        }),
-        modalTexts() {
-            if(this.selectedAction === "Cancel") {
-                return { 
-                    main: "Are you sure?",
-                    approve: "Yes",
-                    notApprove: "No"
-                }
-            } else {
-                return { 
-                    main: "Please, choose action:",
-                    approve: "Send",
-                    notApprove: "Edit & Send"
-                }
-            }
-        }
+        })
     },
     components: {
         DataTable,
