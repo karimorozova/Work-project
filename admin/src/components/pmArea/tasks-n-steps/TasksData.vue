@@ -84,6 +84,7 @@
         )
     .tasks-data__add-tasks
             Button(value="Add tasks" @clicked="checkForErrors")
+    slot(name="errors")
 </template>
 
 <script>
@@ -304,6 +305,7 @@ export default {
 @import "../../../assets/scss/colors.scss";
 
 .tasks-data {
+    position: relative;
     &__main-info {
         margin-bottom: 20px;
         width: 100%;

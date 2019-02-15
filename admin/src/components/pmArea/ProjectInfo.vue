@@ -11,16 +11,17 @@
             @setVendor="setVendor"
             @setDate="setDate"
             @showErrors="showErrors")
+            ValidationErrors(v-if="areErrorsExist"
+                :errors="errors"
+                :isAbsolute="isBlockAbsoulte"
+                @closeErrors="closeErrorsBlock"
+            )
         .project-info__action(v-if="currentProject.status !== 'Closed'")
             ProjectAction(
                 :project="currentProject"
                 @editAndSend="editAndSend")
     .project-info__all-info
         ProjectFinance
-    ValidationErrors(v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
-    )
     .project-info__preview(v-if="isEditAndSend")
         Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
 </template>
@@ -42,6 +43,7 @@ export default {
             excludeKeys: ["nonTranslatable", "totalWords"],
             errors: [],
             areErrorsExist: false,
+            isBlockAbsoulte: true,
             isEditAndSend: false,
             message: ""
         }

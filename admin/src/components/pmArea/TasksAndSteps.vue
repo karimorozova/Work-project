@@ -13,6 +13,8 @@
         @showErrors="showErrors"
         @addTasks="addTasks"
     )
+        template(slot="errors")
+            slot
     .tasks-steps__tables
         Tasks(v-if="currentProject.tasks.length && isTasksShow"
             :allTasks="currentProject.tasks"
