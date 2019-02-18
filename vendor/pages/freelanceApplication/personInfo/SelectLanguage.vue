@@ -20,7 +20,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         selectedLang: {
-            type: Object
+            type: Object,
+            default: () => {return {lang: ""}}
         },
         refersTo: {
             type: String,

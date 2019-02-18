@@ -21,7 +21,8 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedPositions: {
-            type: Array
+            type: Array,
+            default: () => []
         },
         otherChoice: {
             type: String,
