@@ -6,9 +6,9 @@
     .domain__options
         span.domain__label Industries:
         SelectMulti(
-            :selectedOptions="selectedIndustries"
+            :selectedOptions="selectedIndustriesNames"
             :otherChoice="otherChoice"
-            :options="industries"
+            :options="industriesNames"
             @chooseOptions="chooseIndustries"
         )
     OtherChoice(
@@ -33,41 +33,21 @@ export default {
     data() {
         return {
             selectedIndustries: [],
-            industries: [
-                "Finance (Forex/Trading/Binary Options/Cryptocurrency)",
-                "Poker",
-                "iGaming (Casino, Slot games, Gambling, etc.)",
-                "Sports Betting",
-                "Video Games",
-                "Other"
-            ],
+            industries: [],
             otherChoice: "",
             otherChoicelabel: "",
         }
     },
     methods: {
         chooseIndustries({option}) {
-            if(option === "Other") {
-                if(this.selectedIndustries.indexOf(this.otherChoice) === -1) {
-                    this.otherChoicelabel = "Please specify industries"
-                    this.$emit("showOtherChoice", {variable: 'otherIndustryVisibile'})
-                } else {
-                    const pos = this.selectedIndustries.indexOf(this.otherChoice);
-                    this.selectedIndustries.splice(pos, 1);
-                    this.otherChoice = "";
-                }
-                return
+            const position = this.selectedIndustriesNames.indexOf(option);
+            if(position === -1) {
+                const industry = this.industries.find(item => item.name === option);
+                this.selectedIndustries.push(industry);
+            } else {
+                this.selectedIndustries.splice(position, 1);
             }
-            if(option === "Other" && this.selectedIndustries.indexOf("Other") === -1) {
-                this.otherChoicelabel = "Please specify industries"
-                this.$emit("showOtherChoice", {variable: 'otherIndustryVisibile'})
-            }
-            const elementPosition = this.selectedIndustries.indexOf(option);
-            if(elementPosition != -1) {
-                return this.selectedIndustries.splice(elementPosition, 1)
-            }
-            this.selectedIndustries.push(option);
-            this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
+            this.$emit("setValue", {property: 'industries', value: this.selectedIndustries});
         },
         cancelOtherChoice() {
             this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
@@ -77,11 +57,30 @@ export default {
             this.selectedIndustries.push(this.otherChoice);
             this.$emit("setValue", {property: 'industries', value: this.selectedIndustries})
             this.$emit("closeOtherChoice", {variable: 'otherIndustryVisibile'})
+        },
+        async getIndustries() {
+            try {
+                const result = await this.$axios.$get("/api/industries");
+                this.industries = result;
+            } catch(err) {
+                console.log(err);
+            }
         }
     },
     components: {
         SelectMulti,
         OtherChoice
+    },
+    computed: {
+        industriesNames() {
+            return this.industries.map(item => item.name);
+        },
+        selectedIndustriesNames() {
+            return this.selectedIndustries.map(item => item.name);
+        }
+    },
+    mounted() {
+        this.getIndustries();
     }
 }
 </script>

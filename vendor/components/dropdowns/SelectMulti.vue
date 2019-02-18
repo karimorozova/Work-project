@@ -84,15 +84,14 @@ export default {
         max-height: 100px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;
         &__item {
             display: flex;
             align-items: center;
-            height: 37px;
-            padding: 7px;
+            height: 32px;
+            padding: 0 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
