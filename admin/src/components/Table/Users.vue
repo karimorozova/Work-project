@@ -97,7 +97,9 @@ export default {
     },
     methods: {
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            saveUser: "saveUser",
+            removeUser: "removeUser"
         }),
         isActive(key, index) {
             if(this.currentActive === index) {
@@ -136,24 +138,53 @@ export default {
             if(key === "cancel") {
                 this.cancelEdition(index);
             }
+            if(key === "delete") {
+                this.isDeleting = true;
+                this.deleteIndex = index;
+            }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentFirstName) this.errors.push("Please, enter user's first name");
             if(!this.currentLastName) this.errors.push("Please, enter user's last name");
-            if(!this.currentEmail || !this.isEmailValid() || !this.isEmailUnique()) this.errors.push("Email should be unique and not empty");
+            if(!this.currentEmail || !this.isEmailValid() || !this.isEmailUnique(index)) this.errors.push("Email should be unique and not empty");
             if(!this.currentPosition) this.errors.push("Please, enter user's position");
             if(!this.currentGroup) this.errors.push("Please, select user's group");
             if(this.errors.length) {
                 return this.areErrors = true;
             }
+            await this.saveUserInfo(index);
+        },
+        async saveUserInfo(index) {
+            const _id = this.users[index]._id ? this.users[index]._id: "";
+            const username = _id ? this.users[index].username : `${this.currentFirstName}.${this.currentLastName.slice(0, 5)}`;
+            const user = {
+                _id,
+                username: username.toLowerCase(),
+                firstName: this.currentFirstName,
+                lastName: this.currentLastName,
+                email: this.currentEmail,
+                position: this.currentPosition,
+                group: this.currentGroup,
+            }
+            try {
+                const result = await this.saveUser({user});
+                await this.getUsers();
+                this.alertToggle({message: "User info saved", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+            this.setDefaults();
         },
         isEmailValid() {
             const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             return regex.test(this.currentEmail);
         },
-        isEmailUnique() {
-            const emails = this.users.map(item => item.email);
+        isEmailUnique(index) {
+            const emails = this.users.map((item, i) => {
+                if(i !== index) return item.email
+            } );
             return emails.indexOf(this.currentEmail.trim()) === -1;
         },
         setEditingData(index) {
@@ -180,8 +211,25 @@ export default {
             })
             this.setEditingData(this.users.length -1);
         },
-        deleteUser() {
-            return;
+        async deleteUser() {
+            const id = this.users[this.deleteIndex]._id;
+            if(!id) {
+                return this.users.splice(this.deleteIndex, 1);
+            }
+            try {
+                await this.removeUser(id);
+                this.checkToken();
+                await this.getUsers();
+                this.alertToggle({message: "User removed", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+            this.setDefaults();
+        },
+        checkToken() {
+            if(!localStorage.getItem("token")) {
+                this.$router.push("/login");
+            }
         },
         cancelEdition(index) {
             if(!this.users[index]._id) {

@@ -232,7 +232,11 @@ export default {
                     this.modalTexts.main = "Please, choose action:";
                     this.modalTexts.approve = "Send";
                     this.modalTexts.notApprove = "Cancel";
-                    break    
+                    break;
+                case "Mark as accept/reject":
+                    this.modalTexts.main = "Select the status:";
+                    this.modalTexts.approve = "Accepted";
+                    this.modalTexts.notApprove = "Rejected";
             }
         },
         async approveAction() {

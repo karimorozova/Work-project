@@ -1,30 +1,30 @@
 const router = require('express').Router();
 const path = require('path');
-const { User, Requests, Reports, Clients, Vendors } = require('../models');
+const { User, Requests, Reports } = require('../models');
 const { getVendors } = require('./vendors/');
 const { getClients} = require('../clients/');
 const { requiresLogin } = require('../middleware/index');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../configs');
 
-router.get('/', (req, res) => {
-    res.sendFile(path.resolve() + '/dist/index.html');
-});
+// router.get('/', (req, res) => {
+//     res.sendFile(path.resolve() + '/dist/index.html');
+// });
 
-router.get('/tasks-report', (req, res) => {
-    res.sendFile(path.resolve() + '/dist/index.html');
-});
-router.get('/register', (req, res) => {
-    res.sendFile(path.resolve() + '/dist/index.html');
-});
+// router.get('/tasks-report', (req, res) => {
+//     res.sendFile(path.resolve() + '/dist/index.html');
+// });
+// router.get('/register', (req, res) => {
+//     res.sendFile(path.resolve() + '/dist/index.html');
+// });
 
-router.get('/login', (req, res) => {
-    res.sendFile(path.resolve() + '/dist/index.html');
-});
+// router.get('/login', (req, res) => {
+//     res.sendFile(path.resolve() + '/dist/index.html');
+// });
 
-router.get('/main', (req, res) => {
-    res.sendFile(path.resolve() + '/dist/index.html');
-});
+// router.get('/main', (req, res) => {
+//     res.sendFile(path.resolve() + '/dist/index.html');
+// });
 
 // GET /logout
 router.get('/logout', (req, res, next) => {
@@ -91,6 +91,40 @@ router.get('/usergroup', requiresLogin, async (req, res, next) => {
         res.status(500).send("Error on getting Users from DB");
     }
 })
+
+router.post('/user', requiresLogin, async (req, res) => {
+    const { user } = req.body;
+    const { _id, username, firstName, lastName, email, position, group } = user;
+    try {
+        if(_id) { 
+            await User.updateOne({"_id": user._id}, { fistName, lastName, email, position, group });
+        } else {
+            const password = "12345";
+            await User.create({username, password, firstName, lastName, email, position, group});
+        }
+        res.send("User info saved");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving user info");
+    }
+})
+
+router.delete("/user/:id", requiresLogin, async (req, res) => {
+    const { id } = req.params;
+    const { token } = req.body;
+    try {
+        await User.deleteOne({"_id": id});
+        const tokenValue = JSON.parse(token).value;
+        const result = jwt.verify(tokenValue, secretKey);
+        if(result.user._id === id) {
+            return res.send('logout');
+        }
+        res.send("User removed")
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting user");
+    }
+ })
 
 router.get('/requests', requiresLogin, async (req, res, next) => {
     try {

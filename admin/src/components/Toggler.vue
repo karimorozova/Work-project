@@ -49,7 +49,6 @@ export default {
   bottom: 0;
   background-color: #ccc;
   border-radius: 34px;
-  -webkit-transition: .4s;
   transition: .4s;
 }
 
@@ -62,7 +61,6 @@ export default {
   bottom: 4px;
   background-color: white;
   border-radius: 50%;
-  -webkit-transition: .4s;
   transition: .4s;
 }
 
@@ -75,8 +73,6 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(16px);
-  -ms-transform: translateX(16px);
   transform: translateX(16px);
 }
 

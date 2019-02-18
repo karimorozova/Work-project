@@ -226,22 +226,23 @@ export default {
             return number;
         },
         langPaging() {
-            let result = [];
+            let result = [[]];
             let page = [];
             if (this.languages.length) {
+                result = [];
                 for (let i = 14; i < this.languages.length; i = i + 15) {
-                page = [];
-                for (let j = i - 14; j <= i; j++) {
-                    page.push(this.languages[j]);
-                }
-                result.push(page);
-                if (i + 15 > this.languages.length) {
                     page = [];
-                    for (let m = i + 1; m < this.languages.length; m++) {
-                    page.push(this.languages[m]);
+                    for (let j = i - 14; j <= i; j++) {
+                        page.push(this.languages[j]);
                     }
                     result.push(page);
-                }
+                    if (i + 15 > this.languages.length) {
+                        page = [];
+                        for (let m = i + 1; m < this.languages.length; m++) {
+                        page.push(this.languages[m]);
+                        }
+                        result.push(page);
+                    }
                 }
             }
             return result;
