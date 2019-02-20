@@ -3,7 +3,7 @@
     .loginWrapper(v-if="forgotLink")
       .imageWrapper
         img(src="../assets/images/new-logo.png")
-      .loginForm
+      .loginForm(@keydown.enter="sendForm")
         .labelWrapper
           label.warningMessage(v-if="isLoginWarning") Check your email or password
         .h2Wrapper
@@ -14,7 +14,7 @@
           input.checkboxWrapper__input(type="checkbox")
           label.checkboxWrapper__label Remember me
         .buttonWrapper
-          button(@click='sendForm' v-model='form.logemail, form.logpassword' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
+          button(@click='sendForm' :class="{changeButtonView: form.logemail && form.logpassword}") Sign In
           h2(v-if='isLogin') You are logged in!
         .formFooter
           span.firstLabel(@click="forget") Forgot Your Password?
