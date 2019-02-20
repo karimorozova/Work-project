@@ -13,6 +13,7 @@ const checkCollections = require("./helpers/dbSetDefault");
 const { LanguagesModel, RequestSchema } = require("./models");
 const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
+let logger = require('morgan');
 
 // TODO : check origins from localhost only
 const allowedOrigins = [
@@ -20,11 +21,13 @@ const allowedOrigins = [
   "https://vendor.pangea.global",
   "https://portal.pangea.global",
   "http://localhost:3000",
+  "http://localhost:3002",
   "http://localhost:8081"
 ];
 
 mongoose.connect(config.mongoDB.url);
 
+app.use(logger('dev'));
 app.use(
   session({
     secret: "Cookies Very Much secret key!",

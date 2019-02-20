@@ -3,7 +3,7 @@
     .login-main__forgot(v-if="forgotLink")
       .login-main__image
         img(src="../assets/images/new-logo.png")
-      .login-main__form
+      .login-main__form(@keydown.enter="login")
         .login-main__warning
           label.login-main__message(v-if="isLoginWarning") Check your email or password
         .login-main__item
@@ -13,7 +13,7 @@
         .login-main__check-wrap
           input.login-main__check-input(type="checkbox")
           label.login-main__check-label Remember me
-        button.login-main__button(@click='login' v-model='form.logemail, form.logpassword' :class="{'login-main_full-opacity': form.logemail && form.logpassword}") Sign In
+        button.login-main__button(@click='login' :class="{'login-main_full-opacity': form.logemail && form.logpassword}") Sign In
         .login-main__footer
           span.login-main__footer-text(@click="forget") Forgot Your Password?
     passwordrestore(v-else)
@@ -31,15 +31,19 @@ export default {
       },
       isLogin: false,
       isLoginWarning: false,
-      forgotLink: true      
+      forgotLink: true
     };
   },
   methods: {
     async login() {
       try {
+<<<<<<< HEAD
       const loginResult = await this.$http.post('/login', this.form); 
+=======
+      const loginResult = await this.$http.post('../login', this.form);
+>>>>>>> 756d5816ecc4d8e79dfe4b7bbfe12640ff66836b
       await this.loggingIn(loginResult.body);
-      this.alertToggle({message: "You are logged in", isShow: true, type: "success"})
+      this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       this.$router.push("/")
       } catch(err) {
         this.alertToggle({message: err.body, isShow: true, type: "error"});
@@ -83,9 +87,7 @@ export default {
       top: 50%;
       margin-top: -266px;
       width: 436px;
-  
-      border-radius: 26px;
-  
+
       .login-main__image {
         display: flex;
         justify-content: center;
@@ -95,13 +97,13 @@ export default {
           height: 76px;
         }
       }
-  
+
     .login-main__form {
       padding: 1%;
       margin: 0 auto;
       width: 436px;
       background-color: #fff;
-  
+
       .login-main__warning {
         margin-bottom: -3%;
         padding-top: 1%;
@@ -110,13 +112,13 @@ export default {
           padding-left: 7.3%;
         }
       }
-  
+
       .login-main__item {
         display: flex;
         flex-direction: column;
         align-items: center;
       }
-  
+
       input {
         height: 41px;
         width: 356px;
@@ -139,21 +141,21 @@ export default {
           outline: none;
         }
       }
-  
+
       .addShadow {
         box-shadow: 0 0 10px #66563d;
       }
-  
+
       .login-main__email {
         margin-top: 5.5%;
         margin-bottom: 5.5%;
       }
-  
+
       .login-main__password {
         margin-top: 0;
         margin-bottom: 2.5%;
       }
-  
+
       .login-main__check-wrap {
         display: flex;
         flex-direction: row;
@@ -169,7 +171,7 @@ export default {
           margin-left: 2%;
         }
       }
-  
+
       .login-main__button {
         display: flex;
         justify-content: center;
@@ -180,14 +182,14 @@ export default {
         font-size: 20px;
         background-color: #84ca8e;
         color: #66563d;
-        opacity: 0.22; 
+        opacity: 0.22;
       }
-      
+
       .login-main_full-opacity {
         opacity: 1;
         color: #fff;
       }
-  
+
       .login-main__footer {
         display: flex;
         justify-content: space-between;
@@ -200,7 +202,7 @@ export default {
         }
       }
     }
-  
+
     @media (max-width: 625px) {
       width: 450px;
     }
@@ -210,7 +212,7 @@ export default {
     @media (max-width: 374px) {
       width: 300px;
     }
-  
+
     border-radius: 26px;
   }
 </style>
