@@ -13,7 +13,7 @@
       .login__checkbox
         input.login__checkbox-input(type="checkbox")
         label.login__checkbox-label Remember me
-      button.login__button(type="submit" v-model='form.logemail, form.logpassword' :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
+      button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
       span.login__forgot(@click="forget") Forgot Your Password?
   passwordrestore(v-else)
 </template>
@@ -58,14 +58,18 @@ export default {
 <style lang="scss" scoped>
 
 .login {
-  background-image: url("/assets/images/image-background.jpg");
+  background-image: url("/assets/images/signin-background.jpg");
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   &__main {
-    width: 23%;
-    border-radius: 26px;
+    position: absolute;
+    margin-left: -250px;
+    left: 50%;
+    top: 50%;
+    margin-top: -266px;
+    width: 436px;
   }
   &__logo {
     display: flex;
@@ -138,7 +142,7 @@ export default {
     height: 35px;
     border-radius: 8px;
     font-size: 20px;
-    background-color: #84ca8e;
+    background-color: #4BA5A5;
     color: #66563d;
     opacity: 0.22;
   }

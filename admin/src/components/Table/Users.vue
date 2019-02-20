@@ -139,8 +139,8 @@ export default {
                 this.cancelEdition(index);
             }
             if(key === "delete") {
-                this.isDeleting = true;
                 this.deleteIndex = index;
+                this.showApprove(index);
             }
         },
         async checkErrors(index) {
@@ -211,11 +211,16 @@ export default {
             })
             this.setEditingData(this.users.length -1);
         },
+        showApprove(index) {
+            const id = this.users[index]._id;
+            if(!id) {
+                this.setDefaults();
+                return this.users.splice(index, 1);
+            }
+            this.isDeleting = true;
+        },
         async deleteUser() {
             const id = this.users[this.deleteIndex]._id;
-            if(!id) {
-                return this.users.splice(this.deleteIndex, 1);
-            }
             try {
                 await this.removeUser(id);
                 this.checkToken();

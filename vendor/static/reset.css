@@ -1,4 +1,13 @@
-body, html {
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+input[type="checkbox"] {
     margin: 0;
-    padding: 0;
 }

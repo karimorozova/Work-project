@@ -1,21 +1,20 @@
 <template lang="pug">
-  .login-main
-    .login-main__forgot(v-if="forgotLink")
-      .login-main__image
-        img(src="../assets/images/new-logo.png")
-      .login-main__form(@keydown.enter="login")
-        .login-main__warning
-          label.login-main__message(v-if="isLoginWarning") Check your email or password
-        .login-main__item
-          input.login-main__email(v-model='form.logemail' placeholder='Email' :class="{addShadow: form.logemail}")
-        .login-main__item
-          input.login-main__password(type="password" v-model='form.logpassword' placeholder='Password' :class="{addShadow: form.logpassword}")
-        .login-main__check-wrap
-          input.login-main__check-input(type="checkbox")
-          label.login-main__check-label Remember me
-        button.login-main__button(@click='login' :class="{'login-main_full-opacity': form.logemail && form.logpassword}") Sign In
-        .login-main__footer
-          span.login-main__footer-text(@click="forget") Forgot Your Password?
+  .login
+    .login__main(v-if="forgotLink")
+      .login__logo
+        img.login__image(src="../assets/images/new-logo.png")
+      form.login__form(@submit.prevent="sendForm")
+        .login__warning
+          label.login__warning-message(v-if="isLoginWarning") Check your email or password
+        .login__email
+          input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
+        .login__password
+          input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'login_shadow': form.logpassword}")
+        .login__checkbox
+          input.login__checkbox-input(type="checkbox")
+          label.login__checkbox-label Remember me
+        button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
+        span.login__forgot(@click="forget") Forgot Your Password?
     passwordrestore(v-else)
 </template>
 <script>
@@ -37,11 +36,7 @@ export default {
   methods: {
     async login() {
       try {
-<<<<<<< HEAD
       const loginResult = await this.$http.post('/login', this.form); 
-=======
-      const loginResult = await this.$http.post('../login', this.form);
->>>>>>> 756d5816ecc4d8e79dfe4b7bbfe12640ff66836b
       await this.loggingIn(loginResult.body);
       this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       this.$router.push("/")
@@ -73,146 +68,122 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-  .login-main {
-    background-image: url('../assets/images/image-background.jpg');
-    height: 100vh;
-    overflow: hidden;
+.login {
+  background-image: url("../assets/images/signin-background.jpg");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  &__main {
+    position: absolute;
+    margin-left: -250px;
+    left: 50%;
+    top: 50%;
+    margin-top: -266px;
+    width: 436px;
   }
-
-  .login-main__forgot {
-      position: absolute;
-      margin-left: -250px;
-      left: 50%;
-      top: 50%;
-      margin-top: -266px;
-      width: 436px;
-
-      .login-main__image {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 2%;
-        img {
-          width: 269px;
-          height: 76px;
-        }
-      }
-
-    .login-main__form {
-      padding: 1%;
-      margin: 0 auto;
-      width: 436px;
-      background-color: #fff;
-
-      .login-main__warning {
-        margin-bottom: -3%;
-        padding-top: 1%;
-        .login-main__message {
-          color: #ff0000;
-          padding-left: 7.3%;
-        }
-      }
-
-      .login-main__item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      input {
-        height: 41px;
-        width: 356px;
-        font-size: 20px;
-        color: #66563d;
-        padding-left: 3%;
-        border-radius: 8px;
-        border: 2px solid #dedede;
-        &::-webkit-input-placeholder {
-          opacity:0.38;
-          }
-        &::-moz-placeholder {
-          opacity:0.38;
-          }
-        &:-ms-input-placeholder {
-          opacity:0.38;
-          }
-        &:focus {
-          box-shadow: 0 0 4px #66563D;
-          outline: none;
-        }
-      }
-
-      .addShadow {
-        box-shadow: 0 0 10px #66563d;
-      }
-
-      .login-main__email {
-        margin-top: 5.5%;
-        margin-bottom: 5.5%;
-      }
-
-      .login-main__password {
-        margin-top: 0;
-        margin-bottom: 2.5%;
-      }
-
-      .login-main__check-wrap {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        .login-main__check-input {
-          width: 13px;
-          height: 13px;
-          margin-left: 7%;
-        }
-        .login-main__check-label {
-          font-size: 15px;
-          color: #2d2d2d;
-          margin-left: 2%;
-        }
-      }
-
-      .login-main__button {
-        display: flex;
-        justify-content: center;
-        margin: 10px auto;
-        width: 142px;
-        height: 35px;
-        border-radius: 8px;
-        font-size: 20px;
-        background-color: #84ca8e;
-        color: #66563d;
-        opacity: 0.22;
-      }
-
-      .login-main_full-opacity {
-        opacity: 1;
-        color: #fff;
-      }
-
-      .login-main__footer {
-        display: flex;
-        justify-content: space-between;
-        font-size: 20px;
-        .login-main__footer-text {
-          color: #4280d3;
-          padding-left: 6%;
-          margin-bottom: 4%;
-          cursor: pointer;
-        }
-      }
-    }
-
-    @media (max-width: 625px) {
-      width: 450px;
-    }
-    @media (max-width: 560px) {
-      width: 350px;
-    }
-    @media (max-width: 374px) {
-      width: 300px;
-    }
-
-    border-radius: 26px;
+  &__logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
   }
+  &__image {
+    width: 269px;
+    height: 76px;
+  }
+  &__form {
+    padding: 10px;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+  &__warning {
+    margin-bottom: 5px;
+    padding-top: 5px;
+  }
+  &__warning-message {
+    color: #ff0000;
+    padding-left: 20px;
+  }
+  &__email, &__password {
+    width: 85%;
+    margin: 10px 0;
+  }
+  &__input {
+    box-sizing: border-box;
+    margin-top: 20px;
+    height: 41px;
+    width: 100%;
+    font-size: 20px;
+    color: #66563d;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 8px;
+    border: 2px solid #dedede;
+    &::-webkit-input-placeholder {
+      opacity:0.38;
+    }
+    &:focus {
+      box-shadow: 0 0 4px #66563D;
+      outline: none;
+    }
+  }
+  &__checkbox {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    &-input {
+      width: 13px;
+      height: 13px;
+      margin-left: 30px;
+    }
+    &-label {
+      font-size: 15px;
+      color: #2d2d2d;
+      margin-bottom: 0;
+    }
+  }
+  &__button {
+    width: 142px;
+    height: 35px;
+    border-radius: 8px;
+    font-size: 20px;
+    background-color: #4BA5A5;
+    color: #66563d;
+    opacity: 0.22;
+  }
+  &__forgot {
+    color: #4280d3;
+    font-size: 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    align-self: flex-start;
+    padding-left: 30px;
+  }
+  &_shadow {
+    box-shadow: 0 0 10px #66563d;
+  }
+  &_button-backgr {
+    opacity: 1;
+    color: #fff;
+  }
+}
+
+  //   @media (max-width: 625px) {
+  //     width: 450px;
+  //   }
+  //   @media (max-width: 560px) {
+  //     width: 350px;
+  //   }
+  //   @media (max-width: 374px) {
+  //     width: 300px;
+  //   }
+
+  //   border-radius: 26px;
+  // }
 </style>
