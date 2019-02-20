@@ -37,7 +37,7 @@ export default {
   methods: {
     async login() {
       try {
-      const loginResult = await this.$http.post('../login', this.form); 
+      const loginResult = await this.$http.post('/login', this.form); 
       await this.loggingIn(loginResult.body);
       this.alertToggle({message: "You are logged in", isShow: true, type: "success"})
       this.$router.push("/")

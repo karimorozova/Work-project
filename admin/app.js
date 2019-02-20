@@ -47,7 +47,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, Content-Type, Authorization"
+    "Origin, Content-Type, Authorization, token-header"
   );
   res.header("Access-Control-Allow-Credentials", true);
 

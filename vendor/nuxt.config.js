@@ -29,7 +29,8 @@ module.exports = {
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#3B8070' },
+  // loading: { color: '#3B8070' },
+  loading: '~/components/Loading.vue',
   /*
   ** Build configuration
   */
@@ -49,4 +50,8 @@ module.exports = {
   router: {
     base: '/'
   },
+  plugins: [
+    '~/plugins/localStorageInject',
+    '~/plugins/axios'
+  ]
 }

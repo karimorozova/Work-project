@@ -25,6 +25,7 @@ const state = {
     coverLetter: "",
     coverLetterFiles: [],
     confirmed: ""
-  }
+  },
+  currentRequests: 0
 };
 export default state

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const VendorSchema = new mongoose.Schema({
@@ -139,6 +140,38 @@ const VendorSchema = new mongoose.Schema({
         }
     }
 }, { minimize: false });
+
+VendorSchema.statics.authenticate = function (email, password, callback) {
+    Vendors.findOne({ email: email })
+        .exec((err, vendor) => {
+            if (err) {
+                return callback(err)
+            } else if (!vendor) {
+                const err = new Error('Vendor not found.');
+                err.status = 401;
+                return callback(err);
+            }
+            bcrypt.compare(password, vendor.password, function (err, result) {
+                if (result === true || !vendor.password) {
+                    return callback(null, vendor);
+                } else {
+                    return callback();
+                }
+            })
+        });
+}
+
+VendorSchema.pre('save', function (next) {
+    const vendor = this;
+    bcrypt.hash(vendor.password, 10, (err, hash) => {
+        if (err) {
+            return next(err);
+        }
+        vendor.password = hash;
+        next();
+    })
+  });
+  
 
 const Vendors = mongoose.model('Vendors', VendorSchema);
 

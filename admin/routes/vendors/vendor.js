@@ -1,22 +1,32 @@
 const router = require('express').Router();
+const { checkVendor } = require('../../middleware');
+const jwt = require("jsonwebtoken");
+const { secretKey } = require('../../configs');
+const { Vendors } = require('../../models');
 
-router.get('/', (req, res) => {
-    res.send("vendor");
-});
+router.post("/login", async (req, res, next) => {
+    if (req.body.logemail) {
+        Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
+            if (error || !vendor) {
+                var err = new Error('Wrong email or password.');
+                err.status = 401;
+                return next(err);
+            } else {
+                try {
+                const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '2h'});
+                res.statusCode = 200;
+                res.send(token);
+                } catch(err) {
+                    console.log(err);
+                    return next(err);
+                }
+            }
+        });
+    } else {
+        let err = new Error('All fields required.');
+        err.status = 400;
+        return next(err);
+    }
+})
 
-router.get('/vendorJobs', async (req, res) => {
-    const email = req.query.email;
-    axios({
-        url: `https://pangea.s.xtrf.eu/home-api/browser/?viewId=880&q.provider.emailAddress=eq(${email})`,
-        method: 'GET',
-        headers: {
-            'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj',
-        }
-    }).then(function (response) {
-        res.send(response.data);
-    }).catch(function (err) {
-        res.send(err);
-    });
-
-});
 module.exports = router;
