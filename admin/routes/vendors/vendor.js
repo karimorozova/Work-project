@@ -3,6 +3,7 @@ const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
+const { getVendor } = require('./getVendors');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -26,6 +27,22 @@ router.post("/login", async (req, res, next) => {
         let err = new Error('All fields required.');
         err.status = 400;
         res.status(400).send("All fields required.");
+    }
+})
+
+router.get("/info", checkVendor, async (req, res) => {
+    const { token } = req.query;
+    try {
+        jwt.verify(token, secretKey, async (error, decoded) => {
+            if(error) {
+                return res.send("Unauthorised");
+            }
+            const vendor = await getVendor({"_id": decoded.vendorId});
+            res.send(vendor);
+        });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Can't get Vendor info. Try later.");
     }
 })
 

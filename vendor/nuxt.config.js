@@ -5,6 +5,11 @@ module.exports = {
   modules: [
     '@nuxtjs/axios'
   ],
+
+  env: {
+    domain: process.env.API_URL
+  },
+
   axios: {
     baseURL: process.env.API_URL
   },
@@ -48,7 +53,8 @@ module.exports = {
     }
   },
   router: {
-    base: '/'
+    base: '/',
+    middleware: 'check-auth'
   },
   plugins: [
     '~/plugins/localStorageInject',

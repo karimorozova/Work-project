@@ -33,12 +33,12 @@ const middleware = {
     checkVendor(req, res, next) {
         if (req.headers['token-header']) {
             try {
-                const token = JSON.parse(req.headers['token-header']).value;
+                const token = req.headers['token-header'];
                 jwt.verify(token, secretKey, async (err, decoded) => {
                     if(err) {
-                        return res.status(403).send(err);
+                        return res.status(403).send(err.message);
                     }
-                    const vendor = await Vendors.findOne({"_id": decoded.vendor._id});
+                    const vendor = await Vendors.findOne({"_id": decoded.vendorId});
                     if(vendor) {
                         return next()
                     } else {
