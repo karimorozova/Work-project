@@ -26,6 +26,9 @@ const state = {
     coverLetterFiles: [],
     confirmed: ""
   },
-  currentRequests: 0
+  currentRequests: 0,
+  alertMessage: "",
+  isAlert: false,
+  alertType: "success"
 };
 export default state

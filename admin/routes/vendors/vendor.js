@@ -8,9 +8,9 @@ router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
         Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
             if (error || !vendor) {
-                var err = new Error('Wrong email or password.');
+                let err = new Error('Wrong email or password.');
                 err.status = 401;
-                return next(err);
+                res.status(401).send("Wrong email or password.");
             } else {
                 try {
                 const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '2h'});
@@ -18,14 +18,14 @@ router.post("/login", async (req, res, next) => {
                 res.send(token);
                 } catch(err) {
                     console.log(err);
-                    return next(err);
+                    res.status(500).send("Server Error. Try again later.");
                 }
             }
         });
     } else {
         let err = new Error('All fields required.');
         err.status = 400;
-        return next(err);
+        res.status(400).send("All fields required.");
     }
 })
 

@@ -40,13 +40,18 @@ export default {
         const result = await this.$axios.$post("/vendor/login", { ...this.form});
         localStorage.setItem("token", result);
         this.$router.push("/");
+        this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       } catch(err) {
         console.log(err);
+        this.alertToggle({message: err.response.data, isShow: true, type: "error"});
       }
     },
     forget(){
       this.forgotLink = !this.forgotLink;
-    }
+    },
+    ...mapActions({
+      alertToggle: "alertToggle"
+    })
   },
   computed: {},
   components: {
