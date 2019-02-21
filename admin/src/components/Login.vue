@@ -34,7 +34,7 @@ export default {
     };
   },
   methods: {
-    async login() {
+    async sendForm() {
       try {
       const loginResult = await this.$http.post('/login', this.form); 
       await this.loggingIn(loginResult.body);
@@ -146,6 +146,7 @@ export default {
       font-size: 15px;
       color: #2d2d2d;
       margin-bottom: 0;
+      margin-left: 5px;
     }
   }
   &__button {
@@ -174,16 +175,4 @@ export default {
   }
 }
 
-  //   @media (max-width: 625px) {
-  //     width: 450px;
-  //   }
-  //   @media (max-width: 560px) {
-  //     width: 350px;
-  //   }
-  //   @media (max-width: 374px) {
-  //     width: 300px;
-  //   }
-
-  //   border-radius: 26px;
-  // }
 </style>

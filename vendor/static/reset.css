@@ -2,6 +2,15 @@ html, body {
 	margin: 0;
 	padding: 0;
 	border: 0;
+	font-family: MyriadPro;
+}
+
+html {
+	line-height: 1.15
+}
+
+div, p, input, span, textarea, button, a, ul, li {
+	font-family: MyriadPro;
 }
 
 blockquote, q {
@@ -10,4 +19,9 @@ blockquote, q {
 
 input[type="checkbox"] {
     margin: 0;
+}
+
+@font-face {
+    font-family: MyriadPro;
+    src: url('~/assets/fonts/MyriadPro-Regular.otf');
 }
