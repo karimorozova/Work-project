@@ -7,9 +7,9 @@
                 span.selected(v-else) {{ placeholder }}
                 .arrow-button
                     img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': droppedLang}")
-            input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
+            input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")
             .drop(v-if="droppedLang")
-                .drop__item(v-for="(language, index) in filteredLangs" @click="chooseLang(index)" :class="{'active-lang': selectedLang.lang == language.lang}")
+                .drop__item(v-for="(language, main) in filteredLangs" @click="chooseLang(main)" :class="{'active-lang': selectedLang.lang == language.lang}")
                     span {{ language.lang }}
 </template>
 

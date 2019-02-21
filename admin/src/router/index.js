@@ -162,7 +162,7 @@ const router = new Router({
               props: true
             },
             {
-              path: '_contact/:index',
+              path: '_contact/:parent',
               name: '_contact',
               component: ContactDetails,
               props: true
@@ -189,7 +189,7 @@ const router = new Router({
               props: true
             },
             {
-              path: 'contact/:index',
+              path: 'contact/:main',
               name: 'contact',
               component: ContactDetails,
               props: true

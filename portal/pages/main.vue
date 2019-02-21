@@ -2,7 +2,7 @@
     .clientsportalWrapper(v-if="cookies && client")
         .clientsTop
             .clientsTop__clientName
-                a(href="/main") 
+                a(href="/main")
                   h2.clientsPortal CLIENT PORTAL
             .clientsTop__searchBlock
                 .dropdownWrapper
@@ -38,18 +38,18 @@
             .clientsNavbar
               .clientsNavbar__sideBar
                 ul.navbar__ulist
-                  li.navbar__ulist_item(@click="switchInfo(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
+                  li.navbar__ulist_item(@click="switchInfo(parent)" v-for="(note, main) in navbarList" :class="{active: note.active}")
                     .image
-                      img(v-if="!note.active" :src="note.imgWhite") 
+                      img(v-if="!note.active" :src="note.imgWhite")
                       img(v-else :src="note.imgBrown")
                     .title(:class="{showTitle: true}")
                       span {{ note.title }}
                 .logoImage(v-if="expander")
                 .balloons(v-else)
             .clientsMainWrapper__inner
-              .breadCrumbs 
-                span.accountName {{ user.firstName }} 
-                span.arrows(v-if="user.firstName") >> 
+              .breadCrumbs
+                span.accountName {{ user.firstName }}
+                span.arrows(v-if="user.firstName") >>
                 span {{ path }}
                 span.arrows(v-if="clientRequestShow") >>
                 span(v-if="clientRequestShow") {{ serviceType }}
@@ -57,7 +57,7 @@
                 .mainInfo(v-if="visibleChecker == false")
                   .clientsAll
                       .quotesComponent
-                        .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}") 
+                        .clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}")
                           .clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes
                             img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")
                           .clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")
@@ -77,7 +77,7 @@
               documents(v-if="documentsShow")
               Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")
               Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
-              Confirmorder(v-if="thanks" :thanksService="thanksService")             
+              Confirmorder(v-if="thanks" :thanksService="thanksService")
 </template>
 
 <script>
@@ -195,7 +195,7 @@ export default {
       });
       this.client = result.data.client;
       if (!this.client) {
-        window.location.replace("/");        
+        window.location.replace("/");
       }
       this.user = result.data.user;
       this.projects = [];
@@ -241,7 +241,7 @@ export default {
           this.documentsShow = false;
           this.clientRequestShow = false;
           this.path = "All Projects"
-          
+
         }
 
         if (index == 2) {
@@ -251,7 +251,7 @@ export default {
           this.detailedProjectVisible = false;
           this.documentsShow = false;
           this.clientRequestShow = false;
-          this.path = "Invoices"          
+          this.path = "Invoices"
         }
 
         if (index == 3) {
@@ -261,7 +261,7 @@ export default {
           this.detailedProjectVisible = false;
           this.invoicesShow = false;
           this.clientRequestShow = false;
-          this.path = "Documents"                    
+          this.path = "Documents"
         }
         this.thanks = false;
         this.accountInfo = false;
@@ -319,8 +319,8 @@ export default {
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    dataForRequest(ind) {     
-      if(this.user) {        
+    dataForRequest(ind) {
+      if(this.user) {
         let formData = {
           name: this.user.firstName,
           email: this.user.email,

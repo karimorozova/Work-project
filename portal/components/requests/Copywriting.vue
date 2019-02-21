@@ -6,7 +6,7 @@
                     .col-1__block0
                       .lblock
                         .name
-                          label.asterisk PROJECT NAME: 
+                          label.asterisk PROJECT NAME:
                           input(:class="classes('projectName')" type="text" placeholder="50 characters maximum" v-model="projectName")
                       .rblock
                         .name
@@ -24,7 +24,7 @@
                             span.inner-langs__title Language(s)
                               .inner-langs__select
                                   span.select-text.clarify(:class="{ color: selectLang.length }")
-                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }}; 
+                                      template(v-if="selectLang.length > 0" v-for="language in selectLang") {{ language.lang }};
                                       template(v-if="selectLang.length == 0") Select
                                       .span-wrapper(@click.self='showLang')
                                       .icon(:class="{ reverse: langDrop }")
@@ -38,7 +38,7 @@
                     .col-3__block1
                         span.block1 PACKAGE
                     .col-3__block2
-                        .col-3__block2-sub(v-for="(item, index) in col3_block2" @click="switchcheck(index)" :class="{check: item.check}")
+                        .col-3__block2-sub(v-for="(item, parent) in col3_block2" @click="switchcheck(main)" :class="{check: item.check}")
                             .checkTitle
                                 .selected
                                     .empty-check
@@ -48,7 +48,7 @@
                     .col-1__block1
                         span.block1 TYPE
                     .col-1__block2
-                        .col-1__block2-sub1(v-for="(item, index) in col1_block2" @click="switchBg(index)" :class="{activeType: item.active}")
+                        .col-1__block2-sub1(v-for="(item, parent) in col1_block2" @click="switchBg(parent)" :class="{activeType: item.active}")
                           span.sub1 {{ item.title }}
                           img(v-if="item.active" :src="item.imageN")
                           img(v-else :src="item.imageW")
@@ -131,19 +131,19 @@
                     .col-5__block1
                         span.block1 STRUCTURE TO INCLUDE
                     .block1-wrapper
-                      .sub(v-for="(item, index) in col5_block1" @click="switchStructure(index)" :class="[{check: item.check}, {sub_unbord: index == 3}]")
+                      .sub(v-for="(item, main) in col5_block1" @click="switchStructure(main)" :class="[{check: item.check}, {sub_unbord: main == 3}]")
                           .selected
                             .empty-check
                               .check-sel(v-if="item.check")
-                          span.title(:class="[{sec_title: index == 1}, {four_title: index == 3}]") {{ item.title }}
-                          img.secImg(:src="item.image1" v-if="index != 3")
-                          textarea.inpbl5(v-if="index == 3" :class="{textarea_vis: true}" v-model="item.input" @click.prevent="switchStructure(index)" rows="1" @keyup="autoGrowInp5()")
+                          span.title(:class="[{sec_title: main == 1}, {four_title: main == 3}]") {{ item.title }}
+                          img.secImg(:src="item.image1" v-if="parent != 3")
+                          textarea.inpbl5(v-if="parent == 3" :class="{textarea_vis: true}" v-model="item.input" @click.prevent="switchStructure(parent)" rows="1" @keyup="autoGrowInp5()")
                 .col-6
                     .col-6__block1
                         span.block1 STYLE
                         span.star *
                     .col-6__block2
-                        .sub(v-for="(item, index) in col6__block1" @click="switchBlock6(index)" :class="{check: item.check}")
+                        .sub(v-for="(item, parent) in col6__block1" @click="switchBlock6(main)" :class="{check: item.check}")
                             .selected
                                 .empty-check
                                     .check-sel(v-if="item.check")
@@ -163,9 +163,9 @@
                         span.block1 DESIGN
                         .subject-toggle.toggle(@click="toggleSub" :class="{positive: designToggle}")
                             .toggler
-                            .yes 
+                            .yes
                                 span YES
-                            .no 
+                            .no
                                 span NO
                     .col-8__block3(v-if="designToggle")
                       .designChekers
@@ -178,9 +178,9 @@
                         span.block1 SEO
                         .subject-toggle2.toggle(@click="toggleSub2" :class="{positive: seoToggle}")
                             .toggler
-                            .yes 
+                            .yes
                                 span YES
-                            .no 
+                            .no
                                 span NO
                         .voiceChekers.seoadd(v-if="seoToggle")
                             .inner-option.additionalInn
@@ -188,9 +188,9 @@
                                     .checker(v-if="meta.check")
                                 span.voiceTitle {{ meta.title }}
                     .col-9__block2(v-if="seoToggle")
-                      .sub(v-for="(item, index) in col9__block2")
+                      .sub(v-for="(item, parent) in col9__block2")
                         .sub__choose
-                          span.title1 {{ item.title1 }}                                
+                          span.title1 {{ item.title1 }}
                           input(v-model="item.input" value="item.input")
                     .copydetails__quote
                       .send(:class="{copyoptionChecked: copysendOption}" @click="copychooseBegin")
@@ -214,14 +214,14 @@
               .message
                 .closeWarning(@click="closeWarning")
                   i.fa.fa-times
-                p(v-for="err in errors") {{ err }}              
+                p(v-for="err in errors") {{ err }}
         .orderInfoCopy(:style="{transform: slide}")
           .orderInfoCopy__title
             h3 YOUR ORDER
           .orderInfoCopy__summary
             .orderInfo__summary-service
               span 1
-              label SERVICE: 
+              label SERVICE:
               p.check {{ service }}
             .orderInfoCopy__summary-type
               span 2
@@ -231,11 +231,11 @@
               span 3
               label LANGUAGE:
               p.check &nbsp;
-                template(v-for="language of selectLang") {{ language.lang }}; 
+                template(v-for="language of selectLang") {{ language.lang }};
                 template(v-if="selectLang == 0") Select
             .orderInfoCopy__summary-package
               span 4
-              label PACKAGE: 
+              label PACKAGE:
               p.check {{ genBrief.package }}
             .orderInfoCopy__summary-deadline
               label SUGGESTED DEADLINE
@@ -606,7 +606,7 @@ export default {
       })
     },
     switchBlock6(index) {
-      let style = this.col6__block1;      
+      let style = this.col6__block1;
       if (style[index].check) {
         this.styleSelect = style[index].title;
         return true
@@ -707,7 +707,7 @@ export default {
       this.copystartOption = true
     },
     copyChangeRefFiles(event){
-      this.refFiles = event.target.files[0]; 
+      this.refFiles = event.target.files[0];
     },
     clearForm() {
       this.projectName = "";
@@ -787,16 +787,16 @@ export default {
 
         var sendForm = new FormData();
 
-        sendForm.append("typeOfRequest", typeOfRequest);        
+        sendForm.append("typeOfRequest", typeOfRequest);
         sendForm.append("projectName", this.request.projectName);
         sendForm.append("date", this.request.date);
         sendForm.append("contactName", this.request.contactName);
         sendForm.append("contactEmail", this.request.contactEmail);
         sendForm.append("service", JSON.stringify(serviceFull));
-        sendForm.append("industry", this.request.industry); 
+        sendForm.append("industry", this.request.industry);
         sendForm.append("status", "New");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
-        sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages)); 
+        sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages));
         sendForm.append("web", this.request.web);
         sendForm.append("skype", this.request.skype);
         sendForm.append("phone", this.request.phone);
@@ -816,7 +816,7 @@ export default {
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
         if(this.copysendOption) {
-          const result = await this.$axios.$post('api/request', sendForm);          
+          const result = await this.$axios.$post('api/request', sendForm);
         }
         if(this.copystartOption) {
           const result = await this.$axios.$post('api/project-request', sendForm);
@@ -826,32 +826,32 @@ export default {
       async checkForm(event) {
         this.request = {
           projectName: this.projName,
-          date: "", 
-          contactName: this.$store.state.clientInfo.name, 
+          date: "",
+          contactName: this.$store.state.clientInfo.name,
           contactEmail: this.$store.state.clientInfo.email,
-          service: this.$store.state.clientInfo.service, 
-          industry: this.$store.state.clientInfo.industry, 
+          service: this.$store.state.clientInfo.service,
+          industry: this.$store.state.clientInfo.industry,
           status: 'New',
-          sourceLanguage: {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'}, 
-          targetLanguages: this.selectLang, 
+          sourceLanguage: {name : 'English (United Kingdom)', id: '73', xtrf: '73', symbol: 'EN-GB', lang: 'English (United Kingdom)'},
+          targetLanguages: this.selectLang,
           web: this.$store.state.clientInfo.web,
-          skype: this.$store.state.clientInfo.skype, 
-          phone: this.$store.state.clientInfo.phone, 
+          skype: this.$store.state.clientInfo.skype,
+          phone: this.$store.state.clientInfo.phone,
           companyName: this.$store.state.clientInfo.companyName,
           accountManager: "None selected",
           brief: "",
           files: this.files,
-          createdAt: Date.now    
+          createdAt: Date.now
       }
 
       this.errors = [];
       if(!this.projectName) this.errors.push("Project name required!");
       if(!this.request.targetLanguages.length) this.errors.push("Target language(s) required!");
       if(!this.genBrief.briefDescr) this.errors.push("Brief description required!");
-      if(!this.genBrief.briefTopics) this.errors.push("Please, enter topics of brief");      
+      if(!this.genBrief.briefTopics) this.errors.push("Please, enter topics of brief");
       if(!this.toneSelect.length) this.errors.push("Please, choose tone of voice");
       if(!this.errors.length){
-        this.sendForm();         
+        this.sendForm();
         console.log("sent")
         // window.top.location.href = "https://www.pangea.global/thank-you";
         var uniqueCopywr = {
@@ -892,7 +892,7 @@ export default {
      }, 4000)
     },
     getServices() {
-      this.services = this.$store.state.services;     
+      this.services = this.$store.state.services;
     },
     classes(err) {
       for(let i = 0; i < this.errors.length; i++ ) {
@@ -977,7 +977,7 @@ export default {
           result.push(item);
         }
       })
-      return result;      
+      return result;
     },
     sortedLanguages() {
       let result = [];
@@ -1004,7 +1004,7 @@ export default {
           }
         }
       }
-      return result;      
+      return result;
     }
   },
   watch: {

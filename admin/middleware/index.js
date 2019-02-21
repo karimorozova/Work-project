@@ -100,7 +100,7 @@ const middleware = {
         for(let route of routesArray) {
             let length = route.length;
             if(req.originalUrl.slice(0, length) === route) {
-                res.sendFile(path.resolve('./dist/index.html'));
+                res.sendFile(path.resolve('./dist/main.html'));
                 return;
             }
         }

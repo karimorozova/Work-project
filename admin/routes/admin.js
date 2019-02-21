@@ -8,22 +8,22 @@ const jwt = require("jsonwebtoken");
 const { secretKey } = require('../configs');
 
 // router.get('/', (req, res) => {
-//     res.sendFile(path.resolve() + '/dist/index.html');
+//     res.sendFile(path.resolve() + '/dist/parent.html');
 // });
 
 // router.get('/tasks-report', (req, res) => {
-//     res.sendFile(path.resolve() + '/dist/index.html');
+//     res.sendFile(path.resolve() + '/dist/main.html');
 // });
 // router.get('/register', (req, res) => {
-//     res.sendFile(path.resolve() + '/dist/index.html');
+//     res.sendFile(path.resolve() + '/dist/parent.html');
 // });
 
 // router.get('/login', (req, res) => {
-//     res.sendFile(path.resolve() + '/dist/index.html');
+//     res.sendFile(path.resolve() + '/dist/parent.html');
 // });
 
 // router.get('/main', (req, res) => {
-//     res.sendFile(path.resolve() + '/dist/index.html');
+//     res.sendFile(path.resolve() + '/dist/parent.html');
 // });
 
 // GET /logout

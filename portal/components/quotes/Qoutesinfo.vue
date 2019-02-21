@@ -4,60 +4,60 @@
             .shortInfo
                 .row__columns
                     .col
-                        .col__title 
+                        .col__title
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow.png")
                     .col
                         .col__title
                             span Project ID
-                            img(src="../../assets/images/white-arrow.png")                        
+                            img(src="../../assets/images/white-arrow.png")
                     .col.col-5
-                        .col__title 
+                        .col__title
                             span Project Name
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                       
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col.col-4
-                        .col__title 
+                        .col__title
                             span Status
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col
-                        .col__title 
+                        .col__title
                             span Deadline
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                  
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col.col-5.colSplit
-                        .col__title 
+                        .col__title
                             span Total Cost
                         .col
                         .col
         .scrollingArea
-          .row(v-for="(quote,index) in clientQuotes")
+          .row(v-for="(quote,parent) in clientQuotes")
               .shortInfo
                   .row__columns_info
-                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
-                      .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.idNumber }}
-                      .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.name }}
-                      .col.col-4(@click="openQuotesInfoDetailed(index)") {{ quote.status }}
-                      .col(@click="openQuotesInfoDetailed(index)") 
+                      .col(@click="openQuotesInfoDetailed(parent)") {{ quote.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                      .col.proj(@click="openQuotesInfoDetailed(main)") {{ quote.idNumber }}
+                      .col.col-5(@click="openQuotesInfoDetailed(parent)") {{ quote.name }}
+                      .col.col-4(@click="openQuotesInfoDetailed(parent)") {{ quote.status }}
+                      .col(@click="openQuotesInfoDetailed(main)")
                         span(v-if="quote.deadline") {{ quote.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
                       .col.col-5.colSplit
                           .col
-                              span(@click="openQuotesInfoDetailed(index)") {{ quote.totalAgreed.formattedAmount }}
+                              span(@click="openQuotesInfoDetailed(parent)") {{ quote.totalAgreed.formattedAmount }}
                           .col.approve
-                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")                      
+                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")
                           .col.reject
                               img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'" @click="rejectQuote(quote)")
-                                         
+
 </template>
 
 <script>
@@ -128,7 +128,7 @@ export default {
       quote.status = "ACCEPTED"
     },
     async rejectQuote(quote) {
-      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})      
+      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})
       .then(res => console.log(res))
       .catch(err => console.log(err));
       quote.status = "REJECTED";

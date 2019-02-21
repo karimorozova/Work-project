@@ -1,10 +1,10 @@
 <template lang="pug">
 .language-pairs
-    .language-pairs__row(v-for="(pair, index) in selectedLangPairs")
+    .language-pairs__row(v-for="(pair, main) in selectedLangPairs")
         .language-pairs__item
             SelectLanguage(
                 refersTo="source"
-                :parentIndex="index"
+                :parentIndex="main"
                 placeholder="Source language"
                 :selectedLang="pair.source"
                 @chooseLang="setPairLanguage"
@@ -14,7 +14,7 @@
         .language-pairs__item
             SelectLanguage(
                 refersTo="target"
-                :parentIndex="index"
+                :parentIndex="main"
                 placeholder="Target language"
                 :selectedLang="pair.target"
                 @chooseLang="setPairLanguage"
@@ -22,11 +22,11 @@
         .language-pairs__delete
             .language-pairs__button_rotated
                 Add(
-                    @makeAction="(e) => deleteElement(e, index)"
+                    @makeAction="(e) => deleteElement(e, main)"
                 )
             span.language-pairs__button-label_opacity Delete
     transition(name="slide-fade")
-        .language-pairs__button(v-if="showAddButton") 
+        .language-pairs__button(v-if="showAddButton")
             Add(
                 @makeAction="addLanguagePair"
                 )
@@ -35,7 +35,7 @@
 
 <script>
 import SelectLanguage from "./SelectLanguage";
-import Add from "@/components/buttons/Add" 
+import Add from "@/components/buttons/Add"
 
 export default {
     data() {

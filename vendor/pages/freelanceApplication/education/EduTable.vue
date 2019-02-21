@@ -4,9 +4,9 @@
         .table__row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}") {{ field.label }}
     .table__tbody
-        .table__row(v-for="(row, index) of tableData")
+        .table__row(v-for="(row, main) of tableData")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width}")
-                slot(:name="field.key" :row="row" :index="index")
+                slot(:name="field.key" :row="row" :index="main")
 </template>
 
 <script>

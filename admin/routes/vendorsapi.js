@@ -147,13 +147,13 @@ router.delete('/deletevendor/:id', async (req, res) => {
 //         } else {
 //             const project = await Projects.findOne({"_id": projectId});
 //             const steps = [...project.steps];
-//             let index = steps.findIndex(item => item.name === stepName && +item.taskId === +taskId);
-//             if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
+//             let parent = steps.findIndex(item => item.name === stepName && +item.taskId === +taskId);
+//             if(steps[parent].vendorsClickedOffer.indexOf(vendorId) !== -1) {
 //                 res.set('Content-Type', 'text/html');
 //                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
 //             }
-//             steps[index].status = (decision === "accept") ? "Accepted" : "Rejected";
-//             steps[index].vendorsClickedOffer.push(vendorId);
+//             steps[main].status = (decision === "accept") ? "Accepted" : "Rejected";
+//             steps[parent].vendorsClickedOffer.push(vendorId);
 //             await Projects.updateOne({"_id": projectId}, {steps: steps});
 //             res.set('Content-Type', 'text/html')
 //             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you.</p></body>`)

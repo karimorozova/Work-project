@@ -1,7 +1,7 @@
 <template lang="pug">
 .file-list
-    .file-list__item(v-for="(file, index) in files") {{ file.name }}
-        span.file-list__delete(@click="deleteFile(index)") +
+    .file-list__item(v-for="(file, main) in files") {{ file.name }}
+        span.file-list__delete(@click="deleteFile(parent)") +
 </template>
 
 <script>

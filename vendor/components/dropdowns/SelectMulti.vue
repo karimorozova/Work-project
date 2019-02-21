@@ -6,7 +6,7 @@
             .arrow-button
                 img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, index) in options" @click="chooseOptions(index)")
+            .drop__item(v-for="(option, parent) in options" @click="chooseOptions(parent)")
                 .checkbox
                     .checkbox__check(:class="{checked: activeClass(option)}")
                 span {{ option }}
@@ -57,7 +57,7 @@ export default {
         activeClass(elem) {
             return (this.selectedOptions.indexOf(elem) != -1 ||
                 this.otherChoice.indexOf(elem) != -1 ||
-                this.otherDtpChoice.indexOf(elem) != -1 || 
+                this.otherDtpChoice.indexOf(elem) != -1 ||
                 this.otherSoftwareChoice.indexOf(elem) != -1)
         }
     },

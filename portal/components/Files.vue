@@ -1,11 +1,11 @@
 <template lang="pug">
     .filesSelect
-        .select__selected(:class='{errorActive: !projects[index].fileType.text && !projects[index].fileType.exist, savedDisable: projects[index].icons[0].status}')
+        .select__selected(:class='{errorActive: !projects[main].fileType.text && !projects[main].fileType.exist, savedDisable: projects[main].icons[0].status}')
             span {{ selectFile }}
             .icon(@click="showFiles")
                 i.fa.fa-caret-down
-        .drop(v-if="droppedFile && projects[index].icons[1].status" v-click-outside="outClick")
-            span.drop_item(@click="changeFile(typeIndex, index)" v-for="(type, typeIndex) in fileType") {{ type }}
+        .drop(v-if="droppedFile && projects[main].icons[1].status" v-click-outside="outClick")
+            span.drop_item(@click="changeFile(typeIndex, main)" v-for="(type, typeIndex) in fileType") {{ type }}
 </template>
 
 <script>
