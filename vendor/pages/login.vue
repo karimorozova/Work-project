@@ -40,7 +40,7 @@ export default {
         const result = await this.$axios.$post("/vendor/login", { ...this.form});
         localStorage.setItem("token", result);
         document.cookie = `vendor=${result}; max-age=6200;${this.domain}`;
-        this.$router.push("/");
+        this.$router.push("/dashboard");
         this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       } catch(err) {
         console.log(err);
