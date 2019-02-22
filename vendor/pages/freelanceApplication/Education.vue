@@ -3,17 +3,17 @@
     .education__main-title EDUCATION
     span.education__comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
     EduTable(
-        :fields="fields"
+        :fields="fields" 
         :tableData="tableData"
         :tbodyHasScroll="tbodyHasScroll"
         )
-        template(slot="study" slot-scope="{ row, main }")
+        template(slot="study" slot-scope="{ row, index }")
             SelectSingle(
                 :selectedOption="row.study"
                 :options="options"
                 :activeObject="row"
                 @toggleDropMenu="toggleDropMenu"
-                @chooseOption="(e) => chooseOption(e, main)"
+                @chooseOption="(e) => chooseOption(e, index)"
                 )
         template(slot="field" slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.field")
@@ -28,8 +28,8 @@
 
 <script>
 import EduTable from "./education/EduTable";
-import SelectSingle from "@/components/dropdowns/tableDrops/SelectSingle"
-import Add from "@/components/buttons/Add"
+import SelectSingle from "@/components/dropdowns/tableDrops/SelectSingle" 
+import Add from "@/components/buttons/Add" 
 
 export default {
     data() {
@@ -111,7 +111,7 @@ export default {
         font-size: 12px;
     }
     &__input {
-        box-sizing: border-box;
+        box-sizing: border-box; 
         border: none;
         outline: none;
         width: 99%;

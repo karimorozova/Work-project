@@ -9,7 +9,7 @@
                     img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': timezonesDropped}")
             input.search(v-if="timezonesDropped" type="text" v-model="timezoneSearch" placeholder="Search")
             .drop(v-if="timezonesDropped")
-                .drop__item(v-for="(timezone, main) in foundZones" @click="chooseZone(main)" :class="{'active-zone': timezoneSelected == timezone.zone}")
+                .drop__item(v-for="(timezone, index) in foundZones" @click="chooseZone(index)" :class="{'active-zone': timezoneSelected == timezone.zone}")
                     span {{ timezone.zone }}
 </template>
 

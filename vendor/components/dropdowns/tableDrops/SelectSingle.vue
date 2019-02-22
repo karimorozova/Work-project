@@ -1,12 +1,12 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{'z-main': isDropped}")
+    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") Select
             .arrow-button(@click="toggleOptions")
                 img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, parent) in options" @click="chooseOption(parent)" :class="{active: selectedOption == option}")
+            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: selectedOption == option}")
                 span {{ option }}
 </template>
 

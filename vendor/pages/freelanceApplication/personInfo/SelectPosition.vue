@@ -8,7 +8,7 @@
             .arrow-button
                 img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': posDropped}")
         .drop(v-if="posDropped")
-            .drop__item(v-for="(position, main) in positions" @click="choosePosition(main)")
+            .drop__item(v-for="(position, index) in positions" @click="choosePosition(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: activeClass(position)}")
                 span {{ position }}
@@ -46,7 +46,7 @@ export default {
             this.$emit('choosePosition', {position: this.positions[index]})
         },
         activeClass(elem) {
-            return (this.selectedPositions.indexOf(elem) != -1 ||
+            return (this.selectedPositions.indexOf(elem) != -1 || 
                 this.otherChoice.indexOf(elem) != -1)
         }
     },

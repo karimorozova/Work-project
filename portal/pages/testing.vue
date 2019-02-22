@@ -101,7 +101,7 @@
 
 <script>
 // import ElementUI from "element-ui";
-// import "element-ui/lib/theme-chalk/main.css";
+// import "element-ui/lib/theme-chalk/index.css";
 // import Datatables from "vue-data-tables";
 
 export default {
@@ -139,7 +139,7 @@ export default {
           flow_type_code: "repair"
         }
       ],
-
+ 
       titles: [
         {
           prop: "flow_no",
