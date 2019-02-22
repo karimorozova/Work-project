@@ -104,7 +104,6 @@
           const token = localStorage.getItem("token");
           const result = await this.$axios.$get(`/vendor/info?token=${token}`);
           this.vendor = result;
-          console.log(111,this.vendor);
         } catch(err) {
           this.alertToggle({message: err.response.data, isShow: true, type: "error"});
         }
