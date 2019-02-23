@@ -4,22 +4,22 @@
       .table__thead-row
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 20}")
+    .table__tbody.scroll(:class="{'tbody_visible-overflow': tableData.length}")
       .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
-      :errors="errors"
-        :isAbsolute="isAbsolute"
-        @closeErrors="closeErrors")
+    :errors="errors"
+    :isAbsolute="isAbsolute"
+    @closeErrors="closeErrors")
     .table__approve(v-if="isApproveModal")
       ApproveModal(
       text="Are you sure?"
       approveValue="Yes"
       notApproveValue="Cancel"
-        @approve="approve"
-          @notApprove="notApprove"
-          @close="closeModal"
+      @approve="approve"
+      @notApprove="notApprove"
+      @close="closeModal"
       )
 </template>
 
@@ -82,22 +82,46 @@
 <style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
 
+  .scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    background-color: #F2F2F2;
+  }
+
+  .scroll::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: inherit;
+  }
+
+  .scroll::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: $brown-shadow;
+  }
+
   .table {
     width: 100%;
+
     &__thead {
       .table__thead-row {
-        background-color: $thead-background;
+        background-color: $brown-border;
         color: $white;
       }
     }
+
     &__tbody {
       max-height: 600px;
       overflow-y: overlay;
-      margin-bottom: 20px;
-      border: 0.5px solid $cell-border;
-      border-bottom: 1px solid $cell-border;
+      /*margin-bottom: 20px;*/
+      border: 0.5px solid $light-brown;
+      border-bottom: 1px solid $light-brown;
       border-top: none;
     }
+
     &__thead-cell {
       box-sizing: border-box;
       font-size: 14px;
@@ -105,35 +129,44 @@
       border: 0.5px solid $cell-border;
       border-right: none;
       border-left: 0.5px solid $white;
+
       &:first-child {
         border-left: 0.5px solid $cell-border;
       }
+
       &:last-child {
         border-right: 0.5px solid $cell-border;
       }
     }
+
     &__tbody-cell {
       box-sizing: border-box;
       font-size: 14px;
       padding: 7px 5px 5px 6px;
       border: 1px solid $cell-border;
       border-right: none;
+
       &:last-child {
         border-right: 0.5px solid $cell-border;
       }
+
       &:focus-within {
         box-shadow: inset 0 0 5px $cell-border;
       }
     }
+
     &__thead-row, &__tbody-row {
       display: flex;
     }
+
     &_scroll-padding {
       padding-right: 15px;
     }
+
     &_bottom-bordered {
       border-bottom: 0.5px solid $cell-border;
     }
+
     &__approve {
       position: absolute;
       z-index: 50;
@@ -150,6 +183,8 @@
 
   .tbody_visible-overflow {
     overflow: visible;
+    overflow-y: scroll;
+    height: 136px;
   }
 
 </style>

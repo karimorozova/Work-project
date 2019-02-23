@@ -3,17 +3,17 @@
     .jobs_block
       h3 Upcoming Jobs
       .jobs
-        .jobs_table
+        .jobs__table
           SettingsTable(
           :fields="fields"
-            :tableData="jobs"
-              :errors="errors"
-              :areErrors="areErrors"
-              :isApproveModal="isDeleting"
-              @closeErrors="closeErrors"
-              @approve="rejectJob"
-              @notApprove="setDefaults"
-              @closeModal="setDefaults"
+          :tableData="jobs"
+          :errors="errors"
+          :areErrors="areErrors"
+          :isApproveModal="isDeleting"
+          @closeErrors="closeErrors"
+          @approve="rejectJob"
+          @notApprove="setDefaults"
+          @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -43,21 +43,21 @@
               .jobs__data(v-if="currentActive !== index") {{ row.amount }}
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons
-                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}")
+                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
     .jobs_block
       h3 Closed Jobs
       .jobs
-        .jobs_table
+        .jobs__table
           SettingsTable(
           :fields="fields"
-            :tableData="jobs"
-              :errors="errors"
-              :areErrors="areErrors"
-              :isApproveModal="isDeleting"
-              @closeErrors="closeErrors"
-              @approve="rejectJob"
-              @notApprove="setDefaults"
-              @closeModal="setDefaults"
+          :tableData="jobs"
+          :errors="errors"
+          :areErrors="areErrors"
+          :isApproveModal="isDeleting"
+          @closeErrors="closeErrors"
+          @approve="rejectJob"
+          @notApprove="setDefaults"
+          @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -87,7 +87,7 @@
               .jobs__data(v-if="currentActive !== index") {{ row.amount }}
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons
-                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}")
+                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
 </template>
 
 <script>
@@ -106,10 +106,10 @@
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "10%", padding: "0"},
         ],
         jobs: [],
-        icons: {
-          approve: {icon: require("../../assets/images/Approve-icon.png"), active: true},
-          reject: {icon: require("../../assets/images/Reject-icon.png"), active: true}
-        },
+        icons: [
+          {icon: require("../../assets/images/Approve-icon.png"), active: true, type: "approve"},
+          {icon: require("../../assets/images/Reject-icon.png"), active: true, type: "reject"}
+        ],
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
@@ -136,24 +136,53 @@
             "projectName": "Market resources(Updated)",
             "amount": "1000 €",
             "status": "Translation",
-          }, {
-            "type": "Accepted",
-            "username": "kriti.chris",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "gender": "FEMALE",
-            "amount": "1000 €",
-            "status": "QA",
-          }, {
-            "type": "Accepted",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "status": "Proofing",
-          }
+          },
+            {
+              "type": "Accepted",
+              "username": "kriti.chris",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "gender": "FEMALE",
+              "amount": "1000 €",
+              "status": "QA",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            }
           ];
         } catch (err) {
           // this.alertToggle({message: err.message, isShow: true, type: "error"});
@@ -193,15 +222,25 @@
   .vendor_portal_wrapper {
     width: 100%;
     padding: 30px;
+
     .jobs_block {
       color: $main-color;
+
       .jobs {
-        /*width: 90%;*/
-        /*margin: 0 auto;*/
+        width: 1041px;
+        height: 172px;
         background-color: $white;
-        padding: 20px;
         box-shadow: 0 0 10px $main-color;
+        box-sizing: border-box;
+        padding: 3px 0;
+
+        &__table {
+          width: 1027px;
+          margin: 0 auto;
+        }
+
         position: relative;
+
         &__data, &__editing-data {
           height: 32px;
           padding: 0 5px;
@@ -209,12 +248,15 @@
           align-items: center;
           box-sizing: border-box;
         }
+
         &__editing-data, &__drop-menu {
           box-shadow: inset 0 0 7px $brown-shadow;
         }
+
         &__drop-menu {
           position: relative;
         }
+
         &__data-input {
           box-sizing: border-box;
           width: 100%;
@@ -222,17 +264,25 @@
           outline: none;
           color: $main-color;
         }
+
         &__icons {
           padding-top: 3px;
           display: flex;
           justify-content: center;
           align-items: center;
         }
+
         &__icon {
           cursor: pointer;
           opacity: 0.5;
           margin-right: 8px;
+          transition: transform 0.1s ease-out;
+
+          &:hover {
+            transform: scale(1.2);
+          }
         }
+
         &_opacity {
           opacity: 1;
         }
