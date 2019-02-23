@@ -16,7 +16,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .blanket {
     padding: 10px 40px;
     color: #67573e;

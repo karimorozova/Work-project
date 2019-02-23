@@ -1,5 +1,5 @@
 <template lang="pug">
-.loading(v-if="currentRequests")
+.loading(v-show="loading || currentRequests > 0")
     .loading__message
         span.loading__text Loading 
         .loading__spinner
@@ -10,10 +10,15 @@ import { mapGetters } from "vuex";
 
 export default {
     data: () => ({
-
+        loading: false
     }),
     methods: {
-        
+        start() {
+            this.loading = true;
+        },
+        finish() {
+            this.loading = false;
+        }
     },
     computed: {
         ...mapGetters({

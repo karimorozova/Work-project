@@ -1,286 +1,157 @@
 <template lang="pug">
-  .adminportal-wrapper
-    .admin-top
-      .admin-top__admin-name
-        h2.adminPortal VENDOR PORTAL
-      .admin-top__search-block
-        .dropdown-wrapper
-          .imgwrap(@click="showSlider")
+  .vendor-portal
+    .vendor-portal__top
+      .vendor-portal__admin-name
+        h2.vendor-portal__adminPortal VENDOR PORTAL
+      .vendor-portal__search-block
+        .vendor-portal__dropdown-wrapper
+          .vendor-portal__imgwrap
             img(src="../assets/images/Other/admin-button-icon.png" )
             span.spwrap configuration
-        .woman-wrapper
-          img.woman-wrapper__photo(src="../assets/images/client-icon_image.png")
-          .account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
-            .account-block
-              .account-block__info
-                .icon
+        .vendor-portal__woman-wrapper
+          img.vendor-portal__photo(src="../assets/images/client-icon_image.png")
+          .vendor-portal__account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
+            .vendor-portal__account-block
+              .vendor-portal__info
+                .vendor-portal__icon
                   img(src="../assets/images/man.png")
-                .personal__data
-                  .personal__data_name {{ vendor.firstName }}
-                  .personal__data_email {{ vendor.email }}
-              .account-block__myaccount(@click="showAccountInfo")
-                .human_icon
+                .vendor-portal__personal
+                  .vendor-portal__personal-data {{ vendor.firstName }}
+                  .vendor-portal__personal-data {{ vendor.email }}
+              .vendor-portal__item(@click="showAccountInfo")
+                .vendor-portal__icon
                   img(src="../assets/images/man.png")
-                .my_account My Account
-              .account-block__exit(@click="signOut")
-                .icon_exit
+                .vendor-portal__list-label My Account
+              .vendor-portal__item(@click="signOut")
+                .vendor-portal__icon
                   img(src="../assets/images/sign-out.png")
-                .sign_out Sign Out
-        .chevron-wrapper
-          .chevron(@click="showAccountMenu")
-    .admin-main-wrapper
-      .admin-navbar
-        .admin-navbar__sidebar
-          ul.navbar__menu
-            li.navbar__menu_item(@click="switchSection(main)" v-for="(note, main) in navbarList" :class="{active: note.active}")
-              .image
+                .vendor-portal__list-label Sign Out
+        .vendor-portal__arrow-block
+          .vendor-portal__arrow(@click="showAccountMenu")
+    .vendor-portal__main
+      .vendor-portal__nav
+        .vendor-portal__sidebar
+          ul.vendor-portal__nav-menu
+            li.vendor-portal__nav-item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{'vendor-portal_active': note.active}")
+              .vendor-portal__image
                 img(:src="note.imgBrown")
-              .title
+              .vendor-portal__nav-title
                 span {{ note.title }}
-          .balloons
-      nuxt-child
-      <!--router-view(:isSidebar="isSidebar"-->
-      <!--@refreshXtmCustomers="refreshXtmCustomers"-->
-      <!--@getCustomerLangs='getCustomerLangs'-->
-      <!--@refreshServices='refreshServices'-->
-      <!--)-->
+          .vendor-portal__balloons
+        nuxt-child
 </template>
 
 <script>
-  import ClickOutside from "vue-click-outside";
-  import { mapGetters, mapActions } from "vuex";
-  import Loading from "../components/Loading";
 
-  export default {
-    data() {
-      return {
-        user: {
-          name: "Test",
-          email: "test@test.com"
+import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
+
+export default {
+  middleware: 'authenticated',
+  data() {
+    return {
+      vendor: {},
+      navbarList: [
+        {
+          title: "DASHBOARD",
+          path: "/dashboard",
+          imgBrown: require("../assets/images/CATEGORIES/dashboard-brown.png"),
+          active: true
         },
-        vendor: {},
-        navbarList: [
-          {
-            title: "DASHBOARD",
-            path: "/dashboard",
-            imgBrown: require("../assets/images/CATEGORIES/dashboard-brown.png"),
-            active: true
-          },
-          {
-            title: "CLOSED JOB",
-            path: "/closed-job",
-            imgBrown: require("../assets/images/CATEGORIES/Closed Jobs ICON(selected).png"),
-            active: false
-          }
-        ],
-        newProject: [
-          {title: "Translation"},
-          {title: "Copywriting"},
-          {title: "Marketing"},
-          {title: "Proofing/QA"},
-          {title: "Graphic Localization"}
-        ],
-        dropdownVisible: false,
-        accountMenuVisible: false,
-        quotes: [],
-        path: "Language Settings",
-        accountInfo: false,
-        isSidebar: false,
-        clientLanguages: []
-      };
+        {
+          title: "CLOSED JOBS",
+          path: "/closed-jobs",
+          imgBrown: require("../assets/images/CATEGORIES/Closed Jobs ICON(selected).png"),
+          active: false
+        }
+      ],
+      accountMenuVisible: false,
+      accountInfo: false,
+    };
+  },
+  methods: {
+    async getVendorInfo() {
+      try {
+        const result = await this.$axios.$get(`/vendor/info?token=${this.token}`);
+        this.vendor = result;
+      } catch(err) {
+        this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+      }
     },
-    methods: {
-      async getCurrentUserGroup() {
-        try {
-          if(!this.userGroup) {
-            await this.setUserGroup();
+    mainPageRender() {
+      this.toggleSideBar(true);
+    },
+    toggleSideBar(isFirstRender) {
+      for(let elem of this.navbarList) {
+        if(window.location.toString().indexOf(elem.path) !== -1) {
+          elem.active = true;
+          if(isFirstRender) {
+            this.$router.push(elem.path);
           }
-        } catch(err) {
-          console.log("Cannot identify user group");
-        }
-      },
-      async getVendorInfo() {
-        try {
-          const token = localStorage.getItem("token");
-          const result = await this.$axios.$get(`/vendor/info?token=${token}`);
-          this.vendor = result;
-          console.log(111,this.vendor);
-        } catch(err) {
-          this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-        }
-      },
-      async getCustomerLangs(data) {
-        let person = await this.$http.get(`/api/person?customerId=${data.id}`);
-        let personEmail = person.body.email;
-        let token = await this.$http.post('/api/get-token', {email: personEmail});
-        let sessionId = await this.$http.post('/api/token-session', {token: token});
-        document.cookie = "ses=" + sessionId.body + "; " + "maxAge=60;"
-        let result = await this.$http.get(`/portal/language-combinations?customerId=${data.id}`);
-        this.$store.dispatch('gettingClientLangs', result.body);
-        if(typeof result.body == 'string') {
-          this.clientLanguages = []
         } else {
-          this.clientLanguages = result.body;
-        }
-      },
-      async getCustomers() {
-        let result = await this.$http.get('/all-clients');
-        this.$store.dispatch('customersGetting', result.body);
-      },
-      async getXtmCustomers() {
-        let result = await this.$http.get('/xtm/xtm-customers');
-        this.$store.dispatch('xtmCustomersGetting', result.body);
-      },
-      refreshXtmCustomers(data) {
-        this.getXtmCustomers();
-      },
-      async getLanguages() {
-        let result = await this.$http.get('/api/languages');
-        let allLangs = result.body;
-        this.$store.dispatch('allLanguages', allLangs);
-      },
-      mainPageRender() {
-        this.toggleSideBar(true);
-      },
-      checkForSpecifiedSideBar(address, title) {
-        if (window.location.toString().indexOf(address) !== -1) {
-          this.navbarList.forEach(item => {
-            item.active = (item.title == title) ? true: false
-          })
-        }
-      },
-      toggleSideBar(isFirstRender) {
-        // const location = window.location.toString();
-        // if(location.indexOf('pm-') !== -1) {
-        //   this.checkForSpecifiedSideBar('pm-', 'PM AREA');
-        // } else if(location.indexOf('new-client') !== -1) {
-        //   this.checkForSpecifiedSideBar('new-client', 'CLIENTS');
-        // } else {
-        //   this.checkAddressForSideBar(isFirstRender);
-        // }
-      },
-      // checkAddressForSideBar(isFirstRender) {
-      //   for(let elem of this.navbarList) {
-      //     if(window.location.toString().indexOf(elem.title.toLowerCase()) !== -1) {
-      //       elem.active = true;
-      //       if(isFirstRender) {
-      //         const path = '/' + elem.title.toLowerCase();
-      //         this.$router.push(path);
-      //       }
-      //     } else {
-      //       elem.active = false
-      //     }
-      //   }
-      // },
-
-      showSlider() {
-        if(window.location.toString().indexOf('dashboard') == -1) {
-          this.$router.push('/dashboard')
-        }
-        for(let elem of this.navbarList) {
-          if(elem.title == 'DASHBOARD') {
-            elem.active = true
-          } else {
-            elem.active = false
-          }
-        }
-        this.isSidebar = true;
-      },
-      hideAccountMenu() {
-        // this.accountMenuVisible = false;
-      },
-      signOut() {
-        // this.$store.dispatch("logout");
-        this.$axios.$get('/logout')
-          .then(res => {
-            console.log(res)
-          });
-        this.$router.push('/login');
-      },
-      switchSection(index) {
-        this.navbarList.forEach((item, i) => {
-          if (i === index) {
-            item.active = true;
-          } else {
-            item.active = false;
-          }
-        });
-
-        switch(index) {
-          case 0:
-            this.$router.push('/dashboard');
-            this.isSidebar = false;
-            break;
-          case 1:
-            this.$router.push('/closed-job');
-            this.isSidebar = false;
-            break;
-        }
-      },
-      showAccountMenu() {
-        this.accountMenuVisible = !this.accountMenuVisible;
-      },
-      showAccountInfo() {
-        this.$router.push('/account-info');
-        this.accountMenuVisible = false;
-      },
-
-      async getServices() {
-        const result = await this.$http.get('/api/services');
-        const services = result.body;
-        services.sort((a, b) => {return a.sortIndex - b.sortIndex});
-        this.$store.dispatch('servicesGetting', services);
-      },
-      refreshServices(data) {
-        this.getServices();
-      },
-      ...mapActions({
-        setUserGroup: "setUserGroup",
-        alertToggle: "alertToggle"
-      })
-    },
-    computed: {
-      ...mapGetters({
-        isLoading: "loading",
-        userGroup: "getUserGroup"
-      }),
-      fullName() {
-        if(this.vendor) {
-          return this.vendor.firstName + " " + this.vendor.surname;
+          elem.active = false
         }
       }
     },
-    components: {
-      Loading
+    hideAccountMenu() {
+      this.accountMenuVisible = false;
     },
-    // beforeRouteUpdate (to, from, next) {
-    //   if(localStorage.getItem('token')) {
-    //     next()
-    //   } else {
-    //     next('/login')
-    //   }
-    // },
-    async mounted() {
-      this.getVendorInfo();
-      // this.mainPageRender();
-      // await this.getCurrentUserGroup();
-      // await this.getServices();
-      // await this.getCustomers();
-      // await this.getXtmCustomers();
-      // await this.getLanguages();
+    signOut() {
+      this.$router.push('/login');
+      this.logout();
     },
-    updated() {
-      this.toggleSideBar(false);
+    switchSection(index) {
+      this.navbarList.forEach((item, i) => {
+        item.active = i === index;
+      });
+      this.$router.push(this.navbarList[index].path);
     },
-    directives: {
-      ClickOutside
+    showAccountMenu() {
+      this.accountMenuVisible = !this.accountMenuVisible;
+    },
+    showAccountInfo() {
+      this.hideAccountMenu();
+      this.$router.push('/account-info');
+    },
+    setToken() {
+      const vendorToken = this.$cookie.get("vendor");
+      this.$store.commit("SET_TOKEN", vendorToken);
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      logout: "logout"
+    })
+  },
+  computed: {
+    ...mapGetters({
+      token: "getToken"
+    }),
+    fullName() {
+      if(this.vendor) {
+        return this.vendor.firstName + " " + this.vendor.surname;
+      }
     }
-  };
+  },
+  components: {
+  },
+  mounted() {
+    this.setToken();
+    this.getVendorInfo();
+    this.mainPageRender();
+  },
+  updated() {
+    this.toggleSideBar(false);
+  },
+  directives: {
+    ClickOutside
+  }
+};
 </script>
 
 <style lang="scss" scoped>
 
-  .admin-top {
+.vendor-portal {
+  &__top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -288,377 +159,239 @@
     position: fixed;
     height: 6vh;
     width: 100%;
-    z-index: 1000;
-    &__admin-name {
-      width: 35%;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-left: 150px;
-      a {
-        text-decoration: none;
-        padding-top: 11px;
-      }
-      .adminPortal {
-        color: #fff;
-        width: 100%;
-        font-size: 24px;
-        font-family: MyriadPro;
-        font-weight: 700;
-      }
-    }
-    &__search-block {
-      width: 35%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-
-      .dropdown-wrapper {
-        height: 34px;
-        width: 36px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .imgwrap {
-          display: flex;
-          align-items: center;
-          position: relative;
-          cursor: pointer;
-          .spwrap {
-            color: #fff;
-            visibility: visible;
-            position: absolute;
-            right: 41px;
-          }
-        }
-      }
-
-      .woman-wrapper {
-        margin: 0 3px 7px 15px;
-        border-radius: 30px;
-        width: 33px;
-        height: 33px;
-        position: relative;
-        &__photo {
-          border-radius: 50%;
-          background-color: white;
-          padding-bottom: 1px;
-          padding-right: 1px;
-        }
-
-        .account-menu-wrapper {
-          .account-block {
-            width: 192px;
-            height: 124px;
-            background-color: #fff;
-            box-shadow: 1px 1px 11px black;
-            position: absolute;
-            top: 44px;
-            right: -140px;
-            border-radius: 6px;
-            z-index: 5;
-            overflow: hidden;
-            &__info {
-              display: flex;
-              justify-content: flex-start;
-              border-bottom: 1px solid #998e7e;
-              padding-top: 3%;
-              padding-bottom: 3%;
-
-              .icon {
-                margin-left: 8%;
-                img {
-                  height: 32px;
-                }
-              }
-
-              .personal__data {
-                color: #67573e;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: flex-start;
-                padding-top: 2%;
-                margin-right: 14%;
-                margin-left: 8%;
-
-                &_name {
-                  font-size: 12px;
-                }
-
-                &_email {
-                  font-size: 11px;
-                }
-              }
-            }
-
-            &__myaccount {
-              display: flex;
-              justify-content: flex-start;
-              align-items: center;
-              border-bottom: 1px solid #998e7e;
-              cursor: pointer;
-              .human_icon {
-                margin-left: 8%;
-                img {
-                  height: 32px;
-                }
-              }
-
-              .my_account {
-                font-size: 12px;
-                color: #67573e;
-                margin-left: 8%;
-              }
-              &:hover {
-                background-color: #ddd3c8;
-              }
-            }
-
-            &__exit {
-              display: flex;
-              justify-content: flex-start;
-              align-items: center;
-              cursor: pointer;
-              .icon_exit {
-                margin-left: 9%;
-                img {
-                  height: 32px;
-                }
-              }
-
-              .sign_out {
-                font-size: 12px;
-                color: #67573e;
-                margin-left: 7%;
-              }
-              &:hover {
-                background-color: #ddd3c8;
-              }
-            }
-          }
-        }
-      }
-
-      .chevron-wrapper {
-        width: 140px;
-        .chevron {
-          position: relative;
-          text-align: center;
-          padding: 12px 12px 12px 12px;
-          margin-bottom: 6px;
-          height: 16px;
-          width: 16px;
-          cursor: pointer;
-          transform: rotate(180deg);
-          @media screen and (max-width: 1450px) {
-            margin-right: 43px;
-          }
-          @media screen and (max-width: 1350px) {
-            margin-right: 23px;
-          }
-        }
-
-        .chevron:before {
-          content: "";
-          position: absolute;
-          top: 15px;
-          height: 8%;
-          width: 29%;
-          background: #fff;
-          transform: skew(0deg,50deg);
-        }
-        .chevron:after {
-          content: "";
-          position: absolute;
-          top: 15px;
-          height: 8%;
-          left: 8px;
-          width: 29%;
-          background: #fff;
-          transform: skew(0deg,-50deg);
-        }
-      }
+    z-index: 1000;  
+  }
+  &__admin-name {
+    width: 35%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 150px;
+  }
+  &__adminPortal {
+    color: #fff;
+    width: 100%;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  &__search-block {
+    width: 35%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  &__dropdown-wrapper {
+    height: 34px;
+    width: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__imgwrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    .spwrap {
+      color: #fff;
+      visibility: visible;
+      position: absolute;
+      right: 41px;
     }
   }
-
-  .admin-main-wrapper {
+  &__woman-wrapper {
+    margin: 0 3px 7px 15px;
+    border-radius: 30px;
+    width: 33px;
+    height: 33px;
+    position: relative;
+  }
+  &__photo {
+    border-radius: 50%;
+    background-color: white;
+    padding-bottom: 1px;
+    padding-right: 1px;
+  }
+  &__account-block {
+    width: 192px;
+    background-color: #fff;
+    box-shadow: 1px 1px 11px black;
+    position: absolute;
+    top: 44px;
+    right: -140px;
+    border-radius: 6px;
+    z-index: 5;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  &__info {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #998e7e;
+    padding: 5px 0;
+  }
+  &__icon {
+    margin-left: 10px;
+    img {
+      height: 32px;
+    }
+  }
+  &__personal {
+    color: #67573e;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 10px;
+  }
+  &__personal-data {
+    font-size: 12px;
+  }
+  &__item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid #998e7e;
+    cursor: pointer;
+    &:hover {
+      background-color: #ddd3c8;
+    }
+  }
+  &__account {
+    font-size: 12px;
+    color: #67573e;
+    margin-left: 10px;
+  }
+  &__list-label {
+    font-size: 12px;
+    color: #67573e;
+    margin-left: 10px;
+  }
+  &__arrow-block {
+    width: 140px;
+  }
+  &__arrow {
+    position: relative;
+    text-align: center;
+    padding: 12px 12px 12px 12px;
+    margin-bottom: 6px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    transform: rotate(180deg);
+    &:before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      height: 8%;
+      width: 29%;
+      background: #fff;
+      transform: skew(0deg,50deg);
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      height: 8%;
+      left: 8px;
+      width: 29%;
+      background: #fff;
+      transform: skew(0deg,-50deg);
+    }
+    @media screen and (max-width: 1450px) {
+      margin-right: 43px;
+    }
+    @media screen and (max-width: 1350px) {
+      margin-right: 23px;
+    }
+  }
+  &__main {
     box-sizing: border-box;
     padding-top: 6vh;
     padding-left: 150px;
     display: flex;
     height: 100%;
     position: relative;
-    &__inner {
-      width: 90%;
+  }
+  &__inner {
+    width: 90%;
+  }
+  &__nav {
+    position: fixed;
+    left: 0;
+    z-index: 999;
+    display: flex;
+    min-height: 94vh;
+  }
+  &__sidebar {
+    padding: 25px 0;
+    background-color: #998e7e;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
+    transition: all 0.5s;
+    z-index: 2;
+    overflow: hidden;
+  }
+  &__nav-menu {
+    list-style: none;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0;
+    width: 177px;
+    height: 77vh;
+    margin-bottom: 0;
+  }
+  &__nav-item {
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    cursor: pointer;
+    transition: all 0.4s;
+    &:last-child {
+      margin-bottom: 0;
     }
-    .admin-navbar {
-      font-family: MyriadPro;
-      position: fixed;
-      left: 0;
-      z-index: 999;
-      display: flex;
-      min-height: 94vh;
-      &__sidebar {
-        padding: 25px 0;
-        background-color: #998e7e;
-        width: 150px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
-        transition: all 0.5s;
-        z-index: 2;
-        overflow: hidden;
-      }
-      .navbar__menu {
-        list-style: none;
-        font-size: 15px;
-        font-weight: bold;
-        padding: 0;
-        width: 177px;
-        height: 77vh;
-        margin-bottom: 0;
-        /*overflow-y: overlay;*/
-        &_item {
-          padding-bottom: 10px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          margin-bottom: 20px;
-          margin-left: 0;
-          margin-right: 0;
-          cursor: pointer;
-          transition: all 0.4s;
-          &:last-child {
-            margin-bottom: 0;
-          }
-          .title {
-            transition: all 0.3s;
-            color: #fff;
-          }
-          .image {
-            img {
-              filter: brightness(300%);
-            }
-          }
-        }
-        .active {
-          background-color: white;
-          .title {
-            color: #978d7e;
-          }
-          .image {
-            img {
-              filter: none;
-            }
-          }
-        }
-      }
-
-      .balloons {
-        transition: all 0.4s;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-image: url("../assets/images/balloons.png");
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 100%;
-        height: 100px;
-        box-shadow: -2px -5px 5px rgba(103, 87, 62, 0.4);
+  }
+  &__nav-title {
+    transition: all 0.3s;
+    color: #fff;
+  }
+  &__image {
+    img {
+      filter: brightness(300%);
+    }
+  }
+  &_active {
+    background-color: white;
+    .vendor-portal__nav-title {
+      color: #978d7e;
+    }
+    .vendor-portal__image {
+      img {
+        filter: none;
       }
     }
   }
-
-  .new-request {
-    height: 34px;
-    width: 239px;
-    margin-right: 83px;
-    z-index: 3;
-    position: relative;
-    .sel_project_block {
-      margin-right: 150px;
-      width: 239px;
-      width: 33%;
-      background-color: #D15F45;
-      border-radius: 14px;
-      width: 100%;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-
-      &__proj {
-        border-right: 1px solid #fff;
-        line-height: 100%;
-        color: #fff;
-        width: 80%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        position: relative;
-        span {
-          padding-left: 14px;
-        }
-      }
-
-      &__img-wrapper {
-        display: flex;
-        height: 100%;
-        width: 20%;
-        justify-content: center;
-        align-items: center;
-        img {
-          cursor: pointer;
-        }
-        .rotate {
-          transform: rotate(180deg);
-        }
-      }
-      &__image {
-        padding: 5px;
-        cursor: pointer;
-      }
-    }
-  }
-
-  .additional {
-    position: absolute;
-    border: 2px solid #978d7e;
-    color: #67573e;
-    background-color: #fff;
-    font-size: 16px;
+  &__balloons {
+    transition: all 0.4s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../assets/images/balloons.png");
+    background-repeat: no-repeat;
+    background-position: center;
     width: 100%;
-    top: 25px;
-    z-index: -1;
-    box-sizing: border-box;
-    &__listItem {
-      padding: 13px;
-      font-family: MyriadPro;
-      border-bottom: 0.2px solid #978d7e;
-      cursor: pointer;
-      &:hover {
-        background-color: #ddd3c8;
-      }
-      &:first-child {
-        padding-top: 20px;
-      }
-    }
+    height: 100px;
+    box-shadow: -2px -5px 5px rgba(103, 87, 62, 0.4);
   }
-
-  @font-face {
-    font-family: MyriadPro;
-    src: url("../assets/fonts/MyriadPro-Regular.otf");
-  }
-  @font-face {
-    font-family: MyriadBold;
-    src: url("../assets/fonts/MyriadPro-Bold.otf");
-  }
+}
 
 </style>
 

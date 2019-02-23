@@ -1,10 +1,14 @@
-import { getVendorTokenFromCookie, getVendorTokenFromLocalStorage } from "~/utils/auth.js";
+import { getVendorTokenFromHeaders, getVendorTokenFromDocument } from "~/utils/auth.js";
 
-export default function ({ req, redirect, route }) {
+export default function ({ store, req, redirect, route }) {
     if(route.name === "application") return
     if(process.server && !req) return
-    const token = process.server ? getVendorTokenFromCookie(req) : getVendorTokenFromLocalStorage();
+    const token = process.server ? getVendorTokenFromHeaders(req) : getVendorTokenFromDocument();
+    store.commit("SET_TOKEN", token);
     if(!token) {
-        redirect("/login")
+        if(route.path === "/login") {
+        } else {
+            return redirect("/login")
+        }
     }
 }

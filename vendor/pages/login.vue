@@ -38,9 +38,8 @@ export default {
     async sendForm() {
       try {
         const result = await this.$axios.$post("/vendor/login", { ...this.form});
-        localStorage.setItem("token", result);
-        document.cookie = `vendor=${result}; max-age=6200;${this.domain}`;
-        this.$router.push("/dashboard");
+        this.login(result);
+        this.$router.push("/");
         this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       } catch(err) {
         console.log(err);
@@ -51,12 +50,13 @@ export default {
       this.forgotLink = !this.forgotLink;
     },
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      login: "login"
     })
   },
   computed: {
     domain() {
-      return process.env.domain.indexOf("localhost") !== -1 ? "" : " domain=pangea.global"
+      return process.env.domain.indexOf("localhost") !== -1 ? "" : " domain=vendor.pangea.global;"
     }
   },
   components: {
