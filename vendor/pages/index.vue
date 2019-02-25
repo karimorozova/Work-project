@@ -111,7 +111,7 @@ export default {
     },
     showAccountInfo() {
       this.hideAccountMenu();
-      this.$router.push('/account-info');
+      this.$router.push('/account');
     },
     setToken() {
       const vendorToken = this.$cookie.get("vendor");
