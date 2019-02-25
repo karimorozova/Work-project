@@ -98,12 +98,12 @@
       return {
         fields: [
           {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "14%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "20%", padding: "0"},
-          {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "22%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "22%", padding: "0"},
-          {label: "Action", headerKey: "headerIcons", key: "icons", width: "10%", padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "17%", padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "12%", padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: "11%", padding: "0"},
         ],
         jobs: [],
         icons: [
