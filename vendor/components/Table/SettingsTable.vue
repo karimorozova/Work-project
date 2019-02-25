@@ -158,7 +158,9 @@
     &__thead-row, &__tbody-row {
       display: flex;
     }
-
+    &__tbody-row {
+      width: 1027px;
+    }
     &_scroll-padding {
       padding-right: 15px;
     }
@@ -182,7 +184,7 @@
   }
 
   .tbody_visible-overflow {
-    overflow: visible;
+    overflow-x: hidden;
     overflow-y: scroll;
     height: 136px;
   }
