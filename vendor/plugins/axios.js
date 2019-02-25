@@ -1,7 +1,7 @@
 import state from '../store/state';
-import Vue from "vue";
+import Vue from 'vue';
 
-export default function ({ store, $axios, redirect }) {
+export default function ({ store, $axios, route }) {
   $axios.onRequest(config => {
     store.dispatch('addRequest');
     if (config && config.progress === false) {
@@ -27,8 +27,12 @@ export default function ({ store, $axios, redirect }) {
   })
 
   $axios.interceptors.request.use(config => {
-    const token = Vue.prototype.$localStorage() || "";
-    config.headers.common['token-header'] = token;
+    if(route.name !== "application") {
+      if(document) {
+      const token = Vue.cookie.get("vendor");
+      config.headers.common['token-header'] = token;
+      }
+    }
     return config;
   }, error => {
     return Promise.reject(error);

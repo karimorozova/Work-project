@@ -1,4 +1,5 @@
 const state = {
+  token: "",
   languages: [],
   timezones: [],
   applicationFormData: {

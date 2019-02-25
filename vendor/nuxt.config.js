@@ -54,10 +54,10 @@ module.exports = {
   },
   router: {
     base: '/',
-    middleware: 'check-auth'
+    middleware: ['check-auth', 'main-redirect']
   },
   plugins: [
-    '~/plugins/localStorageInject',
-    '~/plugins/axios'
+    '~/plugins/axios',
+    '~plugins/vue-cookie'
   ]
 }
