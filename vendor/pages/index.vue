@@ -38,7 +38,7 @@
               .vendor-portal__nav-title
                 span {{ note.title }}
           .vendor-portal__balloons
-        nuxt-child
+      nuxt-child
 </template>
 
 <script>
