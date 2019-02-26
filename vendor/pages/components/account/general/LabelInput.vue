@@ -1,7 +1,7 @@
 <template lang="pug">
     .pair
         label.pair__name {{ name }}:
-        input.pair__input(type="text" :value="value" :readonly="isReadonly" :class="{'pair_opacity-08': isReadonly}")
+        input.pair__input(type="text" :value="value" :readonly="isReadonly" @input="input" :class="{'pair_opacity-08': isReadonly}")
 </template>
 
 <script>
@@ -10,6 +10,11 @@ export default {
         name: {type: String},
         value: {type: String},
         isReadonly: {type: Boolean}
+    },
+    methods: {
+        input(e) {
+            this.$emit("input", { value: e.target.value })
+        }
     }
 }
 </script>

@@ -1,27 +1,27 @@
 <template lang="pug">
     .other-info
         .other-info__item
-            LabelInput(name="Company Name" :value="vendor.companyName" :isReadonly="isReadonly")
+            LabelInput(name="Company Name" :value="accountInfo.companyName" @input="(e) => setInputValue(e, 'companyName')")
         .other-info__item
-            LabelInput(name="Website" :value="vendor.website" :isReadonly="isReadonly")
+            LabelInput(name="Website" :value="accountInfo.website" @input="(e) => setInputValue(e, 'website')")
         .other-info__item
-            LabelInput(name="Skype" :value="vendor.skype" :isReadonly="isReadonly")
+            LabelInput(name="Skype" :value="accountInfo.skype" @input="(e) => setInputValue(e, 'skype')")
         .other-info__item
-            LabelInput(name="Linkedin" :value="vendor.linkedin" :isReadonly="isReadonly")
+            LabelInput(name="Linkedin" :value="accountInfo.linkedin" @input="(e) => setInputValue(e, 'linkedin')")
         .other-info__item
-            LabelInput(name="WhatsApp" :value="vendor.whatsapp" :isReadonly="isReadonly")
+            LabelInput(name="WhatsApp" :value="accountInfo.whatsapp" @input="(e) => setInputValue(e, 'whatsapp')")
         .other-info__item
-            LabelInput(name="Status" :value="vendor.status" :isReadonly="isReadonly")
-        .other-info__drop
-            .other-info__name Idustries
-            .other-info__list
-                MultiVendorIndustrySelect(:selectedInd="vendorIndustries" :filteredIndustries="industriesNames")
+            LabelInput(name="Status" :value="accountInfo.status"  :isReadonly="isReadonly")
+        .other-info__item
+            LabelDrop(name="Industries")
+                MultiVendorIndustrySelect(:selectedInd="vendorIndustries" :filteredIndustries="industriesNames" @chosenInd="setIndutries")
 </template>
 
 <script>
 import LabelInput from "./LabelInput";
+import LabelDrop from "./LabelDrop";
 import MultiVendorIndustrySelect from "~/components/dropdowns/MultiVendorIndustrySelect";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -30,26 +30,42 @@ export default {
             isNotReadonly: false
         }
     },
+    methods: {
+        ...mapActions({
+            setAccountProp: "setAccountProp"
+        }),
+        setInputValue({value}, prop) {
+            this.setAccountProp({prop, value});
+        },
+        setIndutries({industry}) {
+            let industries = [...this.accountInfo.industries];
+            const position = this.industriesNames.indexOf(industry.name);
+            if(position !== -1) {
+                industries.splice(position, 1);
+            } else {
+                industries.push(industry);
+            }
+            this.setAccountProp({prop: "industries", value: [...industries]});
+        }
+    },
     computed: {
         ...mapGetters({
-            vendor: "getVendor"
+            accountInfo: "getAccountInfo"
         }),
-        nativeLang() {
-            return this.vendor.native ? this.vendor.native.lang : ""
-        },
         vendorIndustries() {
-            return this.vendor.industries ? this.vendor.industries : [];
+            return this.accountInfo.industries ? this.accountInfo.industries : [];
         },
         industriesNames() {
             let result= [];
-            if(this.vendor.industries) {
-                result = this.vendor.industries.map(item => item.name)
+            if(this.accountInfo.industries) {
+                result = this.accountInfo.industries.map(item => item.name)
             }
             return result;
         }
     },
     components: {
         LabelInput,
+        LabelDrop,
         MultiVendorIndustrySelect
     }    
 }
@@ -60,11 +76,6 @@ export default {
 .other-info {
     &__item {
         margin-bottom: 20px;
-    }
-    &__drop {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
     &__name {
         font-size: 14px;

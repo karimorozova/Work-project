@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
+const { saveHashedPassword } = require('./info');
 const bcrypt = require('bcryptjs');
 
 router.post("/login", async (req, res, next) => {
@@ -44,16 +45,21 @@ router.get("/info", checkVendor, async (req, res) => {
 })
 
 router.post("/info", checkVendor, async (req, res, next) => {
-    let { id, password } = req.body;
+    let { id, password, info } = req.body;
     try {
-        bcrypt.hash(password, 10, async (err, hash) => {
-            if (err) {
-                return next(err);
-            }
-            password = hash;
-            vendor = await getVendorAfterUpdate({"_id": id}, { password })
-            res.send(vendor);
-        })
+        if(password) {
+            await saveHashedPassword(id, password);
+        }
+        vendor = await getVendorAfterUpdate({"_id": id}, { ...info })
+        res.send(vendor);
+        // bcrypt.hash(password, 10, async (err, hash) => {
+        //     if (err) {
+        //         return next(err);
+        //     }
+        //     password = hash;
+        //     vendor = await getVendorAfterUpdate({"_id": id}, { password })
+        //     res.send(vendor);
+        // })
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on saving data. Try later.");

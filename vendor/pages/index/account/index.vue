@@ -8,6 +8,7 @@
     .account-info__password
         Password
     .account-info__rates
+        .account-info__title Rates
     ValidationErrors(v-if="areErorrs" 
         :errors="errors" 
         :isAbsolute="isAbsolute" 
@@ -32,25 +33,31 @@ export default {
     },
     methods: {
         ...mapActions({
+            setAccountInfo: "setAccountInfo",
             saveVendorInfo: "saveVendorInfo",
             alertToggle: "alertToggle"
         }),
         closeErrors() {
             this.areErorrs = false;
         },
+        checkEmail() {
+            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
+            return !this.accountInfo.email || !emailValidRegex.test(this.accountInfo.email.toLowerCase());
+        },
         async checkErrors() {
             this.errors = [];
             const { password, confirmedPassword } = this.newPassword;
-            if(password && password !== confirmedPassword) this.errors.push("Use the same password in both fields");
+            if(!this.accountInfo.firstName) this.errors.push("Please, enter you first name.");
+            if(this.checkEmail()) this.errors.push('Please provide a valid email.');
+            if(password && password !== confirmedPassword) this.errors.push("Use the same password in both fields.");
             if(this.errors.length) {
                 return this.areErorrs = true;
             }
             await this.saveInfo();
         },
         async saveInfo() {
-            const { password } = this.newPassword;
             try {
-                await this.saveVendorInfo({ id: this.vendor._id, password});
+                await this.saveVendorInfo();
             } catch(err) {
                 this.alertToggle({message: "Cannot save info", isShow: true, type: "error"});
             }
@@ -59,6 +66,7 @@ export default {
     computed: {
         ...mapGetters({
             vendor: "getVendor",
+            accountInfo: "getAccountInfo",
             newPassword: "getNewPassword"
         })
     },
@@ -67,7 +75,10 @@ export default {
         GeneralInfo,
         Password,
         ValidationErrors
-    }    
+    },
+    mounted() {
+        this.setAccountInfo();
+    }
 }
 </script>
 

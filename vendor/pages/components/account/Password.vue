@@ -50,7 +50,7 @@ export default {
     justify-content: space-around;
     width: 900px;
     box-shadow: 0 0 15px $brown-shadow;
-    margin-left: 10px;
+    margin: 0 0 40px 10px;
     padding: 40px 20px;
     box-sizing: border-box;
     &__title, &__hint {

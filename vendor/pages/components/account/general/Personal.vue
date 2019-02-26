@@ -1,43 +1,93 @@
 <template lang="pug">
     .personal
         .personal__item
-            LabelInput(name="First Name" :value="vendor.firstName" :isReadonly="isReadonly")
+            LabelInput(name="First Name" :value="accountInfo.firstName" @input="(e) => setInputValue(e, 'firstName')")
         .personal__item
-            LabelInput(name="Surame" :value="vendor.surname" :isReadonly="isReadonly")
+            LabelInput(name="Surname" :value="accountInfo.surname" @input="(e) => setInputValue(e, 'surname')")
         .personal__item
-            LabelInput(name="Email" :value="vendor.email" :isReadonly="isReadonly")
+            LabelInput(name="Email" :value="accountInfo.email" @input="(e) => setInputValue(e, 'email')")
         .personal__item
-            LabelInput(name="Phone" :value="vendor.phone" :isReadonly="isReadonly")
+            LabelInput(name="Phone" :value="accountInfo.phone" @input="(e) => setInputValue(e, 'phone')")
         .personal__item
-            LabelInput(name="Time Zone" :value="vendor.timezone" :isReadonly="isReadonly")
+            LabelDrop(name="Time Zone")
+                SelectSingle(
+                    :selectedOption="accountInfo.timezone" 
+                    :options="zones" 
+                    customClass="account"
+                    @chooseOption="(e) => setProperty(e, 'timezone')")
         .personal__item
-            LabelInput(name="Native Language" :value="nativeLang" :isReadonly="isReadonly")
+            LabelDrop(name="Native Language")
+                SelectSingle(
+                    :selectedOption="nativeLang" 
+                    :options="langs" 
+                    customClass="account"
+                    @chooseOption="(e) => setProperty(e, 'native')")
         .personal__item
-            LabelInput(name="Gender" :value="vendor.gender" :isReadonly="isReadonly")
+            LabelDrop(name="Gender")
+                SelectSingle(
+                    :selectedOption="accountInfo.gender" 
+                    :options="genders" 
+                    customClass="account"
+                    @chooseOption="(e) => setProperty(e, 'gender')")
 </template>
 
 <script>
 import LabelInput from "./LabelInput";
-import { mapGetters } from "vuex";
+import LabelDrop from "./LabelDrop";
+import SelectSingle from "~/components/dropdowns/SelectSingle";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
             isReadonly: true,
-            isNotReadonly: false
+            isNotReadonly: false,
+            genders: ["Male", "Female"]
+        }
+    },
+    methods: {
+        ...mapActions({
+            getAllTimezones: "getAllTimezones",
+            getAllLanguages: "getAllLanguages",
+            setAccountProp: "setAccountProp"
+        }),
+        setInputValue({value}, prop) {
+            this.setAccountProp({prop, value});
+        },
+        setProperty({option}, prop) {
+            if(prop === "native") {
+                const language = this.allLanguages.find(item => item.lang === option);
+                return this.setAccountProp({prop: "native", value: language});
+            }
+            this.setAccountProp({ prop, value: option});
         }
     },
     computed: {
         ...mapGetters({
-            vendor: "getVendor"
+            vendor: "getVendor",
+            accountInfo: "getAccountInfo",
+            timezones: "getTimezones",
+            allLanguages: "getLangs"
         }),
         nativeLang() {
-            return this.vendor.native ? this.vendor.native.lang : ""
+            return this.accountInfo.native ? this.accountInfo.native.lang : ""
+        },
+        zones() {
+            return this.timezones.map(item => item.zone);
+        },
+        langs() {
+            return this.allLanguages.map(item => item.lang);
         }
     },
     components: {
-        LabelInput
-    }    
+        LabelInput,
+        LabelDrop,
+        SelectSingle
+    },
+    mounted() {
+        this.getAllTimezones();
+        this.getAllLanguages();
+    }
 }
 </script>
 

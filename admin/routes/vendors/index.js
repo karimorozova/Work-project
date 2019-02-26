@@ -1,5 +1,6 @@
 const { getVendor, getVendors, getVendorAfterUpdate } = require("./getVendors");
 const { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require("./vendorRates");
+const { saveHashedPassword } = require("./info");
 
 const vendors = {
     getVendor,
@@ -8,7 +9,8 @@ const vendors = {
     getVendorAfterUpdate,
     updateVendorRates,
     deleteRate,
-    addSeveralCombinations
+    addSeveralCombinations,
+    saveHashedPassword
 }
 
 module.exports = vendors;
