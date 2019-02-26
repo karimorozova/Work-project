@@ -1,5 +1,7 @@
 const state = {
   token: "",
+  vendor: {},
+  newPassword: {password: "", confirmedPassword: ""},
   languages: [],
   timezones: [],
   applicationFormData: {

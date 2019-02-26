@@ -19,18 +19,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .action-button {
-    margin: 20px;
     &__button {
         width: 138px;
         height: 33px;
-        color: white;
+        color: $white;
         font-size: 14px;
         border-radius: 10px;
-        box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #D15F45;
-        border: 1px solid #D15F45;
+        box-shadow: 0 3px 5px $brown-shadow;
+        background-color: $orange;
+        border: 1px solid $orange;
         cursor: pointer;
         outline: none;
         &:hover {

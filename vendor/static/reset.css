@@ -13,6 +13,10 @@ div, p, input, span, textarea, button, a, ul, li {
 	font-family: MyriadPro;
 }
 
+input, textarea {
+	color: #67573E;
+}
+
 blockquote, q {
 	quotes: none;
 }

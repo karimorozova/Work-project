@@ -3,7 +3,8 @@ const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
-const { getVendor } = require('./getVendors');
+const { getVendor, getVendorAfterUpdate } = require('./getVendors');
+const bcrypt = require('bcryptjs');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -33,16 +34,29 @@ router.post("/login", async (req, res, next) => {
 router.get("/info", checkVendor, async (req, res) => {
     const { token } = req.query;
     try {
-        jwt.verify(token, secretKey, async (error, decoded) => {
-            if(error) {
-                return res.send("Unauthorised");
-            }
-            const vendor = await getVendor({"_id": decoded.vendorId});
-            res.send(vendor);
-        });
+        const verificationResult = jwt.verify(token, secretKey);
+        const vendor = await getVendor({"_id": verificationResult.vendorId});
+        res.send(vendor);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Can't get Vendor info. Try later.");
+        res.status(500).send("Error on getting Vendor info. Try later.");
+    }
+})
+
+router.post("/info", checkVendor, async (req, res, next) => {
+    let { id, password } = req.body;
+    try {
+        bcrypt.hash(password, 10, async (err, hash) => {
+            if (err) {
+                return next(err);
+            }
+            password = hash;
+            vendor = await getVendorAfterUpdate({"_id": id}, { password })
+            res.send(vendor);
+        })
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving data. Try later.");
     }
 })
 

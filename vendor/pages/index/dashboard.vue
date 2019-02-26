@@ -5,15 +5,16 @@
       .jobs
         .jobs__table
           SettingsTable(
-          :fields="fields"
-          :tableData="jobs"
-          :errors="errors"
-          :areErrors="areErrors"
-          :isApproveModal="isDeleting"
-          @closeErrors="closeErrors"
-          @approve="rejectJob"
-          @notApprove="setDefaults"
-          @closeModal="setDefaults"
+            :fields="fields"
+            :tableData="jobs"
+            :errors="errors"
+            :areErrors="areErrors"
+            :isApproveModal="isDeleting"
+            bodyClass="tbody_height-200"
+            @closeErrors="closeErrors"
+            @approve="rejectJob"
+            @notApprove="setDefaults"
+            @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -49,15 +50,16 @@
       .jobs
         .jobs__table
           SettingsTable(
-          :fields="fields"
-          :tableData="jobs"
-          :errors="errors"
-          :areErrors="areErrors"
-          :isApproveModal="isDeleting"
-          @closeErrors="closeErrors"
-          @approve="rejectJob"
-          @notApprove="setDefaults"
-          @closeModal="setDefaults"
+            :fields="fields"
+            :tableData="jobs"
+            :errors="errors"
+            :areErrors="areErrors"
+            :isApproveModal="isDeleting"
+            bodyClass="tbody_height-200"
+            @closeErrors="closeErrors"
+            @approve="rejectJob"
+            @notApprove="setDefaults"
+            @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -98,12 +100,12 @@
       return {
         fields: [
           {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "14%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "20%", padding: "0"},
-          {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "22%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "22%", padding: "0"},
-          {label: "Action", headerKey: "headerIcons", key: "icons", width: "10%", padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "14%", padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
         jobs: [],
         icons: [
@@ -228,7 +230,7 @@
 
       .jobs {
         width: 1041px;
-        height: 172px;
+        max-height: 600px;
         background-color: $white;
         box-shadow: 0 0 10px $main-color;
         box-sizing: border-box;

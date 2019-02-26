@@ -132,14 +132,12 @@ export default {
         max-height: 100px;
         overflow-y: scroll;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         z-index: 6;
         &__item {
-            display: flex;
             align-items: center;
-            padding: 12px 4px;
+            padding: 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             transition: all 0.4s;
@@ -158,12 +156,13 @@ export default {
     .search {
         z-index: 50;
         width: 100%;
-        padding: 5px 3px;
+        padding: 5px;
         color: #67573E;
         outline: none;
-        box-shadow: inset 0 0 5px rgba(125, 138, 180, 0.623);
+        box-shadow: inset 0 0 5px rgba(103, 87, 62, 0.5);
         border: 1px solid rgba(125, 138, 180, 0.466);
         border-right: none;
+        box-sizing: border-box;
     }
 }
 
