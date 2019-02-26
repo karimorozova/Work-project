@@ -4,7 +4,7 @@
       h3 Upcoming Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableUpcoming(
           :fields="fields"
           :tableData="jobs"
           :errors="errors"
@@ -45,10 +45,10 @@
               .jobs__icons
                 img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
     .jobs_block
-      h3 Closed Jobs
+      h3 Open Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableOpened(
           :fields="fields"
           :tableData="jobs"
           :errors="errors"
@@ -91,7 +91,8 @@
 </template>
 
 <script>
-  import SettingsTable from "../../components/Table/SettingsTable";
+  import SettingsTableUpcoming from "@/components/Tables/Upcoming_Jobs/SettingsTable";
+  import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
 
   export default {
     data() {
@@ -208,7 +209,8 @@
       }
     },
     components: {
-      SettingsTable
+      SettingsTableUpcoming,
+      SettingsTableOpened
     },
     mounted() {
       this.getJobs();

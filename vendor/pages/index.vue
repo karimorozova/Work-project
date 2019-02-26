@@ -94,7 +94,7 @@ export default {
       }
     },
     hideAccountMenu() {
-      this.accountMenuVisible = false;
+      // this.accountMenuVisible = false;
     },
     signOut() {
       this.$router.push('/login');
@@ -159,7 +159,7 @@ export default {
     position: fixed;
     height: 6vh;
     width: 100%;
-    z-index: 1000;  
+    z-index: 1000;
   }
   &__admin-name {
     width: 35%;
