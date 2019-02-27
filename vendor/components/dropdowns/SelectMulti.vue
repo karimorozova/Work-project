@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions")
+    .drop-select(v-click-outside="outOptions" :class="customClass")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
             span.selected.no-choice(v-if="!selectedOptions.length") Select
@@ -37,6 +37,9 @@ export default {
         otherSoftwareChoice: {
             type: String,
             default: ""
+        },
+        customClass: {
+            type: String
         }
     },
     data() {
@@ -81,7 +84,7 @@ export default {
     box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
     .drop {
         width: 100%;
-        max-height: 100px;
+        max-height: 120px;
         overflow-y: auto;
         overflow-x: hidden;
         flex-direction: column;
@@ -90,8 +93,7 @@ export default {
         &__item {
             display: flex;
             align-items: center;
-            height: 32px;
-            padding: 0 5px;
+            padding: 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
@@ -174,6 +176,33 @@ export default {
             top: 5px;
             left: 3px;
             transform: rotate(-58deg);
+        }
+    }
+}
+
+.filters {
+    border-radius: 5px;
+    top: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+    .select {
+        height: 28px;
+        .selected {
+            width: 82%;
+            border-right: 1px solid #bfb09d;
+            padding: 0 5px;
+        }
+        .arrow-button {
+            width: 18%;
+        }
+    }
+    .drop {
+        border-top: 1px solid #bfb09d;
+        max-height: 150px;
+        &__item {
+            .checkbox {
+                margin-left: 0;
+            }
         }
     }
 }
