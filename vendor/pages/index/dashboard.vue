@@ -93,7 +93,7 @@
 </template>
 
 <script>
-  import DataTable from "../components/jobs/Table/DataTable";
+  import DataTable from "~/components/Tables/DataTable";
   // import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
 
   export default {
