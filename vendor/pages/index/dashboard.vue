@@ -257,79 +257,78 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../assets/scss/colors.scss';
+@import '../../assets/scss/colors.scss';
 
-  .vendor_portal_wrapper {
-    width: 100%;
-    padding: 30px;
+.vendor_portal_wrapper {
+  width: 100%;
+  padding: 30px;
 
-    .jobs_block {
-      color: $main-color;
+  .jobs_block {
+    color: $main-color;
 
-      .jobs {
-        width: 1041px;
-        max-height: 600px;
-        background-color: $white;
-        box-shadow: 0 0 10px $main-color;
+    .jobs {
+      width: 1041px;
+      max-height: 600px;
+      background-color: $white;
+      box-shadow: 0 0 10px $main-color;
+      box-sizing: border-box;
+      padding: 3px 0;
+
+      &__table {
+        width: 1027px;
+        margin: 0 auto;
+      }
+
+      position: relative;
+
+      &__data, &__editing-data {
+        height: 32px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
         box-sizing: border-box;
-        padding: 3px 0;
+      }
 
-        &__table {
-          width: 1027px;
-          margin: 0 auto;
-        }
+      &__editing-data, &__drop-menu {
+        box-shadow: inset 0 0 7px $brown-shadow;
+      }
 
+      &__drop-menu {
         position: relative;
+      }
 
-        &__data, &__editing-data {
-          height: 32px;
-          padding: 0 5px;
-          display: flex;
-          align-items: center;
-          box-sizing: border-box;
-        }
+      &__data-input {
+        box-sizing: border-box;
+        width: 100%;
+        border: none;
+        outline: none;
+        color: $main-color;
+      }
 
-        &__editing-data, &__drop-menu {
-          box-shadow: inset 0 0 7px $brown-shadow;
-        }
+      &__icons {
+        padding-top: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-        &__drop-menu {
-          position: relative;
-        }
+      &__icon {
+        cursor: pointer;
+        opacity: 0.5;
+        margin-right: 8px;
+        transition: transform 0.1s ease-out;
 
-        &__data-input {
-          box-sizing: border-box;
-          width: 100%;
-          border: none;
-          outline: none;
-          color: $main-color;
-        }
-
-        &__icons {
-          padding-top: 3px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        &__icon {
-          cursor: pointer;
-          opacity: 0.5;
-          margin-right: 8px;
-          transition: transform 0.1s ease-out;
-
-          &:hover {
-            transform: scale(1.2);
-          }
-        }
-
-        &_opacity {
-          opacity: 1;
+        &:hover {
+          transform: scale(1.2);
         }
       }
-    }
 
+      &_opacity {
+        opacity: 1;
+      }
+    }
   }
 
+}
 
 </style>

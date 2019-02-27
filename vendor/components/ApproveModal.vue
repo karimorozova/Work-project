@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Button from "./Button";
+import Button from "./buttons/Button";
 
 export default {
     props: {
@@ -47,7 +47,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../assets/scss/colors.scss";
+@import "../assets/scss/colors.scss";
 
 .approve-modal {
     position: relative;

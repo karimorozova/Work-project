@@ -24,8 +24,8 @@
 </template>
 
 <script>
-  import ValidationErrors from "./ValidationErrors";
-  import ApproveModal from "./ApproveModal";
+  import ValidationErrors from "../ValidationErrors";
+  import ApproveModal from "../ApproveModal";
 
   export default {
     props: {

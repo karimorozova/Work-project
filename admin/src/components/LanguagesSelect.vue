@@ -51,7 +51,6 @@ export default {
         return {
             languages: [],
             droppedLang: false,
-            errors: [],
             searchLang: ''
         }
     },
@@ -74,8 +73,8 @@ export default {
             this.searchLang = "";
         },
         async getLanguages() {
-            await this.$http.get('/api/languages')
-            .then(response => {
+            try {
+                const result = await this.$http.get('/api/languages');
                 let sortedArray = response.body;
                 this.languages = sortedArray.sort( (a,b) => {
                     if(a.lang < b.lang) return -1;
@@ -87,10 +86,9 @@ export default {
                 if(this.addAll) {
                     this.languages.unshift({lang: "All", symbol: "All"})
                 }
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+            } catch(e) {
+                console.log(e);
+            }
         },
         outClick() {
             this.droppedLang = false;

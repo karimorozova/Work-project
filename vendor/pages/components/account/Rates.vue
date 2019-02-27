@@ -1,33 +1,33 @@
 <template lang="pug">
-//- .vendor-rates
-//-     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMonoRatesShow}")
-//-         .vendor-rates__open 
-//-             .vendor-rates__select(@click="monoRatesToggler")
-//-                 span.vendor-rates__label Mono
-//-                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMonoRatesShow}") 
-//-             .vendor-rates__drop(v-if="isMonoRatesShow")
-//-                 MonoRates(:vendor="vendor")
-//-     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isDuoRatesShow}")
-//-         .vendor-rates__open
-//-             .vendor-rates__select(@click="duoRatesToggler")
-//-                 span.vendor-rates__label Duo
-//-                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
-//-             .vendor-rates__drop(v-if="isDuoRatesShow")
-//-                 DuoRates(:vendor="vendor" 
-//-                     @addSevLangs="addSevLangs")
-//-     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
-//-             .vendor-rates____open
-//-                 .vendor-rates__select(@click="matrixToggler")
-//-                     span.vendor-rates__label Matrix
-//-                     img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMatrixShow}") 
-//-                 .vendor-rates__drop(v-if="isMatrixShow")
-//-                     FinanceMatrix(:entity="vendor" @setMatrixData="setMatrixData")
+.rates
+    .rates__block(:class="{'rates_straight-angle': isMonoRatesShow}")
+        .rates__open 
+            .rates__select(@click="monoRatesToggler")
+                span.rates__label Mono
+                img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMonoRatesShow}") 
+            .rates__drop(v-if="isMonoRatesShow")
+                MonoRates(:vendor="vendor")
+    .rates__block(:class="{'rates_straight-angle': isDuoRatesShow}")
+        .rates__open
+            .rates__select(@click="duoRatesToggler")
+                span.rates__label Duo
+                img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isDuoRatesShow}") 
+            .rates__drop(v-if="isDuoRatesShow")
+                DuoRates(:vendor="vendor" 
+                    @addSevLangs="addSevLangs")
+    .rates__block(:class="{'rates_straight-angle': isMatrixShow}")
+            .rates____open
+                .rates__select(@click="matrixToggler")
+                    span.rates__label Matrix
+                    img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMatrixShow}") 
+                .rates__drop(v-if="isMatrixShow")
+                    FinanceMatrix(:entity="vendor" @setMatrixData="setMatrixData")
 </template>
 
 <script>
-// import DuoRates from "./rates/DuoRates";
-// import MonoRates from "./rates/MonoRates";
-// import FinanceMatrix from "../FinanceMatrix";
+import DuoRates from "./rates/DuoRates";
+import MonoRates from "./rates/MonoRates";
+import FinanceMatrix from "./rates/FinanceMatrix";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -65,25 +65,30 @@ export default {
             }
         },
         ...mapActions({
-            alertToggle: "alertToggle",
-            setVendorsMatrixData: "setVendorsMatrixData"
+            alertToggle: "alertToggle"
         })
     },
     components: {
-        // DuoRates,
-        // MonoRates,
-        // FinanceMatrix
+        DuoRates,
+        MonoRates,
+        FinanceMatrix
     }
 }
 
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
 
-.vendor-rates {
+.rates {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    width: 900px;
+    position: relative;
+    margin: 20px 0  0 10px;
+    padding: 10px;
+    box-shadow: 0 0 15px $brown-shadow;
     &__block {
         box-sizing: border-box;
         width: 100%;

@@ -9,6 +9,7 @@
         Password
     .account-info__rates
         .account-info__title Rates
+        Rates
     ValidationErrors(v-if="areErorrs"
         :errors="errors"
         :isAbsolute="isAbsolute"
@@ -19,7 +20,8 @@
 import Buttons from "../../components/account/Buttons";
 import GeneralInfo from "../../components/account/GeneralInfo";
 import Password from "../../components/account/Password";
-import ValidationErrors from "@/components/Tables/ValidationErrors"
+import Rates from "../../components/account/Rates";
+import ValidationErrors from "@/components/ValidationErrors"
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -74,6 +76,7 @@ export default {
         Buttons,
         GeneralInfo,
         Password,
+        Rates,
         ValidationErrors
     },
     mounted() {
@@ -97,7 +100,7 @@ export default {
         margin-left: 10px;
     }
     &__title {
-        font-size: 24px;
+        font-size: 22px;
     }
     &__errors {
         width: 900px;

@@ -24,8 +24,8 @@
 </template>
 
 <script>
-  import ValidationErrors from "@/components/Tables/ValidationErrors";
-  import ApproveModal from "@/components/Tables/ApproveModal";
+  import ValidationErrors from "@/components/ValidationErrors";
+  import ApproveModal from "@/components/ApproveModal";
 
   export default {
     props: {
@@ -86,119 +86,98 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/scss/colors.scss';
+@import '../../../assets/scss/colors.scss';
 
-  .scroll {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+.table {
+  width: 100%;
 
-  .scroll::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-    background-color: #F2F2F2;
-  }
-
-  .scroll::-webkit-scrollbar-track {
-    border-radius: 5px;
-    background-color: inherit;
-  }
-
-  .scroll::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background-color: $brown-shadow;
-  }
-
-  .table {
-    width: 100%;
-
-    &__thead {
-      .table__thead-row {
-        background-color: $brown-border;
-        color: $white;
-      }
-    }
-
-    &__tbody {
-      max-height: 600px;
-      overflow-y: overlay;
-      /*margin-bottom: 20px;*/
-      border: 0.5px solid $light-brown;
-      border-bottom: 1px solid $light-brown;
-      border-top: none;
-    }
-
-    &__thead-cell {
-      box-sizing: border-box;
-      font-size: 14px;
-      padding: 7px 5px 5px 6px;
-      border: 0.5px solid $cell-border;
-      border-right: none;
-      border-left: 0.5px solid $white;
-
-      &:first-child {
-        border-left: 0.5px solid $cell-border;
-      }
-
-      &:last-child {
-        border-right: 0.5px solid $cell-border;
-      }
-    }
-
-    &__tbody-cell {
-      box-sizing: border-box;
-      font-size: 14px;
-      padding: 7px 5px 5px 6px;
-      border: 1px solid $cell-border;
-      border-right: none;
-
-      &:last-child {
-        border-right: 0.5px solid $cell-border;
-      }
-
-      &:focus-within {
-        box-shadow: inset 0 0 5px $cell-border;
-      }
-    }
-
-    &__thead-row, &__tbody-row {
-      display: flex;
-    }
-    &__tbody-row {
-      width: 875px;
-    }
-    &_scroll-padding {
-      padding-right: 15px;
-    }
-
-    &_bottom-bordered {
-      border-bottom: 0.5px solid $cell-border;
-    }
-
-    &__approve {
-      position: absolute;
-      z-index: 50;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  &__thead {
+    .table__thead-row {
+      background-color: $brown-border;
+      color: $white;
     }
   }
 
-  .tbody_height-200 {
-    max-height: 200px;
+  &__tbody {
+    max-height: 600px;
+    overflow-y: overlay;
+    /*margin-bottom: 20px;*/
+    border: 0.5px solid $light-brown;
+    border-bottom: 1px solid $light-brown;
+    border-top: none;
   }
 
-  .tbody_height-300 {
-    max-height: 300px;
+  &__thead-cell {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 7px 5px 5px 6px;
+    border: 0.5px solid $cell-border;
+    border-right: none;
+    border-left: 0.5px solid $white;
+
+    &:first-child {
+      border-left: 0.5px solid $cell-border;
+    }
+
+    &:last-child {
+      border-right: 0.5px solid $cell-border;
+    }
   }
 
-  .tbody_visible-overflow {
-    overflow: visible;
+  &__tbody-cell {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 7px 5px 5px 6px;
+    border: 1px solid $cell-border;
+    border-right: none;
+
+    &:last-child {
+      border-right: 0.5px solid $cell-border;
+    }
+
+    &:focus-within {
+      box-shadow: inset 0 0 5px $cell-border;
+    }
   }
+
+  &__thead-row, &__tbody-row {
+    display: flex;
+  }
+  &__tbody-row {
+    width: 875px;
+  }
+  &_scroll-padding {
+    padding-right: 15px;
+  }
+
+  &_bottom-bordered {
+    border-bottom: 0.5px solid $cell-border;
+  }
+
+  &__approve {
+    position: absolute;
+    z-index: 50;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.tbody_height-200 {
+  max-height: 200px;
+}
+
+.tbody_height-300 {
+  max-height: 300px;
+}
+
+.tbody_visible-overflow {
+  overflow: visible;
+}
 
 </style>
