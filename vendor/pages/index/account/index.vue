@@ -9,9 +9,9 @@
         Password
     .account-info__rates
         .account-info__title Rates
-    ValidationErrors(v-if="areErorrs" 
-        :errors="errors" 
-        :isAbsolute="isAbsolute" 
+    ValidationErrors(v-if="areErorrs"
+        :errors="errors"
+        :isAbsolute="isAbsolute"
         @closeErrors="closeErrors")
 </template>
 
@@ -19,7 +19,7 @@
 import Buttons from "../../components/account/Buttons";
 import GeneralInfo from "../../components/account/GeneralInfo";
 import Password from "../../components/account/Password";
-import ValidationErrors from "~/components/Table/ValidationErrors"
+import ValidationErrors from "@/components/Tables/ValidationErrors"
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -41,7 +41,7 @@ export default {
             this.areErorrs = false;
         },
         checkEmail() {
-            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
+            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             return !this.accountInfo.email || !emailValidRegex.test(this.accountInfo.email.toLowerCase());
         },
         async checkErrors() {

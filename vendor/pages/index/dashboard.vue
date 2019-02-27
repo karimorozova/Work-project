@@ -4,7 +4,7 @@
       h3 Upcoming Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableUpcoming(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -46,10 +46,10 @@
               .jobs__icons
                 img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
     .jobs_block
-      h3 Closed Jobs
+      h3 Open Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableOpened(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -93,7 +93,8 @@
 </template>
 
 <script>
-  import SettingsTable from "../../components/Table/SettingsTable";
+  import SettingsTableUpcoming from "@/components/Tables/Upcoming_Jobs/SettingsTable";
+  import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
 
   export default {
     data() {
@@ -184,6 +185,42 @@
               "projectName": "Market resources(Updated)",
               "amount": "1000 €",
               "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
             }
           ];
         } catch (err) {
@@ -210,7 +247,8 @@
       }
     },
     components: {
-      SettingsTable
+      SettingsTableUpcoming,
+      SettingsTableOpened
     },
     mounted() {
       this.getJobs();
@@ -218,7 +256,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
 
   .vendor_portal_wrapper {

@@ -7439,6 +7439,11 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
+tiny-cookie@^1.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tiny-cookie/-/tiny-cookie-1.0.1.tgz#753786079c642a3c3d0b2accad600f8de119ac2a"
+  integrity sha1-dTeGB5xkKjw9CyrMrWAPjeEZrCo=
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
@@ -7847,6 +7852,13 @@ vue-click-outside@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/vue-click-outside/-/vue-click-outside-1.0.7.tgz#cdd2b1605e3c4944784e1794eae4a12a0f700bd6"
   integrity sha1-zdKxYF48SUR4TheU6uShKg9wC9Y=
+
+vue-cookie@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/vue-cookie/-/vue-cookie-1.1.4.tgz#b8b46d112bda9f93a2f47017c2ed5282d2064fda"
+  integrity sha1-uLRtESvan5Oi9HAXwu1SgtIGT9o=
+  dependencies:
+    tiny-cookie "^1.0"
 
 vue-drag-drop@^0.2.4:
   version "0.2.4"
