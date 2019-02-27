@@ -5,7 +5,7 @@
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
     .table__tbody.scroll(:class="[{'tbody_visible-overflow': isBodyOverflow}, bodyClass]")
-      .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
+      .table__tbody-row(:class="[rowClass]" v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
@@ -24,8 +24,8 @@
 </template>
 
 <script>
-  import ValidationErrors from "./ValidationErrors";
-  import ApproveModal from "./ApproveModal";
+  import ValidationErrors from "~/components/Tables/ValidationErrors";
+  import ApproveModal from "~/components/Tables/ApproveModal";
 
   export default {
     props: {
@@ -53,6 +53,9 @@
         type: Boolean
       },
       bodyClass: {
+        type: String
+      },
+      rowClass: {
         type: String
       }
     },
@@ -86,7 +89,7 @@
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/scss/colors.scss';
+@import '../../../../assets/scss/colors.scss';
 
 .table {
   width: 100%;
@@ -174,9 +177,14 @@
 .tbody_height-300 {
   max-height: 300px;
 }
-
+.tbody_row_width-875 {
+  width: 875px;
+}
 .tbody_visible-overflow {
   overflow: visible;
 }
+  .scroll{
+    overflow-x: hidden;
+  }
 
 </style>

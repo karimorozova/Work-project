@@ -4,7 +4,7 @@
       h3 Upcoming Jobs
       .jobs
         .jobs__table
-          SettingsTableUpcoming(
+          DataTable(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -49,7 +49,7 @@
       h3 Open Jobs
       .jobs
         .jobs__table
-          SettingsTableOpened(
+          DataTable(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -93,8 +93,8 @@
 </template>
 
 <script>
-  import SettingsTableUpcoming from "@/components/Tables/Upcoming_Jobs/SettingsTable";
-  import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
+  import DataTable from "../components/jobs/Table/DataTable";
+  // import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
 
   export default {
     data() {
@@ -247,8 +247,7 @@
       }
     },
     components: {
-      SettingsTableUpcoming,
-      SettingsTableOpened
+      DataTable
     },
     mounted() {
       this.getJobs();
