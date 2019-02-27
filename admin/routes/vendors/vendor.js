@@ -52,14 +52,6 @@ router.post("/info", checkVendor, async (req, res, next) => {
         }
         vendor = await getVendorAfterUpdate({"_id": id}, { ...info })
         res.send(vendor);
-        // bcrypt.hash(password, 10, async (err, hash) => {
-        //     if (err) {
-        //         return next(err);
-        //     }
-        //     password = hash;
-        //     vendor = await getVendorAfterUpdate({"_id": id}, { password })
-        //     res.send(vendor);
-        // })
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on saving data. Try later.");

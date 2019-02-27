@@ -4,10 +4,6 @@
       .vendor-portal__admin-name
         h2.vendor-portal__adminPortal VENDOR PORTAL
       .vendor-portal__search-block
-        .vendor-portal__dropdown-wrapper
-          .vendor-portal__imgwrap
-            img(src="../assets/images/Other/admin-button-icon.png" )
-            span.spwrap configuration
         .vendor-portal__woman-wrapper
           img.vendor-portal__photo(src="../assets/images/client-icon_image.png")
           .vendor-portal__account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
