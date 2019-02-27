@@ -34,13 +34,14 @@
                   .selector__drop(v-if="openTargetInvoiceDate")
                     target-select(@chooseInvoiceDate="chooseInvoiceDate")
         .jobs__table
-          SettingsTableClosed(
+          DataTable(
           :fields="fields"
             :tableData="jobs"
               :errors="errors"
               :areErrors="areErrors"
               :isApproveModal="isDeleting"
               bodyClass="tbody_height-200"
+              rowClass="tbody_row_width-875"
               @closeErrors="closeErrors"
               @approve="rejectJob"
               @notApprove="setDefaults"
@@ -74,7 +75,7 @@
 
 <script>
   import moment from 'moment';
-  import SettingsTableClosed from "@/components/Tables/Closed_Jobs/SettingsTable";
+  import DataTable from "../components/jobs/Table/DataTable";
   import JobTypesSource from "@/components/Tables/Closed_Jobs/JobTypesSource";
   import QuotesCalendarDetailed from "@/components/Tables/quotes/QuotesCalendarDetailed";
   import ClientLangTarget from "@/components/Tables/Closed_Jobs/ClientLangTarget";
@@ -304,7 +305,7 @@
       },
     },
     components: {
-      SettingsTableClosed,
+      DataTable,
       "source-select": JobTypesSource,
       "target-select": ClientLangTarget,
       quotesCalendarDetailed: QuotesCalendarDetailed,
