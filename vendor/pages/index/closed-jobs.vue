@@ -8,31 +8,25 @@
             .filterBlock
               .filterBlock__item.sourceLangs
                 label.inner-label Job Type:
-                .sourceLangs__select.selector
-                  span.job-type(v-model="sourceJobTypeFilter" @click="jobTypeOpen") {{ sourceJobTypeFilter }}
-                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceJobTypes}")
-                  .selector__drop(v-if="openSourceJobTypes")
-                    source-select(@chooseJobType="chooseSourceJobTypes")
+                .filters__drop-menu.job-type
+                    JobTypeSelect(:selectedInd="{name: 'All'}" @chosenInd="chosenIndustry")
             .filterBlock
               .filterBlock__item.deadline
                 label.inner-label Start Date
                 input.calendar(type="text" :value="startDateFilter")
                 img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-              quotesCalendarDetailed(v-if="currentFormVisible" @dateFilter='requestOnFilter')
+              Calendar(v-if="currentFormVisible" @dateFilter='requestOnFilter')
             .filterBlock
               .filterBlock__item.deadline
                 label.inner-label Deadline
                 input.calendar(type="text" :value="deadFilter")
                 img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-              quotesCalendarDetailed(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")
+              Calendar(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")
             .filterBlock
               .filterBlock__item.targetLangs
                 label.inner-label Invoice Date
-                .targetLangs__select.selector
-                  span.invoice-date(v-model="targetInvoiceDateFilter" @click="targetInvoiceDateOpen") {{ targetInvoiceDateFilter }}
-                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetInvoiceDate}")
-                  .selector__drop(v-if="openTargetInvoiceDate")
-                    target-select(@chooseInvoiceDate="chooseInvoiceDate")
+                .filters__drop-menu.invoice-date
+                  InvoiceDateSelect(:selectedInd="{name: 'All'}" @chosenInd="chosenIndustry")
         .jobs__table
           DataTable(
           :fields="fields"
@@ -76,9 +70,9 @@
 <script>
   import moment from 'moment';
   import DataTable from "~/components/Tables/DataTable";
-  import JobTypesSource from "../components/jobs/Tables/Closed_Jobs/JobTypesSource";
-  import QuotesCalendarDetailed from "@/components/Tables/quotes/QuotesCalendarDetailed";
-  import ClientLangTarget from "../components/jobs/Tables/Closed_Jobs/ClientLangTarget";
+  import Calendar from "~/components/Calendar";
+  import InvoiceDateSelect from "../components/jobs/Tables/Closed_Jobs/InvoiceDateSelect.vue";
+  import JobTypeSelect from "../components/jobs/Tables/Closed_Jobs/JobTypeSelect.vue";
 
   export default {
     data() {
@@ -287,6 +281,13 @@
         this.openTargetInvoiceDate = !this.openTargetInvoiceDate;
         console.log('invoice date dropdown open', this.openTargetInvoiceDate);
       },
+
+
+
+      /*methods from another select*/
+      chosenIndustry({industry}) {
+        console.log('choosen industry: ',industry);
+      }
     },
     computed: {
       startDateFilter() {
@@ -306,9 +307,9 @@
     },
     components: {
       DataTable,
-      "source-select": JobTypesSource,
-      "target-select": ClientLangTarget,
-      quotesCalendarDetailed: QuotesCalendarDetailed,
+      Calendar,
+      JobTypeSelect,
+      InvoiceDateSelect
     },
     mounted() {
       this.getJobs();
@@ -318,6 +319,21 @@
 
 <style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
+  .filters {
+    &__drop-menu {
+      position: relative;
+      z-index: 1;
+      &.invoice-date{
+        width: 117px;
+        height: 28px;
+      }
+      &.job-type{
+        width: 125px;
+        height: 28px;
+      }
+
+    }
+  }
 
   .switcher {
     position: absolute;
@@ -356,18 +372,10 @@
             height: 20px;
             border-radius: 4px;
           }
-          span.job-type {
-            width: 125px;
-            height: 28px;
-          }
-          span.invoice-date {
-            width: 117px;
-            height: 28px;
-          }
           input.calendar {
-            width: 136px;
+            width: 128px;
             height: 28px;
-            padding: 0;
+            padding: 0 4px;
           }
           span {
             position: relative;
