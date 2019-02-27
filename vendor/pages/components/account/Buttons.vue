@@ -38,7 +38,7 @@ export default {
 .buttons {
     display: flex;
     &__button {
-        margin-left: 15px;
+        margin-left: 30px;
     }
 }
 </style>
