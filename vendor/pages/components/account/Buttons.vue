@@ -1,8 +1,11 @@
 <template lang="pug">
     .buttons
-        Button(value="Save" @makeAction="save")
-        Button(value="Cancel" @makeAction="cancel")
-        Button(value="Delete" @makeAction="remove")
+        .buttons__button
+            Button(value="Save" @makeAction="save")
+        .buttons__button
+            Button(value="Cancel" @makeAction="cancel")
+        .buttons__button
+            Button(value="Delete" @makeAction="remove")
 </template>
 
 <script>
@@ -16,10 +19,10 @@ export default {
     },
     methods: {
         save() {
-
+            this.$emit("save");
         },
         cancel() {
-
+            this.$router.go(-1);
         },
         remove() {
 
@@ -34,5 +37,8 @@ export default {
 <style lang="scss" scoped>
 .buttons {
     display: flex;
+    &__button {
+        margin-left: 15px;
+    }
 }
 </style>

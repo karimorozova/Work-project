@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped}")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped}, customClass]")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") Select
@@ -22,6 +22,9 @@ export default {
             type: Array
         },
         refersTo: {
+            type: String
+        },
+        customClass: {
             type: String
         }
     },
@@ -83,10 +86,8 @@ export default {
         background-color: white;
         z-index: 6;
         &__item {
-            display: flex;
             align-items: center;
-            height: 37px;
-            padding: 7px;
+            padding: 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
@@ -147,6 +148,28 @@ export default {
         .reverse-icon {
             transform: rotate(180deg);
         }
+    }
+}
+
+.account {
+    border-radius: 5px;
+    top: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+    .select {
+        height: 28px;
+        .selected {
+            width: 82%;
+            border-right: 1px solid #bfb09d;
+            padding: 0 5px;
+        }
+        .arrow-button {
+            width: 18%;
+        }
+    }
+    .drop {
+        border-top: 1px solid #bfb09d;
+        max-height: 150px;
     }
 }
 

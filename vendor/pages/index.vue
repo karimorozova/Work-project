@@ -50,7 +50,6 @@ export default {
   middleware: 'authenticated',
   data() {
     return {
-      vendor: {},
       navbarList: [
         {
           title: "DASHBOARD",
@@ -70,14 +69,6 @@ export default {
     };
   },
   methods: {
-    async getVendorInfo() {
-      try {
-        const result = await this.$axios.$get(`/vendor/info?token=${this.token}`);
-        this.vendor = result;
-      } catch(err) {
-        this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-      }
-    },
     mainPageRender() {
       this.toggleSideBar(true);
     },
@@ -119,12 +110,14 @@ export default {
     },
     ...mapActions({
       alertToggle: "alertToggle",
-      logout: "logout"
+      logout: "logout",
+      getVendorInfo: "getVendorInfo"
     })
   },
   computed: {
     ...mapGetters({
-      token: "getToken"
+      token: "getToken",
+      vendor: "getVendor"
     }),
     fullName() {
       if(this.vendor) {

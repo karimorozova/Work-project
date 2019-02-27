@@ -71,17 +71,16 @@ export default {
     display: flex;
     flex-direction: column;
     .drop {
-        width: 98%;
+        box-sizing: border-box;
         max-height: 100px;
         overflow-y: auto;
         overflow-x: hidden;
-        display: flex;
         flex-direction: column;
         background-color: white;
         border: 1px solid #67573E;
+        border-top: none;
         z-index: 6;
         &__item {
-            display: flex;
             align-items: center;
             padding: 3px;
             border-bottom: .5px solid #BFB09D;
@@ -114,9 +113,10 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    height: 26px;
     .selected {
         width: 77%;
-        padding: 3px 10px;
+        padding: 3px 5px;
         border-right: 0.5px solid #67573E;
         font-size: 14px;
         max-height: 40px;
