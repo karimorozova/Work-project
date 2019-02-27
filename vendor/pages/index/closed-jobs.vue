@@ -40,6 +40,7 @@
               :errors="errors"
               :areErrors="areErrors"
               :isApproveModal="isDeleting"
+              bodyClass="tbody_height-200"
               @closeErrors="closeErrors"
               @approve="rejectJob"
               @notApprove="setDefaults"
@@ -161,6 +162,62 @@
               "projectName": "Market resources(Updated)",
               "amount": "1000 €",
               "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
+            },{
+              "type": "Proofing",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "invoiceDate": "June 2018",
             },
           ];
         } catch (err) {
@@ -258,7 +315,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
 
   .switcher {

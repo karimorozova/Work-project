@@ -4,7 +4,7 @@
       .table__thead-row
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody.scroll(:class="{'tbody_visible-overflow': tableData.length}")
+    .table__tbody.scroll(:class="[{'tbody_visible-overflow': isBodyOverflow}, bodyClass]")
       .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
@@ -48,6 +48,12 @@
       isApproveModal: {
         type: Boolean,
         default: false
+      },
+      isBodyOverflow: {
+        type: Boolean
+      },
+      bodyClass: {
+        type: String
       }
     },
     data() {
@@ -183,10 +189,16 @@
     }
   }
 
+  .tbody_height-200 {
+    max-height: 200px;
+  }
+
+  .tbody_height-300 {
+    max-height: 300px;
+  }
+
   .tbody_visible-overflow {
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 136px;
+    overflow: visible;
   }
 
 </style>

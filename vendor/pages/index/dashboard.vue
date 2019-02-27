@@ -4,7 +4,7 @@
       h3 Upcoming Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableUpcoming(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -49,7 +49,7 @@
       h3 Open Jobs
       .jobs
         .jobs__table
-          SettingsTable(
+          SettingsTableOpened(
             :fields="fields"
             :tableData="jobs"
             :errors="errors"
@@ -185,6 +185,42 @@
               "projectName": "Market resources(Updated)",
               "amount": "1000 €",
               "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
+            },
+            {
+              "type": "Accepted",
+              "username": "admin",
+              "deadLine": "11 Apr 2018",
+              "projectId": "2018 04 11 [27]",
+              "projectName": "Market resources(Updated)",
+              "amount": "1000 €",
+              "status": "Proofing",
             }
           ];
         } catch (err) {
@@ -220,7 +256,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
 
   .vendor_portal_wrapper {
