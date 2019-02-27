@@ -52,17 +52,17 @@ export default {
         }
     },
     methods: {
-        setSourceFilter({lang}) {
-            this.$emit('setSourceFilter', {lang});
+        setSourceFilter({option}) {
+            console.log(option);
         },
-        setTargetFilter({lang}) {
-            this.$emit('setTargetFilter', {lang});
+        setTargetFilter({option}) {
+            console.log(option);
         },
         setIndustryFilter({industry}) {
-            this.$emit('setIndustryFilter', {industry});
+            console.log(industry);           
         },
-        setServiceFilter({service}) {
-            this.$emit('setServiceFilter', {service});
+        setServiceFilter({option}) {
+            console.log(option);
         }
     },
     computed: {
