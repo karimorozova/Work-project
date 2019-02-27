@@ -75,10 +75,10 @@
 
 <script>
   import moment from 'moment';
-  import DataTable from "../components/jobs/Table/DataTable";
-  import JobTypesSource from "@/components/Tables/Closed_Jobs/JobTypesSource";
+  import DataTable from "~/components/Tables/DataTable";
+  import JobTypesSource from "../components/jobs/Tables/Closed_Jobs/JobTypesSource";
   import QuotesCalendarDetailed from "@/components/Tables/quotes/QuotesCalendarDetailed";
-  import ClientLangTarget from "@/components/Tables/Closed_Jobs/ClientLangTarget";
+  import ClientLangTarget from "../components/jobs/Tables/Closed_Jobs/ClientLangTarget";
 
   export default {
     data() {

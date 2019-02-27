@@ -24,8 +24,8 @@
 </template>
 
 <script>
-  import ValidationErrors from "~/components/Tables/ValidationErrors";
-  import ApproveModal from "~/components/Tables/ApproveModal";
+  import ValidationErrors from "~/components/ValidationErrors";
+  import ApproveModal from "~/components/ApproveModal";
 
   export default {
     props: {
@@ -89,7 +89,7 @@
 </script>
 
 <style lang="scss" scoped>
-@import '../../../../assets/scss/colors.scss';
+@import '../../assets/scss/colors.scss';
 
 .table {
   width: 100%;
