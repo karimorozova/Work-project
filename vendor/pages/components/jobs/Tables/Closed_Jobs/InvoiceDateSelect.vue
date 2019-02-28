@@ -57,6 +57,7 @@
       },
       async getJobTypes() {
         this.uniqJobInvoiceDates = _.uniqBy(this.jobs,'invoiceDate');
+        this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
         // try {
         //     const allIndustries = await this.$http.get('/api/industries')
         //     let sortedArray = allIndustries.data.filter(item => {

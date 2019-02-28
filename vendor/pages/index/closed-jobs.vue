@@ -37,8 +37,8 @@
                   )
         .jobs__table
           DataTable(
-          :fields="fields"
-            :tableData="jobs"
+              :fields="fields"
+              :tableData="filteredJobs"
               :errors="errors"
               :areErrors="areErrors"
               :isApproveModal="isDeleting"
@@ -48,6 +48,7 @@
               @approve="rejectJob"
               @notApprove="setDefaults"
               @closeModal="setDefaults"
+              :jobTypeFilter="jobTypeFilter"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -214,6 +215,7 @@
         jobTypeFilter: {type: "All"},
         invoiceDateFilter: {invoiceDate: "All"},
         industryFilter: {name: "All"},
+        filteredJobs : []
       }
     },
     methods: {
@@ -226,7 +228,6 @@
       async getJobs() {
         try {
           // const result = await this.$axios.$get("/jobs");
-          this.jobsTypes = '';
         } catch (err) {
           // this.alertToggle({message: err.message, isShow: true, type: "error"});
         }
@@ -298,8 +299,25 @@
 
       /*methods from another select*/
       setFilter({option}, prop) {
+        this.filteredJobs = this.jobs;
         console.log('option, prop',{option}, prop);
         this[prop] = option;
+        this.filteredJobs = this.filteredJobs.filter((job)=> job.type === option.type);
+      },
+      filterJobs() {
+        console.log('filters: ', );
+        // if(this.industryFilter && this.industryFilter.name !== 'All') {
+        //   result = result.filter(item => {
+        //     const industryIds = item.industries.map(indus => indus._id);
+        //     return industryIds.indexOf(this.industryFilter._id) !== -1;
+        //   })
+        // }
+        // if(this.leadFilter && this.leadFilter !== 'All') {
+        //   result = result.filter(item => {
+        //     return item.leadSource == this.leadFilter;
+        //   })
+        // }
+        // return result;
       },
     },
     computed: {
@@ -323,6 +341,9 @@
       Calendar,
       JobTypeSelect,
       InvoiceDateSelect
+    },
+    created(){
+      this.filteredJobs = this.jobs;
     },
     mounted() {
       this.getJobs();
