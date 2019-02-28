@@ -82,8 +82,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, offsetTop: 0, offsetHeight: 0})
         },
         changeInd(index) {
-          console.log('index: ',index);
-            this.$emit("setJobTypeFilter", { option: this.jobs[index] });
+            this.$emit("setJobTypeFilter", { option: this.uniqJobTypes[index]});
             this.outClick();
         }
     },

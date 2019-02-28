@@ -214,7 +214,6 @@
 
         jobTypeFilter: {type: "All"},
         invoiceDateFilter: {invoiceDate: "All"},
-        industryFilter: {name: "All"},
         filteredJobs : []
       }
     },
@@ -299,25 +298,19 @@
 
       /*methods from another select*/
       setFilter({option}, prop) {
-        this.filteredJobs = this.jobs;
         console.log('option, prop',{option}, prop);
         this[prop] = option;
-        this.filteredJobs = this.filteredJobs.filter((job)=> job.type === option.type);
+        this.filterJobs();
       },
       filterJobs() {
-        console.log('filters: ', );
-        // if(this.industryFilter && this.industryFilter.name !== 'All') {
-        //   result = result.filter(item => {
-        //     const industryIds = item.industries.map(indus => indus._id);
-        //     return industryIds.indexOf(this.industryFilter._id) !== -1;
-        //   })
-        // }
-        // if(this.leadFilter && this.leadFilter !== 'All') {
-        //   result = result.filter(item => {
-        //     return item.leadSource == this.leadFilter;
-        //   })
-        // }
-        // return result;
+        this.filteredJobs = this.jobs;
+        if(this.jobTypeFilter && this.jobTypeFilter.type !== 'All') {
+          this.filteredJobs = this.filteredJobs.filter(item => item.type === this.jobTypeFilter.type )
+        }
+
+        if(this.invoiceDateFilter && this.invoiceDateFilter.invoiceDate !== 'All') {
+          this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter.invoiceDate )
+        }
       },
     },
     computed: {

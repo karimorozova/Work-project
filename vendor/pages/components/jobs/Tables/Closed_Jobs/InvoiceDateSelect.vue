@@ -82,7 +82,7 @@
         this.$emit('scrollDrop', {drop: this.droppedInd, offsetTop: 0, offsetHeight: 0})
       },
       changeInd(index) {
-        this.$emit("setInvoiceDateFilter", { option: this.jobs[index] });
+        this.$emit("setInvoiceDateFilter", { option: this.uniqJobInvoiceDates[index] });
         this.outClick();
       }
     },

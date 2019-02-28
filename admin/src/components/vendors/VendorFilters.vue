@@ -50,7 +50,6 @@ export default {
     methods: {
         filterByName() {
             this.$emit("setNameFilter", { option: this.nameFilter })
-          console.log('in 1:', { option: this.nameFilter });
         },
         chosenStatus({option}) {
             this.$emit("setStatusFilter", { option })
