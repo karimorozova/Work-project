@@ -1,22 +1,22 @@
 <template lang="pug">
 .rates-filters
-    .rates-filters__item(v-if="form !== 'Mono'")
+    .rates-filters__item(v-if="form !== 'mono'")
         label.rates-filters__title Source Language
         .rates-filters__drop-menu
-            SelectMulti(:selectedOptions="sourceSelect" :addAll="true" @chooseOptions="setSourceFilter")
+            SelectMulti(:selectedOptions="sourceSelect" :options="sourceLanguages" @chooseOptions="setSourceFilter" customClass="filters")
     .rates-filters__item
-        label.rates-filters__title(v-if="form !== 'Mono'") Target Language
+        label.rates-filters__title(v-if="form !== 'mono'") Target Language
         label.rates-filters__title(v-else) Language
         .rates-filters__drop-menu
-            SelectMulti(:selectedOptions="targetSelect" :addAll="true" @chooseOptions="setTargetFilter")
+            SelectMulti(:selectedOptions="targetSelect" :options="targetLanguages" @chooseOptions="setTargetFilter" customClass="filters")
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu
-            MultiVendorIndustrySelect(:selectedInd="industryFilter" @chosenInd="setIndustryFilter")
+            MultiVendorIndustrySelect(:selectedInd="industriesSelect" :filteredIndustries="industryFilter" :parentIndustries="industriesList" @chosenInd="setIndustryFilter")
     .rates-filters__item
         label.rates-filters__title Service
         .rates-filters__drop-menu
-            SelectMulti(:form="form" :selectedOptions="serviceSelect" @chooseOptions="setServiceFilter")
+            SelectMulti(:selectedOptions="serviceSelect" :options="services" @chooseOptions="setServiceFilter" customClass="filters")
 </template>
 
 <script>
@@ -33,7 +33,19 @@ export default {
             type: Array,
             default: () => []
         },
+        sourceLanguages: {
+            type: Array,
+            default: () => []
+        },
         targetSelect: {
+            type: Array,
+            default: () => []
+        },
+        targetLanguages: {
+            type: Array,
+            default: () => []
+        },
+        industriesSelect: {
             type: Array,
             default: () => []
         },
@@ -41,7 +53,15 @@ export default {
             type: Array,
             default: () => []
         },
+        industriesList: {
+            type: Array,
+            default: () => []
+        },
         serviceSelect: {
+            type: Array,
+            default: () => []
+        },
+        services: {
             type: Array,
             default: () => []
         }
@@ -53,16 +73,16 @@ export default {
     },
     methods: {
         setSourceFilter({option}) {
-            console.log(option);
+            this.$emit("setSourceFilter", { option });
         },
         setTargetFilter({option}) {
-            console.log(option);
+            this.$emit("setTargetFilter", { option });
         },
         setIndustryFilter({industry}) {
-            console.log(industry);           
+            this.$emit("setIndustryFilter", { industry} );           
         },
         setServiceFilter({option}) {
-            console.log(option);
+            this.$emit("setServiceFilter", { option });
         }
     },
     computed: {

@@ -6,15 +6,14 @@
                 span.rates__label Mono
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMonoRatesShow}") 
             .rates__drop(v-if="isMonoRatesShow")
-                MonoRates(:vendor="vendor")
+                MonoRates(:vendor="vendor" :services="monoServices")
     .rates__block(:class="{'rates_straight-angle': isDuoRatesShow}")
         .rates__open
             .rates__select(@click="duoRatesToggler")
                 span.rates__label Duo
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isDuoRatesShow}") 
             .rates__drop(v-if="isDuoRatesShow")
-                DuoRates(:vendor="vendor" 
-                    @addSevLangs="addSevLangs")
+                DuoRates(:vendor="vendor" :services="duoServices")
     .rates__block(:class="{'rates_straight-angle': isMatrixShow}")
             .rates____open
                 .rates__select(@click="matrixToggler")
@@ -40,7 +39,9 @@ export default {
         return {
             isMonoRatesShow: false,
             isDuoRatesShow: false,
-            isMatrixShow: false
+            isMatrixShow: false,
+            services: [],
+            duoServicesFilter: ["Translation", "Proofing", "QA and Testing"]
         }
     },
     methods: {
@@ -64,14 +65,43 @@ export default {
                 this.alertToggle({message: "Error on setting matrix data", isShow: true, type: "error"})
             }
         },
+        async getServices() {
+            try {
+                const result = await this.$axios.get("/api/services");
+                this.services = result.data;
+            } catch(err) {
+
+            }
+        },
         ...mapActions({
             alertToggle: "alertToggle"
         })
+    },
+    computed: {
+        monoServices() {
+            let result = [];
+            if(this.services.length) {
+                result = this.services.filter(item => item.languageForm === "Mono")
+                .map(item => item.title);
+            }
+            return result;
+        },
+        duoServices() {
+            let result = [];
+            if(this.services.length) {
+                result = this.services.filter(item => item.languageForm === "Duo" && this.duoServicesFilter.indexOf(item.title) !== -1)
+                .map(item => item.title);
+            }
+            return result;
+        }
     },
     components: {
         DuoRates,
         MonoRates,
         FinanceMatrix
+    },
+    mounted() {
+        this.getServices();
     }
 }
 

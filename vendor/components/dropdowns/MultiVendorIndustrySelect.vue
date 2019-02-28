@@ -1,16 +1,18 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick" :class="customClass")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name != 'All'")
+            template(v-if="selectedInd.length && selectedInd[0].name !== 'All'")
                 .selected
                     .industry-tooltip(v-for="item in selectedInd")
                         img(:src="domain + item.icon")
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
-                span.selected.no-industry Options
+            template(v-if="selectedInd.length && selectedInd[0].name === 'All'")
+                span.selected All
+            template(v-if="!selectedInd.length") 
+                span.selected.no-industry Select
             .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click.stop="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
+            .drop__item(v-for="(industry, index) in allIndustries" @click.stop="changeInd(index)" :class="{chosen: industry.name == selectedInd.name}")
                 .checkbox
                     .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
                 span.drop__name {{ industry.name }}
@@ -26,6 +28,13 @@ export default {
         },
         filteredIndustries: {
             type: Array,
+        },
+        parentIndustries: {
+            type: Array,
+            default: () => []
+        },
+        customClass: {
+            type: String
         }
     },
     data() {
@@ -74,7 +83,16 @@ export default {
             this.droppedInd = false;
         },
         changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index]})
+            this.$emit("chosenInd", {industry: this.allIndustries[index]})
+        }
+    },
+    computed: {
+        allIndustries() {
+            let result = this.industries;
+            if(this.parentIndustries.length) {
+                result = this.parentIndustries;
+            }
+            return result;
         }
     },
     directives: {
@@ -241,4 +259,13 @@ export default {
         }
     }
 }
+
+.filters {
+    .drop {
+        &__item {
+            padding: 0 5px;
+        }
+    }
+}
+
 </style>
