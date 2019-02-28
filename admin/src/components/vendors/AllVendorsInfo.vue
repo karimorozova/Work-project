@@ -63,6 +63,7 @@ export default {
             this.storeCurrentVendor({});
         },
         setFilter({option}, prop) {
+          console.log('option, prop',{option}, prop);
             this[prop] = option;
         },
         ...mapActions({

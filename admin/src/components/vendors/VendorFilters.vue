@@ -14,7 +14,7 @@
     .filters__item
         label.filters__filter-title Lead Source
         .filters__drop-menu
-            VendorLeadsourceSelect(:selectedLeadsource="leadFilter" @chosenLeadsource="chosenLead")      
+            VendorLeadsourceSelect(:selectedLeadsource="leadFilter" @chosenLeadsource="chosenLead")
 </template>
 
 <script>
@@ -50,6 +50,7 @@ export default {
     methods: {
         filterByName() {
             this.$emit("setNameFilter", { option: this.nameFilter })
+          console.log('in 1:', { option: this.nameFilter });
         },
         chosenStatus({option}) {
             this.$emit("setStatusFilter", { option })

@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
   /*
   ** Headers of the page
@@ -50,7 +52,13 @@ module.exports = {
           exclude: /(node_modules)/
         })
       }
-    }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+        '_': 'lodash'
+        // ...etc.
+      })
+    ]
   },
   router: {
     base: '/',
@@ -60,4 +68,4 @@ module.exports = {
     '~/plugins/axios',
     '~plugins/vue-cookie'
   ]
-}
+};
