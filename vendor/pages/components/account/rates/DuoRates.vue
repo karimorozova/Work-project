@@ -1,63 +1,51 @@
 <template lang="pug">
     .duo-rates
-        Filters(form="Duo"
-            :industriesList="industries"
-            :industriesSelect="industriesSelect"
-            :industryFilter="industriesNames"
-            :targetLanguages="targetLanguages"
-            :sourceLanguages="sourceLanguages"
-            :services="services"
-            :targetSelect="targetSelect"
-            :sourceSelect="sourceSelect"
-            :serviceSelect="serviceSelect"
-            @setSourceFilter="setSourceFilter"
-            @setTargetFilter="setTargetFilter"
-            @setIndustryFilter="setIndustryFilter"
-            @setServiceFilter="setServiceFilter"
-        )
+        .duo-rates__filters
+            Filters(form="Duo"
+                :industriesList="industries"
+                :industriesSelect="industriesSelect"
+                :industryFilter="industriesNames"
+                :targetLanguages="targetLanguages"
+                :sourceLanguages="sourceLanguages"
+                :services="servicesNames"
+                :targetSelect="targetSelect"
+                :sourceSelect="sourceSelect"
+                :serviceSelect="serviceSelect"
+                @setSourceFilter="(e) => setLangFilter(e, 'sourceSelect')"
+                @setTargetFilter="(e) => setLangFilter(e, 'targetSelect')"
+                @setIndustryFilter="setIndustryFilter"
+                @setServiceFilter="setServiceFilter"
+            )
+        .duo-rates__rates
+            DuoRatesTable(:sourceFilter="sourceSelect" :targetFilter="targetSelect" :industriesFilter="industriesNames")
 </template>
 
 <script>
 import Filters from "./Filters";
+import DuoRatesTable from "./tables/DuoRatesTable";
 import { mapGetters } from "vuex";
 
 export default {
-    props: {
-        services: {
-            type: Array,
-            default: () => []
-        }
-    },
     data() {
         return {
             targetSelect: ["All"],
             sourceSelect: ["All"],
             industriesSelect: [{name: "All"}],
             serviceSelect: ["Translation"],
+            duoServicesFilter: ["tr", "pr", "qt"]
         }
     },
     methods: {
-        setSourceFilter({option}) {
-            if(option === "All") return this.sourceSelect = ["All"];
-            const position = this.sourceSelect.indexOf(option);
+        setLangFilter({option}, prop) {
+            if(option === "All") return this[prop] = ["All"];
+            const position = this[prop].indexOf(option);
             if(position !== -1) {
-                this.sourceSelect.splice(position, 1);
+                this[prop].splice(position, 1);
             } else {
-                this.sourceSelect = this.sourceSelect.filter(item => item !== "All");
-                this.sourceSelect.push(option);
+                this[prop] = this[prop].filter(item => item !== "All");
+                this[prop].push(option);
             }
-            if(!this.sourceSelect.length) return this.sourceSelect = ["All"];
-        },
-        setTargetFilter({option}) {
-            if(option === "All") return this.targetSelect = ["All"];
-            const position = this.targetSelect.indexOf(option);
-            if(position !== -1) {
-                this.targetSelect.splice(position, 1);
-            } else {
-                this.targetSelect = this.targetSelect.filter(item => item !== "All");
-                this.targetSelect.push(option);
-            }
-            if(!this.targetSelect.length) return this.targetSelect = ["All"];
+            if(!this[prop].length) return this[prop] = ["All"];
         },
         setIndustryFilter({industry}) {
             if(industry.name === "All") return this.industriesSelect = [{name: "All"}];
@@ -79,14 +67,20 @@ export default {
                 this.serviceSelect.push(option);
             }
             if(!this.serviceSelect.length) return this.serviceSelect = ["Translation"];
+        },
+        setDefaultService() {
+            const defaultService = this.services.find(item => item.symbol === 'tr');
+            this.serviceSelect = [defaultService.title];
         }
     },
     components: {
-        Filters
+        Filters,
+        DuoRatesTable
     },
     computed: {
         ...mapGetters({
-            accountInfo: "getAccountInfo"
+            accountInfo: "getAccountInfo",
+            services: "getServices"
         }),
         sourceLanguages() {
             let result = [];
@@ -123,11 +117,29 @@ export default {
         },
         industriesNames() {
             return this.industriesSelect.map(item => item.name);
+        },
+        servicesNames() {
+            let result = [];
+            if(this.services.length) {
+                result = this.services.filter(item => item.languageForm === "Duo" && this.duoServicesFilter.indexOf(item.symbol) !== -1)
+                .map(item => item.title);
+            }
+            return result;
         }
+    },
+    mounted() {
+        this.setDefaultService();
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
+.duo-rates {
+    &__filters {
+        padding-bottom: 20px;
+        margin-top: 10px;
+    }
+}
 
 </style>

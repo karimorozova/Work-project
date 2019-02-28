@@ -77,14 +77,6 @@ export default {
     &__item {
         margin-bottom: 20px;
     }
-    &__name {
-        font-size: 14px;
-    }
-    &__list {
-        position: relative;
-        width: 191px;
-        height: 28px;;
-    }
 }
 
 </style>

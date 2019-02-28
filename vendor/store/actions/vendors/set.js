@@ -1,7 +1,7 @@
 import { SET_APPLICATION_DATA } from "../../mutation-types";
 
 export const setApplicationForm = ( { commit }, payload ) => {
-    commit(SET_APPLICATION_DATA, payload)
+    commit(SET_APPLICATION_DATA, payload);
 }
 
 export const setAccountInfo = ({ commit }) => {
@@ -11,5 +11,5 @@ export const setAccountInfo = ({ commit }) => {
 }
 
 export const setAccountProp = ({ commit }, payload) => {
-    commit("SET_ACCOUNT_PROP", payload)
+    commit("SET_ACCOUNT_PROP", payload);
 }

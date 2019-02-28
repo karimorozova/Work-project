@@ -5,7 +5,7 @@ const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const { saveHashedPassword } = require('./info');
-const bcrypt = require('bcryptjs');
+const { getVendorRates } = require('./vendorRates');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -44,7 +44,7 @@ router.get("/info", checkVendor, async (req, res) => {
     }
 })
 
-router.post("/info", checkVendor, async (req, res, next) => {
+router.post("/info", checkVendor, async (req, res) => {
     let { id, password, info } = req.body;
     try {
         if(password) {
@@ -55,6 +55,18 @@ router.post("/info", checkVendor, async (req, res, next) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on saving data. Try later.");
+    }
+})
+
+router.get("/rates", checkVendor, async (req, res) => {
+    const { id, form } = req.query;
+    try {
+        const vendor = await getVendor({"_id": id});
+        const rates = await getVendorRates({vendor, form});
+        res.send(rates);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting rates.");
     }
 })
 

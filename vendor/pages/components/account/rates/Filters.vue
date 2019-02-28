@@ -9,11 +9,15 @@
         label.rates-filters__title(v-else) Language
         .rates-filters__drop-menu
             SelectMulti(:selectedOptions="targetSelect" :options="targetLanguages" @chooseOptions="setTargetFilter" customClass="filters")
+    .rates-filters__item(v-if="form === 'mono'")
+        label.rates-filters__title Packages
+        .rates-filters__drop-menu
+            SelectMulti(:selectedOptions="packageSelect" :options="packages" @chooseOptions="setPackageFilter" customClass="filters")
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu
             MultiVendorIndustrySelect(:selectedInd="industriesSelect" :filteredIndustries="industryFilter" :parentIndustries="industriesList" @chosenInd="setIndustryFilter")
-    .rates-filters__item
+    .rates-filters__item.rates-filters_no-display
         label.rates-filters__title Service
         .rates-filters__drop-menu
             SelectMulti(:selectedOptions="serviceSelect" :options="services" @chooseOptions="setServiceFilter" customClass="filters")
@@ -64,6 +68,14 @@ export default {
         services: {
             type: Array,
             default: () => []
+        },
+        packageSelect: {
+            type: Array,
+            default: () => []
+        },
+        packages: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
@@ -83,6 +95,9 @@ export default {
         },
         setServiceFilter({option}) {
             this.$emit("setServiceFilter", { option });
+        },
+        setPackageFilter({option}) {
+            this.$emit("setPackageFilter", { option });
         }
     },
     computed: {
@@ -125,6 +140,9 @@ export default {
     &__drop-menu {
         position: relative;
         width: 100%;
+    }
+    &_no-display {
+        display: none;
     }
 }
 </style>

@@ -1,6 +1,7 @@
 export * from './language'
 export * from './timezones'
 export * from './vendors'
+export * from './rates'
 export * from './requests'
 export * from './alerts'
 export * from './auth'
