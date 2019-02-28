@@ -6,21 +6,21 @@
                 span.rates__label Mono
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMonoRatesShow}") 
             .rates__drop(v-if="isMonoRatesShow")
-                MonoRates(:vendor="vendor" :services="monoServices")
+                MonoRates
     .rates__block(:class="{'rates_straight-angle': isDuoRatesShow}")
         .rates__open
             .rates__select(@click="duoRatesToggler")
                 span.rates__label Duo
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isDuoRatesShow}") 
             .rates__drop(v-if="isDuoRatesShow")
-                DuoRates(:vendor="vendor" :services="duoServices")
+                DuoRates
     .rates__block(:class="{'rates_straight-angle': isMatrixShow}")
             .rates____open
                 .rates__select(@click="matrixToggler")
                     span.rates__label Matrix
                     img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMatrixShow}") 
                 .rates__drop(v-if="isMatrixShow")
-                    FinanceMatrix(:entity="vendor" @setMatrixData="setMatrixData")
+                    FinanceMatrix
 </template>
 
 <script>
@@ -30,24 +30,14 @@ import FinanceMatrix from "./rates/FinanceMatrix";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-    props: {
-        vendor: {
-            type: Object
-        }
-    },
     data() {
         return {
             isMonoRatesShow: false,
             isDuoRatesShow: false,
             isMatrixShow: false,
-            services: [],
-            duoServicesFilter: ["Translation", "Proofing", "QA and Testing"]
         }
     },
     methods: {
-        addSevLangs(data) {
-            this.$emit('addSevLangs')
-        },
         monoRatesToggler() {
             this.isMonoRatesShow = !this.isMonoRatesShow;
         },
@@ -57,43 +47,29 @@ export default {
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
         },
-        async setMatrixData({value, key}) {
-            try {
-                await this.setVendorsMatrixData({value, key});
-                this.alertToggle({message: "Matrix data updated", isShow: true, type: "success"})
-            } catch(err) {
-                this.alertToggle({message: "Error on setting matrix data", isShow: true, type: "error"})
-            }
-        },
         async getServices() {
             try {
                 const result = await this.$axios.get("/api/services");
-                this.services = result.data;
+                let services = result.data.sort((a, b) => a.sortIndex - b.sortIndex);
+                this.setServices(services);
+            } catch(err) {
+
+            }
+        },
+        async getPackages() {
+            try {
+                const result = await this.$axios.get("/api/packages");
+                let packages = result.data.map(item => item.size);
+                this.setPackages(packages);
             } catch(err) {
 
             }
         },
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            setServices: "setServices",
+            setPackages: "setPackages"
         })
-    },
-    computed: {
-        monoServices() {
-            let result = [];
-            if(this.services.length) {
-                result = this.services.filter(item => item.languageForm === "Mono")
-                .map(item => item.title);
-            }
-            return result;
-        },
-        duoServices() {
-            let result = [];
-            if(this.services.length) {
-                result = this.services.filter(item => item.languageForm === "Duo" && this.duoServicesFilter.indexOf(item.title) !== -1)
-                .map(item => item.title);
-            }
-            return result;
-        }
     },
     components: {
         DuoRates,
@@ -102,6 +78,7 @@ export default {
     },
     mounted() {
         this.getServices();
+        this.getPackages();
     }
 }
 

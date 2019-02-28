@@ -5,7 +5,7 @@
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
     .table__tbody.scroll(:class="[{'tbody_visible-overflow': isBodyOverflow}, bodyClass]")
-      .table__tbody-row(:class="[rowClass]" v-for="(row, index) of tableData" @click="onClick(index)")
+      .table__tbody-row(:class="rowClass" v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
@@ -95,7 +95,7 @@
   width: 100%;
   &__thead {
     .table__thead-row {
-      background-color: $brown-border;
+      background-color: $thead-background;
       color: $white;
     }
   }
@@ -125,7 +125,6 @@
       border-right: 0.5px solid $cell-border;
     }
   }
-
   &__tbody-cell {
     box-sizing: border-box;
     font-size: 14px;
@@ -141,21 +140,13 @@
       box-shadow: inset 0 0 5px $cell-border;
     }
   }
-
-    &__thead-row, &__tbody-row {
-      display: flex;
-    }
-    &__tbody-row {
-      width: 1027px;
-    }
-    &_scroll-padding {
-      padding-right: 15px;
-    }
+  &__thead-row, &__tbody-row {
+    display: flex;
+  }
 
   &_bottom-bordered {
     border-bottom: 0.5px solid $cell-border;
   }
-
   &__approve {
     position: absolute;
     z-index: 50;
@@ -170,6 +161,10 @@
   }
 }
 
+.tbody_height-150 {
+  height: 150px;
+}
+
 .tbody_height-200 {
   max-height: 200px;
 }
@@ -177,14 +172,17 @@
 .tbody_height-300 {
   max-height: 300px;
 }
+
 .tbody_row_width-875 {
   width: 875px;
 }
+
 .tbody_visible-overflow {
   overflow: visible;
 }
-  .scroll{
-    overflow-x: hidden;
-  }
+
+.scroll{
+  overflow-x: hidden;
+}
 
 </style>

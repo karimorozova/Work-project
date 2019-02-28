@@ -5,6 +5,8 @@ const state = {
   newPassword: {password: "", confirmedPassword: ""},
   languages: [],
   timezones: [],
+  services: [],
+  packages: [],
   applicationFormData: {
     name: "",
     surname: "",

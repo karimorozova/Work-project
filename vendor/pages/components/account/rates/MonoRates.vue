@@ -1,48 +1,50 @@
 <template lang="pug">
     .mono-rates
-        Filters(form="mono" 
-            :industriesList="industries"
-            :industriesSelect="industriesSelect"
-            :industryFilter="industriesNames"
-            :targetLanguages="targetLanguages"
-            :services="services"
-            :targetSelect="targetSelect"
-            :serviceSelect="serviceSelect"
-            @setTargetFilter="setTargetFilter"
-            @setIndustryFilter="setIndustryFilter"
-            @setServiceFilter="setServiceFilter"
-        )
+        .mono-rates__filters
+            Filters(form="mono" 
+                :industriesList="industries"
+                :industriesSelect="industriesSelect"
+                :industryFilter="industriesNames"
+                :targetLanguages="targetLanguages"
+                :services="servicesNames"
+                :packages="allPackages"
+                :targetSelect="targetSelect"
+                :serviceSelect="serviceSelect"
+                :packageSelect="packageSelect"
+                @setPackageFilter="(e) => setFilter(e, 'packageSelect')"
+                @setTargetFilter="(e) => setFilter(e, 'targetSelect')"
+                @setIndustryFilter="setIndustryFilter"
+                @setServiceFilter="setServiceFilter"
+            )
+        .mono-rates__rates    
+            MonoRatesTable(:langFilter="targetSelect" :industriesFilter="industriesNames" :packagesFilter="packageSelect")
 </template>
 
 <script>
 import Filters from "./Filters";
+import MonoRatesTable from "./tables/MonoRatesTable";
 import { mapGetters } from "vuex";
 
 export default {
-    props: {
-        services: {
-            type: Array,
-            default: () => []
-        }
-    },
     data() {
         return {
             targetSelect: ["All"],
             industriesSelect: [{name: "All"}],
             serviceSelect: ["Copywriting"],
+            packageSelect: ["All"]
         }
     },
     methods: {
-        setTargetFilter({option}) {
-            if(option === "All") return this.targetSelect = ["All"];
-            const position = this.targetSelect.indexOf(option);
+        setFilter({option}, prop) {
+            if(option === "All") return this[prop] = ["All"];
+            const position = this[prop].indexOf(option);
             if(position !== -1) {
-                this.targetSelect.splice(position, 1);
+                this[prop].splice(position, 1);
             } else {
-                this.targetSelect = this.targetSelect.filter(item => item !== "All");
-                this.targetSelect.push(option);
+                this[prop] = this[prop].filter(item => item !== "All");
+                this[prop].push(option);
             }
-            if(!this.targetSelect.length) return this.targetSelect = ["All"];
+            if(!this[prop].length) return this[prop] = ["All"];
         },
         setIndustryFilter({industry}) {
             if(industry.name === "All") return this.industriesSelect = [{name: "All"}];
@@ -64,14 +66,21 @@ export default {
                 this.serviceSelect.push(option);
             }
             if(!this.serviceSelect.length) return this.serviceSelect = ["Copywriting"];
+        },
+        setDefaultService() {
+            const defaultService = this.services.find(item => item.symbol === 'co');
+            this.serviceSelect = [defaultService.title];
         }
     },
     components: {
-        Filters
+        Filters,
+        MonoRatesTable
     },
     computed: {
         ...mapGetters({
-            accountInfo: "getAccountInfo"
+            accountInfo: "getAccountInfo",
+            services: "getServices",
+            packages: "getPackages"
         }),
         targetLanguages() {
             let result = [];
@@ -94,11 +103,34 @@ export default {
         },
         industriesNames() {
             return this.industriesSelect.map(item => item.name);
+        },
+        servicesNames() {
+            let result = [];
+            if(this.services.length) {
+                result = this.services.filter(item => item.languageForm === "Mono")
+                .map(item => item.title);
+            }
+            return result;
+        },
+        allPackages() {
+            let result = this.packages;
+            result.unshift("All");
+            return result;
         }
+    },
+    mounted() {
+        this.setDefaultService();
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
+.mono-rates {
+    &__filters {
+        padding-bottom: 20px;
+        margin-top: 10px;
+    }
+}
 
 </style>

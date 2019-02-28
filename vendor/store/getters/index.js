@@ -8,3 +8,5 @@ export const getToken = state => state.token;
 export const getVendor = state => state.vendor;
 export const getAccountInfo = state => state.accountInfo;
 export const getNewPassword = state => state.newPassword;
+export const getServices = state => state.services;
+export const getPackages = state => state.packages;

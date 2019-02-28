@@ -25,7 +25,7 @@ export default {
     &__list {
         position: relative;
         width: 191px;
-        height: 28px;;
+        height: 30px;;
     }
 }
 
