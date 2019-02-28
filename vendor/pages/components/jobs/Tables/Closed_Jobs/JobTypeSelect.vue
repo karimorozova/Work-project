@@ -1,20 +1,15 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
         .select
-            template(v-if="selectedInd && selectedInd.name !== 'All'")
-                .selected
-                    .industry-tooltip
-                        img(:src="selectedInd.icon")
-                        span.toolTip {{ selectedInd.name }}
-            template(v-if="selectedInd.name === 'All'")
-                .selected(v-if="!selectedInd.icon") {{ selectedInd.name }}
+            template(v-if="selectedInd")
+                .selected {{ selectedInd.type }}
             template(v-if="!selectedInd")
                 span.selected.no-industry Options
             .arrow-button(@click="showInds")
                 img(src="../../../../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
-            .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)" :class="{chosen: industry.name === selectedInd.name}")
-                span {{ industry.name }}
+            .drop__item(v-for="(job, index) in uniqJobTypes" @click="changeInd(index)" :class="{chosen: job.type === selectedInd.type}")
+                span {{ job.type }}
 </template>
 
 <script>
@@ -25,13 +20,20 @@ export default {
         selectedInd: {
             type: [String, Object]
         },
+        selectedJobType: {
+            type: [String, Object]
+        },
         parentInd: {
             type: Number
         },
+        jobs: {
+          type: [ Object, Array]
+      },
     },
     data() {
         return {
             industries: [],
+            uniqJobTypes: [],
             droppedInd: false,
             errors: []
         }
@@ -53,8 +55,8 @@ export default {
             this.droppedInd = !this.droppedInd;
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
-        async getIndustries() {
-          this.industries = [{"icon":"/static/industries/casino-poker-igaming.png","name":"iGaming (Casino, Slot games, Gambling, etc.)","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd3","__v":0},{"icon":"/static/industries/casino-poker-igaming.png","name":"Poker","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd4","__v":0},{"icon":"/static/industries/cfds-online-tranding.png","name":"CFDs & Online Trading","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd5","__v":0},{"icon":"/static/industries/hotel-real-estates.png","name":"Hotel & Real Estates","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd6","__v":0},{"icon":"/static/industries/icos-cryptocurrency.png","name":"ICOs & Cryptocurrency","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd7","__v":0},{"icon":"/static/industries/legal-icon.png","name":"Legal","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd8","__v":0},{"icon":"/static/industries/video-games.png","name":"Video Games","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cd9","__v":0},{"icon":"/static/industries/more-icon.png","name":"More","generic":"/static/example.xlsx","active":true,"rate":0,"package":200,"_id":"5c6aa7cc982aae4301e15cda","__v":0}];
+        async getJobTypes() {
+          this.uniqJobTypes = _.uniqBy(this.jobs,'type');
             // try {
             //     const allIndustries = await this.$http.get('/api/industries')
             //     let sortedArray = allIndustries.data.filter(item => {
@@ -79,7 +81,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, offsetTop: 0, offsetHeight: 0})
         },
         changeInd(index) {
-            this.$emit("chosenInd", {industry: this.industries[index], index: this.parentInd});
+            this.$emit("setJobTypeFilter", { option: this.jobs[index] });
             this.outClick();
         }
     },
@@ -87,7 +89,7 @@ export default {
         ClickOutside
     },
     mounted () {
-        this.getIndustries()
+        this.getJobTypes()
     }
 }
 </script>

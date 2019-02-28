@@ -9,7 +9,11 @@
               .filterBlock__item.sourceLangs
                 label.inner-label Job Type:
                 .filters__drop-menu.job-type
-                    JobTypeSelect(:selectedInd="{name: 'All'}" @chosenInd="chosenIndustry")
+                    JobTypeSelect(
+                      :jobs="jobs"
+                      :selectedInd="jobTypeFilter"
+                      @setJobTypeFilter="(option) => setFilter(option, 'jobTypeFilter')"
+                    )
             .filterBlock
               .filterBlock__item.deadline
                 label.inner-label Start Date
@@ -26,7 +30,11 @@
               .filterBlock__item.targetLangs
                 label.inner-label Invoice Date
                 .filters__drop-menu.invoice-date
-                  InvoiceDateSelect(:selectedInd="{name: 'All'}" @chosenInd="chosenIndustry")
+                  InvoiceDateSelect(
+                    :jobs="jobs"
+                    :selectedInd="invoiceDateFilter"
+                    @setInvoiceDateFilter="(option) => setFilter(option, 'invoiceDateFilter')"
+                  )
         .jobs__table
           DataTable(
           :fields="fields"
@@ -85,7 +93,107 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "18%", padding: "0"},
           {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "16%", padding: "0"},
         ],
-        jobs: [],
+        jobs: [{
+          "type": "Translation",
+          "username": "illy.dim",
+          "deadLine": "11 Apr 2018",
+          "projectId": "2018 04 11 [27]",
+          "projectName": "Market resources(Updated)",
+          "amount": "1000 €",
+          "invoiceDate": "May 2018",
+        },
+          {
+            "type": "QA",
+            "username": "kriti.chris",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "gender": "FEMALE",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },
+          {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          },{
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Apr 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "August 2018",
+          },
+        ],
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
@@ -102,6 +210,10 @@
         currentFormVisible: false,
         currentFormVisibleOther: false,
 
+
+        jobTypeFilter: {type: "All"},
+        invoiceDateFilter: {invoiceDate: "All"},
+        industryFilter: {name: "All"},
       }
     },
     methods: {
@@ -114,107 +226,7 @@
       async getJobs() {
         try {
           // const result = await this.$axios.$get("/jobs");
-          this.jobs = [{
-            "type": "Translation",
-            "username": "illy.dim",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "May 2018",
-          },
-            {
-              "type": "QA",
-              "username": "kriti.chris",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "gender": "FEMALE",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },
-            {
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            }, {
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            }, {
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },{
-              "type": "Proofing",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "invoiceDate": "June 2018",
-            },
-          ];
+          this.jobsTypes = '';
         } catch (err) {
           // this.alertToggle({message: err.message, isShow: true, type: "error"});
         }
@@ -285,9 +297,10 @@
 
 
       /*methods from another select*/
-      chosenIndustry({industry}) {
-        console.log('choosen industry: ',industry);
-      }
+      setFilter({option}, prop) {
+        console.log('option, prop',{option}, prop);
+        this[prop] = option;
+      },
     },
     computed: {
       startDateFilter() {
