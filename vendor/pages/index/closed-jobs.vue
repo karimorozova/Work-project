@@ -25,7 +25,7 @@
                 label.inner-label Deadline
                 input.calendar(type="text" :value="deadFilter")
                 img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-              Calendar(v-if="currentFormVisibleOther" @dateFilter='requestOnFilterDeadLine' :class="{switcher: currentFormVisibleOther}")
+              Calendar(v-if="currentFormVisibleOther" @dateFilter='requestOnFilterDeadline' :class="{switcher: currentFormVisibleOther}")
             .filterBlock
               .filterBlock__item.targetLangs
                 label.inner-label Invoice Date
@@ -295,8 +295,8 @@
         this.filterJobs();
         this.currentFormVisible = false;
       },
-      requestOnFilterDeadLine(data) {
-        this.deadLineFilter = {from: data.from, to: data.to};
+      requestOnFilterDeadline(data) {
+        this.deadlineFilter = {from: data.from, to: data.to};
         this.filterJobs();
         this.currentFormVisibleOther = false;
 
@@ -324,7 +324,7 @@
         }
 
         if (this.deadlineFilter.from) {
-          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadLine).format() >= moment(this.deadLineFilter.from).format()) && (moment(item.deadLine).format() <= moment(this.deadLineFilter.to).format())))
+          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadline).format() >= moment(this.deadlineFilter.from).format()) && (moment(item.deadline).format() <= moment(this.deadlineFilter.to).format())))
         }
 
         if (this.startDateFilter.from) {
