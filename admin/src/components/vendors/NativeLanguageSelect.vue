@@ -40,7 +40,7 @@ export default {
         showLangs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr" || item.className.indexOf("table__body-row") !== -1) {
+                if(item.localName == "tr" || (item.className && item.className.indexOf("table__body-row") !== -1)) {
                     return item;
                 }
             });
