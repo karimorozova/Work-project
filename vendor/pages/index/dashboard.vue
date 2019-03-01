@@ -112,7 +112,6 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        jobs: [],
         icons: [
           {icon: require("../../assets/images/Approve-icon.png"), active: true, type: "approve"},
           {icon: require("../../assets/images/Reject-icon.png"), active: true, type: "reject"}
@@ -191,6 +190,7 @@
       padding: 3px 0;
 
       &__table {
+        padding-top: 10px; 
         width: 1027px;
         margin: 0 auto;
       }
