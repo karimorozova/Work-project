@@ -9,23 +9,23 @@
               .filterBlock__item.sourceLangs
                 label.inner-label Job Type:
                 .filters__drop-menu.job-type
-                    JobTypeSelect(
-                      :jobs="jobs"
-                      :selectedInd="jobTypeFilter"
-                      @setJobTypeFilter="(option) => setFilter(option, 'jobTypeFilter')"
-                    )
+                  JobTypeSelect(
+                    :jobs="jobs"
+                    :selectedInd="jobTypeFilter"
+                    @setJobTypeFilter="(option) => setFilter(option, 'jobTypeFilter')"
+                  )
             .filterBlock
               .filterBlock__item.deadline
                 label.inner-label Start Date
-                input.calendar(type="text" :value="startDateFilter")
+                input.calendar(type="text" :value="startFilter")
                 img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-              Calendar(v-if="currentFormVisible" @dateFilter='requestOnFilter')
+              Calendar(v-if="currentFormVisible" @dateFilter='requestOnFilterStartDate')
             .filterBlock
               .filterBlock__item.deadline
                 label.inner-label Deadline
                 input.calendar(type="text" :value="deadFilter")
                 img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-              Calendar(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")
+              Calendar(v-if="currentFormVisibleOther" @dateFilter='requestOnFilterDeadLine' :class="{switcher: currentFormVisibleOther}")
             .filterBlock
               .filterBlock__item.targetLangs
                 label.inner-label Invoice Date
@@ -37,14 +37,14 @@
                   )
         .jobs__table
           DataTable(
-              :fields="fields"
-              :tableData="filteredJobs"
+          :fields="fields"
+            :tableData="filteredJobs"
               :errors="errors"
               :areErrors="areErrors"
               :isApproveModal="isDeleting"
-              bodyClass="tbody_height-200"
-              rowClass="tbody_row_width-875"
-              @closeErrors="closeErrors"
+          bodyClass="tbody_height-200"
+          rowClass="tbody_row_width-875"
+            @closeErrors="closeErrors"
               @approve="rejectJob"
               @notApprove="setDefaults"
               @closeModal="setDefaults"
@@ -97,7 +97,8 @@
         jobs: [{
           "type": "Translation",
           "username": "illy.dim",
-          "deadLine": "11 Apr 2018",
+          "deadLine": "11 Dec 2018",
+          "startDate": "01 Apr 2017",
           "projectId": "2018 04 11 [27]",
           "projectName": "Market resources(Updated)",
           "amount": "1000 €",
@@ -106,7 +107,8 @@
           {
             "type": "QA",
             "username": "kriti.chris",
-            "deadLine": "11 Apr 2018",
+            "deadLine": "11 Dec 2018",
+            "startDate": "15 Jan 2018",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
             "gender": "FEMALE",
@@ -116,7 +118,62 @@
           {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Apr 2018",
+            "deadLine": "11 Dec 2018",
+            "startDate": "05 Dec 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "31 Dec 2018",
+            "startDate": "09 Dec 2018",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Jan 2018",
+            "startDate": "15 Nov 2017",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Nov 2018",
+            "startDate": "15 Dec 2017",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Aug 2018",
+            "startDate": "15 Dec 2017",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Aug 2018",
+            "startDate": "15 Dec 2017",
+            "projectId": "2018 04 11 [27]",
+            "projectName": "Market resources(Updated)",
+            "amount": "1000 €",
+            "invoiceDate": "June 2018",
+          }, {
+            "type": "Proofing",
+            "username": "admin",
+            "deadLine": "11 Aug 2018",
+            "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
             "amount": "1000 €",
@@ -125,6 +182,7 @@
             "type": "Proofing",
             "username": "admin",
             "deadLine": "11 Apr 2018",
+            "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
             "amount": "1000 €",
@@ -133,62 +191,16 @@
             "type": "Proofing",
             "username": "admin",
             "deadLine": "11 Apr 2018",
+            "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
             "amount": "1000 €",
             "invoiceDate": "June 2018",
-          },{
+          }, {
             "type": "Proofing",
             "username": "admin",
             "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },{
-            "type": "Proofing",
-            "username": "admin",
-            "deadLine": "11 Apr 2018",
+            "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
             "amount": "1000 €",
@@ -206,7 +218,7 @@
         targetInvoiceDateFilter: '',
         openSourceJobTypes: false,
         openTargetInvoiceDate: false,
-        requestDateFilter: {from: "", to: ""},
+        startDateFilter: {from: "", to: ""},
         deadLineFilter: {from: "", to: ""},
         currentFormVisible: false,
         currentFormVisibleOther: false,
@@ -214,7 +226,7 @@
 
         jobTypeFilter: {type: "All"},
         invoiceDateFilter: {invoiceDate: "All"},
-        filteredJobs : []
+        filteredJobs: []
       }
     },
     methods: {
@@ -278,14 +290,14 @@
           this.currentFormVisible = false;
         }
       },
-      requestOnFilter(data) {
-        this.requestDateFilter = {from: data.from, to: data.to};
-        console.log(this.requestDateFilter);
+      requestOnFilterStartDate(data) {
+        this.startDateFilter = {from: data.from, to: data.to};
+        this.filterJobs();
         this.currentFormVisible = false;
       },
-      dealineFiltered(data) {
-        this.deadlineFilter = {from: data.from, to: data.to};
-        console.log(this.deadlineFilter);
+      requestOnFilterDeadLine(data) {
+        this.deadLineFilter = {from: data.from, to: data.to};
+        this.filterJobs();
         this.currentFormVisibleOther = false;
 
       },
@@ -295,36 +307,43 @@
       },
 
 
-
       /*methods from another select*/
       setFilter({option}, prop) {
-        console.log('option, prop',{option}, prop);
         this[prop] = option;
         this.filterJobs();
       },
       filterJobs() {
         this.filteredJobs = this.jobs;
-        if(this.jobTypeFilter && this.jobTypeFilter.type !== 'All') {
-          this.filteredJobs = this.filteredJobs.filter(item => item.type === this.jobTypeFilter.type )
+
+        if (this.jobTypeFilter && this.jobTypeFilter.type !== 'All') {
+          this.filteredJobs = this.filteredJobs.filter(item => item.type === this.jobTypeFilter.type)
         }
 
-        if(this.invoiceDateFilter && this.invoiceDateFilter.invoiceDate !== 'All') {
-          this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter.invoiceDate )
+        if (this.invoiceDateFilter && this.invoiceDateFilter.invoiceDate !== 'All') {
+          this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter.invoiceDate)
+        }
+
+        if (this.deadLineFilter.from) {
+          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadLine).format() >= moment(this.deadLineFilter.from).format()) && (moment(item.deadLine).format() <= moment(this.deadLineFilter.to).format())))
+        }
+
+        if (this.startDateFilter.from) {
+          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.startDate).format() >= moment(this.startDateFilter.from).format()) && (moment(item.startDate).format() <= moment(this.startDateFilter.to).format())))
         }
       },
     },
     computed: {
-      startDateFilter() {
+      startFilter() {
         let result = "";
-        if (this.requestDateFilter.from) {
-          result = moment(this.requestDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.requestDateFilter.to).format('DD-MM-YYYY')
+        if (this.startDateFilter.from) {
+          result = moment(this.startDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.startDateFilter.to).format('DD-MM-YYYY');
         }
         return result
       },
       deadFilter() {
         let result = "";
         if (this.deadLineFilter.from) {
-          result = moment(this.deadLineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadLineFilter.to).format('DD-MM-YYYY')
+          result = moment(this.deadLineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadLineFilter.to).format('DD-MM-YYYY');
         }
         return result
       },
@@ -335,7 +354,7 @@
       JobTypeSelect,
       InvoiceDateSelect
     },
-    created(){
+    created() {
       this.filteredJobs = this.jobs;
     },
     mounted() {
@@ -346,15 +365,16 @@
 
 <style lang="scss" scoped>
   @import '../../assets/scss/colors.scss';
+
   .filters {
     &__drop-menu {
       position: relative;
       z-index: 1;
-      &.invoice-date{
+      &.invoice-date {
         width: 117px;
         height: 28px;
       }
-      &.job-type{
+      &.job-type {
         width: 125px;
         height: 28px;
       }
