@@ -323,7 +323,7 @@
           this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter.invoiceDate)
         }
 
-        if (this.deadLineFilter.from) {
+        if (this.deadlineFilter.from) {
           this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadLine).format() >= moment(this.deadLineFilter.from).format()) && (moment(item.deadLine).format() <= moment(this.deadLineFilter.to).format())))
         }
 
