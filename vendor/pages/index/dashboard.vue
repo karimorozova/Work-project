@@ -189,6 +189,7 @@
       padding: 3px 0;
 
       &__table {
+        padding-top: 10px; 
         width: 1027px;
         margin: 0 auto;
       }
