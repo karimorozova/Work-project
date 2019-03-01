@@ -17,11 +17,16 @@ async function getJobs(id) {
 }
 
 function getSteps(project, id) {
-    const { steps } = project;
+    const { steps, tasks } = project;
     let assignedSteps = [];
     let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id);
     for(let step of filteredSteps) {
-        assignedSteps.push({...step._doc, projectId: project.projectId, projectName: project.projectName});
+        const stepTask = tasks.find(item => item.taskId === step.taskId);
+        assignedSteps.push({...step._doc, 
+            projectId: project.projectId, 
+            projectName: project.projectName,
+            xtmJobId: stepTask.xtmJobs[0]
+        });
     }
     return assignedSteps;
 }

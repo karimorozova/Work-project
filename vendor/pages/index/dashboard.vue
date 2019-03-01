@@ -56,6 +56,7 @@
             :isApproveModal="isDeleting"
             bodyClass="tbody_height-200"
             @closeErrors="closeErrors"
+            @onRowClicked="goToXtmEditor"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -125,6 +126,17 @@
         getJobs: "getJobs",
         setJobStatus: "setJobStatus"
       }),
+      async goToXtmEditor({index}) {
+        try {
+          const url = await this.$axios.get(`/xtm/editor?jobId=${this.openedJobs[index].xtmJobId}`);
+          let link = document.createElement("a");
+          link.target = "_blank";
+          link.href = url.data;
+          link.click();
+        } catch(err) {
+          this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+        }
+      },
       closeErrors() {
         this.areErrors = false;
       },
