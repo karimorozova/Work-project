@@ -1,4 +1,5 @@
-const { getProjects } = require('../../projects');
+const { getProjects, getProject } = require('../../projects');
+const { Projects } = require('../../models');
 
 async function getJobs(id) {
     try {
@@ -25,4 +26,21 @@ function getSteps(project, id) {
     return assignedSteps;
 }
 
-module.exports = { getJobs };
+async function updateStepStatus(jobId, status) {
+    try {
+        const project = await getProject({'steps._id': jobId});
+        let { steps } = project;
+        let modifiedSteps = steps.map(item => {
+            if(item.id === jobId) {
+                item.status = status;
+                return item;
+            }
+            return item;
+        })
+        await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
+    } catch(err) {
+
+    }
+}
+
+module.exports = { getJobs, updateStepStatus };

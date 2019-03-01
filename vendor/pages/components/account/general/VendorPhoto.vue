@@ -7,7 +7,7 @@
             img.photo__image(v-if="isImageExist")
         .photo__wrap(v-if="vendor.photo")
             input.photo__file(type="file" @change="previewPhoto")                       
-            img.photo__image(:src="vendor.photo")
+            img.photo__image(:src="domain+vendor.photo")
 </template>
 
 <script>
@@ -17,7 +17,8 @@ export default {
     data() {
         return {
             photoFile: [],
-            isImageExist: false
+            isImageExist: false,
+            domain: ""
         }
     },
     methods: {
@@ -38,6 +39,9 @@ export default {
         ...mapGetters({
             vendor: "getVendor"
         })
+    },
+    mounted() {
+        this.domain = process.env.domain;
     }
 }
 </script>

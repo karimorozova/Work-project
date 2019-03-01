@@ -2,11 +2,11 @@ const router = require('express').Router();
 const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
-const { Vendors } = require('../../models');
+const { Vendors, Projects } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const { saveHashedPassword } = require('./info');
 const { getVendorRates } = require('./vendorRates');
-const { getJobs } = require('./jobs');
+const { getJobs, updateStepStatus } = require('./jobs');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -80,6 +80,17 @@ router.get("/jobs", checkVendor, async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting jobs.")
+    }
+})
+
+router.post("/job", checkVendor, async (req, res) => {
+    const { jobId, status } = req.body;
+    try {
+        await updateStepStatus(jobId, status);
+        res.send("Status updated");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on changing job status")
     }
 })
 
