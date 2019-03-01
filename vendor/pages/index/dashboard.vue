@@ -42,7 +42,7 @@
             template(slot="deadLine" slot-scope="{ row, index }")
               .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }} 
+              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
                 span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons
@@ -96,7 +96,6 @@
 
 <script>
   import DataTable from "~/components/Tables/DataTable";
-  // import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
   import { mapGetters, mapActions } from "vuex";
   import moment from "moment";
 
@@ -112,7 +111,6 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        jobs: [],
         icons: [
           {icon: require("../../assets/images/Approve-icon.png"), active: true, type: "approve"},
           {icon: require("../../assets/images/Reject-icon.png"), active: true, type: "reject"}

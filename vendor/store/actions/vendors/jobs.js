@@ -5,4 +5,4 @@ export const getJobs = async function({ commit, dispatch, state}) {
     } catch(err) {
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
-}
+};
