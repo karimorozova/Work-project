@@ -1,5 +1,5 @@
 import { setApplicationData, SET_VENDOR, SET_NEW_PASSWORD,
-        SET_CONFIRMED_PASSWORD, SET_ACCOUNT_INFO, SET_ACCOUNT_PROP } from './set';
+        SET_CONFIRMED_PASSWORD, SET_ACCOUNT_INFO, SET_ACCOUNT_PROP, SET_JOBS } from './set';
 import { SET_APPLICATION_DATA } from '../../mutation-types';
 
 export default {
@@ -8,5 +8,6 @@ export default {
     SET_NEW_PASSWORD,
     SET_CONFIRMED_PASSWORD,
     SET_ACCOUNT_INFO,
-    SET_ACCOUNT_PROP
+    SET_ACCOUNT_PROP,
+    SET_JOBS
 }

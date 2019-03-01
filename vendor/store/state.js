@@ -3,6 +3,7 @@ const state = {
   vendor: {},
   accountInfo: {},
   newPassword: {password: "", confirmedPassword: ""},
+  jobs: [],
   languages: [],
   timezones: [],
   services: [],

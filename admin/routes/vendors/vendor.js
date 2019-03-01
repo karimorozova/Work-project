@@ -6,6 +6,7 @@ const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const { saveHashedPassword } = require('./info');
 const { getVendorRates } = require('./vendorRates');
+const { getJobs } = require('./jobs');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -67,6 +68,18 @@ router.get("/rates", checkVendor, async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting rates.");
+    }
+})
+
+router.get("/jobs", checkVendor, async (req, res) => {
+    const { token } = req.query;
+    try {
+        const verificationResult = jwt.verify(token, secretKey);
+        const jobs = await getJobs(verificationResult.vendorId);
+        res.send(jobs);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting jobs.")
     }
 })
 

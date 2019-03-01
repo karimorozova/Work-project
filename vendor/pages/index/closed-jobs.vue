@@ -56,7 +56,7 @@
               .jobs__head-title {{ field.label }}
             template(slot="headerType" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
-            template(slot="headerDeadLine" slot-scope="{ field }")
+            template(slot="headerDeadline" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
             template(slot="headerAmount" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -68,8 +68,8 @@
               .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
             template(slot="type" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.type }}
-            template(slot="deadLine" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.deadLine }}
+            template(slot="deadline" slot-scope="{ row, index }")
+              .jobs__data(v-if="currentActive !== index") {{ row.deadline }}
             template(slot="amount" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.amount }}
             template(slot="invoiceDate" slot-scope="{ row, index }")
@@ -90,14 +90,14 @@
           {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
           {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "22%", padding: "0"},
           {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "17%", padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "17%", padding: "0"},
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "18%", padding: "0"},
           {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "16%", padding: "0"},
         ],
         jobs: [{
           "type": "Translation",
           "username": "illy.dim",
-          "deadLine": "11 Dec 2018",
+          "deadline": "11 Dec 2018",
           "startDate": "01 Apr 2017",
           "projectId": "2018 04 11 [27]",
           "projectName": "Market resources(Updated)",
@@ -107,7 +107,7 @@
           {
             "type": "QA",
             "username": "kriti.chris",
-            "deadLine": "11 Dec 2018",
+            "deadline": "11 Dec 2018",
             "startDate": "15 Jan 2018",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -118,7 +118,7 @@
           {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Dec 2018",
+            "deadline": "11 Dec 2018",
             "startDate": "05 Dec 2018",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -127,7 +127,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "31 Dec 2018",
+            "deadline": "31 Dec 2018",
             "startDate": "09 Dec 2018",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -136,7 +136,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Jan 2018",
+            "deadline": "11 Jan 2018",
             "startDate": "15 Nov 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -145,7 +145,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Nov 2018",
+            "deadline": "11 Nov 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -154,7 +154,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Aug 2018",
+            "deadline": "11 Aug 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -163,7 +163,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Aug 2018",
+            "deadline": "11 Aug 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -172,7 +172,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Aug 2018",
+            "deadline": "11 Aug 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -181,7 +181,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Apr 2018",
+            "deadline": "11 Apr 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -190,7 +190,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Apr 2018",
+            "deadline": "11 Apr 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -199,7 +199,7 @@
           }, {
             "type": "Proofing",
             "username": "admin",
-            "deadLine": "11 Apr 2018",
+            "deadline": "11 Apr 2018",
             "startDate": "15 Dec 2017",
             "projectId": "2018 04 11 [27]",
             "projectName": "Market resources(Updated)",
@@ -219,7 +219,7 @@
         openSourceJobTypes: false,
         openTargetInvoiceDate: false,
         startDateFilter: {from: "", to: ""},
-        deadLineFilter: {from: "", to: ""},
+        deadlineFilter: {from: "", to: ""},
         currentFormVisible: false,
         currentFormVisibleOther: false,
 
@@ -342,8 +342,8 @@
       },
       deadFilter() {
         let result = "";
-        if (this.deadLineFilter.from) {
-          result = moment(this.deadLineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadLineFilter.to).format('DD-MM-YYYY');
+        if (this.deadlineFilter.from) {
+          result = moment(this.deadlineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadlineFilter.to).format('DD-MM-YYYY');
         }
         return result
       },
