@@ -57,7 +57,11 @@
       },
       rowClass: {
         type: String
-      }
+      },
+      industryFilter: {
+        type: [String, Object],
+        default: ""
+      },
     },
     data() {
       return {

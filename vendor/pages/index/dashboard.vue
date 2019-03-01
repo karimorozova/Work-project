@@ -42,7 +42,7 @@
             template(slot="deadLine" slot-scope="{ row, index }")
               .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }} 
+              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
                 span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons(v-if="row.status==='Request Sent'")

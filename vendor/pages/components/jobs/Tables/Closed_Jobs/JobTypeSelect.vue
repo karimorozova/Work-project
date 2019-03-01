@@ -57,6 +57,7 @@ export default {
         },
         async getJobTypes() {
           this.uniqJobTypes = _.uniqBy(this.jobs,'type');
+          this.uniqJobTypes.unshift({type: "All"})
             // try {
             //     const allIndustries = await this.$http.get('/api/industries')
             //     let sortedArray = allIndustries.data.filter(item => {
@@ -81,7 +82,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, offsetTop: 0, offsetHeight: 0})
         },
         changeInd(index) {
-            this.$emit("setJobTypeFilter", { option: this.jobs[index] });
+            this.$emit("setJobTypeFilter", { option: this.uniqJobTypes[index]});
             this.outClick();
         }
     },
