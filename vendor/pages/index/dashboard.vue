@@ -35,13 +35,15 @@
             template(slot="projectName" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
             template(slot="type" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.type }}
+              .jobs__data(v-if="row.name === 'translate1'") Translation
+              .jobs__data(v-else) Proofing
             template(slot="status" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.status }}
             template(slot="deadLine" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.deadLine }}
+              .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.amount }}
+              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }} 
+                span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons
                 img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
@@ -84,7 +86,7 @@
             template(slot="status" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.status }}
             template(slot="deadLine" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.deadLine }}
+              .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.amount }}
             template(slot="icons" slot-scope="{ row, index }")
@@ -95,6 +97,8 @@
 <script>
   import DataTable from "~/components/Tables/DataTable";
   // import SettingsTableOpened from "@/components/Tables/Opened_Jobs/SettingsTable";
+  import { mapGetters, mapActions } from "vuex";
+  import moment from "moment";
 
   export default {
     data() {
@@ -122,110 +126,18 @@
       }
     },
     methods: {
+      ...mapActions({
+        alertToggle: "alertToggle",
+        getJobs: "getJobs"
+      }),
       closeErrors() {
         this.areErrors = false;
       },
       setDefaults() {
         return true
       },
-      async getJobs() {
-        try {
-          // const result = await this.$axios.$get("/jobs");
-          this.jobs = [{
-            "type": "Request Sent",
-            "username": "illy.dim",
-            "deadLine": "11 Apr 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "status": "Translation",
-          },
-            {
-              "type": "Accepted",
-              "username": "kriti.chris",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "gender": "FEMALE",
-              "amount": "1000 €",
-              "status": "QA",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            },
-            {
-              "type": "Accepted",
-              "username": "admin",
-              "deadLine": "11 Apr 2018",
-              "projectId": "2018 04 11 [27]",
-              "projectName": "Market resources(Updated)",
-              "amount": "1000 €",
-              "status": "Proofing",
-            }
-          ];
-        } catch (err) {
-          // this.alertToggle({message: err.message, isShow: true, type: "error"});
-        }
+      formatDeadline(date) {
+        return moment(date).format('DD-MMM-YYYY')
       },
       rejectJob() {
         console.log('reject job');
@@ -245,6 +157,11 @@
       async makeAction(index, key) {
         console.log('clicked:', index, key);
       }
+    },
+    computed: {
+      ...mapGetters({
+        jobs: "getAllJobs"
+      })
     },
     components: {
       DataTable
