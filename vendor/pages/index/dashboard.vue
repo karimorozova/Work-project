@@ -111,10 +111,10 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        icons: {
-          approve: {icon: require("../../assets/images/Approve-icon.png")},
-          reject: {icon: require("../../assets/images/Reject-icon.png")}
-        },
+        icons: [
+          {icon: require("../../assets/images/Approve-icon.png"), active: true, type: "approve"},
+          {icon: require("../../assets/images/Reject-icon.png"), active: true, type: "reject"}
+        ],
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
@@ -142,7 +142,7 @@
         console.log('reject job');
       },
       isActive(key, index) {
-        
+
         return true;
       },
       async checkErrors(index) {
@@ -190,7 +190,7 @@
       padding: 3px 0;
 
       &__table {
-        padding-top: 10px; 
+        padding-top: 10px;
         width: 1027px;
         margin: 0 auto;
       }
