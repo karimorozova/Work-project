@@ -6,15 +6,12 @@
         .jobs__table
           DataTable(
             :fields="fields"
-            :tableData="jobs"
+            :tableData="upcomingJobs"
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
             bodyClass="tbody_height-200"
             @closeErrors="closeErrors"
-            @approve="rejectJob"
-            @notApprove="setDefaults"
-            @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -53,15 +50,12 @@
         .jobs__table
           DataTable(
             :fields="fields"
-            :tableData="jobs"
+            :tableData="openedJobs"
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
             bodyClass="tbody_height-200"
             @closeErrors="closeErrors"
-            @approve="rejectJob"
-            @notApprove="setDefaults"
-            @closeModal="setDefaults"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -82,16 +76,18 @@
             template(slot="projectName" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
             template(slot="type" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.type }}
+              .jobs__data(v-if="row.name === 'translate1'") Translation
+              .jobs__data(v-else) Proofing
             template(slot="status" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.status }}
             template(slot="deadLine" slot-scope="{ row, index }")
               .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.amount }}
+              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
+                span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="icons" slot-scope="{ row, index }")
               .jobs__icons
-                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+                //- img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
 </template>
 
 <script>
@@ -160,7 +156,21 @@
     computed: {
       ...mapGetters({
         jobs: "getAllJobs"
-      })
+      }),
+      upcomingJobs() {
+        return this.jobs.filter(item => {
+          if(item.status === "Request Sent" || item.status === "Created") {
+            return item;
+          }
+        })
+      },
+      openedJobs() {
+        return this.jobs.filter(item => {
+          if(item.status === "In Progress" || item.status === "Accepted") {
+            return item;
+          }
+        })
+      }
     },
     components: {
       DataTable

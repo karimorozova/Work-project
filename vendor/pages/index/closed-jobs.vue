@@ -37,18 +37,14 @@
                   )
         .jobs__table
           DataTable(
-          :fields="fields"
-            :tableData="filteredJobs"
-              :errors="errors"
-              :areErrors="areErrors"
-              :isApproveModal="isDeleting"
-          bodyClass="tbody_height-200"
-          rowClass="tbody_row_width-875"
+            :fields="fields"
+            :tableData="closedJobs"
+            :errors="errors"
+            :areErrors="areErrors"
+            :isApproveModal="isDeleting"
+            bodyClass="tbody_height-200"
+            rowClass="tbody_row_width-875"
             @closeErrors="closeErrors"
-              @approve="rejectJob"
-              @notApprove="setDefaults"
-              @closeModal="setDefaults"
-              :jobTypeFilter="jobTypeFilter"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -82,6 +78,7 @@
   import Calendar from "~/components/Calendar";
   import InvoiceDateSelect from "../components/jobs/Tables/Closed_Jobs/InvoiceDateSelect.vue";
   import JobTypeSelect from "../components/jobs/Tables/Closed_Jobs/JobTypeSelect.vue";
+  import { mapGetters, mapActions } from "vuex";
 
   export default {
     data() {
@@ -94,126 +91,12 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "18%", padding: "0"},
           {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "16%", padding: "0"},
         ],
-        jobs: [{
-          "type": "Translation",
-          "username": "illy.dim",
-          "deadline": "11 Dec 2018",
-          "startDate": "01 Apr 2017",
-          "projectId": "2018 04 11 [27]",
-          "projectName": "Market resources(Updated)",
-          "amount": "1000 €",
-          "invoiceDate": "May 2018",
-        },
-          {
-            "type": "QA",
-            "username": "kriti.chris",
-            "deadline": "11 Dec 2018",
-            "startDate": "15 Jan 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "gender": "FEMALE",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          },
-          {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Dec 2018",
-            "startDate": "05 Dec 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "31 Dec 2018",
-            "startDate": "09 Dec 2018",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Jan 2018",
-            "startDate": "15 Nov 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Nov 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Aug 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Aug 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Aug 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Apr 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Apr 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "June 2018",
-          }, {
-            "type": "Proofing",
-            "username": "admin",
-            "deadline": "11 Apr 2018",
-            "startDate": "15 Dec 2017",
-            "projectId": "2018 04 11 [27]",
-            "projectName": "Market resources(Updated)",
-            "amount": "1000 €",
-            "invoiceDate": "August 2018",
-          },
-        ],
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
         errors: [],
         isDeleting: false,
         deleteIndex: -1,
-
         sourceJobTypeFilter: '',
         targetInvoiceDateFilter: '',
         openSourceJobTypes: false,
@@ -222,38 +105,20 @@
         deadlineFilter: {from: "", to: ""},
         currentFormVisible: false,
         currentFormVisibleOther: false,
-
-
         jobTypeFilter: {type: "All"},
         invoiceDateFilter: {invoiceDate: "All"},
         filteredJobs: []
       }
     },
     methods: {
+      ...mapActions({
+        getJobs: "getJobs"
+      }),
       closeErrors() {
         this.areErrors = false;
       },
       setDefaults() {
         return true
-      },
-      async getJobs() {
-        try {
-          // const result = await this.$axios.$get("/jobs");
-        } catch (err) {
-          // this.alertToggle({message: err.message, isShow: true, type: "error"});
-        }
-      },
-      rejectJob() {
-        console.log('reject job');
-      },
-      isActive(key, index) {
-        // if (this.currentActive === index) {
-        //   return key !== "edit";
-        // }
-        // if (this.currentActive !== index) {
-        //   return key !== "save" && key !== "cancel";
-        // }
-        return true;
       },
       async checkErrors(index) {
 
@@ -261,8 +126,6 @@
       async makeAction(index, key) {
         console.log('clicked:', index, key);
       },
-
-
       jobTypeOpen() {
         this.openSourceJobTypes = !this.openSourceJobTypes;
         console.log('job type dropdown open', this.openSourceJobTypes);
@@ -333,6 +196,9 @@
       },
     },
     computed: {
+      ...mapGetters({
+        jobs: "getAllJobs"
+      }),
       startFilter() {
         let result = "";
         if (this.startDateFilter.from) {
@@ -347,6 +213,9 @@
         }
         return result
       },
+      closedJobs() {
+        return this.jobs.filter(item => item.status === "Closed");
+      }
     },
     components: {
       DataTable,
@@ -367,6 +236,7 @@
   @import '../../assets/scss/colors.scss';
 
   .filters {
+    padding-top: 10px;
     &__drop-menu {
       position: relative;
       z-index: 1;
@@ -488,16 +358,17 @@
       color: $main-color;
 
       .jobs {
-        width: 892px;
+        width: 1047px;
         /*height: 243px;*/
         height: auto;
         background-color: $white;
         box-shadow: 0 0 10px $main-color;
         box-sizing: border-box;
-        padding: 3px 0;
+        padding-top: 15px;
 
         &__table {
-          width: 875px;
+          // width: 875px;
+          padding: 5px;
           margin: 0 auto;
         }
 
