@@ -75,7 +75,7 @@ export default {
         async getLanguages() {
             try {
                 const result = await this.$http.get('/api/languages');
-                let sortedArray = response.body;
+                let sortedArray = result.body;
                 this.languages = sortedArray.sort( (a,b) => {
                     if(a.lang < b.lang) return -1;
                     if(a.lang > b.lang) return 1;
