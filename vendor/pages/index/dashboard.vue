@@ -45,8 +45,8 @@
               .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
                 span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="icons" slot-scope="{ row, index }")
-              .jobs__icons
-                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+              .jobs__icons(v-if="row.status==='Request Sent'")
+                img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)")
     .jobs_block
       h3 Open Jobs
       .jobs
@@ -111,10 +111,10 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        icons: [
-          {icon: require("../../assets/images/Approve-icon.png"), active: true, type: "approve"},
-          {icon: require("../../assets/images/Reject-icon.png"), active: true, type: "reject"}
-        ],
+        icons: {
+          approve: {icon: require("../../assets/images/Approve-icon.png")},
+          reject: {icon: require("../../assets/images/Reject-icon.png")}
+        },
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
@@ -126,7 +126,8 @@
     methods: {
       ...mapActions({
         alertToggle: "alertToggle",
-        getJobs: "getJobs"
+        getJobs: "getJobs",
+        setJobStatus: "setJobStatus"
       }),
       closeErrors() {
         this.areErrors = false;
@@ -141,19 +142,19 @@
         console.log('reject job');
       },
       isActive(key, index) {
-        // if (this.currentActive === index) {
-        //   return key !== "edit";
-        // }
-        // if (this.currentActive !== index) {
-        //   return key !== "save" && key !== "cancel";
-        // }
+        
         return true;
       },
       async checkErrors(index) {
 
       },
       async makeAction(index, key) {
-        console.log('clicked:', index, key);
+        try {
+          const status = key === "approve" ? "Accepted" : "Rejected";
+          await this.setJobStatus({jobId: this.jobs[index]._id, status});
+        } catch(err) {
+          this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
+        }
       }
     },
     computed: {
@@ -229,7 +230,6 @@
 
       &__icon {
         cursor: pointer;
-        opacity: 0.5;
         margin-right: 8px;
         transition: transform 0.1s ease-out;
 

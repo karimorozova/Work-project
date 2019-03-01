@@ -4,8 +4,9 @@
       .vendor-portal__admin-name
         h2.vendor-portal__adminPortal VENDOR PORTAL
       .vendor-portal__search-block
-        .vendor-portal__woman-wrapper
-          img.vendor-portal__photo(src="../assets/images/client-icon_image.png")
+        .vendor-portal__photo-wrapper
+          img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
+          img.vendor-portal__photo(v-else :src="domain+vendor.photo")
           .vendor-portal__account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
             .vendor-portal__account-block
               .vendor-portal__info
@@ -62,6 +63,7 @@ export default {
       ],
       accountMenuVisible: false,
       accountInfo: false,
+      domain: ""
     };
   },
   methods: {
@@ -124,6 +126,7 @@ export default {
   components: {
   },
   mounted() {
+    this.domain = process.env.domain;
     this.setToken();
     this.getVendorInfo();
     this.mainPageRender();
@@ -188,18 +191,24 @@ export default {
       right: 41px;
     }
   }
-  &__woman-wrapper {
+  &__photo-wrapper {
     margin: 0 3px 7px 15px;
     border-radius: 30px;
     width: 33px;
     height: 33px;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // overflow: hidden;
   }
   &__photo {
     border-radius: 50%;
     background-color: white;
     padding-bottom: 1px;
     padding-right: 1px;
+    max-width: 35px;
+    max-height: 35px;
   }
   &__account-block {
     width: 192px;
