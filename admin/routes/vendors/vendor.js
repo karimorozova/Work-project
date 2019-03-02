@@ -4,9 +4,11 @@ const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors, Projects } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
-const { saveHashedPassword } = require('./info');
+const { saveHashedPassword, getPhotoLink, removeOldPhoto } = require('./info');
 const { getVendorRates } = require('./vendorRates');
 const { getJobs, updateStepStatus } = require('./jobs');
+const { upload } = require('../../utils');
+
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -45,11 +47,18 @@ router.get("/info", checkVendor, async (req, res) => {
     }
 })
 
-router.post("/info", checkVendor, async (req, res) => {
-    let { id, password, info } = req.body;
+router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req, res) => {
+    let info = JSON.parse(req.body.info)
+    let { id, password } = req.body;
+    const photoFile = req.files["photo"];
     try {
         if(password) {
             await saveHashedPassword(id, password);
+        }
+        if(photoFile) {
+            let oldPath = info.photo;
+            info.photo = await getPhotoLink(id, photoFile);
+            removeOldPhoto(oldPath, info.photo);
         }
         vendor = await getVendorAfterUpdate({"_id": id}, { ...info })
         res.send(vendor);

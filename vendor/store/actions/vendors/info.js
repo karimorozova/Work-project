@@ -2,7 +2,14 @@ export const saveVendorInfo = async function ({commit, dispatch, state}, payload
     try {
         const id = state.vendor._id;
         const { password } = state.newPassword;
-        const result = await this.$axios.post('/vendor/info', { id, password, info: state.accountInfo });
+        let infoData = new FormData();
+        infoData.append("info", JSON.stringify(state.accountInfo));
+        infoData.append("id", id);
+        infoData.append("password", password);
+        if(state.accountInfo.photoFile) {
+            infoData.append("photo", state.accountInfo.photoFile[0]);
+        }
+        const result = await this.$axios.post('/vendor/info', infoData);
         commit("SET_VENDOR", result.data);
         commit("SET_ACCOUNT_INFO");
         commit("SET_NEW_PASSWORD", "");
