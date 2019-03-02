@@ -392,73 +392,77 @@ router.get('/xtmwords', async (req, res) => {
 })
 
 router.get('/editor', async (req, res) => {
-    let jobId = parseInt(req.query.jobId);
-    let str = '<?xml version="1.0" encoding="UTF-8"?>' +
-    '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
-   '<soapenv:Header/>' +
-   '<soapenv:Body>' +
-      '<pm:obtainXTMEditorLink>' +
-         '<loginAPI>' +
-            '<client>Pangea</client>' +
-            '<password>pm</password>' +
-            '<userId>3150</userId>' +
-         '</loginAPI>' +
-         '<editor>' +
-            '<customerDescriptor>' +
-               '<id>23</id>' +
-            '</customerDescriptor>' +
-            '<jobDescriptor>' +
-               `<id>${jobId}</id>` +
-            '</jobDescriptor>' +
-            '<userDescriptor>' +
-               '<id>3150</id>' +
-            '</userDescriptor>' +
-            '<userOptions>' +
-               '<role>TRANSLATOR</role>' +
-               '<terminologyRights>UPDATE_APPROVE</terminologyRights>' +
-            '</userOptions>' +
-            '<workflowOptions>' +
-               '<currentWorkflowStep>' +
-                  '<id>2885</id>' +
-                '</currentWorkflowStep>' +
-            '</workflowOptions>' + 
-         '</editor>' +
-         '<options/>' +
-      '</pm:obtainXTMEditorLink>' +
-    '</soapenv:Body>' +
-    '</soapenv:Envelope>';
+    try {
+        let jobId = parseInt(req.query.jobId);
+        let str = '<?xml version="1.0" encoding="UTF-8"?>' +
+        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
+    '<soapenv:Header/>' +
+    '<soapenv:Body>' +
+        '<pm:obtainXTMEditorLink>' +
+            '<loginAPI>' +
+                '<client>Pangea</client>' +
+                '<password>pm</password>' +
+                '<userId>3150</userId>' +
+            '</loginAPI>' +
+            '<editor>' +
+                '<customerDescriptor>' +
+                '<id>26216</id>' +
+                '</customerDescriptor>' +
+                '<jobDescriptor>' +
+                `<id>${jobId}</id>` +
+                '</jobDescriptor>' +
+                '<userDescriptor>' +
+                '<id>3150</id>' +
+                '</userDescriptor>' +
+                '<userOptions>' +
+                '<role>TRANSLATOR</role>' +
+                '<terminologyRights>UPDATE_APPROVE</terminologyRights>' +
+                '</userOptions>' +
+                '<workflowOptions>' +
+                '<currentWorkflowStep>' +
+                    '<id>2885</id>' +
+                    '</currentWorkflowStep>' +
+                '</workflowOptions>' + 
+            '</editor>' +
+            '<options/>' +
+        '</pm:obtainXTMEditorLink>' +
+        '</soapenv:Body>' +
+        '</soapenv:Envelope>';
 
-    function createCORSRequest(method, url) {
-        let xhr = new XMLHttpRequest();
-        if ("withCredentials" in xhr) {
-            xhr.open(method, url, false);
-        } else if (typeof XDomainRequest != "undefined") {
-            alert
-            xhr = new XDomainRequest();
-            xhr.open(method, url);
-        } else {
-            console.log("CORS not supported");
-            alert("CORS not supported");
-            xhr = null;
+        function createCORSRequest(method, url) {
+            let xhr = new XMLHttpRequest();
+            if ("withCredentials" in xhr) {
+                xhr.open(method, url, false);
+            } else if (typeof XDomainRequest != "undefined") {
+                alert
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+            } else {
+                console.log("CORS not supported");
+                alert("CORS not supported");
+                xhr = null;
+            }
+            return xhr;
         }
-        return xhr;
-    }
-    let xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
-    if(!xhr){
-    console.log("XHR issue");
-    return;
-    }
+        let xhr = createCORSRequest("POST", "https://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+        if(!xhr){
+        console.log("XHR issue");
+        return;
+        }
 
-    xhr.onload = function (){
-    let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
-    // console.log(parser.toJson(results));
-    let object = JSON.parse(parser.toJson(results));
-    let editorLink = object.editorURL;
-    res.send(editorLink);
-    }
+        xhr.onload = function (){
+        let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
+        let object = JSON.parse(parser.toJson(results));
+        let editorLink = object.editorURL;
+        res.send(editorLink);
+        }
 
-    xhr.setRequestHeader('Content-Type', 'text/xml');
-    xhr.send(str);
+        xhr.setRequestHeader('Content-Type', 'text/xml');
+        xhr.send(str);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on trying to get editor URL");
+    }
 })
 
 router.post('/step-target', async (req, res) => {

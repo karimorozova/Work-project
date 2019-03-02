@@ -1,6 +1,8 @@
 const { getVendor } = require('./getVendors');
 const { Vendors } = require('../../models');
 const bcrypt = require('bcryptjs');
+const { moveFile } = require('../../utils/movingFile');
+const fs = require('fs');
 
 async function saveHashedPassword(id, pass) {
     try {
@@ -17,4 +19,26 @@ async function saveHashedPassword(id, pass) {
     }
 }
 
-module.exports = { saveHashedPassword }
+async function getPhotoLink(id, file) {
+    try {
+        const newPath = await moveFile(file[0], `./dist/vendorsDocs/${id}/${file[0].filename}`);
+        return newPath.split('./dist')[1];
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getPhotoLink");
+    }
+}
+
+function removeOldPhoto(oldPath, newPath) {
+    if(oldPath === newPath) return;
+    try {
+        fs.unlink(`./dist/${oldPath}`, (err) => {
+            if (err) throw err;
+        });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeOldPhoto");
+    }
+}
+
+module.exports = { saveHashedPassword, getPhotoLink, removeOldPhoto }

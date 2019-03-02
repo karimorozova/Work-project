@@ -1,17 +1,17 @@
 <template lang="pug">
     .photo
-        .photo__wrap(v-if="!vendor.photo")
+        .photo__wrap(v-if="!accountInfo.photo")
             input.photo__file(type="file" @change="previewPhoto")
             .photo__text(v-if="!isImageExist")
                 p.photo__message upload your photo                          
             img.photo__image(v-if="isImageExist")
-        .photo__wrap(v-if="vendor.photo")
+        .photo__wrap(v-if="accountInfo.photo")
             input.photo__file(type="file" @change="previewPhoto")                       
-            img.photo__image(:src="domain+vendor.photo")
+            img.photo__image(:src="domain+accountInfo.photo")
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -22,10 +22,13 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            setAccountProp: "setAccountProp"
+        }),
         previewPhoto() {
             let input = document.getElementsByClassName('photo__file')[0];
             if(input.files && input.files[0]) {
-                this.photoFile = input.files;
+                this.setAccountProp({prop: "photoFile", value: input.files});
                 this.isImageExist = true;
                 let reader = new FileReader();
                 reader.onload = (e) => {
@@ -37,7 +40,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            vendor: "getVendor"
+            accountInfo: "getAccountInfo"
         })
     },
     mounted() {
