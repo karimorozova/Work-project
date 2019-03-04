@@ -78,7 +78,7 @@
         deleteIndex: -1,
         startDateFilter: {from: "", to: ""},
         deadlineFilter: {from: "", to: ""},
-        jobTypeFilter: {type: "All"},
+        jobTypeFilter: "All",
         invoiceDateFilter: {invoiceDate: "All"},
         filteredJobs: [],
         fakeJobs: [],
@@ -125,11 +125,11 @@
 
       filterJobs() {
         this.filteredJobs = this.closedJobs;
-        console.log('this.jobTypeFilter:', this.jobTypeFilter.type);
-        if (this.jobTypeFilter && this.jobTypeFilter.type !== 'All' && this.jobTypeFilter.type !== 'QA') {
-          if (this.jobTypeFilter.type === 'Translation') {
+        console.log('this.jobTypeFilter:', this.jobTypeFilter);
+        if (this.jobTypeFilter && this.jobTypeFilter !== 'All' && this.jobTypeFilter !== 'QA') {
+          if (this.jobTypeFilter === 'Translation') {
             this.filteredJobs = this.filteredJobs.filter(item => item.name === 'translate1')
-          } else if (this.jobTypeFilter.type === 'Proofing') {
+          } else if (this.jobTypeFilter === 'Proofing') {
             this.filteredJobs = this.filteredJobs.filter(item => item.name === 'correct1')
           }
         }

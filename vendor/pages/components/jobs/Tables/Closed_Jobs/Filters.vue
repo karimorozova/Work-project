@@ -5,10 +5,11 @@
         .filterBlock__item.sourceLangs
           label.inner-label Job Type:
           .filters__drop-menu.job-type
-            JobTypeSelect(
-            :jobs="jobs"
-            :selectedInd="jobTypeFilter"
-            @setJobTypeFilter="(option)=>$emit('setJobTypeFilter',option)"
+            SelectSingle(
+            :options="['All', 'Translation', 'Proofing', 'QA']"
+            :selectedOption="jobTypeFilter"
+            @chooseOption="(option)=>$emit('setJobTypeFilter',option)"
+            customClass="account"
             )
       .filterBlock
         .filterBlock__item.deadline
@@ -37,11 +38,12 @@
   import Calendar from "~/components/Calendar";
   import InvoiceDateSelect from "./InvoiceDateSelect.vue";
   import JobTypeSelect from "./JobTypeSelect.vue";
+  import SelectSingle from "~/components/dropdowns/SelectSingle.vue";
 
   export default {
     props: {
       jobTypeFilter: {
-        type: Object
+        type: String
       },
       invoiceDateFilter: {
         type: Object
@@ -79,8 +81,12 @@
     components: {
       Calendar,
       JobTypeSelect,
-      InvoiceDateSelect
+      InvoiceDateSelect,
+      SelectSingle
     },
+    mounted(){
+      console.log('this.jobTypeFilter',this.jobTypeFilter);
+    }
   }
 </script>
 
