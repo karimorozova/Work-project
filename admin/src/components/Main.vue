@@ -18,7 +18,8 @@
                     img(src="../assets/images/Other/admin-button-icon.png" )
                     span.spwrap settings
                 .woman-wrapper
-                  img.woman-wrapper__photo(src="../assets/images/client-icon_image.png")
+                  img.woman-wrapper__photo(v-if="!user.photo" src="../assets/images/client-icon_image.png")
+                  img.woman-wrapper__photo(v-else :src="user.photo")
                   .account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
                     .account-block
                       .account-block__info
@@ -398,6 +399,9 @@ export default {
         background-color: white;
         padding-bottom: 1px;
         padding-right: 1px;
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
       }
 
       .account-menu-wrapper {
@@ -414,13 +418,12 @@ export default {
           overflow: hidden;
           &__info {
             display: flex;
-            justify-content: space-around;
+            justify-content: flex-start;
             border-bottom: 1px solid #998e7e;
-            padding-top: 3%;
-            padding-bottom: 3%;
+            padding: 5px 0;
 
             .icon {
-              margin-left: 20%;
+              margin-left: 10px;
               img {
                 height: 32px;
               }
@@ -432,8 +435,8 @@ export default {
               flex-direction: column;
               justify-content: flex-start;
               align-items: flex-start;
-              padding-top: 2%;
-              margin-right: 14%;
+              padding-top: 5px;
+              margin-left: 10px;
 
               &_name {
                 font-size: 12px;
@@ -452,7 +455,7 @@ export default {
             border-bottom: 1px solid #998e7e;
             cursor: pointer;
             .human_icon {
-              margin-left: 8%;
+              margin-left: 10px;
               img {
                 height: 32px;
               }
@@ -461,7 +464,7 @@ export default {
             .my_account {
               font-size: 12px;
               color: #67573e;
-              margin-left: 8%;
+              margin-left: 10px;
             }
             &:hover {
               background-color: #ddd3c8;
@@ -474,7 +477,7 @@ export default {
             align-items: center;
             cursor: pointer;
             .icon_exit {
-              margin-left: 9%;
+              margin-left: 10px;
               img {
                 height: 32px;
               }

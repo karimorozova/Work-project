@@ -200,15 +200,15 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    // overflow: hidden;
   }
   &__photo {
     border-radius: 50%;
     background-color: white;
     padding-bottom: 1px;
     padding-right: 1px;
-    max-width: 35px;
-    max-height: 35px;
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
   }
   &__account-block {
     width: 192px;
