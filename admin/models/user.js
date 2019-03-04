@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema({
   position: {
     type: String,
     trim: true
+  },
+  photo: {
+    type: String,
+    trim: true
   }
 }, { minimize: false });
 
