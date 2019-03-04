@@ -13,6 +13,9 @@ export const mutations = {
         state.isAlert = payload.isShow;
         state.alertType = payload.type;
     },
+    setLoggedUser(state, payload) {
+        state.user = payload;
+    },
     servicesFill(state, payload) {
         state.services = payload
     },

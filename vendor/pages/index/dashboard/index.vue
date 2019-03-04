@@ -1,26 +1,27 @@
 <template lang="pug">
-  .vendor_portal_wrapper
-    .jobs_block
-      h3 Upcoming Jobs
-      .jobs
-        UpcomingJobs(
-          :fields="fields"
-          :tableData="upcomingJobs"
-          @makeAction="makeAction"
-        )
-    .jobs_block
-      h3 Open Jobs
-      .jobs
-        OpenedJobs(
-        :fields="fields"
-        :tableData="openedJobs"
-        )
+    .dashboard
+        .jobs_block
+            h3 Upcoming Jobs
+            .jobs
+                UpcomingJobs(
+                    :fields="fields"
+                    :tableData="upcomingJobs"
+                    @makeAction="makeAction"
+                )
+        .jobs_block
+            h3 Open Jobs
+            .jobs
+                OpenedJobs(
+                    :fields="fields"
+                    :tableData="openedJobs"
+                )
+        nuxt-child
 </template>
 
 <script>
   import DataTable from "~/components/Tables/DataTable";
-  import UpcomingJobs from "../components/jobs/Tables/Upcoming_Jobs/UpcomingJobs";
-  import OpenedJobs from "../components/jobs/Tables/Opened_Jobs/OpenedJobs";
+  import UpcomingJobs from "../../components/jobs/Tables/Upcoming_Jobs/UpcomingJobs";
+  import OpenedJobs from "../../components/jobs/Tables/Opened_Jobs/OpenedJobs";
 
   import { mapGetters, mapActions } from "vuex";
   import moment from "moment";
@@ -94,9 +95,9 @@
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/scss/colors.scss';
+@import '../../../assets/scss/colors.scss';
 
-.vendor_portal_wrapper {
+.dashboard {
   width: 100%;
   padding: 30px;
 

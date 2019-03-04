@@ -127,8 +127,9 @@ export const alertToggle = ({ commit }, payload) => {
 export const login = ({ commit, state }, payload) => {
   commit('startRequest')
   return new Promise(resolve => {
-    const {token, group} = payload;
+    const {token, group, firstName, lastName, photo} = payload;
     state.userGroup = group;
+    state.user = {firstName, lastName, photo}; 
     setTimeout(() => {
       let currentDate = Date.now();
       let expiryTime = currentDate + 60000*120;
@@ -144,12 +145,13 @@ export const logout = ({ commit }) => {
     localStorage.removeItem("token");
 }
 
-export const setUserGroup = async ({commit, state}) => {
+export const setUser = async ({commit, state}) => {
   commit('startRequest')
   try {
     const key = JSON.parse(localStorage.getItem("token"));
-    const result = await Vue.http.get(`/usergroup?key=${key.value}`);
-    state.userGroup = result.data;
+    const result = await Vue.http.get(`/user?key=${key.value}`);
+    state.user = result.data;
+    state.userGroup = result.data.group;
     commit('endRequest');
   } catch(err) {
     commit('endRequest');

@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+    default: "",
     trim: true
   },
   position: {
@@ -44,6 +45,7 @@ const UserSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
+    default: "",
     trim: true
   }
 }, { minimize: false });

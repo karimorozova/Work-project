@@ -16,3 +16,7 @@ export const setJobStatus = async function({commit, dispatch}, payload) {
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
 }
+
+export const selectJob = ({ commit }, payload) => {
+    commit("SELECT_JOB", payload);
+}
