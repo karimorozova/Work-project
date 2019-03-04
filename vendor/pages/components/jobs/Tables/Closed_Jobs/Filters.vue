@@ -137,7 +137,7 @@
           }
 
           input.calendar {
-            width: 128px;
+            width: 160px;
             height: 28px;
             padding: 0 4px;
           }

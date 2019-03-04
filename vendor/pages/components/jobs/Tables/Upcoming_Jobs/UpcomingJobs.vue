@@ -72,7 +72,10 @@
         this.areErrors = false;
       },
       formatDeadline(date) {
-        return moment(date).format('DD-MMM-YYYY')
+        if (date) {
+          return moment(date).format('DD-MMM-YYYY')
+        }
+        return ''
       },
       makeAction(index, key) {
         this.$emit('makeAction', {index, key});
@@ -86,7 +89,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .jobs__table {
     padding-top: 10px;
     width: 1027px;

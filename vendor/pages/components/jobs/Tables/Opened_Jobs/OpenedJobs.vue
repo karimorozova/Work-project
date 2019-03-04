@@ -79,7 +79,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .jobs__table {
     padding-top: 10px;
     width: 1027px;

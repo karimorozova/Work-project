@@ -10,7 +10,7 @@
                     .col2-text2 Anytime
             .calendarContainer__left-level4
                 input(type="text" :value="dateFrom" readonly)
-                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.from")
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.from" @touch="touch")
         .calendarContainer__right
             .calendarContainer__right-level1
                 .col1 To
@@ -20,7 +20,7 @@
                     .col2-text2 Anytime
             .calendarContainer__right-level4
                 input(type="text" :value="dateTo" readonly)
-                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.to")
+                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' v-model="datesFilter.to" @touch="touch")
             .calendarContainer__right-level5
                 .col2
                     button(@click="closeWindow") Close
@@ -45,15 +45,17 @@ export default {
       },
       datesFilter: {from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), to: new Date()},
       checked: {from: false, to: false},
-      currentTo: ''
+      currentTo: '',
+      isTouched :false,
     }
   },
   methods: {
     closeWindow() {
       this.formVisible = !this.formVisible;
-      this.$emit('dateFilter', this.datesFilter)
+      this.$emit('dateFilter', {...this.datesFilter,isTouched: this.isTouched})
     },
     fromAny() {
+      this.isTouched = true;
       this.checked.from = !this.checked.from;
       if(!this.checked.from) {
         this.datesFilter.from = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -63,9 +65,13 @@ export default {
       this.$emit('fromAny', this.datesFilter);
     },
     toAny() {
+      this.isTouched = true;
       this.checked.to = !this.checked.to;
       this.datesFilter.to = new Date();
       this.$emit('toAny', this.datesFilter);
+    },
+    touch(){
+      this.isTouched = true;
     }
   },
   computed: {

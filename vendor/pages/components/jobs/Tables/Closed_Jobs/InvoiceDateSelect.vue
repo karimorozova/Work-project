@@ -56,26 +56,11 @@
         this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
       },
       async getJobTypes() {
-        this.uniqJobInvoiceDates = _.uniqBy(this.jobs,'invoiceDate');
-        this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
-        // try {
-        //     const allIndustries = await this.$http.get('/api/industries')
-        //     let sortedArray = allIndustries.data.filter(item => {
-        //         if (item.name != 'More') {
-        //             return item
-        //         }
-        //     });
-        //     sortedArray.sort( (a,b) => {
-        //         if(a.name < b.name) return -1;
-        //         if(a.name > b.name) return 1;
-        //     });
-        //     if(this.isAllExist) {
-        //         sortedArray.unshift({name: "All"});
-        //     }
-        //     this.industries = sortedArray;
-        // } catch(err) {
-        //     this.errors.push(err)
-        // }
+        // this.uniqJobInvoiceDates = _.uniqBy(this.jobs,'invoiceDate');
+        // this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
+        this.uniqJobInvoiceDates = [
+          {invoiceDate: "All"},
+        ];
       },
       outClick() {
         this.droppedInd = false;
