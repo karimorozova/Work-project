@@ -105,12 +105,12 @@
     color: $main-color;
 
     .jobs {
-      width: 1041px;
+      width: 1047px;
       max-height: 600px;
       background-color: $white;
       box-shadow: 0 0 10px $main-color;
       box-sizing: border-box;
-      padding: 3px 0;
+      padding: 3px 5px;
       position: relative;
       &_opacity {
         opacity: 1;

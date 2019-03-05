@@ -5,10 +5,11 @@
         .filterBlock__item.sourceLangs
           label.inner-label Job Type:
           .filters__drop-menu.job-type
-            JobTypeSelect(
-            :jobs="jobs"
-            :selectedInd="jobTypeFilter"
-            @setJobTypeFilter="(option)=>$emit('setJobTypeFilter',option)"
+            SelectSingle(
+            :options="['All', 'Translation', 'Proofing', 'QA']"
+            :selectedOption="jobTypeFilter"
+            @chooseOption="(option)=>$emit('setJobTypeFilter',option)"
+            customClass="account"
             )
       .filterBlock
         .filterBlock__item.deadline
@@ -26,28 +27,26 @@
         .filterBlock__item.targetLangs
           label.inner-label Invoice Date
           .filters__drop-menu.invoice-date
-            InvoiceDateSelect(
-            :jobs="jobs"
-            :selectedInd="invoiceDateFilter"
-            @setInvoiceDateFilter="(option)=>{$emit('setInvoiceDateFilter',option)}"
+            SelectSingle(
+            :options="options"
+            :selectedOption="invoiceDateFilter"
+            @chooseOption="(option)=>{$emit('setInvoiceDateFilter',option)}"
+            customClass="account"
             )
 </template>
 
 <script>
   import Calendar from "~/components/Calendar";
-  import InvoiceDateSelect from "./InvoiceDateSelect.vue";
-  import JobTypeSelect from "./JobTypeSelect.vue";
+  import SelectSingle from "~/components/dropdowns/SelectSingle.vue";
+  import {mapGetters, mapActions} from "vuex";
 
   export default {
     props: {
       jobTypeFilter: {
-        type: Object
+        type: String
       },
       invoiceDateFilter: {
-        type: Object
-      },
-      jobs: {
-        type: Array
+        type: String
       },
       startFilter: {
         type: String
@@ -60,9 +59,14 @@
       return {
         currentFormVisible: false,
         currentFormVisibleOther: false,
+        options: [],
+        uniqJobInvoiceDates: [],
       }
     },
     methods: {
+      ...mapActions({
+        getJobs: "getJobs"
+      }),
       showDetailedCalendar() {
         this.currentFormVisible = !this.currentFormVisible;
         if (this.currentFormVisible) {
@@ -76,11 +80,25 @@
         }
       },
     },
+    computed: {
+      ...mapGetters({
+        jobs: "getAllJobs"
+      })
+    },
     components: {
       Calendar,
-      JobTypeSelect,
-      InvoiceDateSelect
+      SelectSingle
     },
+    mounted() {
+      this.getJobs();
+      this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate');
+      this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
+      this.uniqJobInvoiceDates.map((job) => {
+        this.options.push(job.invoiceDate)
+      });
+
+      this.options = this.options.filter((option) => option !== undefined);
+    }
   }
 </script>
 
@@ -137,7 +155,7 @@
           }
 
           input.calendar {
-            width: 128px;
+            width: 160px;
             height: 28px;
             padding: 0 4px;
           }

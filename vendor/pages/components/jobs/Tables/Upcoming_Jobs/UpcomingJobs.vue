@@ -72,7 +72,10 @@
         this.areErrors = false;
       },
       formatDeadline(date) {
-        return moment(date).format('DD-MMM-YYYY')
+        if (date) {
+          return moment(date).format('DD-MMM-YYYY')
+        }
+        return ''
       },
       makeAction(index, key) {
         this.$emit('makeAction', {index, key});

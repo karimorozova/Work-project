@@ -436,6 +436,7 @@ export default {
      * @param {Object} day
      */
     selectDate (day) {
+      this.$emit('touch');
       if (day.isDisabled) {
         this.$emit('selectedDisabled', day)
         return false
@@ -892,7 +893,7 @@ export default {
 	z-index: 100;
 	background: #fff;
 	width: 300px;
-  border: 1px solid #ccc;  
+  border: 1px solid #ccc;
 }
 @media (max-width: 350px) {
   .vdp-datepicker__calendar {
@@ -1021,7 +1022,7 @@ export default {
 .vdp-datepicker__calendar .cell.today {
   background-color: #D15F45;
   color: #FFF;
-  font-weight: bold;  
+  font-weight: bold;
 }
 
 .vdp-datepicker__calendar .cell.beforeToday {
