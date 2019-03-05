@@ -92,7 +92,7 @@ export default {
 <style lang="scss">
   .quotesCalendarWrapper {
     position: absolute;
-    top: 28%;
+    top: 70%;
     left: -30%;
     z-index: 5;
     width: 582px;

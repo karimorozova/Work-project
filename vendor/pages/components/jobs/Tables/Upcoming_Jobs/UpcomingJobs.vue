@@ -8,6 +8,7 @@
       :isApproveModal="isDeleting"
       bodyClass="tbody_height-200"
       @closeErrors="closeErrors"
+      @onRowClicked="chooseJob"
     )
       template(slot="headerProjectId" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
@@ -45,6 +46,7 @@
 <script>
   import DataTable from "~/components/Tables/DataTable";
   import moment from "moment";
+  import { mapGetters, mapActions } from "vuex";
 
   export default {
     props: {
@@ -68,6 +70,14 @@
       }
     },
     methods: {
+      ...mapActions({
+        selectJob: "selectJob",
+        alertToggle: "alertToggle"
+      }),
+      chooseJob({index}) {
+        this.selectJob(this.tableData[index]);
+        this.$router.push("dashboard/project-details");
+      },
       closeErrors() {
         this.areErrors = false;
       },

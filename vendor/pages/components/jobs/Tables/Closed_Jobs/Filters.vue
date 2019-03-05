@@ -112,12 +112,12 @@
       z-index: 1;
 
       &.invoice-date {
-        width: 117px;
+        width: 147px;
         height: 28px;
       }
 
       &.job-type {
-        width: 125px;
+        width: 165px;
         height: 28px;
       }
 
@@ -133,7 +133,7 @@
       justify-content: space-between;
 
       .filterBlock {
-        width: 25%;
+        width: 24%;
         position: relative;
 
         &__item {
@@ -147,7 +147,6 @@
           }
 
           input, span {
-            /*padding: 5px;*/
             border: 1px solid #67573e;
             width: 175px;
             height: 20px;

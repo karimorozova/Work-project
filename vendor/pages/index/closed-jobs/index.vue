@@ -21,8 +21,8 @@
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
             bodyClass="tbody_height-200"
-            /*rowClass="tbody_row_width-875"*/
             @closeErrors="closeErrors"
+            @onRowClicked="chooseJob"
           )
             template(slot="headerProjectId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -87,8 +87,14 @@
     },
     methods: {
       ...mapActions({
-        getJobs: "getJobs"
+        getJobs: "getJobs",
+        selectJob: "selectJob",
+        alertToggle: "alertToggle"
       }),
+      chooseJob({index}) {
+        this.selectJob(this.tableData[index]);
+        this.$router.push("dashboard/project-details");
+      },
       closeErrors() {
         this.areErrors = false;
       },
