@@ -51,6 +51,7 @@ function saveTemplateTasks(object) {
         .attach(filesObj)
         .end(response => {
             if(response.error) {
+                console.log(response.error);
                 return reject(response.error)
             }
             resolve(response.body)
