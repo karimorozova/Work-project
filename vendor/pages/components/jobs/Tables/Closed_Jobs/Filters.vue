@@ -38,6 +38,7 @@
 <script>
   import Calendar from "~/components/Calendar";
   import SelectSingle from "~/components/dropdowns/SelectSingle.vue";
+  import {mapGetters, mapActions} from "vuex";
 
   export default {
     props: {
@@ -46,9 +47,6 @@
       },
       invoiceDateFilter: {
         type: String
-      },
-      jobs: {
-        type: Array
       },
       startFilter: {
         type: String
@@ -66,6 +64,9 @@
       }
     },
     methods: {
+      ...mapActions({
+        getJobs: "getJobs"
+      }),
       showDetailedCalendar() {
         this.currentFormVisible = !this.currentFormVisible;
         if (this.currentFormVisible) {
@@ -79,16 +80,24 @@
         }
       },
     },
+    computed: {
+      ...mapGetters({
+        jobs: "getAllJobs"
+      })
+    },
     components: {
       Calendar,
       SelectSingle
     },
-    mounted(){
-      this.uniqJobInvoiceDates = _.uniqBy(this.jobs,'invoiceDate');
+    mounted() {
+      this.getJobs();
+      this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate');
       this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
-      this.uniqJobInvoiceDates.map((job)=>{
+      this.uniqJobInvoiceDates.map((job) => {
         this.options.push(job.invoiceDate)
       });
+
+      this.options = this.options.filter((option) => option !== undefined);
     }
   }
 </script>
