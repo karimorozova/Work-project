@@ -27,17 +27,16 @@
         .filterBlock__item.targetLangs
           label.inner-label Invoice Date
           .filters__drop-menu.invoice-date
-            InvoiceDateSelect(
-            :jobs="jobs"
-            :selectedInd="invoiceDateFilter"
-            @setInvoiceDateFilter="(option)=>{$emit('setInvoiceDateFilter',option)}"
+            SelectSingle(
+            :options="options"
+            :selectedOption="invoiceDateFilter"
+            @chooseOption="(option)=>{$emit('setInvoiceDateFilter',option)}"
+            customClass="account"
             )
 </template>
 
 <script>
   import Calendar from "~/components/Calendar";
-  import InvoiceDateSelect from "./InvoiceDateSelect.vue";
-  import JobTypeSelect from "./JobTypeSelect.vue";
   import SelectSingle from "~/components/dropdowns/SelectSingle.vue";
 
   export default {
@@ -46,7 +45,7 @@
         type: String
       },
       invoiceDateFilter: {
-        type: Object
+        type: String
       },
       jobs: {
         type: Array
@@ -62,6 +61,8 @@
       return {
         currentFormVisible: false,
         currentFormVisibleOther: false,
+        options: [],
+        uniqJobInvoiceDates: [],
       }
     },
     methods: {
@@ -80,12 +81,14 @@
     },
     components: {
       Calendar,
-      JobTypeSelect,
-      InvoiceDateSelect,
       SelectSingle
     },
     mounted(){
-      console.log('this.jobTypeFilter',this.jobTypeFilter);
+      this.uniqJobInvoiceDates = _.uniqBy(this.jobs,'invoiceDate');
+      this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
+      this.uniqJobInvoiceDates.map((job)=>{
+        this.options.push(job.invoiceDate)
+      });
     }
   }
 </script>
