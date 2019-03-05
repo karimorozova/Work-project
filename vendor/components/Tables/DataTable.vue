@@ -148,6 +148,20 @@
     display: flex;
   }
 
+  &__tbody-row {
+    cursor: pointer;
+    &:nth-of-type(even) {
+      .table__tbody-cell {
+        background-color: $table-row-zebra-background;
+      }
+    }
+    &:hover {
+      .table__tbody-cell {
+        background-color: $cell-background;
+      }
+    }
+  }
+
   &_bottom-bordered {
     border-bottom: 0.5px solid $cell-border;
   }

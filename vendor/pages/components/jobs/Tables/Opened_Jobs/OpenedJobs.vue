@@ -40,7 +40,7 @@
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons
-          //- img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'jobs_opacity': isActive(key, index)}" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+          img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="goToXtmEditor(index)")
 </template>
 
 <script>
@@ -68,7 +68,8 @@
     },
     methods:{
       ...mapActions({
-        selectJob: "selectJob"
+        selectJob: "selectJob",
+        alertToggle: "alertToggle"
       }),
       chooseJob({index}) {
         this.selectJob(this.tableData[index]);
@@ -79,6 +80,16 @@
       },
       formatDeadline(date) {
         return moment(date).format('DD-MMM-YYYY')
+      },
+      async goToXtmEditor(index) {
+        try {
+          const url = await this.$axios.get(`/xtm/editor?jobId=${this.tableData[index].xtmJobId}`);
+          let link = document.createElement("a");
+          link.target = "_blank";
+          link.href = url.data;
+          link.click();
+        } catch(err) {
+          this.alertToggle({message: err.response.data, isShow: true, type: "error"});        }
       },
     },
     components: {
@@ -115,9 +126,8 @@
   cursor: pointer;
   margin-right: 8px;
   transition: transform 0.1s ease-out;
-
   &:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
   }
 }
 
