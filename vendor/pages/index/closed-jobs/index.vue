@@ -1,5 +1,5 @@
 <template lang="pug">
-  .vendor_portal_wrapper
+  .closed-jobs
     .jobs_block
       h3 Closed Jobs
       .jobs
@@ -51,12 +51,13 @@
                 span.jobs__currency(v-if="row.finance.Price.payables") &euro;
             template(slot="invoiceDate" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.invoiceDate }}
+    nuxt-child
 </template>
 
 <script>
   import moment from 'moment';
   import DataTable from "~/components/Tables/DataTable";
-  import Filters from "../components/jobs/Tables/Closed_Jobs/Filters";
+  import Filters from "../../components/jobs/Tables/Closed_Jobs/Filters";
   import { mapGetters, mapActions } from "vuex";
 
   export default {
@@ -176,7 +177,7 @@
       DataTable,
       Filters
     },
-    created() {
+    mounted() {
       this.getJobs();
       // console.log('jobs from store:', this.jobs);
       this.closedJobs = this.jobs.filter((job) => job.status === "Closed");
@@ -390,9 +391,9 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../assets/scss/colors.scss';
+  @import '../../../assets/scss/colors.scss';
 
-  .vendor_portal_wrapper {
+  .closed-jobs {
     width: 100%;
     padding: 30px;
 

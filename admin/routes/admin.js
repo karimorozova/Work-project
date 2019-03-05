@@ -80,12 +80,17 @@ router.get('/users-full', requiresLogin, async (req, res, next) => {
     }
 })
 
-router.get('/usergroup', requiresLogin, async (req, res, next) => {
+router.get('/user', requiresLogin, async (req, res, next) => {
     try {
         const key = req.query["key"];
         const result = jwt.verify(key, secretKey);
-        const { group } = result.user;
-        res.send(group);
+        const loggedUser = Object.keys(result.user).reduce((init, cur) => {
+            if(cur !== "__v" && cur !== "password") {
+                init[cur] = result.user[cur];
+            }
+            return {...init};
+        }, {});
+        res.send({ ...loggedUser });
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting Users from DB");
@@ -158,7 +163,13 @@ router.post('/login', (req, res, next) => {
                 const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h'});
                 req.session.userId = user._id;
                 res.statusCode = 200;
-                res.send({token, group: user.group});
+                const loggedUser = Object.keys(user).reduce((init, cur) => {
+                    if(cur !== "__v" && cur !== "password") {
+                        init[cur] = user[cur];
+                    }
+                    return {...init};
+                }, {});
+                res.send({token, ...loggedUser});
                 } catch(err) {
                     console.log(err);
                     return next(err);

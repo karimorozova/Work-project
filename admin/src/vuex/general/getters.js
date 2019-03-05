@@ -1,5 +1,6 @@
 export const getRequestCounter = state => state.requestCounter;
 export const isLoggedIn = state => state.isLoggedIn;
+export const getUser = state => state.user;
 export const getUserGroup = state => state.userGroup;
 export const loading = state => state.isLoading; 
 export const isAlert = state => state.isAlert;

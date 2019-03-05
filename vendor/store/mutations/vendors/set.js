@@ -32,3 +32,7 @@ export const SET_ACCOUNT_PROP = (state, payload) => {
 export const SET_JOBS = (state, payload) => {
     state.jobs = payload;
 }
+
+export const SELECT_JOB = (state, payload) => {
+    state.selectedJob = payload;
+}

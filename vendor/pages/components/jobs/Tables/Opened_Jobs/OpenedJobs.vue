@@ -8,6 +8,7 @@
       :isApproveModal="isDeleting"
       bodyClass="tbody_height-200"
       @closeErrors="closeErrors"
+      @onRowClicked="chooseJob"
     )
       template(slot="headerProjectId" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
@@ -45,6 +46,7 @@
 <script>
   import DataTable from "~/components/Tables/DataTable";
   import moment from "moment";
+  import { mapGetters, mapActions } from "vuex";
 
   export default {
     props: {
@@ -65,6 +67,13 @@
       }
     },
     methods:{
+      ...mapActions({
+        selectJob: "selectJob"
+      }),
+      chooseJob({index}) {
+        this.selectJob(this.tableData[index]);
+        this.$router.push("dashboard/project-details");
+      },
       closeErrors() {
         this.areErrors = false;
       },
@@ -80,36 +89,37 @@
 </script>
 
 <style lang="scss" scoped>
-  .jobs__table {
-    padding-top: 10px;
-    width: 1027px;
-    margin: 0 auto;
-  }
 
-  .jobs__data {
-    height: 32px;
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-  }
+.jobs__table {
+  padding-top: 10px;
+  width: 1027px;
+  margin: 0 auto;
+}
 
-  .jobs__icons {
-    padding-top: 3px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.jobs__data {
+  height: 32px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
 
-  .jobs__icon {
-    cursor: pointer;
-    margin-right: 8px;
-    transition: transform 0.1s ease-out;
+.jobs__icons {
+  padding-top: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    &:hover {
-      transform: scale(1.2);
-    }
+.jobs__icon {
+  cursor: pointer;
+  margin-right: 8px;
+  transition: transform 0.1s ease-out;
+
+  &:hover {
+    transform: scale(1.2);
   }
+}
 
 </style>
 

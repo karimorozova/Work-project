@@ -95,7 +95,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Business Development Manager",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "kriti@pangea-langs.com",
@@ -106,7 +107,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Senior Project Manager",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "sergey@galuza.com",
@@ -117,7 +119,8 @@ const usersDefault = [
       "gender" : "MALE",
       "phone" : "",
       "position" : "Development Manager",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "michal@pangea.global",
@@ -128,7 +131,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Administrator",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "rafaella@pangea.global",
@@ -139,7 +143,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Vendor Manager & Translation Technologist",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "sakis@pangea-langs.com",
@@ -150,7 +155,8 @@ const usersDefault = [
       "gender" : "MALE",
       "phone" : "",
       "position" : "Project Manager",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "eirini@pangea-langs.com",
@@ -161,7 +167,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Bookkeeper",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "arans@pangea-langs.com",
@@ -172,7 +179,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Team Lead",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "angela@pangea-langs.com",
@@ -183,7 +191,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Copywriter",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     },
     {
       "email" : "alexia@pangea-langs.com",
@@ -194,7 +203,8 @@ const usersDefault = [
       "gender" : "FEMALE",
       "phone" : "",
       "position" : "Project Coordinator",
-      "password" : "12345"
+      "password" : "12345",
+      "photo": ""
     }
 ]
 

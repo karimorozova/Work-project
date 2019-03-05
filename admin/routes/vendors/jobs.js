@@ -25,6 +25,8 @@ function getSteps(project, id) {
         assignedSteps.push({...step._doc, 
             projectId: project.projectId, 
             projectName: project.projectName,
+            manager: project.projectManager,
+            industry: project.industry,
             xtmJobId: stepTask.xtmJobs[0]
         });
     }

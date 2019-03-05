@@ -4,6 +4,7 @@ const state = {
   accountInfo: {},
   newPassword: {password: "", confirmedPassword: ""},
   jobs: [],
+  selectedJob: {},
   languages: [],
   timezones: [],
   services: [],

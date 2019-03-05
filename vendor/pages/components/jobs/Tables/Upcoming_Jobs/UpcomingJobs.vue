@@ -90,39 +90,40 @@
 </script>
 
 <style lang="scss" scoped>
-  .jobs__table {
-    padding-top: 10px;
-    width: 1027px;
-    margin: 0 auto;
-  }
 
-  .jobs__data {
-    height: 32px;
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-  }
+.jobs__table {
+  padding-top: 10px;
+  width: 1027px;
+  margin: 0 auto;
+}
 
-  .jobs__drop-menu {
-    position: relative;
-  }
+.jobs__data {
+  height: 32px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
 
-  .jobs__icons {
-    padding-top: 3px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.jobs__drop-menu {
+  position: relative;
+}
 
-  .jobs__icon {
-    cursor: pointer;
-    margin-right: 8px;
-    transition: transform 0.1s ease-out;
+.jobs__icons {
+  padding-top: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    &:hover {
-      transform: scale(1.2);
-    }
+.jobs__icon {
+  cursor: pointer;
+  margin-right: 8px;
+  transition: transform 0.1s ease-out;
+
+  &:hover {
+    transform: scale(1.2);
   }
+}
 
 </style>

@@ -26,7 +26,7 @@
                         .icon
                           img(src="../assets/images/man.png")
                         .personal__data
-                          .personal__data_name {{ user.name }}
+                          .personal__data_name {{ user.firstName }} {{ user.lastName }}
                           .personal__data_email {{ user.email }}
                       .account-block__myaccount(@click="showAccountInfo")
                         .human_icon
@@ -63,10 +63,6 @@ import Loading from "./Loading";
 export default {
   data() {
     return {
-      user: {
-        name: "Test",
-        email: "test@test.com"
-      },
       navbarList: [
         {
           title: "DASHBOARD",
@@ -129,7 +125,7 @@ export default {
     async getCurrentUserGroup() {
       try {
         if(!this.userGroup) {
-          await this.setUserGroup();
+          await this.setUser();
         }
       } catch(err) {
         console.log("Cannot identify user group");
@@ -291,12 +287,13 @@ export default {
       this.getServices();
     },
     ...mapActions({
-      setUserGroup: "setUserGroup"
+      setUser: "setUser"
     })
   },
   computed: {
     ...mapGetters({
       isLoading: "loading",
+      user: "getUser",
       userGroup: "getUserGroup"
     })
   },
