@@ -93,7 +93,7 @@
       }),
       chooseJob({index}) {
         this.selectJob(this.tableData[index]);
-        this.$router.push("dashboard/project-details");
+        this.$router.push("/closed-jobs/project-details");
       },
       closeErrors() {
         this.areErrors = false;
