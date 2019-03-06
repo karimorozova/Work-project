@@ -54,7 +54,6 @@ export default {
     data() {
         return {
             matrixData: [],
-            stepFiles: [],
             excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
@@ -101,15 +100,16 @@ export default {
             })
         },
         getStepFiles() {
-            this.stepFilesFiller(this.currentProject.sourceFiles, "Source file");
-            this.stepFilesFiller(this.currentProject.refFiles, "Reference file");
+            this.stepFilesFiller(this.task.sourceFiles, "Source file");
+            this.stepFilesFiller(this.task.refFiles, "Reference file");
         },
         stepFilesFiller(arr, category) {
+            let files = [];
             for(let file of arr) {
                 const nameArr = file.split('/');
                 const filePath =  __WEBPACK__API_URL__ + file.split('./dist')[1];
                 const fileName = nameArr[nameArr.length - 1];
-                this.stepFiles.push({
+                files.push({
                     check: false,
                     fileName: fileName,
                     category: category,
@@ -117,6 +117,7 @@ export default {
                     target: this.step.targetFile || ""
                 })
             }
+            return files;
         },
         toggleMatrixRowActive({index}) {
             this.matrixData[index].active = !this.matrixData[index].active;
@@ -166,6 +167,16 @@ export default {
                     }
                 ]
             },[])
+        },
+        stepFiles() {
+            let result = [];
+            if(this.task.sourceFiles) {
+                result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source file"));
+            }
+            if(this.task.refFiles) {
+                result.push(...this.stepFilesFiller(this.task.refFiles, "Reference file"));
+            }
+            return result;
         }
     },
     components: {
@@ -176,7 +187,7 @@ export default {
     },
     mounted() {
         this.getMatrixData('clientRate', 'client');
-        this.getStepFiles();
+        // this.getStepFiles();
     }
 }
 </script>

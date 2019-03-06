@@ -158,7 +158,8 @@ export default {
                                 vendorRate: "",
                                 margin: "",
                                 check: false,
-                                vendorsClickedOffer: []
+                                vendorsClickedOffer: [],
+                                isVendorRead: false
                             })
                         } else {
                             for(const step of project.steps) {

@@ -44,7 +44,7 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
             await Projects.updateOne({"_id": project._id}, 
             {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles, isMetricsExist: false}, 
             $push: {tasks: {taskId: taskId, xtmJobs: jobIds, service: tasksInfo.service, projectId: xtmProject.projectId, start: project.createdAt, deadline: project.deadline, 
-                stepsDates, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "",
+                stepsDates, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", sourceFiles: filesToTranslate, refFiles: referenceFiles,
                 receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
             );
             tasksLength++
