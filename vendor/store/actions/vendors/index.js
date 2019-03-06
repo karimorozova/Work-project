@@ -2,4 +2,4 @@ export { setApplicationForm, setAccountInfo, setAccountProp } from "./set";
 export { default as getVendorInfo } from "./get";
 export { setConfirmedPassword, setNewPassword } from "./password";
 export { saveVendorInfo } from "./info";
-export { getJobs, setJobStatus, selectJob } from "./jobs";
+export { getJobs, setJobStatus, selectJob, setStepTermsAgreement } from "./jobs";

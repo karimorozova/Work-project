@@ -20,3 +20,15 @@ export const setJobStatus = async function({commit, dispatch}, payload) {
 export const selectJob = ({ commit }, payload) => {
     commit("SELECT_JOB", payload);
 }
+
+export const setStepTermsAgreement = async function ({commit, dispatch, state}, payload) {
+    try {
+        const {jobId, value} = payload;
+        await this.$axios.post('/vendor/selected-job', { jobId, value });
+        await dispatch("getJobs");
+        let selectedJob = state.jobs.find(item => item._id === jobId);
+        commit("SELECT_JOB", selectedJob);
+    } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"})
+    }
+}

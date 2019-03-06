@@ -5,15 +5,16 @@
             .jobs
                 UpcomingJobs(
                     :fields="fields"
-                    :tableData="upcomingJobs"
-                    @makeAction="makeAction"
+                    :jobs="upcomingJobs"
+                    @makeAction="(e) => makeAction(e, 'upcomingJobs')"
                 )
         .jobs_block
             h3 Open Jobs
             .jobs
                 OpenedJobs(
                     :fields="fields"
-                    :tableData="openedJobs"
+                    :jobs="openedJobs"
+                    @makeAction="(e) => makeAction(e, 'openedJobs')"
                 )
         nuxt-child
 </template>
@@ -50,15 +51,13 @@
       formatDeadline(date) {
         return moment(date).format('DD-MMM-YYYY')
       },
-
-
       async checkErrors(index) {
 
       },
-      async makeAction({index,key}) {
+      async makeAction({index,key}, prop) {
         try {
           const status = key === 0 ? "Accepted" : "Rejected";
-          await this.setJobStatus({jobId: this.upcomingJobs[index]._id, status});
+          await this.setJobStatus({jobId: this[prop][index]._id, status});
         } catch(err) {
           this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
         }

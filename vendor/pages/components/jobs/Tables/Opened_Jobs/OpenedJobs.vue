@@ -2,7 +2,7 @@
   .jobs__table
     DataTable(
       :fields="fields"
-      :tableData="tableData"
+      :tableData="jobs"
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
@@ -39,8 +39,10 @@
         .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
-        .jobs__icons
-          img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="goToXtmEditor(index)")
+        .jobs__icons(v-if="row.projectStatus === 'Started'")
+          img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="goToXtmEditor(index)" :class="{'jobs_disable': !row.isVendorRead}")
+        .jobs__icons(v-else)
+          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="icon.type ==='approve' ? 'approve' : 'reject'")
 </template>
 
 <script>
@@ -53,7 +55,7 @@
       fields: {
         type: Array
       },
-      tableData: {
+      jobs: {
         type: Array
       },
     },
@@ -63,7 +65,10 @@
         areErrors: false,
         errors: [],
         isDeleting: false,
-
+        icons: [
+          {icon: require("../../../../../assets/images/Approve-icon.png"), active: true, type: "approve"},
+          {icon: require("../../../../../assets/images/Reject-icon.png"), active: true, type: "reject"}
+        ]
       }
     },
     methods:{
@@ -71,8 +76,11 @@
         selectJob: "selectJob",
         alertToggle: "alertToggle"
       }),
+      makeAction(index, key) {
+        this.$emit('makeAction', {index, key});
+      },
       chooseJob({index}) {
-        this.selectJob(this.tableData[index]);
+        this.selectJob(this.jobs[index]);
         this.$router.push("/dashboard/project-details");
       },
       closeErrors() {
@@ -82,8 +90,9 @@
         return moment(date).format('DD-MMM-YYYY')
       },
       async goToXtmEditor(index) {
+        if(!this.jobs[index].isVendorRead) return;
         try {
-          const url = await this.$axios.get(`/xtm/editor?jobId=${this.tableData[index].xtmJobId}`);
+          const url = await this.$axios.get(`/xtm/editor?jobId=${this.jobs[index].xtmJobId}`);
           let link = document.createElement("a");
           link.target = "_blank";
           link.href = url.data;
@@ -101,33 +110,36 @@
 
 <style lang="scss" scoped>
 
-.jobs__table {
-  padding-top: 10px;
-  width: 1027px;
-  margin: 0 auto;
-}
-
-.jobs__data {
-  height: 32px;
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.jobs__icons {
-  padding-top: 3px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.jobs__icon {
-  cursor: pointer;
-  margin-right: 8px;
-  transition: transform 0.1s ease-out;
-  &:hover {
-    transform: scale(1.1);
+.jobs {
+  &__table {
+    padding-top: 10px;
+    width: 1027px;
+    margin: 0 auto;
+  }
+  &__data {
+    height: 32px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  &__icons {
+    padding-top: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &__icon {
+    cursor: pointer;
+    margin-right: 8px;
+    transition: transform 0.1s ease-out;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  &_disable {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }
 

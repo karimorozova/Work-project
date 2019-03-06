@@ -27,7 +27,7 @@
                     img.main-info__download(src="../../../../assets/images/download.png")
         .main-info__terms
             .main-info__check
-                CheckBox(:isChecked="isChecked" @check="check" @unCheck="unCheck")
+                CheckBox(:isChecked="job.isVendorRead" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
             span.main-info__text I have read the instructions and downloaded the reference files
         .main-info__button
             Button(:value="buttonValue")    
@@ -42,16 +42,19 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-            isColon: true,
-            isChecked: false
+            isColon: true
         }
     },
     methods: {
-        check() {
-            this.isChecked = true;
-        },
-        unCheck() {
-            this.isChecked = false;
+        ...mapActions({
+            setStepTermsAgreement: "setStepTermsAgreement" 
+        }),
+        async toggle(e, bool) {
+            try {
+                await this.setStepTermsAgreement({jobId: this.job._id, value: bool});
+            } catch(err) {
+
+            }
         }
     },
     computed: {

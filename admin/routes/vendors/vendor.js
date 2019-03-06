@@ -6,7 +6,7 @@ const { Vendors, Projects } = require('../../models');
 const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const { saveHashedPassword, getPhotoLink, removeOldPhoto } = require('./info');
 const { getVendorRates } = require('./vendorRates');
-const { getJobs, updateStepStatus } = require('./jobs');
+const { getJobs, updateStepProp } = require('./jobs');
 const { upload } = require('../../utils');
 
 
@@ -88,18 +88,29 @@ router.get("/jobs", checkVendor, async (req, res) => {
         res.send(jobs);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on getting jobs.")
+        res.status(500).send("Error on getting jobs.");
     }
 })
 
 router.post("/job", checkVendor, async (req, res) => {
     const { jobId, status } = req.body;
     try {
-        await updateStepStatus(jobId, status);
+        await updateStepProp({jobId, prop: 'status', value: status});
         res.send("Status updated");
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on changing job status")
+        res.status(500).send("Error on changing job status");
+    }
+})
+
+router.post("/selected-job", checkVendor, async (req, res) => {
+    const { jobId, value } = req.body;
+    try {
+        await updateStepProp({jobId, prop: 'isVendorRead', value});
+        res.send("Terms agreement status changed");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking job's terms agreement");
     }
 })
 

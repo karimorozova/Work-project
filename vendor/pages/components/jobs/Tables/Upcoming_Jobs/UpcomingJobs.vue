@@ -2,7 +2,7 @@
   .jobs__table
     DataTable(
       :fields="fields"
-      :tableData="tableData"
+      :tableData="jobs"
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
@@ -40,7 +40,7 @@
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="row.status==='Request Sent'")
-          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="icon.type ==='approve' ? 'approve' : 'reject'")
 </template>
 
 <script>
@@ -53,7 +53,7 @@
       fields: {
         type: Array
       },
-      tableData: {
+      jobs: {
         type: Array
       },
     },
@@ -75,7 +75,7 @@
         alertToggle: "alertToggle"
       }),
       chooseJob({index}) {
-        this.selectJob(this.tableData[index]);
+        this.selectJob(this.jobs[index]);
         this.$router.push("/dashboard/project-details");
       },
       closeErrors() {
@@ -89,7 +89,6 @@
       },
       makeAction(index, key) {
         this.$emit('makeAction', {index, key});
-
       }
     },
     components: {

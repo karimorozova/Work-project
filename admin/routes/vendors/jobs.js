@@ -25,29 +25,67 @@ function getSteps(project, id) {
         assignedSteps.push({...step._doc, 
             projectId: project.projectId, 
             projectName: project.projectName,
+            projectStatus: project.status,
             manager: project.projectManager,
             industry: project.industry,
-            xtmJobId: stepTask.xtmJobs[0]
+            xtmJobId: stepTask.xtmJobs[0],
+            refFiles: stepTask.refFiles
         });
     }
     return assignedSteps;
 }
 
-async function updateStepStatus(jobId, status) {
+// async function updateStepStatus(jobId, status) {
+//     try {
+//         const project = await getProject({'steps._id': jobId});
+//         let { steps } = project;
+//         let modifiedSteps = steps.map(item => {
+//             if(item.id === jobId) {
+//                 item.status = status;
+//                 return item;
+//             }
+//             return item;
+//         })
+//         await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
+//     } catch(err) {
+//         console.log(err);
+//         console.log("Error in updateStepStatus");
+//     }
+// }
+
+// async function updateStepAgreement(jobId, value) {
+//     try {
+//         const project = await getProject({'steps._id': jobId});
+//         let { steps } = project;
+//         let modifiedSteps = steps.map(item => {
+//             if(item.id === jobId) {
+//                 item.status = status;
+//                 return item;
+//             }
+//             return item;
+//         })
+//         await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
+//     } catch(err) {
+//         console.log(err);
+//         console.log("Error in updateStepAgreement");
+//     }
+// }
+
+async function updateStepProp({jobId, prop, value}) {
     try {
         const project = await getProject({'steps._id': jobId});
-        let { steps } = project;
-        let modifiedSteps = steps.map(item => {
+        let steps = project.steps.map(item => {
             if(item.id === jobId) {
-                item.status = status;
+                item[prop] = value;
                 return item;
             }
             return item;
         })
-        await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
+        await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
-
+        console.log(err);
+        console.log("Error in updateStepProp");
     }
 }
 
-module.exports = { getJobs, updateStepStatus };
+module.exports = { getJobs, updateStepProp };
