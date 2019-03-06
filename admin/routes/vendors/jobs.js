@@ -35,42 +35,6 @@ function getSteps(project, id) {
     return assignedSteps;
 }
 
-// async function updateStepStatus(jobId, status) {
-//     try {
-//         const project = await getProject({'steps._id': jobId});
-//         let { steps } = project;
-//         let modifiedSteps = steps.map(item => {
-//             if(item.id === jobId) {
-//                 item.status = status;
-//                 return item;
-//             }
-//             return item;
-//         })
-//         await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
-//     } catch(err) {
-//         console.log(err);
-//         console.log("Error in updateStepStatus");
-//     }
-// }
-
-// async function updateStepAgreement(jobId, value) {
-//     try {
-//         const project = await getProject({'steps._id': jobId});
-//         let { steps } = project;
-//         let modifiedSteps = steps.map(item => {
-//             if(item.id === jobId) {
-//                 item.status = status;
-//                 return item;
-//             }
-//             return item;
-//         })
-//         await Projects.updateOne({'steps._id': jobId}, {steps: modifiedSteps});
-//     } catch(err) {
-//         console.log(err);
-//         console.log("Error in updateStepAgreement");
-//     }
-// }
-
 async function updateStepProp({jobId, prop, value}) {
     try {
         const project = await getProject({'steps._id': jobId});
