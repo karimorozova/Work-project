@@ -1,5 +1,5 @@
 <template lang="pug">
-    .check-box
+    .check-box(:class="{'check-box_opacity': isReadonly}")
         img.check-box__image(v-if="isChecked" src="../assets/images/selected-checkbox.png" @click="unCheck")
         img.check-box__image(v-else src="../assets/images/unselected-checkbox.png" @click="check")
             
@@ -8,13 +8,16 @@
 <script>
 export default {
     props: {
-        isChecked: {type: Boolean}
+        isChecked: {type: Boolean},
+        isReadonly: {type: Boolean}
     },
     methods: {
         check() {
+            if(this.isReadonly) return;
             this.$emit("check");
         },
         unCheck() {
+            if(this.isReadonly) return;
             this.$emit("unCheck");
         }
     }
@@ -26,6 +29,9 @@ export default {
         &__image {
             height: 25px;
             width: 25px;
+        }
+        &_opacity {
+            opacity: 0.5;
         }
     }
 </style>

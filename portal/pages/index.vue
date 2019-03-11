@@ -40,7 +40,7 @@ export default {
       this.$axios.post("/portal/auth", this.form).then(
         response => {
           console.log(response);
-          document.cookie = "ses=" + response.data.jsessionId + "; max-age=3600;" + "domain=pangea.global";
+          document.cookie = "ses=" + response.data.jsessionId + "; max-age=3600;" //+ "domain=pangea.global";
           this.isLogin = true;
           window.location.href = "/main";
         },

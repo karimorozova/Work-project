@@ -43,7 +43,6 @@ export default {
     justify-content: center;
     align-items: center;
     &__item {
-        font-family: 'Open Sans';
         &:first-child {
             @media (max-width: 450px) {
                 margin-bottom: 15px;
@@ -54,7 +53,6 @@ export default {
     &__cookies {
         color: #fff;
         font-size: 14px;
-        font-family: 'Open Sans';
     }
 }
 
@@ -73,11 +71,9 @@ export default {
         font-size: 12px;
         margin-top: 0.5px;
         margin-bottom: 0.5px;
-        font-family: 'Open Sans';
     }
     &-copywrite-text {
         font-weight: bold;
-        font-family: 'Open Sans';
     }
 }
 

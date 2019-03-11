@@ -254,31 +254,7 @@
       transition(name="slide-fade")
         .server-err(v-if="isServerError")
           ServerError(:errorMessage="serverErrMessage")
-    .footer
-      .linkList
-        .linkList__item.first
-          ul.list
-            li(v-for="link in linksArray[0]")
-              a(:href='link.link') {{ link.title }}
-        .linkList__item.second
-          ul.list
-            li(v-for="link in linksArray[1]")
-              a(:href='link.link') {{ link.title }}
-      .legalInfo
-        .legalInfo__item
-          a.cookies-link(href="http://www.aboutcookies.org/" target="_blank") Use cookies
-          p.linfo YIOTA COURT, Makariou III Ave. 134, 3021, Limassol
-          p.linfo office : +35725252150
-          p.linfo Reg. No. HE362046  VAT. No. 10362046H
-          p.linfo © 2016 
-            span.pangeaFooterSpan Pangea Translation Services (Cyprus) LTD
-        .legalInfo__item
-          img(border="0" src="https://twb.translationcenter.org/workspace/display-badge/index/id/61931/Volunteer_Translator.jpg" alt="English to French & English to Arabic & English to Chinese volunteer translator")
-      .socialLinks
-        ul.socials
-          li(v-for="social in socialsArray")
-            a(:href="social.socialLink")
-              img.socialsImage(:src="social.image")
+    Footer
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -299,6 +275,7 @@ import ServerError from '../components/ServerError';
 import moment from 'moment';
 import ClickOutside from 'vue-click-outside';
 import Datepicker from './../components/Datepicker.vue';
+import Footer from '../components/Footer';
 import { Drag, Drop } from 'vue-drag-drop';
 
 var sbjs = require('sourcebuster');
@@ -965,7 +942,8 @@ export default {
   components: {
     Datepicker,
     Drop,
-    ServerError
+    ServerError,
+    Footer
   },
   mounted(){
     this.google();

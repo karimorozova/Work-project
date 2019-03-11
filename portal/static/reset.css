@@ -1,0 +1,22 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-family: MyriadPro;
+}
+
+html {
+	line-height: 1.15
+}
+
+input, textarea {
+	color: #67573E;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+input[type="checkbox"] {
+    margin: 0;
+}
