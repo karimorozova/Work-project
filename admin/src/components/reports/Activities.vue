@@ -125,7 +125,6 @@ export default {
         async generateTokens() {
             try {
                 const result = await this.$http.get(`/zoho/getTokens?code=${this.code}`);
-                console.log(result);
             } catch(err) {
                 this.alertToggle({message: err.data, isShow: true, type: "error"})
             }
