@@ -11,6 +11,7 @@ const portalRouter = require('./portal');
 const industryRouter = require('./industry');
 const serviceRouter = require('./service');
 const xtmRouter = require('./xtm');
+const zohoRouter = require('./zoho');
 const clientsapiRouter = require('./clientsapi');
 const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
@@ -24,6 +25,7 @@ router.use('/portal', portalRouter);
 router.use('/industry', industryRouter);
 router.use('/service', serviceRouter);
 router.use('/xtm', xtmRouter);
+router.use('/zoho', zohoRouter);
 router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 router.use('/vendors/application', vendorApplicationRouter)

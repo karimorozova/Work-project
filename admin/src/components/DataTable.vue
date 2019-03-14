@@ -2,7 +2,7 @@
 .table
     .table__thead
         .table__head-row
-            .table__thead-cell(v-for="field of fields" :style="{width: field.width}") 
+            .table__thead-cell(v-for="field of fields" :style="{width: field.width}" :class="headCellClass") 
                 slot(:name="field.headerKey" :field="field")
     .table__tbody(:class="bodyClass")
         .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
@@ -31,6 +31,9 @@ export default {
         },
         activeIndex: {
             type: Number
+        },
+        headCellClass: {
+            type: String
         },
         bodyClass: {
             type: [String, Array]
@@ -181,6 +184,10 @@ export default {
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateY(-10px);
   opacity: 0;
+}
+
+.table_no-bottom-margin {
+    margin-bottom: 0;
 }
 
 </style>

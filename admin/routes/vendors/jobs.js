@@ -28,7 +28,7 @@ function getSteps(project, id) {
             projectStatus: project.status,
             manager: project.projectManager,
             industry: project.industry,
-            xtmJobId: stepTask.xtmJobs[0],
+            xtmJobIds: stepTask.xtmJobs,
             refFiles: stepTask.refFiles
         });
     }

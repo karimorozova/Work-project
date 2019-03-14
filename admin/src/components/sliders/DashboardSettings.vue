@@ -10,12 +10,14 @@
     .settings__inner(v-if="isSidebar" :class='{"settings__open": slidebarVisible}')
       .settings__table
         router-view
-    Blanket(title='Welcome to the Pangea Admin' v-if="!isSidebar")    
+    //- Blanket(title='Welcome to the Pangea Admin' v-if="!isSidebar")
+    Activities(v-if="!isSidebar")
 </template>
 
 <script>
 import Sidebar from "../Sidebar";
 import Blanket from "../Blanket/Blanket";
+import Activities from "../reports/Activities"
 import { mapGetters } from "vuex";
 
 export default {
@@ -74,7 +76,8 @@ export default {
   },
   components: {
     Sidebar,
-    Blanket
+    Blanket,
+    Activities
   }
 };
 </script>

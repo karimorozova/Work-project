@@ -394,6 +394,7 @@ router.get('/xtmwords', async (req, res) => {
 router.get('/editor', async (req, res) => {
     try {
         let jobId = parseInt(req.query.jobId);
+        const { stepName } = req.query;
         let str = '<?xml version="1.0" encoding="UTF-8"?>' +
         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
     '<soapenv:Header/>' +
@@ -420,8 +421,8 @@ router.get('/editor', async (req, res) => {
                 '</userOptions>' +
                 '<workflowOptions>' +
                 '<currentWorkflowStep>' +
-                    '<id>2885</id>' +
-                    '</currentWorkflowStep>' +
+                `<workflowStepName>${stepName}</workflowStepName>` +
+                '</currentWorkflowStep>' +
                 '</workflowOptions>' + 
             '</editor>' +
             '<options/>' +
