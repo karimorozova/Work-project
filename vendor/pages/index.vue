@@ -75,7 +75,7 @@ export default {
         if(window.location.toString().indexOf(elem.path) !== -1) {
           elem.active = true;
           if(isFirstRender) {
-            this.$router.push(elem.path);
+            // this.$router.push(elem.path);
           }
         } else {
           elem.active = false

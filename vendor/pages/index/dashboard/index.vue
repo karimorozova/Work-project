@@ -54,9 +54,9 @@
       async checkErrors(index) {
 
       },
-      async makeAction({index,key}, prop) {
+      async makeAction({index, key}, prop) {
+        const status = key === "Approve" ? "Accepted" : "Rejected";
         try {
-          const status = key === 0 ? "Accepted" : "Rejected";
           await this.setJobStatus({jobId: this[prop][index]._id, status});
         } catch(err) {
           this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
@@ -69,17 +69,14 @@
       }),
       upcomingJobs() {
         return this.jobs.filter(item => {
-          if(item.status === "Request Sent" || item.status === "Created") {
+          if((item.status === "Request Sent" || item.status === "Accepted" || item.status === "Created") 
+            && item.projectStatus !== "Started") {
             return item;
           }
         })
       },
       openedJobs() {
-        return this.jobs.filter(item => {
-          if(item.status === "In Progress" || item.status === "Accepted") {
-            return item;
-          }
-        })
+        return this.jobs.filter(item => item.projectStatus === "Started")
       }
     },
     components: {

@@ -32,14 +32,16 @@
                     img.main-info__download(src="../../../../assets/images/download.png" :class="{'main-info_opacity05': !job.terminology}" @click="downloadTerm")
         .main-info__terms
             .main-info__check
-                CheckBox(:isChecked="job.isVendorRead" :isReadonly="job.isVendorRead" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
+                CheckBox(:isChecked="job.isVendorRead" :isReadonly="isReadonly" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
             span.main-info__text I have read the instructions and downloaded the reference files
-        .main-info__button
-            Button(:value="buttonValue")    
+        .main-info__button(v-if="showButton")
+            Button(:value="buttonValue")
+        .main-info__button(v-if="job.status === 'Request sent'")
+            .main-info__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)")
 </template>
 
 <script>
-import LabelValue from "../LabelValue";
+import LabelValue from "../../../components/jobs/LabelValue";
 import Button from "~/components/buttons/Button";
 import CheckBox from "~/components/CheckBox";
 import Progress from "~/components/Progress";
@@ -49,13 +51,20 @@ export default {
     data() {
         return {
             isColon: true,
-            domain: ""
+            domain: "",
+            icons: [
+                {icon: require("../../../../assets/images/Approve-icon.png"), active: true, type: "approve"},
+                {icon: require("../../../../assets/images/Reject-icon.png"), active: true, type: "reject"}
+            ]
         }
     },
     methods: {
         ...mapActions({
             setStepTermsAgreement: "setStepTermsAgreement" 
         }),
+        async makeAction(key, index) {
+            console.log(key, index);
+        },
         async toggle(e, bool) {
             try {
                 await this.setStepTermsAgreement({jobId: this.job._id, value: bool});
@@ -64,7 +73,7 @@ export default {
             }
         },
         downloadRef() {
-            if(!job.refFiles.length) return;
+            if(!this.job.refFiles || !this.job.refFiles.length) return;
             for(let file of this.job.refFiles) {
                 let a = document.createElement("a");
                 a.href = this.domain + file.split('./dist')[1];
@@ -72,7 +81,7 @@ export default {
             }    
         },
         downloadTerm() {
-            if(!job.terminology) return;
+            if(!this.job.terminology) return;
             console.log('downloading...');
         }
     },
@@ -80,11 +89,20 @@ export default {
         ...mapGetters({
             job: "getSelectedJob"
         }),
+        showButton() {
+            const statuses = ['Accepted', 'Started'];
+            return this.job.projectStatus === 'Started' && statuses.indexOf(this.job.status) !== -1;
+        },
         buttonValue() {
             return "Start"
         },
         progress() {
-            return this.job.progress.wordsDone / this.job.progress.wordsTotal;            
+            if(this.job.progress) {
+                return +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2);
+            }
+        },
+        isReadonly() {
+            return this.job.isVendorRead || this.job.projectStatus !== "Accepted";
         }
     },
     components: {

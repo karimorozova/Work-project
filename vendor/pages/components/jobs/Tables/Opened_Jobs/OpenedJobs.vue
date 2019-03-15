@@ -39,12 +39,14 @@
         .jobs__data {{ row.finance.Price.payables }}
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
-        .jobs__icons(v-if="row.projectStatus === 'Started'")
+        .jobs__icons(v-if="row.status === 'Started'")
           img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="enterEditor(index)" :class="{'jobs_disable': !row.isVendorRead}")
           .jobs__select-popup(v-if="isXtmJobs && index === currentActive" v-click-outside="closePopup")
             span.jobs__job-ids(v-for="(id, idIndex) in row.xtmJobIds" @click.stop="goToXtmEditor(index, idIndex)") file-{{idIndex+1}}
-        .jobs__icons(v-else)
-          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+        .jobs__icons(v-if="isApproveReject(row)")
+          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
+        .jobs__icons(v-if="row.status === 'Accepted'")
+          img.jobs__icon(src="../../../../../assets/images/enter-icon.png")
 </template>
 
 <script>
@@ -69,10 +71,10 @@
         errors: [],
         isDeleting: false,
         isXtmJobs: false,
-        icons: [
-          {icon: require("../../../../../assets/images/Approve-icon.png"), active: true, type: "approve"},
-          {icon: require("../../../../../assets/images/Reject-icon.png"), active: true, type: "reject"}
-        ]
+        icons: {
+          Approve: {icon: require("../../../../../assets/images/Approve-icon.png"), active: true},
+          Reject: {icon: require("../../../../../assets/images/Reject-icon.png"), active: true}
+        }
       }
     },
     methods:{
@@ -85,7 +87,7 @@
       },
       chooseJob({index}) {
         this.selectJob(this.jobs[index]);
-        this.$router.push("/dashboard/project-details");
+        this.$router.push(`/dashboard/project-details/${this.jobs[index]._id}`);
       },
       closeErrors() {
         this.areErrors = false;
@@ -118,6 +120,9 @@
           this.alertToggle({message: err.response.data, isShow: true, type: "error"});
         }
       },
+      isApproveReject(row) {
+        return row.status === "Request Sent" || row.status === "Created";
+      }
     },
     components: {
       DataTable

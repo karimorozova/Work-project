@@ -1,5 +1,5 @@
 <template lang="pug">
-.action-button
+.action-button(:class="{'action-button_disabled': isDisabled}")
     input.action-button__button(type="button" :value="value" @click="makeAction")    
 </template>
 
@@ -8,6 +8,10 @@ export default {
     props: {
         value: {
             type: String
+        },
+        isDisabled: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
@@ -44,6 +48,19 @@ export default {
         margin: 7px;
         @media (max-width: 450px) {
             margin: 5px;
+        }
+    }
+}
+
+.action-button_disabled {
+    .action-button__button {
+        box-shadow: none;
+        cursor: default;
+        &:hover {
+            box-shadow: none;
+        }
+        &:active {
+            box-shadow: none;
         }
     }
 }

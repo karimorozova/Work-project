@@ -22,7 +22,8 @@ function getSteps(project, id) {
     let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id);
     for(let step of filteredSteps) {
         const stepTask = tasks.find(item => item.taskId === step.taskId);
-        assignedSteps.push({...step._doc, 
+        assignedSteps.push({...step._doc,
+            project_Id: project._id,
             projectId: project.projectId, 
             projectName: project.projectName,
             projectStatus: project.status,

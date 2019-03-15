@@ -40,7 +40,7 @@
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="row.status==='Request Sent'")
-          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="icon.type ==='approve' ? 'approve' : 'reject'")
+          img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
 </template>
 
 <script>
@@ -63,10 +63,10 @@
         areErrors: false,
         errors: [],
         isDeleting: false,
-        icons: [
-          {icon: require("../../../../../assets/images/Approve-icon.png"), active: true, type: "approve"},
-          {icon: require("../../../../../assets/images/Reject-icon.png"), active: true, type: "reject"}
-        ],
+        icons: {
+          Approve: {icon: require("../../../../../assets/images/Approve-icon.png"), active: true},
+          Reject: {icon: require("../../../../../assets/images/Reject-icon.png"), active: true}
+        },
       }
     },
     methods: {
@@ -76,7 +76,7 @@
       }),
       chooseJob({index}) {
         this.selectJob(this.jobs[index]);
-        this.$router.push("/dashboard/project-details");
+        this.$router.push(`/dashboard/project-details/${this.jobs[index]._id}`);
       },
       closeErrors() {
         this.areErrors = false;

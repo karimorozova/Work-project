@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import LabelValue from "../LabelValue";
+import LabelValue from "../../../components/jobs/LabelValue";
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 
