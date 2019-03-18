@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
     props: {
         person: {
@@ -32,31 +34,57 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            alertToggle: "alertToggle"
+        }),
         toggleTermsAgree() {
             this.isAgree = !this.isAgree;
         },
+        validateEmail() {
+            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            const email = this.person.email.toLowerCase();
+            return emailValidRegex.test(email);
+        },
+        async checkEmailErrors() {
+            try {
+                if(!this.person.email || !this.validateEmail()) {
+                    this.errors.push("Please enter your valid email.");
+                    return
+                }
+                const result = await this.$axios.get(`/vendors/application/unique-email?email=${this.person.email}`);
+                const isUnique = !result.data;
+                console.log(isUnique);
+                isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
+            } catch(err) {
+
+            }
+        },
         async checkForm() {
             this.errors = [];
-            if(!this.person.firstName) this.errors.push("Please enter your name.");
-            if(!this.person.surname) this.errors.push("Please enter your surname.");
-            if(!this.person.email) this.errors.push("Please enter your email.");
-            if(!this.person.phone) this.errors.push("Please enter your phone number.");
-            if(!this.person.native) this.errors.push("Please select your mother tongue.");
-            if(!this.person.timezone) this.errors.push("Please select your timezone.");
-            if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
-            if(!this.person.cvFiles || (this.person.cvFiles && !this.person.cvFiles.length)) this.errors.push("Please upload CV file.");
-            if(!this.person.position) this.errors.push("Please select position(s).");
-            if(!this.person.translationExp) this.errors.push("Please select years of experience.");
-            if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
-            if(!this.person.industries) this.errors.push("Please select industries.");
-            if(!this.person.availability) this.errors.push("Please select availability.");
-            if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
-            let captchaValidation = await grecaptcha.getResponse();
-            if(captchaValidation.length === 0) this.errors.push("Please confirm that you are not a robot.");
-            if(this.errors.length) {
-                this.$emit("formValidationFail", {errors: this.errors})
-            } else {
-                this.$emit("sumbitForm", {confirmed: this.isAgree})
+            try {
+                if(!this.person.firstName) this.errors.push("Please enter your name.");
+                if(!this.person.surname) this.errors.push("Please enter your surname.");
+                await this.checkEmailErrors();
+                if(!this.person.phone) this.errors.push("Please enter your phone number.");
+                if(!this.person.native) this.errors.push("Please select your mother tongue.");
+                if(!this.person.timezone) this.errors.push("Please select your timezone.");
+                if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
+                if(!this.person.cvFiles || (this.person.cvFiles && !this.person.cvFiles.length)) this.errors.push("Please upload CV file.");
+                if(!this.person.position) this.errors.push("Please select position(s).");
+                if(!this.person.translationExp) this.errors.push("Please select years of experience.");
+                if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
+                if(!this.person.industries) this.errors.push("Please select industries.");
+                if(!this.person.availability) this.errors.push("Please select availability.");
+                if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
+                let captchaValidation = await grecaptcha.getResponse();
+                if(captchaValidation.length === 0) this.errors.push("Please confirm that you are not a robot.");
+                if(this.errors.length) {
+                    this.$emit("formValidationFail", {errors: this.errors})
+                } else {
+                    // this.$emit("sumbitForm", {confirmed: this.isAgree})
+                }
+            } catch(err) {
+                this.alertToggle({message: "An errors occured. Please try again later.", isShow: true, type: "error"});
             }
         }
     }

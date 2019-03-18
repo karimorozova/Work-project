@@ -64,4 +64,18 @@ router.post("/send-form", upload.any(), async (req, res) => {
     }
 })
 
+router.get("/unique-email", async (req, res) => {
+    const { email } = req.query;
+    try {
+        const vendor = await Vendors.findOne({"email": email});
+        if(vendor) {
+            return res.send("exist");
+        }
+        res.send("");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking Vendor email uniqueness.")
+    }
+})
+
 module.exports = router;
