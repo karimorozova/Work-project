@@ -95,7 +95,8 @@ const middleware = {
             '/pm-project-details',
             '/finance',
             '/reports',
-            '/translation-request'
+            '/translation-request',
+            '/zoho-code'
         ]
         for(let route of routesArray) {
             let length = route.length;

@@ -151,7 +151,7 @@ export default {
     display: flex;
     align-items: center;
 }
-.vendors-table__body, .clients__table {
+.vendors-table__body, .clients__table, .reports__table {
     max-height: 600px;
 }
 .vendors-table_scroll-y {

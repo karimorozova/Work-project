@@ -2,7 +2,7 @@ const mailTransporter = require("./mailTransporter");
 const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress } = require("./xtmApi");
 const { getOneService, getManyServices } = require("./getServices");
 const { createNewRate, updateRate, deleteRate, updateLangCombs } = require("./rates");
-const { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount } = require("./zoho");
+const { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount, saveRecords } = require("./zoho");
 
 module.exports = {
     mailTransporter,
@@ -23,5 +23,6 @@ module.exports = {
     getLeads, 
     getActivities,
     getCallsCount,
-    getRecords
+    getRecords,
+    saveRecords
 }

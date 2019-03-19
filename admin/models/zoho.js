@@ -10,7 +10,11 @@ const ZohoSchema = new mongoose.Schema({
         type : String, 
         default : '', 
         trim : true 
-    }    
+    },
+    lastRefreshed: {
+        type: Date,
+        default: Date.now
+    },  
 }, { minimize: false });
 
 const Zoho = mongoose.model('Zoho', ZohoSchema);

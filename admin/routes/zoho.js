@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { Zoho } = require('../models');
 const { zohoCreds } = require('../configs');
-const { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount } = require('../services');
+const { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount, saveRecords } = require('../services');
 
 router.get("/getTokens", async (req, res) => {
     const { code } = req.query;
@@ -54,10 +54,10 @@ router.get("/activities", async (req, res) => {
 
 router.get("/crm-records", async (req, res) => {
     const { user } = req.query;
-    console.log(user);
     try {
-        const result = await getRecords(user);
-        res.send(result);
+        const records = await getRecords(user);
+        const result = saveRecords(records, user);
+        res.send("New records recieved");
     }   catch(err) {
         console.log(err);
         if(err.status === 401) {

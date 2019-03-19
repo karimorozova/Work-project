@@ -32,6 +32,7 @@ import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import CreateProject from '@/components/pmArea/CreateProject'
+import ZohoCode from '@/components/ZohoCode'
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -69,6 +70,11 @@ const router = new Router({
           }
       },
       children: [
+        {
+          path: '/zoho-code',
+          name: 'zoho',
+          component: ZohoCode
+        },
         {
           path: 'account-info',
           name: 'account-info',
