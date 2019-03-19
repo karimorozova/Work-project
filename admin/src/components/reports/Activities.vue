@@ -181,8 +181,8 @@ export default {
         Button
     },
     mounted() {
-        this.getReports();
         this.getZohoCrmData();
+        this.getReports();
     }
 }
 </script>
