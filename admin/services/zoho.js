@@ -184,7 +184,7 @@ function parseRecords(records) {
         calls: records.calls.length,
         communications: records.communications.length,
         meetings: records.meetings.length,
-        percent: +getDayAverage(records),
+        percent: Math.random(+getDayAverage(records)),
         grade: getDayGrade(records),
         notes: ""
     }
