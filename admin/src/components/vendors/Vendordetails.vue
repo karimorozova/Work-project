@@ -30,7 +30,7 @@
                 .block-item
                     label.block-item__label.block-item_relative Email:
                         Asterisk(:customStyle="asteriskStyle")
-                    input.block-item__input-filed(:class="{'block-item_error-shadow': checkEmail() && isSaveClicked}" type="text" placeholder="Email" :value="currentVendor.email" @change="(e) => updateProp(e,'email')")
+                    input.block-item__input-filed(:class="{'block-item_error-shadow': validateEmail() && isSaveClicked}" type="text" placeholder="Email" :value="currentVendor.email" @change="(e) => updateProp(e,'email')")
                 .block-item
                     label Phone:
                     input.block-item__input-filed(type="text" placeholder="Phone" :value="currentVendor.phone" @change="(e) => updateProp(e,'phone')")
@@ -135,7 +135,8 @@ export default {
             backPath: "/vendors",
             isAvailablePairs: false,
             langPairs: [],
-            addSeveralPriceId: ""
+            addSeveralPriceId: "",
+            oldEmail: ""
         }
     },
     methods: {
@@ -193,24 +194,41 @@ export default {
         closeErrors() {
             this.areErrorsExist = false;
         },
-        checkEmail() {
+        validateEmail() {
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase())
         },
+        async checkEmail() {
+            if(this.validateEmail()) {
+                return this.errors.push('Please provide a valid email.')
+            }
+            if(this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
+                try {
+                    const result = await this.$http.get(`/vendors/application/unique-email?email=${this.currentVendor.email}`);
+                    console.log(result.data);
+                    const isUnique = !result.data;
+                    isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
+                } catch(err) {
+                    this.alertToggle({message: "Error on email uniqueness checking", isShow: true, type: "error"});
+                }
+            }
+        },
         async checkForErrors() {
-            this.errors = [];
-            if(!this.currentVendor.firstName) this.errors.push('Company name cannot be empty.');
-            if(!this.currentVendor.industries.length) this.errors.push('Please, choose at least one industry.');
-            if(!this.currentVendor.status) this.errors.push('Please, choose status.');
-            if(this.checkEmail()) {
-                this.errors.push('Please provide a valid email.');
+            try {
+                this.errors = [];
+                if(!this.currentVendor.firstName) this.errors.push('Company name cannot be empty.');
+                if(!this.currentVendor.industries.length) this.errors.push('Please, choose at least one industry.');
+                if(!this.currentVendor.status) this.errors.push('Please, choose status.');
+                await this.checkEmail();
+                if(this.errors.length) {
+                    this.areErrorsExist = true;
+                    this.isSaveClicked = true;
+                    return
+                }
+                await this.updateVendor();
+            } catch(err) {
+
             }
-            if(this.errors.length) {
-                this.areErrorsExist = true;
-                this.isSaveClicked = true;
-                return
-            }
-            await this.updateVendor();
         }, 
         async updateVendor() {
             let sendData = new FormData();
@@ -218,6 +236,7 @@ export default {
             sendData.append('photo', this.photoFile[0]);
             try {
                 await this.updateCurrentVendor(sendData);
+                this.oldEmail = this.currentVendor.email;
                 this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
@@ -301,6 +320,9 @@ export default {
     },
     directives: {
         ClickOutside
+    },
+    mounted() {
+        this.oldEmail = this.currentVendor.email;
     },
     beforeRouteEnter(to, from, next) {
         next(vm => {

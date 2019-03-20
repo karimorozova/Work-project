@@ -53,7 +53,6 @@ export default {
                 }
                 const result = await this.$axios.get(`/vendors/application/unique-email?email=${this.person.email}`);
                 const isUnique = !result.data;
-                console.log(isUnique);
                 isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
             } catch(err) {
 
