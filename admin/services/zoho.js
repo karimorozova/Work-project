@@ -80,6 +80,7 @@ async function getRecords(user) {
     } catch(err) {
         console.log(err);
         console.log("Error in getRecords(Zoho)");
+        throw err;
     }
 }
 // async function getLeads() {
