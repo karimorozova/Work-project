@@ -80,7 +80,6 @@ async function getRecords(user) {
     } catch(err) {
         console.log(err);
         console.log("Error in getRecords(Zoho)");
-        throw err
     }
 }
 // async function getLeads() {
@@ -106,7 +105,7 @@ async function getLeads(user) {
             if(res.error) {
                 return reject(res.error)
             }
-            let result = res.body.data.filter(item => item.Owner.name === user);
+            let result = res.body ? res.body.data.filter(item => item.Owner.name === user): "";
             resolve(result);
         })
     })
@@ -135,13 +134,14 @@ async function getActivities(user) {
             if(res.error) {
                 return reject(res.error)
             }
-            let result = res.body.data.filter(item => item.Owner.name === user);
+            let result = res.body ? res.body.data.filter(item => item.Owner.name === user): "";
             resolve(result);
         })
     })
 }
 
 function getCallsCount(data) {
+    if(!data) return "";
     const result = data.filter(item => {
         return item.Activity_Type === "Calls"
     });
@@ -149,6 +149,7 @@ function getCallsCount(data) {
 }
 
 function getMeetings(data) {
+    if(!data) return "";
     const result = data.filter(item => {
         return item.Subject === "Meeting setup"
     });
@@ -156,6 +157,7 @@ function getMeetings(data) {
 }
 
 function getCommunications(data) {
+    if(!data) return "";
     const subjects = ["Email Comm", "Linkedin Comm", "Facebook Comm"];
     const result = data.filter(item => {
         return item.Activity_Type === 'Tasks' && subjects.indexOf(item.Subject) !== -1;

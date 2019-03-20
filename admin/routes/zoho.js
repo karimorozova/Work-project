@@ -56,7 +56,7 @@ router.get("/crm-records", async (req, res) => {
     const { user } = req.query;
     try {
         const records = await getRecords(user);
-        const result = saveRecords(records, user);
+        await saveRecords(records, user);
         res.send("New records recieved");
     }   catch(err) {
         console.log(err);

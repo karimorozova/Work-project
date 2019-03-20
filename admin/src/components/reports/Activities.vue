@@ -133,7 +133,9 @@ export default {
                 const result = await this.$http.get('/zoho/crm-records?user=Amelia%20Lotter');
             } catch(err) {
                 if (err.status === 401) this.isTokenExpired = true;
-                this.alertToggle({message: err.data, isShow: true, type: "error"})
+                this.alertToggle({message: err.data, isShow: true, type: "error"});
+            } finally {
+                await this.getReports();
             }
         },
         getCurrentMonth() {
@@ -182,7 +184,7 @@ export default {
     },
     mounted() {
         this.getZohoCrmData();
-        this.getReports();
+        // this.getReports();
     }
 }
 </script>

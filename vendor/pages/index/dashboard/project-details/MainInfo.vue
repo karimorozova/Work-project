@@ -37,7 +37,7 @@
         .main-info__button(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
             Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
             .main-info__select-popup(v-if="isXtmJobs" v-click-outside="closePopup")
-                span.main-info__job-ids(v-for="(id, idIndex) in job.xtmJobIds" @click.stop="goToXtmEditor(idIndex)") file-{{idIndex+1}}
+                span.main-info__job-ids(v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" @click.stop="goToXtmEditor(xtmJobIndex)") {{ xtmJob.fileName }}
         .main-info__icons(v-if="job.status === 'Created'")
             .main-info__icon(v-for="(icon, key) in icons")
                 img.main-info__image(:src="icon.icon" @click="makeAction(key)")
@@ -97,7 +97,7 @@ export default {
         async setStatus(status) {
             try {
                 await this.setJobStatus({jobId: this.job._id, status});
-                const currentJob = this.allJob.find(item => item._id === this.job._id);
+                const currentJob = this.allJobs.find(item => item._id === this.job._id);
                 await this.selectJob(currentJob);
             } catch(err) {
                 this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
@@ -125,8 +125,8 @@ export default {
         closePopup() {
             this.isXtmJobs = false;
         },
-        async goToXtmEditor(jobIdIndex) {
-        const jobId = this.job.xtmJobIds[jobIdIndex];
+        async goToXtmEditor(xtmJobIndex) {
+        const { jobId } = this.job.xtmJobIds[xtmJobIndex];
         try {
           const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
           let link = document.createElement("a");

@@ -42,7 +42,7 @@
         .jobs__icons(v-if="row.status === 'Started'")
           img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="enterEditor(index)" :class="{'jobs_disable': !row.isVendorRead}")
           .jobs__select-popup(v-if="isXtmJobs && index === currentActive" v-click-outside="closePopup")
-            span.jobs__job-ids(v-for="(id, idIndex) in row.xtmJobIds" @click.stop="goToXtmEditor(index, idIndex)") file-{{idIndex+1}}
+            span.jobs__job-ids(v-for="(xtmJob, xtmJobIndex) in row.xtmJobIds" @click.stop="goToXtmEditor(index, xtmJobIndex)") {{ xtmJob.fileName }}
         .jobs__icons(v-if="isApproveReject(row)")
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
         .jobs__icons(v-if="row.status === 'Accepted'")
@@ -106,8 +106,8 @@
         }
         await this.goToXtmEditor(index, 0);
       },
-      async goToXtmEditor(index, jobIdIndex) {
-        const jobId = this.jobs[index].xtmJobIds[jobIdIndex];
+      async goToXtmEditor(index, xtmJobIndex) {
+        const { jobId } = this.jobs[index].xtmJobIds[xtmJobIndex];
         try {
           const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.jobs[index].name}`);
           let link = document.createElement("a");
@@ -165,7 +165,7 @@
     box-shadow: 0 0 10px $main-color;
     box-sizing: border-box;
     border-radius: 5px;
-    left: -60px;
+    right: 70%;
   }
   &__job-ids {
     font-size: 16px;

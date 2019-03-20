@@ -373,7 +373,11 @@ router.get('/fill-reports', async (req, res) => {
 
 router.get('/zoho-reports', async (req, res) => {
   try {
-    const result = await ZohoReport.find().populate('user', 'firstName lastName').sort({date: 1});
+    const currentDate = new Date();
+    var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const result = await ZohoReport.find({date: {$gte: firstDay}})
+            .populate('user', 'firstName lastName')
+            .sort({date: 1});
     res.send(result);
   } catch(err) {
     console.log(err);
