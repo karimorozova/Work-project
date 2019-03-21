@@ -42,9 +42,6 @@ export default {
     },
     components: {
         Button
-    },
-    directives: {
-        ClickOutside
     }
 }
 </script>
