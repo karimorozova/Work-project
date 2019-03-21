@@ -1,5 +1,5 @@
 <template lang="pug">
-.approve-modal
+.approve-modal(:class="{'approve-modal_centered': isCentered}")
     .approve-modal__text {{ text }}
     .approve-modal__buttons
         .approve-modal__button(@click="approve")
@@ -22,6 +22,9 @@ export default {
         },
         notApproveValue: {
             type: String
+        },
+        isCentered: {
+            type: Boolean
         }
     },
     data() {
@@ -73,6 +76,21 @@ export default {
         cursor: pointer;
         font-size: 22px;
         font-weight: bold;
+    }
+}
+
+.approve-modal_centered {
+    padding: 20px 30px;
+    max-width: 220px;
+    .approve-modal {
+        &__text {
+            line-height: 1.5;
+            font-size: 20px;
+            text-align: center;       
+        }
+        &__buttons {
+            flex-direction: column;
+        }
     }
 }
 </style>
