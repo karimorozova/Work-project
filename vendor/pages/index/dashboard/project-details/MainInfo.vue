@@ -45,8 +45,8 @@
             .main-info__icon(v-for="(icon, key) in icons")
                 img.main-info__image(:src="icon.icon" @click="makeAction(key)")
                 span.main-info__tooltip {{ key }}
-        .main-info__modal
-            ApproveModal(v-if="isApproveModal"
+        .main-info__modal(v-if="isApproveModal")
+            ApproveModal(
                 @close="closeModal"
                 @notApprove="closeModal"
                 @approve="completeJob" 
