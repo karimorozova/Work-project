@@ -6,7 +6,7 @@ const tokensUrl = 'https://accounts.zoho.com';
 const dataUrl = 'https://www.zohoapis.com/crm/v2';
 
 const date = new Date();
-date.setHours(0,0,0,0);
+// date.setHours(0,0,0,0);
 const isoDate = date.toISOString().split(".")[0];
 
 const grades = {
