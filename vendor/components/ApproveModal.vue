@@ -1,5 +1,5 @@
 <template lang="pug">
-.approve-modal
+.approve-modal(v-click-outside="close")
     .approve-modal__text {{ text }}
     .approve-modal__buttons
         .approve-modal__button(@click="approve")
@@ -11,6 +11,7 @@
 
 <script>
 import Button from "./buttons/Button";
+import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
@@ -42,6 +43,9 @@ export default {
     },
     components: {
         Button
+    },
+    directives: {
+        ClickOutside
     }
 }
 </script>
