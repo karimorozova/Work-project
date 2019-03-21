@@ -3,7 +3,7 @@
         <svg class="progress__bar" :view-box.camel="`0 0 ${size} ${size}`">
             <g fill="none" :stroke-width="strokeWidth" :transform="`rotate(-90, ${center}, ${center})`">
             <circle class="progress__circle" :cx="center" :cy="center" :r="radius" stroke="#938676" stroke-width="2"/>
-            <circle class="progress__circle" :cx="center" :cy="center" :r="radius" stroke="#d15f45" :stroke-width="strokeWidth" pathLength="100" :stroke-dasharray="`${percent}, 999`"/>
+            <circle class="progress__circle" :cx="center" :cy="center" :r="radius" stroke="#d15f45" :stroke-width="strokeWidth" :pathLength="pathLength" :stroke-dasharray="`${percent}, 999`"/>
             </g>
             <text :x="center" :y="center" class="progress__text" dominant-baseline="central" text-anchor="middle">{{ percent }}%</text>
         </svg>
@@ -27,6 +27,9 @@ export default {
         },
         center () {
             return this.size / 2
+        },
+        pathLength() {
+            return this.percent < 100 ? 100 : 99;
         }
     }
 }

@@ -39,7 +39,7 @@
         .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
-        .jobs__icons(v-if="row.status==='Request Sent'")
+        .jobs__icons(v-if="isApproveReject(row)")
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
 </template>
 
@@ -89,6 +89,9 @@
       },
       makeAction(index, key) {
         this.$emit('makeAction', {index, key});
+      },
+      isApproveReject(row) {
+        return row.status === "Request Sent" || row.status === "Created";
       }
     },
     components: {
@@ -100,38 +103,35 @@
 
 <style lang="scss" scoped>
 
-.jobs__table {
-  padding-top: 10px;
-  width: 1027px;
-  margin: 0 auto;
-}
-
-.jobs__data {
-  height: 32px;
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.jobs__drop-menu {
-  position: relative;
-}
-
-.jobs__icons {
-  padding-top: 3px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.jobs__icon {
-  cursor: pointer;
-  margin-right: 8px;
-  transition: transform 0.1s ease-out;
-
-  &:hover {
-    transform: scale(1.2);
+.jobs {
+  &__table {
+    padding-top: 10px;
+    width: 1027px;
+    margin: 0 auto;
+  }
+  &__data {
+    height: 32px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  &__drop-menu {
+    position: relative;
+  }
+  &__icons {
+    padding-top: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &__icon {
+    cursor: pointer;
+    margin-right: 8px;
+    transition: transform 0.1s ease-out;
+    &:hover {
+      transform: scale(1.2);
+    }
   }
 }
 

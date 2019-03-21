@@ -55,8 +55,8 @@ export default {
           active: true
         },
         {
-          title: "COMPLETE JOBS",
-          path: "/closed-jobs",
+          title: "COMPLETED JOBS",
+          path: "/completed-jobs",
           imgBrown: require("../assets/images/CATEGORIES/Closed Jobs ICON(selected).png"),
           active: false
         }

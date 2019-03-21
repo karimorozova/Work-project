@@ -102,7 +102,7 @@ export default {
             }
         },
         isReadonly() {
-            return this.job.isVendorRead || this.job.projectStatus !== "Accepted";
+            return this.job.isVendorRead || this.job.projectStatus !== "Completed";
         }
     },
     components: {

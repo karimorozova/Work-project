@@ -18,6 +18,8 @@
         .jobs__head-title {{ field.label }}
       template(slot="headerStatus" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
+      template(slot="headerProgress" slot-scope="{ field }")
+        .jobs__head-title {{ field.label }}
       template(slot="headerDeadLine" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
       template(slot="headerAmount" slot-scope="{ field }")
@@ -33,6 +35,11 @@
         .jobs__data(v-else) Proofing
       template(slot="status" slot-scope="{ row, index }")
         .jobs__data {{ row.status }}
+      template(slot="progress" slot-scope="{ row, index }")
+        .jobs__data
+          .jobs__progress-bar(v-if="progress(row.progress)")
+            .jobs__progress-filler(:style="{width: progress(row.progress) + '%'}")
+            span.jobs__progress-tooltip {{ progress(row.progress) }}%
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
@@ -57,15 +64,22 @@
 
   export default {
     props: {
-      fields: {
-        type: Array
-      },
       jobs: {
         type: Array
       },
     },
     data(){
       return {
+        fields: [
+          {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "12%", padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0"},
+          {label: "Progress", headerKey: "headerProgress", key: "progress", width: "10%", padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "11%", padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "11%", padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+        ],
         currentActive: -1,
         areErrors: false,
         errors: [],
@@ -122,7 +136,10 @@
       },
       isApproveReject(row) {
         return row.status === "Request Sent" || row.status === "Created";
-      }
+      },
+      progress(prog) {
+        return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
+      },
     },
     components: {
       DataTable
@@ -148,6 +165,34 @@
     display: flex;
     align-items: center;
     box-sizing: border-box;
+  }
+  &__progress-tooltip {
+    position: absolute;
+    opacity: 0;
+    background-color: $white;
+    color: $main-color;
+    transition: all 0.2s;
+    font-size: 14px;
+    top: -1px;
+    left: 25%;
+    padding: 0 3px;
+  }
+  &__progress-bar {
+    width: 100%;
+    height: 15px;
+    border: 1px solid $brown-border;
+    position: relative;
+    box-sizing: border-box;
+    padding: 1px;
+    &:hover {
+      .jobs__progress-tooltip {
+        opacity: 1;
+      }
+    }
+  }
+  &__progress-filler {
+    background-color: $green-success;
+    height: 100%;
   }
   &__icons {
     padding-top: 3px;

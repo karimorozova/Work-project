@@ -27,30 +27,14 @@ export default {
             selectJob: "selectJob",
             alertToggle: "alertToggle"
         }),
-        async refreshProgress() {
-            if(this.job.status === "Started") {
-                try {
-                    await this.$axios.get(`/xtm/update-progress?projectId=${this.job.projectId}`);
-                    await this.getJobs();
-                    const currentJob = this.allJobs.find(item => item._id === this.job._id);
-                    await this.selectJob(currentJob);
-                    this.alertToggle({message: "Progress updated", isShow: true, type: "success"});
-                } catch(err) {
-                    this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-
-                }
-            }
-        },
         async getJobInfo() {
             const { id } = this.$route.params;
-            console.log(this.allJobs);
             try {
                 if(!this.allJobs.length) {
                     await this.getJobs();
                 }
                 const currentJob = this.allJobs.find(item => item._id === id);
                 await this.selectJob(currentJob);
-                console.log(this.job);
             } catch(err) {
 
             }
@@ -60,18 +44,14 @@ export default {
         ...mapGetters({
             job: "getSelectedJob",
             allJobs: "getAllJobs"
-        }),
-        buttonValue() {
-            return "Start"
-        }
+        })
     },
     components: {
         MainInfo,
         OtherInfo
     },
-    async mounted() {
-        await this.getJobInfo();
-        // this.refreshProgress();
+    mounted() {
+        this.getJobInfo();
     }
 }
 </script>

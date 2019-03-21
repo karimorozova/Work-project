@@ -1,7 +1,7 @@
 <template lang="pug">
   .closed-jobs
     .jobs_block
-      h3 Closed Jobs
+      h3 Completed Jobs
       .jobs
         Filters(
           :startFilter="startFilter"
@@ -56,7 +56,7 @@
 <script>
   import moment from 'moment';
   import DataTable from "~/components/Tables/DataTable";
-  import Filters from "../../components/jobs/Tables/Closed_Jobs/Filters";
+  import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters";
   import { mapGetters, mapActions } from "vuex";
 
   export default {
@@ -90,7 +90,7 @@
       }),
       chooseJob({index}) {
         this.selectJob(this.closedJobs[index]);
-        this.$router.push("/closed-jobs/project-details");
+        this.$router.push(`/completed-jobs/project-details/${this.jobs[index]._id}`);
       },
       closeErrors() {
         this.areErrors = false;
@@ -173,7 +173,7 @@
       closedJobs() {
         let result = [];
         if(this.jobs.length) {
-          result = this.jobs.filter((job) => job.status === "Closed");
+          result = this.jobs.filter((job) => job.status === "Completed");
         }
         return result;
       }

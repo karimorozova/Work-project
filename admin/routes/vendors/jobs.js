@@ -22,6 +22,8 @@ function getSteps(project, id) {
     let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id);
     for(let step of filteredSteps) {
         const stepTask = tasks.find(item => item.taskId === step.taskId);
+        const prevStep = step.name !== 'translate1' ? steps.find(item => item.name === "translate1" && item.taskId === step.taskId) : "";
+        const prevStepProgress = prevStep ? prevStep.progress : "";
         assignedSteps.push({...step._doc,
             project_Id: project._id,
             projectId: project.projectId, 
@@ -30,7 +32,9 @@ function getSteps(project, id) {
             manager: project.projectManager,
             industry: project.industry,
             xtmJobIds: stepTask.xtmJobs,
-            refFiles: stepTask.refFiles
+            refFiles: stepTask.refFiles,
+            prevStepProgress,
+            prevStepStatus: prevStep.status
         });
     }
     return assignedSteps;

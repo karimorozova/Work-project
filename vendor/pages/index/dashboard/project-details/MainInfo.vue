@@ -34,14 +34,25 @@
             .main-info__check
                 CheckBox(:isChecked="job.isVendorRead" :isReadonly="isReadonly" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
             span.main-info__text I have read the instructions and downloaded the reference files
-        .main-info__button(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
-            Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
-            .main-info__select-popup(v-if="isXtmJobs" v-click-outside="closePopup")
-                span.main-info__job-ids(v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" @click.stop="goToXtmEditor(xtmJobIndex)") {{ xtmJob.fileName }}
+        .main-info__buttons(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
+            .main-info__button
+                Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
+                .main-info__select-popup(v-if="isXtmJobs" v-click-outside="closePopup")
+                    span.main-info__job-ids(v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" @click.stop="goToXtmEditor(xtmJobIndex)") {{ xtmJob.fileName }}
+            .main-info__button(v-if="progress >= 100" )
+                Button(value="Complete" @makeAction="showModal")
         .main-info__icons(v-if="job.status === 'Created'")
             .main-info__icon(v-for="(icon, key) in icons")
                 img.main-info__image(:src="icon.icon" @click="makeAction(key)")
                 span.main-info__tooltip {{ key }}
+        .main-info__modal(v-click-outside="closeModal" v-if="isApproveModal")
+            ApproveModal( 
+                @close="closeModal"
+                @notApprove="closeModal"
+                @approve="completeJob" 
+                text="Are you sure?"
+                approveValue="Complete" 
+                notApproveValue="Cancel")
 </template>
 
 <script>
@@ -49,6 +60,7 @@ import LabelValue from "../../../components/jobs/LabelValue";
 import Button from "~/components/buttons/Button";
 import CheckBox from "~/components/CheckBox";
 import Progress from "~/components/Progress";
+import ApproveModal from "~/components/ApproveModal";
 import ClickOutside from "vue-click-outside";
 import { mapGetters, mapActions } from "vuex";
 
@@ -61,7 +73,8 @@ export default {
                 Approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 Reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
             },
-            isXtmJobs: false
+            isXtmJobs: false,
+            isApproveModal: false
         }
     },
     methods: {
@@ -78,13 +91,19 @@ export default {
                     case "Start":
                         await this.setStatus("Started");
                         break
-                    case "Go to Editor":
-                        this.isXtmJobs = true;
+                    case "Enter Editor":
+                        await this.enterEditor();
                         break
                 }
             } catch(err) {
                 this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
             }
+        },
+        async enterEditor() {
+            if(this.job.xtmJobIds.length > 1) {
+                return this.isXtmJobs = true;
+            }
+            await this.goToXtmEditor(0);
         },
         async makeAction(key) {
             const status = key === "Approve" ? "Accepted" : "Rejected";
@@ -126,19 +145,33 @@ export default {
             this.isXtmJobs = false;
         },
         async goToXtmEditor(xtmJobIndex) {
-        const { jobId } = this.job.xtmJobIds[xtmJobIndex];
-        try {
-          const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
-          let link = document.createElement("a");
-          link.target = "_blank";
-          link.href = url.data;
-          link.click();
-          this.currentActive = -1;
-          this.closePopup();
-        } catch(err) {
-          this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+            const { jobId } = this.job.xtmJobIds[xtmJobIndex];
+            try {
+                const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
+                let link = document.createElement("a");
+                link.target = "_blank";
+                link.href = url.data;
+                link.click();
+                this.currentActive = -1;
+                this.closePopup();
+            } catch(err) {
+                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+            }
+        },
+        closeModal() {
+            this.isApproveModal = false;            
+        },
+        showModal() {
+            this.isApproveModal = true;
+        },
+        async completeJob() {
+            try {
+                await this.setStatus("Completed");
+                this.closeModal();
+            } catch(err) {
+                this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
+            }
         }
-      },
     },
     computed: {
         ...mapGetters({
@@ -153,8 +186,7 @@ export default {
             return this.job.isVendorRead === 'Started' 
         },
         buttonValue() {
-            if(+this.progress >= 100) return "Complete";
-            return this.job.status === "Accepted" ? "Start" : "Go to Editor";
+            return this.job.status === "Accepted" ? "Start" : "Enter Editor";
         },
         progress() {
             if(this.job.progress) {
@@ -162,15 +194,23 @@ export default {
             }
         },
         isReadonly() {
-            return this.job.projectStatus !== "Started" ||
-                this.job.status === "Started";
+            if(this.job.projectStatus !== "Started") return true;
+            if(this.job.name !== "translate1") {
+                const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
+                return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
+            }
+            if(this.job.status !== "Started") {
+                return this.job.status !== "Accepted";
+            }
+            return this.job.status === "Started";
         }
     },
     components: {
         LabelValue,
         Button,
         CheckBox,
-        Progress
+        Progress,
+        ApproveModal
     },
     directives: {
         ClickOutside
@@ -190,6 +230,7 @@ export default {
     flex-direction: column;
     padding: 0 0 20px 20px;
     box-sizing: border-box;
+    position: relative;
     &__job-data {
        border-bottom: 1px solid $light-brown;
        display: flex;
@@ -241,11 +282,14 @@ export default {
     &__check {
         margin-right: 10px;
     }
-    &__button, &__icons {
+    &__buttons, &__icons {
         display: flex;
         justify-content: center;
     }
     &__button {
+        width: 30%;
+        display: flex;
+        justify-content: center;
         position: relative;
     }
     &__icons {
@@ -293,6 +337,12 @@ export default {
     &_opacity05 {
         opacity: 0.5;
         cursor: default;
+    }
+    &__modal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -150px;
     }
 }
 
