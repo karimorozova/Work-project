@@ -6,7 +6,7 @@ const tokensUrl = 'https://accounts.zoho.com';
 const dataUrl = 'https://www.zohoapis.com/crm/v2';
 
 const date = new Date();
-// date.setHours(0,0,0,0);
+date.setHours(2);
 const isoDate = date.toISOString().split(".")[0];
 
 const grades = {
@@ -83,18 +83,6 @@ async function getRecords(user) {
         throw err;
     }
 }
-// async function getLeads() {
-//     return new Promise((resolve,reject) => {
-//         unirest.get(`${dataUrl}/Leads/search?criteria=(Owner.name:equals:Amelia Lotter)`)
-//         .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
-//         .end( (res) => {
-//             if(res.error) {
-//                 return reject(res.error)
-//             }
-//             resolve(res.body);
-//         })
-//     })
-// }
 
 async function getLeads(user) {
     const currentToken = await getCurrentToken();
@@ -111,19 +99,6 @@ async function getLeads(user) {
         })
     })
 }
-
-// async function getActivities(params) {
-//     return new Promise((resolve,reject) => {
-//         unirest.get(`${dataUrl}/Activities/search?criteria=${params}`)
-//         .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
-//         .end( (res) => {
-//             if(res.error) {
-//                 return reject(res.error)
-//             }
-//             resolve(res.body);
-//         })
-//     })
-// }
 
 async function getActivities(user) {
     const currentToken = await getCurrentToken();
@@ -225,6 +200,5 @@ function gradeLetter(percent) {
     }
     return result;
 }
-
 
 module.exports = { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount, saveRecords }

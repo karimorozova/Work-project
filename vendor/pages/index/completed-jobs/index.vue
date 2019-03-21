@@ -16,7 +16,7 @@
         .jobs__table
           DataTable(
             :fields="fields"
-            :tableData="closedJobs"
+            :tableData="completedJobs"
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
@@ -89,8 +89,8 @@
         alertToggle: "alertToggle"
       }),
       chooseJob({index}) {
-        this.selectJob(this.closedJobs[index]);
-        this.$router.push(`/completed-jobs/project-details/${this.jobs[index]._id}`);
+        this.selectJob(this.completedJobs[index]);
+        this.$router.push(`/completed-jobs/project-details/${this.completedJobs[index]._id}`);
       },
       closeErrors() {
         this.areErrors = false;
@@ -123,7 +123,7 @@
       },
 
       filterJobs() {
-        this.filteredJobs = this.closedJobs;
+        this.filteredJobs = this.completedJobs;
 
         if (this.jobTypeFilter && this.jobTypeFilter !== 'All' && this.jobTypeFilter !== 'QA') {
           if (this.jobTypeFilter === 'Translation') {
@@ -170,10 +170,10 @@
         }
         return result
       },
-      closedJobs() {
+      completedJobs() {
         let result = [];
         if(this.jobs.length) {
-          result = this.jobs.filter((job) => job.status === "Completed");
+          result = this.jobs.filter(job => job.status === "Completed");
         }
         return result;
       }

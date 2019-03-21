@@ -48,6 +48,7 @@
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="row.status === 'Started'")
           img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="enterEditor(index)" :class="{'jobs_disable': !row.isVendorRead}")
+          img.jobs__icon(v-if="progress(row.progress) >= 100" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
           .jobs__select-popup(v-if="isXtmJobs && index === currentActive" v-click-outside="closePopup")
             span.jobs__job-ids(v-for="(xtmJob, xtmJobIndex) in row.xtmJobIds" @click.stop="goToXtmEditor(index, xtmJobIndex)") {{ xtmJob.fileName }}
         .jobs__icons(v-if="isApproveReject(row)")
@@ -140,6 +141,9 @@
       progress(prog) {
         return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
       },
+      showModal(index) {
+        this.$emit("showModal", { index });
+      }
     },
     components: {
       DataTable

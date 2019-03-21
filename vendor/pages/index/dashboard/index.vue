@@ -14,13 +14,25 @@
                 OpenedJobs(
                     :fields="fields"
                     :jobs="openedJobs"
+                    @showModal="showModal"
                     @makeAction="(e) => makeAction(e, 'openedJobs')"
                 )
+                .jobs__modal(v-if="isApproveModal")
+                  ApproveModal(
+                    :isCentered="isApproveModal"
+                    @close="closeModal"
+                    @notApprove="closeModal"
+                    @approve="completeJob" 
+                    text="Are you sure you have completed your job and reviewed your work?"
+                    approveValue="Complete" 
+                    notApproveValue="Cancel"
+                  )
         nuxt-child
 </template>
 
 <script>
   import DataTable from "~/components/Tables/DataTable";
+  import ApproveModal from "~/components/ApproveModal";
   import UpcomingJobs from "../../components/jobs/Tables/Upcoming_Jobs/UpcomingJobs";
   import OpenedJobs from "../../components/jobs/Tables/Opened_Jobs/OpenedJobs";
 
@@ -39,6 +51,9 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
+        jobStatuses: ["Request Sent", "Accepted", "Created"],
+        currentIndex: -1,
+        isApproveModal: false
       }
     },
     methods: {
@@ -47,7 +62,22 @@
         getJobs: "getJobs",
         setJobStatus: "setJobStatus"
       }),
+      showModal({index}) {
+        this.currentIndex = index;
+        this.isApproveModal = true;
+      },
+      closeModal() {
+        this.isApproveModal = false;
+      },
+      async completeJob() {
+        const jobId = this.openedJobs[this.currentIndex]._id;
+        try {
+          await this.setJobStatus({jobId, status: "Completed"});
+          this.closeModal();
+        } catch(err) {
 
+        }
+      },
       formatDeadline(date) {
         return moment(date).format('DD-MMM-YYYY')
       },
@@ -69,18 +99,19 @@
       }),
       upcomingJobs() {
         return this.jobs.filter(item => {
-          if((item.status === "Request Sent" || item.status === "Accepted" || item.status === "Created") 
-            && item.projectStatus !== "Started") {
-            return item;
-          }
+          return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started"
         })
       },
       openedJobs() {
-        return this.jobs.filter(item => item.projectStatus === "Started")
+        const statuses = [...this.jobStatuses, "Started"];
+        return this.jobs.filter(item => {
+          return statuses.indexOf(item.status) !== -1 && item.projectStatus === "Started";          
+        })
       }
     },
     components: {
       DataTable,
+      ApproveModal,
       UpcomingJobs,
       OpenedJobs,
     },
@@ -110,6 +141,16 @@
       position: relative;
       &_opacity {
         opacity: 1;
+      }
+      &__modal {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
