@@ -6,10 +6,8 @@ const tokensUrl = 'https://accounts.zoho.com';
 const dataUrl = 'https://www.zohoapis.com/crm/v2';
 
 const date = new Date();
-console.log(date.getTimezoneOffset());
 date.setHours(0,0,0,0);
 const isoDate = date.toISOString().split(".")[0];
-console.log(isoDate);
 
 const grades = {
     "F": {min: 0, max: 59},
@@ -147,10 +145,12 @@ async function saveRecords(records, user) {
     const newRecords = parseRecords(records);
     try {
         const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
-        const todaysRecords = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: date}});
-        todaysRecords ? await ZohoReport.updateOne({_id: todaysRecords.id}, { ...newRecords }) :
+        // const todaysRecords = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: date}});
+        const lastRecord = await ZohoReport.find({user: recordsUser.id}).sort({date: -1}).limit(1);
+        const lastDate = new Date(lastRecord.date);
+        console.log('lastDate: ', lastDate);
+        lastDate >= date ? await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords }) :
         await ZohoReport.create({ ...newRecords, user: recordsUser._id })
-        console.log(todaysRecords.date);
     } catch(err) {
         console.log(err);
         console.log("Error in saveRecords (Zoho)");
