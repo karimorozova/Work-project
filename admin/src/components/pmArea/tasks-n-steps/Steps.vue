@@ -246,17 +246,25 @@ export default {
             if(!checkedSteps.length) {
                 return this.closeApproveModal();
             }
+            await this.doStepApproveAction(checkedSteps);
+        },
+        async doStepApproveAction(checkedSteps) {
             try {
-                if(this.selectedAction === "Request confirmation") {
-                    this.closeApproveModal();
-                    return await this.requestConfirmation(checkedSteps);
-                }
-                if(this.selectedAction === "Cancel") {
-                    this.closeApproveModal();
-                    return await this.cancelSteps(checkedSteps);
+                switch (this.selectedAction) {
+                    case "Request confirmation":
+                        await this.requestConfirmation(checkedSteps);
+                        break
+                    case "Cancel":
+                        await this.cancelSteps(checkedSteps);
+                        break
+                    case "Mark as accept/reject":
+                        await this.setStepsStatus({status: "Accepted", steps: checkedSteps});
+                        break
                 }
             } catch(err) {
-                this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'})
+                this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'})
+            } finally {
+                this.closeApproveModal();
             }
         },
         notApproveAction() {
@@ -269,21 +277,25 @@ export default {
             this.selectedAction = "";
         },
         async requestConfirmation(steps) {
+            const filteredSteps = steps.filter(item => item.status === "Created" || item.status === "Rejected");
+            if(!filteredSteps.length) return;
             try {
-                const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: steps, projectId: this.currentProject._id });
+                const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
                 await this.storeProject(result.body);
                 this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
             } catch(err) {
-                this.alertToggle({message: "Internal server error. Request Confirmation cannot be sent.", isShow: true, type: 'error'});
+                this.alertToggle({message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error'});
             }
         },
         async cancelSteps(steps) {
+            const filteredSteps = steps.filter(item => item.status !== "Completed");
+            if(!filteredSteps.length) return;
             try {
                 const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: steps, projectId: this.currentProject._id });
                 await this.storeProject(result.body);
                 this.alertToggle({message: "Chosen steps are cancelled.", isShow: true, type: 'success'});
             } catch(err) {
-                this.alertToggle({message: "Internal server error. Cannot execute action.", isShow: true, type: 'error'});
+                this.alertToggle({message: "Error: Cannot execute action.", isShow: true, type: 'error'});
             }
         },
         progress(prog) {
@@ -338,7 +350,8 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
-            storeProject: "setCurrentProject"
+            storeProject: "setCurrentProject",
+            setStepsStatus: "setStepsStatus"
         })
     },
     computed: {
@@ -349,7 +362,7 @@ export default {
         }),
         stepActions() {
             let result = this.actions;
-            const requestedStep = this.allSteps.find(item => item.status === "Request Sent");
+            const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Rejected");
             if(requestedStep && result.indexOf("Mark as accept/reject") === -1) {
                 result.unshift("Mark as accept/reject");
             }

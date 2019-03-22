@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors } = require("../../projects/");
+const { getProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus } = require("../../projects/");
 const { getOneService } = require("../../services/");
 const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
@@ -133,6 +133,19 @@ router.post("/cancel-steps", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on cancelling steps / cancel-steps");
+    }
+})
+
+router.post("/step-status", async (req, res) => {
+    const { id, status, steps } = req.body;
+    try {
+        const project = await getProject({"_id": id});
+        const updatedSteps = setStepsStatus({steps, status, project});
+        const updatedProject = await updateProject({"_id": id}, {steps: updatedSteps});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on setting step status");
     }
 })
 

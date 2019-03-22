@@ -43,18 +43,49 @@ function getSteps(project, id) {
 async function updateStepProp({jobId, prop, value}) {
     try {
         const project = await getProject({'steps._id': jobId});
-        let steps = project.steps.map(item => {
+        const steps = project.steps.map(item => {
             if(item.id === jobId) {
                 item[prop] = value;
                 return item;
             }
             return item;
         })
+        if(value === "Completed" && isAllStepsCompleted({jobId, steps})) {
+            return await setTaskStatusAndSave({tasks: project.tasks, jobId, steps});
+        }
         await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
         console.log(err);
         console.log("Error in updateStepProp");
     }
+}
+
+async function setTaskStatusAndSave({tasks, jobId, steps}) {
+    const step = steps.find(item => item.id === jobId);
+    const updatedTasks = tasks.map(item => {
+        if(item.taskId === step.taskId) {
+            item.status = "Completed";
+        }
+        return item;
+    })
+    try {
+        await Projects.updateOne({'steps._id': jobId}, { tasks: updatedTasks, steps });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setTaskStatusAndSave");
+    }
+}
+
+function isAllStepsCompleted({jobId, steps}) {
+    const currentStep = steps.find(item => item.id === jobId);
+    const taskSteps = steps.filter(item => item.taskId === currentStep.taskid);
+    const nonCompleted = taskSteps.reduce((init, cur) => {
+        if(cur.taskId === currentStep.taskId && cur.status === "Completed") {
+            return init;
+        }
+        return ++init;
+    }, 0);
+    return nonCompleted === 0;
 }
 
 module.exports = { getJobs, updateStepProp };

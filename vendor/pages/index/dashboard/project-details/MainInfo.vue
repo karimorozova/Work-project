@@ -195,8 +195,8 @@ export default {
             }
         },
         isReadonly() {
-            if(this.job.projectStatus !== "Started") return true;
-            if(this.job.name !== "translate1") {
+            if(this.job.projectStatus !== "Started" || this.job.status === "Completed") return true;
+            if(this.job.name !== "translate1" && this.job.status !== "Started") {
                 const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
