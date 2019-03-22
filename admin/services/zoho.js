@@ -150,6 +150,7 @@ async function saveRecords(records, user) {
         const todaysRecords = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: date}});
         todaysRecords ? await ZohoReport.updateOne({_id: todaysRecords.id}, { ...newRecords }) :
         await ZohoReport.create({ ...newRecords, user: recordsUser._id })
+        console.log(todaysRecords.date);
     } catch(err) {
         console.log(err);
         console.log("Error in saveRecords (Zoho)");
