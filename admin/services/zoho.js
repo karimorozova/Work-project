@@ -145,10 +145,8 @@ async function saveRecords(records, user) {
     const newRecords = parseRecords(records);
     try {
         const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
-        // const todaysRecords = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: date}});
-        const lastRecord = await ZohoReport.find({user: recordsUser.id}).sort({date: -1}).limit(1);
+        const lastRecord = await ZohoReport.findOne({user: recordsUser.id}).sort({date: -1});
         const lastDate = new Date(lastRecord.date);
-        console.log('lastDate: ', lastDate);
         lastDate >= date ? await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords }) :
         await ZohoReport.create({ ...newRecords, user: recordsUser._id })
     } catch(err) {
