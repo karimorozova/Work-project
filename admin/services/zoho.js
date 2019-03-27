@@ -1,12 +1,12 @@
 const unirest = require('unirest');
 const { zohoCreds } = require('../configs');
 const { Zoho, ZohoReport, User } = require('../models');
+const moment = require('moment');
 
 const tokensUrl = 'https://accounts.zoho.com';
 const dataUrl = 'https://www.zohoapis.com/crm/v2';
 
-const date = new Date();
-date.setHours(0,0,0,0);
+const date = moment();
 const isoDate = date.toISOString().split(".")[0];
 
 const grades = {
@@ -146,9 +146,9 @@ async function saveRecords(records, user) {
     try {
         const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
         const lastRecord = await ZohoReport.findOne({user: recordsUser.id}).sort({date: -1});
-        const lastDate = new Date(lastRecord.date);
-        lastDate >= date ? await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords }) :
-        await ZohoReport.create({ ...newRecords, user: recordsUser._id })
+        const lastDate = moment(lastRecord.date).format('DD-MM-YYYY');
+        lastDate === date.format('DD-MM-YYYY') ? await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords }) :
+        await ZohoReport.create({ ...newRecords, user: recordsUser._id, date })
     } catch(err) {
         console.log(err);
         console.log("Error in saveRecords (Zoho)");
