@@ -147,8 +147,16 @@ async function saveRecords(records, user) {
         const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
         const lastRecord = await ZohoReport.findOne({user: recordsUser.id}).sort({date: -1});
         const lastDate = moment(lastRecord.date).format('DD-MM-YYYY');
-        lastDate === date.format('DD-MM-YYYY') ? await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords }) :
-        await ZohoReport.create({ ...newRecords, user: recordsUser._id, date })
+        const newDate = date.format('DD-MM-YYYY');
+        console.log("lastDate: ", lastDate);
+        console.log("newDate: ", newDate);
+        if(lastDate === newDate) {
+            console.log("updating")
+            await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords })
+        } else {
+            console.log("creating");
+            await ZohoReport.create({ ...newRecords, user: recordsUser._id, date })
+        }
     } catch(err) {
         console.log(err);
         console.log("Error in saveRecords (Zoho)");
