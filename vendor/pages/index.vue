@@ -83,7 +83,7 @@ export default {
       }
     },
     hideAccountMenu() {
-      this.accountMenuVisible = false;
+      // this.accountMenuVisible = false;
     },
     signOut() {
       this.$router.push('/login');
