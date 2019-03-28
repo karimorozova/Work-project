@@ -27,7 +27,7 @@ function applicationMessage(obj) {
     }
     if(obj.industries) {
         industries = obj.industries.reduce((initial, current, index) => {
-            return initial + current + "; "
+            return initial + current.name + "; "
         }, "")
     }
     if(obj.position) {
