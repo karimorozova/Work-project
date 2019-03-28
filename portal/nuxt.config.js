@@ -39,7 +39,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    
+
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
@@ -50,5 +50,8 @@ module.exports = {
         })
       }
     }
-  }
-}
+  },
+  plugins: [
+    '~/plugins/vue-cookie'
+  ]
+};
