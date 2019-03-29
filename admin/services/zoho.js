@@ -6,9 +6,6 @@ const moment = require('moment');
 const tokensUrl = 'https://accounts.zoho.com';
 const dataUrl = 'https://www.zohoapis.com/crm/v2';
 
-const date = moment();
-const isoDate = date.toISOString().split(".")[0];
-
 const grades = {
     "F": {min: 0, max: 59},
     "D": {min: 60, max: 69},
@@ -86,6 +83,8 @@ async function getRecords(user) {
 
 async function getLeads(user) {
     const currentToken = await getCurrentToken();
+    const date = moment().hours(0);
+    const isoDate = date.toISOString().split(".")[0];
     return new Promise((resolve,reject) => {
         unirest.get(`${dataUrl}/Leads`)
         .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
@@ -102,6 +101,8 @@ async function getLeads(user) {
 
 async function getActivities(user) {
     const currentToken = await getCurrentToken();
+    const date = moment().hours(0);
+    const isoDate = date.toISOString().split(".")[0];
     return new Promise((resolve,reject) => {
         unirest.get(`${dataUrl}/Activities`)
         .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
@@ -143,19 +144,16 @@ function getCommunications(data) {
 
 async function saveRecords(records, user) {
     const newRecords = parseRecords(records);
+    const today = moment().hours(2);
     try {
         const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
-        const lastRecord = await ZohoReport.findOne({user: recordsUser.id}).sort({date: -1});
-        const lastDate = moment(lastRecord.date).format('DD-MM-YYYY');
-        const newDate = date.format('DD-MM-YYYY');
-        console.log("lastDate: ", lastDate);
-        console.log("newDate: ", newDate);
-        if(lastDate === newDate) {
+        const lastRecord = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: today}});
+        if(lastRecord) {
             console.log("updating")
             await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords })
         } else {
             console.log("creating");
-            await ZohoReport.create({ ...newRecords, user: recordsUser._id, date })
+            await ZohoReport.create({ ...newRecords, user: recordsUser._id })
         }
     } catch(err) {
         console.log(err);
