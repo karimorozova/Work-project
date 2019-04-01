@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const ClientSchema = new mongoose.Schema({
@@ -97,10 +98,21 @@ const ClientSchema = new mongoose.Schema({
     industries: [
         {type: Schema.Types.ObjectId, ref: 'Industries'}
     ],
-    contacts: {
-        type: Array,
-        default: []
-    },
+    contacts: [{
+        country: "",
+        timezone: "",
+        firstName: "",
+        surname: "",
+        email: "",
+        password: "",
+        gender: "",
+        phone: "",
+        photo: "",
+        skype: "",
+        position: "",
+        notes: "",
+        leadContact: false
+    }],
     matrix: {
         type: Object,
         default: {

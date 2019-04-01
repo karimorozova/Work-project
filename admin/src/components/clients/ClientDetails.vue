@@ -5,6 +5,9 @@
     router-view(
         :index="contactInd"
         :contactsPhotos="contactsPhotos"
+        :contractFiles="contractFiles"
+        :ndaFiles="ndaFiles"
+        @loadFile="loadFile"
         @contactSave="contactSave"
         @contactUpdate="contactUpdate"
         @approveDelete="approveContactDelete"
@@ -21,7 +24,9 @@ export default {
             sidebarShow: true,
             sidebarLinks: ["General Information"],
             fromRoute: "/clients",
-            contactsPhotos: []
+            contactsPhotos: [],
+            contactsPhotos: [],
+            ndaFiles: []
         }
     },
     methods: {
@@ -62,6 +67,9 @@ export default {
             }
             this.updateClientContact({index: this.currentClient.contacts.length - 1, contact: newContact});
             this.$router.go(-1);
+        },
+        loadFile({files, prop}) {
+            this[prop] = files;
         },
         ...mapActions({
             alertToggle: "alertToggle",

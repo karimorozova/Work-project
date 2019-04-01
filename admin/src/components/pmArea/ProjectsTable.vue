@@ -4,6 +4,7 @@
         :fields="fields"
         :tableData="allProjects"
         :hasScroll="hasScroll"
+        bodyClass="all-projects"
         @onRowClicked="onRowClicked"
     )
         template(slot="headerProjectId" slot-scope="{ field }")

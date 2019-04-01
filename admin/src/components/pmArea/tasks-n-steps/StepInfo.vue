@@ -25,6 +25,7 @@
         Files(
             :stepFiles="stepFiles"
             :step="step"
+            :xtmJobs="task.xtmJobs"
             :projectId="task.projectId"
         )
 </template>

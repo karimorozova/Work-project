@@ -84,9 +84,10 @@ export default {
             contact: {
                 country: "",
                 timezone: "",
-                name: "",
+                firstName: "",
                 surname: "",
                 email: "",
+                password: "12345",
                 gender: "",
                 phone: "",
                 photo: "",
@@ -146,12 +147,25 @@ export default {
             this.timezoneSelected = data;
             this.contact.timezone = data;
         },
-        checkForErrors() {
+        async checkEmailUniquenes() {
+            try {
+                const result = await this.$http.get(`/clientsapi/unique-email?email=${this.contact.email}`);
+                if(result.body === "exist") {
+                    this.errors.push("The email you entered is already used in our system.")
+                }
+            } catch(err) {
+
+            }
+        },
+        async checkForErrors() {
             this.errors = [];
             const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             if(!this.contact.firstName) this.errors.push("Please, enter contact's first name.");
             if(!this.contact.position) this.errors.push("Please, enter contact's position.");
             if(!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.");
+            if(this.contact.email && emailValidReg.test(this.contact.email)) {
+                await this.checkEmailUniquenes();
+            }
             if(this.errors.length) {
                 this.areErrorsExist = true;
                 this.isSaveClicked = true;

@@ -1,35 +1,11 @@
 const router = require('express').Router();
-const { upload, clientMail, pmMail } = require('../utils/');
-const fs = require('fs');
+const { upload, clientMail, pmMail } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
-const mv = require('mv');
-const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations} = require('../clients/');
+const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations, updateClientInfo} = require('../clients');
 const { Clients, Projects, User } = require('../models');
 const { getProject } = require('../projects');
 const { emitter } = require('../events');
-
-function movePhoto(oldFile, clientId, contact) {
-const newFile = './dist/clientsDocs/' + clientId + '/contacts/' + contact.name + '-' + contact.surname + oldFile.filename;
-mv(oldFile.path, newFile, {
-        mkdirp: true
-    }, function (err) {
-        console.log(err);
-});
-
-return oldFile.filename;
-}
-
-function moveNdaCont(oldFile, clientId, ndaCont) {
-const newFile = './dist/clientsDocs/' + clientId + `/${ndaCont}/` + oldFile.filename;
-mv(oldFile.path, newFile, {
-        mkdirp: true
-    }, function (err) {
-        console.log(err);
-});
-
-return oldFile.filename;
-}
 
 router.get('/client', async (req, res) => {
     let { id } = req.query;
@@ -169,6 +145,20 @@ router.post('/several-langs', async (req, res) => {
     }
 })
 
+router.get("/unique-email", async (req, res) => {
+    const { email } = req.query;
+    try {
+        const client = await Clients.findOne({"contacts.email": email});
+        if(client) {
+            return res.send("exist");
+        }
+        res.send("");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking Client's contact email uniqueness.")
+    }
+})
+
 router.post('/update-client', upload.any(), async (req, res) => {
     let client = JSON.parse(req.body.client);
     let clientId;
@@ -179,55 +169,7 @@ router.post('/update-client', upload.any(), async (req, res) => {
         } else {
             clientId = client._id;
         }
-        const contacts = client.contacts;
-        const photoFiles = req.files.filter(item =>{
-            return item.fieldname == 'photos'
-        });
-
-        if(photoFiles.length) {
-            for(let photo of photoFiles) {
-                for(let contact of contacts) {
-                    if(contact.file && photo.filename == contact.file) {
-                        if(contact.photo) {
-                            await fs.unlink('./dist' + contact.photo, (err) => {
-                                console.log(err)
-                            })
-                        }
-                        await movePhoto(photo, clientId, contact);
-                        contact.photo = `/clientsDocs/${clientId}/contacts/${contact.name}-${contact.surname}${photo.filename}`;
-                        contact.file = null;
-                    }
-                }
-            }
-            client.contacts = contacts;
-        }
-
-        let contract = req.files.find(item => {
-            return item.fieldname == 'contract'
-        })
-        if(contract) {
-            if(client.contract) {
-                await fs.unlink('./dist' + client.contract, (err) => {
-                    console.log(err)
-                })
-            }
-            await moveNdaCont(contract, clientId, "contract");
-            client.contract = '/clientsDocs/' + clientId + '/contract/' + contract.filename;
-        }
-
-        let nda = req.files.find(item => {
-            return item.fieldname == 'nda'
-        })
-        if(nda) {
-            if(client.nda) {
-                await fs.unlink('./dist' + client.nda, (err) => {
-                    console.log(err)
-                })
-            }
-            await moveNdaCont(nda, clientId, "nda");
-            client.nda = '/clientsDocs/' + clientId + '/nda/' + nda.filename;
-        }
-        const result = await getAfterUpdate({"_id": clientId}, client);
+        const result = await updateClientInfo({clientId, client, files: req.files});
         res.send({client: result})
     } catch(err) {
         console.log(err);

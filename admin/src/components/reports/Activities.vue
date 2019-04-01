@@ -8,7 +8,7 @@
                 bodyClass="table_no-bottom-margin"
                 headCellClass="table_no-cell-rihgt-border"
             )
-                span.activities__top-header(slot="headerMonth" slot-scope="{ field }") March
+                span.activities__top-header(slot="headerMonth" slot-scope="{ field }") {{ getCurrentMonth() }}
                 span.activities__top-header(slot="headerLeads" slot-scope="{ field }")
                 span.activities__top-header(slot="headerCalls" slot-scope="{ field }")
                 span.activities__top-header(slot="headerComm" slot-scope="{ field }")
@@ -184,7 +184,6 @@ export default {
     },
     mounted() {
         this.getZohoCrmData();
-        // this.getReports();
     }
 }
 </script>

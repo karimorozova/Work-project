@@ -114,6 +114,14 @@ export default {
             type: Array,
             default: () => []
         },
+        contractFiles: {
+            type: Array,
+            default: () => []
+        },
+        ndaFiles: {
+            type: Array,
+            default: () => []
+        }
     },
     data() {
         return {
@@ -122,8 +130,6 @@ export default {
             contactShow: false,
             contactInd: 0,
             newContact: false,
-            contractFile: [],
-            ndaFile: [],
             fromRoute: "/clients",
             areErrorsExist: false,
             errors: [],
@@ -141,12 +147,12 @@ export default {
     methods: {
         contractLoad(e) {
             if(e.target.files && e.target.files[0]) {
-                this.contractFile = e.target.files;
-            }
+                this.$emit('loadFile', {files: e.target.files, prop: 'contractFiles'})
+            };
         },
         ndaLoad(e) {
             if(e.target.files && e.target.files[0]) {
-                this.ndaFile = e.target.files;
+                this.$emit('loadFile', {files: e.target.files, prop: 'ndaFiles'})
             }
         },
         addSevLangs({serviceTitle}) {
@@ -309,11 +315,11 @@ export default {
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
             }
-            for(let i = 0; i < this.contractFile.length; i++) {
-                sendData.append('contract', this.contractFile[i]);
+            for(let i = 0; i < this.contractFiles.length; i++) {
+                sendData.append('contract', this.contractFiles[i]);
             }
-            for(let i = 0; i < this.ndaFile.length; i++) {
-                sendData.append('nda', this.ndaFile[i]);
+            for(let i = 0; i < this.ndaFiles.length; i++) {
+                sendData.append('nda', this.ndaFiles[i]);
             }
             try {
                 const result = await this.$http.post('/clientsapi/update-client', sendData);

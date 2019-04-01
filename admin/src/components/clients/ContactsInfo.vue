@@ -88,6 +88,7 @@ export default {
             isErrorShow: false,
             isDeleteMessageShow: false,
             currentEmail: "",
+            oldEmail: "",
             currentPosition: "",
             currentNotes: "",
             deletingContactIndex: -1,
@@ -126,12 +127,14 @@ export default {
         setCurrentEditionValues(index) {
             this.currentEditingIndex = index;
             this.currentEmail = this.client.contacts[index].email;
+            this.oldEmail = this.client.contacts[index].email;
             this.currentPosition = this.client.contacts[index].position;
             this.currentNotes = this.client.contacts[index].notes;
         },
         setCurrentDefaults() {
             this.currentEditingIndex = -1;
             this.currentEmail = "";
+            this.oldEmail = "";
             this.currentPosition = "";
             this.currentNotes = "";
         },
@@ -153,11 +156,31 @@ export default {
                 this.isDeleteMessageShow = true;
             }
         },
-        checkForValidation(index) {
+        async checkEmailUniquenes(index) {
+            if(this.oldEmail === this.currentEmail) return;
+            const sameEmail = this.client.contacts.find((item, i) => {
+                return i !== index && this.currentEmail === item.email
+            })
+            if(sameEmail) {
+                return this.errors.push("The email you entered is already used");
+            }
+            try {
+                const result = await this.$http.get(`/clientsapi/unique-email?email=${this.currentEmail}`);
+                if(result.body === "exist") {
+                    this.errors.push("The email you entered is already used in our system.")
+                }
+            } catch(err) {
+
+            }
+        },
+        async checkForValidation(index) {
             this.errors = [];
             const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             if(!this.currentPosition) this.errors.push("Please, enter contact's position.");
             if(!this.currentEmail || !emailValidReg.test(this.currentEmail)) this.errors.push("Please, enter valid e-mail address.");
+            if(this.currentEmail && emailValidReg.test(this.currentEmail)) {
+                await this.checkEmailUniquenes(index);
+            }
             if(this.errors.length) {
                 this.areErrorsExist = true;
                 return
