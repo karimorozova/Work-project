@@ -1,5 +1,5 @@
 <template lang="pug">
-  Accountinfo(:client='client' :user="user" :projects="projects" :quotes="quotes")
+  Accountinfo(:client="client" :user="user" :projects="projects" :quotes="quotes")
 </template>
 
 <script>

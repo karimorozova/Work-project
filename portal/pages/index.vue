@@ -2,8 +2,7 @@
   .clientsportalWrapper(v-if="cookies && client")
     .clientsTop
       .clientsTop__clientName
-        a(href="/main")
-          h2.clientsPortal CLIENT PORTAL
+        h2.clientsPortal CLIENT PORTAL
       .clientsTop__searchBlock
         .dropdownWrapper
           .sel_project_block
@@ -78,21 +77,22 @@
         <!--Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")-->
         Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
         Confirmorder(v-if="thanks" :thanksService="thanksService")
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" )
+        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote")
 </template>
 
 <script>
-  import Quotesinfo from "~/components/quotes/Qoutesinfo";
-  import ProjectsInfo from "~/components/projects/ProjectsInfo";
-  import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
-  import Accountinfo from "../components/account/Accountinfo";
-  import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
-  import Allprojects from "../components/projects/Allprojects";
-  import invoices from "../components/invoices/invoices";
-  import documents from "../components/documents/documents";
+  // import Quotesinfo from "~/components/quotes/Qoutesinfo";
+  // import ProjectsInfo from "~/components/projects/ProjectsInfo";
+  // import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
+  // import Accountinfo from "../components/account/Accountinfo";
+  // import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
+  // import Allprojects from "../components/projects/Allprojects";
+  // import invoices from "../components/invoices/invoices";
+  // import documents from "../components/documents/documents";
   import Clientrequest from "../components/Clientrequest";
   import ClickOutside from "vue-click-outside";
-  import Confirmorder from "../components/Confirmorder"
+  import Confirmorder from "../components/Confirmorder";
+  import { mapActions } from "vuex";
 
   export default {
     data() {
@@ -145,8 +145,45 @@
         user: {},
         projects: [],
         quotes: [],
-        quote: {},
-        project: {},
+        quote: {
+          name:'some name',
+          idNumber: 345345,
+          status: 'SENT',
+          totalAgreed:{
+            formattedAmount:1000
+          },
+          projectManager:{
+            name: 'Sam'
+          },
+          service: 'Special',
+          specialization: 'Some spec',
+          startDate:{
+            formatted:'1980 07 15'
+          },
+          deadline:{
+            formatted:'2980 07 15'
+          }
+        },
+        project: {
+          name:'some name',
+          idNumber: 345345,
+          status: 'active',
+          totalAgreed:{
+            formattedAmount:1000
+          },
+          projectManager:{
+            name: 'Sam'
+          },
+          service: 'Special',
+          specialization: 'Some spec',
+          startDate:{
+            formatted:'1980 07 15'
+          },
+          deadline:{
+            formatted:'2980 07 15'
+          }
+
+        },
         jobsById: [],
         languageCombinations: [],
         quoteIndex: 0,
@@ -190,103 +227,103 @@
         this.dropdownVisible = false;
       },
       signOut() {
-        document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        this.logout();
+        // document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.$router.push('/login');
-        // window.location.replace("/");
+
       },
       async clientInfo() {
-        const result = await this.$axios.request({
-          method: "get",
-          url: "portal/clientinfo",
-          withCredentials: true
-        });
-        this.client = result.data.client;
+
+        const result = await this.$axios.$get("/portal/clientinfo");
+
+        this.client = result.client;
         if (!this.client) {
           this.$router.push('/login');
-          // window.location.replace("/");
+
         }
-        this.user = result.data.user;
+        this.user = result.user;
         this.projects = [];
         this.quotes = [];
         this.languageCombinations = this.client.languageCombinations;
         this.$store.dispatch('loadLangs', this.languageCombinations);
       },
-      expandBar() {
-        this.expander = !this.expander;
-      },
-      switchInfo(index) {
-        this.navbarList.forEach((item, i) => {
-          if (i == index) {
-            item.active = true;
-            if (this.detailedInfoVisible && !this.detailedProjectVisible) {
-              this.detailedInfoVisible = !this.detailedInfoVisible;
-              this.openQuotes = true;
 
-            }
-            if (!this.detailedInfoVisible && this.detailedProjectVisible) {
-              this.detailedProjectVisible = !this.detailedProjectVisible;
-              this.openProjects = true;
-            }
-          } else {
-            item.active = false;
-          }
-
-          if (index == 0) {
-            this.allProjectsShow = false;
-            this.detailedInfoVisible = false;
-            this.detailedProjectVisible = false;
-            this.invoicesShow = false;
-            this.documentsShow = false;
-            this.clientRequestShow = false;
-            this.path = "Open Quotes"
-          }
-
-          if (index == 1) {
-            this.allProjectsShow = true;
-            this.detailedInfoVisible = false;
-            this.detailedProjectVisible = false;
-            this.invoicesShow = false
-            this.documentsShow = false;
-            this.clientRequestShow = false;
-            this.path = "All Projects"
-
-          }
-
-          if (index == 2) {
-            this.invoicesShow = true;
-            this.allProjectsShow = false;
-            this.detailedInfoVisible = false;
-            this.detailedProjectVisible = false;
-            this.documentsShow = false;
-            this.clientRequestShow = false;
-            this.path = "Invoices"
-          }
-
-          if (index == 3) {
-            this.documentsShow = true;
-            this.allProjectsShow = false;
-            this.detailedInfoVisible = false;
-            this.detailedProjectVisible = false;
-            this.invoicesShow = false;
-            this.clientRequestShow = false;
-            this.path = "Documents"
-          }
-          this.thanks = false;
-          this.accountInfo = false;
-        });
-      },
+      // expandBar() {
+      //   this.expander = !this.expander;
+      // },
+      // switchInfo(index) {
+      //   this.navbarList.forEach((item, i) => {
+      //     if (i == index) {
+      //       item.active = true;
+      //       if (this.detailedInfoVisible && !this.detailedProjectVisible) {
+      //         this.detailedInfoVisible = !this.detailedInfoVisible;
+      //         this.openQuotes = true;
+      //
+      //       }
+      //       if (!this.detailedInfoVisible && this.detailedProjectVisible) {
+      //         this.detailedProjectVisible = !this.detailedProjectVisible;
+      //         this.openProjects = true;
+      //       }
+      //     } else {
+      //       item.active = false;
+      //     }
+      //
+      //     if (index == 0) {
+      //       this.allProjectsShow = false;
+      //       this.detailedInfoVisible = false;
+      //       this.detailedProjectVisible = false;
+      //       this.invoicesShow = false;
+      //       this.documentsShow = false;
+      //       this.clientRequestShow = false;
+      //       this.path = "Open Quotes"
+      //     }
+      //
+      //     if (index == 1) {
+      //       this.allProjectsShow = true;
+      //       this.detailedInfoVisible = false;
+      //       this.detailedProjectVisible = false;
+      //       this.invoicesShow = false
+      //       this.documentsShow = false;
+      //       this.clientRequestShow = false;
+      //       this.path = "All Projects"
+      //
+      //     }
+      //
+      //     if (index == 2) {
+      //       this.invoicesShow = true;
+      //       this.allProjectsShow = false;
+      //       this.detailedInfoVisible = false;
+      //       this.detailedProjectVisible = false;
+      //       this.documentsShow = false;
+      //       this.clientRequestShow = false;
+      //       this.path = "Invoices"
+      //     }
+      //
+      //     if (index == 3) {
+      //       this.documentsShow = true;
+      //       this.allProjectsShow = false;
+      //       this.detailedInfoVisible = false;
+      //       this.detailedProjectVisible = false;
+      //       this.invoicesShow = false;
+      //       this.clientRequestShow = false;
+      //       this.path = "Documents"
+      //     }
+      //     this.thanks = false;
+      //     this.accountInfo = false;
+      //   });
+      // },
       switchSection(index) {
         this.navbarList.forEach((item, i) => {
           item.active = i === index;
         });
         this.$router.push(this.navbarList[index].path);
       },
-      showQuotes() {
-        this.openQuotes = !this.openQuotes;
-      },
-      showProjects() {
-        this.openProjects = !this.openProjects;
-      },
+      // showQuotes() {
+      //   this.openQuotes = !this.openQuotes;
+      // },
+      // showProjects() {
+      //   this.openProjects = !this.openProjects;
+      // },
       showAccountMenu() {
         this.accountMenuVisible = !this.accountMenuVisible;
       },
@@ -304,32 +341,32 @@
           item.active = false;
         });
       },
-      quoteDetails(data) {
-        this.detailedInfoVisible = true;
-        this.quote = data.quote;
-        this.detailedProjectVisible = false;
-        this.allProjectsShow = false;
-        this.clientRequestShow = false;
-        for (let i = 0; i < this.navbarList.length; i++) {
-          if (i == 1) this.navbarList[i].active = true;
-          else this.navbarList[i].active = false;
-        }
-      },
-      projectDetails(data) {
-        this.detailedProjectVisible = true;
-        this.allProjectsShow = false;
-        this.detailedInfoVisible = false;
-        this.clientRequestShow = false;
-        this.project = data.project;
-        this.jobsById = data.jobs;
-        for (let i = 0; i < this.navbarList.length; i++) {
-          if (i == 1) this.navbarList[i].active = true;
-          else this.navbarList[i].active = false;
-        }
-      },
-      backToMain() {
-        this.$refs.againMain.baseURI;
-      },
+      // quoteDetails(data) {
+      //   this.detailedInfoVisible = true;
+      //   this.quote = data.quote;
+      //   this.detailedProjectVisible = false;
+      //   this.allProjectsShow = false;
+      //   this.clientRequestShow = false;
+      //   for (let i = 0; i < this.navbarList.length; i++) {
+      //     if (i == 1) this.navbarList[i].active = true;
+      //     else this.navbarList[i].active = false;
+      //   }
+      // },
+      // projectDetails(data) {
+      //   this.detailedProjectVisible = true;
+      //   this.allProjectsShow = false;
+      //   this.detailedInfoVisible = false;
+      //   this.clientRequestShow = false;
+      //   this.project = data.project;
+      //   this.jobsById = data.jobs;
+      //   for (let i = 0; i < this.navbarList.length; i++) {
+      //     if (i == 1) this.navbarList[i].active = true;
+      //     else this.navbarList[i].active = false;
+      //   }
+      // },
+      // backToMain() {
+      //   this.$refs.againMain.baseURI;
+      // },
       showDropdown() {
         this.dropdownVisible = !this.dropdownVisible;
       },
@@ -369,7 +406,10 @@
         const result = await this.$axios.$get('api/services')
         result.sort((a, b) => {return a.sortIndex - b.sortIndex});
         this.$store.dispatch('servicesGetting', result);
-      }
+      },
+    ...mapActions({
+      logout: "logout",
+    })
     },
     mounted() {
       this.getCookie();
@@ -377,14 +417,14 @@
       this.getServices();
     },
     components: {
-      Quotesinfo,
-      projectsInfo: ProjectsInfo,
-      QuotesInfoDetailed,
-      Accountinfo,
-      projectInfoDetailed: ProjectInfoDetailed,
-      Allprojects,
-      invoices,
-      documents,
+      // Quotesinfo,
+      // projectsInfo: ProjectsInfo,
+      // QuotesInfoDetailed,
+      // Accountinfo,
+      // projectInfoDetailed: ProjectInfoDetailed,
+      // Allprojects,
+      // invoices,
+      // documents,
       Clientrequest,
       Confirmorder
     },
@@ -392,22 +432,21 @@
       ClickOutside
     },
     computed: {
-      visibleChecker() {
-        return (
-          this.detailedInfoVisible ||
-          this.detailedProjectVisible ||
-          this.accountInfo ||
-          this.allProjectsShow ||
-          this.invoicesShow ||
-          this.documentsShow ||
-          this.clientRequestShow ||
-          this.thanks
-        );
-      },
+      // visibleChecker() {
+      //   return (
+      //     this.detailedInfoVisible ||
+      //     this.detailedProjectVisible ||
+      //     this.accountInfo ||
+      //     this.allProjectsShow ||
+      //     this.invoicesShow ||
+      //     this.documentsShow ||
+      //     this.clientRequestShow ||
+      //     this.thanks
+      //   );
+      // },
       jsess() {
         let result = "";
         let cookies = document.cookie.split(";");
-        // console.log(cookies);
         for(let i = 0; i < cookies.length; i++) {
           let findSession = cookies[i].split("=");
           if (findSession[0].indexOf('ses') > 0) {

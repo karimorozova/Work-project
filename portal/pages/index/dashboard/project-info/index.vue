@@ -17,42 +17,15 @@
       user: {
         type: Object
       },
-      // project: {
-      //   type: Object
-      // },
+      project: {
+        type: Object
+      },
       jobsById: {
         type: Array
       },
       projectIndex: {
         type: Number
       }
-    },
-    data() {
-      return {
-        project:{
-          name:'some name',
-          idNumber: 345345,
-          status: 'SENT',
-          totalAgreed:{
-            formattedAmount:1000
-          },
-          projectManager:{
-            name: 'Sam'
-          },
-          service: 'Special',
-          specialization: 'Some spec',
-          startDate:{
-            formatted:'1980 07 15'
-          },
-          deadline:{
-            formatted:'2980 07 15'
-          }
-
-        }
-      }
-    },
-    created() {
-      console.log('project: ', this.project);
     },
     components: {
       projectInfoDetailed: ProjectInfoDetailed,

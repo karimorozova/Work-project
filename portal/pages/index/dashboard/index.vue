@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  div.dashboard
     .maininfoWrapper
       .mainInfo
         .clientsAll
@@ -14,8 +14,8 @@
               .clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects
                 img(src="../../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
               .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
-                projectsInfo(@projectDetails="projectDetails" :projects="projects")
-    nuxt-child( :quoteIndex="quoteIndex" :projectIndex="projectIndex" :quotes="quotes" :projects="projects"  :jobsById="jobsById" :user="user")
+                projectsInfo(@projectDetails="projectDetails" :projects="projects" :project="project")
+    nuxt-child(:project="project" :quoteIndex="quoteIndex" :projectIndex="projectIndex" :quotes="quotes" :projects="projects"  :jobsById="jobsById" :user="{}" :quote="quote")
 </template>
 
 <script>
@@ -31,7 +31,10 @@
       quotes: {
         type: Array
       },
-      user:{
+      user: {
+        type: Object
+      },
+      project: {
         type: Object
       },
     },
@@ -39,51 +42,31 @@
       return {
         openQuotes: true,
         openProjects: true,
-        // quote: {
-        //   name:'some name',
-        //   idNumber: 345345,
-        //   status: 'SENT',
-        //   totalAgreed:{
-        //     formattedAmount:1000
-        //   },
-        //   projectManager:{
-        //     name: 'Sam'
-        //   },
-        //   service: 'Special',
-        //   specialization: 'Some spec',
-        //   startDate:{
-        //     formatted:'1980 07 15'
-        //   },
-        //   deadline:{
-        //     formatted:'2980 07 15'
-        //   }
-        // },
-        // project: {
-        //   name:'some name',
-        //   idNumber: 345345,
-        //   status: 'active',
-        //   totalAgreed:{
-        //     formattedAmount:1000
-        //   },
-        //   projectManager:{
-        //     name: 'Sam'
-        //   },
-        //   service: 'Special',
-        //   specialization: 'Some spec',
-        //   startDate:{
-        //     formatted:'1980 07 15'
-        //   },
-        //   deadline:{
-        //     formatted:'2980 07 15'
-        //   }
-        //
-        // },
+        quote: {
+          name: 'some name',
+          idNumber: 345345,
+          status: 'SENT',
+          totalAgreed: {
+            formattedAmount: 1000
+          },
+          projectManager: {
+            name: 'Sam'
+          },
+          service: 'Special',
+          specialization: 'Some spec',
+          startDate: {
+            formatted: '1980 07 15'
+          },
+          deadline: {
+            formatted: '2980 07 15'
+          }
+        },
         quoteIndex: 0,
         projectIndex: 0,
         jobsById: [],
       }
     },
-    methods:{
+    methods: {
       showQuotes() {
         this.openQuotes = !this.openQuotes;
       },
@@ -108,8 +91,13 @@
 </script>
 
 <style lang="scss" scoped>
+  .dashboard {
+    padding-top: 80px;
+  }
+
   .maininfoWrapper {
     width: 100%;
+    margin-left: 58px;
   }
 
   .projectsComponent,
@@ -119,6 +107,7 @@
     flex-direction: column;
     justify-content: center;
   }
+
   .quotesComponent {
     margin-bottom: 40px;
   }
