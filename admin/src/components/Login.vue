@@ -15,7 +15,7 @@
           label.login__checkbox-label Remember me
         button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
         span.login__forgot(@click="forget") Forgot Your Password?
-    passwordrestore(v-else)
+    passwordrestore(@loginVisible="forget" v-else)
 </template>
 <script>
 import PasswordRestore from '../components/PasswordRestore';
@@ -36,7 +36,7 @@ export default {
   methods: {
     async sendForm() {
       try {
-      const loginResult = await this.$http.post('/login', this.form); 
+      const loginResult = await this.$http.post('/login', this.form);
       await this.loggingIn(loginResult.body);
       this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
       this.$router.push("/")
