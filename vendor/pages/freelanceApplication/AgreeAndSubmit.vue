@@ -80,7 +80,7 @@ export default {
                 if(this.errors.length) {
                     this.$emit("formValidationFail", {errors: this.errors})
                 } else {
-                    // this.$emit("sumbitForm", {confirmed: this.isAgree})
+                    this.$emit("sumbitForm", {confirmed: this.isAgree})
                 }
             } catch(err) {
                 this.alertToggle({message: "An errors occured. Please try again later.", isShow: true, type: "error"});

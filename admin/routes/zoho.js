@@ -14,7 +14,7 @@ router.get("/getTokens", async (req, res) => {
             await Zoho.create(result);
         }
         res.send(result);
-    }   catch(err) {
+    } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting ZOHO tokens");
     }
@@ -34,7 +34,7 @@ router.get("/leads", async (req, res) => {
     try {
         const result = await getLeads();
         res.send(result.data);
-    }   catch(err) {
+    } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting ZOHO leads");
     }
@@ -46,7 +46,7 @@ router.get("/activities", async (req, res) => {
         const callsReport = getCallsCount(result.data);
         res.send({callsReport});
         // res.send(result.data);
-    }   catch(err) {
+    } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting ZOHO activities");
     }
@@ -58,7 +58,7 @@ router.get("/crm-records", async (req, res) => {
         const records = await getRecords(user);
         await saveRecords(records, user);
         res.send("New records recieved");
-    }   catch(err) {
+    } catch(err) {
         console.log(err);
         if(err.status === 401) {
             return res.status(401).send(err.message+" ZOHO");
