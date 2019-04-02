@@ -197,9 +197,6 @@ export default {
     width: 33px;
     height: 33px;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   &__photo {
     border-radius: 50%;
