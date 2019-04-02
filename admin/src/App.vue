@@ -52,39 +52,38 @@ body {
   transform: translateX(20px);
   opacity: 0;
 }
-
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(103, 87, 62, 0.1);
+}
+::-webkit-scrollbar-thumb:vertical {
+  background-color: rgba(103, 87, 62, 0.3);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 6px;
+  min-height: 25px;
+  &:hover {
+    background-color: rgba(103, 87, 62, 0.6);
+    background-clip: content-box;
+  }
+}
+::-webkit-scrollbar-thumb:horizontal {
+  background-color: rgba(103, 87, 62, 0.3);
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 7px;
+  &:hover {
+    background-color: rgba(103, 87, 62, 0.6);
+    background-clip: content-box;
+  }
+}
 /* Custom scroll-bar */
 #app {
-  ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
-  }
-  ::-webkit-scrollbar-track {
-    background: rgba(103, 87, 62, 0.1);
-  }
-  ::-webkit-scrollbar-thumb:vertical {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    background-clip: content-box;
-    border-radius: 6px;
-    min-height: 25px;
-    &:hover {
-      background-color: rgba(103, 87, 62, 0.6);
-      background-clip: content-box;
-    }
-  }
-  ::-webkit-scrollbar-thumb:horizontal {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-top: 3px solid transparent;
-    border-bottom: 3px solid transparent;
-    background-clip: content-box;
-    border-radius: 7px;
-    &:hover {
-      background-color: rgba(103, 87, 62, 0.6);
-      background-clip: content-box;
-    }
-  }
   /* ------- If buttons needed ---------
 
   ::-webkit-scrollbar-button:vertical:decrement {
