@@ -2,26 +2,26 @@
 import { ALERTING_MESSAGE } from "./alerts";
 import { SET_TOKEN } from "./auth";
 import {
-  details,
-  detfilesToDetails,
-  reffilesToDetails,
-  orderType,
-  langs,
-  clientForRequest,
-  servicesFill,
-  sesCook
+  DETAILS,
+  DETFILES_TO_DETAILS,
+  REFFILES_TO_DATAILS,
+  ORDER_TYPE,
+  LANGS,
+  CLIENT_FOR_REQUEST,
+  SERVICES_FILL,
+  SES_COOK
 } from "./services";
 
 
 export {
   ALERTING_MESSAGE,
   SET_TOKEN,
-  details,
-  detfilesToDetails,
-  reffilesToDetails,
-  orderType,
-  langs,
-  clientForRequest,
-  servicesFill,
-  sesCook
+  DETAILS,
+  DETFILES_TO_DETAILS,
+  REFFILES_TO_DATAILS,
+  ORDER_TYPE,
+  LANGS,
+  CLIENT_FOR_REQUEST,
+  SERVICES_FILL,
+  SES_COOK
 };

@@ -12,7 +12,7 @@
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
             .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-              .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+              .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .womanWrapper
           img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
           .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
@@ -54,8 +54,8 @@
           span.arrows(v-if="clientRequestShow") >>
           span(v-if="clientRequestShow") {{ serviceType }}
         Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
-        Confirmorder(v-if="thanks" :thanksService="thanksService")
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote")
+        Confirmorder(v-if="true" :thanksService="thanksService")
+        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
 </template>
 
 <script>
@@ -159,11 +159,11 @@
         quoteIndex: 0,
         projectIndex: 0,
         newProject: [
-          {title: "Translation"},
-          {title: "Copywriting"},
-          {title: "Marketing"},
-          {title: "Proofing/QA"},
-          {title: "Graphic Localization"}
+          {title: "Translation", path: "/translation"},
+          {title: "Copywriting", path: "/copywriting"},
+          {title: "Marketing", path: "/marketing"},
+          {title: "Proofing/QA", path: "/proofing"},
+          {title: "Graphic Localization", path: "/graphic-localization"}
         ],
         dropdownVisible: false,
         clientRequestShow: false,
@@ -224,7 +224,6 @@
         this.accountMenuVisible = !this.accountMenuVisible;
       },
       showAccountInfo() {
-        console.log('show account info: ',this.accountMenuVisible);
         // this.accountInfo = true;
         this.accountMenuVisible = !this.accountMenuVisible;
 
@@ -258,22 +257,27 @@
           this.$store.dispatch('requestInfo', formData);
           this.$store.dispatch('loadLangs', this.languageCombinations);
           this.$store.dispatch('jsession', this.jsess);
+
           this.clientRequestShow = true;
-          this.accountInfo = false;
-          this.allProjectsShow = false;
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
-          this.documentsShow = false;
-          this.invoicesShow = false;
+          // this.accountInfo = false;
+          // this.allProjectsShow = false;
+          // this.detailedInfoVisible = false;
+          // this.detailedProjectVisible = false;
+          // this.documentsShow = false;
+          // this.invoicesShow = false;
           this.dropdownVisible = false;
           this.thanks = false;
         }
         this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach((item, i) => {
-          if (i === 0) item.active = true;
-          else item.active = false;
-        })
+          if (i === 0) {
+            item.active = true;
+          } else {
+            item.active = false;
+          }
+        });
+        this.$router.push(`/client-request${this.newProject[ind].path}`);
       },
       async getServices() {
         const result = await this.$axios.$get('api/services');
