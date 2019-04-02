@@ -26,7 +26,7 @@
                 a.step-files__link(:href='row.source')
                     img.step-files__image(src="../../../assets/images/download-big-b.png")
             template(slot="target" slot-scope="{ row, index }")
-                img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile")                            
+                img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile(index)")                            
 </template>
 
 <script>
@@ -44,6 +44,9 @@ export default {
         },
         projectId: {
             type: Number
+        },
+        xtmJobs: {
+            type: Array
         }
     },
     data() {
@@ -62,29 +65,35 @@ export default {
     methods: {
         ...mapActions({
             storeProject: "setCurrentProject",
+            alertToggle: "alertToggle"
         }),
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
         },
-        async downloadTargetFile() {
-            const id = this.currentProject._id;
-            if(this.step.targetFiles && this.step.targetFiles.length) {
-                return this.downloadExistingTargets(this.step.targetFiles);
+        async downloadTargetFile(index) {
+            const xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
+            try {
+                const id = this.currentProject._id;
+                if(this.step.targetFiles && this.step.targetFiles.length) {
+                    return this.downloadExistingTargets(this.step.targetFiles);
+                }
+                if(this.step.progress.wordsTotal != this.step.progress.wordsDone) return;
+                const fileIds = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});
+                let updatedStep = {...this.step};
+                updatedStep.targetFiles = [];
+                for(let obj of fileIds.body) {
+                    let fileLink = await this.$http.get(`/xtm/target-file?stepName=${this.step.name}&id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
+                    let href = fileLink.body.path;
+                    updatedStep.targetFiles.push(href);
+                    let link = document.createElement('a');
+                    link.href = __WEBPACK__API_URL__ + href;
+                    link.click();
+                }
+                const updatedProject = await this.$http.post('/xtm/step-target', {step: updatedStep, projectId: id});
+                await this.storeProject(updatedProject.body);
+            } catch(err) {
+                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
             }
-            if(this.step.progress.wordsTotal != this.step.progress.wordsDone) return;
-            const fileIds = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, taskId: this.step.taskId});
-            let updatedStep = {...this.step};
-            updatedStep.targetFiles = [];
-            for(let obj of fileIds.body) {
-                let fileLink = await this.$http.get(`/xtm/target-file?step=${updatedStep}&id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
-                let href = fileLink.body.path;
-                updatedStep.targetFiles.push(href);
-                let link = document.createElement('a');
-                link.href = __WEBPACK__API_URL__ + href;
-                link.click();
-            }
-            const updatedProject = await this.$http.post('/xtm/step-target', {step: updatedStep, projectId: id});
-            await this.storeProject(updatedProject.body);
         },
         downloadExistingTargets(arr) {
             for(let path of arr) {

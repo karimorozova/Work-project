@@ -30,13 +30,13 @@
                         .contract__upload
                             input.upload(type="file" @change="contractLoad")
                         .contract__download
-                            img(v-if="client.contract" src="../../assets/images/Other/Download-icon.png" @click="contractDownload")
+                            img(v-if="client.contract" src="../../assets/images/Other/Download-icon.png")
                     label.block-item__label NDA:
                     .nda
                         .nda__upload
                             input.upload(type="file" @change="ndaLoad")
                         .nda__download
-                            img(v-if="client.nda" src="../../assets/images/Other/Download-icon.png" @click="ndaDownload")
+                            img(v-if="client.nda" src="../../assets/images/Other/Download-icon.png")
                 .block-item
                     label.block-item__label.block-item_relative Account Manager:
                         Asterisk(:customStyle="asteriskStyle")
@@ -92,6 +92,14 @@ export default {
         contactsPhotos: {
             type: Array,
             default: () => []
+        },
+        contractFiles: {
+            type: Array,
+            default: () => []
+        },
+        ndaFiles: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
@@ -112,12 +120,12 @@ export default {
     methods: {
         contractLoad(e) {
             if(e.target.files && e.target.files[0]) {
-                this.contractFile = e.target.files;
+                this.$emit('loadFile', {files: e.target.files, prop: 'contractFiles'})
             };
         },
         ndaLoad(e) {
             if(e.target.files && e.target.files[0]) {
-                this.ndaFile = e.target.files;
+                this.$emit('loadFile', {files: e.target.files, prop: 'ndaFiles'})
             }
         },
         cancel() {
@@ -211,11 +219,11 @@ export default {
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
             }
-            for(let i = 0; i < this.contractFile.length; i++) {
-                sendData.append('contract', this.contractFile[i]);
+            for(let i = 0; i < this.contractFiles.length; i++) {
+                sendData.append('contract', this.contractFiles[i]);
             }
-            for(let i = 0; i < this.ndaFile.length; i++) {
-                sendData.append('nda', this.ndaFile[i]);
+            for(let i = 0; i < this.ndaFiles.length; i++) {
+                sendData.append('nda', this.ndaFiles[i]);
             }
             try {
                 const result = await this.$http.post('/clientsapi/update-client', sendData);

@@ -170,7 +170,7 @@ VendorSchema.pre('save', function (next) {
         vendor.password = hash;
         next();
     })
-  });
+});
   
 
 const Vendors = mongoose.model('Vendors', VendorSchema);

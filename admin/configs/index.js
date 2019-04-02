@@ -1,9 +1,10 @@
-const xtmAuth = require('./xtm');
+const { xtmToken, xtmBaseUrl } = require('./xtm');
 const secretKey = require('./jwtkey');
 const zohoCreds = require('./zoho');
 
 module.exports = {
-    xtmAuth,
+    xtmToken,
+    xtmBaseUrl,
     secretKey,
     zohoCreds
 }

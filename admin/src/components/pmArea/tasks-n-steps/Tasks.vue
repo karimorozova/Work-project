@@ -5,7 +5,7 @@
         .tasks__drop-menu
             SelectSingle(
                 :selectedOption="selectedAction"
-                :options="actions"
+                :options="availableActions"
                 placeholder="Select Action"
                 @chooseOption="setAction"
             )
@@ -70,7 +70,7 @@
                 span.tasks__money(v-if="+marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
-                img.tasks__delivery-image(v-if="+progress(row) === 100" src="../../../assets/images/download-big-b.png")
+                img.tasks__delivery-image(v-if="row.status==='Ready for Delivery'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
     .tasks__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
@@ -103,9 +103,9 @@ export default {
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "9%"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "10%"},
-                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "10%"},
-                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "12%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%"},
+                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%"},
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
                 {label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "7%", cellClass: "tasks_centered"},
             ],
@@ -131,13 +131,24 @@ export default {
         },
         async approveAction() {
             const checkedTasks = this.allTasks.filter(item => item.check);
+            if(!this.checkedTasks.length) {
+                return this.closeApproveModal();
+            }
+            await this.doTasksApproveaction(checkedTasks);
+        },
+        async doTasksApproveaction(checkedTasks) {
             try {
-                if(this.selectedAction === "Cancel") {
-                    this.closeApproveModal();
-                    await this.cancelTasks(checkedTasks)
+                switch(this.selectedAction) {
+                    case 'Cancel':
+                        await this.cancelTasks(checkedTasks);
+                        break;
+                    case 'Deliver':
+                        console.log('delivering...')
+                        break
                 }
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
+            } finally {
                 this.closeApproveModal();
             }
         },
@@ -184,6 +195,17 @@ export default {
             this.isApproveActionShow = false;
             this.selectedAction = "";
         },
+        async downloadFiles(task) {
+            const jobIds = task.xtmJobs.reduce((init, cur) => {
+                return init + `${cur.jobId},`;
+            }, "");
+            try {
+                const result = await this.$http.post('/xtm/generate-file', {projectId: task.projectId, jobId: jobIds});
+                console.log(result);
+            } catch(err) {
+                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+            }
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
@@ -193,7 +215,15 @@ export default {
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject' 
-        })
+        }),
+        availableActions() {
+            let result = this.actions;
+            const completedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
+            if(completedTask) {
+                result.push('Deliver')
+            }
+            return result;
+        }
     },
     components: {
         DataTable,

@@ -105,7 +105,8 @@ export default {
             errors: [],
             isSaveClicked: false,
             genders: ["Male", "Female"],
-            fromRoute: ""
+            fromRoute: "",
+            oldEmail: ""
         }
     },
     methods: {
@@ -151,12 +152,36 @@ export default {
             this.timezoneSelected = data;
             this.contact.timezone = data;
         },
-        checkForErrors() {
+        checkInNewCLient() {
+            const { contacts } = this.newClient;
+            const sameEmail = contacts.find((item, index) => {
+                return this.index !== index && item.email === this.contact.email
+            })
+            if(sameEmail) this.errors.push("The email you entered is already used.")
+        },
+        async checkEmailUniquenes() {
+            if(this.oldEmail === this.contact.email) return;
+            if(this.isNewClient) {
+                return checkInNewCLient();
+            }
+            try {
+                const result = await this.$http.get(`/clientsapi/unique-email?email=${this.contact.email}`);
+                if(result.body === "exist") {
+                    this.errors.push("The email you entered is already used in our system.")
+                }
+            } catch(err) {
+
+            }
+        },
+        async checkForErrors() {
             this.errors = [];
             const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             if(!this.contact.firstName) this.errors.push("Please, enter contact's first name.");
             if(!this.contact.position) this.errors.push("Please, enter contact's position.");
             if(!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.");
+            if(this.contact.email && emailValidReg.test(this.contact.email)) {
+                await this.checkEmailUniquenes();
+            }
             if(this.errors.length) {
                 this.areErrorsExist = true;
                 this.isSaveClicked = true;
@@ -173,6 +198,7 @@ export default {
             } else {
                 this.contact = {...this.newClient.contacts[this.index]};
             }
+            this.oldEmail = this.contact.email;
         },
         closeErrorsBlock() {
             this.areErrorsExist = false;

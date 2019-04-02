@@ -8,7 +8,7 @@ const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const parser = require('xml2json');
 const https = require('https');
-const { xtmAuth } = require('../configs/');
+const { xtmToken, xtmBaseUrl } = require('../configs/');
 
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     try {
@@ -89,8 +89,8 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/project-metrics', async (req, res) => {
     const { projectId, customerId } = req.query;
     try {
-        unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/metrics`)
-        .headers({"Authorization": xtmAuth.token,
+        unirest.get(`xtmBaseUrl/rest-api/projects/${projectId}/metrics`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end(async (response) => {
             if(response.error) {
@@ -216,8 +216,8 @@ router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFile
 })
 
 router.get('/xtm-customers', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/customers')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/customers`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'}) 
         .end((response) => {
             res.send(response.body);
@@ -225,8 +225,8 @@ router.get('/xtm-customers', async (req, res) => {
 })
 
 router.get('/xtm-clientinfo', async (req, res) => {
-    unirest.get(`http://wstest2.xtm-intl.com/rest-api/customers?fetchAddress=YES&ids=${req.query.id}`)
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/customers?fetchAddress=YES&ids=${req.query.id}`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'}) 
         .end((response) => {
             res.send(response.body);
@@ -269,8 +269,8 @@ router.post('/savejobs', async (req, res) => {
 })
 
 router.get('/newproject', async (req, res) => {
-    unirest.post('http://wstest2.xtm-intl.com/rest-api/projects')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.post(`${xtmBaseUrl}/rest-api/projects`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'multipart/form-data'}) 
         .field('customerId', 23)
         .field('name',  'Project-Test')
@@ -294,8 +294,8 @@ router.get('/metrics', async (req, res) => {
 })
 
 router.get('/status', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/status?fetchLevel=STEPS')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/status?fetchLevel=STEPS`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end( (response) => {
         res.send(response.body)
@@ -303,8 +303,8 @@ router.get('/status', async (req, res) => {
 })
 
 router.get('/estimates', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/proposal')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/proposal`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end( (response) => {
         res.send(response.body)
@@ -312,8 +312,8 @@ router.get('/estimates', async (req, res) => {
 })
 
 router.get('/jobs-metrics', async (req, res) => {
-    unirest.get(`http://wstest2.xtm-intl.com/rest-api/projects/${req.query.projectId}/metrics/jobs?jobIds=${req.query.jobId}`)
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/projects/${req.query.projectId}/metrics/jobs?jobIds=${req.query.jobId}`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end( (response) => {
         res.send(response.body)
@@ -321,8 +321,8 @@ router.get('/jobs-metrics', async (req, res) => {
 })
 
 router.get('/customer-projects', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects?customerIds=5041&Ids=5500')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/projects?customerIds=5041&Ids=5500`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end( (response) => {
         res.send(response.body)
@@ -330,8 +330,8 @@ router.get('/customer-projects', async (req, res) => {
 })
 
 router.get('/projects-analysis', async (req, res) => {
-    unirest.get('http://wstest2.xtm-intl.com/rest-api/projects/5500/analysis?fetchLevel=JOBS')
-        .headers({"Authorization": "XTM-Basic lGoRADtSF14/TQomvOJnHrIFg5QhHDPwrjlgrQJOLtnaYpordXXn98IwnSjt+7fQJ1FpjAQz410K6aGzYssKtQ==",
+    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/analysis?fetchLevel=JOBS`)
+        .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end( (response) => {
         res.send(response.body)
@@ -372,7 +372,7 @@ router.get('/xtmwords', async (req, res) => {
         }
         return xhr;
     }
-    let xhr = createCORSRequest("POST", "http://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+    let xhr = createCORSRequest("POST", `${xtmBaseUrl}/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl`);
     if(!xhr){
     console.log("XHR issue");
     return;
@@ -445,7 +445,7 @@ router.get('/editor', async (req, res) => {
             }
             return xhr;
         }
-        let xhr = createCORSRequest("POST", "https://wstest2.xtm-intl.com/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl");
+        let xhr = createCORSRequest("POST", `${xtmBaseUrl}/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl`);
         if(!xhr){
         console.log("XHR issue");
         return;
@@ -483,13 +483,13 @@ router.post('/step-target', async (req, res) => {
 })
 
 router.post('/generate-file', async (req, res) => {
-    const { projectId, taskId } = req.body;
+    const { projectId, jobId } = req.body;
     try {
-        unirest.post(`http://wstest2.xtm-intl.com/rest-api/projects/${projectId}/files/generate?jobIds=${taskId}&fileType=TARGET`)
-            .headers({"Authorization": xtmAuth.token})
+        unirest.post(`${xtmBaseUrl}/rest-api/projects/${projectId}/files/generate?jobIds=${jobId}&fileType=TARGET`)
+            .headers({"Authorization": xtmToken})
             .end( (response) => {
                 if(response.error) {
-                    throw new Error('Error on generating file in XTM');
+                   return res.status(response.error.status).send(response.error.message + " XTM-generate file");;
                 }
                 res.send(response.body);
             }) 
@@ -500,20 +500,20 @@ router.post('/generate-file', async (req, res) => {
 })
 
 router.get('/target-file', async (req, res) => {
-    const { step, id, projectId, fileId } = req.query;
+    const { stepName, id, projectId, fileId } = req.query;
     const requestData = {
         method: "GET",
         path: `projects/${projectId}/files/${fileId}/download?fileType=TARGET`,
     }
     const options = getRequestOptions(requestData);
     try {
-        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${step.name}-${fileId}.zip`);
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${stepName}-${fileId}.zip`);
         let reqq = await https.request(options, (resp) => {
             resp.pipe(wstream);
         });
         reqq.end(); 
         wstream.on('finish', () => {
-        res.send({path: `/projectFiles/${id}/target-${step.name}-${fileId}.zip`});
+        res.send({path: `/projectFiles/${id}/target-${stepName}-${fileId}.zip`});
         })
     } catch(err) {
         console.log(err);

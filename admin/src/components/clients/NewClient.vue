@@ -7,6 +7,9 @@
             :client="client"
             :newClient="client"
             :contactsPhotos="contactsPhotos"
+            :contractFiles="contractFiles"
+            :ndaFiles="ndaFiles"
+            @loadFile="loadFile"
             @contactUpdate="contactUpdate"
             @contactSave="contactSave"
             @approveDelete="approveContactDelete"
@@ -21,6 +24,8 @@ export default {
     data() {
         return {
             contactsPhotos: [],
+            ndaFiles: [],
+            contractFiles: [],
             client: {
                 name: "",
                 officialName: "",
@@ -83,9 +88,11 @@ export default {
             this.setLeadWhenUpdate(this.client.contacts.length-1);
             this.$router.go(-1);
         },
+        loadFile({files, prop}) {
+            this[prop] = [files[0]];
+        },
         ...mapActions({
-            alertToggle: "alertToggle",
-            addNewClient: "addNewClient"
+            alertToggle: "alertToggle"
         })
     },
     computed: {

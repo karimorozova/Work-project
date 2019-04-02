@@ -51,7 +51,7 @@ async function updateStepProp({jobId, prop, value}) {
             return item;
         })
         if(value === "Completed" && isAllStepsCompleted({jobId, steps})) {
-            return await setTaskStatusAndSave({tasks: project.tasks, jobId, steps});
+            return await setTaskStatusAndSave({tasks: project.tasks, jobId, steps, status: "Ready for Delivery"});
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
@@ -60,11 +60,11 @@ async function updateStepProp({jobId, prop, value}) {
     }
 }
 
-async function setTaskStatusAndSave({tasks, jobId, steps}) {
+async function setTaskStatusAndSave({tasks, jobId, steps, status}) {
     const step = steps.find(item => item.id === jobId);
     const updatedTasks = tasks.map(item => {
         if(item.taskId === step.taskId) {
-            item.status = "Completed";
+            item.status = status;
         }
         return item;
     })
