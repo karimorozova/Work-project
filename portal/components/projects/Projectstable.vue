@@ -4,21 +4,21 @@
             .shortInfo
                 .row__columns
                     .col
-                        .col__title 
+                        .col__title
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow-down.png" @click="sortReq" :class="{toUp: requestSort}")
                     .col.col-lg
                         .col__title
                             span Project ID
-                            img(src="../../assets/images/white-arrow-down.png" @click="sortProjId" :class="{toUp: projectIdSort}")                        
+                            img(src="../../assets/images/white-arrow-down.png" @click="sortProjId" :class="{toUp: projectIdSort}")
                     .col.col-xlg
-                        .col__title 
+                        .col__title
                             span Project Name
-                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortProjName" :class="{toUp: projectNameSort}")                                     
+                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortProjName" :class="{toUp: projectNameSort}")
                     .col.col-md
-                        .col__title 
+                        .col__title
                             span Deadline
-                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortDeadline" :class="{toUp: deadlineSort}")                  
+                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortDeadline" :class="{toUp: deadlineSort}")
                     .col.col-end
                         span Total Cost
                     .col.col-d
@@ -35,8 +35,8 @@
                         .col.col-end(@click="projectDetails(index)")
                             span {{ project.totalAgreed.formattedAmount }}
                         .col.col-d(@click="downloadZip(index)")
-                            img(src="../../assets/images/download.png")                             
-  
+                            img(src="../../assets/images/download.png")
+
 </template>
 
 <script>
@@ -91,7 +91,7 @@ export default {
     methods: {
         getCookie() {
         // let sessionCookie = document.cookie.split("=")[1];
-            if (document.cookie.indexOf("ses") >= 0) {
+            if (this.jsess) {
                 return true;
             } else {
                 console.log("login failed");
@@ -100,13 +100,9 @@ export default {
             }
         },
         async clientInfo() {
-            const result = await this.$axios.request({
-                method: "get",
-                url: "portal/clientinfo",
-                withCredentials: true
-            });
-            // console.log(result);
-            this.companyName = result.data.name;
+          const token = this.jsess;
+          const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
+            this.companyName = result.client.name;
         },
         projectDetails(index) {
             this.$emit('projectDetails', this.clientProjects[index]);
@@ -124,10 +120,10 @@ export default {
             this.deadlineSort = !this.deadlineSort;
         },
         async downloadZip(index) {
-            console.log('Start downloading project files...');           
+            console.log('Start downloading project files...');
             let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.clientProjects[index].id}`, {withCredentials: true});
             let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.clientProjects[index].id}`);
-            
+
             let link = document.createElement('a');
                 link.href = file.data;
                 link.click();
@@ -145,7 +141,7 @@ export default {
                         result.push({
                         requestOn: moment(new Date(array[i].startDate.millisGMT)).format("DD-MM-YYYY"),
                         id: array[i].id,
-                        startDate: array[i].startDate, 
+                        startDate: array[i].startDate,
                         idNumber: array[i].idNumber,
                         name: array[i].name,
                         status: array[i].status,
@@ -157,7 +153,7 @@ export default {
                         languageCombinations: array[i].languageCombinations,
                         fullInfoAppear: false
                         })
-                    }         
+                    }
                 }
 
                 var filtered = result;
@@ -221,7 +217,7 @@ export default {
                             for (let i = 0; i < item.languageCombinations.length; i++) {
                                 if (item.languageCombinations[i].sourceLanguage.name.indexOf(this.sourceLangsFilter) != -1) {
                                     return true
-                                } 
+                                }
                             }
                         }
                         return false
@@ -234,7 +230,7 @@ export default {
                             for (let i = 0; i < item.languageCombinations.length; i++) {
                                 if (item.languageCombinations[i].targetLanguage.name.indexOf(this.targetLangsFilter) != -1) {
                                     return true
-                                } 
+                                }
                             }
                         }
                         return false
@@ -269,6 +265,17 @@ export default {
             }
             return filtered;
         },
+      jsess() {
+        let result = "";
+        let cookies = document.cookie.split(";");
+        for(let i = 0; i < cookies.length; i++) {
+          let findSession = cookies[i].split("=");
+          if (findSession[0].indexOf('ses') > 0) {
+            result = findSession[1];
+          }
+        }
+        return result;
+      }
     },
     mounted() {
         this.getCookie(),

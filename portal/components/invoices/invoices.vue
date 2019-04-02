@@ -46,12 +46,12 @@ export default {
         async getProjects() {
             let projectsArray = await this.$axios.$get('/api/allprojects');
             this.project = projectsArray[0];
-            if(this.project.jobs) {
+            if(this.project && this.project.jobs) {
                 let words = await this.$axios.$get(`/xtm/xtmwords?projectId=${this.project.xtmId}`);
                 this.project.jobs.forEach(item => {
                     item.wordcount = words;
                 });
-                 
+
             let saveProject = await this.$axios.$post('/xtm/saveproject', this.project);
             let jobsCosts = await this.$axios.$post('/service/jobcost', this.project);
             projectsArray = await this.$axios.$get('/api/allprojects');

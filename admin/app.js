@@ -53,7 +53,7 @@ app.use((req, res, next) => {
   );
   res.header("Access-Control-Allow-Credentials", true);
 
-  var index = allowedOrigins.indexOf(origin);
+  const index = allowedOrigins.indexOf(origin);
   if (index > -1) {
     res.setHeader("Access-Control-Allow-Origin", allowedOrigins[index]);
   }
@@ -67,7 +67,7 @@ app.use("/", routes);
 
 app.use((err, req, res, next) => {
   return res.status(err.status).send(err.message);
-})
+});
 
 app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);

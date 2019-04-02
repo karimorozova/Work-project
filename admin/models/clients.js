@@ -1,31 +1,32 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const ClientSchema = new mongoose.Schema({
-    name: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    name: {
+        type : String,
+        default : '',
+        trim : true
     },
     website: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    status: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    status: {
+        type : String,
+        default : '',
+        trim : true
     },
     contract: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    nda: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    nda: {
+        type : String,
+        default : '',
+        trim : true
     },
     accountManager: {
         type: Object,
@@ -35,44 +36,44 @@ const ClientSchema = new mongoose.Schema({
         type: Object,
         default: {}
     },
-    projectManager: { 
-        type : Object, 
-        default : {} 
+    projectManager: {
+        type : Object,
+        default : {}
     },
     leadSource: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    salesComission: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    salesComission: {
+        type : String,
+        default : '',
+        trim : true
     },
     officialName: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    contactName: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    contactName: {
+        type : String,
+        default : '',
+        trim : true
     },
     email: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    vat: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    vat: {
+        type : String,
+        default : '',
+        trim : true
     },
     address: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
     languageCombinations: [{
         source: {
@@ -91,7 +92,7 @@ const ClientSchema = new mongoose.Schema({
             },
             rates: {
                 type: Object
-            }            
+            }
         }]
     }],
     industries: [
@@ -116,6 +117,28 @@ const ClientSchema = new mongoose.Schema({
         }
     }
 }, { minimize: false });
+
+ClientSchema.statics.authenticate = function (email, password, callback) {
+  Clients.findOne({ "contacts.email": email })
+    .exec((err, client) => {
+      if (err) {
+        return callback(err)
+      } else if (!client) {
+        const err = new Error('Client not found.');
+        err.status = 401;
+        return callback(err);
+      }
+
+      const contact = client.contacts.find((contact)=>contact.email === email);
+      bcrypt.compare(password, contact.password, function (err, result) {
+        if (result === true || !contact.password) {
+          return callback(null, {client,contact});
+        } else {
+          return callback();
+        }
+      })
+    });
+};
 
 const Clients = mongoose.model('Clients', ClientSchema);
 
