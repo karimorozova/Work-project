@@ -9,7 +9,7 @@
             .sel_project_block__proj
               span New Project
             .sel_project_block__imgWrapper(@click="showDropdown")
-              img(src="../assets/images/white-arrow.png" :class="{rotate: dropdownVisible}")
+              img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
             .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
               .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
@@ -20,13 +20,14 @@
               .accountBlock__info
                 .icon
                   img(src="../assets/images/man.png")
-                .personal_data
-                  .name {{ user.firstName }}
-                  .email {{ user.email }}
-              router-link.accountBlock__myaccount(@click="showAccountInfo" to="/account")
-                .human_icon
-                  img(src="../assets/images/man.png")
-                .my_account My Account
+                .personal__data
+                  .personal__data_name {{ user.firstName }}
+                  .personal__data_email {{ user.email }}
+              .accountBlock__myaccount__wrapper(@click="showAccountInfo")
+                router-link.accountBlock__myaccount(to="/account")
+                  .human_icon
+                    img(src="../assets/images/man.png")
+                  .my_account My Account
               .accountBlock__exit(@click="signOut")
                 .icon_exit
                   img(src="../assets/images/sign-out.png")
@@ -61,7 +62,7 @@
   import Clientrequest from "../components/Clientrequest";
   import ClickOutside from "vue-click-outside";
   import Confirmorder from "../components/Confirmorder";
-  import { mapActions } from "vuex";
+  import {mapActions} from "vuex";
 
   export default {
     data() {
@@ -115,41 +116,41 @@
         projects: [],
         quotes: [],
         quote: {
-          name:'some name',
+          name: 'some name',
           idNumber: 345345,
           status: 'SENT',
-          totalAgreed:{
-            formattedAmount:1000
+          totalAgreed: {
+            formattedAmount: 1000
           },
-          projectManager:{
+          projectManager: {
             name: 'Sam'
           },
           service: 'Special',
           specialization: 'Some spec',
-          startDate:{
-            formatted:'1980 07 15'
+          startDate: {
+            formatted: '1980 07 15'
           },
-          deadline:{
-            formatted:'2980 07 15'
+          deadline: {
+            formatted: '2980 07 15'
           }
         },
         project: {
-          name:'some name',
+          name: 'some name',
           idNumber: 345345,
           status: 'active',
-          totalAgreed:{
-            formattedAmount:1000
+          totalAgreed: {
+            formattedAmount: 1000
           },
-          projectManager:{
+          projectManager: {
             name: 'Sam'
           },
           service: 'Special',
           specialization: 'Some spec',
-          startDate:{
-            formatted:'1980 07 15'
+          startDate: {
+            formatted: '1980 07 15'
           },
-          deadline:{
-            formatted:'2980 07 15'
+          deadline: {
+            formatted: '2980 07 15'
           }
 
         },
@@ -223,15 +224,17 @@
         this.accountMenuVisible = !this.accountMenuVisible;
       },
       showAccountInfo() {
-        this.accountInfo = true;
+        console.log('show account info: ',this.accountMenuVisible);
+        // this.accountInfo = true;
         this.accountMenuVisible = !this.accountMenuVisible;
-        this.allProjectsShow = false;
-        this.detailedInfoVisible = false;
-        this.detailedProjectVisible = false;
-        this.clientRequestShow = false;
-        this.documentsShow = false;
-        this.invoicesShow = false;
-        this.thanks = false;
+
+        // this.allProjectsShow = false;
+        // this.detailedInfoVisible = false;
+        // this.detailedProjectVisible = false;
+        // this.clientRequestShow = false;
+        // this.documentsShow = false;
+        // this.invoicesShow = false;
+        // this.thanks = false;
         this.navbarList.forEach(item => {
           item.active = false;
         });
@@ -241,7 +244,7 @@
         this.dropdownVisible = !this.dropdownVisible;
       },
       dataForRequest(ind) {
-        if(this.user) {
+        if (this.user) {
           let formData = {
             name: this.user.firstName,
             email: this.user.email,
@@ -267,19 +270,21 @@
         }
         this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
-        this.navbarList.forEach( (item, i) => {
+        this.navbarList.forEach((item, i) => {
           if (i === 0) item.active = true;
           else item.active = false;
         })
       },
       async getServices() {
         const result = await this.$axios.$get('api/services');
-        result.sort((a, b) => {return a.sortIndex - b.sortIndex});
+        result.sort((a, b) => {
+          return a.sortIndex - b.sortIndex
+        });
         this.$store.dispatch('servicesGetting', result);
       },
-    ...mapActions({
-      logout: "logout",
-    })
+      ...mapActions({
+        logout: "logout",
+      })
     },
     mounted() {
       this.getCookie();
@@ -297,7 +302,7 @@
       jsess() {
         let result = "";
         let cookies = document.cookie.split(";");
-        for(let i = 0; i < cookies.length; i++) {
+        for (let i = 0; i < cookies.length; i++) {
           let findSession = cookies[i].split("=");
           if (findSession[0].indexOf('ses') > 0) {
             result = findSession[1];
@@ -323,9 +328,11 @@
     flex-direction: column;
     justify-content: center;
   }
+
   .quotesComponent {
     margin-bottom: 40px;
   }
+
   .clientsTop {
     display: flex;
     align-items: center;
@@ -399,7 +406,7 @@
       .dropdownWrapper {
         height: 34px;
         width: 239px;
-        margin-right: 50px;
+        margin-right: 119px;
         z-index: 3;
         position: relative;
 
@@ -420,28 +427,32 @@
             border-right: 1px solid #fff;
             line-height: 100%;
             color: #fff;
-            padding-right: 60px;
+            width: 80%;
             height: 100%;
             display: flex;
             align-items: center;
+            position: relative;
             span {
-              padding-right: 33px;
               padding-left: 14px;
-              white-space: nowrap;
             }
           }
 
           &__imgWrapper {
             display: flex;
+            height: 100%;
+            width: 20%;
+            justify-content: center;
+            align-items: center;
             img {
-              height: 14px;
-              transform: rotate(180deg);
-              padding: 10px 17px;
               cursor: pointer;
             }
             .rotate {
-              transform: rotate(0deg);
+              transform: rotate(180deg);
             }
+          }
+          &__image {
+            padding: 5px;
+            cursor: pointer;
           }
         }
 
@@ -459,8 +470,7 @@
             font-size: 16px;
             width: 185px;
 
-            &__listItem
-            {
+            &__listItem {
               padding: 15px;
               border-bottom: 0.2px solid #978d7e;
               cursor: pointer;
@@ -489,6 +499,9 @@
           background-color: white;
           padding-bottom: 1px;
           padding-right: 1px;
+          width: 35px;
+          height: 35px;
+          object-fit: cover;
         }
 
         .accountMenuWrapper {
@@ -498,8 +511,8 @@
             background-color: #fff;
             box-shadow: 1px 1px 11px black;
             position: absolute;
-            top: 50px;
-            right: -15px;
+            top: 44px;
+            right: -140px;
             border-radius: 6px;
             z-index: 5;
             overflow: hidden;
@@ -507,30 +520,29 @@
               display: flex;
               justify-content: flex-start;
               border-bottom: 1px solid #998e7e;
-              padding-top: 3%;
-              padding-bottom: 3%;
+              padding: 5px 0;
 
               .icon {
-                margin-left: 8%;
+                margin-left: 10px;
                 img {
                   height: 32px;
                 }
               }
 
-              .personal_data {
+              .personal__data {
                 color: #67573e;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
                 align-items: flex-start;
-                padding-top: 2%;
-                margin-right: 14%;
-                margin-left: 8%;
-                .name {
+                padding-top: 5px;
+                margin-left: 10px;
+
+                &_name {
                   font-size: 12px;
                 }
 
-                .email {
+                &_email {
                   font-size: 11px;
                 }
               }
@@ -544,7 +556,7 @@
               cursor: pointer;
               text-decoration: none;
               .human_icon {
-                margin-left: 8%;
+                margin-left: 10px;
                 img {
                   height: 32px;
                 }
@@ -553,7 +565,7 @@
               .my_account {
                 font-size: 12px;
                 color: #67573e;
-                margin-left: 8%;
+                margin-left: 10px;
               }
               &:hover {
                 background-color: #ddd3c8;
@@ -566,7 +578,7 @@
               align-items: center;
               cursor: pointer;
               .icon_exit {
-                margin-left: 9%;
+                margin-left: 10px;
                 img {
                   height: 32px;
                 }
@@ -586,6 +598,7 @@
       }
 
       .chevronWrapper {
+        width: 140px;
         .chevron {
           position: relative;
           text-align: center;
@@ -593,33 +606,33 @@
           margin-bottom: 6px;
           height: 16px;
           width: 16px;
-          margin-right: 123px;
+          /*margin-right: 123px;*/
           cursor: pointer;
-          @media screen and (max-width: 1450px){
+          transform: rotate(180deg);
+          @media screen and (max-width: 1450px) {
             margin-right: 43px;
           }
-          @media screen and (max-width: 1350px){
+          @media screen and (max-width: 1350px) {
             margin-right: 23px;
           }
         }
 
         .chevron:before {
-          content: '';
+          content: "";
           position: absolute;
-          top: 23px;
-          left: 6px;
+          top: 15px;
           height: 8%;
-          width: 21%;
+          width: 29%;
           background: #fff;
           transform: skew(0deg, 50deg);
         }
         .chevron:after {
-          content: '';
+          content: "";
           position: absolute;
-          top: 23px;
-          right: 18px;
+          top: 15px;
           height: 8%;
-          width: 21%;
+          left: 8px;
+          width: 29%;
           background: #fff;
           transform: skew(0deg, -50deg);
         }
@@ -693,7 +706,7 @@
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 4px 6px 8px rgba(103,87,62,.4);
+        box-shadow: 4px 6px 8px rgba(103, 87, 62, .4);
         transition: all .5s;
         z-index: 2;
         overflow: hidden;
@@ -858,6 +871,7 @@
     font-family: MyriadPro;
     src: url('../assets/fonts/MyriadPro-Regular.otf');
   }
+
   @font-face {
     font-family: MyriadBold;
     src: url('../assets/fonts/MyriadPro-Bold.otf')
