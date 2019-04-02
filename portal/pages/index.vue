@@ -53,8 +53,8 @@
           span {{ path }}
           span.arrows(v-if="clientRequestShow") >>
           span(v-if="clientRequestShow") {{ serviceType }}
-        Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
-        Confirmorder(v-if="true" :thanksService="thanksService")
+        <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
+        Confirmorder(v-if="thanks" :thanksService="thanksService")
         nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
 </template>
 
