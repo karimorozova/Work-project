@@ -52,43 +52,12 @@
           span {{ path }}
           span.arrows(v-if="clientRequestShow") >>
           span(v-if="clientRequestShow") {{ serviceType }}
-        <!--.maininfoWrapper-->
-          <!--.mainInfo(v-if="visibleChecker == false")-->
-            <!--.clientsAll-->
-              <!--.quotesComponent-->
-                <!--.clientsAll__dropMenu.openQuotes(:class="{borderAngle: openQuotes}")-->
-                  <!--.clientsAll__dropMenu_select(@click="showQuotes" :class="{bottomLine: openQuotes}") Open Quotes-->
-                    <!--img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openQuotes}")-->
-                  <!--.clientsAll__dropMenu_item.quotesTable(v-if="openQuotes")-->
-                    <!--Quotesinfo(@quoteDetails="quoteDetails" :quotes="quotes")-->
-              <!--.projectsComponent-->
-                <!--.clientsAll__dropMenu.openProjects(:class="{borderAngle: openProjects}")-->
-                  <!--.clientsAll__dropMenu_select(@click="showProjects" :class="{bottomLine: openProjects}") Open Projects-->
-                    <!--img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")-->
-                  <!--.clientsAll__dropMenu_item.projectsTable(v-if="openProjects")-->
-                    <!--projectsInfo(@projectDetails="projectDetails" :projects="projects")-->
-        <!--.detailedInfoWrapper-->
-          <!--QuotesInfoDetailed(v-if="detailedInfoVisible" :quoteIndex="quoteIndex" :quotes="quotes" :quote="quote")-->
-        <!--.detailedProjectWrapper-->
-          <!--projectInfoDetailed(v-if="detailedProjectVisible" :projects="projects" :project="project" :jobsById="jobsById" :user="user")-->
-        <!--Allprojects(v-if="allProjectsShow" :projects="projects" :user="user" @projectDetails='projectDetails')-->
-        <!--invoices(v-if="invoicesShow")-->
-        <!--documents(v-if="documentsShow")-->
-        <!--Accountinfo(v-if="accountInfo" :client='client' :user="user" :projects="projects" :quotes="quotes")-->
         Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
         Confirmorder(v-if="thanks" :thanksService="thanksService")
         nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote")
 </template>
 
 <script>
-  // import Quotesinfo from "~/components/quotes/Qoutesinfo";
-  // import ProjectsInfo from "~/components/projects/ProjectsInfo";
-  // import QuotesInfoDetailed from "../components/quotes/QuotesInfoDetailed";
-  // import Accountinfo from "../components/account/Accountinfo";
-  // import ProjectInfoDetailed from "../components/projects/ProjectsInfoDetailed";
-  // import Allprojects from "../components/projects/Allprojects";
-  // import invoices from "../components/invoices/invoices";
-  // import documents from "../components/documents/documents";
   import Clientrequest from "../components/Clientrequest";
   import ClickOutside from "vue-click-outside";
   import Confirmorder from "../components/Confirmorder";
@@ -209,14 +178,11 @@
         this.thanksService = data;
       },
       getCookie() {
-        let sessionCookie = document.cookie.split("=")[1];
-        if (document.cookie.indexOf("ses") >= 0) {
+        if (this.jsess) {
           this.cookies = true;
           return true;
         } else {
           console.log("login failed");
-          // alert("Please, Log in!")
-          // window.location.replace("/");
           this.$router.push('/login');
         }
       },
@@ -228,14 +194,12 @@
       },
       signOut() {
         this.logout();
-        // document.cookie = "ses" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.$router.push('/login');
 
       },
       async clientInfo() {
-
-        const result = await this.$axios.$get("/portal/clientinfo");
-
+        const token = this.jsess;
+        const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
         this.client = result.client;
         if (!this.client) {
           this.$router.push('/login');
@@ -248,82 +212,13 @@
         this.$store.dispatch('loadLangs', this.languageCombinations);
       },
 
-      // expandBar() {
-      //   this.expander = !this.expander;
-      // },
-      // switchInfo(index) {
-      //   this.navbarList.forEach((item, i) => {
-      //     if (i == index) {
-      //       item.active = true;
-      //       if (this.detailedInfoVisible && !this.detailedProjectVisible) {
-      //         this.detailedInfoVisible = !this.detailedInfoVisible;
-      //         this.openQuotes = true;
-      //
-      //       }
-      //       if (!this.detailedInfoVisible && this.detailedProjectVisible) {
-      //         this.detailedProjectVisible = !this.detailedProjectVisible;
-      //         this.openProjects = true;
-      //       }
-      //     } else {
-      //       item.active = false;
-      //     }
-      //
-      //     if (index == 0) {
-      //       this.allProjectsShow = false;
-      //       this.detailedInfoVisible = false;
-      //       this.detailedProjectVisible = false;
-      //       this.invoicesShow = false;
-      //       this.documentsShow = false;
-      //       this.clientRequestShow = false;
-      //       this.path = "Open Quotes"
-      //     }
-      //
-      //     if (index == 1) {
-      //       this.allProjectsShow = true;
-      //       this.detailedInfoVisible = false;
-      //       this.detailedProjectVisible = false;
-      //       this.invoicesShow = false
-      //       this.documentsShow = false;
-      //       this.clientRequestShow = false;
-      //       this.path = "All Projects"
-      //
-      //     }
-      //
-      //     if (index == 2) {
-      //       this.invoicesShow = true;
-      //       this.allProjectsShow = false;
-      //       this.detailedInfoVisible = false;
-      //       this.detailedProjectVisible = false;
-      //       this.documentsShow = false;
-      //       this.clientRequestShow = false;
-      //       this.path = "Invoices"
-      //     }
-      //
-      //     if (index == 3) {
-      //       this.documentsShow = true;
-      //       this.allProjectsShow = false;
-      //       this.detailedInfoVisible = false;
-      //       this.detailedProjectVisible = false;
-      //       this.invoicesShow = false;
-      //       this.clientRequestShow = false;
-      //       this.path = "Documents"
-      //     }
-      //     this.thanks = false;
-      //     this.accountInfo = false;
-      //   });
-      // },
+
       switchSection(index) {
         this.navbarList.forEach((item, i) => {
           item.active = i === index;
         });
         this.$router.push(this.navbarList[index].path);
       },
-      // showQuotes() {
-      //   this.openQuotes = !this.openQuotes;
-      // },
-      // showProjects() {
-      //   this.openProjects = !this.openProjects;
-      // },
       showAccountMenu() {
         this.accountMenuVisible = !this.accountMenuVisible;
       },
@@ -341,32 +236,7 @@
           item.active = false;
         });
       },
-      // quoteDetails(data) {
-      //   this.detailedInfoVisible = true;
-      //   this.quote = data.quote;
-      //   this.detailedProjectVisible = false;
-      //   this.allProjectsShow = false;
-      //   this.clientRequestShow = false;
-      //   for (let i = 0; i < this.navbarList.length; i++) {
-      //     if (i == 1) this.navbarList[i].active = true;
-      //     else this.navbarList[i].active = false;
-      //   }
-      // },
-      // projectDetails(data) {
-      //   this.detailedProjectVisible = true;
-      //   this.allProjectsShow = false;
-      //   this.detailedInfoVisible = false;
-      //   this.clientRequestShow = false;
-      //   this.project = data.project;
-      //   this.jobsById = data.jobs;
-      //   for (let i = 0; i < this.navbarList.length; i++) {
-      //     if (i == 1) this.navbarList[i].active = true;
-      //     else this.navbarList[i].active = false;
-      //   }
-      // },
-      // backToMain() {
-      //   this.$refs.againMain.baseURI;
-      // },
+
       showDropdown() {
         this.dropdownVisible = !this.dropdownVisible;
       },
@@ -381,7 +251,7 @@
             skype: "",
             service: this.newProject[ind].title,
             industry: this.client.industries[0].name
-          }
+          };
           this.$store.dispatch('requestInfo', formData);
           this.$store.dispatch('loadLangs', this.languageCombinations);
           this.$store.dispatch('jsession', this.jsess);
@@ -398,12 +268,12 @@
         this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach( (item, i) => {
-          if (i == 0) item.active = true;
+          if (i === 0) item.active = true;
           else item.active = false;
         })
       },
       async getServices() {
-        const result = await this.$axios.$get('api/services')
+        const result = await this.$axios.$get('api/services');
         result.sort((a, b) => {return a.sortIndex - b.sortIndex});
         this.$store.dispatch('servicesGetting', result);
       },
@@ -417,14 +287,6 @@
       this.getServices();
     },
     components: {
-      // Quotesinfo,
-      // projectsInfo: ProjectsInfo,
-      // QuotesInfoDetailed,
-      // Accountinfo,
-      // projectInfoDetailed: ProjectInfoDetailed,
-      // Allprojects,
-      // invoices,
-      // documents,
       Clientrequest,
       Confirmorder
     },
@@ -432,18 +294,6 @@
       ClickOutside
     },
     computed: {
-      // visibleChecker() {
-      //   return (
-      //     this.detailedInfoVisible ||
-      //     this.detailedProjectVisible ||
-      //     this.accountInfo ||
-      //     this.allProjectsShow ||
-      //     this.invoicesShow ||
-      //     this.documentsShow ||
-      //     this.clientRequestShow ||
-      //     this.thanks
-      //   );
-      // },
       jsess() {
         let result = "";
         let cookies = document.cookie.split(";");
@@ -466,10 +316,6 @@
     font-family: MyriadPro;
   }
 
-  .clientsportalWrapper {
-    /*margin: 0 auto;*/
-    /*overflow: auto;*/
-  }
   .projectsComponent,
   .quotesComponent {
     width: 1010px;
@@ -491,7 +337,6 @@
     z-index: 1000;
     .company {
       span {
-        font-weight: 600;
         font-size: 24px;
         font-weight: bold;
         color: darkslategray;

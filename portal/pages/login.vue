@@ -39,7 +39,7 @@
       async sendForm() {
         try {
           const result = await this.$axios.$post("/portal/auth", { ...this.form});
-          this.login(result.jsessionId);
+          this.login(result.jsession);
           this.$router.push("/dashboard");
           this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
         } catch(err) {

@@ -97,7 +97,7 @@ const middleware = {
             '/reports',
             '/translation-request',
             '/zoho-code'
-        ]
+        ];
         for(let route of routesArray) {
             let length = route.length;
             if(req.originalUrl.slice(0, length) === route) {
@@ -107,6 +107,6 @@ const middleware = {
         }
         next();
     }
-}
+};
 
 module.exports = middleware;

@@ -14,7 +14,7 @@ const languagesDefault = [
     {"lang":"Danish", "icon":"/static/flags31x21pix/Danish[DA].png", "symbol":"DA", "xtm": "da_DK", "iso1":"da-DK", "iso2":"dan", "direction":"both", "crud": false, "active": true, "check": false},
     {"lang":"Dutch", "icon":"/static/flags31x21pix/Dutch[NL].png", "symbol":"NL", "xtm": "nl_NL", "direction":"both", "iso1":"nl", "iso2":"dut", "crud": false, "active": true, "check": false, children: true},
     {"lang":"Flemish", "icon":"/static/flags31x21pix/Flemish[NL-BE].png", "symbol":"NL-BE", "xtm": "nl_BE", "iso1":"nl-BE", "iso2":"dut-BE", "direction":"both", "crud": false, "check": false, "active": true, parent: "NL"},
-    {"lang":"Dutch (Netherlands)", "icon":"/static/flags31x21pix/Dutch[NL-NL].png", "symbol":"NL-NL", "xtm": "nl_NL", "iso1":"nl-NL", "iso2":"dut-NL", "direction":"both", "crud": false, "check": false, "active": true, parent: "NL"},    
+    {"lang":"Dutch (Netherlands)", "icon":"/static/flags31x21pix/Dutch[NL-NL].png", "symbol":"NL-NL", "xtm": "nl_NL", "iso1":"nl-NL", "iso2":"dut-NL", "direction":"both", "crud": false, "check": false, "active": true, parent: "NL"},
     {"lang":"German", "icon":"/static/flags31x21pix/German[DE].png", "symbol":"DE", "xtm": "de_DE", "iso1":"de", "iso2":"ger", "diraction":"both", "crud": false, "active": true, "check": false, children: true},
     {"lang":"German (Switzerland)", "icon":"/static/flags31x21pix/German[DE-CH].png", "symbol":"DE-CH", "xtm": "de_CH", "iso1":"de-CH", "iso2":"ger-CH", "direction":"both", "crud": false, "check": false, "active": true, parent: "DE"},
     {"lang":"German (Austria)", "icon":"/static/flags31x21pix/German[DE-AT].png", "symbol":"DE-AT", "xtm": "de_AT", "iso1":"de-AT", "iso2": "ger-AT", "direction":"both", "crud": false, "check": false, "active": true, parent: "DE"},
@@ -235,20 +235,20 @@ const industriesDefault = [
 ];
 
 const packagesDefault = [
-    {name: "Up to 200", size: "200"},{name: "201 to 300", size: "300"},{name: "301 to 400", size: "400"},{name: "401 to 699", size: "700"},{name: "700 to 1000", size: "1000"}, 
+    {name: "Up to 200", size: "200"},{name: "201 to 300", size: "300"},{name: "301 to 400", size: "400"},{name: "401 to 699", size: "700"},{name: "700 to 1000", size: "1000"},
 ]
 
 const projectsDefault = [];
 
 const clientsDefault = [
     {name: "DDD-default", website: "www.ddd.com", status: "Active", contract: "", nda: "", accountManager: "aran.s", salesManager: "eirini.loi", projectManager: "illy.dim", leadSource: "Website", salesComission: "Passed threshold", officialName: "DDD LTD", contactName: "Jack Di", email: "ddd@ddd.com", vat: "", address: "345 DSD Street, Moscow, Russia", languageCombinations: [], industries: [{name: "Hotel & Real Estates"}], contacts: [{
-        photo: "", firstName: "Sam", surname: "Nolan", email: "sam@ddd.com", gender: "Male", position: "Manager", phone: 12345678, skype: "samNol", country: "Australia", timezone: "(UTC+10:00) Canberra, Melbourne, Sydney", leadContact: true, notes: ""}]
+        photo: "", firstName: "Sam", surname: "Nolan", email: "sam@ddd.com", gender: "Male", position: "Manager", phone: 12345678, skype: "samNol", country: "Australia", timezone: "(UTC+10:00) Canberra, Melbourne, Sydney", leadContact: true, notes: "", password:"$2a$10$HRZ.Ba0HGe.cIZ8iJN5o4efPszCR5O.nq/evyLxkSVj/Pd8lTIryi"}]
     },
     {name: "EEE-default", website: "www.eee.com", status: "Active", contract: "", nda: "", accountManager: "angela.st", salesManager: "eirini.loi", projectManager: "illy.dim", leadSource: "Internet", salesComission: "Passed threshold", officialName: "EEE LTD", contactName: "Mark Brenson", email: "eee@eee.com", vat: "", address: "Old Street, Warsaw, Poland", languageCombinations: [], industries: [{name: "Legal"}], contacts: [{
-        photo: "", firstName: "Ella", surname: "Johns", email: "el@eee.com", gender: "Female", position: "Manager", phone: 12345678, skype: "el-jo", country: "Bahamas", timezone: "(UTC-04:00) Georgetown, La Paz, Manaus, San Juan", leadContact: true, notes: ""}]
+        photo: "", firstName: "Ella", surname: "Johns", email: "el@eee.com", gender: "Female", position: "Manager", phone: 12345678, skype: "el-jo", country: "Bahamas", timezone: "(UTC-04:00) Georgetown, La Paz, Manaus, San Juan", leadContact: true, notes: "",password:"$2a$10$HRZ.Ba0HGe.cIZ8iJN5o4efPszCR5O.nq/evyLxkSVj/Pd8lTIryi"}]
     },
     {name: "FFF-default", website: "www.fff.com", status: "Inactive", contract: "", nda: "", accountManager: "aran.s", salesManager: "eirini.loi", projectManager: "alexia.m", leadSource: "Friend", salesComission: "Passed threshold", officialName: "FFF LTD", contactName: "Bruce Lee", email: "fff@fff.com", vat: "", address: "32 Ave, Seattle WA, USA", languageCombinations: [], industries: [{name: "CFDs & Online Trading"}], contacts: [{
-        photo: "", firstName: "Chen", surname: "Dong", email: "chen@fff.com", gender: "Male", position: "Manager", phone: 12345678, skype: "dong", country: "United States of America", timezone: "(UTC-06:00) Central America", leadContact: true, notes: ""}]
+        photo: "", firstName: "Chen", surname: "Dong", email: "chen@fff.com", gender: "Male", position: "Manager", phone: 12345678, skype: "dong", country: "United States of America", timezone: "(UTC-06:00) Central America", leadContact: true, notes: "",password:"$2a$10$HRZ.Ba0HGe.cIZ8iJN5o4efPszCR5O.nq/evyLxkSVj/Pd8lTIryi"}]
     }
 ];
 

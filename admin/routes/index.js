@@ -28,7 +28,7 @@ router.use('/xtm', xtmRouter);
 router.use('/zoho', zohoRouter);
 router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
-router.use('/vendors/application', vendorApplicationRouter)
+router.use('/vendors/application', vendorApplicationRouter);
 router.use('/projectsapi', projectsRouter);
 
 module.exports = router;

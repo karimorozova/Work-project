@@ -1,36 +1,40 @@
 const { ClientApi, HomeApi } = require('../models/xtrf');
-const { getClients } = require('../clients');
+const { getClient } = require('../clients');
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
+const { Clients } = require('../models');
+const { secretKey } = require('../configs');
+const jwt = require("jsonwebtoken");
 
 router.get('/', (req, res) => {
     res.send("portal");
 });
 
-router.post('/auth', async (req, res, next) => {
-    try{ 
-        if (req.body.logemail && req.body.logpassword) {
-            if(req.body.logemail === "admin" && req.body.logpassword === "12345");
-            const jsessionId = Math.random(100) + (12345 * 12345);
-            // var jsessionId = await (ClientApi.authUser(req.body.logemail, req.body.logpassword));
-            // var customer = new ClientApi("",jsessionId);
-            // var userInfo = await (customer.userInfo());
-            // var userdata = await (customer.getName());
-            // res.statusCode = 200;
-            // req.session.name = userdata.data.name;
-            // req.session.jsessionId = jsessionId; 
-            res.send({ jsessionId });
-        } else {
-            let err = new Error('All fields required.');
-            err.status = 400;
-            return next(err);
+router.post("/auth", async (req, res, next) => {
+  if (req.body.logemail) {
+    Clients.authenticate(req.body.logemail, req.body.logpassword, async (error, data) => {
+      if (error || !data) {
+        let err = new Error('Wrong email or password.');
+        err.status = 401;
+        res.status(401).send("Wrong email or password.");
+      } else {
+        try {
+          const jsession = await jwt.sign({clientId: data.client._id, contactEmail: data.contact.email}, secretKey, { expiresIn: '2h'});
+          res.statusCode = 200;
+          res.send({ jsession });
+        } catch(err) {
+          console.log(err);
+          res.status(500).send("Server Error. Try again later.");
         }
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on authorisation');            
-    }
+      }
+    });
+  } else {
+    let err = new Error('All fields required.');
+    err.status = 400;
+    res.status(400).send("All fields required.");
+  }
 });
 
 router.get('/language-combinations', async (req, res) => {
@@ -44,7 +48,7 @@ router.get('/language-combinations', async (req, res) => {
         console.log(err);
         res.status(500).send('Error on getting language combinations');
     }
-})
+});
 
 router.get('/customer-info', async (req, res) => {
     try {
@@ -54,13 +58,14 @@ router.get('/customer-info', async (req, res) => {
         console.log(err);
         res.status(500).send('Error on getting customer info');
     }
-})
+});
 
 router.get('/clientinfo', async (req, res) => {
     try {
-        const clients = await getClients();
-        const client = clients[0];
-        const user = client.contacts[0];
+        const { token } = req.query;
+        const verificationResult = jwt.verify(token, secretKey);
+        const client = await getClient({"_id": verificationResult.clientId});
+        const user = client.contacts.find((contact)=>contact.email === verificationResult.contactEmail);
         res.send({client, user});
     } catch(err) {
         console.log(err);
@@ -80,10 +85,10 @@ router.get('/projectFiles', async (request, res) => {
     try {
         let wstream = fs.createWriteStream(`./dist/project${request.query.projectId}.zip`);
         let req = await https.request(options, (resp) => {
-            
+
             resp.pipe(wstream);
         });
-        req.end(); 
+        req.end();
         wstream.on('finish', () => {
             res.send('File created!')
         })
@@ -91,11 +96,11 @@ router.get('/projectFiles', async (request, res) => {
         console.log(err);
         res.status(500).send('Error on getting project files');
     }
-})
+});
 
 router.get('/downloadProject', (req, res) => {
     res.send(`https://admin.pangea.global/project${req.query.projectId}.zip`);
-})
+});
 
 router.get('/deleteZip', (req, res) => {
     let fileName = 'project';
@@ -107,13 +112,13 @@ router.get('/deleteZip', (req, res) => {
         }
         setTimeout(() => {
             fs.unlink(`./dist/${fileName}${fileId}.zip`, (err) => console.log(err));
-        }, 6000)
+        }, 6000);
         res.send('Deleted');
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on deleting file');        
+        res.status(500).send('Error on deleting file');
     }
-})
+});
 
 router.get('/taskFiles', async (request, res) => {
     let options = {
@@ -129,20 +134,20 @@ router.get('/taskFiles', async (request, res) => {
         let req = await https.request(options, (resp) => {
             resp.pipe(wstream);
         });
-            
-        req.end(); 
+
+        req.end();
         wstream.on('finish', () => {
             res.send('File created!')
         })
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on getting task files');        
+        res.status(500).send('Error on getting task files');
     }
-})
+});
 
 router.get('/downloadTask', (req, res) => {
     res.send(`https://admin.pangea.global/task${req.query.taskId}.zip`);
-})
+});
 
 router.get('/job',async (req, res) => {
     const id = req.query.projectId;
@@ -151,7 +156,7 @@ router.get('/job',async (req, res) => {
     res.send({jobById});
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on getting job information');        
+        res.status(500).send('Error on getting job information');
     }
 });
 
@@ -162,7 +167,7 @@ router.get('/tasksInfo', async (req,res) => {
         res.send({tasksOfQuote});
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on getting task information'); 
+        res.status(500).send('Error on getting task information');
     }
 });
 
@@ -174,7 +179,7 @@ router.get('/approve', async (req, res) => {
         res.send("approved");
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on approving'); 
+        res.status(500).send('Error on approving');
     }
 });
 
@@ -186,7 +191,7 @@ router.get('/reject', async (req, res) => {
         res.send("rejected");
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on rejecting'); 
+        res.status(500).send('Error on rejecting');
     }
 });
 
