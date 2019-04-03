@@ -169,6 +169,7 @@
         console.log('thank you triggered!!', data);
         this.clientRequestShow = false;
         this.thanksService = data;
+        this.$router.push('/confirm-order');
       },
       getCookie() {
         if (this.jsess) {

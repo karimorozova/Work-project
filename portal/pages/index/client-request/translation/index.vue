@@ -112,7 +112,7 @@
           label LANGUAGE:
           p(v-if='serviceSelect.source') Source:
             span.choice &nbsp; {{ sourceSelect.name }}
-              template(v-if="true") &nbsp;Select
+              template(v-if="!sourceSelect.name") &nbsp;Select
           p Target:
             span.choice &nbsp;
               template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.name }};
@@ -256,7 +256,7 @@
         this.infoSlide = !this.infoSlide
       },
       changeDetailFiles(event) {
-        for(var i = 0; i < event.target.files.length; i++){
+        for(let i = 0; i < event.target.files.length; i++){
           this.detailFiles.push(event.target.files[i]);
         }
       },
@@ -358,16 +358,16 @@
         })
       },
       async sendForm() {
-        var serviceFull;
+        let serviceFull;
         for(let i = 0; i < this.services.length; i++) {
           if(this.request.service == this.services[i].title)
             serviceFull = this.services[i];
         }
-        var typeOfRequest = "quote";
+        let typeOfRequest = "quote";
         if (this.startOption) {
           typeOfRequest = "project";
         }
-        var sendForm = new FormData();
+        let sendForm = new FormData();
 
         sendForm.append("typeOfRequest", typeOfRequest);
         sendForm.append("projectName", this.request.projectName);
@@ -388,12 +388,12 @@
         sendForm.append("createdAt", this.request.createdAt);
         sendForm.append("dateFormatted", moment(this.request.createdAt).format('YYYY MM DD'));
         sendForm.append("jsession", this.$store.state.session);
-        for(var i = 0; i < this.detailFiles.length; i++){
+        for(let i = 0; i < this.detailFiles.length; i++){
           console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
         }
         sendForm.append("refFiles", this.refFiles, this.refFiles.name);
-        /*`for(var i = 0; i < this.refFiles.length; i++){
+        /*`for(let i = 0; i < this.refFiles.length; i++){
           console.log(this.refFiles[i]);
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
@@ -410,7 +410,7 @@
         ////////////////////////////////////
 
         const result = await this.$axios.$post('/xtm/request', sendForm);
-        console.log(result);
+        // console.log(result);
         this.xtmProjects = result;
         this.clearForm();
       },
@@ -451,14 +451,14 @@
 
         if(!this.errors.length){
           this.sendForm();
-          console.log("sent")
-          var requestType = "QUOTE";
+          console.log("sent");
+          let requestType = "QUOTE";
           if(!this.sendOption) requestType = "PROJECT";
           this.$store.dispatch('loadOrderDetails', this.request);
           this.$store.dispatch('files', this.detailFiles);
           this.$store.dispatch('referFiles', this.refFiles);
           this.$store.dispatch('requestType', requestType);
-          this.$emit('thankYou', this.request.service);
+          this.$emit('thankYou', 'Translation');
           // window.top.location.href = "https://www.pangea.global/thank-you";
         } else {
           this.showError();
@@ -468,6 +468,7 @@
       async getLanguages() {
         let result = await this.$axios.$get('/api/languages');
         this.languages = result;
+        // console.log('get languages: ', this.languages);
       },
     },
     computed: {
@@ -475,7 +476,11 @@
         let result = [];
         if(this.clientLanguages.length) {
           for(let i = 0; i < this.clientLanguages.length; i++) {
-            result.push({name: this.clientLanguages[i].source.lang, lang: this.clientLanguages[i].source.lang, symbol: this.clientLanguages[i].source.symbol, id: this.clientLanguages[i].source.id, xtrf: this.clientLanguages[i].source.id, check: false})
+            // console.log('i: ',i, 'source: ',this.clientLanguages[i].source);
+            if (this.clientLanguages[i].source) {
+              result.push({name: this.clientLanguages[i].source.lang, lang: this.clientLanguages[i].source.lang, symbol: this.clientLanguages[i].source.symbol, id: this.clientLanguages[i].source.id, xtrf: this.clientLanguages[i].source.id, check: false})
+            }
+
           }
         }
         result = result.filter((obj, pos, arr) => {
@@ -502,9 +507,14 @@
         let result = [];
         if(this.clientLanguages.length) {
           for(let i = 0; i < this.clientLanguages.length; i++) {
-            if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
-              result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+            if (this.clientLanguages[i].source) {
+              if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
+                result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+              }
             }
+            // if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
+            //   result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+            // }
           }
         }
         result = result.filter((obj, pos, arr) => {
@@ -559,7 +569,8 @@
       this.getServices();
       this.getClientLanguages();
       this.getLanguages();
-
+      // console.log('this.$store.state.services : ',this.$store.state.services);
+      // console.log('this.$store.state.clientLanguages : ',this.$store.state.clientLanguages);
     }
   }
 
