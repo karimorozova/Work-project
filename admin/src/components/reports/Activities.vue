@@ -1,6 +1,13 @@
 <template lang="pug">
     .activities
         .activities__title Chosen range Avg: {{ rangeAverages.percent }}% {{ rangeAverages.grade }}
+        .activities__bars
+            Charts(
+                :leads="rangeAverages.leads"
+                :calls="rangeAverages.calls"
+                :communications="rangeAverages.communications"
+                :meetings="rangeAverages.meetings"
+            )
         .activities__date-range
             DateRange(@getFilteredReports="getFilteredReports")
         .activities__table
@@ -38,6 +45,7 @@
 <script>
 import DataTable from "../DataTable";
 import DateRange from "./DateRange";
+import Charts from "./charts/Charts"
 import Button from "../Button";
 import moment from "moment";
 import { mapActions } from "vuex";
@@ -138,7 +146,15 @@ export default {
             if(this.tableData.length) {
                 for(let row of this.tableData) {
                     result.percent += +row.percent;
+                    result.leads += +row.leads;
+                    result.calls += +row.calls;
+                    result.communications += +row.communications;
+                    result.meetings += +row.meetings;
                 }
+                result.leads = Math.round(result.leads/this.tableData.length);
+                result.calls = Math.round(result.calls/this.tableData.length);
+                result.communications = Math.round(result.communications/this.tableData.length);
+                result.meetings = Math.round(result.meetings/this.tableData.length); 
                 result.percent = Math.round(result.percent /this.tableData.length);
                 result.grade = this.gradeLetter(result.percent);
             }
@@ -148,7 +164,8 @@ export default {
     components: {
         DataTable,
         Button,
-        DateRange
+        DateRange,
+        Charts
     },
     mounted() {
         this.getZohoCrmData();
@@ -164,6 +181,9 @@ export default {
     &__title {
         font-size: 21px;
         font-weight: 700;
+        margin-bottom: 40px;
+    }
+    &__bars {
         margin-bottom: 40px;
     }
     &__table {
