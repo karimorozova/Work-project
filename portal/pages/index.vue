@@ -54,20 +54,17 @@
           span.arrows(v-if="clientRequestShow") >>
           span(v-if="clientRequestShow") {{ serviceType }}
         <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
-        Confirmorder(v-if="thanks" :thanksService="thanksService")
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
+        <!--Confirmorder(v-if="thanks" :thanksService="thanksService")-->
+        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 
 <script>
-  import Clientrequest from "../components/Clientrequest";
   import ClickOutside from "vue-click-outside";
-  import Confirmorder from "../components/Confirmorder";
   import {mapActions} from "vuex";
 
   export default {
     data() {
       return {
-        thanks: false,
         companyName: "",
         clientPortal: "CLIENT PORTAL",
         navbarList: [
@@ -104,12 +101,6 @@
         openProjects: true,
         expander: false,
         accountMenuVisible: false,
-        accountInfo: false,
-        detailedInfoVisible: false,
-        detailedProjectVisible: false,
-        allProjectsShow: false,
-        invoicesShow: false,
-        documentsShow: false,
         cookies: false,
         client: "",
         user: {},
@@ -174,8 +165,8 @@
     },
     methods: {
       thankYou(data) {
+        console.log('thank you triggered!!', data);
         this.clientRequestShow = false;
-        this.thanks = true;
         this.thanksService = data;
       },
       getCookie() {
@@ -210,7 +201,7 @@
         this.projects = [];
         this.quotes = [];
         this.languageCombinations = this.client.languageCombinations;
-        this.$store.dispatch('loadLangs', this.languageCombinations);
+        this.loadLangs(this.languageCombinations);
       },
 
 
@@ -224,16 +215,8 @@
         this.accountMenuVisible = !this.accountMenuVisible;
       },
       showAccountInfo() {
-        // this.accountInfo = true;
         this.accountMenuVisible = !this.accountMenuVisible;
-
-        // this.allProjectsShow = false;
-        // this.detailedInfoVisible = false;
-        // this.detailedProjectVisible = false;
-        // this.clientRequestShow = false;
-        // this.documentsShow = false;
-        // this.invoicesShow = false;
-        // this.thanks = false;
+        this.clientRequestShow = false;
         this.navbarList.forEach(item => {
           item.active = false;
         });
@@ -248,25 +231,18 @@
             name: this.user.firstName,
             email: this.user.email,
             companyName: this.client.name,
-            www: "test.com",
+            www: this.client.website,
             phone: this.user.phone,
-            skype: "",
+            skype: this.user.skype,
             service: this.newProject[ind].title,
             industry: this.client.industries[0].name
           };
-          this.$store.dispatch('requestInfo', formData);
-          this.$store.dispatch('loadLangs', this.languageCombinations);
-          this.$store.dispatch('jsession', this.jsess);
+          this.requestInfo(formData);
+          this.loadLangs(this.languageCombinations);
+          this.jsession(this.jsess);
 
           this.clientRequestShow = true;
-          // this.accountInfo = false;
-          // this.allProjectsShow = false;
-          // this.detailedInfoVisible = false;
-          // this.detailedProjectVisible = false;
-          // this.documentsShow = false;
-          // this.invoicesShow = false;
           this.dropdownVisible = false;
-          this.thanks = false;
         }
         this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
@@ -284,20 +260,21 @@
         result.sort((a, b) => {
           return a.sortIndex - b.sortIndex
         });
-        this.$store.dispatch('servicesGetting', result);
+        this.servicesGetting(result)
       },
       ...mapActions({
         logout: "logout",
+        requestInfo: "requestInfo",
+        loadLangs:"loadLangs",
+        jsession: "jsession",
+        servicesGetting: "servicesGetting"
+
       })
     },
     mounted() {
       this.getCookie();
       this.clientInfo();
       this.getServices();
-    },
-    components: {
-      Clientrequest,
-      Confirmorder
     },
     directives: {
       ClickOutside
@@ -610,7 +587,6 @@
           margin-bottom: 6px;
           height: 16px;
           width: 16px;
-          /*margin-right: 123px;*/
           cursor: pointer;
           transform: rotate(180deg);
           @media screen and (max-width: 1450px) {
@@ -722,7 +698,7 @@
         width: 27px;
         height: 38px;
         top: 0;
-        right: 0px;
+        right: 0;
         text-align: center;
         cursor: pointer;
         z-index: 1;

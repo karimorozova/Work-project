@@ -65,7 +65,6 @@
 
 <script>
   import axios from "axios";
-  import querystring from "querystring";
   import Datepicker from "~/components/Datepicker.vue";
   import moment from "moment";
   import Multiselect from "vue-multiselect";

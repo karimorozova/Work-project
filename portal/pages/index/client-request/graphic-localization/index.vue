@@ -132,9 +132,6 @@
   import ClickOutside from 'vue-click-outside';
   import Datepicker from '~/components/Datepicker.vue';
   import { Drag, Drop } from 'vue-drag-drop';
-  // import Marketing from './requests/Marketing.vue';
-  // import Copywriting from './requests/Copywriting.vue';
-  // import Proofing from './requests/Proofing.vue';
 
   export default {
     name: 'client-form',
