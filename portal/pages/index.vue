@@ -50,8 +50,8 @@
         .breadCrumbs
           span.accountName {{ user.firstName }}
           span.arrows(v-if="user.firstName") >>
-          span {{ path }}
-          span.arrows(v-if="clientRequestShow") >>
+          span {{ breadCrumb1.toUpperCase() }}
+          span.arrows(v-if="breadCrumb2") >>
           span(v-if="clientRequestShow") {{ serviceType }}
         <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
         <!--Confirmorder(v-if="thanks" :thanksService="thanksService")-->
@@ -158,9 +158,10 @@
         ],
         dropdownVisible: false,
         clientRequestShow: false,
-        path: 'Open Quotes',
         serviceType: "",
-        thanksService: ""
+        thanksService: "",
+        breadCrumb1: "",
+        breadCrumb2: ""
       };
     },
     methods: {
@@ -244,7 +245,6 @@
           this.clientRequestShow = true;
           this.dropdownVisible = false;
         }
-        this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach((item, i) => {
           if (i === 0) {
@@ -265,16 +265,29 @@
       ...mapActions({
         logout: "logout",
         requestInfo: "requestInfo",
-        loadLangs:"loadLangs",
+        loadLangs: "loadLangs",
         jsession: "jsession",
         servicesGetting: "servicesGetting"
 
       })
     },
+    watch: {
+      '$route'(to, from) {
+        this.breadCrumb1 = to.path.split('/')[1];
+        this.breadCrumb2 = to.path.split('/')[2];
+        if (!this.breadCrumb2) {
+          this.clientRequestShow = false;
+        } else if (this.breadCrumb1 === 'client-request') {
+          this.breadCrumb1 = 'New Project'
+        }
+      }
+    },
     mounted() {
       this.getCookie();
       this.clientInfo();
       this.getServices();
+      this.breadCrumb1 = this.$route.path.split('/')[1];
+      this.breadCrumb2 = this.$route.path.split('/')[2];
     },
     directives: {
       ClickOutside
