@@ -12,7 +12,7 @@
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
             .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
-              .additional__listItem(target="_newtab" v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+              .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .womanWrapper
           img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
           .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
@@ -50,24 +50,21 @@
         .breadCrumbs
           span.accountName {{ user.firstName }}
           span.arrows(v-if="user.firstName") >>
-          span {{ path }}
-          span.arrows(v-if="clientRequestShow") >>
+          span {{ breadCrumb1.toUpperCase() }}
+          span.arrows(v-if="breadCrumb2") >>
           span(v-if="clientRequestShow") {{ serviceType }}
-        Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")
-        Confirmorder(v-if="thanks" :thanksService="thanksService")
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote")
+        <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
+        <!--Confirmorder(v-if="thanks" :thanksService="thanksService")-->
+        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 
 <script>
-  import Clientrequest from "../components/Clientrequest";
   import ClickOutside from "vue-click-outside";
-  import Confirmorder from "../components/Confirmorder";
   import {mapActions} from "vuex";
 
   export default {
     data() {
       return {
-        thanks: false,
         companyName: "",
         clientPortal: "CLIENT PORTAL",
         navbarList: [
@@ -104,12 +101,6 @@
         openProjects: true,
         expander: false,
         accountMenuVisible: false,
-        accountInfo: false,
-        detailedInfoVisible: false,
-        detailedProjectVisible: false,
-        allProjectsShow: false,
-        invoicesShow: false,
-        documentsShow: false,
         cookies: false,
         client: "",
         user: {},
@@ -159,23 +150,24 @@
         quoteIndex: 0,
         projectIndex: 0,
         newProject: [
-          {title: "Translation"},
-          {title: "Copywriting"},
-          {title: "Marketing"},
-          {title: "Proofing/QA"},
-          {title: "Graphic Localization"}
+          {title: "Translation", path: "/translation"},
+          {title: "Copywriting", path: "/copywriting"},
+          {title: "Marketing", path: "/marketing"},
+          {title: "Proofing/QA", path: "/proofing"},
+          {title: "Graphic Localization", path: "/graphic-localization"}
         ],
         dropdownVisible: false,
         clientRequestShow: false,
-        path: 'Open Quotes',
         serviceType: "",
-        thanksService: ""
+        thanksService: "",
+        breadCrumb1: "",
+        breadCrumb2: ""
       };
     },
     methods: {
       thankYou(data) {
+        console.log('thank you triggered!!', data);
         this.clientRequestShow = false;
-        this.thanks = true;
         this.thanksService = data;
       },
       getCookie() {
@@ -210,7 +202,7 @@
         this.projects = [];
         this.quotes = [];
         this.languageCombinations = this.client.languageCombinations;
-        this.$store.dispatch('loadLangs', this.languageCombinations);
+        this.loadLangs(this.languageCombinations);
       },
 
 
@@ -224,17 +216,8 @@
         this.accountMenuVisible = !this.accountMenuVisible;
       },
       showAccountInfo() {
-        console.log('show account info: ',this.accountMenuVisible);
-        // this.accountInfo = true;
         this.accountMenuVisible = !this.accountMenuVisible;
-
-        // this.allProjectsShow = false;
-        // this.detailedInfoVisible = false;
-        // this.detailedProjectVisible = false;
-        // this.clientRequestShow = false;
-        // this.documentsShow = false;
-        // this.invoicesShow = false;
-        // this.thanks = false;
+        this.clientRequestShow = false;
         this.navbarList.forEach(item => {
           item.active = false;
         });
@@ -249,51 +232,62 @@
             name: this.user.firstName,
             email: this.user.email,
             companyName: this.client.name,
-            www: "test.com",
+            www: this.client.website,
             phone: this.user.phone,
-            skype: "",
+            skype: this.user.skype,
             service: this.newProject[ind].title,
             industry: this.client.industries[0].name
           };
-          this.$store.dispatch('requestInfo', formData);
-          this.$store.dispatch('loadLangs', this.languageCombinations);
-          this.$store.dispatch('jsession', this.jsess);
+          this.requestInfo(formData);
+          this.loadLangs(this.languageCombinations);
+          this.jsession(this.jsess);
+
           this.clientRequestShow = true;
-          this.accountInfo = false;
-          this.allProjectsShow = false;
-          this.detailedInfoVisible = false;
-          this.detailedProjectVisible = false;
-          this.documentsShow = false;
-          this.invoicesShow = false;
           this.dropdownVisible = false;
-          this.thanks = false;
         }
-        this.path = "New Project";
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach((item, i) => {
-          if (i === 0) item.active = true;
-          else item.active = false;
-        })
+          if (i === 0) {
+            item.active = true;
+          } else {
+            item.active = false;
+          }
+        });
+        this.$router.push(`/client-request${this.newProject[ind].path}`);
       },
       async getServices() {
         const result = await this.$axios.$get('api/services');
         result.sort((a, b) => {
           return a.sortIndex - b.sortIndex
         });
-        this.$store.dispatch('servicesGetting', result);
+        this.servicesGetting(result)
       },
       ...mapActions({
         logout: "logout",
+        requestInfo: "requestInfo",
+        loadLangs: "loadLangs",
+        jsession: "jsession",
+        servicesGetting: "servicesGetting"
+
       })
+    },
+    watch: {
+      '$route'(to, from) {
+        this.breadCrumb1 = to.path.split('/')[1];
+        this.breadCrumb2 = to.path.split('/')[2];
+        if (!this.breadCrumb2) {
+          this.clientRequestShow = false;
+        } else if (this.breadCrumb1 === 'client-request') {
+          this.breadCrumb1 = 'New Project'
+        }
+      }
     },
     mounted() {
       this.getCookie();
       this.clientInfo();
       this.getServices();
-    },
-    components: {
-      Clientrequest,
-      Confirmorder
+      this.breadCrumb1 = this.$route.path.split('/')[1];
+      this.breadCrumb2 = this.$route.path.split('/')[2];
     },
     directives: {
       ClickOutside
@@ -606,7 +600,6 @@
           margin-bottom: 6px;
           height: 16px;
           width: 16px;
-          /*margin-right: 123px;*/
           cursor: pointer;
           transform: rotate(180deg);
           @media screen and (max-width: 1450px) {
@@ -718,7 +711,7 @@
         width: 27px;
         height: 38px;
         top: 0;
-        right: 0px;
+        right: 0;
         text-align: center;
         cursor: pointer;
         z-index: 1;

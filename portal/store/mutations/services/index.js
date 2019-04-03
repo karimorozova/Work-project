@@ -1,8 +1,8 @@
-export const details = (state, payload) => {
+export const DETAILS = (state, payload) => {
   state.orderDetails = payload
 };
 
-export const detfilesToDetails = (state, payload) => {
+export const DETFILES_TO_DETAILS = (state, payload) => {
   if (payload.length) {
     state.orderDetails.detailFiles = [];
     for (let i = 0; i < payload.length; i++) {
@@ -11,27 +11,27 @@ export const detfilesToDetails = (state, payload) => {
   }
 };
 
-export const reffilesToDetails = (state, payload) => {
+export const REFFILES_TO_DATAILS = (state, payload) => {
   if (payload) {
     state.orderDetails.refFiles = payload.name;
   }
 };
 
-export const orderType = (state, payload) => {
+export const ORDER_TYPE = (state, payload) => {
   state.orderDetails.requestType = payload;
 };
 
-export const langs = (state, payload) => {
+export const LANGS = (state, payload) => {
   state.clientLanguages = payload
 };
 
-export const clientForRequest = (state, payload) => {
+export const CLIENT_FOR_REQUEST = (state, payload) => {
   state.clientInfo = payload
 };
-export const servicesFill = (state, payload) => {
+export const SERVICES_FILL = (state, payload) => {
   state.services = payload
 };
 
-export const sesCook = (state, payload) => {
+export const SES_COOK = (state, payload) => {
   state.session = payload
 };
