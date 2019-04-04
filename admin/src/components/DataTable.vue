@@ -155,6 +155,9 @@ export default {
 .reports__table, .all-projects {
     max-height: 600px;
 }
+.reports__table {
+    margin-bottom: 0;
+}
 .vendors-table_scroll-y {
     overflow-y: auto;
     padding: 0;

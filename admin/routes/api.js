@@ -372,10 +372,11 @@ router.get('/fill-reports', async (req, res) => {
 })
 
 router.get('/zoho-reports', async (req, res) => {
+  const { from, to } = req.query;
   try {
-    const currentDate = new Date();
-    var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const result = await ZohoReport.find({date: {$gte: firstDay}})
+    const fromDate = from ? new Date(from): new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const toDate = to ? new Date(to) : new Date();
+    const result = await ZohoReport.find({date: {$gte: fromDate, $lte: toDate}})
             .populate('user', 'firstName lastName')
             .sort({date: 1});
     res.send(result);
