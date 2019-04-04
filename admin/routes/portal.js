@@ -4,7 +4,7 @@ const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
-const { Clients } = require('../models');
+const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
 const jwt = require("jsonwebtoken");
 
@@ -194,5 +194,28 @@ router.get('/reject', async (req, res) => {
         res.status(500).send('Error on rejecting');
     }
 });
+
+router.post('/request', async (req, res) => {
+  console.log('req:', req.body);
+  // let project = {...req.body};
+  // project.projectManager = req.session.userId;
+  // let todayStart = new Date();
+  // todayStart.setUTCHours(0,0,0,0);
+  // let todayEnd = new Date(todayStart);
+  // todayEnd.setUTCHours(23,59,59,0);
+  // try {
+  //   const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
+  //   const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
+  //   project.status = "Requested";
+  //   project.projectId = req.body.dateFormatted + ' ' + nextNumber;
+  //   const newProject = await Projects.create(project);
+  //   const result = await getProject({"_id": newProject.id});
+  //   res.send(result);
+  // } catch(err) {
+  //   console.log(err);
+  //   res.status(500).send('Error on creating a project!');
+  // }
+});
+
 
 module.exports = router;
