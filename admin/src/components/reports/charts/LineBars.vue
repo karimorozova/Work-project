@@ -30,9 +30,11 @@ export default {
 
 .bars {
     width: 380px;
+    max-height: 250px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
+    padding: 40px 0;
     &__item {
         margin-bottom: 40px;
         &:last-child {

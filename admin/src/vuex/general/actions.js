@@ -95,6 +95,18 @@ export const updateMatrix = async ({ commit }, payload) => {
   }
 }
 
+export const updateReport = async ({ commit }, payload) => {
+  commit('startRequest');
+  try {
+    const { id, notes } = payload;
+    await Vue.http.post('/api/report', { id, notes });
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.message);
+  }
+}
+
 export const sendClientQuote = async ({commit, state}, payload) => {
   commit('startRequest');
   try { 

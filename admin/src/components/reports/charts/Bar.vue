@@ -37,6 +37,7 @@ export default {
         background-color: $orange;
         height: 100%;
         position: relative;
+        transition: all 1s;
         &::before {
             content: "";
             position: absolute;

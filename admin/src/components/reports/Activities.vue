@@ -3,10 +3,14 @@
         .activities__title Chosen range Avg: {{ rangeAverages.percent }}% {{ rangeAverages.grade }}
         .activities__bars
             Charts(
-                :leads="rangeAverages.leads"
-                :calls="rangeAverages.calls"
-                :communications="rangeAverages.communications"
-                :meetings="rangeAverages.meetings"
+                :rangeLeads="rangeAverages.leads"
+                :rangeCalls="rangeAverages.calls"
+                :rangeCommunications="rangeAverages.communications"
+                :rangeMeetings="rangeAverages.meetings"
+                :todaysLeads="todaysData.leads"
+                :todaysCalls="todaysData.calls"
+                :todaysCommunications="todaysData.communications"
+                :todaysMeetings="todaysData.meetings"
             )
         .activities__date-range
             DateRange(@getFilteredReports="getFilteredReports")
@@ -26,6 +30,7 @@
                 span.activities__header(slot="headerMeeting" slot-scope="{ field }") Meeting Setup
                     span.activities__standard {{ standard.meetings }}
                 span.activities__header.activities_flex-end(slot="headerNotes" slot-scope="{ field }") Notes
+                span.activities__header(slot="headerEdit" slot-scope="{ field }")
                 .activities__data.activities_space-around(slot="date" slot-scope="{ row }") 
                     span.activities__data-item {{ formattedDate(row.date) }}
                     span.activities__data-item.activities_orange {{ row.grade }}
@@ -34,12 +39,17 @@
                 .activities__data(slot="leads" slot-scope="{ row }") {{ row.leads}}
                 .activities__data(slot="calls" slot-scope="{ row }") {{ row.calls }}
                 .activities__data(slot="comm" slot-scope="{ row }") {{ row.communications }}
-                .activities__data(slot="meeting" slot-scope="{ row }") {{ row.meetings }}
-                .activities__data(slot="notes" slot-scope="{ row }") {{ row.notes }}
+                .activities__data(slot="meeting" slot-scope="{ row, index }") {{ row.meetings }}
+                .activities__data(slot="notes" slot-scope="{ row, index }")
+                    .activities__notes(v-if="currentActive !== index") {{ row.notes }}
+                    input.activities__text(v-else type="text" v-model="currentNote")
+                .activities__icons(slot="edit" slot-scope="{ row, index }")
+                    img.activities__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'activities_opacity-1': isActive(key, index)}")
         .activities__tokens
             .activities__item
                 .activities__button
                     Button(v-if="isTokenExpired" value="Generate tokens" @clicked="generateTokens")
+                    Button(v-else value="Get latest data" @clicked="getZohoCrmData")
 </template>
 
 <script>
@@ -54,14 +64,16 @@ export default {
     data() {
         return {
             fields: [
-                {label: "", headerKey: "headerDate", key: "date", width: "22%", padding: "0"},
-                {label: "", headerKey: "headerLeads", key: "leads", width: "13%", padding: "0"},
-                {label: "", headerKey: "headerCalls", key: "calls", width: "13%", padding: "0"},
-                {label: "", headerKey: "headerComm", key: "comm", width: "13%", padding: "0"},
-                {label: "", headerKey: "headerMeeting", key: "meeting", width: "13%", padding: "0"},
-                {label: "", headerKey: "headerNotes", key: "notes", width: "26%", padding: "0"}
+                {label: "", headerKey: "headerDate", key: "date", width: "18%", padding: "0"},
+                {label: "", headerKey: "headerLeads", key: "leads", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerCalls", key: "calls", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerComm", key: "comm", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerMeeting", key: "meeting", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerNotes", key: "notes", width: "24%", padding: "0"},
+                {label: "", headerKey: "headerEdit", key: "edit", width: "10%", padding: "0"}
             ],
             tableData: [],
+            todaysData: {leads: 0, calls: 0, communications: 0, meetings: 0},
             today: new Date(),
             standard: {leads: 30, calls: 30, communications: 50, meetings: 1},
             code: "",
@@ -78,13 +90,57 @@ export default {
                 "A": {min: 93, max: 96},
                 "A+": {min: 97, max: 100}
             },
-            isTokenExpired: false
+            isTokenExpired: false,
+            currentActive: -1,
+            currentNote: "",
+            icons: {
+                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
+                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
+                cancel: {icon: require("../../assets/images/cancel-icon.png")},
+            },
         }
     },
     methods: {
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            updateReport: "updateReport"
         }),
+        isActive(key, index) {
+            if(this.currentActive === index) {
+                return key !== "edit";
+            }
+            if(this.currentActive !== index) {
+                return key !== "save" && key !== "cancel";
+            }
+        },
+        async makeAction(index, key) {
+            if(this.currentActive !== -1 && this.currentActive !== index) return;
+            if(key === 'edit') {
+                this.currentActive = index;
+                this.currentNote = this.tableData[index].notes;
+            }
+            if(key === 'cancel') {
+                this.setDefault()
+            }
+            if(key === 'save') {
+                await this.saveChanges(index);
+            }
+        },
+        async saveChanges(index) {
+            const report = this.tableData[index];
+            try {
+                await this.updateReport({id: report._id, notes: this.currentNote});
+                await this.getReports(this.reportRefreshDates.from, this.reportRefreshDates.to);
+            } catch(err) {
+                this.alertToggle({message: err.data, isShow: true, type: "error"})
+            } finally {
+                this.setDefault();
+            }
+        },
+        setDefault() {
+            this.currentNote = "";
+            this.currentActive = -1;
+        },
         async getFilteredReports({fromDate, toDate}) {
             try {
                 await this.getReports(fromDate, toDate);
@@ -93,9 +149,14 @@ export default {
             }
         },
         async getReports(fromDate, toDate) {
+            const from = fromDate ? fromDate : this.reportRefreshDates.from;
+            const to = toDate ? toDate : this.reportRefreshDates.to;
             try {
-                const result = await this.$http.get(`/api/zoho-reports?from=${fromDate}&to=${toDate}`);
+                const result = await this.$http.get(`/api/zoho-reports?from=${from}&to=${to}`);
                 this.tableData = result.data;
+                const currentDate = moment(this.today).hours(0);
+                const lastDayData = this.tableData.find(item => new Date(item.date) >= currentDate);
+                this.todaysData = lastDayData ? lastDayData : this.todaysData;
             } catch(err) {
                 this.alertToggle({message: err.data, isShow: true, type: "error"});
             }
@@ -118,7 +179,7 @@ export default {
                 if (err.status === 401) this.isTokenExpired = true;
                 this.alertToggle({message: err.data, isShow: true, type: "error"});
             } finally {
-                await this.getReports("", "");
+                await this.getReports(this.reportRefreshDates.from, this.reportRefreshDates.to);
             }
         },
         getCurrentMonth() {
@@ -159,6 +220,16 @@ export default {
                 result.grade = this.gradeLetter(result.percent);
             }
             return result;
+        },
+        reportRefreshDates() {
+            let result = {from: "", to: ""};
+            if(this.tableData.length) {
+                const fromDate = new Date(this.tableData[0].date);
+                fromDate.setHours(2);
+                const toDate = new Date(this.tableData[this.tableData.length - 1].date);
+                result = {from: fromDate, to: toDate}
+            }
+            return result;
         }
     },
     components: {
@@ -168,7 +239,7 @@ export default {
         Charts
     },
     mounted() {
-        this.getZohoCrmData();
+        this.getReports();
     }
 }
 </script>
@@ -193,7 +264,7 @@ export default {
         box-sizing: border-box;
         box-shadow: 0 0 10px $brown-shadow;
     }
-    &__header, &__data {
+    &__header, &__data, &__icons {
         height: 30px;
         display: flex;
         align-items: center;
@@ -233,6 +304,24 @@ export default {
         outline: none;
         color: $main-color;
     }
+    &__icons {
+        padding: 0 10px;
+        box-sizing: border-box;
+        justify-content: space-around;
+    }
+    &__icon {
+        opacity: 0.5;
+    }
+    &__text {
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        box-shadow: inset 0 0 5px $brown-shadow;
+        border: none;
+        background: none;
+        color: $main-color;
+    }
     &_flex-end {
         justify-content: flex-end;
     }
@@ -241,6 +330,9 @@ export default {
     }
     &_orange {
         color: $orange;
+    }
+    &_opacity-1 {
+        opacity: 1;
     }
 }
 </style>

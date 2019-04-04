@@ -386,4 +386,15 @@ router.get('/zoho-reports', async (req, res) => {
   }
 })
 
+router.post('/report', async (req, res) => {
+  const { id, notes } = req.body;
+  try {
+    await ZohoReport.updateOne({"_id": id}, { notes });
+    res.send("Updated");
+  } catch(err) {
+    console.log(err);
+    res.status(500).send("Error on updating the Report");
+  }
+})
+
 module.exports = router;
