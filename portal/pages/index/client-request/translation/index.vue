@@ -376,7 +376,7 @@
         sendForm.append("contactEmail", this.request.contactEmail);
         sendForm.append("service", JSON.stringify(serviceFull));
         sendForm.append("industry", this.request.industry);
-        sendForm.append("status", "New");
+        sendForm.append("status", "Requested");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
         sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages));
         sendForm.append("web", this.request.web);
@@ -409,7 +409,7 @@
         //End Comment because of XTM testing
         ////////////////////////////////////
 
-        const result = await this.$axios.$post('/xtm/request', sendForm);
+        const result = await this.$axios.$post('/portal/request', sendForm);
         // console.log(result);
         this.xtmProjects = result;
         this.clearForm();
@@ -430,10 +430,10 @@
           contactEmail: this.$store.state.clientInfo.email,
           service: this.$store.state.clientInfo.service,
           industry: this.$store.state.clientInfo.industry,
-          status: 'New',
+          status: 'Requested',
           sourceLanguage: this.sourceSelect,
           targetLanguages: this.targetSelect,
-          web: this.$store.state.clientInfo.web,
+          web: this.$store.state.clientInfo.www,
           skype: this.$store.state.clientInfo.skype,
           phone: this.$store.state.clientInfo.phone,
           companyName: this.$store.state.clientInfo.companyName,
@@ -458,7 +458,7 @@
           this.$store.dispatch('files', this.detailFiles);
           this.$store.dispatch('referFiles', this.refFiles);
           this.$store.dispatch('requestType', requestType);
-          this.$emit('thankYou', 'Translation');
+          this.$emit('thankYou', this.request.service);
           // window.top.location.href = "https://www.pangea.global/thank-you";
         } else {
           this.showError();
@@ -512,9 +512,6 @@
                 result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
               }
             }
-            // if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
-            //   result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
-            // }
           }
         }
         result = result.filter((obj, pos, arr) => {
@@ -522,7 +519,7 @@
         });
         result = result.filter(item => {
           return item.name != this.sourceSelect.name;
-        })
+        });
 
         if(this.languages.length) {
           for(let lang of this.languages) {
@@ -571,6 +568,7 @@
       this.getLanguages();
       // console.log('this.$store.state.services : ',this.$store.state.services);
       // console.log('this.$store.state.clientLanguages : ',this.$store.state.clientLanguages);
+      console.log('this.$store.state.clientInfo : ',this.$store.state.clientInfo);
     }
   }
 

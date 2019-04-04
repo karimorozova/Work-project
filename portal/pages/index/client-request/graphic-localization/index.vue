@@ -112,7 +112,7 @@
           label LANGUAGE:
           p(v-if='serviceSelect.source') Source:
             span.choice &nbsp; {{ sourceSelect.name }}
-              template(v-if="true") &nbsp;Select
+              template(v-if="!sourceSelect.name") &nbsp;Select
           p Target:
             span.choice &nbsp;
               template(v-if="targetSelect.length > 0" v-for="language of targetSelect") {{ language.name }};
@@ -376,7 +376,7 @@
         sendForm.append("contactEmail", this.request.contactEmail);
         sendForm.append("service", JSON.stringify(serviceFull));
         sendForm.append("industry", this.request.industry);
-        sendForm.append("status", "New");
+        sendForm.append("status", "Requested");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
         sendForm.append("targetLanguages", JSON.stringify(this.request.targetLanguages));
         sendForm.append("web", this.request.web);
@@ -409,7 +409,7 @@
         //End Comment because of XTM testing
         ////////////////////////////////////
 
-        const result = await this.$axios.$post('/xtm/request', sendForm);
+        const result = await this.$axios.$post('/portal/request', sendForm);
         console.log(result);
         this.xtmProjects = result;
         this.clearForm();
@@ -430,7 +430,7 @@
           contactEmail: this.$store.state.clientInfo.email,
           service: this.$store.state.clientInfo.service,
           industry: this.$store.state.clientInfo.industry,
-          status: 'New',
+          status: 'Requested',
           sourceLanguage: this.sourceSelect,
           targetLanguages: this.targetSelect,
           web: this.$store.state.clientInfo.web,
@@ -441,7 +441,7 @@
           brief: this.brief,
           files: this.files,
           createdAt: new Date()
-        }
+        };
 
         this.errors = [];
         if(!this.request.projectName) this.errors.push("Project name required!");
@@ -475,7 +475,9 @@
         let result = [];
         if(this.clientLanguages.length) {
           for(let i = 0; i < this.clientLanguages.length; i++) {
-            result.push({name: this.clientLanguages[i].source.lang, lang: this.clientLanguages[i].source.lang, symbol: this.clientLanguages[i].source.symbol, id: this.clientLanguages[i].source.id, xtrf: this.clientLanguages[i].source.id, check: false})
+            if (this.clientLanguages[i].source) {
+              result.push({name: this.clientLanguages[i].source.lang, lang: this.clientLanguages[i].source.lang, symbol: this.clientLanguages[i].source.symbol, id: this.clientLanguages[i].source.id, xtrf: this.clientLanguages[i].source.id, check: false})
+            }
           }
         }
         result = result.filter((obj, pos, arr) => {
@@ -502,9 +504,12 @@
         let result = [];
         if(this.clientLanguages.length) {
           for(let i = 0; i < this.clientLanguages.length; i++) {
-            if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
-              result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+            if (this.clientLanguages[i].source) {
+              if (this.clientLanguages[i].source.lang == this.sourceSelect.name) {
+                result.push({name: this.clientLanguages[i].target.lang, lang: this.clientLanguages[i].target.lang, symbol: this.clientLanguages[i].target.symbol, id: this.clientLanguages[i].target.id, xtrf: this.clientLanguages[i].target.id, check: false});
+              }
             }
+
           }
         }
         result = result.filter((obj, pos, arr) => {
