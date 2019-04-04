@@ -1,8 +1,5 @@
 {
     "verbose": true,
     "ignore": ["node_modules", "dist"],
-    "watch": [
-      "app.js"
-    ],
     "ext": "js json"
   }

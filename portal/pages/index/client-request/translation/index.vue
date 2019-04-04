@@ -433,7 +433,7 @@
           status: 'Requested',
           sourceLanguage: this.sourceSelect,
           targetLanguages: this.targetSelect,
-          web: this.$store.state.clientInfo.web,
+          web: this.$store.state.clientInfo.www,
           skype: this.$store.state.clientInfo.skype,
           phone: this.$store.state.clientInfo.phone,
           companyName: this.$store.state.clientInfo.companyName,
@@ -568,6 +568,7 @@
       this.getLanguages();
       // console.log('this.$store.state.services : ',this.$store.state.services);
       // console.log('this.$store.state.clientLanguages : ',this.$store.state.clientLanguages);
+      console.log('this.$store.state.clientInfo : ',this.$store.state.clientInfo);
     }
   }
 

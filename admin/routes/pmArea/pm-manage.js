@@ -5,6 +5,7 @@ const { getOneService } = require("../../services/");
 const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
+  console.log('req.session.userId admin:', req.session.userId);
     let project = {...req.body};
     project.projectManager = req.session.userId;
     let todayStart = new Date();
@@ -18,7 +19,7 @@ router.post("/new-project", async (req, res) => {
     project.projectId = req.body.dateFormatted + ' ' + nextNumber;
     const newProject = await Projects.create(project);
     const result = await getProject({"_id": newProject.id});
-    res.send(result); 
+    res.send(result);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on creating a project!');
