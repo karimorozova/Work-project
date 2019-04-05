@@ -215,7 +215,7 @@
           .closeWarning(@click="closeWarning")
             i.fa.fa-times
           p(v-for="err in errors") {{ err }}
-    .orderInfoCopy(:style="{transform: slide}")
+    .orderInfoCopy
       .orderInfoCopy__title
         h3 YOUR ORDER
       .orderInfoCopy__summary
@@ -2156,7 +2156,7 @@
       border: 1px solid #66563D;
       border-radius: 15px;
       position: sticky;
-      top: 7px;
+      top: calc(6vh + 7px);
       right: 20px;
       width: 250px;
       display: flex;
