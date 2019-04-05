@@ -198,7 +198,7 @@ function getDayGrade(obj) {
 function gradeLetter(percent) {
     let result = "F";
     Object.keys(grades).forEach(key => {
-        if(Math.round(percent) >= grades[key].min && percent <= grades[key].max) {
+        if(Math.round(percent) >= grades[key].min && Math.round(percent) <= grades[key].max) {
             result = key;
         }
     })

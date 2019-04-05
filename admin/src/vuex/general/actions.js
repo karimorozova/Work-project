@@ -98,8 +98,8 @@ export const updateMatrix = async ({ commit }, payload) => {
 export const updateReport = async ({ commit }, payload) => {
   commit('startRequest');
   try {
-    const { id, notes } = payload;
-    await Vue.http.post('/api/report', { id, notes });
+    const { id, notes, isWorkingDay } = payload;
+    await Vue.http.post('/zoho/report', { id, notes, isWorkingDay });
     commit('endRequest');
   } catch(err) {
     commit('endRequest');

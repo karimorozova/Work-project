@@ -13,7 +13,7 @@ const ZohoReportSchema = new mongoose.Schema({
     communications: Number,
     meetings: Number,
     notes: "",
-    isUserAvailable: {
+    isWorkingDay: {
         type: Boolean,
         default: true
     },

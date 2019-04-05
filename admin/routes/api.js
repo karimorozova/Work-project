@@ -4,7 +4,7 @@ const unirest = require('unirest');
 const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
 const fs = require('fs');
 const mv = require('mv');
-const { Requests, Languages, Industries, Timezones, LeadSource, Package, ZohoReport } = require('../models');
+const { Requests, Languages, Industries, Timezones, LeadSource, Package } = require('../models');
 const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
@@ -12,8 +12,6 @@ const reqq = require('request');
 const writeFile = require('write');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
-const reports = require('../helpers/reports');
-
 
 function moveFile(oldFile, requestId) {
 
@@ -356,44 +354,6 @@ router.delete('/package/:id', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send("Error on deleting package")
-  }
-})
-
-router.get('/fill-reports', async (req, res) => {
-  try {
-    for(let report of reports) {
-      await ZohoReport.create(report);
-    }
-    res.send("Done");
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on Zoho Reports saving");
-  }
-})
-
-router.get('/zoho-reports', async (req, res) => {
-  const { from, to } = req.query;
-  try {
-    const fromDate = from ? new Date(from): new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const toDate = to ? new Date(to) : new Date();
-    const result = await ZohoReport.find({date: {$gte: fromDate, $lte: toDate}})
-            .populate('user', 'firstName lastName')
-            .sort({date: 1});
-    res.send(result);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on getting Zoho Reports");
-  }
-})
-
-router.post('/report', async (req, res) => {
-  const { id, notes } = req.body;
-  try {
-    await ZohoReport.updateOne({"_id": id}, { notes });
-    res.send("Updated");
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on updating the Report");
   }
 })
 

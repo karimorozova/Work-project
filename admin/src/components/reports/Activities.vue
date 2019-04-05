@@ -31,10 +31,12 @@
                     span.activities__standard {{ standard.meetings }}
                 span.activities__header.activities_flex-end(slot="headerNotes" slot-scope="{ field }") Notes
                 span.activities__header(slot="headerEdit" slot-scope="{ field }")
-                .activities__data.activities_space-around(slot="date" slot-scope="{ row }") 
+                .activities__data.activities_space-around(slot="date" slot-scope="{ row, index }") 
                     span.activities__data-item {{ formattedDate(row.date) }}
-                    span.activities__data-item.activities_orange {{ row.grade }}
-                    span.activities__data-item.activities_orange {{ row.percent }}
+                    .activities__toggler(v-if="currentActive === index")
+                        Toggler(:isActive="isWorkingDay" :isDisabled="false" @toggle="excludeDate")
+                    span.activities__data-item.activities_orange(v-if="currentActive !== index") {{ row.grade }}
+                    span.activities__data-item.activities_orange(v-if="currentActive !== index") {{ row.percent }}
                         span.activities__percent(v-if="row.percent") %
                 .activities__data(slot="leads" slot-scope="{ row }") {{ row.leads}}
                 .activities__data(slot="calls" slot-scope="{ row }") {{ row.calls }}
@@ -54,6 +56,7 @@
 
 <script>
 import DataTable from "../DataTable";
+import Toggler from "../Toggler";
 import DateRange from "./DateRange";
 import Charts from "./charts/Charts"
 import Button from "../Button";
@@ -93,6 +96,7 @@ export default {
             isTokenExpired: false,
             currentActive: -1,
             currentNote: "",
+            isWorkingDay: true,
             icons: {
                 save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
                 edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
@@ -129,7 +133,8 @@ export default {
         async saveChanges(index) {
             const report = this.tableData[index];
             try {
-                await this.updateReport({id: report._id, notes: this.currentNote});
+                await this.updateReport({
+                    id: report._id, notes: this.currentNote, isWorkingDay: this.isWorkingDay});
                 await this.getReports(this.reportRefreshDates.from, this.reportRefreshDates.to);
             } catch(err) {
                 this.alertToggle({message: err.data, isShow: true, type: "error"})
@@ -140,6 +145,10 @@ export default {
         setDefault() {
             this.currentNote = "";
             this.currentActive = -1;
+            this.isWorkingDay = true;
+        },
+        excludeDate() {
+            this.isWorkingDay = !this.isWorkingDay;
         },
         async getFilteredReports({fromDate, toDate}) {
             try {
@@ -152,7 +161,7 @@ export default {
             const from = fromDate ? fromDate : this.reportRefreshDates.from;
             const to = toDate ? toDate : this.reportRefreshDates.to;
             try {
-                const result = await this.$http.get(`/api/zoho-reports?from=${from}&to=${to}`);
+                const result = await this.$http.get(`/zoho/zoho-reports?from=${from}&to=${to}`);
                 this.tableData = result.data;
                 const currentDate = moment(this.today).hours(0);
                 const lastDayData = this.tableData.find(item => new Date(item.date) >= currentDate);
@@ -191,7 +200,7 @@ export default {
         gradeLetter(percent) {
             let result = "F";
             Object.keys(this.grades).forEach(key => {
-                if(Math.round(percent) >= this.grades[key].min && percent <= this.grades[key].max) {
+                if(Math.round(percent) >= this.grades[key].min && Math.round(percent) <= this.grades[key].max) {
                     result = key;
                 }
             })
@@ -236,7 +245,8 @@ export default {
         DataTable,
         Button,
         DateRange,
-        Charts
+        Charts,
+        Toggler
     },
     mounted() {
         this.getReports();
@@ -294,6 +304,10 @@ export default {
     }
     &__button {
         margin-right: 10px;
+    }
+    &__notes {
+        max-height: 100%;
+        overflow-y: auto;
     }
     &__input {
         border: 1px solid $light-brown;
