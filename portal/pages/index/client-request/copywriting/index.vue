@@ -215,7 +215,7 @@
           .closeWarning(@click="closeWarning")
             i.fa.fa-times
           p(v-for="err in errors") {{ err }}
-    .orderInfoCopy(:style="{transform: slide}")
+    .orderInfoCopy
       .orderInfoCopy__title
         h3 YOUR ORDER
       .orderInfoCopy__summary
@@ -1055,7 +1055,22 @@
       border: 1px solid #67563D;
       border-radius: 15px;;
       color: #67563D;
-      position: relative;
+      margin-left: 20%;
+      @media (max-width: 1320px) {
+        margin-left: 3%;
+        width: 55%;
+      }
+      @media (max-width: 1070px) {
+        margin: 5px;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      @media (max-width: 1024px) {
+        width: 65%;
+      }
+      @media (max-width: 868px) {
+        width: 80%;
+      }
 
       .copywriting-form {
         width: 100%;
@@ -2156,13 +2171,19 @@
       border: 1px solid #66563D;
       border-radius: 15px;
       position: sticky;
-      top: 7px;
+      top: calc(6vh + 7px);
       right: 20px;
       width: 250px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      @media (max-width: 1024px) {
+        margin-left: 0;
+      }
+      @media (max-width: 1023px) {
+        display: none;
+      }
       &__title {
         width: 100%;
         border-bottom: 1px solid rgba(0, 0, 0, 0.2);

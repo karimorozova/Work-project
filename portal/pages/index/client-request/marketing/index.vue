@@ -189,7 +189,7 @@
             .closeWarning(@click="closeWarning")
               i.fa.fa-times
             p(v-for="err in errors") {{ err }}
-      .orderInfo(:style="{transform: slide}")
+      .orderInfo
         .orderInfo__title
           h3 YOUR ORDER
         .orderInfo__summary
@@ -1408,8 +1408,98 @@
   .disable {
     opacity: 0.5;
   }
+  .mainWrapper {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
 
-
+    .container {
+      position: relative;
+      font-family: MyriadPro;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 80px 0 80px;
+      border: 1px solid #67563D;
+      border-radius: 15px;;
+      color: #67563D;
+      position: relative;
+    }
+    .orderInfo {
+      font-family: MyriadPro;
+      color: #66563D;
+      transition: all 0.7s;
+      margin-left: 30px;
+      padding-bottom: 20px;
+      border: 1px solid #66563D;
+      border-radius: 15px;
+      position: sticky;
+      top: calc(6vh + 7px);
+      right: 20px;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      @media (max-width: 1024px) {
+        margin-left: 0;
+      }
+      @media (max-width: 1023px) {
+        display: none;
+      }
+      &__title {
+        width: 100%;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        h3 {
+          font-size: 22px;
+          margin-bottom: 5px;
+          margin-top: 15px;
+          text-align: center;
+          font-weight: normal;
+        }
+      }
+      &__summary {
+        padding: 10px 20px 0;
+        p {
+          padding-left: 20px;
+        }
+        span {
+          font-size: 30px;
+          padding-right: 5px;
+          font-family: MyriadBold;
+        }
+        label {
+          font-size: 18px;
+          font-family: MyriadBold;
+        }
+        .check {
+          margin-top: 5px;
+          color: #D15F45;
+          font-family: MyriadPro;
+        }
+        &-languages {
+          p {
+            .check {
+              font-size: 16px;
+              color: #D15F45;
+            }
+          }
+        }
+        &-deadline {
+          p {
+            .check {
+              font-size: 16px;
+              color: #D15F45;
+            }
+          }
+        }
+      }
+    }
+  }
 
 </style>
 
