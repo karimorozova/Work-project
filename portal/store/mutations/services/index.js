@@ -35,3 +35,6 @@ export const SERVICES_FILL = (state, payload) => {
 export const SES_COOK = (state, payload) => {
   state.session = payload
 };
+export const PROJECTS = (state, payload) => {
+  state.projects = payload
+};

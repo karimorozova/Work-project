@@ -2,6 +2,7 @@ const state = {
   clientLanguages: [],
   clientInfo: {},
   services: [],
+  projects: [],
   session: "",
   orderDetails: {},
   token: "",

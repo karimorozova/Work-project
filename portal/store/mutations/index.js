@@ -9,7 +9,8 @@ import {
   LANGS,
   CLIENT_FOR_REQUEST,
   SERVICES_FILL,
-  SES_COOK
+  SES_COOK,
+  PROJECTS
 } from "./services";
 
 
@@ -23,5 +24,6 @@ export {
   LANGS,
   CLIENT_FOR_REQUEST,
   SERVICES_FILL,
-  SES_COOK
+  SES_COOK,
+  PROJECTS
 };

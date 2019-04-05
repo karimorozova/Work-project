@@ -22,3 +22,6 @@ export const referFiles = (context, payload) => {
 export const requestType = (context, payload) => {
   context.commit('ORDER_TYPE', payload)
 };
+export const projects = (context, payload) => {
+  context.commit('PROJECTS', payload)
+};

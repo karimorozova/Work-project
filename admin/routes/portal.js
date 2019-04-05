@@ -24,10 +24,10 @@ router.post("/auth", async (req, res, next) => {
       } else {
         try {
           const jsession = await jwt.sign({clientId: data.client._id, contactEmail: data.contact.email}, secretKey, { expiresIn: '2h'});
+          const projects = await Projects.find({"projectManager": data.client._id});
           req.session.clientId = data.client._id;
-          console.log('req.session.clientId1 ', req.session.clientId);
           res.statusCode = 200;
-          res.send({ jsession });
+          res.send({ jsession, projects });
         } catch(err) {
           console.log(err);
           res.status(500).send("Server Error. Try again later.");
@@ -216,7 +216,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     const result = await getProject({"_id": newProject.id});
     res.json(result);
   } catch(err) {
-    console.log('Now is error: ',err);
+    console.log(err);
     res.status(500).send('Error on creating a project!');
   }
 });
