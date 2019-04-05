@@ -4,39 +4,39 @@
             .shortInfo
                 .row__columns
                     .col
-                        .col__title 
+                        .col__title
                             span Request On
                             img.req_img(src="../../assets/images/white-arrow.png")
                     .col
                         .col__title
                             span Project ID
-                            img(src="../../assets/images/white-arrow.png")                        
+                            img(src="../../assets/images/white-arrow.png")
                     .col.col-5
-                        .col__title 
+                        .col__title
                             span Project Name
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                       
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col.col-4
-                        .col__title 
+                        .col__title
                             span Status
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col
-                        .col__title 
+                        .col__title
                             span Deadline
                             .double_arrow
                               .up
                                 img.arrow_up(src="../../assets/images/white-arrow.png")
                               .down
-                                img.arrow_down(src="../../assets/images/white-arrow.png")                  
+                                img.arrow_down(src="../../assets/images/white-arrow.png")
                     .col.col-5.colSplit
-                        .col__title 
+                        .col__title
                             span Total Cost
                         .col
                         .col
@@ -44,20 +44,20 @@
           .row(v-for="(quote,index) in clientQuotes")
               .shortInfo
                   .row__columns_info
-                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.startDate.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                      .col(@click="openQuotesInfoDetailed(index)") {{ quote.startDate }}
                       .col.proj(@click="openQuotesInfoDetailed(index)") {{ quote.idNumber }}
                       .col.col-5(@click="openQuotesInfoDetailed(index)") {{ quote.name }}
                       .col.col-4(@click="openQuotesInfoDetailed(index)") {{ quote.status }}
-                      .col(@click="openQuotesInfoDetailed(index)") 
-                        span(v-if="quote.deadline") {{ quote.deadline.formatted.split(' ')[0].split('-').reverse().join('-') }}
+                      .col(@click="openQuotesInfoDetailed(index)")
+                        span(v-if="quote.deadline") {{ quote.deadline }}
                       .col.col-5.colSplit
                           .col
                               span(@click="openQuotesInfoDetailed(index)") {{ quote.totalAgreed.formattedAmount }}
                           .col.approve
-                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")                      
+                              img(src="../../assets/images/Approve-icon.png" v-if="quote.status == 'SENT'" @click="approveQuote(quote)")
                           .col.reject
                               img(src="../../assets/images/Reject-icon.png" v-if="quote.status == 'SENT'" @click="rejectQuote(quote)")
-                                         
+
 </template>
 
 <script>
@@ -128,7 +128,7 @@ export default {
       quote.status = "ACCEPTED"
     },
     async rejectQuote(quote) {
-      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})      
+      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})
       .then(res => console.log(res))
       .catch(err => console.log(err));
       quote.status = "REJECTED";
@@ -140,20 +140,42 @@ export default {
       if(this.quotes.length) {
         let array = this.quotes;
         let finalDeadline = '';
-        for(let i = 0; i < array.length; i++) {
-          if(array[i].deadline) {
-             finalDeadline = moment(new Date(array[i].deadline.millisGMT)).format("DD-MM-YYYY");
-          } else {
-            finalDeadline = ''
-          }
-          if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status.indexOf("ACCEPTED") == -1) {
-              result.push(array[i])
-          }
-        }
+
+        // for(let i = 0; i < array.length; i++) {
+        //   if(array[i].deadline) {
+        //      finalDeadline = moment(new Date(array[i].deadline.millisGMT)).format("DD-MM-YYYY");
+        //   } else {
+        //     finalDeadline = ''
+        //   }
+        //   if(array[i].status != "APPROVED" && array[i].status != "REJECTED" && array[i].status.indexOf("ACCEPTED") == -1) {
+        //       result.push(array[i])
+        //   }
+        // }
+        array.map((project)=>{
+          console.log('project',project);
+          result.push({
+            requestOn: moment(project.createdAt).format("DD-MM-YYYY"),
+            id: project._id,
+            startDate: moment(project.createdAt).format("DD-MM-YYYY"),
+            idNumber: project.projectId,
+            name: project.projectName,
+            // status: array[i].status,
+            deadline: moment(project.deadline).format("DD-MM-YYYY"),
+            totalAgreed: {formattedAmount:1000},
+            // projectManager: array[i].projectManager,
+            // service: array[i].service,
+            // specialization: array[i].specialization,
+            // languageCombinations: array[i].languageCombinations,
+            // fullInfoAppear: false
+          })
+        });
       }
       // result.fullInfoAppear = false;
       return result;
     }
+  },
+  mounted(){
+    console.log('quotes: ',this.quotes);
   },
   components: {
     quotesCalendarDetailed: QuotesCalendarDetailed

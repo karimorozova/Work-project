@@ -201,8 +201,8 @@
 
         }
         this.user = result.user;
-        this.projects = [];
-        this.quotes = [];
+        this.projects = this.$store.state.projects;
+        this.quotes = this.$store.state.projects;
         this.languageCombinations = this.client.languageCombinations;
         this.loadLangs(this.languageCombinations);
       },
@@ -290,8 +290,9 @@
       this.getCookie();
       this.clientInfo();
       this.getServices();
-      this.projects = this.$store.state.projects;
-      console.log('this.projects: ', this.projects);
+      // this.projects = this.$store.state.projects;
+      // this.quotes = this.$store.state.projects;
+      // console.log('this.projects: ', this.projects);
       this.breadCrumb1 = this.$route.path.split('/')[1];
       this.breadCrumb2 = this.$route.path.split('/')[2];
     },
