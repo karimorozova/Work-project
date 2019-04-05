@@ -1445,6 +1445,12 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      @media (max-width: 1024px) {
+        margin-left: 0;
+      }
+      @media (max-width: 1023px) {
+        display: none;
+      }
       &__title {
         width: 100%;
         border-bottom: 1px solid rgba(0, 0, 0, 0.2);
