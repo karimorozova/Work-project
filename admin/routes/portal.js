@@ -200,27 +200,25 @@ router.get('/reject', async (req, res) => {
 });
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-  // console.log('req:', req.body);
-  console.log('req.session.clientId2:', req.session.clientId);
   let project = {...req.body};
-  project.projectManager = req.session.clientId;
+  project.projectManager = req.body.clientId;
+  delete project.clientId;
   let todayStart = new Date();
   todayStart.setUTCHours(0,0,0,0);
   let todayEnd = new Date(todayStart);
   todayEnd.setUTCHours(23,59,59,0);
-  console.log('Project: ', project.projectManager);
-  // try {
-  //   const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
-  //   const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
-  //   project.status = "Requested";
-  //   project.projectId = req.body.dateFormatted + ' ' + nextNumber;
-  //   const newProject = await Projects.create(project);
-  //   const result = await getProject({"_id": newProject.id});
-  //   res.send(result);
-  // } catch(err) {
-  //   // console.log('Now is error: ',err);
-  //   res.status(500).send('Error on creating a project!');
-  // }
+  try {
+    const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
+    const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
+    project.status = "Requested";
+    project.projectId = req.body.dateFormatted + ' ' + nextNumber;
+    const newProject = await Projects.create(project);
+    const result = await getProject({"_id": newProject.id});
+    res.json(result);
+  } catch(err) {
+    console.log('Now is error: ',err);
+    res.status(500).send('Error on creating a project!');
+  }
 });
 
 

@@ -359,10 +359,11 @@
       },
       async sendForm() {
         let serviceFull;
-        for(let i = 0; i < this.services.length; i++) {
-          if(this.request.service == this.services[i].title)
-            serviceFull = this.services[i];
-        }
+        // for(let i = 0; i < this.services.length; i++) {
+        //   if(this.request.service == this.services[i].title)
+        //     serviceFull = this.services[i];
+        // }
+        serviceFull = this.services.find((el)=>el.title === this.$store.state.clientInfo.service)._id;
         let typeOfRequest = "quote";
         if (this.startOption) {
           typeOfRequest = "project";
@@ -374,7 +375,7 @@
         sendForm.append("date", this.request.date);
         sendForm.append("contactName", this.request.contactName);
         sendForm.append("contactEmail", this.request.contactEmail);
-        sendForm.append("service", JSON.stringify(serviceFull));
+        sendForm.append("service", serviceFull);
         sendForm.append("industry", this.request.industry);
         sendForm.append("status", "Requested");
         sendForm.append("sourceLanguage", JSON.stringify(this.request.sourceLanguage));
@@ -388,6 +389,7 @@
         sendForm.append("createdAt", this.request.createdAt);
         sendForm.append("dateFormatted", moment(this.request.createdAt).format('YYYY MM DD'));
         sendForm.append("jsession", this.$store.state.session);
+        sendForm.append("clientId", this.request.clientId);
         for(let i = 0; i < this.detailFiles.length; i++){
           console.log(this.detailFiles[i]);
           sendForm.append("detailFiles", this.detailFiles[i]);
@@ -410,7 +412,6 @@
         ////////////////////////////////////
 
         const result = await this.$axios.$post('/portal/request', sendForm);
-        // console.log(result);
         this.xtmProjects = result;
         this.clearForm();
       },
@@ -424,12 +425,13 @@
 
       async checkForm(event) {
         this.request = {
+          clientId: this.$store.state.clientInfo.clientId,
           projectName: this.projectName,
           date: this.deadlineSelect,
           contactName: this.$store.state.clientInfo.name,
           contactEmail: this.$store.state.clientInfo.email,
           service: this.$store.state.clientInfo.service,
-          industry: this.$store.state.clientInfo.industry,
+          industry: this.$store.state.clientInfo.industryId,
           status: 'Requested',
           sourceLanguage: this.sourceSelect,
           targetLanguages: this.targetSelect,
@@ -441,7 +443,7 @@
           brief: this.brief,
           files: this.files,
           createdAt: new Date()
-        }
+        };
 
         this.errors = [];
         if(!this.request.projectName) this.errors.push("Project name required!");
@@ -568,7 +570,8 @@
       this.getLanguages();
       // console.log('this.$store.state.services : ',this.$store.state.services);
       // console.log('this.$store.state.clientLanguages : ',this.$store.state.clientLanguages);
-      console.log('this.$store.state.clientInfo : ',this.$store.state.clientInfo);
+      // console.log('this.$store.state.clientInfo : ',this.$store.state.clientInfo);
+      // console.log('service : ',this.$store.state.services.find((el)=>el.title === this.$store.state.clientInfo.service)._id);
     }
   }
 

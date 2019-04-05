@@ -194,6 +194,7 @@
       async clientInfo() {
         const token = this.jsess;
         const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
+        // console.log('result: ', result);
         this.client = result.client;
         if (!this.client) {
           this.$router.push('/login');
@@ -237,7 +238,9 @@
             phone: this.user.phone,
             skype: this.user.skype,
             service: this.newProject[ind].title,
-            industry: this.client.industries[0].name
+            industry: this.client.industries[0].name,
+            clientId: this.client._id,
+            industryId: this.client.industries[0]._id
           };
           this.requestInfo(formData);
           this.loadLangs(this.languageCombinations);
