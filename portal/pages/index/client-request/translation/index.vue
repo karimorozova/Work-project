@@ -618,7 +618,7 @@
       border: 1px solid;
       border-radius: 15px;
       position: sticky;
-      top: 7px;
+      top: calc(6vh + 7px);
       right: 20px;
       width: 250px;
       display: flex;

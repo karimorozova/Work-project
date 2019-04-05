@@ -337,20 +337,24 @@
 
 <style lang="scss">
   .proofingQa {
+    width: 100%;
+    max-width: 1320px;
     margin: 0 auto;
     display: flex;
-    max-width: 1320px;
+    align-items: flex-start;
+    margin-bottom: 30px;
     .table-block {
       margin-top: 40px;
+      padding: 0 20px;
     }
     .orderInfo {
       font-family: MyriadPro;
       color: #66563D;
       transition: all 0.7s;
-      @media (max-width: 1024px) {
+      @media (max-width: 1424px) {
         margin-left: 0;
       }
-      @media (max-width: 1023px) {
+      @media (max-width: 1423px) {
         display: none;
       }
       padding-bottom: 20px;
@@ -733,6 +737,15 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    position: sticky;
+    top: calc(6vh + 7px);
+    transition: all 0.7s;
+    @media (max-width: 1024px) {
+      margin-left: 0;
+    }
+    @media (max-width: 1400px) {
+      display: none;
+    }
     .orderSummary {
       color: #D15F45;
       font-weight: 800;
