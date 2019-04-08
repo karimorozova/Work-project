@@ -1,6 +1,7 @@
 const { ClientApi, HomeApi } = require('../models/xtrf');
+const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
-const { getProject } = require("../projects/");
+const { getProject, getProjects } = require("../projects/");
 const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
 const router = require('express').Router();
 const fs = require('fs');
@@ -23,11 +24,9 @@ router.post("/auth", async (req, res, next) => {
         res.status(401).send("Wrong email or password.");
       } else {
         try {
-          const jsession = await jwt.sign({clientId: data.client._id, contactEmail: data.contact.email}, secretKey, { expiresIn: '2h'});
-          const projects = await Projects.find({"projectManager": data.client._id});
-          req.session.clientId = data.client._id;
+          const clientToken = await jwt.sign({clientId: data.client.id, contactEmail: data.contact.email}, secretKey, { expiresIn: '2h'});
           res.statusCode = 200;
-          res.send({ jsession, projects });
+          res.send({ clientToken });
         } catch(err) {
           console.log(err);
           res.status(500).send("Server Error. Try again later.");
@@ -41,7 +40,21 @@ router.post("/auth", async (req, res, next) => {
   }
 });
 
-router.get('/language-combinations', async (req, res) => {
+router.get('/projects', checkClientContact, async (req, res) => {
+    const { token } = req.query;
+    try {
+        const verificationResult = jwt.verify(token, secretKey);
+        const client = await getClient({"_id": verificationResult.clientId})
+        const projects = await getProjects({"customer": verificationResult.clientId});
+        const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
+        res.send({client, user, projects});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting Projects.");
+    }
+})
+
+router.get('/language-combinations', checkClientContact, async (req, res) => {
     let customer = new ClientApi("", req.cookies.ses);
     let id = +req.query.customerId;
     try {
@@ -54,7 +67,7 @@ router.get('/language-combinations', async (req, res) => {
     }
 });
 
-router.get('/customer-info', async (req, res) => {
+router.get('/customer-info', checkClientContact, async (req, res) => {
     try {
         let customer = await HomeApi.customerInfo(req.query.customerId);
         res.send(customer)
@@ -64,12 +77,12 @@ router.get('/customer-info', async (req, res) => {
     }
 });
 
-router.get('/clientinfo', async (req, res) => {
+router.get('/clientinfo', checkClientContact, async (req, res) => {
     try {
         const { token } = req.query;
         const verificationResult = jwt.verify(token, secretKey);
         const client = await getClient({"_id": verificationResult.clientId});
-        const user = client.contacts.find((contact)=>contact.email === verificationResult.contactEmail);
+        const user = client.contacts.find((contact) => contact.email === verificationResult.contactEmail);
         res.send({client, user});
     } catch(err) {
         console.log(err);
@@ -77,7 +90,7 @@ router.get('/clientinfo', async (req, res) => {
     }
 });
 
-router.get('/projectFiles', async (request, res) => {
+router.get('/projectFiles', checkClientContact, async (request, res) => {
     let options = {
         hostname: 'pangea.s.xtrf.eu',
         path: `/customer-api/projects/${request.query.projectId}/files/outputFilesAsZip`,
@@ -102,7 +115,7 @@ router.get('/projectFiles', async (request, res) => {
     }
 });
 
-router.get('/downloadProject', (req, res) => {
+router.get('/downloadProject', checkClientContact, (req, res) => {
     res.send(`https://admin.pangea.global/project${req.query.projectId}.zip`);
 });
 
@@ -124,7 +137,7 @@ router.get('/deleteZip', (req, res) => {
     }
 });
 
-router.get('/taskFiles', async (request, res) => {
+router.get('/taskFiles', checkClientContact, async (request, res) => {
     let options = {
         hostname: 'pangea.s.xtrf.eu',
         path: `/customer-api/projects/tasks/${request.query.taskId}/files/outputFilesAsZip`,
@@ -149,7 +162,7 @@ router.get('/taskFiles', async (request, res) => {
     }
 });
 
-router.get('/downloadTask', (req, res) => {
+router.get('/downloadTask', checkClientContact, (req, res) => {
     res.send(`https://admin.pangea.global/task${req.query.taskId}.zip`);
 });
 
@@ -164,7 +177,7 @@ router.get('/job',async (req, res) => {
     }
 });
 
-router.get('/tasksInfo', async (req,res) => {
+router.get('/tasksInfo', checkClientContact, async (req,res) => {
     const id = req.query.quoteId;
     try {
         const tasksOfQuote = await quoteTasksInfo(id);
@@ -175,7 +188,7 @@ router.get('/tasksInfo', async (req,res) => {
     }
 });
 
-router.get('/approve', async (req, res) => {
+router.get('/approve', checkClientContact, async (req, res) => {
     const customer = new ClientApi("", req.cookies.ses);
     const id = req.query.quoteId;
     try {
@@ -187,7 +200,7 @@ router.get('/approve', async (req, res) => {
     }
 });
 
-router.get('/reject', async (req, res) => {
+router.get('/reject', checkClientContact, async (req, res) => {
     const customer = new ClientApi("", req.cookies.ses);
     const id = req.query.quoteId;
     try {
@@ -199,7 +212,7 @@ router.get('/reject', async (req, res) => {
     }
 });
 
-router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
+router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
   let project = {...req.body};
   project.projectManager = req.body.clientId;
   delete project.clientId;

@@ -1,14 +1,16 @@
 const state = {
   clientLanguages: [],
   clientInfo: {},
+  user: {},
   services: [],
   projects: [],
-  session: "",
+  token: "",
   orderDetails: {},
   token: "",
   alertMessage: "",
   isAlert: false,
-  alertType: "success"
+  alertType: "success",
+  currentRequests: 0,
 };
 
 export default state

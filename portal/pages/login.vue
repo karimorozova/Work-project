@@ -19,7 +19,6 @@
 </template>
 <script>
 
-  // import axios from "axios";
   import PasswordRestore from '../components/PasswordRestore';
   import { mapActions } from "vuex";
 
@@ -39,14 +38,11 @@
       async sendForm() {
         try {
           const result = await this.$axios.$post("/portal/auth", { ...this.form});
-          // console.log('result: ', result);
-          this.setProjects(result.projects);
-          this.login(result.jsession);
-          this.$router.push("/dashboard");
+          this.login(result.clientToken);
+          this.$router.push("/");
           this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
         } catch(err) {
-          console.log(err);
-          this.alertToggle({message: err.response.data, isShow: true, type: "error"});
+          this.alertToggle({message: err.message, isShow: true, type: "error"});
         }
       },
       forget(){
@@ -55,7 +51,6 @@
       ...mapActions({
         alertToggle: "alertToggle",
         login: "login",
-        setProjects: "projects"
       })
     },
     components: {

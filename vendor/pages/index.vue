@@ -82,9 +82,6 @@ export default {
         }
       }
     },
-    hideAccountMenu() {
-      // this.accountMenuVisible = false;
-    },
     signOut() {
       this.$router.push('/login');
       this.logout();

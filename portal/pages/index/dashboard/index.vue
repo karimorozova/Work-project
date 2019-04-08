@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.dashboard
+  .dashboard
     .maininfoWrapper
       .mainInfo
         .clientsAll
@@ -15,7 +15,7 @@
                 img(src="../../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openProjects}")
               .clientsAll__dropMenu_item.projectsTable(v-if="openProjects")
                 projectsInfo(@projectDetails="projectDetails" :projects="projects" :project="project")
-    nuxt-child(:project="project" :quoteIndex="quoteIndex" :projectIndex="projectIndex" :quotes="quotes" :projects="projects"  :jobsById="jobsById" :user="{}" :quote="quote")
+    //- nuxt-child(:project="project" :quoteIndex="quoteIndex" :projectIndex="projectIndex" :quotes="quotes" :projects="projects"  :jobsById="jobsById" :user="user" :quote="quote")
 </template>
 
 <script>
@@ -40,7 +40,7 @@
     },
     data() {
       return {
-        openQuotes: true,
+        openQuotes: false,
         openProjects: true,
         quote: {
           name: 'some name',
@@ -86,7 +86,7 @@
     components: {
       Quotesinfo,
       projectsInfo: ProjectsInfo,
-    },
+    }
   }
 </script>
 

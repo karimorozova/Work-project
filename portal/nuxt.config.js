@@ -6,6 +6,10 @@ module.exports = {
     '@nuxtjs/axios',
   ],
 
+  env: {
+    domain: process.env.API_URL
+  },
+
   axios: {
     // API url
     baseURL: process.env.API_URL
@@ -34,7 +38,8 @@ module.exports = {
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#3B8070' },
+  // loading: { color: '#3B8070' },
+  loading: '~/components/Loading.vue',
   /*
   ** Build configuration
   */
@@ -51,7 +56,14 @@ module.exports = {
       }
     }
   },
+
+  router: {
+    base: '/',
+    middleware: ['check-auth', 'main-redirect']
+  },
+
   plugins: [
-    '~/plugins/vue-cookie'
+    '~/plugins/axios',
+    '~plugins/vue-cookie'
   ]
 };

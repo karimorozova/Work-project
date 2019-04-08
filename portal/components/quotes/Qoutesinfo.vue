@@ -122,16 +122,16 @@ export default {
       this.currentFormVisibleOther = !this.currentFormVisibleOther;
     },
     async approveQuote(quote) {
-      this.$axios.get(`portal/approve?quoteId=${quote.id}`, {withCredentials: true})
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
-      quote.status = "ACCEPTED"
+      // this.$axios.get(`portal/approve?quoteId=${quote.id}`, {withCredentials: true})
+      // .then(res => console.log(res))
+      // .catch(err => console.log(err));
+      // quote.status = "ACCEPTED"
     },
     async rejectQuote(quote) {
-      this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
-      quote.status = "REJECTED";
+      // this.$axios.get(`portal/reject?quoteId=${quote.id}`, {withCredentials: true})
+      // .then(res => console.log(res))
+      // .catch(err => console.log(err));
+      // quote.status = "REJECTED";
     }
   },
   computed: {
@@ -152,7 +152,6 @@ export default {
         //   }
         // }
         array.map((project)=>{
-          console.log('project',project);
           result.push({
             requestOn: moment(project.createdAt).format("DD-MM-YYYY"),
             id: project._id,
@@ -173,9 +172,6 @@ export default {
       // result.fullInfoAppear = false;
       return result;
     }
-  },
-  mounted(){
-    console.log('quotes: ',this.quotes);
   },
   components: {
     quotesCalendarDetailed: QuotesCalendarDetailed

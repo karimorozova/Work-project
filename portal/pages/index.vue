@@ -1,5 +1,5 @@
 <template lang="pug">
-  .clientsportalWrapper(v-if="cookies && client")
+  .clientsportalWrapper
     .clientsTop
       .clientsTop__clientName
         h2.clientsPortal CLIENT PORTAL
@@ -60,7 +60,7 @@
 
 <script>
   import ClickOutside from "vue-click-outside";
-  import {mapActions} from "vuex";
+  import { mapActions, mapGetters } from "vuex";
 
   export default {
     data() {
@@ -101,10 +101,6 @@
         openProjects: true,
         expander: false,
         accountMenuVisible: false,
-        cookies: false,
-        client: "",
-        user: {},
-        projects: [],
         quotes: [],
         quote: {
           name: 'some name',
@@ -165,20 +161,25 @@
       };
     },
     methods: {
+      mainPageRender() {
+      this.toggleSideBar(true);
+      },
+      toggleSideBar(isFirstRender) {
+        for(let elem of this.navbarList) {
+          if(window.location.toString().indexOf(elem.path) !== -1) {
+            elem.active = true;
+            if(isFirstRender) {
+              // this.$router.push(elem.path);
+            }
+          } else {
+            elem.active = false
+          }
+        }
+      },
       thankYou(data) {
-        console.log('thank you triggered!!', data);
         this.clientRequestShow = false;
         this.thanksService = data;
         this.$router.push('/confirm-order');
-      },
-      getCookie() {
-        if (this.jsess) {
-          this.cookies = true;
-          return true;
-        } else {
-          console.log("login failed");
-          this.$router.push('/login');
-        }
       },
       hideAccountMenu() {
         this.accountMenuVisible = false;
@@ -191,23 +192,6 @@
         this.$router.push('/login');
 
       },
-      async clientInfo() {
-        const token = this.jsess;
-        const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
-        // console.log('result: ', result);
-        this.client = result.client;
-        if (!this.client) {
-          this.$router.push('/login');
-
-        }
-        this.user = result.user;
-        this.projects = this.$store.state.projects;
-        this.quotes = this.$store.state.projects;
-        this.languageCombinations = this.client.languageCombinations;
-        this.loadLangs(this.languageCombinations);
-      },
-
-
       switchSection(index) {
         this.navbarList.forEach((item, i) => {
           item.active = i === index;
@@ -244,8 +228,6 @@
           };
           this.requestInfo(formData);
           this.loadLangs(this.languageCombinations);
-          this.jsession(this.jsess);
-
           this.clientRequestShow = true;
           this.dropdownVisible = false;
         }
@@ -260,19 +242,22 @@
         this.$router.push(`/client-request${this.newProject[ind].path}`);
       },
       async getServices() {
-        const result = await this.$axios.$get('api/services');
+        const result = await this.$axios.$get('/api/services');
         result.sort((a, b) => {
           return a.sortIndex - b.sortIndex
         });
         this.servicesGetting(result)
       },
+      setToken() {
+        const clientToken = this.$cookie.get("client");
+        this.$store.commit("SET_TOKEN", clientToken);
+      },
       ...mapActions({
         logout: "logout",
         requestInfo: "requestInfo",
         loadLangs: "loadLangs",
-        jsession: "jsession",
-        servicesGetting: "servicesGetting"
-
+        servicesGetting: "servicesGetting",
+        getProjects: "getProjects"
       })
     },
     watch: {
@@ -287,12 +272,10 @@
       }
     },
     mounted() {
-      this.getCookie();
-      this.clientInfo();
+      this.mainPageRender();
+      this.setToken();
       this.getServices();
-      // this.projects = this.$store.state.projects;
-      // this.quotes = this.$store.state.projects;
-      // console.log('this.projects: ', this.projects);
+      this.getProjects();
       this.breadCrumb1 = this.$route.path.split('/')[1];
       this.breadCrumb2 = this.$route.path.split('/')[2];
     },
@@ -300,17 +283,11 @@
       ClickOutside
     },
     computed: {
-      jsess() {
-        let result = "";
-        let cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-          let findSession = cookies[i].split("=");
-          if (findSession[0].indexOf('ses') > 0) {
-            result = findSession[1];
-          }
-        }
-        return result;
-      }
+      ...mapGetters({
+        projects: "getAllProjects",
+        user: "getUserInfo",
+        client: "getClientInfo"
+      })
     }
   };
 </script>

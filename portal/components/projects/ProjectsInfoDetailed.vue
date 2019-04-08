@@ -119,6 +119,5 @@ export default {
 
 
 <style lang="scss" src="../../assets/styles/projects/projectsinfodetailed.scss" scoped>
-// @import "../../assets/styles/projects/projectsinfodetailed.scss";
 
 </style>

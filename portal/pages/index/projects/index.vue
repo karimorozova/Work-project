@@ -1,17 +1,14 @@
 <template lang="pug">
-  Allprojects(:projects="projects" :user="user" @projectDetails='projectDetails')
+  .all-projects
+    Allprojects(:projects="projects" :user="user" @projectDetails='projectDetails')
 </template>
 
 <script>
   import Allprojects from "~/components/projects/Allprojects";
+  import { mapGetters } from "vuex";
+
   export default {
     props: {
-      projects: {
-        type: Array
-      },
-      user:{
-        type: Object
-      },
       jobsById:{
         type: Array
       },
@@ -22,6 +19,13 @@
         this.jobsById = data.jobs;
         this.$router.push('/dashboard/project-info');
       },
+    },
+    computed: {
+      ...mapGetters({
+        user: "getUserInfo",
+        client: "getClientInfo",
+        projects: "getAllProjects"
+      })
     },
     components: {
       Allprojects,

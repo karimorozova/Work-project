@@ -1,59 +1,34 @@
 <template lang="pug">
-    .root
-        .row
-            .shortInfo
-                .row__columns
-                    .col
-                        .col__title
-                            span Request On
-                            img.req_img(src="../../assets/images/white-arrow-down.png" @click="sortReq" :class="{toUp: requestSort}")
-                    .col.col-lg
-                        .col__title
-                            span Project ID
-                            img(src="../../assets/images/white-arrow-down.png" @click="sortProjId" :class="{toUp: projectIdSort}")
-                    .col.col-xlg
-                        .col__title
-                            span Project Name
-                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortProjName" :class="{toUp: projectNameSort}")
-                    .col.col-md
-                        .col__title
-                            span Deadline
-                            img.arrow_down(src="../../assets/images/white-arrow-down.png" @click="sortDeadline" :class="{toUp: deadlineSort}")
-                    .col.col-end
-                        span Total Cost
-                    .col.col-d
-        .scrollArea
-            .row(v-for="(project, index) in clientProjects")
-                .shortInfo
-                    .row__columns_info
-                        .col(@click="projectDetails(index)") {{ project.requestOn }}
-                        .col.proj(@click="projectDetails(index)") {{ project.idNumber }}
-                        .col.col-xlg(@click="projectDetails(index)")
-                            span {{ project.name }}
-                        .col.col-md(v-if="project.deadline" @click="projectDetails(index)")
-                            span {{ project.deadline }}
-                        .col.col-end(@click="projectDetails(index)")
-                            span {{ project.totalAgreed.formattedAmount }}
-                        .col.col-d(@click="downloadZip(index)")
-                            img(src="../../assets/images/download.png")
-
+    .projects-table
+        .projects-table__filters
+        .projects-table__table
+            DataTable(
+                :fields="fields"
+                :tableData="projects"
+            )
+                .projects-table__header(slot="headerRequestDate" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerProjectId" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerProjectName" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerDeadline" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
+                .projects-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
+                .projects-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId }}
+                .projects-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
+                .projects-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}
+                .projects-table__data(slot="totalCost" slot-scope="{ row, index }") {{ row.finance.Price.receivables }}
+                    .projects-table__currency(v-if="row.finance.Price.receivables") &euro;
+                .projects-table__data.projects-table_centered(slot="download" slot-scope="{ row, index }")
+                    img.projects-table__icon(src="../../assets/images/download.png" @click.stop="download(index)")
 </template>
 
 <script>
 import moment from "moment";
+import DataTable from "../Tables/DataTable";
 
 export default {
     props: {
-        client: {
-            type: Object
-        },
-        user: {
-            type: Object
-        },
         projects : {
-            type: Array
-        },
-        quotes: {
             type: Array
         },
         requestDateFilter: {
@@ -82,53 +57,35 @@ export default {
         return {
             clientQuotes: [],
             allProjectsFiltered: [],
-            requestSort: false,
-            projectIdSort: false,
-            projectNameSort: false,
-            deadlineSort: false,
-            allProjects: []
+            allProjects: [],
+            fields: [
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0"},
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "16%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "24%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "16%", padding: "0"},
+                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "15%", padding: "0"},
+                {label: "", headerKey: "headerDownload", key: "download", width: "14%", padding: "0"},
+            ]
         }
     },
     methods: {
-        getCookie() {
-        // let sessionCookie = document.cookie.split("=")[1];
-            if (this.jsess) {
-                return true;
-            } else {
-                console.log("login failed");
-                // alert("Please, Log in!")
-                // window.location.replace("/");
-            }
+        getFormattedDate(date) {
+            return moment(date).format("DD-MM-YYYY");
         },
         async clientInfo() {
           const token = this.jsess;
           const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
             this.companyName = result.client.name;
         },
-        projectDetails(index) {
-            this.$emit('projectDetails', this.clientProjects[index]);
-        },
-        sortReq() {
-            this.requestSort = !this.requestSort;
-        },
-        sortProjId() {
-            this.projectIdSort = !this.projectIdSort;
-        },
-        sortProjName() {
-            this.projectNameSort = !this.projectNameSort;
-        },
-        sortDeadline() {
-            this.deadlineSort = !this.deadlineSort;
-        },
-        async downloadZip(index) {
-            console.log('Start downloading project files...');
-            let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.clientProjects[index].id}`, {withCredentials: true});
-            let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.clientProjects[index].id}`);
+        async download(index) {
+            console.log('Start downloading project files...', index);
+            // let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.clientProjects[index].id}`, {withCredentials: true});
+            // let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.clientProjects[index].id}`);
 
-            let link = document.createElement('a');
-                link.href = file.data;
-                link.click();
-            let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.clientProjects[index].id}`);
+            // let link = document.createElement('a');
+            //     link.href = file.data;
+            //     link.click();
+            // let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.clientProjects[index].id}`);
         }
     },
     computed: {
@@ -158,7 +115,6 @@ export default {
                 //     }
                 // }
                 array.map((project)=>{
-                  console.log('project',project);
                   result.push({
                             requestOn: moment(project.createdAt).format("DD-MM-YYYY"),
                             id: project._id,
@@ -285,29 +241,33 @@ export default {
             }
             return filtered;
         },
-      jsess() {
-        let result = "";
-        let cookies = document.cookie.split(";");
-        for(let i = 0; i < cookies.length; i++) {
-          let findSession = cookies[i].split("=");
-          if (findSession[0].indexOf('ses') > 0) {
-            result = findSession[1];
-          }
-        }
-        return result;
-      }
     },
-    mounted() {
-        this.getCookie();
-        this.clientInfo();
-        console.log('projects at last child: ', this.projects);
-        console.log('clients projects: ', this.clientProjects);
+    components: {
+        DataTable
     }
 }
 </script>
 
 
-<style lang="scss" src="../../assets/styles/projects/projectstable.scss" scoped>
-// @import "../../assets/styles/projects/projectstable.scss";
+<style lang="scss" scoped>
+
+.projects-table {
+    &__data {
+        height: 30px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        padding: 0 5px;
+    }
+    &__currency {
+        margin-left: 3px;
+    }
+    &__icon {
+        cursor: pointer;
+    }
+    &_centered {
+        justify-content: center;
+    }
+}
 
 </style>

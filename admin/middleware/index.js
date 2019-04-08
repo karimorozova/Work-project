@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const path = require("path");
-const { User, Vendors } = require('../models');
+const { User, Vendors, Clients } = require('../models');
 const { secretKey } = require('../configs');
 
 const middleware = {
@@ -14,6 +14,32 @@ const middleware = {
                     }
                     const user = await User.findOne({"_id": decoded.user._id});
                     if(user) {
+                        return next()
+                    } else {
+                        return res.status(403).send("No such user")
+                    }
+                })
+            } catch(err) {
+                res.status(401).send(err.message);
+            }
+        } else {
+            const err = new Error('You must be logged in to view this page.');
+            err.status = 401;
+            res.status(401);
+            res.send(err.message);
+        }
+    },
+
+    checkClientContact(req, res, next) {
+        if (req.headers['token-header']) {
+            try {
+                const token = req.headers['token-header'];
+                jwt.verify(token, secretKey, async (err, decoded) => {
+                    if(err) {
+                        return res.status(403).send(err.message);
+                    }
+                    const client = await Clients.findOne({"_id": decoded.clientId});
+                    if(client) {
                         return next()
                     } else {
                         return res.status(403).send("No such user")

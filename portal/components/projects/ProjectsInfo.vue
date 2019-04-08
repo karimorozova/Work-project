@@ -64,15 +64,15 @@ export default {
   props: {
     client: {
         type: Object
-      },
-      user: {
-        type: Object
-      },
-      projects : {
+    },
+    user: {
+      type: Object
+    },
+    projects : {
+      type: Array
+    },
+    quotes: {
         type: Array
-      },
-      quotes: {
-          type: Array
     }
   },
   data() {
@@ -82,13 +82,12 @@ export default {
   },
   methods: {
     async openProjectsInfoDetailed(index) {
-      console.log(this.clientProjects[index])
       var id = this.clientProjects[index].id;
-      this.$axios.get(`portal/job?projectId=${id}`)
-      .then(res => {
-        this.$emit("projectDetails", {project: this.clientProjects[index], jobs: res.data.jobById})
-      }).catch(err => {console.log(err)})
-      this.projectInfoDetailed = !this.projectInfoDetailed;
+      // this.$axios.get(`portal/job?projectId=${id}`)
+      // .then(res => {
+      //   this.$emit("projectDetails", {project: this.clientProjects[index], jobs: res.data.jobById})
+      // }).catch(err => {console.log(err)})
+      // this.projectInfoDetailed = !this.projectInfoDetailed;
     }
   },
   computed: {
@@ -108,7 +107,6 @@ export default {
         //   }
         // }
         array.map((project)=>{
-          console.log('project',project);
           result.push({
             requestOn: moment(project.createdAt).format("DD-MM-YYYY"),
             id: project._id,
@@ -133,5 +131,5 @@ export default {
 </script>
 
 <style lang="scss" src="../../assets/styles/projects/projectsinfo.scss" scoped>
-// @import "../../assets/styles/projects/projectsinfo.scss";
+
 </style>

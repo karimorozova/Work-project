@@ -11,7 +11,7 @@ export const DETFILES_TO_DETAILS = (state, payload) => {
   }
 };
 
-export const REFFILES_TO_DATAILS = (state, payload) => {
+export const REFFILES_TO_DETAILS = (state, payload) => {
   if (payload) {
     state.orderDetails.refFiles = payload.name;
   }
@@ -32,9 +32,18 @@ export const SERVICES_FILL = (state, payload) => {
   state.services = payload
 };
 
-export const SES_COOK = (state, payload) => {
-  state.session = payload
-};
-export const PROJECTS = (state, payload) => {
+export const SET_USER = (state, payload) => {
+  state.user = payload;
+}
+
+export const SET_CLIENT = (state, payload) => {
+  state.clientInfo = payload;
+}
+
+export const SET_PROJECTS = (state, payload) => {
   state.projects = payload
 };
+
+export const SET_COMBINATIONS = (state, payload) => {
+  state.clientLanguages = payload;
+}

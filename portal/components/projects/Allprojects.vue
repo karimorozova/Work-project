@@ -5,39 +5,11 @@
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
             .dropItem(v-if="openAll")
                 .dropItem__filters
-                    .filterBlock
-                        .filterBlock__item.projectId
-                            label.inner-label Project ID
-                            input(type="text" v-model="projectIdFilter")
-                        .filterBlock__item.sourceLangs    
-                            label.inner-label Source Langs
-                            .sourceLangs__select.selector
-                                span(v-model="sourceLangsFilter" @click="sourceLangOpen") {{ sourceLangsFilter }}
-                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openSourceLangs}")
-                                .selector__drop(v-if="openSourceLangs")
-                                    source-select(@chooseLang="chooseSourceLang")
-                    .filterBlock
-                        .filterBlock__item.projectName
-                            label.inner-label Project Name
-                            input(type="text" v-model="projectNameFilter")
-                        .filterBlock__item.targetLangs
-                            label.inner-label Target Langs                            
-                            .targetLangs__select.selector
-                                span(v-model="targetLangsFilter" @click="targetLangOpen") {{ targetLangsFilter }}
-                                    img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openTargetLangs}")
-                                .selector__drop(v-if="openTargetLangs")
-                                    target-select(@chooseLang="chooseTargetLang")
-                    .filterBlock
-                        .filterBlock__item.request
-                            label.inner-label Request On
-                            input(type="text" :value="requestFilter")
-                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendar")
-                        quotesCalendarDetailed(v-if="currentFormVisible" @dateFilter='requestOnFilter')
-                        .filterBlock__item.deadline
-                            label.inner-label Deadline
-                            input(type="text" :value="deadFilter")
-                            img(src="../../assets/images/calendar.png" @click="showDetailedCalendarOther")
-                        quotesCalendarDetailed(v-if="currentFormVisibleOther" @dateFilter='dealineFiltered' :class="{switcher: currentFormVisibleOther}")   
+                    Filters(
+                        :sourceFilter="sourceFilter"
+                        :targetFilter="targetFilter"
+                        @setLangFilter="setLangFilter"
+                        )
                 .dropItem__table
                     Projectstable(
                         @projectDetails="projectDetails"
@@ -46,14 +18,15 @@
                         :projectNameFilter="projectNameFilter"
                         :projectIdFilter="projectIdFilter"
                         :deadlineFilter="deadlineFilter"
-                        :sourceLangsFilter="sourceLangsFilter"
-                        :targetLangsFilter="targetLangsFilter"
+                        :sourceFilter="sourceFilter"
+                        :targetFilter="targetFilter"
                         :statusFilter="statusFilter"
                     )
 </template>
 
 <script>
 import moment from 'moment';
+import Filters from "./Filters";
 import Projectstable from "./Projectstable";
 import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
 import ClientLangSource from "../../components/ClientLangSource";
@@ -80,8 +53,8 @@ export default {
             projectNameFilter: '',
             deadlineFilter: {from: "", to: ""},
             projectIdFilter: '',
-            sourceLangsFilter: '',
-            targetLangsFilter: '',
+            sourceFilter: '',
+            targetFilter: '',
             statusFilter: '',
             openAll: true,
             openSourceLangs: false,
@@ -92,6 +65,10 @@ export default {
         }
     },
     methods: {
+        setLangFilter({filter, value}) {
+            console.log(filter, value);
+            this[filter] = value;
+        },
         showAllProjects() {
             this.openAll = !this.openAll
         },
@@ -122,21 +99,19 @@ export default {
             .catch(err => {console.log(err)})
         },
         chooseSourceLang(data) {
-            this.sourceLangsFilter = data;
+            this.sourceFilter = data;
             this.openSourceLangs = false;
         },
         chooseTargetLang(data) {
-            this.targetLangsFilter = data;
+            this.targetFilter = data;
             this.openTargetLangs = false;
         },
         requestOnFilter(data) {
             this.requestDateFilter = {from: data.from, to: data.to};
-            console.log(this.requestDateFilter);
             this.currentFormVisible = false;
         },
         dealineFiltered(data) {
             this.deadlineFilter = {from: data.from, to: data.to};
-            console.log(this.deadlineFilter);
             this.currentFormVisibleOther = false;
             
         }
@@ -158,6 +133,7 @@ export default {
         }
     },
     components: {
+        Filters,
         Projectstable,
         quotesCalendarDetailed: QuotesCalendarDetailed,
         "source-select": ClientLangSource,
@@ -167,5 +143,4 @@ export default {
 </script>
 
 <style lang="scss" src="../../assets/styles/projects/allprojects.scss" scoped>
-// @import "../../assets/styles/projects/allprojects.scss";
 </style>
