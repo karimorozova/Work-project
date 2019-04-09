@@ -1,26 +1,24 @@
 <template lang="pug">
-    .allProjects
-        .allProjects__dropMenu(:class="{opened: openAll}")
-            .drop-select(@click="showAllProjects") All Projects
-                img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseImage: openAll}")
-            .dropItem(v-if="openAll")
-                .dropItem__filters
+    .all-projects
+        .all-projects__drop-menu(:class="{'all-projects_cornered': isOpened}")
+            .all-projects__drop-select(@click="toggleProjects") All Projects
+                img(src="../../assets/images/open-close-arrow-brown.png" :class="{'all-projects_rotate-180': isOpened}")
+            .all-projects__item(v-if="isOpened")
+                .all-projects__filters
                     Filters(
                         :sourceFilter="sourceFilter"
                         :targetFilter="targetFilter"
-                        @setLangFilter="setLangFilter"
-                        )
-                .dropItem__table
-                    Projectstable(
-                        @projectDetails="projectDetails"
-                        :projects="projects"
-                        :requestDateFilter="requestDateFilter"
-                        :projectNameFilter="projectNameFilter"
-                        :projectIdFilter="projectIdFilter"
+                        :requestFilter="requestFilter"
                         :deadlineFilter="deadlineFilter"
-                        :sourceFilter="sourceFilter"
-                        :targetFilter="targetFilter"
-                        :statusFilter="statusFilter"
+                        @setFilter="setFilter"
+                        @setLangFilter="setFilter"
+                        @setDateFilter="setDateFilter"
+                        @setFromAnyFilter="setFromAnyFilter"
+                        @setToAnyFilter="setToAnyFilter"
+                    )
+                .all-projects__table
+                    Projectstable(
+                        :projects="filteredProjects"
                     )
 </template>
 
@@ -28,119 +26,131 @@
 import moment from 'moment';
 import Filters from "./Filters";
 import Projectstable from "./Projectstable";
-import QuotesCalendarDetailed from "../../components/quotes/QuotesCalendarDetailed";
-import ClientLangSource from "../../components/ClientLangSource";
-import ClientLangTarget from "../../components/ClientLangTarget";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
-    props: {
-        client: {
-            type: Object
-        },
-        user: {
-            type: Object
-        },
-        projects : {
-            type: Array
-        },
-        quotes: {
-            type: Array
-        }
-    },
     data() {
         return {
-            requestDateFilter: {from: "", to: ""},
+            requestFilter: {
+                from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
+                to: new Date()
+            },
             projectNameFilter: '',
-            deadlineFilter: {from: "", to: ""},
+            deadlineFilter: {
+                from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
+                to: new Date()
+            },
             projectIdFilter: '',
             sourceFilter: '',
             targetFilter: '',
             statusFilter: '',
-            openAll: true,
-            openSourceLangs: false,
-            openTargetLangs: false,
-            openStatus: false,
-            currentFormVisible: false,
-            currentFormVisibleOther: false,  
+            isOpened: true
         }
     },
     methods: {
-        setLangFilter({filter, value}) {
-            console.log(filter, value);
+        setFilter({filter, value}) {
             this[filter] = value;
         },
-        showAllProjects() {
-            this.openAll = !this.openAll
+        setDateFilter({filter, prop, date}) {
+            this[filter][prop] = date;
         },
-        sourceLangOpen() {
-        this.openSourceLangs = !this.openSourceLangs;
+        setFromAnyFilter({filter, from}) {
+            this[filter].from = from;
         },
-        targetLangOpen() {
-        this.openTargetLangs = !this.openTargetLangs;
+        setToAnyFilter({filter, to}) {
+            this[filter].to = to;
         },
-        statusOpen() {
-        this.openStatus = !this.openStatus;
+        toggleProjects() {
+            this.isOpened = !this.isOpened
         },
-        showDetailedCalendar() {
-        this.currentFormVisible = !this.currentFormVisible;
-            if(this.currentFormVisible) {
-                this.currentFormVisibleOther = false;
-            }
+        isSourceExist(tasks) {
+            return tasks.find(item => item.sourceLanguage === this.sourceFilter);
         },
-        showDetailedCalendarOther() {
-        this.currentFormVisibleOther = !this.currentFormVisibleOther;
-            if(this.currentFormVisibleOther) {
-                this.currentFormVisible = false;
-            }
-        },
-        async projectDetails(data) {
-            this.$axios.get(`portal/job?projectId=${data.id}`)
-            .then(res => this.$emit('projectDetails', {project: data, jobs: res.data.jobById}))
-            .catch(err => {console.log(err)})
-        },
-        chooseSourceLang(data) {
-            this.sourceFilter = data;
-            this.openSourceLangs = false;
-        },
-        chooseTargetLang(data) {
-            this.targetFilter = data;
-            this.openTargetLangs = false;
-        },
-        requestOnFilter(data) {
-            this.requestDateFilter = {from: data.from, to: data.to};
-            this.currentFormVisible = false;
-        },
-        dealineFiltered(data) {
-            this.deadlineFilter = {from: data.from, to: data.to};
-            this.currentFormVisibleOther = false;
-            
+        isTargetExist(tasks) {
+            return tasks.find(item => item.targetLanguage === this.targetFilter);
         }
     },
     computed: {
-        requestFilter() {
-            let result = "";
-            if(this.requestDateFilter.from) {
-                result = moment(this.requestDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.requestDateFilter.to).format('DD-MM-YYYY')
+        ...mapGetters({
+            allProjects: "getAllProjects"
+        }),
+        filteredProjects() {
+            let result = this.allProjects.filter(item => {
+                return moment(item.createdAt) >= this.requestFilter.from && moment(item.createdAt) <= this.requestFilter.to
+                    && moment(item.deadline) >= this.deadlineFilter.from && moment(item.deadline) <= this.deadlineFilter.to
+            });
+            if(this.projectIdFilter) {
+                result = result.filter(item => item.projectId.indexOf(this.projectIdFilter) !== -1);
             }
-            return result
-        },
-        deadFilter() {
-            let result = "";
-            if(this.deadlineFilter.from) {
-                result = moment(this.deadlineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadlineFilter.to).format('DD-MM-YYYY')
+            if(this.projectNameFilter) {
+                result = result.filter(item => item.projectName.toLowerCase().indexOf(this.projectNameFilter) !== -1);
             }
-            return result
+            if(this.sourceFilter) {
+                result = result.filter(item => this.isSourceExist(item.tasks));
+            }
+            if(this.targetFilter) {
+                result = result.filter(item => this.isTargetExist(item.tasks));
+            }
+            return result;
         }
     },
     components: {
         Filters,
-        Projectstable,
-        quotesCalendarDetailed: QuotesCalendarDetailed,
-        "source-select": ClientLangSource,
-        "target-select": ClientLangTarget
+        Projectstable
     }
 };
 </script>
 
-<style lang="scss" src="../../assets/styles/projects/allprojects.scss" scoped>
+<style lang="scss" scoped>
+
+.all-projects {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+    margin: 0 auto;
+    &__drop-menu {
+        max-width: 919px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 18px;
+        box-shadow: 0 3px 13px rgba(103, 87, 62, 0.5);
+        margin-right: 4%;
+        margin-bottom: 10px;
+        padding: 0 14px;
+        color: #67573e;
+        transition: all 0.2s;
+        @media (max-width: 1550px) {
+            margin-left: 58px;
+        }       
+    }
+    &__drop-select {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 18px;
+        padding: 14px;
+        cursor: pointer;
+    }
+    &__item {
+        width: 100%;
+    }
+    &_rotate-180 {
+        transform: rotate(180deg);
+    }
+    &_cornered {
+        border-radius: 0;
+        border: none;
+        margin-bottom: 0;
+        @media (max-width: 1550px) {
+            margin-left: 58px;
+        }
+    }
+}
+
 </style>

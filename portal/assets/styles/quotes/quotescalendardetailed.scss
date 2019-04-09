@@ -1,13 +1,13 @@
 .quotesCalendarWrapper {
     position: absolute;
-    top: 28%;
+    top: 30px;
     left: -30%;
     z-index: 5;
     width: 582px;
   
     .calendarContainer {
       display: flex;
-      border: 2px solid #67573e;
+      border: 1px solid #67573e;
       padding: 10px;
       font-size: 16px;
       background-color: #fff;

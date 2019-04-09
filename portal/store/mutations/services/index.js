@@ -41,7 +41,14 @@ export const SET_CLIENT = (state, payload) => {
 }
 
 export const SET_PROJECTS = (state, payload) => {
-  state.projects = payload
+  let projects = [];
+  if(payload.length) {
+    projects = payload.sort((a, b) => {
+      if (a.createdAt > b.createdAt) return -1
+      if (a.createdAt < b.createdAt) return 1;
+  });
+  }
+  state.projects = projects;
 };
 
 export const SET_COMBINATIONS = (state, payload) => {
