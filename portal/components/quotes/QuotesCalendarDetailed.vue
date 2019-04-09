@@ -1,34 +1,32 @@
 <template lang="pug">
-  .quotesCalendarWrapper(v-click-outside="close")
-    .calendarContainer
-        .calendarContainer__left
-            .calendarContainer__left-level1
-                .col1 From
-                .col2
-                    .col2-text1(@click="fromAny")
-                      .innerCheck(:class="{checkedBox: checked.from}")
-                    .col2-text2 Anytime
-            .calendarContainer__left-level4
-                input(type="text" :value="dateFrom" readonly)
-                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'from')" v-model="datesFilter.from")
-        .calendarContainer__right
-            .calendarContainer__right-level1
-                .col1 To
-                .col2
-                    .col2-text1(@click="toAny")
-                      .innerCheck(:class="{checkedBox: checked.to}")
-                    .col2-text2 Anytime
-            .calendarContainer__right-level4
-                input(type="text" :value="dateTo" readonly)
-                datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'to')" v-model="datesFilter.to")
-            .calendarContainer__right-level5
-                .col2
-                    button(@click="close") Close
+  .datepickers(v-click-outside="close")
+    .datepickers__item
+        .datepickers__title
+            .datepickers__text From
+            .datepickers__check
+                .datepickers__checkbox(@click="fromAny")
+                  .innerCheck(:class="{checkedBox: checked.from}")
+                .datepickers__hint Anytime
+        .datepickers__picker
+            input(type="text" :value="dateFrom" readonly)
+            datepicker(wrapperClass="all-projects" monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'from')" v-model="datesFilter.from")
+    .datepickers__item
+        .datepickers__title
+            .datepickers__text To
+            .datepickers__check
+                .datepickers__checkbox(@click="toAny")
+                  .innerCheck(:class="{checkedBox: checked.to}")
+                .datepickers__hint Anytime
+        .datepickers__picker
+            input(type="text" :value="dateTo" readonly)
+            datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'to')" v-model="datesFilter.to")
+        .datepickers__button
+          Button(value="Close" @makeAction="close")
 </template>
-
 
 <script>
 import DatePicker from "../Datepicker.vue";
+import Button from "../buttons/Button";
 import moment from "moment";
 import ClickOutside from "vue-click-outside";
 
@@ -94,7 +92,8 @@ export default {
     }
   },
   components: {
-    datepicker: DatePicker
+    datepicker: DatePicker,
+    Button
   },
   directives: {
     ClickOutside
@@ -103,7 +102,79 @@ export default {
 </script>
 
 
-<style lang="scss">
-@import "../../assets/styles/quotes/quotescalendardetailed.scss";
+<style lang="scss" scoped>
+
+.datepickers {
+  position: absolute;
+  top: 30px;
+  left: -30%;
+  z-index: 5;
+  width: 500px;
+  display: flex;
+  border: 1px solid #67573e;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #fff;
+  box-sizing: border-box;
+  justify-content: space-between;
+  @media screen and (max-width: 1550px) {
+    padding: 10px;
+  }
+  &__title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    box-sizing: border-box;        
+    .datepickers__text {
+      color: #67573e;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .datepickers__check {
+      display: flex;
+      align-items: baseline;
+    }
+  }
+  &__hint {
+    font-size: 14px;
+  }
+  &__button {
+    text-align: right;
+  }
+  &__item {
+    flex-direction: column;
+    width: 48%;
+    box-sizing: border-box;
+    @media screen and (max-width: 1550px) {
+      margin-right: 9px;
+    }
+  }
+  &__picker {
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    input {
+      padding: 4px;
+      margin-bottom: 10px;
+    }
+  }
+  &__checkbox {
+    border: 0.1px solid #e2dddb;
+    height: 20px;
+    width: 20px;
+    margin-right: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    .innerCheck {
+      width: 62%;
+      height: 62%;
+      background-color: white;
+    }
+    .checkedBox {
+      background-color: #67573e;
+    }
+  }
+}
 
 </style>

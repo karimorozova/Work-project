@@ -999,7 +999,7 @@ export default {
 	border: 1px solid #4bd;
 }
 
-.vdp-datepicker__calendar .cell.selected {
+.vdp-datepicker__calendar span.cell.selected {
 	background: white;
   font-weight: bold;
 }
@@ -1018,7 +1018,7 @@ export default {
   color: rgba(0, 0, 0, 0.4);
 }
 
-.vdp-datepicker__calendar .cell.today {
+.vdp-datepicker__calendar span.cell.today {
   background-color: #D15F45;
   color: #FFF;
   font-weight: bold;  
@@ -1072,4 +1072,27 @@ export default {
 .vdp-datepicker__calendar .cell.notCurrentMonth {
   color: rgba(0, 0, 0, 0.2);
 }
+
+.all-projects .vdp-datepicker__calendar {
+  width: 230px;
+}
+
+.all-projects .vdp-datepicker__calendar .cell.day-header {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.all-projects .vdp-datepicker__calendar .day  {
+  background-color: #eaeaea;
+  height: 25px;
+  font-size: 14px;
+  line-height: 30px;
+}
+
+.all-projects .vdp-datepicker__calendar .cell.highlighted,
+.all-projects .vdp-datepicker__calendar .cell.disabled.weekend {
+  background: #cde1f7;
+  color: rgba(0, 0, 0, 0.4);
+}
+
 </style>
