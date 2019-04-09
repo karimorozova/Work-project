@@ -89,7 +89,7 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/project-metrics', async (req, res) => {
     const { projectId, customerId } = req.query;
     try {
-        unirest.get(`xtmBaseUrl/rest-api/projects/${projectId}/metrics`)
+        unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end(async (response) => {
