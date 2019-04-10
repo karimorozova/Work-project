@@ -11,11 +11,11 @@
             .sel_project_block__imgWrapper(@click="showDropdown")
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
-            .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
+            .additional(v-if="dropdownVisible")
               .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .womanWrapper
           img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
-          .accountMenuWrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
+          .accountMenuWrapper(v-if="accountMenuVisible")
             .accountBlock
               .accountBlock__info
                 .icon
