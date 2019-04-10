@@ -20,11 +20,11 @@
         .filters__item
             span.filters__label Source Langs
             .filters__drop-menu
-                SelectSingle(:options="sourceLangs" :selectedOption="sourceFilter" @chooseOption="(e) => setLangFilter(e, 'source')" customClass="filters_height-30")
+                SelectSingle(:options="sourceLangs" :selectedOption="sourceFilter" @chooseOption="(e) => setLangFilter(e, 'source')" customClass="filters_height-30" :isSearch="true")
         .filters__item
             span.filters__label Target Langs
             .filters__drop-menu
-                SelectSingle(:options="targetLangs" :selectedOption="targetFilter" @chooseOption="(e) => setLangFilter(e, 'target')" customClass="filters_height-30")
+                SelectSingle(:options="targetLangs" :selectedOption="targetFilter" @chooseOption="(e) => setLangFilter(e, 'target')" customClass="filters_height-30" :isSearch="true")
         .filters__item
             span.filters__label Deadline
             input.filters__filter(type="text" readonly :value="formatDateFilter('deadlineFilter')")

@@ -55,7 +55,7 @@
           span(v-if="clientRequestShow") {{ serviceType }}
         <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
         <!--Confirmorder(v-if="thanks" :thanksService="thanksService")-->
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" :project="project" :quote="quote" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
+        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 
 <script>
@@ -102,49 +102,6 @@
         expander: false,
         accountMenuVisible: false,
         quotes: [],
-        quote: {
-          name: 'some name',
-          idNumber: 345345,
-          status: 'SENT',
-          totalAgreed: {
-            formattedAmount: 1000
-          },
-          projectManager: {
-            name: 'Sam'
-          },
-          service: 'Special',
-          specialization: 'Some spec',
-          startDate: {
-            formatted: '1980 07 15'
-          },
-          deadline: {
-            formatted: '2980 07 15'
-          }
-        },
-        project: {
-          name: 'some name',
-          idNumber: 345345,
-          status: 'active',
-          totalAgreed: {
-            formattedAmount: 1000
-          },
-          projectManager: {
-            name: 'Sam'
-          },
-          service: 'Special',
-          specialization: 'Some spec',
-          startDate: {
-            formatted: '1980 07 15'
-          },
-          deadline: {
-            formatted: '2980 07 15'
-          }
-
-        },
-        jobsById: [],
-        languageCombinations: [],
-        quoteIndex: 0,
-        projectIndex: 0,
         newProject: [
           {title: "Translation", path: "/translation"},
           {title: "Copywriting", path: "/copywriting"},
@@ -205,29 +162,10 @@
           item.active = false;
         });
       },
-
       showDropdown() {
         this.dropdownVisible = !this.dropdownVisible;
       },
       dataForRequest(ind) {
-        if (this.user) {
-          let formData = {
-            name: this.user.firstName,
-            email: this.user.email,
-            companyName: this.client.name,
-            www: this.client.website,
-            phone: this.user.phone,
-            skype: this.user.skype,
-            service: this.newProject[ind].title,
-            industry: this.client.industries[0].name,
-            clientId: this.client._id,
-            industryId: this.client.industries[0]._id
-          };
-          this.requestInfo(formData);
-          this.loadLangs(this.languageCombinations);
-          this.clientRequestShow = true;
-          this.dropdownVisible = false;
-        }
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach((item, i) => {
           if (i === 0) {
@@ -237,6 +175,7 @@
           }
         });
         this.$router.push(`/client-request${this.newProject[ind].path}`);
+        this.dropdownVisible = false;
       },
       async getServices() {
         const result = await this.$axios.$get('/api/services');

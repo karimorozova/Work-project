@@ -3,6 +3,7 @@
         DataTable(
             :fields="fields"
             :tableData="projects"
+            @onRowClicked="getDetails"
         )
             .data-table__header(slot="headerRequestDate" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerProjectId" slot-scope="{ field }") {{ field.label }}
@@ -10,7 +11,7 @@
             .data-table__header(slot="headerDeadline" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
-            .data-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
+            .data-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
             .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
             .data-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId }}
             .data-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
@@ -18,7 +19,8 @@
             .data-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
             .data-table__data(slot="totalCost" slot-scope="{ row, index }") {{ row.finance.Price.receivables }}
                 .data-table__currency(v-if="row.finance.Price.receivables") &euro;
-            .data-table__data.data-table_centered(slot="download" slot-scope="{ row, index }")
+            .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
+                img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
 </template>
 
 <script>
@@ -42,13 +44,23 @@ export default {
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "16%", padding: "0"},
                 {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "12%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
-            ]
+            ],
+            icons: {
+                approve: {src: require("../../../assets/images/Approve-icon.png")},
+                reject: {src: require("../../../assets/images/Reject-icon.png")}
+            }
         }
     },
     methods: {
         getFormattedDate(date) {
             return moment(date).format("DD-MM-YYYY");
         },
+        makeAction(index, key) {
+            this.$emit("iconClicked", { index, key })
+        },
+        getDetails({index}) {
+            this.$emit("getDetails", { index });
+        }
     },
     components: {
         DataTable
@@ -68,6 +80,16 @@ export default {
     }
     &__currency {
         margin-left: 3px;
+    }
+    &__icon {
+        margin: 0 5px;
+        transition: all 0.2s;
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+    &_centered {
+        justify-content: center;
     }
 }
 

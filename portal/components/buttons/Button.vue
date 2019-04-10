@@ -1,6 +1,6 @@
 <template lang="pug">
 .action-button(:class="{'action-button_disabled': isDisabled}")
-    input.action-button__button(type="button" :value="value" @click="makeAction")    
+    input.action-button__button(type="button" :value="value" @click="makeAction" :class="buttonClass")    
 </template>
 
 <script>
@@ -12,6 +12,9 @@ export default {
         isDisabled: {
             type: Boolean,
             default: false
+        },
+        buttonClass: {
+            type: String
         }
     },
     methods: {
@@ -49,6 +52,10 @@ export default {
         @media (max-width: 450px) {
             margin: 5px;
         }
+    }
+    .tasks-approve {
+        background-color: $green;
+        border-color: $green;
     }
 }
 

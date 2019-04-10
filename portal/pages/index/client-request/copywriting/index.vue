@@ -1021,12 +1021,6 @@
     directives: {
       ClickOutside
     },
-    created() {
-      window.addEventListener("scroll", this.handleScroll);
-    },
-    destroyed() {
-      window.removeEventListener("scroll", this.handleScroll);
-    },
     mounted() {
       this.getLanguages();
       this.getServiceLangs();

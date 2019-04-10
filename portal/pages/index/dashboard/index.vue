@@ -5,17 +5,18 @@
         .dashboard__select(@click="toggleQuotes") Open Quotes
           img(src="../../../assets/images/open-close-arrow-brown.png" :class="{'dashboard_rotate-180': isQuotesOpened}")
         .dashboard__table(v-if="isQuotesOpened")
-          Table(:projects="filteredQuotes")
+          Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
     .dashboard__item
       .dashboard__drop-menu(:class="{'dashboard_cornered': isProjectsOpened}")
         .dashboard__select(@click="toggleProjects") Open Projects
           img(src="../../../assets/images/open-close-arrow-brown.png" :class="{'dashboard_rotate-180': isProjectsOpened}")
         .dashboard__table(v-if="isProjectsOpened")
-          Table(:projects="filteredProjects")
+          Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')")
 </template>
 
 <script>
 import Table from "../../components/projects/Table";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   props: {
@@ -30,6 +31,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      updateQuoteStatus: "updateQuoteStatus"
+    }),
     toggleQuotes() {
       this.isQuotesOpened = !this.isQuotesOpened;
     },
@@ -40,6 +44,18 @@ export default {
       return this.projects.filter(item => {
         return statuses.indexOf(item.status) !== -1
       })
+    },
+    getDetails({index}, prop) {
+      const id = this[prop][index]._id
+      this.$router.push(`/dashboard/details/${id}`);
+    },
+    async makeQuoteAction({index, key}) {
+      const quote = this.filteredQuotes[index];
+      try {
+        await this.updateQuoteStatus({ quote, key});
+      } catch(err) {
+
+      }
     }
   },
   computed: {

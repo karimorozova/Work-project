@@ -2,6 +2,7 @@
 import { ALERTING_MESSAGE } from "./alerts";
 import { SET_TOKEN } from "./auth";
 import { INCREASE_REQUEST, DECREASE_REQUEST } from "./requests";
+import { REPLACE_QUOTE, SET_PROJECT } from "./projects";
 import {
   DETAILS,
   DETFILES_TO_DETAILS,
@@ -15,7 +16,6 @@ import {
   SET_PROJECTS,
   SET_COMBINATIONS
 } from "./services";
-
 
 export {
   ALERTING_MESSAGE,
@@ -32,5 +32,7 @@ export {
   SET_PROJECTS,
   SET_COMBINATIONS,
   INCREASE_REQUEST,
-  DECREASE_REQUEST
+  DECREASE_REQUEST,
+  REPLACE_QUOTE,
+  SET_PROJECT
 };

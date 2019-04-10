@@ -1,5 +1,6 @@
 <template lang="pug">
-  nuxt-child
+  .client-requests
+    nuxt-child
 </template>
 
 <script>

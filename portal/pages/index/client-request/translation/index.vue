@@ -568,10 +568,6 @@
       this.getServices();
       this.getClientLanguages();
       this.getLanguages();
-      // console.log('this.$store.state.services : ',this.$store.state.services);
-      // console.log('this.$store.state.clientLanguages : ',this.$store.state.clientLanguages);
-      // console.log('this.$store.state.clientInfo : ',this.$store.state.clientInfo);
-      // console.log('service : ',this.$store.state.services.find((el)=>el.title === this.$store.state.clientInfo.service)._id);
     }
   }
 

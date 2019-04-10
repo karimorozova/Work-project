@@ -1,8 +1,6 @@
-const { ClientApi, HomeApi } = require('../models/xtrf');
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
-const { getProject, getProjects } = require("../projects/");
-const { jobInfo, quoteTasksInfo } = require('../models/xtrf/report');
+const { getProject, getProjects, updateProjectStatus } = require("../projects/");
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
@@ -55,7 +53,6 @@ router.get('/projects', checkClientContact, async (req, res) => {
 })
 
 router.get('/language-combinations', checkClientContact, async (req, res) => {
-    let customer = new ClientApi("", req.cookies.ses);
     let id = +req.query.customerId;
     try {
         let result = await customer.languageComb(id);
@@ -69,7 +66,6 @@ router.get('/language-combinations', checkClientContact, async (req, res) => {
 
 router.get('/customer-info', checkClientContact, async (req, res) => {
     try {
-        let customer = await HomeApi.customerInfo(req.query.customerId);
         res.send(customer)
     } catch(err) {
         console.log(err);
@@ -169,7 +165,6 @@ router.get('/downloadTask', checkClientContact, (req, res) => {
 router.get('/job',async (req, res) => {
     const id = req.query.projectId;
     try {
-    const jobById = await jobInfo(id);
     res.send({jobById});
     } catch(err) {
         console.log(err);
@@ -180,7 +175,6 @@ router.get('/job',async (req, res) => {
 router.get('/tasksInfo', checkClientContact, async (req,res) => {
     const id = req.query.quoteId;
     try {
-        const tasksOfQuote = await quoteTasksInfo(id);
         res.send({tasksOfQuote});
     } catch(err) {
         console.log(err);
@@ -188,12 +182,15 @@ router.get('/tasksInfo', checkClientContact, async (req,res) => {
     }
 });
 
-router.get('/approve', checkClientContact, async (req, res) => {
-    const customer = new ClientApi("", req.cookies.ses);
-    const id = req.query.quoteId;
+router.post('/approve-reject', checkClientContact, async (req, res) => {
+    const { quote, key } = req.body;
     try {
-        const result = await customer.quoteApprove(id);
-        res.send("approved");
+        let status = 'Rejected';
+        if(key === 'approve') {
+            status = quote.isStartAccepted ? 'Started' : "Approved";
+        }
+        const updatedQuote = await updateProjectStatus(quote._id, status);
+        res.send(updatedQuote);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on approving');
@@ -201,7 +198,6 @@ router.get('/approve', checkClientContact, async (req, res) => {
 });
 
 router.get('/reject', checkClientContact, async (req, res) => {
-    const customer = new ClientApi("", req.cookies.ses);
     const id = req.query.quoteId;
     try {
         const result = await customer.quoteReject(id);

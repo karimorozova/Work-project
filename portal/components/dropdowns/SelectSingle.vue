@@ -5,8 +5,9 @@
             span.selected.no-choice(v-if="!selectedOption") Select
             .arrow-button
                 img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+        input.drop-select__search(v-if="isSearch && isDropped" type="text" v-model="searchValue" placeholder="Search")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+            .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ option }}
 </template>
 
@@ -23,11 +24,15 @@ export default {
         },
         customClass: {
             type: String
+        },
+        isSearch: {
+            type: Boolean
         }
     },
     data() {
         return {
-            isDropped: false
+            isDropped: false,
+            searchValue: ""
         }
     },
     methods: {
@@ -38,14 +43,23 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index]});
+            this.$emit("chooseOption", {option: this.filteredOptions[index]});
             this.outOptions();
         },
         activeClass(elem) {
-            if(this.selectedOption == elem && elem != "Yes") return true;
+            if(this.selectedOption == elem && elem !== "Yes") return true;
             if(elem == "Yes" && this.selectedOption && 
-            this.options.indexOf(this.selectedOption) === -1) return true;
+            this.filteredOptions.indexOf(this.selectedOption) === -1) return true;
             return false;
+        }
+    },
+    computed: {
+        filteredOptions() {
+            let result = this.options;
+            if(this.searchValue) {
+                result = result.filter(item => item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1)
+            }
+            return result;
         }
     },
     directives: {
@@ -71,6 +85,14 @@ export default {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    &__search {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 5px;
+        outline: none;
+        border: 1px solid #938676;
+        box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
+    }
     .drop {
         width: 100%;
         max-height: 100px;
