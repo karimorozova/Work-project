@@ -1,6 +1,6 @@
 <template lang="pug">
   .copywritingWrapper
-    .container
+    .copywriting__container
       form.copywriting-form(@submit.prevent="checkForm")
         .col-1
           .col-1__block0
@@ -1038,7 +1038,7 @@
     align-items: flex-start;
     margin-bottom: 30px;
 
-    .container {
+    .copywriting__container {
       position: relative;
       font-family: MyriadPro;
       display: flex;

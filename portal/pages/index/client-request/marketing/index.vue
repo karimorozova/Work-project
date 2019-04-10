@@ -619,12 +619,12 @@
         this.$refs.programaticOpen.showCalendar();
       }
     },
-    created() {
-      window.addEventListener("scroll", this.handleScroll);
-    },
-    destroyed() {
-      window.removeEventListener("scroll", this.handleScroll);
-    },
+    // created() {
+    //   window.addEventListener("scroll", this.handleScroll);
+    // },
+    // destroyed() {
+    //   window.removeEventListener("scroll", this.handleScroll);
+    // },
     computed: {
       toneSelect() {
         let result = [];
@@ -880,7 +880,6 @@
         }
         &__select {
           position: absolute;
-          left: 10px;
           margin-top: 5px;
           max-height: 490px;
           width: 510px;
@@ -1428,6 +1427,7 @@
       border-radius: 15px;;
       color: #67563D;
       position: relative;
+      margin-left: 20%;
     }
     .orderInfo {
       font-family: MyriadPro;

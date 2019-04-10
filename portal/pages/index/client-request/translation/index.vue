@@ -716,7 +716,6 @@
     position: relative;
     color: #66563D;
     font-family: MyriadPro;
-    width: 50%;
     margin-left: 20%;
     display: flex;
     flex-direction: column;
