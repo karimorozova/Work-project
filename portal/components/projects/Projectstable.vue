@@ -5,6 +5,7 @@
             DataTable(
                 :fields="fields"
                 :tableData="projects"
+                @onRowClicked="getDetails"
             )
                 .projects-table__header(slot="headerRequestDate" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerProjectId" slot-scope="{ field }") {{ field.label }}
@@ -19,7 +20,7 @@
                 .projects-table__data(slot="totalCost" slot-scope="{ row, index }") {{ row.finance.Price.receivables }}
                     .projects-table__currency(v-if="row.finance.Price.receivables") &euro;
                 .projects-table__data.projects-table_centered(slot="download" slot-scope="{ row, index }")
-                    img.projects-table__icon(src="../../assets/images/download.png" @click.stop="download(index)")
+                    img.projects-table__icon(v-if="isDownload(row)" src="../../assets/images/download.png" @click.stop="download(index)")
 </template>
 
 <script>
@@ -49,6 +50,10 @@ export default {
         getFormattedDate(date) {
             return moment(date).format("DD-MM-YYYY");
         },
+        isDownload(project) {
+            const statuses = ['Ready for Delivery', 'Delivered'];
+            return statuses.indexOf(project.status) !== -1;
+        },
         async clientInfo() {
           const token = this.jsess;
           const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
@@ -63,7 +68,11 @@ export default {
             //     link.href = file.data;
             //     link.click();
             // let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.clientProjects[index].id}`);
-        }    
+        },
+        getDetails({index}) {
+            const id = this.projects[index]._id
+            this.$router.push(`/projects/details/${id}`);
+        }
     },
     components: {
         DataTable
