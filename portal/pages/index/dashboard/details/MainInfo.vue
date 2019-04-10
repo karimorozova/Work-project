@@ -114,6 +114,7 @@ export default {
     &__buttons {
         display: flex;
         justify-content: center;
+        margin-bottom: 20px;
     }
     &__button {
         width: 30%;

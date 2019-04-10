@@ -1,5 +1,5 @@
 <template lang="pug">
-  .datepickers(v-click-outside="close")
+  .datepickers
     .datepickers__item
         .datepickers__title
             .datepickers__text From
@@ -28,7 +28,6 @@
 import DatePicker from "../Datepicker.vue";
 import Button from "../buttons/Button";
 import moment from "moment";
-import ClickOutside from "vue-click-outside";
 
 export default {
   props: {
@@ -94,9 +93,6 @@ export default {
   components: {
     datepicker: DatePicker,
     Button
-  },
-  directives: {
-    ClickOutside
   }
 };
 </script>
