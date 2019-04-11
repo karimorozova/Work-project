@@ -11,7 +11,7 @@
             .sel_project_block__imgWrapper(@click="showDropdown")
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
-            .additional(v-if="dropdownVisible")
+            .additional(v-if="dropdownVisible" v-click-outside="closeRequestsMenu")
               .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .womanWrapper
           img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
@@ -138,8 +138,10 @@
       hideAccountMenu() {
         this.accountMenuVisible = false;
       },
-      hideAdditional() {
-        this.dropdownVisible = false;
+      closeRequestsMenu() {
+        if(this.dropdownVisible) {
+          this.dropdownVisible = false
+        }
       },
       signOut() {
         this.logout();
