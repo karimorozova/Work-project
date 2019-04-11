@@ -139,8 +139,12 @@
         this.accountMenuVisible = false;
       },
       closeRequestsMenu() {
-        if(this.dropdownVisible) {
+        const element = document.querySelector('.additional__listItem');
+        if(element) {
+          console.log('yes')
           this.dropdownVisible = false
+        } else {
+          console.log('no')
         }
       },
       signOut() {
