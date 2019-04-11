@@ -82,9 +82,6 @@ export default {
         closePickers(e, prop) {
             this[prop] = false;
         },
-        closeRequestPicker() {
-
-        },
         formatDateFilter(prop) {
             const from = this[prop].from ? moment(this[prop].from).format("DD-MM-YYYY") : "";
             const to = this[prop].to ? moment(this[prop].to).format("DD-MM-YYYY") : "";
