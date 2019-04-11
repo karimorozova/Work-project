@@ -6,7 +6,7 @@
         .filters__item
             span.filters__label Project Name
             input.filters__filter(type="text" @input="(e) => setFilter(e, 'projectNameFilter')")
-        .filters__item
+        .filters__item(v-click-outside="(e) => closePickers(e, 'isRequestOnFilter')")
             span.filters__label Request On
             input.filters__filter(type="text" readonly :value="formatDateFilter('requestFilter')")
             img.filters__icon(src="../../assets/images/calendar.png" @click="(e) => togglePickers(e, 'isRequestOnFilter')")
@@ -25,7 +25,7 @@
             span.filters__label Target Langs
             .filters__drop-menu
                 SelectSingle(:options="targetLangs" :selectedOption="targetFilter" @chooseOption="(e) => setLangFilter(e, 'target')" customClass="filters_height-30" :isSearch="true")
-        .filters__item
+        .filters__item(v-click-outside="(e) => closePickers(e, 'isDeadlineFilter')")
             span.filters__label Deadline
             input.filters__filter(type="text" readonly :value="formatDateFilter('deadlineFilter')")
             img.filters__icon(src="../../assets/images/calendar.png" @click="(e) => togglePickers(e, 'isDeadlineFilter')")
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import ClickOutside from "vue-click-outside";
 import moment from 'moment';
 import { mapGetters } from "vuex";
 import SelectSingle from "../dropdowns/SelectSingle";
@@ -81,6 +82,9 @@ export default {
         closePickers(e, prop) {
             this[prop] = false;
         },
+        closeRequestPicker() {
+
+        },
         formatDateFilter(prop) {
             const from = this[prop].from ? moment(this[prop].from).format("DD-MM-YYYY") : "";
             const to = this[prop].to ? moment(this[prop].to).format("DD-MM-YYYY") : "";
@@ -105,6 +109,9 @@ export default {
     components: {
         SelectSingle,
         QuotesCalendarDetailed
+    },
+    directives: {
+        ClickOutside
     }
 }
 </script>

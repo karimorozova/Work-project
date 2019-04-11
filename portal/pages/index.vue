@@ -4,36 +4,37 @@
       .clientsTop__clientName
         h2.clientsPortal CLIENT PORTAL
       .clientsTop__searchBlock
-        .dropdownWrapper
+        .dropdownWrapper(v-click-outside="closeRequestsMenu")
           .sel_project_block
             .sel_project_block__proj
               span New Project
             .sel_project_block__imgWrapper(@click="showDropdown")
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
           .clientsTop__dropdown
-            .additional(v-if="dropdownVisible" v-click-outside="closeRequestsMenu")
+            .additional(v-if="dropdownVisible")
               .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
-        .womanWrapper
-          img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
-          .accountMenuWrapper(v-if="accountMenuVisible")
-            .accountBlock
-              .accountBlock__info
-                .icon
-                  img(src="../assets/images/man.png")
-                .personal__data
-                  .personal__data_name {{ user.firstName }}
-                  .personal__data_email {{ user.email }}
-              .accountBlock__myaccount__wrapper(@click="showAccountInfo")
-                router-link.accountBlock__myaccount(to="/account")
-                  .human_icon
+        .account-menu(v-click-outside="hideAccountMenu")
+          .womanWrapper
+            img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
+            .accountMenuWrapper(v-if="accountMenuVisible")
+              .accountBlock
+                .accountBlock__info
+                  .icon
                     img(src="../assets/images/man.png")
-                  .my_account My Account
-              .accountBlock__exit(@click="signOut")
-                .icon_exit
-                  img(src="../assets/images/sign-out.png")
-                .sign_out Sign Out
-        .chevronWrapper
-          .chevron(@click="showAccountMenu")
+                  .personal__data
+                    .personal__data_name {{ user.firstName }}
+                    .personal__data_email {{ user.email }}
+                .accountBlock__myaccount__wrapper(@click="showAccountInfo")
+                  router-link.accountBlock__myaccount(to="/account")
+                    .human_icon
+                      img(src="../assets/images/man.png")
+                    .my_account My Account
+                .accountBlock__exit(@click="signOut")
+                  .icon_exit
+                    img(src="../assets/images/sign-out.png")
+                  .sign_out Sign Out
+          .chevronWrapper
+            .chevron(@click="showAccountMenu")
     .clientsMainWrapper
       .clientsNavbar
         .clientsNavbar__sideBar
@@ -139,13 +140,7 @@
         this.accountMenuVisible = false;
       },
       closeRequestsMenu() {
-        const element = document.querySelector('.additional__listItem');
-        if(element) {
-          console.log('yes')
-          this.dropdownVisible = false
-        } else {
-          console.log('no')
-        }
+        this.dropdownVisible = false
       },
       signOut() {
         this.logout();
@@ -322,7 +317,10 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-
+      .account-menu {
+        display: flex;
+        align-items: center;
+      }
       .dropdownWrapper {
         height: 34px;
         width: 239px;
