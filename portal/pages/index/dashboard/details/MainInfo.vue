@@ -12,6 +12,8 @@
                 .data-block__item
                     LabelValue(v-if="project.finance" title="Total Cost" :isColon="isColon" :value="project.finance.Price.receivables")
                         span.main-info__currency(v-if="project.finance && project.finance.Price.receivables") &euro;
+            .data-block(v-if="!isQuote")
+                Progress(:percent="getTotalProgress()")
         .main-info__tasks(v-if="isQuote")
             QuoteTasks
         .main-info__tasks(v-else)
@@ -27,6 +29,7 @@
 import LabelValue from "~/components/LabelValue";
 import Button from "~/components/buttons/Button";
 import ApproveModal from "~/components/ApproveModal";
+import Progress from "~/components/Progress";
 import ClickOutside from "vue-click-outside";
 import QuoteTasks from "./QuoteTasks";
 import ProjectTasks from "./ProjectTasks";
@@ -58,6 +61,14 @@ export default {
                 this.selectProject(updatedQuote);
             } catch(err) {}
         },
+        getTotalProgress() {
+            let total = 0;
+            const { steps } = this.project;
+            for(let step of steps) {
+                total+= +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2);
+            }
+            return total/steps.length;
+        }
     },
     computed: {
         ...mapGetters({
@@ -74,7 +85,8 @@ export default {
         Button,
         QuoteTasks,
         ProjectTasks,
-        ApproveModal
+        ApproveModal,
+        Progress
     },
     directives: {
         ClickOutside
@@ -137,9 +149,8 @@ export default {
     flex-direction: column;
     justify-content: space-around;
     position: relative;
-    &__progress {
-        position: absolute;
-        left: -20px;
+    &:last-child {
+        width: 20%;
     }
 }
 

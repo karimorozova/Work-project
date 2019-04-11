@@ -1,7 +1,7 @@
 <template lang="pug">
     .data-table
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="projects"
             @onRowClicked="getDetails"
         )
@@ -21,6 +21,10 @@
                 .data-table__currency(v-if="row.finance.Price.receivables") &euro;
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
+            .data-table__data(slot="progress" slot-scope="{ row, index }")
+                .data-table__progress-bar
+                    .data-table__progress-filler(:style="{width: progress(row.steps) + '%'}")
+                    span.data-table__progress-tooltip {{ progress(row.steps) }}%
 </template>
 
 <script>
@@ -32,6 +36,10 @@ export default {
         projects: {
             type: Array,
             default: () => []
+        },
+        isOpenProjects: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -60,6 +68,23 @@ export default {
         },
         getDetails({index}) {
             this.$emit("getDetails", { index });
+        },
+        progress(steps) {
+            let total = 0;
+            for(let step of steps) {
+                total+= +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2);
+            }
+            return total/steps.length;
+        }
+    },
+    computed: {
+        tableFields() {
+            let result = [...this.fields];
+            if(this.isOpenProjects) {
+                result[result.length-1].label = 'Progress';
+                result[result.length-1].key = 'progress';
+            }
+            return result;
         }
     },
     components: {
@@ -69,6 +94,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
 
 .data-table {
     &__data {
@@ -87,6 +113,34 @@ export default {
         &:hover {
             transform: scale(1.1);
         }
+    }
+    &__progress-tooltip {
+        position: absolute;
+        opacity: 0;
+        background-color: $white;
+        color: $main-color;
+        transition: all 0.2s;
+        font-size: 14px;
+        top: -1px;
+        left: 40%;
+        padding: 0 3px;
+    }
+    &__progress-bar {
+        width: 100%;
+        height: 15px;
+        border: 1px solid $brown-border;
+        position: relative;
+        box-sizing: border-box;
+        padding: 1px;
+        &:hover {
+            .data-table__progress-tooltip {
+                opacity: 1;
+            }
+        }
+    }
+    &__progress-filler {
+        background-color: $green;
+        height: 100%;
     }
     &_centered {
         justify-content: center;

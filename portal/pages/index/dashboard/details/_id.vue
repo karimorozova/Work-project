@@ -75,7 +75,7 @@ export default {
     justify-content: center;
     align-items: center;
     &__data {
-        width: 920px;
+        width: 1020px;
         margin-top: 10px;
         box-shadow: 0 0 15px $brown-shadow;
         box-sizing: border-box;
@@ -92,10 +92,10 @@ export default {
         height: 100%;
     }
     &__main {
-        width: 70%;
+        width: 75%;
     }
     &__describe {
-        width: 30%;
+        width: 25%;
         background-color: #F6F1EF;
     }
 }

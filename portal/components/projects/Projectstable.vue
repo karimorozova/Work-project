@@ -11,12 +11,14 @@
                 .projects-table__header(slot="headerProjectId" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerProjectName" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerDeadline" slot-scope="{ field }") {{ field.label }}
+                .projects-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
                 .projects-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
                 .projects-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId }}
                 .projects-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
                 .projects-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}
+                .projects-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
                 .projects-table__data(slot="totalCost" slot-scope="{ row, index }") {{ row.finance.Price.receivables }}
                     .projects-table__currency(v-if="row.finance.Price.receivables") &euro;
                 .projects-table__data.projects-table_centered(slot="download" slot-scope="{ row, index }")
@@ -37,12 +39,13 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0"},
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "16%", padding: "0"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "24%", padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "16%", padding: "0"},
-                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "15%", padding: "0"},
-                {label: "", headerKey: "headerDownload", key: "download", width: "14%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "25%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "17%", padding: "0"},
+                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "12%", padding: "0"},
+                {label: "", headerKey: "headerDownload", key: "download", width: "10%", padding: "0"},
             ]
         }
     },

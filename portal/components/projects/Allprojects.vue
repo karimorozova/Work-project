@@ -111,15 +111,13 @@ export default {
     padding-top: 80px;
     margin: 0 auto;
     &__drop-menu {
-        max-width: 919px;
-        width: 100%;
+        width: 970px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
         border-radius: 18px;
         box-shadow: 0 3px 13px rgba(103, 87, 62, 0.5);
-        margin-right: 4%;
         margin-bottom: 10px;
         padding: 0 14px;
         color: #67573e;

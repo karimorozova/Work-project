@@ -11,7 +11,7 @@
         .dashboard__select(@click="toggleProjects") Open Projects
           img(src="../../../assets/images/open-close-arrow-brown.png" :class="{'dashboard_rotate-180': isProjectsOpened}")
         .dashboard__table(v-if="isProjectsOpened")
-          Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')")
+          Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
 </template>
 
 <script>
