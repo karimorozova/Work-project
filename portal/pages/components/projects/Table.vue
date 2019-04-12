@@ -21,14 +21,13 @@
                 .data-table__currency(v-if="row.finance.Price.receivables") &euro;
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
-            .data-table__data(slot="progress" slot-scope="{ row, index }")
-                .data-table__progress-bar
-                    .data-table__progress-filler(:style="{width: progress(row.steps) + '%'}")
-                    span.data-table__progress-tooltip {{ progress(row.steps) }}%
+            .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")
+                ProgressLine(:progress="progress(row.steps)")
 </template>
 
 <script>
 import DataTable from "~/components/Tables/DataTable";
+import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
 
 export default {
@@ -45,11 +44,11 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
                 {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "16%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
                 {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "12%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
             ],
@@ -81,14 +80,16 @@ export default {
         tableFields() {
             let result = [...this.fields];
             if(this.isOpenProjects) {
-                result[result.length-1].label = 'Progress';
-                result[result.length-1].key = 'progress';
+                let progressElement = {...result[result.length-1], label: 'Progress', key: 'progress'};
+                result.pop();
+                result.splice(3, 0, progressElement);
             }
             return result;
         }
     },
     components: {
-        DataTable
+        DataTable,
+        ProgressLine
     }
 }
 </script>
@@ -114,33 +115,8 @@ export default {
             transform: scale(1.1);
         }
     }
-    &__progress-tooltip {
-        position: absolute;
-        opacity: 0;
-        background-color: $white;
-        color: $main-color;
-        transition: all 0.2s;
-        font-size: 14px;
-        top: -1px;
-        left: 40%;
-        padding: 0 3px;
-    }
-    &__progress-bar {
-        width: 100%;
-        height: 15px;
-        border: 1px solid $brown-border;
+    &__progress {
         position: relative;
-        box-sizing: border-box;
-        padding: 1px;
-        &:hover {
-            .data-table__progress-tooltip {
-                opacity: 1;
-            }
-        }
-    }
-    &__progress-filler {
-        background-color: $green;
-        height: 100%;
     }
     &_centered {
         justify-content: center;

@@ -39,11 +39,11 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
                 {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "25%", padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "17%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
                 {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "12%", padding: "0"},
                 {label: "", headerKey: "headerDownload", key: "download", width: "10%", padding: "0"},
             ]

@@ -12,10 +12,8 @@
             .tasks-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
             .tasks-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
-            .tasks-table__data(slot="progress" slot-scope="{ row }")
-                .tasks-table__progress-bar
-                    .tasks-table__progress-filler(:style="{width: getProgress(row) + '%'}")
-                    span.tasks-table__progress-tooltip {{ getProgress(row) }}%
+            .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row }")
+                ProgressLine(:progress="getProgress(row)")
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
             .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
                 .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
@@ -26,6 +24,7 @@
 
 <script>
 import DataTable from "~/components/Tables/DataTable";
+import ProgressLine from "~/components/ProgressLine";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -77,7 +76,8 @@ export default {
         })
     },
     components: {
-        DataTable
+        DataTable,
+        ProgressLine
     }    
 }
 </script>
@@ -99,33 +99,8 @@ export default {
     &__icon {
         cursor: pointer;
     }
-    &__progress-tooltip {
-        position: absolute;
-        opacity: 0;
-        background-color: $white;
-        color: $main-color;
-        transition: all 0.2s;
-        font-size: 14px;
-        top: -1px;
-        left: 30%;
-        padding: 0 3px;
-    }
-    &__progress-bar {
-        width: 100%;
-        height: 15px;
-        border: 1px solid $brown-border;
+    &__progress {
         position: relative;
-        box-sizing: border-box;
-        padding: 1px;
-        &:hover {
-            .tasks-table__progress-tooltip {
-                opacity: 1;
-            }
-        }
-    }
-    &__progress-filler {
-        background-color: $green;
-        height: 100%;
     }
     &_centered {
         justify-content: center;
