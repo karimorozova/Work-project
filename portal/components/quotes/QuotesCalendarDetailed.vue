@@ -9,7 +9,7 @@
                 .datepickers__hint Anytime
         .datepickers__picker
             input(type="text" :value="dateFrom" readonly)
-            datepicker(wrapperClass="all-projects" monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'from')" v-model="datesFilter.from")
+            datepicker(wrapperClass="small" monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'from')" v-model="datesFilter.from")
     .datepickers__item
         .datepickers__title
             .datepickers__text To
@@ -19,7 +19,7 @@
                 .datepickers__hint Anytime
         .datepickers__picker
             input(type="text" :value="dateTo" readonly)
-            datepicker(monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'to')" v-model="datesFilter.to")
+            datepicker(wrapperClass="small" monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'to')" v-model="datesFilter.to")
         .datepickers__button
           Button(value="Close" @makeAction="close")
 </template>

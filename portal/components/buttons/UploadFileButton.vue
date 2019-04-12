@@ -2,7 +2,7 @@
 .upload-file
     span.upload-file__label {{ label }}
     .upload-file__button
-        .upload-file__button-text Upload file(s)
+        .upload-file__button-text {{ buttonTitle}}
         input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
     span.upload-file__comment Drag &amp; Drop
 </template>
@@ -13,6 +13,10 @@ export default {
         label: {
             type: String,
             default: ""
+        },
+        buttonTitle : {
+            type: String,
+            default: "Upload"
         }
     },
     data() {
@@ -30,11 +34,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .upload-file {
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: $main-color;
     &__button {
         overflow: hidden;
         position: relative;
@@ -43,7 +49,7 @@ export default {
         margin-bottom: 5px;
         border-radius: 10px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #D15F45;
+        background-color: $orange;
         &:hover {
             box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);     
         }
@@ -57,7 +63,7 @@ export default {
     &__button-text {
         z-index: 1;
         position: relative;
-        color: #fff;
+        color: $white;
         font-size: 15px;
         font-family: MyriadPro;
         text-align: center;
@@ -75,6 +81,7 @@ export default {
     }
     &__label {
         font-size: 12px;
+        margin-bottom: 5px;
     }
     &__comment {
         font-size: 12px;

@@ -1073,24 +1073,24 @@ export default {
   color: rgba(0, 0, 0, 0.2);
 }
 
-.all-projects .vdp-datepicker__calendar {
+.small .vdp-datepicker__calendar {
   width: 230px;
 }
 
-.all-projects .vdp-datepicker__calendar .cell.day-header {
+.small .vdp-datepicker__calendar .cell.day-header {
   font-weight: bold;
   font-size: 14px;
 }
 
-.all-projects .vdp-datepicker__calendar .day  {
+.small .vdp-datepicker__calendar .day  {
   background-color: #eaeaea;
   height: 25px;
   font-size: 14px;
   line-height: 30px;
 }
 
-.all-projects .vdp-datepicker__calendar .cell.highlighted,
-.all-projects .vdp-datepicker__calendar .cell.disabled.weekend {
+.small .vdp-datepicker__calendar .cell.highlighted,
+.small .vdp-datepicker__calendar .cell.disabled.weekend {
   background: #cde1f7;
   color: rgba(0, 0, 0, 0.4);
 }

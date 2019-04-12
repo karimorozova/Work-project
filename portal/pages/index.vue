@@ -565,7 +565,8 @@
     height: 100%;
     position: relative;
     &__inner {
-      width: 90%;
+      width: 100%;
+      box-sizing: border-box;
     }
     .maininfoWrapper {
       width: 100%;
