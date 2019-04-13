@@ -1,6 +1,6 @@
 <template lang="pug">
     .project-deadline
-        TitleInput(title="SUGGESTED DEADLINE:" :isAsterisk="true" customClass="pair-block_flex-end")
+        TitleInput(title="SUGGESTED DEADLINE:" :isAsterisk="true")
             .project-deadline__date(v-click-outside="closePicker")
                 input.project-deadline__input(type="text" placeholder="dd-mm-yyyy" readonly :value="formattedDeadline")
                 img.project-deadline__icon(src="../../../assets/images/calendar.png" @click="togglePicker")
@@ -19,6 +19,7 @@ import TitleInput from "./TitleInput";
 import Datepicker from '~/components/Datepicker';
 import moment from "moment";
 import ClickOutside from "vue-click-outside";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -29,11 +30,14 @@ export default {
             disabled: {
                 to: moment().add(-1, 'day').endOf('day').toDate()
             },
+            selectedDeadline: "",
             isPickerOpened: false,
-            selectedDeadline: ""
         }
     },
     methods: {
+        ...mapActions({
+            setOrderDetail: "setOrderDetail"
+        }),
         togglePicker () {
             this.isPickerOpened = !this.isPickerOpened;
         },
@@ -41,13 +45,16 @@ export default {
             this.isPickerOpened = false;
         },
         setDeadline(date) {
-            this.selectedDeadline = date;
+            this.setOrderDetail({prop: 'deadline', value: date})
             this.closePicker();
         }
     },
     computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        }),
         formattedDeadline() {
-            return this.selectedDeadline ? moment(this.selectedDeadline).format("DD-MM-YYYY") : "";
+            return this.orderDetails.deadline ? moment(this.orderDetails.deadline).format("DD-MM-YYYY") : "";
         }
     }, 
     components: {
@@ -86,6 +93,7 @@ export default {
     }
     &__picker {
         position: absolute;
+        z-index: 10;
     }
     &__icon {
         position: absolute;

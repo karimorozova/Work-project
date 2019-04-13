@@ -16,6 +16,7 @@ import {
   SET_PROJECTS,
   SET_COMBINATIONS
 } from "./services";
+import { SET_DETAIL, REMOVE_FILE } from "./orders";
 
 export {
   ALERTING_MESSAGE,
@@ -34,5 +35,7 @@ export {
   INCREASE_REQUEST,
   DECREASE_REQUEST,
   REPLACE_QUOTE,
-  SET_PROJECT
+  SET_PROJECT,
+  SET_DETAIL,
+  REMOVE_FILE
 };

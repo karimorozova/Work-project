@@ -6,37 +6,51 @@
                     UploadFileButton(label="Files" buttonTitle="Upload File(s)" @uploadedFile="setDetailFiles")
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in detailFiles")
-                            span.project-details__remove(@click="(e) => removeFile(e, index, 'detailFiles')") +
+                            span.project-details__remove(@click="(e) => deleteFile(e, index, 'detailFiles')") +
                             span.project-details__file {{ file.name }}
                 .project-details__item
                     UploadFileButton(label="Upload Reference File" @uploadedFile="setRefFiles")
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in refFiles")
-                            span.project-details__remove(@click="(e) => removeFile(e, index, 'refFiles')") +
+                            span.project-details__remove(@click="(e) => deleteFile(e, index, 'refFiles')") +
                             span.project-details__file {{ file.name }}
-                    
 </template>
 
 <script>
 import UploadFileButton from "~/components/buttons/UploadFileButton";
 import TitleInput from "../TitleInput";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
-            detailFiles: [],
-            refFiles: []
+
         }
     },
     methods: {
+        ...mapActions({
+            setOrderDetail: "setOrderDetail",
+            removeFile: "removeFile"
+        }),
         setDetailFiles({ files }) {
-            this.detailFiles = files;
+            this.setOrderDetail({prop: 'detailFiles', value: files});
         },
         setRefFiles({ files }) {
-            this.refFiles = files;
+            this.setOrderDetail({prop: 'refFiles', value: files});            
         },
-        removeFile(e, index, arr) {
-            this[arr].splice(index, 1);
+        deleteFile(e, index, arr) {
+            this.removeFile({prop: arr, index})
+        }
+    },
+    computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        }),
+        detailFiles() {
+            return this.orderDetails.detailFiles || [];
+        },
+        refFiles() {
+            return this.orderDetails.refFiles || [];
         }
     },
     components: {
@@ -56,7 +70,8 @@ export default {
         display: flex;
         justify-content: space-between;
         margin-top: 30px;
-        margin-left: 15px;
+        margin-left: 12px;
+        box-sizing: border-box;
     }
     &__files-list {
         width: 171px;

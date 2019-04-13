@@ -22,30 +22,30 @@ import { lang } from 'moment';
 export default {
     data() {
         return {
-            selectedSource: {lang: "Select"},
             selectedTargets: []
         }
     },
     methods: {
-        setDefaultSource() {
-            if(this.sourceLangs.length) {
-                this.selectedSource = this.sourceLangs.find(item => item.symbol === "EN-GB");
-            }
-        },
+        ...mapActions({
+            setOrderDetail: "setOrderDetail"
+        }),
         setSource({ language }) {
-            this.selectedSource = language;
+            this.setOrderDetail({prop: 'source', value: language});
         },
         setTargets({ language }) {
             const position = this.targets.indexOf(language.symbol);
             if(position !== -1) {
-                return this.selectedTargets.splice(position, 1);
+                this.selectedTargets.splice(position, 1);
+            } else {
+                this.selectedTargets.push(language);
             }
-            this.selectedTargets.push(language);
+            this.setOrderDetail({prop: 'targets', value: this.selectedTargets});
         }
     },
     computed: {
         ...mapGetters({
-            clientLanguages: "getCombinations"
+            clientLanguages: "getCombinations",
+            orderDetails: "getOrderDetails"
         }),
         sourceLangs() {
             return this.clientLanguages.map(item => item.source)
@@ -64,16 +64,20 @@ export default {
             return result;
         },
         targets() {
-            return this.selectedTargets.length ? this.selectedTargets.map(item => item.symbol) : [];
+            let result = [];
+            if(this.orderDetails.targets && this.orderDetails.targets.length) {
+                result = this.selectedTargets.map(item => item.symbol)
+            }
+            return result;
+        },
+        selectedSource() {
+            return this.orderDetails.source || {lang: 'Select'};
         }
     },
     components: {
         TitleInput,
         SingleLangsMenu,
         MultiLangsMenu
-    },
-    mounted() {
-        this.setDefaultSource();
     }
 }
 </script>
@@ -91,6 +95,7 @@ export default {
         justify-content: space-between;
         padding-left: 12px;
         margin-top: 10px;
+        box-sizing: border-box;
     }
     &__source, &__target {
         width: 45%;

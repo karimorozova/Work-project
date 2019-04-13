@@ -1,62 +1,31 @@
 <template lang="pug">
     .localization
-        FormWrapper
-            form.form
-                .form__block
-                    .form__name
-                        ProjectName
-                    .form__deadline
-                        Deadline
-                .form__block
-                    Languages
-                .form__block
-                    ProjectDetails
-
-                    
-                    
-
-
+        RequestForm(
+            requestService="lo"
+        )
 </template>
 
 <script>
-import Languages from "../../../components/forms/translation/Languages";
-import ProjectDetails from "../../../components/forms/translation/ProjectDetails";
-import FormWrapper from "../../../components/forms/FormWrapper";
-import ProjectName from "../../../components/forms/ProjectName";
-import Deadline from "../../../components/forms/Deadline";
+import RequestForm from "../../../components/forms/translation/RequestForm";
 
 export default {
+    data() {
+        return {
+            quoteDecision: "Send"
+        }
+    },
+    methods: {
+        setQuoteDecision({value}) {
+            this.quoteDecision = value;
+        },
+    },
     components: {
-        FormWrapper,
-        ProjectName,
-        Deadline,
-        Languages,
-        ProjectDetails
+        RequestForm,
     }    
 }
 </script>
 
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors.scss";
-
-.localization {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.form {
-    &__block {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 40px; 
-    }
-    &__name {
-        width: 48%;
-    }
-    &__deadline {
-        width: fit-content;
-    }
-}
 
 </style>

@@ -1,13 +1,31 @@
 <template lang="pug">
     .project-name
         TitleInput(title="PROJECT NAME:" :isAsterisk="true")
-            input.project-name__input(type="text" placeholder="Project Name")
+            input.project-name__input(type="text" placeholder="Project Name" :value="orderDetails.projectName" @input="setProjectName")
 </template>
 
 <script>
 import TitleInput from "./TitleInput";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
+    methods: {
+        ...mapActions({
+            setOrderDetail: "setOrderDetail" 
+        }),
+        setProjectName(e) {
+            const value = e.target.value;
+            this.setOrderDetail({prop: 'projectName', value})
+        }
+    },
+    computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        }),
+        projectName() {
+            return this.orderDetails.projectName || "";
+        }
+    },
     components: {
         TitleInput
     }    
