@@ -3,6 +3,7 @@ const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, deleteCopiedFiles } = require('./files');
 const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus } = require('./updates');
 const { notifyVendors } = require('./emails');
+const  { createProject, createTasks } = require('./create');
 
 const projectFunctions = {
     metricsCalc,
@@ -23,7 +24,9 @@ const projectFunctions = {
     updateProjectStatus,
     notifyVendors,
     setDefaultStepVendors,
-    setStepsStatus
+    setStepsStatus,
+    createProject,
+    createTasks
 }
 
 module.exports = projectFunctions;

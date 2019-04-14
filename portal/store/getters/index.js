@@ -10,3 +10,4 @@ export const getClientInfo = state => state.clientInfo;
 export const getCombinations = state => state.clientLanguages;
 export const getSelectedProject = state => state.selectedProject;
 export const getOrderDetails = state => state.orderDetails;
+export const getAllXtmCustomers = state => state.xtmCustomers;

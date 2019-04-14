@@ -16,7 +16,7 @@
                 .form__block
                     QuoteDecision(:quoteDecision="quoteDecision" @setQuoteDecision="setQuoteDecision")
                 .form__block.form_centered
-                    Button(value="Submit" @makeAction="submit")
+                    Button(value="Submit" @makeAction="checkErrors")
         OrderInfo(
             :service="service.title"
         )
@@ -45,14 +45,16 @@ export default {
     },
     methods: {
         ...mapActions({
+            setOrderDetails: "setOrderDetails",
             setOrderDetail: "setOrderDetail",
-            submitForm: "submitForm"
+            submitForm: "submitForm",
+            setDefaultSource: "setDefaultSource"
         }),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
         },
-        async submit() {
-            await this.submitForm({service: this.service});
+        checkErrors() {
+            this.$emit('checkErrors', {service: this.service});
         }
     },
     computed: {
@@ -86,7 +88,9 @@ export default {
         Button
     },
     mounted() {
+        this.setOrderDetails({});
         this.setOrderDetail({prop: 'quoteDecision', value: 'Send'});
+        this.setDefaultSource();
     }
 }
 </script>

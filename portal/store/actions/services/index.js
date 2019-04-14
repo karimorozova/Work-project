@@ -42,10 +42,8 @@ export const getProjects = async function({ commit, dispatch, state}) {
 export const setLangCombinations = ({ commit }, payload) => {
   const combinations = payload.languageCombinations.filter(item => item.source).map(item => {
       return {source: item.source, target: item.target}
-  })
-  const defaultOrderSource = combinations.map(item => item.source).find(item => item.symbol === 'EN-GB');
+  });
   commit('SET_COMBINATIONS', combinations);
-  commit('SET_DETAIL', {prop: 'source', value: defaultOrderSource});
 }
 
 export const setProjects = ({commit}, payload) => {

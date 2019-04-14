@@ -4,8 +4,27 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+
 export default {
-    
+    methods: {
+        ...mapActions({
+            getXtmCustomers: "getXtmCustomers"
+        }),
+        async getCustomers() {
+            if(!this.xtmCustomers.length) {
+                await this.getXtmCustomers();
+            }
+        }
+    },
+    computed: {
+        ...mapGetters({
+            xtmCustomers: "getAllXtmCustomers"
+        })
+    },
+    mounted() {
+        this.getCustomers();
+    }
 }
 </script>
 

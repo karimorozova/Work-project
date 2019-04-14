@@ -115,7 +115,7 @@ export default {
                 this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are updated.", isShow: true, type: "success"});
             } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot update metrics.", isShow: true, type: "error"})
+                this.alertToggle({message: "Internal server error. Cannot update metrics.", isShow: true, type: "error"})
             }
         },
         async getMetrics() {
@@ -136,8 +136,7 @@ export default {
                             return item.taskId === task.taskId && item.name === key
                         })
                         if(!existedTask) {
-                            const startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
-                            const deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
+                            const {startDate, deadline} = this.getStepsDates({task, key})
                             project.steps.push({
                                 taskId: task.taskId,
                                 name: key,
@@ -177,8 +176,17 @@ export default {
                 this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot get metrics.", isShow: true, type: "error"})
+                this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
             }
+        },
+        getStepsDates({task, key}) {
+            let startDate = task.start; 
+            let deadline = task.deadline; 
+            if(task.stepsDates.length) {
+                const startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
+                const deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
+            }
+            return {startDate, deadline};
         },
         async getVendors() {
             try{

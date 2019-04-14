@@ -1,25 +1,16 @@
 const router = require("express").Router();
-const { User, Languages, Projects } = require("../../models");
-const { getProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus } = require("../../projects/");
+const { User, Clients, Projects } = require("../../models");
+const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus } = require("../../projects/");
 const { getOneService } = require("../../services/");
 const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
-  console.log('req.session.userId admin:', req.session.userId);
     let project = {...req.body};
-    project.projectManager = req.session.userId;
-    let todayStart = new Date();
-    todayStart.setUTCHours(0,0,0,0);
-    let todayEnd = new Date(todayStart);
-    todayEnd.setUTCHours(23,59,59,0);
+    const client = await Clients.findOne({"_id": project.customer});
+    project.projectManager = client.projectManager._id;
     try {
-    const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
-    const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
-    project.status = "Draft";
-    project.projectId = req.body.dateFormatted + ' ' + nextNumber;
-    const newProject = await Projects.create(project);
-    const result = await getProject({"_id": newProject.id});
-    res.send(result);
+        const result = await createProject(project);
+        res.send(result);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on creating a project!');

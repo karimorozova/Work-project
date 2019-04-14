@@ -1,7 +1,7 @@
 const unirest = require('unirest');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
-const { metricsCalc } = require('../projects');
+const { metricsCalc } = require('../projects/calculations');
 
 function saveTasks(object) {
 

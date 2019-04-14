@@ -11,13 +11,11 @@ import RequestForm from "../../../components/forms/translation/RequestForm";
 export default {
     data() {
         return {
-            quoteDecision: "Send"
+            
         }
     },
     methods: {
-        setQuoteDecision({value}) {
-            this.quoteDecision = value;
-        },
+        
     },
     components: {
         RequestForm,

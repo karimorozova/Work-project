@@ -1,6 +1,6 @@
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
-const { getProject, getProjects, updateProjectStatus } = require("../projects/");
+const { getProject, getProjects, createProject, createTasks, updateProjectStatus } = require("../projects/");
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
@@ -63,6 +63,21 @@ router.get('/language-combinations', checkClientContact, async (req, res) => {
         res.status(500).send('Error on getting language combinations');
     }
 });
+
+router.get('/default-source', checkClientContact, async (req, res) => {
+    const tokenHeader = req.headers['token-header'];
+    try {
+        const verificationResult = jwt.verify(tokenHeader, secretKey);
+        const client = await getClient({"_id": verificationResult.clientId});
+        const english = client.languageCombinations.filter(item => item.source)
+            .find(item => item.source.symbol === 'EN-GB');
+        const source = english ? english.source : "";
+        res.send({source});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on setting default source language');
+    }
+})
 
 router.get('/customer-info', checkClientContact, async (req, res) => {
     try {
@@ -209,25 +224,20 @@ router.get('/reject', checkClientContact, async (req, res) => {
 });
 
 router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-  let project = {...req.body};
-  project.projectManager = req.body.clientId;
-  delete project.clientId;
-  let todayStart = new Date();
-  todayStart.setUTCHours(0,0,0,0);
-  let todayEnd = new Date(todayStart);
-  todayEnd.setUTCHours(23,59,59,0);
-  try {
-    const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
-    const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
-    project.status = "Requested";
-    project.projectId = req.body.dateFormatted + ' ' + nextNumber;
-    const newProject = await Projects.create(project);
-    const result = await getProject({"_id": newProject.id});
-    res.json(result);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Error on creating a project!');
-  }
+    let {source, targets, quoteDecision, service, xtmCustomerId, ...project } = req.body;
+    try {
+        const createdProject = await createProject(project);
+        let tasksInfo = {source, targets, service, 
+            projectId: createdProject.id, customerId: xtmCustomerId};
+        tasksInfo.source = JSON.parse(tasksInfo.source);
+        tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        const { detailFiles: sourceFiles, refFiles } = req.files;
+        const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on creating a project!');
+    }
 });
 
 

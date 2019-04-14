@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const { upload , moveFile } = require('../utils/');
-const { Requests, Projects, Clients, Languages, Services, Industries } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress } = require('../services/');
-const { getProject, updateProject, updateProjectCosts, metricsCalc, storeFiles, deleteCopiedFiles, calcCost, taskMetricsCalc } = require('../projects/');
+const { upload } = require('../utils/');
+const { Projects, Clients } = require('../models');
+const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress } = require('../services/');
+const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -15,41 +15,8 @@ router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles
         let tasksInfo = {...req.body};
         tasksInfo.source = JSON.parse(tasksInfo.source);
         tasksInfo.targets = JSON.parse(tasksInfo.targets);
-        let stepsDates = JSON.parse(tasksInfo.stepsDates);
         const { sourceFiles, refFiles } = req.files;
-        let template = tasksInfo.template || '247336FD';
-        let workflow = tasksInfo.workflow || 2917;
-        let customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        const filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
-        const referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
-        await deleteCopiedFiles();
-        const project = await Projects.findOne({"_id": tasksInfo.projectId});
-        let tasksLength = project.tasks.length + 1;
-        for(let target of tasksInfo.targets) {
-            let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`
-            let xtmProject = await saveTemplateTasks({
-                customerId: customerId,
-                name: name,
-                source: tasksInfo.source.xtm,
-                target: target.xtm,
-                sourceFiles: filesToTranslate,
-                refFiels: referenceFiles,
-                templateId: template,
-                workflowId: workflow,
-                join: tasksInfo.join
-            });
-            // const jobIds = xtmProject.jobs.map(item => item.jobId);
-            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
-            let taskId = project.projectId + ` ${idNumber}`;
-            await Projects.updateOne({"_id": project._id}, 
-            {$set: {sourceFiles: filesToTranslate, refFiles: referenceFiles, isMetricsExist: false}, 
-            $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: tasksInfo.service, projectId: xtmProject.projectId, start: project.createdAt, deadline: project.deadline, 
-                stepsDates, sourceLanguage: tasksInfo.source.symbol, targetLanguage: target.symbol, status: "Created", cost: "", sourceFiles: filesToTranslate, refFiles: referenceFiles,
-                receivables: "", payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 'Price': {receivables: "", payables: ""}}}}}
-            );
-            tasksLength++
-        }
-        const updatedProject = await getProject({"_id": tasksInfo.projectId});
+        const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
