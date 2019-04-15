@@ -1,5 +1,6 @@
 <template lang="pug">
-  invoices
+  .invoices
+    .invoices__message Coming soon...
 </template>
 
 <script>
@@ -12,6 +13,15 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
+.invoices {
+  &__message {
+    color: $main-color;
+    margin-left: 20px;
+    font-size: 28px;
+  }
+}
 
 </style>

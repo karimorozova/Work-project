@@ -567,6 +567,7 @@
     &__inner {
       width: 100%;
       box-sizing: border-box;
+      padding-left: 40px;
     }
     .maininfoWrapper {
       width: 100%;
@@ -775,7 +776,7 @@
 
   .breadCrumbs {
     max-height: 50px;
-    margin: 20px 40px;
+    margin: 20px 0;
     color: #67573e;
     font-size: 20px;
     .arrows {
