@@ -5,7 +5,6 @@ const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/'
 const fs = require('fs');
 const mv = require('mv');
 const { Requests, Languages, Industries, Timezones, LeadSource, Package } = require('../models');
-const { quote, project } = require('../models/xtrf');
 const { getProject, getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
@@ -120,12 +119,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   await request.save();
   if (projectName) {
     await sendMailPortal(request);
-    quote(request);
   } else {
     await sendMail(request);
   }
   await sendMailClient(request);
-  // quote(request);
   console.log("Saved");
   res.send({
     message: "request was added"
@@ -187,8 +184,6 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
     sendMail(request);
   }
   sendMailClient(request);
-  project(request);
-
   console.log("Saved");
   
   res.send({

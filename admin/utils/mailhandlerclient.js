@@ -32,7 +32,7 @@ const sendMailClient = function(request) {
     });
     var msg = `<div class="emailWrapper" style="width: 600px; padding:10px;">
     <a href="https://www.pangea.global/">
-    <img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
+    <img src="cid:logo@pan" style="width: 50%;"></a>
     <p style="color: #66563D;font-size: 12px; line-height: 1.5em;">
     Hi ${request.contactName}, <br/>
     Thank you for your interest in Pangea Localization Services. <br/>

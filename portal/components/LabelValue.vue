@@ -1,8 +1,8 @@
 <template lang="pug">
     .pair(:class="customClass")
-        label.pair__label {{ title }}
+        label.pair__label(:class="labelClass") {{ title }}
             span.pair__colon(v-if="isColon") :
-        span.pair__value {{ value }}
+        span.pair__value(:class="valueClass") {{ value }}
             slot
 </template>
 
@@ -12,12 +12,15 @@ export default {
         title: {type: String},
         value: {type: [String, Number]},
         customClass: {type: String},
+        labelClass: {type: String},
+        valueClass: {type: String},
         isColon: {tyep: Boolean}
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
 
 .pair {
     display: flex;
@@ -36,6 +39,19 @@ export default {
     flex-direction: column;
     .pair__label {
         margin-right: 0;
+    }
+}
+
+.order-confirm {
+    flex-direction: column;
+    align-items: flex-start;
+    &__label {
+        font-size: 22px;
+        margin-right: 0;
+    }
+    &__value {
+        color: $orange;
+        font-weight: 400;
     }
 }
 

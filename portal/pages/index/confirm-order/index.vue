@@ -1,8 +1,9 @@
 <template lang="pug">
   .confirms
-    p.confirms__message Thank you for request!
-    //- Translationconfirm(v-if="serviceType == 'Translation' || serviceType == 'Graphic Localization'")
-    //- Proofingconfirm(v-if="serviceType == 'Proofing/QA'")
+    p.confirms__header THANK YOU FOR YOUR ORDER!
+    p.confirms__summary-text SUMMARY BELOW:
+    Translationconfirm(v-if="serviceType == 'Translation' || serviceType == 'Localization'")
+    //- Proofingconfirm(v-if="serviceType == 'Proofing'")
     //- Copywritingconfirm(v-if="serviceType == 'Copywriting'")
     //- Marketingconfirm(v-if="serviceType == 'Marketing'")
 </template>
@@ -15,22 +16,17 @@
   import { mapGetters } from "vuex";
 
   export default {
-    props: {
-      thanksService: {
-        type: String,
-        default: ""
-      }
-    },
     data() {
       return {
-        translation: false,
-        serviceType: "",
+        serviceType: "Translation",
       }
     },
     methods: {
       serviceDetect() {
-        let service = this.services.find(item => this.orderDetails.service === item._id);
-        this.serviceType === service ? service.title : 'Translation';
+        if(this.orderDetails.service) {
+          let service = this.services.find(item => this.orderDetails.service === item._id);
+          this.serviceType = service.title;
+        }
       }
     },
     computed: {
@@ -52,11 +48,22 @@
 </script>
 
 <style lang="scss">
+@import "../../../assets/scss/colors.scss";
 
-.confirms__message {
-  margin-left: 80px;
-  color: #67573E;
-  font-size: 20px;
+.confirms {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  color: $main-color;
+  box-sizing: border-box;
+  &__header {
+    font-size: 22px;
+    margin-bottom: 0;
+  }
+  &__summary-text {
+    font-size: 14px;
+  }
 }
 
 </style>

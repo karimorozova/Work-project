@@ -1,118 +1,109 @@
 <template lang="pug">
-    .confirmation
-        .head
-            .head__title
-                span.thanks THANK YOU FOR YOUR ORDER!
-                span.summary SUMMARY BELOW:
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName PROJECT NAME:
-                    span.itemData {{ orderData.projectName }}
-            .allDetails
-                .allDetails__item
-                    span.itemName SUGGESTED DEADLINE:
-                    span.itemData {{ deadlineSelect }}
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName SOURCE LANGUAGE:
-                    span.itemData {{ sourceLang }}
-            .allDetails
-                .allDetails__item
-                    span.itemName TARGET LANGUAGE(S):
-                    span.itemData {{ targetLangs }}
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName PROJECT FILE(S):
-                    span.itemData {{ detailFilesList }}
-            .allDetails
-                .allDetails__item
-                    span.itemName REFERENCE FILE:
-                    span.itemData {{ refFileName }}
-        .confirmation__mainData
-            .allDetails
-                .allDetails__item
-                    span.itemName BRIEF:
-                    span.itemData {{ briefText }}
-        .foot
-            p.footText(v-if="orderData.requestType == 'QUOTE'")
-                | A {{ orderData.requestType }} WILL BE SENT SHORTLY
+    .order
+        .order__data
+            .order__item
+                DetailValuePair(title="PROJECT NAME:" :value="projectName")
+            .order__item
+                DetailValuePair(title="SUGGESTED DEADLINE:" :value="deadline")
+        .order__data
+            .order__item
+                DetailValuePair(title="SOURCE LANGUAGE:" :value="sourceLang")
+            .order__item
+                DetailValuePair(title="TARGET LANGUAGE(S):" :value="targetLangs")
+        .order__data
+            .order__item
+                DetailValuePair(title="PROJECT FILE(S):" :value="detailFilesList")
+            .order__item
+                DetailValuePair(title="REFERENCE FILE(S):" :value="refFilesList")
+        .order__data
+            .order__item.order_width-100
+                DetailValuePair(title="BRIEF:" :value="briefText")
+        .order__footer
+            p.footText(v-if="orderDetails.quoteDecision == 'Send'")
+                | A QUOTE WILL BE SENT SHORTLY
             p.footText(v-else)
-                | THE {{ orderData.requestType }} WILL BEGIN SHORTLY
+                | THE PROJECT WILL BEGIN SHORTLY
 </template>
 
 <script>
 import moment from 'moment';
+import DetailValuePair from "./DetailValuePair";
+import { mapGetters } from "vuex";
 
 export default {
-    props: {
-    },
-    data() {
-        return {
-            orderData: {},
-        }
-    },
-    methods: {
-        getData() {
-            this.orderData = this.$store.state.orderDetails;
-        }
-    },
     computed: {
-        deadlineSelect() {
-            let date = "";            
-            if(this.orderData.date) {
-                date = moment(this.orderData.date).format('DD/MM/YYYY');
-            }
-            return date;
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        }),
+        projectName() {
+            return this.orderDetails.projectName || ""
+        },
+        deadline() {
+            return this.orderDetails.deadline ? moment(this.orderDetails.deadline).format('DD/MM/YYYY') : "";
         },
         sourceLang() {
-            let result = "";
-            if(this.orderData.sourceLanguage) {
-                result = this.orderData.sourceLanguage.lang;
-            }
-            return result;
+            return this.orderDetails.source ? this.orderDetails.source.lang : "";
         },
         targetLangs() {
             let result = "";
-            if(this.orderData.targetLanguages) {
-                for(let i = 0; i < this.orderData.targetLanguages.length; i++) {
-                    result += this.orderData.targetLanguages[i].lang + "; "
-                }
+            if(this.orderDetails.targets && this.orderDetails.targets.length) {
+                result = this.orderDetails.targets.reduce((init, cur) => {
+                    return init + `${cur.lang}; `
+                },"") 
             }
             return result;
         },
         detailFilesList() {
             let files = "";
-            if(this.orderData.detailFiles) {
-                for(let i = 0; i < this.orderData.detailFiles.length; i++) {
-                    files += this.orderData.detailFiles[i] + "; ";
-                }
+            if(this.orderDetails.detailFiles && this.orderDetails.detailFiles.length) {
+                files = this.orderDetails.detailFiles.reduce((init, cur) => {
+                    return init + `${cur.name}; `
+                },"")
             }
             return files;
         },
-        refFileName() {
-            let file = "";
-            if(this.orderData.refFiles) {
-                file = this.orderData.refFiles;
+        refFilesList() {
+            let files = "";
+            if(this.orderDetails.refFiles && this.orderDetails.refFiles.length) {
+                files = this.orderDetails.refFiles.reduce((init, cur) => {
+                    return init + `${cur.name}; `
+                },"")
             }
-            return file;
+            return files;
         },
         briefText() {
-            let brief = "";
-            if(this.orderData.brief) {
-                brief = this.orderData.brief;
-            }
-            return brief;
+            return this.orderDetails.brief || "";
         }
     },
-    mounted() {
-        this.getData();
+    components: {
+        DetailValuePair
     }
 }
 </script>
 
-<style lang="scss">
-    @import '../../../assets/styles/clientrequest/transthanks.scss';
+<style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
+.order {
+    width: 40%;
+    margin-top: 40px;
+    &__data {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 50px;
+    }
+    &__item {
+        width: 35%;
+    }
+    &__footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 60px;
+        font-size: 12px;
+    }
+    &_width-100 {
+        width: 100%;
+    }
+}
+
 </style>
