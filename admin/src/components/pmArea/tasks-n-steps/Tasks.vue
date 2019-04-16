@@ -131,7 +131,7 @@ export default {
         },
         async approveAction() {
             const checkedTasks = this.allTasks.filter(item => item.check);
-            if(!this.checkedTasks.length) {
+            if(!checkedTasks.length) {
                 return this.closeApproveModal();
             }
             await this.doTasksApproveaction(checkedTasks);

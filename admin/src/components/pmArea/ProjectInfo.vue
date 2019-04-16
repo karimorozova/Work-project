@@ -19,7 +19,8 @@
         .project-info__action(v-if="currentProject.status !== 'Closed'")
             ProjectAction(
                 :project="currentProject"
-                @editAndSend="editAndSend")
+                @editAndSend="editAndSend"
+                @setStatus="setStatus")
     .project-info__all-info
         ProjectFinance
     .project-info__preview(v-if="isEditAndSend")
