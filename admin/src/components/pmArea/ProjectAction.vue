@@ -33,7 +33,7 @@ export default {
     methods: {
         setAction({option}) {
             this.selectedAction = option;
-            if(this.selectedAction === "Send a Quote") {
+            if(this.selectedAction === "Send a Quote" || this.selectedAction === "Send Project Details") {
                 this.buttonValue = "Edit & Send"
             }
         },
@@ -42,7 +42,11 @@ export default {
                 switch(this.selectedAction) {
                     case "Send a Quote":
                         const message = await this.$http.get(`/pm-manage/quote-message?projectId=${this.project._id}`);
-                        this.$emit("editAndSend", { message });
+                        this.$emit("editAndSend", { message, subject: "quote" });
+                        break;
+                    case "Send Project Details":
+                        const details = await this.$http.get(`/pm-manage/project-details?projectId=${this.project._id}`);
+                        this.$emit("editAndSend", { message: details, subject: "details" });
                         break;
                     case "Cancel":
                         this.$emit('setStatus', { option: 'Cancelled'});

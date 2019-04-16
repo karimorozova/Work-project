@@ -1,8 +1,7 @@
 const router = require("express").Router();
-const { User, Clients, Projects } = require("../../models");
-const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus } = require("../../projects/");
-const { getOneService } = require("../../services/");
-const { sendEmail, clientQuoteEmail, messageForClient, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
+const { User, Clients } = require("../../models");
+const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage } = require("../../projects/");
+const { clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -33,6 +32,7 @@ router.put("/project-option", async (req, res) => {
         const result = await changeProjectProp(projectId, property);
         res.send(result);
     } catch(err) {
+        console.log(err);
         res.status(500).send("Internal server error / Cannot change Project's property");
     }
 })
@@ -43,6 +43,7 @@ router.put("/project-status", async (req, res) => {
         const result = await updateProjectStatus(id, status);
         res.send(result);
     } catch(err) {
+        console.log(err);
         res.status(500).send("Internal server error / Cannot change Project's status");
     }
 })
@@ -50,14 +51,34 @@ router.put("/project-status", async (req, res) => {
 router.get("/quote-message", async (req, res) => {
     const { projectId } = req.query;
     try {
-        const project = await getProject({"_id": projectId});
-        const service = await getOneService({"_id": project.tasks[0].service});
-        let quote = {...project._doc, id: project.id};
-        quote.service = service.title;
-        const message = messageForClient(quote);
+        const message = await getMessage(projectId, "quote");
         res.send({message});
     } catch(err) {
+        console.log(err);
         res.status(500).send("Error on getting quote message");
+    }
+})
+
+router.get("/project-details", async (req, res) => {
+    const { projectId } = req.query;
+    try {
+        const message = await getMessage(projectId, "details");
+        res.send({message});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting project details");
+    }
+})
+
+router.post("/project-details", async (req, res) => {
+    const { id, message } = req.body;
+    try {
+        const project = await getProject({"_id": id});
+        await clientQuoteEmail({...project.customer._doc, subject: "Project details"}, message);
+        res.send("Project details sent");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending project details");
     }
 })
 
@@ -66,7 +87,7 @@ router.post("/send-quote", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
-        await clientQuoteEmail({...project.customer._doc, subject: subject}, message);
+        await clientQuoteEmail({...project.customer._doc, subject }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {

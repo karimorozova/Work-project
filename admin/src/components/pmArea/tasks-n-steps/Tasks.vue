@@ -55,9 +55,7 @@
             template(slot="deadline" slot-scope="{ row }")
                 span.tasks__task-data {{ formatDate(row.deadline) }}
             template(slot="progress" slot-scope="{ row }")
-                .tasks__progress-bar(v-if="progress(row)")
-                    .tasks__progress-filler(:style="{width: progress(row) + '%'}")
-                    span.tasks__progress-tooltip {{ progress(row) }}%
+                ProgressLine(:progress="progress(row)")
             template(slot="status" slot-scope="{ row }")
                 span.tasks__task-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
@@ -83,6 +81,7 @@
 
 <script>
 import DataTable from "../../DataTable";
+import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
 import SelectSingle from "../../SelectSingle";
 import ApproveModal from "../../ApproveModal";
@@ -201,7 +200,6 @@ export default {
             }, "");
             try {
                 const result = await this.$http.post('/xtm/generate-file', {projectId: task.projectId, jobId: jobIds});
-                console.log(result);
             } catch(err) {
                 this.alertToggle({message: err.response.data, isShow: true, type: "error"});
             }
@@ -227,6 +225,7 @@ export default {
     },
     components: {
         DataTable,
+        ProgressLine,
         SelectSingle,
         ApproveModal,
         Tabs
@@ -251,34 +250,6 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
-    }
-    &__progress-tooltip {
-        position: absolute;
-        opacity: 0;
-        background-color: $white;
-        color: $main-color;
-        transition: all 0.2s;
-        font-size: 14px;
-        top: -1px;
-        left: 14px;
-        padding: 0 3px;
-    }
-    &__progress-bar {
-        width: 100%;
-        height: 15px;
-        border: 1px solid $brown-border;
-        position: relative;
-        box-sizing: border-box;
-        padding: 1px;
-        &:hover {
-            .tasks__progress-tooltip {
-                opacity: 1;
-            }
-        }
-    }
-    &__progress-filler {
-        background-color: $green-success;
-        height: 100%;
     }
     &__delivery-image {
         height: 18px;

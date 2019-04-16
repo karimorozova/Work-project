@@ -120,6 +120,18 @@ export const sendClientQuote = async ({commit, state}, payload) => {
   }
 }
 
+export const sendProjectDetails = async ({commit, state}, payload) => {
+  commit('startRequest');
+  try { 
+    const { message } = payload;
+    await Vue.http.post('/pm-manage/project-details', {id: state.currentProject._id, message});
+    commit('endRequest');
+  } catch(err) {
+    commit('endRequest');
+    throw new Error(err.message);
+  }
+} 
+
 export const saveUser = async ({ commit }, payload) => {
   commit('startRequest');
   try {

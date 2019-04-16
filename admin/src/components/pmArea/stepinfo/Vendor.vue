@@ -2,7 +2,7 @@
 .step-vendor
     .step-vendor__title Vendor:
     .step-vendor__info
-        .step-vendor__drop-menu
+        .step-vendor__drop-menu(v-if="step.status === 'Created' || !vendor")
             PersonSelect(
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="filteredVendors"
@@ -11,6 +11,7 @@
                 @setPerson="setVendor"
                 @togglePersonsData="toggleVendors"
             )
+        .step-vendor__current-vendor(v-else) {{ currentVendorName(vendor) }}
         .step-vendor__contacts
             .step-vendor__icon
                 i.fa.fa-info-circle

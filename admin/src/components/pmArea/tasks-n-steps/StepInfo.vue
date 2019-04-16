@@ -100,10 +100,6 @@ export default {
                 total: total
             })
         },
-        getStepFiles() {
-            this.stepFilesFiller(this.task.sourceFiles, "Source file");
-            this.stepFilesFiller(this.task.refFiles, "Reference file");
-        },
         stepFilesFiller(arr, category) {
             let files = [];
             for(let file of arr) {
@@ -188,7 +184,6 @@ export default {
     },
     mounted() {
         this.getMatrixData('clientRate', 'client');
-        // this.getStepFiles();
     }
 }
 </script>

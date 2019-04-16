@@ -46,7 +46,8 @@ export default {
             areErrorsExist: false,
             isBlockAbsoulte: true,
             isEditAndSend: false,
-            message: ""
+            message: "",
+            mailSubject: "",
         }
     },
     methods: {
@@ -60,7 +61,8 @@ export default {
             setStepVendor: 'setStepVendor',
             setStepDate: 'setStepDate',
             updateCurrentProject: "updateCurrentProject",
-            sendClientQuote: "sendClientQuote"
+            sendClientQuote: "sendClientQuote",
+            sendProjectDetails: "sendProjectDetails"
         }),
         tasksAdded({id}) {
             this.$emit("tasksAdded", { id });
@@ -211,14 +213,20 @@ export default {
             this.areErrorsExist = false;
             this.errors = [];
         },
-        editAndSend({message}) {
+        editAndSend({message, subject}) {
             this.isEditAndSend = true;
             this.message = message.data.message;
+            this.mailSubject = subject;
         },
         async sendQuote({message}) {
             try {
-                await this.sendClientQuote({ message });
-                this.alertToggle({message: "Quote Details sent", isShow: true, type: "success"});
+                if(this.mailSubject === 'quote') {
+                    await this.sendClientQuote({ message });
+                }
+                if(this.mailSubject === 'details') {
+                    await this.sendProjectDetails({ message });
+                }
+                this.alertToggle({message: "Details sent", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
             }

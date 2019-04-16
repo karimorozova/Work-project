@@ -55,7 +55,7 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                .steps__vendor-menu
+                .steps__vendor-menu(v-if="row.status === 'Created' || !row.vendor")
                     PersonSelect(
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
@@ -65,6 +65,7 @@
                         @togglePersonsData="toggleVendors"
                         @scrollDrop="scrollDrop"
                     )
+                span.steps__step-vendor(v-if="row.status !== 'Created'") {{ vendorName(row.vendor) }}
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
                     @selected="(e) => changeDate(e, 'start', index)" 
@@ -87,10 +88,7 @@
                     :highlighted="highlighted"
                     @scrollDrop="scrollDrop")
             template(slot="progress" slot-scope="{ row }")
-                span.steps__step-data(v-if="!progress(row.progress)") {{ progress(row.progress) }}
-                .steps__progress-bar(v-if="progress(row.progress)")
-                    .steps__progress-filler(:style="{width: progress(row.progress) + '%'}")
-                    span.steps__progress-tooltip {{ progress(row.progress) }}%
+                ProgressLine(:progress="progress(row.progress)")
             template(slot="status" slot-scope="{ row }")
                 span.steps__step-data {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
@@ -124,6 +122,7 @@
 
 <script>
 import DataTable from "../../DataTable";
+import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
 import ApproveModal from "../../ApproveModal";
@@ -371,6 +370,7 @@ export default {
     },
     components: {
         DataTable,
+        ProgressLine,
         PersonSelect,
         SelectSingle,
         Datepicker,
@@ -428,36 +428,11 @@ export default {
             }
         }
     }
+    &__step-vendor {
+        padding: 7px 5px 5px 6px;
+    }
     &_rotated {
         transform: rotate(180deg);
-    };
-    &__progress-tooltip {
-        position: absolute;
-        opacity: 0;
-        background-color: $white;
-        color: $main-color;
-        transition: all 0.2s;
-        font-size: 14px;
-        top: -1px;
-        left: 14px;
-        padding: 0 3px;
-    }
-    &__progress-bar {
-        width: 100%;
-        height: 15px;
-        border: 1px solid $brown-border;
-        position: relative;
-        box-sizing: border-box;
-        padding: 1px;
-        &:hover {
-            .steps__progress-tooltip {
-                opacity: 1;
-            }
-        }
-    }
-    &__progress-filler {
-        background-color: $green-success;
-        height: 100%;
     }
     &__vendor-menu {
         position: relative;
