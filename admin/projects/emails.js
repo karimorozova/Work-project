@@ -6,7 +6,7 @@ const { getOneService } = require("../services/getServices");
 async function notifyVendors(steps) {
     try {
         for(let step of steps) {
-            if(step.vendor) {
+            if(step.vendor && (step.status === 'Cancelled' || step.status === 'Cancelled Halfway')) {
                 const message = vendorNotificationMessage(step);
                 step["to"] = step.vendor.email;
                 step.subject = "Step cancelling notification!";

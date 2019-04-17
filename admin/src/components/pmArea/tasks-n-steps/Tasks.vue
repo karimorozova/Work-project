@@ -155,8 +155,9 @@ export default {
             this.closeApproveModal();
         },
         async cancelTasks(tasks) {
+            const filteredTasks = tasks.filter(item => item.status !== "Ready for Delivery" && item.status !== "Delivered");
             try {
-                const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks, projectId: this.currentProject._id});
+                const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id});
                 await this.storeProject(updatedProject.body);
                 this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
             } catch(err) {

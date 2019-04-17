@@ -13,10 +13,37 @@ function cancelTasks(tasks, project) {
     let projectTasks = [...project.tasks];
     let projectSteps = [...project.steps];
     const tasksIds = tasks.map(item => item.taskId);
-    const changedTasks = cancelledStatuses(tasksIds, projectTasks);
-    const changedSteps = cancelledStatuses(tasksIds, projectSteps);
-    const checkedSteps = project.steps.filter(item => tasksIds.indexOf(item.taskId) !== -1);
-    return { changedTasks, changedSteps, checkedSteps };
+    const inCompletedSteps = projectSteps.filter(item => item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1)
+        .map(step => step.taskId + step.name);
+    const cancelledSteps = updateStepsStatuses({stepIdentify: inCompletedSteps, steps: projectSteps, status: "Cancelled"});
+    const changedSteps = updateAllSteps(cancelledSteps);
+    const changedTasks = cancellCheckedTasks(tasksIds, projectTasks, changedSteps);
+    // const changedTasks = cancelledStatuses(tasksIds, projectTasks);
+    // const changedSteps = cancelledStatuses(tasksIds, projectSteps);
+    return { changedTasks, changedSteps };
+}
+
+function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
+    return projectTasks.map(task => {
+        if(tasksIds.indexOf(task.taskId) !== -1) {
+            task.status = getTaskNewStatus(changedSteps, task.taskId);
+        }
+        return task;
+    })
+} 
+
+function getTaskNewStatus(steps, taskId) {
+    const taskSteps = steps.filter(item => item.taskId === taskId)
+        .map(step => step.status);
+    const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
+    const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
+    if(halfCancelledSteps.length) {
+        return "Cancelled Halfway"
+    }
+    if(cancelledSteps.length === taskSteps.length) {
+        return "Cancelled"
+    }
+    return "Ready for Delivery";
 }
 
 function cancelSteps(checkedSteps, project) {
@@ -25,30 +52,29 @@ function cancelSteps(checkedSteps, project) {
     const stepIdentify = checkedSteps.map(item => {
         return item.taskId + item.name;
     })
-    const changedSteps = updateStepsStatuses({stepIdentify, steps:projectSteps, status: "Cancelled"});
+    const changedCheckedSteps = updateStepsStatuses({stepIdentify, steps:projectSteps, status: "Cancelled"});
+    const changedSteps = updateAllSteps(changedCheckedSteps);
     const changedTasks = cancelledTasks(changedSteps, projectTasks);
     return { changedSteps, changedTasks };
 }
 
 function cancelledTasks(changedSteps, arr) {
     const updated = arr.map(item => {
-        if(!checkForNotCancelledSteps(changedSteps, item)) {
+        if(!checkStepsStatuses({changedSteps, task: item, status: "Cancelled"})) {
             item.status = "Cancelled";
             return item;
         }
-        return item;
     })
     return updated;
 }
 
-function checkForNotCancelledSteps(changedSteps, task) {
-    let isNotCancelledExist = false;
+function checkStepsStatuses({changedSteps, task, status}) {
     for(let step of changedSteps) {
-        if(step.taskId === task.taskId && step.status !== "Cancelled") {
-            isNotCancelledExist = true;
+        if(step.taskId === task.taskId && step.status !== status) {
+            return true;
         }
     }
-    return isNotCancelledExist;
+    return false;
 }
 
 function cancelledStatuses(tasksIds, arr) {
@@ -62,10 +88,23 @@ function cancelledStatuses(tasksIds, arr) {
     return updated;
 }
 
+function updateAllSteps(steps) {
+    const translateSteps = steps.filter(item => item.name === "translate1").map(item => {
+        return item.taskId + item.status;
+    });
+    return steps.map(step => {
+        if(translateSteps.indexOf(step.taskId + "Cancelled") !== -1 || 
+            translateSteps.indexOf(step.taskId + "Cancelled Halfway") !== -1) {
+                step.status = "Cancelled";
+            }
+        return step;
+    })  
+}
+
 function updateStepsStatuses({steps, status, stepIdentify}) {
     const updated = steps.map(item => {
         if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
-            item.status = status;
+            item.status = +item.progress.wordsDone > 0 ? "Cancelled Halfway" : status;
             return item;
         }
         return item;

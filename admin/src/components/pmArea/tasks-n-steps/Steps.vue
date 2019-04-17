@@ -290,7 +290,7 @@ export default {
             const filteredSteps = steps.filter(item => item.status !== "Completed");
             if(!filteredSteps.length) return;
             try {
-                const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: steps, projectId: this.currentProject._id });
+                const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
                 await this.storeProject(result.body);
                 this.alertToggle({message: "Chosen steps are cancelled.", isShow: true, type: 'success'});
             } catch(err) {

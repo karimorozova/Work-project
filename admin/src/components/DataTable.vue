@@ -150,6 +150,9 @@ export default {
 .steps-table-cell {
     display: flex;
     align-items: center;
+    max-height: 32px;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 .vendors-table__body, .clients__table,
 .reports__table, .all-projects {

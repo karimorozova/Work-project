@@ -125,8 +125,8 @@ router.post("/cancel-tasks", async (req, res) => {
     const { tasks, projectId } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        const { changedTasks, changedSteps, checkedSteps } = cancelTasks(tasks, project);
-        await notifyVendors(checkedSteps);
+        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        await notifyVendors(changedSteps);
         const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
         res.send(updatedProject);
     } catch(err) {
@@ -140,7 +140,7 @@ router.post("/cancel-steps", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         const { changedSteps, changedTasks } = cancelSteps(checkedSteps, project);
-        await notifyVendors(checkedSteps);
+        await notifyVendors(changedSteps);
         const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
         res.send(updatedProject);
     } catch(err) {
