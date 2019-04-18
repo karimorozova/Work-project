@@ -2,7 +2,7 @@
 .step-vendor
     .step-vendor__title Vendor:
     .step-vendor__info
-        .step-vendor__drop-menu(v-if="step.status === 'Created' || !vendor")
+        .step-vendor__drop-menu(v-if="step.status === 'Created'")
             PersonSelect(
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="filteredVendors"
@@ -12,6 +12,7 @@
                 @togglePersonsData="toggleVendors"
             )
         .step-vendor__current-vendor(v-else) {{ currentVendorName(vendor) }}
+            span.step-vendor__no-vendor(v-if="!vendor") No Vendor
         .step-vendor__contacts
             .step-vendor__icon
                 i.fa.fa-info-circle
@@ -143,6 +144,9 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
+    }
+    &__no-vendor {
+        opacity: 0.7;
     }
     &__contacts {
         max-height: 28px;

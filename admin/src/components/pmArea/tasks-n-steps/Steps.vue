@@ -55,7 +55,7 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                .steps__vendor-menu(v-if="row.status === 'Created' || !row.vendor")
+                .steps__vendor-menu(v-if="row.status === 'Created'")
                     PersonSelect(
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
@@ -66,6 +66,7 @@
                         @scrollDrop="scrollDrop"
                     )
                 span.steps__step-vendor(v-if="row.status !== 'Created'") {{ vendorName(row.vendor) }}
+                    span.steps__step-no-select(v-if="!row.vendor") No Vendor
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
                     @selected="(e) => changeDate(e, 'start', index)" 
@@ -90,7 +91,7 @@
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row.progress)")
             template(slot="status" slot-scope="{ row }")
-                span.steps__step-data {{ row.status }}
+                span.steps__step-status {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
                 span.steps__money(v-if="row.finance.Price.receivables") &euro;
                 span.steps__step-data {{ row.finance.Price.receivables }}
@@ -159,7 +160,7 @@ export default {
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "9%"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: 0},
                 {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%"},
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
@@ -431,6 +432,9 @@ export default {
     &__step-vendor {
         padding: 7px 5px 5px 6px;
     }
+    &__step-no-select {
+        opacity: 0.7;
+    }
     &_rotated {
         transform: rotate(180deg);
     }
@@ -444,6 +448,11 @@ export default {
         right: 0;
         z-index: 50;
         background-color: $white;
+    }
+    &__step-status {
+        padding-left: 5px;
+        max-height: 32px;
+        overflow-y: auto;
     }
 }
 

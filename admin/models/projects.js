@@ -41,8 +41,18 @@ const ProjectsSchema = new mongoose.Schema({
     payables: "",
     clientRate: "",
     finance: {
-        'Wordcount': {receivables: "", payables: ""},
-        'Price': {receivables: "", payables: ""}
+      'Wordcount': {
+        receivables: "", 
+        payables: "",
+        halfReceivables: "", 
+        halfPayables: "",
+      },
+      'Price': {
+        receivables: "", 
+        payables: "",
+        halfReceivables: "", 
+        halfPayables: "",
+      }
     },
     vendorRate: "",
     margin: "",

@@ -18,8 +18,6 @@ function cancelTasks(tasks, project) {
     const cancelledSteps = updateStepsStatuses({stepIdentify: inCompletedSteps, steps: projectSteps, status: "Cancelled"});
     const changedSteps = updateAllSteps(cancelledSteps);
     const changedTasks = cancellCheckedTasks(tasksIds, projectTasks, changedSteps);
-    // const changedTasks = cancelledStatuses(tasksIds, projectTasks);
-    // const changedSteps = cancelledStatuses(tasksIds, projectSteps);
     return { changedTasks, changedSteps };
 }
 
@@ -59,33 +57,37 @@ function cancelSteps(checkedSteps, project) {
 }
 
 function cancelledTasks(changedSteps, arr) {
-    const updated = arr.map(item => {
-        if(!checkStepsStatuses({changedSteps, task: item, status: "Cancelled"})) {
-            item.status = "Cancelled";
-            return item;
+    const updated = arr.map(task => {
+        if(checkAllStepsCancelled({changedSteps, task})) {
+            task.status = "Cancelled";
+            return task;
         }
+        if(checkNoOpenSteps({changedSteps, task})) {
+            task.status = "Ready for Delivery";
+        }
+        return task
     })
     return updated;
 }
 
-function checkStepsStatuses({changedSteps, task, status}) {
+function checkAllStepsCancelled({changedSteps, task}) {
     for(let step of changedSteps) {
-        if(step.taskId === task.taskId && step.status !== status) {
-            return true;
+        if(step.taskId === task.taskId && step.status !== "Cancelled") {
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
-function cancelledStatuses(tasksIds, arr) {
-    const updated = arr.map(item => {
-        if(tasksIds.indexOf(item.taskId) !== -1) {
-            item.status = "Cancelled";
-            return item; 
-        }
-        return item;
-    })
-    return updated;
+function checkNoOpenSteps({changedSteps, task}) {
+    for(let step of changedSteps) {
+        if(step.taskId === task.taskId && 
+            (step.status !== "Completed" &&
+            step.status !== "Cancelled Halfway")) {
+                return false
+            }
+    }
+    return true
 }
 
 function updateAllSteps(steps) {
@@ -104,12 +106,28 @@ function updateAllSteps(steps) {
 function updateStepsStatuses({steps, status, stepIdentify}) {
     const updated = steps.map(item => {
         if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
-            item.status = +item.progress.wordsDone > 0 ? "Cancelled Halfway" : status;
-            return item;
+            let newStatus = status;
+            if(+item.progress.wordsDone > 0) {
+                newStatus = "Cancelled Halfway";
+                let finance = getStepNewFinance(item);
+                return {...item._doc, status: newStatus, finance};
+            }
+            item.status = newStatus;
         }
         return item;
     })
     return updated;
+}
+
+function getStepNewFinance(step) {
+    const { progress, finance } = step;
+    const { Wordcount, Price } = finance;
+    const done = progress.wordsDone/progress.wordsTotal;
+    Wordcount.halfReceivables = Wordcount.receivables*done;
+    Wordcount.halfPayables = Wordcount.payables*done;
+    Price.halfReceivables = Price.receivables*done;
+    Price.halfPayables = Price.payables*done;
+    return { Wordcount, Price }
 }
 
 async function updateProjectStatus(id, status) {
@@ -120,12 +138,22 @@ async function updateProjectStatus(id, status) {
         const project = await getProject({"_id": id});
         const { tasks } = project;
         const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        const projectStatus = getProjectNewStatus(changedTasks, status)
         await notifyVendors(changedSteps);
-        return await updateProject({"_id": id}, { status, tasks: changedTasks, steps: changedSteps});
+        return await updateProject({"_id": id}, { status: projectStatus, tasks: changedTasks, steps: changedSteps});
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectStatus");
     }
+}
+
+function getProjectNewStatus(changedTasks, status) {
+    const notFullyCancelledTask = changedTasks.find(item => {
+        return item.status === "Cancelled Halfway" || 
+            item.status === "Ready for Delivery" || 
+            item.status === "Delivered"
+    })
+    return notFullyCancelledTask ? "Cancelled Halfway" : status;
 }
 
 function setStepsStatus({steps, status, project}) {
