@@ -25,23 +25,58 @@ function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
     return projectTasks.map(task => {
         if(tasksIds.indexOf(task.taskId) !== -1) {
             task.status = getTaskNewStatus(changedSteps, task.taskId);
+            if(task.status === "Cancelled Halfway") {
+                task.finance = getTaskNewFinance(changedSteps, task);
+            }
         }
         return task;
     })
-} 
+}
+
+function getTaskNewFinance(changedSteps, task) {
+    const  { wordValues, priceValues } = updateTaskNewFinance(changedSteps, task);
+    const { finance } = task;
+    const Wordcount = {...finance.Wordcount, halfReceivables: wordValues.receivables, halfPayables: wordValues.payables};
+    const Price = {...finance.Price, halfReceivables: priceValues.receivables, halfPayables: priceValues.payables};
+    const updatedFinance = {...finance, Wordcount, Price};
+    return updatedFinance;
+}
+
+function updateTaskNewFinance(changedSteps, task) {
+    let wordValues = {receivables: 0, payables: 0};
+    let priceValues = {receivables: 0, payables: 0};
+    const taskSteps = changedSteps.filter(item => item.taskId === task.taskId);
+    for(let step of taskSteps) {
+        if(step.status === "Cancelled Halfway") {
+            wordValues.receivables+= +step.finance.Wordcount.halfReceivables;
+            wordValues.payables+= +step.finance.Wordcount.halfPayables;
+            priceValues.receivables+= +step.finance.Price.halfReceivables;
+            priceValues.payables+= +step.finance.Price.halfPayables;
+        } else {
+            wordValues.receivables+= +step.finance.Wordcount.receivables;
+            wordValues.payables+= +step.finance.Wordcount.payables;
+            priceValues.receivables+= +step.finance.Price.receivables;
+            priceValues.payables+= +step.finance.Price.payables;
+        }
+    }
+    return { wordValues, priceValues };
+}
 
 function getTaskNewStatus(steps, taskId) {
     const taskSteps = steps.filter(item => item.taskId === taskId)
         .map(step => step.status);
     const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
+    const completedSteps = taskSteps.filter(item => item === "Completed");
     const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
+    if(completedSteps.length) {
+        return "Ready for Delivery"
+    }
     if(halfCancelledSteps.length) {
         return "Cancelled Halfway"
     }
     if(cancelledSteps.length === taskSteps.length) {
         return "Cancelled"
     }
-    return "Ready for Delivery";
 }
 
 function cancelSteps(checkedSteps, project) {
@@ -64,6 +99,7 @@ function cancelledTasks(changedSteps, arr) {
         }
         if(checkNoOpenSteps({changedSteps, task})) {
             task.status = "Ready for Delivery";
+            task.finance = getTaskNewFinance(changedSteps, task);
         }
         return task
     })
