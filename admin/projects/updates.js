@@ -34,32 +34,26 @@ function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
 }
 
 function getTaskNewFinance(changedSteps, task) {
-    const  { wordValues, priceValues } = updateTaskNewFinance(changedSteps, task);
+    const  { priceValues } = updateTaskNewFinance(changedSteps, task);
     const { finance } = task;
-    const Wordcount = {...finance.Wordcount, halfReceivables: wordValues.receivables, halfPayables: wordValues.payables};
     const Price = {...finance.Price, halfReceivables: priceValues.receivables, halfPayables: priceValues.payables};
-    const updatedFinance = {...finance, Wordcount, Price};
+    const updatedFinance = {...finance, Price};
     return updatedFinance;
 }
 
 function updateTaskNewFinance(changedSteps, task) {
-    let wordValues = {receivables: 0, payables: 0};
     let priceValues = {receivables: 0, payables: 0};
     const taskSteps = changedSteps.filter(item => item.taskId === task.taskId);
     for(let step of taskSteps) {
         if(step.status === "Cancelled Halfway") {
-            wordValues.receivables+= +step.finance.Wordcount.halfReceivables;
-            wordValues.payables+= +step.finance.Wordcount.halfPayables;
             priceValues.receivables+= +step.finance.Price.halfReceivables;
             priceValues.payables+= +step.finance.Price.halfPayables;
         } else {
-            wordValues.receivables+= +step.finance.Wordcount.receivables;
-            wordValues.payables+= +step.finance.Wordcount.payables;
             priceValues.receivables+= +step.finance.Price.receivables;
             priceValues.payables+= +step.finance.Price.payables;
         }
     }
-    return { wordValues, priceValues };
+    return { priceValues };
 }
 
 function getTaskNewStatus(steps, taskId) {
@@ -68,7 +62,7 @@ function getTaskNewStatus(steps, taskId) {
     const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
     const completedSteps = taskSteps.filter(item => item === "Completed");
     const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
-    if(completedSteps.length) {
+    if(completedSteps.length === taskSteps.length) {
         return "Ready for Delivery"
     }
     if(halfCancelledSteps.length) {
@@ -93,37 +87,10 @@ function cancelSteps(checkedSteps, project) {
 
 function cancelledTasks(changedSteps, arr) {
     const updated = arr.map(task => {
-        if(checkAllStepsCancelled({changedSteps, task})) {
-            task.status = "Cancelled";
-            return task;
-        }
-        if(checkNoOpenSteps({changedSteps, task})) {
-            task.status = "Ready for Delivery";
-            task.finance = getTaskNewFinance(changedSteps, task);
-        }
+        task.status = getTaskNewStatus(changedSteps, task.taskId);
         return task
     })
     return updated;
-}
-
-function checkAllStepsCancelled({changedSteps, task}) {
-    for(let step of changedSteps) {
-        if(step.taskId === task.taskId && step.status !== "Cancelled") {
-            return false;
-        }
-    }
-    return true;
-}
-
-function checkNoOpenSteps({changedSteps, task}) {
-    for(let step of changedSteps) {
-        if(step.taskId === task.taskId && 
-            (step.status !== "Completed" &&
-            step.status !== "Cancelled Halfway")) {
-                return false
-            }
-    }
-    return true
 }
 
 function updateAllSteps(steps) {
@@ -174,13 +141,24 @@ async function updateProjectStatus(id, status) {
         const project = await getProject({"_id": id});
         const { tasks } = project;
         const { changedTasks, changedSteps } = cancelTasks(tasks, project);
-        const projectStatus = getProjectNewStatus(changedTasks, status)
+        const projectStatus = getProjectNewStatus(changedTasks, status);
+        const Price = getUpdatedProjectFinance(changedTasks);
         await notifyVendors(changedSteps);
-        return await updateProject({"_id": id}, { status: projectStatus, tasks: changedTasks, steps: changedSteps});
+        return await updateProject({"_id": id}, { status: projectStatus, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps});
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectStatus");
     }
+}
+
+function getUpdatedProjectFinance(tasks) {
+    let receivables = 0;
+    let payables = 0;
+    for(let task of tasks) {
+        receivables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfReceivables : +task.finance.Price.receivables;
+        payables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfPayables : +task.finance.Price.payables;
+    }
+    return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) };
 }
 
 function getProjectNewStatus(changedTasks, status) {

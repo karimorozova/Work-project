@@ -1,14 +1,8 @@
 <template lang="pug">
 .project-details
     .project-details__project-id {{ project.projectId }}
-    .project-details__status
-        LabelValue(label="Project Status")
-            .project-details__drop-menu
-                SelectSingle(
-                    :selectedOption="project.status"
-                    :options="filteredStatuses"
-                    @chooseOption="setStatus"
-                )
+    .project-details__status Project Status:
+        span.project-details__text {{ project.status }}
     .project-details__additional
         .project-details__item(v-for="(obj, key) in additional")
             input.project-details__check(type="checkbox" v-model="project[key]" @change="toggleCheck(key)")
@@ -37,8 +31,6 @@
 </template>
 
 <script>
-import SelectSingle from "../SelectSingle";
-import LabelValue from "./LabelValue";
 import PersonSelect from "./PersonSelect";
 import { mapGetters, mapActions } from "vuex";
 
@@ -50,7 +42,6 @@ export default {
     },
     data() {
         return {
-            statuses: ["Draft", "Quote sent", "Started", "Closed", "Cancelled", "Requested", "Rejected"],
             additional: {
                 isUrgent: {title: "Urgent"},
                 isAutoDelivery: {title: "Auto Delivery"},
@@ -64,9 +55,6 @@ export default {
     methods: {
         toggleCheck(key) {
             this.$emit('toggleCheck', { key });
-        },
-        setStatus({option}) {
-            this.$emit('setStatus', {option: option})
         },
         setDefaultContact() {
             const contact = this.project.customer.contacts.find(item => item.leadContact); 
@@ -105,36 +93,9 @@ export default {
         selectedPerson() {
             return this.selectedContact ? this.selectedContact.firstName + " " + this.selectedContact.surname
             : "";
-        },
-        filteredStatuses() {
-            let result = this.statuses;
-            switch(this.project.status) {
-                case "Draft":
-                    result = ["Quote sent", "Started", "Cancelled"];
-                    break
-                case "Quote sent":
-                    result = ["Started", "Cancelled", "Rejected"];
-                    break
-                case "Started":
-                    result = ["Closed", "Cancelled"];
-                    break
-                case "Closed":
-                    result = ["Closed"];
-                    break
-                case "Cancelled":
-                case "Rejected":
-                    result = ['Draft', "Started"];
-                    break
-                case "Requested":
-                    result = ["Quote sent", "Started", "Cancelled"];
-                    break
-            }
-            return result;
         }
     },
     components: {
-        SelectSingle,
-        LabelValue,
         PersonSelect
     },
     mounted() {
@@ -168,6 +129,10 @@ export default {
     &__status {
         width: 100%;
         margin-bottom: 15px;
+    }
+    &__text {
+        margin-left: 5px;
+        font-weight: 700;
     }
     &__contacts {
         width: 100%;

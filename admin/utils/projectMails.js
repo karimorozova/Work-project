@@ -87,12 +87,12 @@ async function sendRequestToVendor(project, step) {
 async function sendEmailToContact(project, contact) {
     let projectInfo = {...project._doc};
     projectInfo.firstName = contact.firstName;
-    projectInfo.surname = contact.surame;
+    projectInfo.surname = contact.surname;
     try {
         const service = await Services.findOne({"_id": project.tasks[0].service});
         projectInfo.service = service.title;
         const message = emailMessageForContact(projectInfo);
-        await clientQuoteEmail({email: contact.email, subject: 'Project information'}, message);
+        await clientQuoteEmail({contact, subject: 'Project information'}, message);
     } catch(err) {
         throw new Error('Cannot send email to contact / sendEmailToContact');
     }

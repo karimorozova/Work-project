@@ -475,12 +475,12 @@ router.get('/target-file', async (req, res) => {
     const options = getRequestOptions(requestData);
     try {
         let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${stepName}-${fileId}.zip`);
-        let reqq = await https.request(options, (resp) => {
+        let reqq = https.request(options, (resp) => {
             resp.pipe(wstream);
         });
         reqq.end(); 
         wstream.on('finish', () => {
-        res.send({path: `/projectFiles/${id}/target-${stepName}-${fileId}.zip`});
+            res.send({path: `/projectFiles/${id}/target-${stepName}-${fileId}.zip`});
         })
     } catch(err) {
         console.log(err);

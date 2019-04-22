@@ -3,7 +3,7 @@
     .project-info__title Project Details
     .project-info__all-info
         Project(:project="currentProject")
-        ProjectShortDetails(:project="currentProject" @setStatus="setStatus" @toggleCheck="toggleProjectOption")
+        ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
     .project-info__all-info
         TasksAndSteps(
             @tasksAdded="tasksAdded"

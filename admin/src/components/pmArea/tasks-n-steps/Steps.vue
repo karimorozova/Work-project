@@ -239,14 +239,14 @@ export default {
                     this.modalTexts.notApprove = "Rejected";
             }
         },
-        async approveAction() {
-            const checkedSteps = this.allSteps.filter(item => {
+        getCheckedSteps() {
+            return this.allSteps.filter(item => {
                 return item.check 
             })
-            if(!checkedSteps.length) {
-                return this.closeApproveModal();
-            }
-            await this.doStepApproveAction(checkedSteps);
+        },
+        async approveAction() {
+            const checkedSteps = this.getCheckedSteps();
+            !checkedSteps.length ? this.closeApproveModal() : await this.doStepApproveAction(checkedSteps);
         },
         async doStepApproveAction(checkedSteps) {
             try {
@@ -262,14 +262,29 @@ export default {
                         break
                 }
             } catch(err) {
-                this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'})
+                this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
             } finally {
                 this.closeApproveModal();
             }
         },
-        notApproveAction() {
-            if(this.modalTexts.notApprove !== "Edit & Send") {
-                return this.closeApproveModal(); 
+        async notApproveAction() {
+            const checkedSteps = this.getCheckedSteps();
+            if(!checkedSteps.length) {
+                return this.closeApproveModal();
+            }
+            try {
+                switch(this.modalTexts.notApprove) {
+                    case "No":
+                    case "Cancel":
+                        this.closeApproveModal();
+                        break;
+                    case "Rejected":
+                        await this.setStepsStatus({status: "Rejected", steps: checkedSteps});
+                }
+            } catch(err) {
+                this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
+            } finally {
+                this.closeApproveModal();
             }
         },
         closeApproveModal() {
@@ -291,8 +306,12 @@ export default {
             const filteredSteps = steps.filter(item => item.status !== "Completed");
             if(!filteredSteps.length) return;
             try {
-                const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
-                await this.storeProject(result.body);
+                if(this.allSteps.length === steps.length) {
+                    await setProjectStatus({status: "Cancelled"});
+                } else {
+                    const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
+                    await this.storeProject(result.body);
+                }
                 this.alertToggle({message: "Chosen steps are cancelled.", isShow: true, type: 'success'});
             } catch(err) {
                 this.alertToggle({message: "Error: Cannot execute action.", isShow: true, type: 'error'});
@@ -351,7 +370,8 @@ export default {
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
-            setStepsStatus: "setStepsStatus"
+            setStepsStatus: "setStepsStatus",
+            setProjectStatus: "setProjectStatus"
         })
     },
     computed: {

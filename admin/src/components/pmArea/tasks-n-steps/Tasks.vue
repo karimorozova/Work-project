@@ -157,8 +157,12 @@ export default {
         async cancelTasks(tasks) {
             const filteredTasks = tasks.filter(item => item.status !== "Ready for Delivery" && item.status !== "Delivered");
             try {
-                const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id});
-                await this.storeProject(updatedProject.body);
+                if(this.allTasks === tasks.length) {
+                    await setProjectStatus({status: "Cancelled"});
+                } else {
+                    const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id});
+                    await this.storeProject(updatedProject.body);
+                }
                 this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error"})
@@ -208,7 +212,8 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
-            storeProject: "setCurrentProject"
+            storeProject: "setCurrentProject",
+            setProjectStatus: "setProjectStatus"
         })
     },
     computed: {

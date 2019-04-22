@@ -21,7 +21,7 @@ const sendEmail = function (obj, msg) {
 }
 
 const clientQuoteEmail = function (obj, msg) {
-    const contact = obj.contacts.find(item => item.leadContact);
+    const contact = !obj.contact ? obj.contacts.find(item => item.leadContact): obj.contact;
     return new Promise( (res, rej) => {
         let mailOptions = {
             from: 'Michal <michal@pangea.global>',
