@@ -26,8 +26,13 @@ export default {
     },
     methods: {
         uploadFile(event) {
-            this.files.push(event.target.files[0]);
-            this.$emit("uploadedFile", {files: this.files})
+            for(let file of event.target.files) {
+                const isExist = this.files.find(item => item.name === file.name) 
+                if (!isExist) {
+                    this.files.push(file);
+                    this.$emit("uploadedFile", {files: this.files})
+                }
+            }
         }
     }
 }

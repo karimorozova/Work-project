@@ -14,7 +14,6 @@ export default {
                 {url: 'https://www.facebook.com/PangeaLocalizationServices/', image: require('../assets/images/social/facebook.png')},
                 {url: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')},
                 {url: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')},
-                {url: 'https://plus.google.com/116520029165216678356', image: require('../assets/images/social/google +.png')},
                 {url: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')},
                 {url: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')},
                 {url: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')}

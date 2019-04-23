@@ -181,7 +181,12 @@ export default {
             this.$emit("setTargets", { lang });
         },
         uploadSourceFiles(event) {
-            this.sourceFiles.push(event.target.files[0]);
+            for(let file of event.target.files) {
+                const isExist = this.sourceFiles.find(item => item.name === file.name);
+                if(!isExist) {
+                    this.sourceFiles.push(file);
+                }
+            }
         },
         toggleSourceFiles() {
             this.isSourceFilesShow = !this.isSourceFilesShow;
