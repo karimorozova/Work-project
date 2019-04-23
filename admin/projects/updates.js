@@ -178,4 +178,21 @@ function setStepsStatus({steps, status, project}) {
     return updateStepsStatuses({steps: projectSteps, status, stepIdentify})
 }
 
-module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus };
+function updateStepsProgress({steps, task, progress}) {
+    const updatedSteps = steps.map(item => {
+        if(task.taskId === item.taskId) {
+            item.progress = progress[item.name];
+            item.status = item.progress.wordsDone === item.progress.wordsTotal ? "Completed" : item.status; 
+            return item
+        }
+        return item;
+    });
+    return updatedSteps;
+}
+
+function areAllStepsCompleted(steps, taskId) {
+    const nonCompleted = steps.filter(step => step.taskId === taskId && step.status !== "Completed");
+    return !nonCompleted.length;
+}
+
+module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, updateStepsProgress, areAllStepsCompleted };

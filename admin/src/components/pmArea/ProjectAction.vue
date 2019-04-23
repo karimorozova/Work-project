@@ -76,7 +76,8 @@ export default {
     computed: {
         filteredActions() {
             let result = this.actions;
-            if(this.project.finance.Price.receivables) {
+            if(this.project.finance.Price.receivables && 
+                (this.project.status === "Draft" || this.project.status === "Requested")) {
                 result = ["Send a Quote", "Cancel"];
             }
             if(this.project.status === "Started") {

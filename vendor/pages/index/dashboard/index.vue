@@ -99,13 +99,13 @@
       }),
       upcomingJobs() {
         return this.jobs.filter(item => {
-          return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started"
+          return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started" && item.projectStatus !== "Approved"
         })
       },
       openedJobs() {
         const statuses = [...this.jobStatuses, "Started"];
         return this.jobs.filter(item => {
-          return statuses.indexOf(item.status) !== -1 && item.projectStatus === "Started";          
+          return statuses.indexOf(item.status) !== -1 && (item.projectStatus === "Started" || item.projectStatus === "Approved");          
         })
       }
     },

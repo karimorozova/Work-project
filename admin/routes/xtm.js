@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Projects, Clients } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress } = require('../services/');
-const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc } = require('../projects/');
+const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc, updateStepsProgress, areAllStepsCompleted } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -85,18 +85,13 @@ router.get('/update-progress', async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         let steps = [...project.steps];
-        const tasks = [...project.tasks];
+        let tasks = [...project.tasks];
         for(let task of tasks) {
             const { progress } = await getTaskProgress(task);
-            steps = steps.map(item => {
-                if(task.taskId === item.taskId) {
-                    item.progress = progress[item.name];
-                    return item
-                }
-                return item;
-            });
+            steps = updateStepsProgress({task, steps, progress});
+            task.status = areAllStepsCompleted(steps, task.taskId) ? "Ready for Delivery" : task.status;
         }
-        const result = await updateProject({"_id": projectId}, {steps: steps});
+        const result = await updateProject({"_id": projectId}, { steps, tasks });
         res.send(result);
     } catch(err) {
         console.log(err);
@@ -468,11 +463,10 @@ router.post('/generate-file', async (req, res) => {
 
 router.get('/target-file', async (req, res) => {
     const { stepName, id, projectId, fileId } = req.query;
-    const requestData = {
+    const options = getRequestOptions({
         method: "GET",
         path: `projects/${projectId}/files/${fileId}/download?fileType=TARGET`,
-    }
-    const options = getRequestOptions(requestData);
+    });
     try {
         let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${stepName}-${fileId}.zip`);
         let reqq = https.request(options, (resp) => {
@@ -485,6 +479,26 @@ router.get('/target-file', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.send(err);
+    }
+})
+
+router.get('/delivery-file', async (req, res) => {
+    const { fileId, projectId, id, taskId } = req.query;
+    const options = getRequestOptions({
+        method: "GET",
+        path: `projects/${projectId}/files/${fileId}/download?fileType=TARGET`,
+    })
+    try {
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/delivery-${taskId}.zip`);
+        let reqq = https.request(options, (resp) => {
+            resp.pipe(wstream);
+        });
+        reqq.end(); 
+        wstream.on('finish', () => {
+            res.send({path: `/projectFiles/${id}/delivery-${taskId}.zip`});
+        })
+    } catch(err) {
+
     }
 })
 
