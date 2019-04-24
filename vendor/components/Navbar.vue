@@ -18,12 +18,12 @@ export default {
                 firstRow:
                 [
                     {url: 'https://www.pangea.global', title: 'Home'},
-                    {url: 'https://www.pangea.global/career', title: 'Careers'},
+                    {url: 'https://www.pangea.global/careers', title: 'Careers'},
                     {url: 'https://www.pangea.global/faq', title: 'FAQ'},
                     {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
                 ],
                 secondRow: [
-                    {url: 'https://www.pangea.global/contact', title: 'Contact Us'},
+                    {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'},
                     {url: 'https://www.pangea.global/blog', title: 'Blog'},
                     {url: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
                 ]
