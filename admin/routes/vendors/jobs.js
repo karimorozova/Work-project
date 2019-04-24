@@ -78,7 +78,7 @@ async function manageStatuses({project, steps, jobId, status}) {
     }
 }
 
-async function setTaskStatusAndSave({tasks, jobId, steps, status}) {
+async function setTaskStatusAndSave({project, jobId, steps, status}) {
     const { tasks } = project;
     const step = steps.find(item => item.id === jobId);
     const updatedTasks = tasks.map(item => {
