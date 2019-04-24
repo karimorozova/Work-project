@@ -69,7 +69,7 @@ async function manageStatuses({project, steps, jobId, status}) {
         }
         if(status === "Started" && task.status !== "Started") {
             return await setTaskStatusAndSave({
-                project, jobId, steps, status: "Started", projectStatus
+                project, jobId, steps, status: "Started"
             });
         }
     } catch(err) {
