@@ -142,7 +142,7 @@ export default {
             }
         },
         isForbidden() {
-            if(this.job.status === "Accepted") {
+            if(this.job.status === "Accepted" && this.job.name !== "translate1") {
                 const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
