@@ -1,39 +1,8 @@
 <template lang="pug">
     .main-info
-        .main-info__job-data
-            .data-block
-                .data-block__item
-                    LabelValue(title="Project Name" :isColon="isColon" :value="job.projectName")  
-                .data-block__item
-                    LabelValue(title="Project ID" :isColon="isColon" :value="job.projectId")  
-                .data-block__item
-                    LabelValue(v-if="job.finance" title="Total Wordcount" :isColon="isColon" :value="job.finance.Wordcount.receivables")  
-            .data-block
-                .data-block__item
-                    LabelValue(title="Status" :isColon="isColon" :value="job.status")  
-                .data-block__item
-                    LabelValue(v-if="job.finance" title="Total Cost" :isColon="isColon" :value="job.finance.Price.payables")
-                        span.main-info__currency(v-if="job.finance && job.finance.Price.payables") &euro;
-                .data-block__item
-                    LabelValue(v-if="job.finance" title="Weighted Wordcount" :isColon="isColon" :value="job.finance.Wordcount.payables")
-            .data-block
-                .data-block__progress
-                    Progress(:percent="progress")
-        .main-info__instructions
-            .main-info__textarea
-                .main-info__title Instructions:
-                p.main-info__text Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
-            .main-info__files
-                .main-info__files-item
-                    .main-info__title Reference:
-                    img.main-info__download(src="../../../../assets/images/download.png" :class="{'main-info_opacity05': !job.refFiles || !job.refFiles.length}" @click="downloadRef")
-                .main-info__files-item
-                    .main-info__title Terminology:
-                    img.main-info__download(src="../../../../assets/images/download.png" :class="{'main-info_opacity05': !job.terminology}" @click="downloadTerm")
-        .main-info__terms
-            .main-info__check
-                CheckBox(:isChecked="job.isVendorRead" :isReadonly="isReadonly" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
-            span.main-info__text I have read the instructions and downloaded the reference files
+        JobData(:job="job")
+        Instructions(:job="job")
+        TermsAgree(:job="job")
         .main-info__buttons(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
             .main-info__button
                 Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
@@ -54,13 +23,15 @@
                 text="Are you sure you have completed your job and reviewed your work?"
                 approveValue="Complete" 
                 notApproveValue="Cancel")
+        Forbidden(v-if="isForbidden")
 </template>
 
 <script>
-import LabelValue from "../../../components/jobs/LabelValue";
+import JobData from "../../../components/details/JobData";
+import Instructions from "../../../components/details/Instructions";
+import TermsAgree from "../../../components/details/TermsAgree";
+import Forbidden from "../../../components/details/Forbidden";
 import Button from "~/components/buttons/Button";
-import CheckBox from "~/components/CheckBox";
-import Progress from "~/components/Progress";
 import ApproveModal from "~/components/ApproveModal";
 import ClickOutside from "vue-click-outside";
 import { mapGetters, mapActions } from "vuex";
@@ -69,7 +40,6 @@ export default {
     data() {
         return {
             isColon: true,
-            domain: "",
             icons: {
                 Approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 Reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
@@ -80,7 +50,6 @@ export default {
     },
     methods: {
         ...mapActions({
-            setStepTermsAgreement: "setStepTermsAgreement",
             setJobStatus: "setJobStatus",
             selectJob: "selectJob",
             alertToggle: "alertToggle"
@@ -123,25 +92,6 @@ export default {
                 this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
             }
         },
-        async toggle(e, bool) {
-            try {
-                await this.setStepTermsAgreement({jobId: this.job._id, value: bool});
-            } catch(err) {
-
-            }
-        },
-        downloadRef() {
-            if(!this.job.refFiles || !this.job.refFiles.length) return;
-            for(let file of this.job.refFiles) {
-                let a = document.createElement("a");
-                a.href = this.domain + file.split('./dist')[1];
-                a.click(); 
-            }    
-        },
-        downloadTerm() {
-            if(!this.job.terminology) return;
-            console.log('downloading...');
-        },
         closePopup() {
             this.isXtmJobs = false;
         },
@@ -183,9 +133,6 @@ export default {
             const statuses = ['Accepted', 'Started'];
             return statuses.indexOf(this.job.status) !== -1;
         },
-        isButtonDisabled() {
-            return this.job.isVendorRead === 'Started' 
-        },
         buttonValue() {
             return this.job.status === "Accepted" ? "Start" : "Enter Editor";
         },
@@ -194,30 +141,24 @@ export default {
                 return +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2);
             }
         },
-        isReadonly() {
-            if(this.job.projectStatus !== "Started" && this.job.projectStatus !== "Approved" || this.job.status === "Completed") return true;
-            if(this.job.name !== "translate1" && this.job.status !== "Started") {
+        isForbidden() {
+            if(this.job.status === "Accepted") {
                 const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
-            if(this.job.status !== "Started") {
-                return this.job.status !== "Accepted";
-            }
-            return this.job.status === "Started";
+            return false;
         }
     },
     components: {
-        LabelValue,
+        JobData,
+        Instructions,
+        TermsAgree,
+        Forbidden,
         Button,
-        CheckBox,
-        Progress,
         ApproveModal
     },
     directives: {
         ClickOutside
-    },
-    mounted() {
-        this.domain = process.env.domain;
     }
 }
 </script>
@@ -232,57 +173,6 @@ export default {
     padding: 0 0 20px 20px;
     box-sizing: border-box;
     position: relative;
-    &__job-data {
-       border-bottom: 1px solid $light-brown;
-       display: flex;
-       flex-direction: column;
-       flex-wrap: wrap;
-       height: 125px;
-       padding: 10px 0 10px 8px;
-    }
-    &__currency {
-        margin-left: 5px;
-    }
-    &__instructions {
-        margin-top: 20px;
-        padding-right: 10px;
-    }
-    &__textarea {
-        padding: 8px;
-        box-sizing: border-box;
-        border: 2px solid $light-brown;
-        border-radius: 5px;
-        max-height: 125px;
-        overflow-y: overlay;
-    }
-    &__text {
-        margin: 10px 0;
-        font-size: 14px;
-    }
-    &__files {
-        display: flex;
-        margin: 15px 0;
-        padding-left: 8px;
-    }
-    &__files-item {
-        display: flex;
-        align-items: center;
-        width: 30%;
-    }
-    &__download {
-        margin-left: 15px;
-        padding-bottom: 3px;
-        cursor: pointer;
-    }
-    &__terms {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    &__check {
-        margin-right: 10px;
-    }
     &__buttons, &__icons {
         display: flex;
         justify-content: center;
@@ -348,18 +238,6 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-}
-
-.data-block {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    position: relative;
-    &__progress {
-        position: absolute;
-        left: -20px;
     }
 }
 

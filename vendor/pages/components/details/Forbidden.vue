@@ -1,0 +1,34 @@
+<template lang="pug">
+    .forbidden
+        p.forbidden__message Sorry, you can't start the job until previous job is completed!    
+</template>
+
+<script>
+export default {
+    
+}
+</script>
+
+<style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
+.forbidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.1);
+    &__message {
+        font-size: 18px;
+        background-color: $white;
+        padding: 20px;
+        color: $orange;
+        border: 2px solid $orange;
+    }
+}
+
+</style>

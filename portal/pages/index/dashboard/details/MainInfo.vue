@@ -10,8 +10,8 @@
                 .data-block__item
                     LabelValue(title="Status" :isColon="isColon" :value="project.status")  
                 .data-block__item
-                    LabelValue(v-if="project.finance" title="Total Cost" :isColon="isColon" :value="project.finance.Price.receivables")
-                        span.main-info__currency(v-if="project.finance && project.finance.Price.receivables") &euro;
+                    LabelValue(v-if="project.finance" title="Total Cost" :isColon="isColon" :value="receivables")
+                        span.main-info__currency(v-if="project.finance.Price.receivables && project.status !== 'Requested'") &euro;
             .data-block(v-if="!isQuote")
                 Progress(:percent="getTotalProgress()")
         .main-info__tasks(v-if="isQuote")
@@ -78,6 +78,9 @@ export default {
         isQuote() {
             const statuses = ['Quote sent', 'Requested'];
             return statuses.indexOf(this.project.status) !== -1
+        },
+        receivables() {
+            return this.project.status !== 'Requested' ? this.project.finance.Price.receivables : "-";
         }
     },
     components: {

@@ -17,8 +17,9 @@
             .data-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
             .data-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}
             .data-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
-            .data-table__data(slot="totalCost" slot-scope="{ row, index }") {{ row.finance.Price.receivables }}
-                .data-table__currency(v-if="row.finance.Price.receivables") &euro;
+            .data-table__data(slot="totalCost" slot-scope="{ row, index }")
+                .data-table__payment(v-if="row.status !== 'Requested'") {{ row.finance.Price.receivables }}
+                    span.data-table__currency(v-if="row.finance.Price.receivables") &euro;
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
             .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")

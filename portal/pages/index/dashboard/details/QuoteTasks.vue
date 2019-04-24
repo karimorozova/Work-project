@@ -9,8 +9,10 @@
             .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
-            .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
-                .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+            .tasks-table__data(slot="cost" slot-scope="{ row }")
+                .tasks-table__cost(v-if="project.status !== 'Requested'") {{ row.finance.Price.receivables }}
+                    span.tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+                .tasks-table__cost(v-else) -
 
 </template>
 

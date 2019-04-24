@@ -20,7 +20,7 @@
                 i.fa.fa-envelope
             .step-vendor__icon
                 i.fa.fa-slack
-    .step-vendor__options
+    .step-vendor__options(v-if="!isVendorApproved")
         .step-vendor__check
             CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")
             .step-vendor__text Send next vendor after rejection
@@ -115,6 +115,10 @@ export default {
         },
         isTimeDouble() {
             return this.nextSendTime.length === 2;
+        },
+        isVendorApproved() {
+            const statuses= ["Request Sent", "Created", "Rejected"]
+            return this.step.vendor && statuses.indexOf(this.step.status) === -1;
         }
     },
     components: {

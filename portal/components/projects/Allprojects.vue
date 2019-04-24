@@ -32,12 +32,12 @@ export default {
     data() {
         return {
             requestFilter: {
-                from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
+                from: new Date(new Date().getFullYear(), 0, 1), 
                 to: new Date()
             },
             projectNameFilter: '',
             deadlineFilter: {
-                from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
+                from: new Date(new Date().getFullYear(), 0, 1), 
                 to: new Date()
             },
             projectIdFilter: '',

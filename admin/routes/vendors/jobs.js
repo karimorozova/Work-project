@@ -50,8 +50,8 @@ async function updateStepProp({jobId, prop, value}) {
             }
             return item;
         })
-        if(value === "Completed" && isAllStepsCompleted({jobId, steps})) {
-            return await setTaskStatusAndSave({tasks: project.tasks, jobId, steps, status: "Ready for Delivery"});
+        if(prop === "status") {
+            return await manageStatuses({project, steps, jobId, status: value});
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
@@ -60,7 +60,26 @@ async function updateStepProp({jobId, prop, value}) {
     }
 }
 
+async function manageStatuses({project, steps, jobId, status}) {
+    const step = steps.find(item => item.id === jobId);
+    const task = project.tasks.find(item => item.taskId === step.taskId);
+    try {
+        if(status === "Completed" && isAllStepsCompleted({jobId, steps})) {
+            return await setTaskStatusAndSave({project, jobId, steps, status: "Ready for Delivery"});
+        }
+        if(status === "Started" && task.status !== "Started") {
+            return await setTaskStatusAndSave({
+                project, jobId, steps, status: "Started", projectStatus
+            });
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageStatuses");
+    }
+}
+
 async function setTaskStatusAndSave({tasks, jobId, steps, status}) {
+    const { tasks } = project;
     const step = steps.find(item => item.id === jobId);
     const updatedTasks = tasks.map(item => {
         if(item.taskId === step.taskId) {
@@ -68,8 +87,9 @@ async function setTaskStatusAndSave({tasks, jobId, steps, status}) {
         }
         return item;
     })
+    const projectStatus = project.status === "Started" ? project.status : "Started";
     try {
-        await Projects.updateOne({'steps._id': jobId}, { tasks: updatedTasks, steps });
+        await Projects.updateOne({'steps._id': jobId}, { status: projectStatus, tasks: updatedTasks, steps });
     } catch(err) {
         console.log(err);
         console.log("Error in setTaskStatusAndSave");
