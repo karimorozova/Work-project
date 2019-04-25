@@ -76,15 +76,11 @@ async function payablesCalc({task, project, step}) {
         const metrics = task.metrics;
         const vendor = await getVendor({"_id": step.vendor._id});
         const comb = getCombination({combs: vendor.languageCombinations, service, task});
-        console.log("comb is: ", JSON.stringify(comb));
         const rateIndustry = comb ? comb.industries.find(item => {
             return item.industry.id === project.industry.id
         }) : "";
-        console.log("rateIndustry is: ", JSON.stringify(rateIndustry));
         const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-        console.log("basic rate is: ", basicRate);
         const rate = rateIndustry ? rateIndustry.rates[service.id].value : basicRate;
-        console.log("payable rate is: ", rate);
         step.finance['Price'].payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
         : calcCost(metrics, 'vendor', rate);
         step.vendorRate = rate;
@@ -105,7 +101,6 @@ function calcCost(metrics, field, rate) {
         }
     }
     cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
-    console.log("final cost is: ", rate);
     return +cost.toFixed(2);
 }
 

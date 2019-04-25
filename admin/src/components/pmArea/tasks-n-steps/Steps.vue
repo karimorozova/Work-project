@@ -65,7 +65,7 @@
                         @togglePersonsData="toggleVendors"
                         @scrollDrop="scrollDrop"
                     )
-                span.steps__step-vendor(v-if="row.status !== 'Created'") {{ vendorName(row.vendor) }}
+                span.steps__step-vendor(v-if="row.status !== 'Created' && row.status !== 'Rejected'") {{ vendorName(row.vendor) }}
                     span.steps__step-no-select(v-if="!row.vendor") No Vendor
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
