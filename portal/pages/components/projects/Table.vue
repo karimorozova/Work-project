@@ -14,7 +14,7 @@
             .data-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
             .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
             .data-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId }}
-            .data-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
+            .data-table__data(slot="projectName" slot-scope="{ row, index }" :class="{'data-table_break-word': row.projectName.length > 30}") {{ row.projectName }}
             .data-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}
             .data-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
             .data-table__data(slot="totalCost" slot-scope="{ row, index }")
@@ -121,6 +121,11 @@ export default {
     }
     &_centered {
         justify-content: center;
+    }
+    &_break-word {
+        word-break: break-all;
+        overflow-y: overlay;
+        align-items: baseline;
     }
 }
 

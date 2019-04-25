@@ -42,62 +42,87 @@ function taskMetricsCalc({metrics, matrix, prop}) {
 }
 
 async function updateTaskMetrics(metrics, vendorId) {
-    const vendor = await Vendors.findOne({"_id": vendorId});
-    const matrix = {...vendor.matrix};
-    const updatedMetrics = taskMetricsCalc({metrics, matrix, prop: 'vendor'});
-    return updatedMetrics
+    try {
+        const vendor = await Vendors.findOne({"_id": vendorId});
+        const matrix = {...vendor.matrix};
+        const updatedMetrics = taskMetricsCalc({metrics, matrix, prop: 'vendor'});
+        return updatedMetrics
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateTaskMetrics");
+    }
 }
 
 async function receivablesCalc({task, project, step}) {
-    if(step.name !== "translate1") {
-        const { cost, rate } = await calcProofingStep({task, project, words: task.metrics.totalWords});
-        return {cost, rate};
-    } 
-    const metrics = task.metrics;
-    const rate = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});;
-    const cost = calcCost(metrics, 'client', rate);
-    return { cost, rate };
+    try {
+        if(step.name !== "translate1") {
+            const { cost, rate } = await calcProofingStep({task, project, words: task.metrics.totalWords});
+            return {cost, rate};
+        } 
+        const metrics = task.metrics;
+        const rate = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});;
+        const cost = calcCost(metrics, 'client', rate);
+        return { cost, rate };
+    } catch(err) {
+        console.log(err);
+        console.log("Error in receivablesCalc");
+    }
 }
 
 async function payablesCalc({task, project, step}) {
-    const service = step.name !== "translate1" ? await Services.findOne({"symbol":'pr'}) 
-    : await Services.findOne({"_id": task.service});
-    const metrics = task.metrics;
-    const vendor = await getVendor({"_id": step.vendor._id});
-    const comb = getCombination({combs: vendor.languageCombinations, service, task});
-    const rateIndustry = comb ? comb.industries.find(item => {
-        return item.industry.id === project.industry.id
-    }) : "";
-    const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-    const rate = rateIndustry ? rateIndustry.rates[service.id].value : basicRate;
-    step.finance['Price'].payables = step.name !== "translate1" ? (metrics.totalWords*rate).toFixed(2)
-    : calcCost(metrics, 'vendor', rate);
-    step.vendorRate = rate;
-    return step;
+    try {
+        const service = step.name !== "translate1" ? await Services.findOne({"symbol":'pr'}) 
+        : await Services.findOne({"_id": task.service});
+        const metrics = task.metrics;
+        const vendor = await getVendor({"_id": step.vendor._id});
+        const comb = getCombination({combs: vendor.languageCombinations, service, task});
+        console.log("comb is: ", JSON.stringify(comb));
+        const rateIndustry = comb ? comb.industries.find(item => {
+            return item.industry.id === project.industry.id
+        }) : "";
+        console.log("rateIndustry is: ", JSON.stringify(rateIndustry));
+        const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
+        console.log("basic rate is: ", basicRate);
+        const rate = rateIndustry ? rateIndustry.rates[service.id].value : basicRate;
+        console.log("payable rate is: ", rate);
+        step.finance['Price'].payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
+        : calcCost(metrics, 'vendor', rate);
+        step.vendorRate = rate;
+        return step;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in payablesCalc");
+    }
 }
 
 function calcCost(metrics, field, rate) {
     let cost = 0;
     let wordsSum = 0;
     for(let key in metrics) {
-        if(key !== 'totalWords' && key !== "nonTranslatable" && key !== "__proto__") {
+        if(key !== 'totalWords' && key !== "nonTranslatable") {
             cost+= metrics[key].value*metrics[key][field]*rate;
             wordsSum += metrics[key].value;
         }
     }
     cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
-    return cost.toFixed(2);
+    console.log("final cost is: ", rate);
+    return +cost.toFixed(2);
 }
 
 async function getCustomerRate({task, industry, customerId}) {
-    const service = await Services.findOne({"_id": task.service});
-    const customer = await getClient({"_id": customerId});
-    const comb = getCombination({combs: customer.languageCombinations, service, task});
-    const rateIndustry = comb ? comb.industries.find(item => {
-        return item.industry.id === industry
-    }) : "";
-    const customerRate = rateIndustry ? rateIndustry.rates[task.service].value : "";
-    return customerRate;
+    try {
+        const service = await Services.findOne({"_id": task.service});
+        const customer = await getClient({"_id": customerId});
+        const comb = getCombination({combs: customer.languageCombinations, service, task});
+        const rateIndustry = comb ? comb.industries.find(item => {
+            return item.industry.id === industry
+        }) : "";
+        const customerRate = rateIndustry ? rateIndustry.rates[task.service].value : "";
+        return customerRate;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getCustomerRate");
+    }
 }
 
 function getCombination({combs, service, task}) {
@@ -114,13 +139,14 @@ function getCombination({combs, service, task}) {
 }
 
 async function calcProofingStep({task, project, words}) {
-    try{
+    try {
         const service = await getOneService({symbol: 'pr'});
         const rate = await getCustomerRate({task: {...task, "service": service.id}, industry: project.industry.id, customerId: project.customer.id});
         const cost = (words*rate).toFixed(2);
         return { cost, rate }
     } catch(err) {
-        console.log('Error in calcProofingStep: ' + err);
+        console.log(err);
+        console.log('Error in calcProofingStep');
     }
 }
 
@@ -147,27 +173,37 @@ async function setDefaultStepVendors(project) {
 
 async function getMatchedVendors({activeVendors, step, project}) {
     let matchedVendors = [];
-    for(let vendor of activeVendors) {
-        const isMatching = await checkForLanguages({vendor, step, project});
-        if(isMatching) {
-            matchedVendors.push(vendor);
+    try {
+        for(let vendor of activeVendors) {
+            const isMatching = await checkForLanguages({vendor, step, project});
+            if(isMatching) {
+                matchedVendors.push(vendor);
+            }
         }
+        return matchedVendors;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getMatchedVendors");
     }
-    return matchedVendors;
 }
 
 async function checkForLanguages({vendor, step, project}) {
-    const service = step.name === "translate1" ? await Services.findOne({"symbol": "tr"}) : await Services.findOne({"symbol": "pr"});
-    return vendor.languageCombinations.find(item => {
-        if(item.source && item.source.symbol === step.source && 
-            item.target.symbol === step.target) {
-                return hasRateValue({
-                        service: service.id, 
-                        vendorIndustries: item.industries, 
-                        stepIndustry: project.industry.id
-                    });
-        }
-    })
+    try {
+        const service = step.name === "translate1" ? await Services.findOne({"symbol": "tr"}) : await Services.findOne({"symbol": "pr"});
+        return vendor.languageCombinations.find(item => {
+            if(item.source && item.source.symbol === step.source && 
+                item.target.symbol === step.target) {
+                    return hasRateValue({
+                            service: service.id, 
+                            vendorIndustries: item.industries, 
+                            stepIndustry: project.industry.id
+                        });
+            }
+        })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in checkForLanguages");
+    }
 }
 
 function hasRateValue({service, vendorIndustries, stepIndustry}) {
@@ -194,7 +230,12 @@ async function updateProjectCosts(project) {
         finance['Discount'] = discount;
     }
     projectToUpdate = {...project, finance};
-    return await updateProject({"_id": project.id}, projectToUpdate);
+    try {
+        return await updateProject({"_id": project.id}, projectToUpdate);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateProjectCosts");
+    }
 }
 
 function getWordsData(project) {

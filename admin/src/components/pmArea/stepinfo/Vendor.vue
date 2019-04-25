@@ -2,7 +2,7 @@
 .step-vendor
     .step-vendor__title Vendor:
     .step-vendor__info
-        .step-vendor__drop-menu(v-if="step.status === 'Created'")
+        .step-vendor__drop-menu(v-if="step.status === 'Created' || step.status === 'Rejected'")
             PersonSelect(
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="filteredVendors"

@@ -94,6 +94,7 @@ export default {
     }
     &__item {
         width: 35%;
+        word-break: break-word;
     }
     &__footer {
         display: flex;

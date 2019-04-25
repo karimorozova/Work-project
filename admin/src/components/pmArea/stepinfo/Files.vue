@@ -17,9 +17,10 @@
             template(slot="headerTarget" slot-scope="{ field }")
                 span.step-files__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
-                input.step-files__check(type="checkbox" v-model="row.check")
+                .step-files__checkbox
+                    input.step-files__check(type="checkbox" v-model="row.check")
             template(slot="fileName" slot-scope="{ row, index }")
-                span.step-files__data {{ row.fileName }}
+                span.step-files__name(:class="{'step-files_break-word': row.fileName.length > 40}") {{ row.fileName }}
             template(slot="category" slot-scope="{ row, index }")
                 span.step-files__data {{ row.category }}
             template(slot="source" slot-scope="{ row, index }") 
@@ -54,11 +55,11 @@ export default {
             isFilesShown: false,
             isAllChecked: false,
             fields: [
-                {label: "Check", headerKey: "headerCheck", key: "check", width: "5%"},
-                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "33%"},
-                {label: "Category", headerKey: "headerCategory", key: "category", width: "22%"},
-                {label: "Source", headerKey: "headerSource", key: "source", width: "20%", cellClass: "step-files_centered"},
-                {label: "Target", headerKey: "headerTarget", key: "target", width: "20%", cellClass: "step-files_centered"},
+                {label: "Check", headerKey: "headerCheck", key: "check", width: "5%", padding: 0},
+                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "33%", padding: 0},
+                {label: "Category", headerKey: "headerCategory", key: "category", width: "22%", padding: 0},
+                {label: "Source", headerKey: "headerSource", key: "source", width: "20%", padding: 0, cellClass: "step-files_centered"},
+                {label: "Target", headerKey: "headerTarget", key: "target", width: "20%", padding: 0, cellClass: "step-files_centered"},
             ]
         }
     },
@@ -122,6 +123,13 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors.scss";
 
+%flex {
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    height: 30px;
+}
+
 .step-files {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
@@ -132,6 +140,18 @@ export default {
         height: 18px;
         width: 18px;
         cursor: pointer;
+    }
+    &__data, &__checkbox, &__name {
+        @extend %flex;
+    }
+    &__link {
+        @extend %flex;
+        padding-left: 0;
+    }
+    &_break-word {
+        word-break: break-word;
+        align-items: baseline;
+        overflow-y: overlay;
     }
 }
 

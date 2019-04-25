@@ -55,7 +55,7 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                .steps__vendor-menu(v-if="row.status === 'Created'")
+                .steps__vendor-menu(v-if="row.status === 'Created' || row.status === 'Rejected'")
                     PersonSelect(
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
@@ -127,9 +127,9 @@ import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
 import ApproveModal from "../../ApproveModal";
-import StepInfo from "./StepInfo";
+const StepInfo = () => import("./StepInfo");
 import SelectSingle from "../../SelectSingle";
-import Datepicker from "../../Datepicker";
+const Datepicker = () => import("../../Datepicker");
 import moment from "moment";
 import ClickOutside from "vue-click-outside";
 import { mapGetters, mapActions } from 'vuex';
