@@ -102,7 +102,7 @@ router.post('/user', requiresLogin, async (req, res) => {
     const { _id, username, firstName, lastName, email, position, group } = user;
     try {
         if(_id) { 
-            await User.updateOne({"_id": user._id}, { fistName, lastName, email, position, group });
+            await User.updateOne({"_id": user._id}, { firstName, lastName, email, position, group });
         } else {
             const password = "12345";
             await User.create({username, password, firstName, lastName, email, position, group});
