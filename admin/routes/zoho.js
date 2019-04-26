@@ -69,7 +69,7 @@ router.get("/leads", async (req, res) => {
 
 router.get("/activities", async (req, res) => {
     try {
-        const result = await getActivities('(Owner.name:equals:Amelia Lotter)');
+        const result = await getActivities('(Owner.name:equals:Sakis Kyriakou)');
         const callsReport = getCallsCount(result.data);
         res.send({callsReport});
         // res.send(result.data);

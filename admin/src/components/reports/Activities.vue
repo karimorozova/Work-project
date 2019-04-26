@@ -183,7 +183,7 @@ export default {
         },
         async getZohoCrmData() {
             try {
-                const result = await this.$http.get('/zoho/crm-records?user=Amelia%20Lotter');
+                const result = await this.$http.get('/zoho/crm-records?user=Sakis%20Kyriakou');
             } catch(err) {
                 if (err.status === 401) this.isTokenExpired = true;
                 this.alertToggle({message: err.data, isShow: true, type: "error"});
