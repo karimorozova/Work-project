@@ -3,11 +3,11 @@
     .vendor-portal__top
       .vendor-portal__admin-name
         h2.vendor-portal__adminPortal VENDOR PORTAL
-      .vendor-portal__search-block
+      .vendor-portal__account(v-click-outside="hideAccountMenu")
         .vendor-portal__photo-wrapper
           img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
           img.vendor-portal__photo(v-else :src="domain+vendor.photo")
-          .vendor-portal__account-menu-wrapper(v-if="isAccountMenu" v-click-outside="hideAccountMenu")
+          .vendor-portal__account-menu-wrapper(v-if="isAccountMenu")
             .vendor-portal__account-block
               .vendor-portal__info
                 .vendor-portal__icon
@@ -166,10 +166,8 @@ export default {
     font-size: 24px;
     font-weight: 700;
   }
-  &__search-block {
-    width: 35%;
+  &__account {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
   }
   &__dropdown-wrapper {
@@ -250,11 +248,6 @@ export default {
     &:hover {
       background-color: #ddd3c8;
     }
-  }
-  &__account {
-    font-size: 12px;
-    color: #67573e;
-    margin-left: 10px;
   }
   &__list-label {
     font-size: 12px;
