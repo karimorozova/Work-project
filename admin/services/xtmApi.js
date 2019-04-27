@@ -23,7 +23,7 @@ function saveTasks(object) {
 }
 
 function saveTemplateTasks(object) {
-    const withJoinObject = object.join !== "false" ? {
+    const withJoinObject = object.join && object.join !== "false" ? {
         'workflowId': object.workflowId,
         'fileProcessType': 'JOIN'
     } : {'workflowId': object.workflowId}

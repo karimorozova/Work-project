@@ -177,6 +177,9 @@
     justify-content: center;
     align-items: center;
   }
+  &_no-body-bottom-margin {
+    margin-bottom: 0;
+  }
 }
 
 .tbody_height-150 {

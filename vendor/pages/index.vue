@@ -7,7 +7,7 @@
         .vendor-portal__photo-wrapper
           img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
           img.vendor-portal__photo(v-else :src="domain+vendor.photo")
-          .vendor-portal__account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
+          .vendor-portal__account-menu-wrapper(v-if="isAccountMenu" v-click-outside="hideAccountMenu")
             .vendor-portal__account-block
               .vendor-portal__info
                 .vendor-portal__icon
@@ -61,7 +61,7 @@ export default {
           active: false
         }
       ],
-      accountMenuVisible: false,
+      isAccountMenu: false,
       accountInfo: false,
       domain: ""
     };
@@ -93,11 +93,14 @@ export default {
       this.$router.push(this.navbarList[index].path);
     },
     showAccountMenu() {
-      this.accountMenuVisible = !this.accountMenuVisible;
+      this.isAccountMenu = !this.isAccountMenu;
     },
     showAccountInfo() {
       this.hideAccountMenu();
       this.$router.push('/account');
+    },
+    hideAccountMenu() {
+      this.isAccountMenu = false;
     },
     setToken() {
       const vendorToken = this.$cookie.get("vendor");

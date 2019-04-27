@@ -24,7 +24,7 @@ function cancelTasks(tasks, project) {
 function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
     return projectTasks.map(task => {
         if(tasksIds.indexOf(task.taskId) !== -1) {
-            task.status = getTaskNewStatus(changedSteps, task.taskId);
+            task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
             if(task.status === "Cancelled Halfway") {
                 task.finance = getTaskNewFinance(changedSteps, task);
             }
@@ -87,8 +87,8 @@ function cancelSteps(checkedSteps, project) {
 
 function cancelledTasks(changedSteps, arr) {
     const updated = arr.map(task => {
-        task.status = getTaskNewStatus(changedSteps, task.taskId);
-        return task
+        task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
+        return task;
     })
     return updated;
 }
@@ -115,6 +115,9 @@ function updateStepsStatuses({steps, status, stepIdentify}) {
                 let finance = getStepNewFinance(item);
                 return {...item._doc, status: newStatus, finance};
             }
+            if(status === "Ready to Start" && item.name !== "translate1") {
+                newStatus = "Waiting to Start";
+            }
             item.status = newStatus;
         }
         return item;
@@ -135,10 +138,10 @@ function getStepNewFinance(step) {
 
 async function updateProjectStatus(id, status) {
     try {
-        if(status !== "Cancelled") {
-            return await updateProject({"_id": id}, { status });
-        }
         const project = await getProject({"_id": id});
+        if(status !== "Cancelled") {
+            return await setNewProjectDetails(project, status);
+        }
         const { tasks } = project;
         const { changedTasks, changedSteps } = cancelTasks(tasks, project);
         const projectStatus = getProjectNewStatus(changedTasks, status);
@@ -148,6 +151,33 @@ async function updateProjectStatus(id, status) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectStatus");
+    }
+}
+
+async function setNewProjectDetails(project, status) {
+    try {
+        if(status === "Started" || status === "Approved") {
+            return await updateWithAcceptedSteps(project, status);
+        }
+        return await updateProject({"_id": id}, { status })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setNewProjectDetails");
+    }
+}
+
+async function updateWithAcceptedSteps(project, status) {
+    let { steps } = project;
+    for(let step of steps) {
+        if(step.status === 'Accepted') {
+            step.status = step.name === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
+        }
+    }
+    try {
+        return await updateProject({"_id": project.id},{status, steps});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateWithAcceptedSteps");
     }
 }
 

@@ -33,7 +33,7 @@ export default {
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
             if(this.job.status !== "Started") {
-                return this.job.status !== "Accepted";
+                return this.job.status !== "Accepted" && this.job.status !== "Ready to Start";
             }
             return this.job.status === "Started";
         }

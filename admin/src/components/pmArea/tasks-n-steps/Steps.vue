@@ -258,7 +258,8 @@ export default {
                         await this.cancelSteps(checkedSteps);
                         break
                     case "Mark as accept/reject":
-                        await this.setStepsStatus({status: "Accepted", steps: checkedSteps});
+                        const status = this.getAcceptedStepStatus();
+                        await this.setStepsStatus({status, steps: checkedSteps});
                         break
                 }
             } catch(err) {
@@ -266,6 +267,13 @@ export default {
             } finally {
                 this.closeApproveModal();
             }
+        },
+        getAcceptedStepStatus() {
+            let status = "Accepted";
+            if(this.currentProject.status === 'Approved' || this.currentProject.status === 'Started') {
+                status = "Ready to Start"
+            }
+            return status;
         },
         async notApproveAction() {
             const checkedSteps = this.getCheckedSteps();

@@ -51,7 +51,7 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        jobStatuses: ["Request Sent", "Accepted", "Created"],
+        jobStatuses: ["Request Sent", "Accepted", "Ready to Start", "Waiting to Start", "Created"],
         currentIndex: -1,
         isApproveModal: false
       }
@@ -99,11 +99,15 @@
       }),
       upcomingJobs() {
         return this.jobs.filter(item => {
+          if(item.status === 'Request Sent') {
+            return item;
+          }
           return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started" && item.projectStatus !== "Approved"
         })
       },
       openedJobs() {
-        const statuses = [...this.jobStatuses, "Started"];
+        let statuses = this.jobStatuses.filter(item => item !== "Request Sent");
+        statuses.push("Started");
         return this.jobs.filter(item => {
           return statuses.indexOf(item.status) !== -1 && (item.projectStatus === "Started" || item.projectStatus === "Approved");          
         })

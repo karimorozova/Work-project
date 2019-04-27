@@ -32,6 +32,7 @@ function getSteps(project, id) {
             manager: project.projectManager,
             industry: project.industry,
             xtmJobIds: stepTask.xtmJobs,
+            sourceFiles: stepTask.sourceFiles,
             refFiles: stepTask.refFiles,
             prevStepProgress,
             prevStepStatus: prevStep.status
@@ -68,14 +69,44 @@ async function manageStatuses({project, steps, jobId, status}) {
             return await setTaskStatusAndSave({project, jobId, steps, status: "Ready for Delivery"});
         }
         if(status === "Started" && task.status !== "Started") {
-            return await setTaskStatusAndSave({
-                project, jobId, steps, status: "Started"
-            });
+            return await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
+        }
+        if(status === "Accepted" || status === "Rejected") {
+            const updatedSteps = status === "Accepted" ? setAcceptedStepStatus({project, steps, jobId})
+            : setRejectedStatus({steps, jobId});
+            return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
         }
     } catch(err) {
         console.log(err);
         console.log("Error in manageStatuses");
     }
+}
+
+function setAcceptedStepStatus({project, steps, jobId}) {
+    let status = "Accepted";
+    if(project.status === "Started" || project.status === "Approved") {
+        status = "Ready to Start";
+    }
+    const updatedSteps = steps.map(item => {
+        if(item.id === jobId) {
+            if(item.name === "translate1") {
+                item.status = status; 
+            } else {
+                item.status = status === "Accepted" ? status : "Waiting to Start";
+            }
+        }
+        return item;
+    })
+    return updatedSteps;
+}
+
+function setRejectedStatus({steps, jobId}) {
+    return steps.map(item => {
+        if(item.id === jobId) {
+            item.status = "Rejected";
+        }
+        return item;
+    })
 }
 
 async function setTaskStatusAndSave({project, jobId, steps, status}) {

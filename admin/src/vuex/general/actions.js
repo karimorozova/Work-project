@@ -33,7 +33,7 @@ export const setStepsStatus = async ({ commit, state }, payload) => {
   try {
     const { status, steps } = payload;
     const id = state.currentProject._id;
-    const filteredSteps = steps.filter(item => item.status === 'Request Sent' || item.status === 'Rejected');
+    const filteredSteps = steps.filter(item => item.status === 'Request Sent' || item.status === 'Rejected' || item.status === 'Created');
     if(filteredSteps.length) {
       const updatedProject = await Vue.http.post('/pm-manage/step-status', { id, status, steps: filteredSteps });
       await commit('storeCurrentProject', updatedProject.body);

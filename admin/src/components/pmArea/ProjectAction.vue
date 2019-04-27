@@ -54,6 +54,8 @@ export default {
                 }
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot execute chosen action.', isShow: true, type: 'error'})
+            } finally {
+                this.selectedAction = "";
             }
         },
         async sendQuote() {

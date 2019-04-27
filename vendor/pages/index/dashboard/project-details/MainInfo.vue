@@ -7,10 +7,13 @@
             .main-info__button
                 Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
                 .main-info__select-popup(v-if="isXtmJobs" v-click-outside="closePopup")
-                    span.main-info__job-ids(v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" @click.stop="goToXtmEditor(xtmJobIndex)") {{ xtmJob.fileName }}
+                    span.main-info__job-ids(
+                        v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" 
+                        @click.stop="goToXtmEditor(xtmJobIndex)") {{ getFileName(xtmJobIndex) }}
+                        span.main-info__full-name(v-if="xtmJob.fileName.length > 15") {{ xtmJob.fileName }}
             .main-info__button(v-if="progress >= 100" )
                 Button(value="Complete" @makeAction="showModal")
-        .main-info__icons(v-if="job.status === 'Created'")
+        .main-info__icons(v-if="areIcons")
             .main-info__icon(v-for="(icon, key) in icons")
                 img.main-info__image(:src="icon.icon" @click="makeAction(key)")
                 span.main-info__tooltip {{ key }}
@@ -54,6 +57,10 @@ export default {
             selectJob: "selectJob",
             alertToggle: "alertToggle"
         }),
+        getFileName(xtmJobIndex) {
+            const fileName = this.job.xtmJobIds[xtmJobIndex].fileName;
+            return fileName.length < 20 ? fileName : `${fileName.slice(0, 15)}...`;
+        },
         async makeButtonAction() {
             if(!this.job.isVendorRead) return;
             try {
@@ -129,12 +136,16 @@ export default {
             job: "getSelectedJob",
             allJobs: "getAllJobs"
         }),
+        areIcons() {
+            const statuses = ["Created", "Request Sent"];
+            return statuses.indexOf(this.job.status) !== -1;
+        },
         isButton() {
-            const statuses = ['Accepted', 'Started'];
+            const statuses = ['Accepted', 'Started', 'Ready to Start', 'Waiting to Start'];
             return statuses.indexOf(this.job.status) !== -1;
         },
         buttonValue() {
-            return this.job.status === "Accepted" ? "Start" : "Enter Editor";
+            return this.job.status !== "Started" ? "Start" : "Enter Editor";
         },
         progress() {
             if(this.job.progress) {
@@ -142,7 +153,7 @@ export default {
             }
         },
         isForbidden() {
-            if(this.job.status === "Accepted" && this.job.name !== "translate1") {
+            if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.name !== "translate1") {
                 const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
@@ -214,16 +225,33 @@ export default {
         box-sizing: border-box;
         border-radius: 5px;
         justify-content: center;
-        top: -40px;
+        bottom: 40px;
     }
     &__job-ids {
         font-size: 16px;
         text-decoration: underline;
         margin: 0 5px;
         cursor: pointer;
+        max-width: 150px;
+        position: relative;
         &:hover {
             font-weight: 600;
+            .main-info__full-name {
+                display: block;
+                z-index: 2;
+                top: 0;
+                left: 0;
+            }
         }
+    }
+    &__full-name {
+        position: absolute;
+        background-color: $white;
+        padding: 2px;
+        display: none;
+    }
+    &_break {
+        word-break: break-word;
     }
     &_opacity05 {
         opacity: 0.5;

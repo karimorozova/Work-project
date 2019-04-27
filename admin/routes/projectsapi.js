@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const { pmMail } = require('../utils/');
 const { Projects, User } = require('../models');
-const { getProject } = require('../projects');
+const { getProject, updateProjectStatus } = require('../projects');
 const { emitter } = require('../events');
-const  { getProjectManageToken } = require("../middleware");
+const { getProjectManageToken } = require("../middleware");
 
 router.get('/acceptquote', getProjectManageToken, async (req, res) => {
     const mailDate = req.query.to;
@@ -20,7 +20,9 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            await Projects.updateOne({"_id": projectId}, {$set: {status: 'Started', isClientOfferClicked: true}});
+            const status = project.isStartAccepted ? "Start" : "Approved";
+            await updateProjectStatus(projectId, status);
+            await Projects.updateOne({"_id": projectId}, {$set: {isClientOfferClicked: true}});
             emitter.emit('managersNotificationEmail', project);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
