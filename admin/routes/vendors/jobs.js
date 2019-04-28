@@ -76,6 +76,7 @@ async function manageStatuses({project, steps, jobId, status}) {
             : setRejectedStatus({steps, jobId});
             return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
         }
+        await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
         console.log(err);
         console.log("Error in manageStatuses");
