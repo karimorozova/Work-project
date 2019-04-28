@@ -4,9 +4,9 @@
         Instructions(:job="job")
         TermsAgree(:job="job")
         .main-info__buttons(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
-            .main-info__button
+            .main-info__button(v-click-outside="closePopup")
                 Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
-                .main-info__select-popup(v-if="isXtmJobs" v-click-outside="closePopup")
+                .main-info__select-popup(v-if="isXtmJobs")
                     span.main-info__job-ids(
                         v-for="(xtmJob, xtmJobIndex) in job.xtmJobIds" 
                         @click.stop="goToXtmEditor(xtmJobIndex)") {{ getFileName(xtmJobIndex) }}
