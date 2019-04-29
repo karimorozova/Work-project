@@ -3,17 +3,11 @@
         .instructions__textarea
             .instructions__title Instructions:
             p.instructions__text Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
-        .instructions__files
-            Files   
 </template>
 
 <script>
-import Files from "./Files";
-
 export default {
-    components: {
-        Files
-    }
+    
 }
 </script>
 
@@ -34,10 +28,6 @@ export default {
     &__text {
         margin: 10px 0;
         font-size: 14px;
-    }
-    &__files {
-        box-sizing: border-box;
-        margin: 15px 0;
     }
 }
 

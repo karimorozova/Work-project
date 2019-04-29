@@ -65,7 +65,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 0 40px;
+    padding: 15px 0;
     height: 100%;
     box-sizing: border-box;
     &__header {

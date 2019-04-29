@@ -10,22 +10,37 @@
                 span.job-files__label {{ field.label }}
             template(slot="headerCategory" slot-scope="{ field }")
                 span.job-files__label {{ field.label }}
+            template(slot="headerProgress" slot-scope="{ field }")
+                span.job-files__label {{ field.label }}
             template(slot="headerSource" slot-scope="{ field }")
                 span.job-files__label {{ field.label }}
             template(slot="headerTarget" slot-scope="{ field }")
+                span.job-files__label {{ field.label }}
+            template(slot="headerEditor" slot-scope="{ field }")
                 span.job-files__label {{ field.label }}
             template(slot="fileName" slot-scope="{ row, index }")
                 span.job-files__name(:class="{'job-files_break-word': row.fileName.length > 40}") {{ row.fileName }}
             template(slot="category" slot-scope="{ row, index }")
                 span.job-files__data {{ row.category }}
+            template(slot="progress" slot-scope="{ row, index }")
+                .job-files__progress(v-if="row.category === 'Source file'")
+                    ProgressLine(:progress="getProgress(row)")
             template(slot="source" slot-scope="{ row, index }")
                 .job-files_flex-centered
                     a.job-files__link(:href='row.source')
-                        img.job-files__image(src="../../../assets/images/download.png")                         
+                        img.job-files__image(src="../../../assets/images/download.png")
+            template(slot="target" slot-scope="{ row, index }")
+                .job-files_flex-centered(v-if="row.category === 'Source file'")
+                    .job-files__link(v-if="getProgress(row) === 100")
+                        img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
+            template(slot="editor" slot-scope="{ row, index }")
+                .job-files__editor(v-if="job.status === 'Started' && row.category === 'Source file'")
+                    img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToXtmEditor(row)")                   
 </template>
 
 <script>
 import DataTable from "~/components/Tables/DataTable";
+import ProgressLine from "~/components/ProgressLine";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -33,9 +48,12 @@ export default {
         return {
             jobFiles: [],
             fields: [
-                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "48%", padding: 0},
-                {label: "Category", headerKey: "headerCategory", key: "category", width: "32%", padding: 0},
-                {label: "Source", headerKey: "headerSource", key: "source", width: "20%", padding: 0}
+                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35%", padding: 0},
+                {label: "Category", headerKey: "headerCategory", key: "category", width: "25%", padding: 0},
+                {label: "Progress", headerKey: "headerProgress", key: "progress", width: "12%", padding: 0},
+                {label: "Source", headerKey: "headerSource", key: "source", width: "10%", padding: 0},
+                {label: "Target", headerKey: "headerTarget", key: "target", width: "10%", padding: 0},
+                {label: "Editor", headerKey: "headerEditor", key: "editor", width: "8%", padding: 0}
             ],
             domain: ""
         }
@@ -45,6 +63,11 @@ export default {
             storeProject: "setCurrentProject",
             alertToggle: "alertToggle"
         }),
+        getProgress(file) {
+            const { jobId } = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            const progress = this.job.progress[jobId];
+            return +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2);
+        },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
         },
@@ -63,12 +86,27 @@ export default {
                 const filePath = this.domain + file.split('./dist')[1];
                 const fileName = nameArr[nameArr.length - 1];
                 files.push({
-                    fileName: fileName,
+                    fileName,
                     category: category,
                     source: filePath
                 })
             }
             return files;
+        },
+        async goToXtmEditor(file) {
+            const { jobId } = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            try {
+                const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
+                let link = document.createElement("a");
+                link.target = "_blank";
+                link.href = url.data;
+                link.click();
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+        },
+        async downloadTarget(row) {
+            
         }
     },
     computed: {
@@ -81,7 +119,8 @@ export default {
         }
     },
     components: {
-        DataTable
+        DataTable,
+        ProgressLine
     },
     mounted() {
         this.domain = process.env.domain;
@@ -116,6 +155,15 @@ export default {
     &__link {
         @extend %flex;
         padding-left: 0;
+    }
+    &__progress {
+        @extend %flex;
+        padding: 0 3px;
+    }
+    &__editor {
+        @extend %flex;
+        padding: 0;
+        justify-content: center;
     }
     &_break-word {
         word-break: break-word;

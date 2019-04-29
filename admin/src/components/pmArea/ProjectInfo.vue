@@ -139,7 +139,7 @@ export default {
                             return item.taskId === task.taskId && item.name === key
                         })
                         if(!existedTask) {
-                            const {startDate, deadline} = this.getStepsDates({task, key})
+                            const {startDate, deadline} = this.getStepsDates({task, key});
                             project.steps.push({
                                 taskId: task.taskId,
                                 name: key,
@@ -148,7 +148,7 @@ export default {
                                 vendor: null,
                                 start: startDate,
                                 deadline: deadline,
-                                progress: progress[key],
+                                progress: this.setStepsProgress(key, progress),
                                 status: "Created",
                                 receivables: "",
                                 payables: "",
@@ -181,6 +181,16 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
             }
+        },
+        setStepsProgress(name, progress) {
+            const { jobsMetrics } = progress;
+            let stepProgress = progress[name];
+            for(let metrics of jobsMetrics) {
+                const { jobId, metricsProgress } = metrics;
+                const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[name];
+                stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
+            }
+            return stepProgress;
         },
         getStepsDates({task, key}) {
             let startDate = task.start; 

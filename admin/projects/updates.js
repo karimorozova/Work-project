@@ -211,12 +211,23 @@ function setStepsStatus({steps, status, project}) {
 function updateStepsProgress({steps, task, progress}) {
     const updatedSteps = steps.map(item => {
         if(task.taskId === item.taskId) {
-            item.progress = progress[item.name];
+            item.progress = setStepsProgress(item, progress);
             return item
         }
         return item;
     });
     return updatedSteps;
+}
+
+function setStepsProgress(step, progress) {
+    const { jobsMetrics } = progress;
+    let stepProgress = progress[step.name];
+    for(let metrics of jobsMetrics) {
+        const { jobId, metricsProgress } = metrics;
+        const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[step.name];
+        stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
+    }
+    return stepProgress;
 }
 
 function areAllStepsCompleted(steps, taskId) {

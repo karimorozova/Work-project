@@ -29,6 +29,7 @@ async function metricsCalc(metrics) {
                 wordsToBeCorrected: metrics.metricsProgress[key].wordsToBeCorrected,
             }
         }
+        progress.jobsMetrics = [...metrics.jobsMetrics];
         resolve({xtmMetrics, progress});
     })
 }

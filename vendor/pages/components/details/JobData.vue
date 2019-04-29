@@ -48,8 +48,7 @@ export default {
 .job-data {
     border-bottom: 1px solid $light-brown;
     display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+    justify-content: space-between;
     height: 125px;
     padding: 10px 0 10px 8px;
     &__currency {
@@ -59,13 +58,15 @@ export default {
 
 .data-block {
     height: 100%;
+    width: 30%;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     position: relative;
-    &__progress {
-        position: absolute;
-        left: -20px;
+    &:last-child {
+        width: 20%;
+        display: flex;
+        align-items: flex-start;
     }
 }
 

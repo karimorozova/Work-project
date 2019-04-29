@@ -27,7 +27,8 @@
                 a.step-files__link(:href='row.source')
                     img.step-files__image(src="../../../assets/images/download-big-b.png")
             template(slot="target" slot-scope="{ row, index }")
-                img.step-files__image(v-if="row.category !== 'Reference file' && isCompleted" src="../../../assets/images/download-big-b.png" @click="downloadTargetFile(index)")                            
+                .step-files__link(v-if="row.category !== 'Reference file' && isCompleted")
+                    img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile(index)")                            
 </template>
 
 <script>

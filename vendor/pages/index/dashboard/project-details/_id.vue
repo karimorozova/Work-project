@@ -7,26 +7,61 @@
                 .details__main
                     MainInfo
                 .details__describe
-                    OtherInfo 
+                    OtherInfo
+            .details__files
+                FilesAndButtons(@showModal="showModal")
+            .details__modal(v-if="isApproveModal")
+                 ApproveModal(
+                    :isCentered="isApproveModal"
+                    @close="closeModal"
+                    @notApprove="closeModal"
+                    @approve="completeJob" 
+                    text="Are you sure you have completed your job and reviewed your work?"
+                    approveValue="Complete" 
+                    notApproveValue="Cancel")
+            Forbidden(v-if="isForbidden")
 </template>
 
 <script>
 import MainInfo from "./MainInfo";
 import OtherInfo from "./OtherInfo";
+import FilesAndButtons from "./FilesAndButtons";
+import Forbidden from "../../../components/details/Forbidden";
+const ApproveModal = () => import("~/components/ApproveModal");
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
-            
+            isApproveModal: false
         }
     },
     methods: {
         ...mapActions({
             getJobs: "getJobs",
             selectJob: "selectJob",
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            setJobStatus: "setJobStatus"
         }),
+        closeModal() {
+            this.isApproveModal = false;            
+        },
+        showModal() {
+            this.isApproveModal = true;
+        },
+        setCurrentJob() {
+            const currentJob = this.allJobs.find(item => item._id === this.job._id);
+            this.selectJob(currentJob);
+        },
+        async completeJob() {
+            this.closeModal();
+            try {
+                await this.setJobStatus({jobId: this.job._id, status: "Completed"});
+                this.setCurrentJob();
+            } catch(err) {
+                this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
+            }
+        },
         async refreshProgress() {
             try {
                 if(!this.job._id) {
@@ -35,8 +70,7 @@ export default {
                 if(this.job.status !== "Started") return;
                 await this.$axios.get(`/xtm/update-progress?projectId=${this.job.project_Id}`);
                 await this.getJobs();
-                const currentJob = this.allJobs.find(item => item._id === this.job._id);
-                await this.selectJob(currentJob);
+                this.setCurrentJob();
                 this.alertToggle({message: "Progress updated", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: err.response.data, isShow: true, type: "error"});
@@ -63,11 +97,21 @@ export default {
         }),
         buttonValue() {
             return "Start"
+        },
+        isForbidden() {
+            if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.name !== "translate1") {
+                const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
+                return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
+            }
+            return false;
         }
     },
     components: {
         MainInfo,
-        OtherInfo
+        OtherInfo,
+        FilesAndButtons,
+        ApproveModal,
+        Forbidden
     },
     mounted() {
         this.refreshProgress();
@@ -87,6 +131,7 @@ export default {
         margin-top: 10px;
         box-shadow: 0 0 15px $brown-shadow;
         box-sizing: border-box;
+        position: relative;
     }
     &__header {
         padding: 10px 20px 10px 28px;
@@ -104,6 +149,16 @@ export default {
     &__describe {
         width: 30%;
         background-color: #F6F1EF;
+    }
+    &__modal {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 

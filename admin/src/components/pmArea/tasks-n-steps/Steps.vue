@@ -390,9 +390,9 @@ export default {
         }),
         stepActions() {
             let result = this.actions;
-            const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Rejected");
-            if(requestedStep && result.indexOf("Mark as accept/reject") === -1) {
-                result.unshift("Mark as accept/reject");
+            const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
+            if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
+                result= ["Request confirmation", "Cancel"];
             }
             return result;
         }
