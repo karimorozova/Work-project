@@ -167,7 +167,7 @@ export default {
             ],
             selectedVendors: [],
             isAllSelected: false,
-            actions: ["Request confirmation", "Cancel"],
+            actions: ["Mark as accept/reject" ,"Request confirmation", "Cancel"],
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             activeIndex: -1,

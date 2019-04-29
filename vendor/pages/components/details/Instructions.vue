@@ -4,23 +4,15 @@
             .instructions__title Instructions:
             p.instructions__text Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
         .instructions__files
-            Files(:domain="domain")    
+            Files   
 </template>
 
 <script>
 import Files from "./Files";
 
 export default {
-    data() {
-        return {
-            domain: ""
-        }
-    },
     components: {
         Files
-    },
-    mounted() {
-        this.domain = process.env.domain;
     }
 }
 </script>

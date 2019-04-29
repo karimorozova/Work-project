@@ -29,9 +29,6 @@ import DataTable from "~/components/Tables/DataTable";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-    props: {
-        domain: {type: String}
-    },
     data() {
         return {
             jobFiles: [],
@@ -39,7 +36,8 @@ export default {
                 {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "48%", padding: 0},
                 {label: "Category", headerKey: "headerCategory", key: "category", width: "32%", padding: 0},
                 {label: "Source", headerKey: "headerSource", key: "source", width: "20%", padding: 0}
-            ]
+            ],
+            domain: ""
         }
     },
     methods: {
@@ -86,6 +84,7 @@ export default {
         DataTable
     },
     mounted() {
+        this.domain = process.env.domain;
         this.fillJobFiles();
     }
 }

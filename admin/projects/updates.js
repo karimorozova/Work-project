@@ -212,7 +212,6 @@ function updateStepsProgress({steps, task, progress}) {
     const updatedSteps = steps.map(item => {
         if(task.taskId === item.taskId) {
             item.progress = progress[item.name];
-            item.status = item.progress.wordsDone === item.progress.wordsTotal ? "Completed" : item.status; 
             return item
         }
         return item;

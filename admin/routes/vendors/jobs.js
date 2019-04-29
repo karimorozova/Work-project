@@ -65,8 +65,8 @@ async function manageStatuses({project, steps, jobId, status}) {
     const step = steps.find(item => item.id === jobId);
     const task = project.tasks.find(item => item.taskId === step.taskId);
     try {
-        if(status === "Completed" && isAllStepsCompleted({jobId, steps})) {
-            return await setTaskStatusAndSave({project, jobId, steps, status: "Ready for Delivery"});
+        if(status === "Completed") {
+            return await manageCompletedStatus({project, jobId, steps})
         }
         if(status === "Started" && task.status !== "Started") {
             return await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
@@ -80,6 +80,28 @@ async function manageStatuses({project, steps, jobId, status}) {
     } catch(err) {
         console.log(err);
         console.log("Error in manageStatuses");
+    }
+}
+
+async function manageCompletedStatus({project, jobId, steps}) {
+    try {
+        if(isAllStepsCompleted({jobId, steps})) {
+            return await setTaskStatusAndSave({project, jobId, steps, status: "Ready for Delivery"});
+        }
+        const step = steps.find(item => item.id === jobId);
+        if(step.name === "translate1") {
+            const updatedSteps = steps.map(item => {
+                if(item.taskId === step.taskId && item.name !== "translate1") {
+                    item.status = "Ready to Start";
+                }
+                return item;
+            })
+            return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
+        }
+        return await Projects.updateOne({"steps._id": jobId},{ steps })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageCompletedStatus");
     }
 }
 
@@ -119,7 +141,9 @@ async function setTaskStatusAndSave({project, jobId, steps, status}) {
         }
         return item;
     })
-    const projectStatus = project.status === "Started" ? project.status : "Started";
+    let projectStatus = project.status === "Started" ? project.status : "Started";
+    const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery');
+    projectStatus = incompletedTasks ? projectStatus : "Ready for Delivery";
     try {
         await Projects.updateOne({'steps._id': jobId}, { status: projectStatus, tasks: updatedTasks, steps });
     } catch(err) {
@@ -130,7 +154,7 @@ async function setTaskStatusAndSave({project, jobId, steps, status}) {
 
 function isAllStepsCompleted({jobId, steps}) {
     const currentStep = steps.find(item => item.id === jobId);
-    const taskSteps = steps.filter(item => item.taskId === currentStep.taskid);
+    const taskSteps = steps.filter(item => item.taskId === currentStep.taskId);
     const nonCompleted = taskSteps.reduce((init, cur) => {
         if(cur.taskId === currentStep.taskId && cur.status === "Completed") {
             return init;

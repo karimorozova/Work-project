@@ -4,7 +4,7 @@
         Instructions(:job="job")
         TermsAgree(:job="job")
         .main-info__buttons(v-if="isButton" :class="{'main-info_opacity05': !job.isVendorRead}")
-            .main-info__button(v-click-outside="closePopup")
+            .main-info__button(v-if="progress < 100" v-click-outside="closePopup")
                 Button(:value="buttonValue" :isDisabled="!job.isVendorRead" @makeAction="makeButtonAction")
                 .main-info__select-popup(v-if="isXtmJobs")
                     span.main-info__job-ids(
