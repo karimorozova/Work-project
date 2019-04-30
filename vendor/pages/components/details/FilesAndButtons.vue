@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import Files from "../../../components/details/Files";
-const TermsAgree = () => import("../../../components/details/TermsAgree");
+import Files from "./Files";
+const TermsAgree = () => import("./TermsAgree");
 const Button = () => import("~/components/buttons/Button");
 import { mapGetters, mapActions } from "vuex";
 
@@ -24,8 +24,8 @@ export default {
     data() {
         return {
             icons: {
-                Approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
-                Reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
+                Approve: {icon: require("../../../assets/images/Approve-icon.png"), active: true},
+                Reject: {icon: require("../../../assets/images/Reject-icon.png"), active: true}
             },
         }
     },
@@ -91,7 +91,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/scss/colors.scss";
+@import "../../../assets/scss/colors.scss";
 
 .files-buttons {
     padding-bottom: 20px;

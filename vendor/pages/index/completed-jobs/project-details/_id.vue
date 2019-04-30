@@ -7,12 +7,15 @@
                 .details__main
                     MainInfo
                 .details__describe
-                    OtherInfo 
+                    OtherInfo
+            .details__files
+                FilesAndButtons
 </template>
 
 <script>
 import MainInfo from "./MainInfo";
 import OtherInfo from "./OtherInfo";
+import FilesAndButtons from "../../../components/details/FilesAndButtons";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -48,7 +51,8 @@ export default {
     },
     components: {
         MainInfo,
-        OtherInfo
+        OtherInfo,
+        FilesAndButtons
     },
     mounted() {
         this.getJobInfo();

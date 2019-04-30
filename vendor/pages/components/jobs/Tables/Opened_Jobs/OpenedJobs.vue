@@ -37,9 +37,7 @@
         .jobs__data {{ row.status }}
       template(slot="progress" slot-scope="{ row, index }")
         .jobs__data
-          .jobs__progress-bar(v-if="progress(row.progress)")
-            .jobs__progress-filler(:style="{width: progress(row.progress) + '%'}")
-            span.jobs__progress-tooltip {{ progress(row.progress) }}%
+          ProgressLine(:progress="progress(row.progress)")
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
@@ -47,10 +45,7 @@
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="row.status === 'Started'")
-          img.jobs__icon(src="../../../../../assets/images/goto-editor.png" @click.stop="enterEditor(index)" :class="{'jobs_disable': !row.isVendorRead}")
           img.jobs__icon(v-if="progress(row.progress) >= 100" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
-          .jobs__select-popup(v-if="isXtmJobs && index === currentActive" v-click-outside="closePopup")
-            span.jobs__job-ids(v-for="(xtmJob, xtmJobIndex) in row.xtmJobIds" @click.stop="goToXtmEditor(index, xtmJobIndex)") {{ xtmJob.fileName }}
         .jobs__icons(v-if="isApproveReject(row)")
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
         .jobs__icons(v-if="row.status === 'Accepted'")
@@ -59,6 +54,7 @@
 
 <script>
   import DataTable from "~/components/Tables/DataTable";
+  import ProgressLine from "~/components/ProgressLine";
   import moment from "moment";
   import ClickOutside from "vue-click-outside";
   import { mapGetters, mapActions } from "vuex";
@@ -81,11 +77,9 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "11%", padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
         ],
-        currentActive: -1,
         areErrors: false,
         errors: [],
         isDeleting: false,
-        isXtmJobs: false,
         icons: {
           Approve: {icon: require("../../../../../assets/images/Approve-icon.png"), active: true},
           Reject: {icon: require("../../../../../assets/images/Reject-icon.png"), active: true}
@@ -110,31 +104,6 @@
       formatDeadline(date) {
         return moment(date).format('DD-MMM-YYYY')
       },
-      closePopup() {
-        this.isXtmJobs = false;
-      },
-      async enterEditor(index) {
-        if(!this.jobs[index].isVendorRead) return;
-        if(this.jobs[index].xtmJobIds.length > 1) {
-          this.currentActive = index;
-          return this.isXtmJobs = true;
-        }
-        await this.goToXtmEditor(index, 0);
-      },
-      async goToXtmEditor(index, xtmJobIndex) {
-        const { jobId } = this.jobs[index].xtmJobIds[xtmJobIndex];
-        try {
-          const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.jobs[index].name}`);
-          let link = document.createElement("a");
-          link.target = "_blank";
-          link.href = url.data;
-          link.click();
-          this.currentActive = -1;
-          this.closePopup();
-        } catch(err) {
-          this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-        }
-      },
       isApproveReject(row) {
         return row.status === "Request Sent" || row.status === "Created";
       },
@@ -146,7 +115,8 @@
       }
     },
     components: {
-      DataTable
+      DataTable,
+      ProgressLine
     },
     directives: {
       ClickOutside
@@ -170,59 +140,12 @@
     align-items: center;
     box-sizing: border-box;
   }
-  &__progress-tooltip {
-    position: absolute;
-    opacity: 0;
-    background-color: $white;
-    color: $main-color;
-    transition: all 0.2s;
-    font-size: 14px;
-    top: -1px;
-    left: 25%;
-    padding: 0 3px;
-  }
-  &__progress-bar {
-    width: 100%;
-    height: 15px;
-    border: 1px solid $brown-border;
-    position: relative;
-    box-sizing: border-box;
-    padding: 1px;
-    &:hover {
-      .jobs__progress-tooltip {
-        opacity: 1;
-      }
-    }
-  }
-  &__progress-filler {
-    background-color: $green-success;
-    height: 100%;
-  }
   &__icons {
     padding-top: 3px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-  }
-  &__select-popup {
-    position: absolute;
-    z-index: 10;
-    background-color: $white;
-    display: flex;
-    padding: 8px;
-    box-shadow: 0 0 10px $main-color;
-    box-sizing: border-box;
-    border-radius: 5px;
-    right: 70%;
-  }
-  &__job-ids {
-    font-size: 16px;
-    text-decoration: underline;
-    margin: 0 5px;
-    &:hover {
-      font-weight: 600;
-    }
   }
   &__icon {
     cursor: pointer;

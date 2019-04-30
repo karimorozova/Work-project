@@ -101,7 +101,7 @@ export default {
         }),
         isCompleted() {
             const { progress } = this.step;
-            return progress.wordsDone / progress.wordsTotal * 100 >= 100;
+            return progress.wordsDone / progress.wordsTotal * 100 >= 100 && this.step.status === 'Completed';
         }
     },
     components: {

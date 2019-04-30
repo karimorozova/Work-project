@@ -26,7 +26,7 @@
 import MainInfo from "./MainInfo";
 import OtherInfo from "./OtherInfo";
 import FilesAndButtons from "./FilesAndButtons";
-import Forbidden from "../../../components/details/Forbidden";
+const Forbidden = () => import("../../../components/details/Forbidden");
 const ApproveModal = () => import("~/components/ApproveModal");
 import { mapGetters, mapActions } from "vuex";
 

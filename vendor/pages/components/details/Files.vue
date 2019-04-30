@@ -31,7 +31,7 @@
                         img.job-files__image(src="../../../assets/images/download.png")
             template(slot="target" slot-scope="{ row, index }")
                 .job-files_flex-centered(v-if="row.category === 'Source file'")
-                    .job-files__link(v-if="getProgress(row) === 100")
+                    .job-files__link(v-if="getProgress(row) === 100 && job.status === 'Completed'")
                         img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
             template(slot="editor" slot-scope="{ row, index }")
                 .job-files__editor(v-if="job.status === 'Started' && row.category === 'Source file'")
@@ -64,13 +64,13 @@ export default {
             alertToggle: "alertToggle"
         }),
         getFilesJobId(file) {
-            const { jobId } = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
-            return jobId;
+            const xtmJob = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            return xtmJob ? xtmJob.jobId : "";
         },
         getProgress(file) {
             const jobId = this.getFilesJobId(file);
-            const progress = this.job.progress[jobId];
-            return +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2);
+            const progress = jobId ? this.job.progress[jobId] : "";
+            return progress ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2): "";
         },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;

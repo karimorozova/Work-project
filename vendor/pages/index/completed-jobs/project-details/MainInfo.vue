@@ -2,13 +2,11 @@
     .main-info
         JobData(:job="job")
         Instructions(:job="job")
-        TermsAgree(:job="job")
 </template>
 
 <script>
 import JobData from "../../../components/details/JobData";
 import Instructions from "../../../components/details/Instructions";
-import TermsAgree from "../../../components/details/TermsAgree";
 import { mapGetters } from "vuex";
 
 export default {
@@ -20,8 +18,7 @@ export default {
     },
     components: {
         JobData,
-        Instructions,
-        TermsAgree
+        Instructions
     }
 }
 </script>
