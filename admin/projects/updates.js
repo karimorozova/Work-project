@@ -235,4 +235,29 @@ function areAllStepsCompleted(steps, taskId) {
     return !nonCompleted.length;
 }
 
-module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, updateStepsProgress, areAllStepsCompleted };
+async function updateTaskTargetFiles({step, jobId, path}) {
+    try {
+        const project = await Projects.findOne({"steps._id": step._id});
+        const tasks = project.tasks.map(task => {
+            if(task.taskId === step.taskId) {
+                task.xtmJobs = getUpdatedXtmJobs(task.xtmJobs, jobId, path);
+            }
+            return task;
+        })
+        return await updateProject({"_id": project.id}, { tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateTaskTargetFiles");
+    }
+}
+
+function getUpdatedXtmJobs(xtmJobs, jobId, path) {
+    return xtmJobs.map(item => {
+        if(item.jobId === jobId) {
+            item.targetFile = path;
+        }
+        return item;
+    })
+}
+
+module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles };

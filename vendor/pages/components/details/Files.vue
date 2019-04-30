@@ -60,11 +60,15 @@ export default {
     },
     methods: {
         ...mapActions({
-            storeProject: "setCurrentProject",
+            setJob: "selectJob",
             alertToggle: "alertToggle"
         }),
-        getProgress(file) {
+        getFilesJobId(file) {
             const { jobId } = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            return jobId;
+        },
+        getProgress(file) {
+            const jobId = this.getFilesJobId(file);
             const progress = this.job.progress[jobId];
             return +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2);
         },
@@ -94,7 +98,7 @@ export default {
             return files;
         },
         async goToXtmEditor(file) {
-            const { jobId } = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            const jobId = this.getFilesJobId(file);
             try {
                 const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
                 let link = document.createElement("a");
@@ -105,8 +109,37 @@ export default {
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
             }
         },
-        async downloadTarget(row) {
-            
+        async downloadTarget(file) {
+            const jobId = this.getFilesJobId(file);
+            const existingTarget = this.getExistingTargetPath(jobId);
+            if(existingTarget) {
+                return this.createLinkAndDownolad(existingTarget);
+            }
+            try {
+                const fileId = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId});
+                let fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, projectId: this.job.xtmProjectId, file: fileId.data[0]});
+                let href = fileLink.data.path;
+                this.createLinkAndDownolad(href);
+                this.setCurrentJob(fileLink.data.updatedProject);
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+        },
+        createLinkAndDownolad(href) {
+            let link = document.createElement('a');
+            link.href = this.domain + href;
+            link.target = "_blank";
+            link.click();
+        },
+        getExistingTargetPath(jobId) {
+            const xtmJob = this.job.xtmJobIds.find(item => item.jobId === jobId);
+            return xtmJob.targetFile;
+        },
+        setCurrentJob(project) {
+            const { tasks } = project;
+            const updatedTask = tasks.find(item => item.taskId === this.job.taskId);
+            const currentJob = {...this.job, xtmJobIds: updatedTask.xtmJobs};
+            this.setJob(currentJob);
         }
     },
     computed: {

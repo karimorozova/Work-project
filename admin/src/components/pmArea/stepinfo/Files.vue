@@ -75,35 +75,25 @@ export default {
         async downloadTargetFile(index) {
             const xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
             try {
+                if(xtmJob.targetFile) {
+                    return this.createLinkAndDownolad(xtmJob.targetFile);
+                }
                 const id = this.currentProject._id;
-                if(this.step.targetFiles && this.step.targetFiles.length) {
-                    return this.downloadExistingTargets(this.step.targetFiles);
-                }
-                if(this.step.progress.wordsTotal != this.step.progress.wordsDone) return;
-                const fileIds = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});
-                let updatedStep = {...this.step};
-                updatedStep.targetFiles = [];
-                for(let obj of fileIds.body) {
-                    let fileLink = await this.$http.get(`/xtm/target-file?stepName=${this.step.name}&id=${id}&projectId=${this.projectId}&fileId=${obj.fileId}`);
-                    let href = fileLink.body.path;
-                    updatedStep.targetFiles.push(href);
-                    let link = document.createElement('a');
-                    link.href = __WEBPACK__API_URL__ + href;
-                    link.click();
-                }
-                const updatedProject = await this.$http.post('/xtm/step-target', {step: updatedStep, projectId: id});
-                await this.storeProject(updatedProject.body);
+                const fileId = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});
+                let fileLink = await this.$http.post('/xtm/target-file', {step: this.step, id, projectId: this.projectId, file: fileId.data[0]});
+                let href = fileLink.data.path;
+                this.createLinkAndDownolad(href);
+                await this.storeProject(fileLink.data.updatedProject);
             } catch(err) {
                 this.alertToggle({message: err.response.data, isShow: true, type: "error"});
             }
         },
-        downloadExistingTargets(arr) {
-            for(let path of arr) {
-                let link = document.createElement('a');
-                link.href = __WEBPACK__API_URL__ + path;
-                link.click();
-            }
-        }
+        createLinkAndDownolad(href) {
+            let link = document.createElement('a');
+            link.href = __WEBPACK__API_URL__ + href;
+            link.target = "_blank";
+            link.click();
+        },
     },
     computed: {
         ...mapGetters({

@@ -27,6 +27,7 @@ function getSteps(project, id) {
         assignedSteps.push({...step._doc,
             project_Id: project._id,
             projectId: project.projectId, 
+            xtmProjectId: stepTask.projectId,
             projectName: project.projectName,
             projectStatus: project.status,
             manager: project.projectManager,
