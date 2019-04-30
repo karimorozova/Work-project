@@ -140,29 +140,31 @@ export default {
                         })
                         if(!existedTask) {
                             const {startDate, deadline} = this.getStepsDates({task, key});
-                            project.steps.push({
-                                taskId: task.taskId,
-                                name: key,
-                                source: task.sourceLanguage,
-                                target: task.targetLanguage,
-                                vendor: null,
-                                start: startDate,
-                                deadline: deadline,
-                                progress: this.setStepsProgress(key, progress),
-                                status: "Created",
-                                receivables: "",
-                                payables: "",
-                                clientRate: "",
-                                finance: {
-                                    'Wordcount': { ...task.finance.Wordcount },
-                                    'Price': {receivables: "", payables: ""}
-                                },
-                                vendorRate: "",
-                                margin: "",
-                                check: false,
-                                vendorsClickedOffer: [],
-                                isVendorRead: false
-                            })
+                            if(key !== "jobsMetrics") {
+                                project.steps.push({
+                                    taskId: task.taskId,
+                                    name: key,
+                                    source: task.sourceLanguage,
+                                    target: task.targetLanguage,
+                                    vendor: null,
+                                    start: startDate,
+                                    deadline: deadline,
+                                    progress: this.setStepsProgress(key, progress),
+                                    status: "Created",
+                                    receivables: "",
+                                    payables: "",
+                                    clientRate: "",
+                                    finance: {
+                                        'Wordcount': { ...task.finance.Wordcount },
+                                        'Price': {receivables: "", payables: ""}
+                                    },
+                                    vendorRate: "",
+                                    margin: "",
+                                    check: false,
+                                    vendorsClickedOffer: [],
+                                    isVendorRead: false
+                                })
+                            }
                         } else {
                             for(const step of project.steps) {
                                 if(step.taskId === task.taskId) {
