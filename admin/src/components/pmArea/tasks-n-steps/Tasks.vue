@@ -77,6 +77,8 @@
             @approve="approveAction"
             @notApprove="notApproveAction"
             @close="closeApproveModal")
+    .tasks__review(v-if="isDeliveryReview")
+        DeliveryReview(@close="closeReview" :task="reviewTask")
 </template>
 
 <script>
@@ -84,7 +86,8 @@ import DataTable from "../../DataTable";
 import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
 import SelectSingle from "../../SelectSingle";
-import ApproveModal from "../../ApproveModal";
+const ApproveModal = () => import("../../ApproveModal");
+const DeliveryReview = () => import("./DeliveryReview");
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -113,7 +116,9 @@ export default {
             tabs: ['Tasks', 'Steps'],
             isAllSelected: false,
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
-            isApproveActionShow: false
+            isApproveActionShow: false,
+            isDeliveryReview: false,
+            reviewTask: null
         }
     },
     methods: {
@@ -122,8 +127,27 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
+            if(option === "Delivery Review") {
+                return this.deliveryReviewAction();
+            }
             this.setModalTexts(option);
             this.isApproveActionShow = true;
+        },
+        deliveryReviewAction() {
+            const task = this.allTasks.find(item => item.check && item.status === "Pending Approval");
+            if(task) {
+                this.reviewTask = task;
+                this.isDeliveryReview = true;
+            }
+            this.selectedAction = "";
+            this.unCehckAllTAsks();
+        },
+        unCehckAllTAsks() {
+            const unchecked = this.allTasks.map(item => {
+                item.check = false;
+                return item;
+            })
+            this.storeProject({...this.currentProject, tasks: unchecked});
         },
         setModalTexts(option) {
             this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
@@ -141,8 +165,8 @@ export default {
                     case 'Cancel':
                         await this.cancelTasks(checkedTasks);
                         break;
-                    case 'Delivery Review':
-                        
+                    case 'Deliver':
+                        console.log('Delivering...');
                         break
                 }
             } catch(err) {
@@ -199,6 +223,9 @@ export default {
             this.isApproveActionShow = false;
             this.selectedAction = "";
         },
+        closeReview() {
+            this.isDeliveryReview = false;
+        },
         async downloadFiles(task) {
             const jobId = task.xtmJobs[task.xtmJobs.length-1].jobId;
             try {
@@ -242,6 +269,7 @@ export default {
         ProgressLine,
         SelectSingle,
         ApproveModal,
+        DeliveryReview,
         Tabs
     }    
 }
@@ -275,6 +303,18 @@ export default {
         right: 0;
         z-index: 50;
         background-color: $white;
+    }
+    &__review {
+        position: absolute;
+        top: -350px;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 50;
+        box-sizing: border-box;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
     }
 }
 </style>

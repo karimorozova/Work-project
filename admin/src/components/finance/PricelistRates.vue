@@ -106,10 +106,18 @@ export default {
         goBack() {
             this.$router.go(-1);
         },
+        async getAllServices() {
+            try {
+                if(!this.services.length) {
+                    await this.getServices();
+                }
+            } catch(err) {}
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             storeDuoRates: "storeDuoRates",
-            getDuoCombinations: "getDuoCombinations"
+            getDuoCombinations: "getDuoCombinations",
+            getServices: "getServices"
         })
     },
     computed: {
@@ -127,7 +135,8 @@ export default {
         Button,
         AvailablePairs
     },
-    mounted() {
+    created() {
+        this.getAllServices();
     }
 };
 </script>

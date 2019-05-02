@@ -28,13 +28,13 @@
 </template>
 
 <script>
-import ValidationErrors from "../ValidationErrors";
+const ValidationErrors = () => import("../ValidationErrors");
 import Project from "./Project";
 import ProjectShortDetails from "./ProjectShortDetails";
 import ProjectAction from "./ProjectAction";
 import ProjectFinance from "./ProjectFinance";
 import TasksAndSteps from "./TasksAndSteps";
-import Preview from "./Preview";
+const Preview = () => import("./Preview");
 import { mapGetters, mapActions } from 'vuex';
 
 export default {

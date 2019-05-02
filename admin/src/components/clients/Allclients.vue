@@ -54,6 +54,26 @@ export default {
         }
     },
     methods: {
+        async getCustomers() {
+            try {
+                if(!this.allClients.length) {
+                    let result = await this.$http.get('/all-clients');
+                    this.customersGetting(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
+            }
+        },
+        async getXtmCustomers() {
+            try {
+                if(!this.allXtmCustomers.length) {
+                    let result = await this.$http.get('/xtm/xtm-customers');
+                    this.xtmCustomersGetting(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on getting XTM customers", isShow: true, type: "error"});
+            }
+        },
         closeSevLangs(data) {
             this.addSeveral = false
         },
@@ -71,17 +91,6 @@ export default {
         addClient() {
             this.$router.push('/new-client');
         },
-        deleteContact(data) {
-            let id = this.client._id;
-            this.client.contacts.splice(data, 1);
-            this.$http.post('clientsapi/deleteContact', {id: id, contacts: this.client.contacts})
-            .then(res => {
-                console.log("contact deleted")
-            })
-            .catch(err => {
-                consol.elog(err)
-            })
-        },
         chosenLeadsource({leadSource}) {
             this.filterLeadsource = leadSource;
         },
@@ -91,27 +100,16 @@ export default {
         chosenInd({industry}) {
             this.industryFilter = industry;
         },
-        clientDelete(data) {
-            let id = data._id;
-            this.$http.post('clientsapi/deleteclient', {id: id})
-            .then(res => {
-                console.log('deleted');
-            })
-            .catch(err => {
-                console.log(err)
-            })
-            this.clientData = false;
-            this.getclients();
-            this.$emit('clientCancel');
-        },
         ...mapActions({
             alertToggle: "alertToggle",
+            customersGetting: "customersGetting",
             storeCurrentClient: "storeCurrentClient"
         })
     },
     computed: {
         ...mapGetters({
-            allClients: "getClients"
+            allClients: "getClients",
+            allXtmCustomers: "getXtmCustomers"
         }),
     },
     components: {
@@ -120,6 +118,10 @@ export default {
         MultiClientIndustrySelect,
         ClientStatusSelect,
         ClientLeadsourceSelect,
+    },
+    created() {
+        this.getCustomers();
+        // this.getXtmCustomers();
     },
     mounted() {
         this.storeCurrentClient({});

@@ -253,7 +253,12 @@ export default {
                 this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
             }
         },
-        defaultService() {
+        async defaultService() {
+            try {
+                if(!this.vuexServices.length) {
+                    await this.getServices();
+                }
+            } catch(err) { }
             let defaultServ = this.vuexServices.find(item => {
                 return item.symbol === 'tr';
             });
@@ -275,7 +280,8 @@ export default {
             getDuoCombinations: "getVendorDuoCombinations",
             storeVendor: "storeVendor",
             storeDuoRates: "storeVendorDuoRates",
-            deleteCheckedRate: "deleteVendorsCheckedRate"
+            deleteCheckedRate: "deleteVendorsCheckedRate",
+            getServices: "getServices"
         })
     },
     computed: {

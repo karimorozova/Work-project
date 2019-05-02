@@ -145,14 +145,6 @@ export default {
         this.clientLanguages = result.body;
       }
     },
-    async getCustomers() {
-      let result = await this.$http.get('/all-clients');
-      this.$store.dispatch('customersGetting', result.body);
-    },
-    async getXtmCustomers() {
-      let result = await this.$http.get('/xtm/xtm-customers');
-      this.$store.dispatch('xtmCustomersGetting', result.body);
-    },
     refreshXtmCustomers(data) {
       this.getXtmCustomers();
     },
@@ -277,17 +269,12 @@ export default {
     showDropdown() {
       this.dropdownVisible = !this.dropdownVisible;
     },
-    async getServices() {
-      const result = await this.$http.get('/api/services');
-      const services = result.body;
-      services.sort((a, b) => {return a.sortIndex - b.sortIndex});
-      this.$store.dispatch('servicesGetting', services);
-    },
-    refreshServices(data) {
-      this.getServices();
+    async refreshServices(data) {
+      await this.getServices();
     },
     ...mapActions({
-      setUser: "setUser"
+      setUser: "setUser",
+      getServices: "getServices"
     })
   },
   computed: {
@@ -307,13 +294,12 @@ export default {
       next('/login')
     }
   },
-  async mounted() {
+  created() {
+    this.getCurrentUserGroup();
+    this.getLanguages();
+  },
+  mounted() {
     this.mainPageRender();
-    await this.getCurrentUserGroup();
-    await this.getServices();
-    await this.getCustomers();
-    await this.getXtmCustomers();
-    await this.getLanguages();
   },
   updated() {
     this.toggleSideBar(false);

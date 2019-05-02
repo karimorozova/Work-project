@@ -345,14 +345,20 @@ export default {
         }
       })
     },
-    defaultService() {
+    async defaultService() {
+      try {
+        if(!this.vuexServices.length) {
+          await this.getServices();
+        }
+      } catch(err) { }
       this.serviceSelect = this.vuexServices.find(item => {
         return item.symbol === 'co'
       })
     },
     ...mapActions({
       loadingToggle: "loadingToggle",
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      getServices: "getServices"
     })
   },
   computed: {

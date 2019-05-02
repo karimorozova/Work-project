@@ -332,7 +332,12 @@ export default {
         this.alertToggle({message: 'Internal serer error. Cannot get rates for vendor.', isShow: true, type: 'error'});
       }
     },
-    defaultService() {
+    async defaultService() {
+      try {
+        if(!this.vuexServices.length) {
+          await this.getServices();
+        }
+      } catch(err) { }
       this.serviceSelect = this.vuexServices.find(item => {
         return item.symbol === 'tr'
       })
@@ -340,6 +345,7 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeVendors: "vendorsSetting",
+      getServices: "getServices"
     })
   },
   computed: {
@@ -347,12 +353,15 @@ export default {
       vuexServices: "getVuexServices"
     }),
     services() {
-      let result = this.vuexServices.filter(item => {
-        return item.languageForm === "Duo"
-      }).map(item => {
-        item.crud = this.serviceSelect.title === item.title;
-        return item;
-      });
+      let result = [];
+      if(this.vuexServices.length) {
+        let result = this.vuexServices.filter(item => {
+          return item.languageForm === "Duo"
+        }).map(item => {
+          item.crud = this.serviceSelect.title === item.title;
+          return item;
+        });
+      }
       return result;
     },
     filterIndustry() {

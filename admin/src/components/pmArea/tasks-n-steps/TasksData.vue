@@ -225,7 +225,22 @@ export default {
             }
             this.addTasks();
         },
-        getTasksData() {
+        async getCustomersFromXtm() {
+            try {
+                if(!this.allXtmCustomers.length) {
+                    let result = await this.$http.get('/xtm/xtm-customers');
+                    this.xtmCustomersGetting(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on getting XTM customers", isShow: true, type: "error"});
+            }
+        },
+        async getTasksData() {
+            try {
+                if(!this.xtmCustomers.length) {
+                    await this.getCustomersFromXtm();
+                }
+            } catch(err) { }
             const xtmCustomer = this.xtmCustomers.find(item => {
                 return item.name === this.currentProject.customer.name
             });
@@ -263,9 +278,12 @@ export default {
             xtmCustomers: "getXtmCustomers",
         }),
         allServices() {
-            return this.services.map(item => {
-                return item.title
-            })
+            if(this.services.length) {
+                return this.services.map(item => {
+                    return item.title
+                })
+            }
+            return [];
         },
         allTemplates() {
             return this.templates.map(item => {

@@ -246,7 +246,6 @@ export default {
     },
     computed: {
         ...mapGetters({
-            vuexServices: "getVuexServices",
             vuexPricelists: "getPricelists",
             currentPrice: "getCurrentPrice"
         }),

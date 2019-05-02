@@ -15,6 +15,19 @@ export const setProjectValue = ({ commit }, payload) => commit('storeProjectValu
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+export const getServices = async ({ commit, dispatch }) => {
+  commit('startRequest')
+  try {
+    const result = await Vue.http.get('/api/services');
+    const allServices = result.body;
+    allServices.sort((a, b) => {return a.sortIndex - b.sortIndex});
+    dispatch('servicesGetting', allServices);
+    commit('endRequest');
+  } catch(err) {
+      commit('endRequest');
+      dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+  }
+}
 export const setProjectStatus = async ({commit, state}, payload) => {
   commit('startRequest')
   try {

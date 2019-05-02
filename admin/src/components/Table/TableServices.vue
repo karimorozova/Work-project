@@ -284,7 +284,7 @@ export default {
             });
             this.setEditionData(this.services.length - 1);
         },
-        async getServices() {
+        async getAllServices() {
             try {
                 const services = await this.$http.get("/api/services");
                 this.services = services.body.sort((x, y) => {
@@ -303,7 +303,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            servicesGetting: "servicesGetting"
+            getServices: "getServices"
         }),
     },
     computed: {
@@ -317,7 +317,7 @@ export default {
         Add
     },
     mounted() {
-        this.getServices();
+        this.getAllServices();
     }
 }
 </script>

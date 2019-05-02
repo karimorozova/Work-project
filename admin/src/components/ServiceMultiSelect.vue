@@ -62,7 +62,12 @@ export default {
             this.droppedServ = !this.droppedServ;
             this.$emit('scrollDrop', {drop: this.droppedServ, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
-        getServices() {
+        async getAllServices() {
+            try {
+                if(!this.vuexServices.length) {
+                    await this.getServices();
+                }
+            } catch(err) { }
             this.services = this.vuexServices;
             this.services.sort( (a,b) => {
                 if(a.title < b.title) return -1;
@@ -85,7 +90,10 @@ export default {
         },
         changeServ(index) {
             this.$emit("chosenServ", {service: this.services[index], index: this.parentIndex})
-        }
+        },
+        ...mapActions({
+            getServices: "getServices"
+        })
     },
     computed: {
         ...mapGetters({
@@ -96,7 +104,7 @@ export default {
         ClickOutside
     },
     mounted () {
-        this.getServices()
+        this.getAllServices()
     }
 }
 </script>

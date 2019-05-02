@@ -38,6 +38,13 @@ export default {
         changeServ(index) {
             this.$emit("chosenServ", this.filteredServices[index])
             this.droppedServ = false;
+        },
+        async getAllServices() {
+             try {
+                if(!this.vuexServices.length) {
+                    await this.getServices();
+                }
+            } catch(err) { }
         }
     },
     computed: {
@@ -45,20 +52,23 @@ export default {
             vuexServices: "getVuexServices"
         }),
         filteredServices() {
-            let result = this.vuexServices.sort((a,b) => {
-                if(a.title < b.title) return -1;
-                if(a.title > b.title) return 1;
-            });
-            if(this.langForm) {
-                result = this.vuexServices.filter(item => {
-                    if(this.langForm === 'Duo') {
-                        return item.title === 'Translation' ||
-                            item.title === 'Proofing' || 
-                            item.title === 'QA and Testing'
-                    } else {
-                        return item.languageForm === this.langForm
-                    }
-                })
+            let result = [];
+            if(this.vuexServices.length) {
+                let result = this.vuexServices.sort((a,b) => {
+                    if(a.title < b.title) return -1;
+                    if(a.title > b.title) return 1;
+                });
+                if(this.langForm) {
+                    result = this.vuexServices.filter(item => {
+                        if(this.langForm === 'Duo') {
+                            return item.title === 'Translation' ||
+                                item.title === 'Proofing' || 
+                                item.title === 'QA and Testing'
+                        } else {
+                            return item.languageForm === this.langForm
+                        }
+                    })
+                }
             }
             return result;
         },
@@ -66,7 +76,8 @@ export default {
     directives: {
         ClickOutside
     },
-    mounted () {
+    created() {
+        this.getAllServices();
     }
 }
 </script>
