@@ -47,12 +47,12 @@ const clientQuoteEmail = function (obj, msg) {
     })
 }
 
-const managerNotifyMail = function(obj, msg) {
+const managerNotifyMail = function(obj, msg, subject) {
     return new Promise( (res, rej) => {
         let mailOptions = {
             from: 'translation@pangea.global',
             to: obj.email, 
-            subject: 'Quote Accepted but translators were not assigned',
+            subject,
             text: "plain text",
             html: msg
         };

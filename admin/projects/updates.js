@@ -63,7 +63,7 @@ function getTaskNewStatus(steps, taskId) {
     const completedSteps = taskSteps.filter(item => item === "Completed");
     const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
     if(completedSteps.length === taskSteps.length) {
-        return "Ready for Delivery"
+        return "Pending Approval"
     }
     if(halfCancelledSteps.length) {
         return "Cancelled Halfway"

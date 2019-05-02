@@ -1,6 +1,7 @@
 const apiUrl = require("../helpers/apiurl");
 const jwt = require('jsonwebtoken');
 const { secretKey } = require('../configs');
+const moment = require('moment');
 
 function applicationMessage(obj) {
     let cvFiles = "";
@@ -322,6 +323,49 @@ function emailMessageForContact(obj) {
         </div>`;
 }
 
+function managerTaskCompleteNotificationMessage(obj) {
+    const lastName = obj.projectManager.lastName || "";
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.projectManager.firstName} ${lastName},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="description" style="font-size: 18px;">
+                    Please, pay attention that one of the tasks has been completed.
+                </p>
+                <h3 class="detailsTitle">See details below:</h3>
+                <table class="details">
+                    <tr>
+                        <td>Project number:</td>
+                        <td>${obj.projectId}</td>
+                    </tr>
+                    <tr>
+                        <td>Project name:</td>
+                        <td>${obj.projectName}</td>
+                    </tr>
+                    <tr>
+                        <td>Task ID:</td>
+                        <td>${obj.task.taskId}</td>
+                    </tr>
+                    <tr>
+                        <td>Service:</td>
+                        <td>${obj.service}</td>
+                    </tr>
+                    <tr>
+                        <td>Language pair:</td>
+                        <td>${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}</td>
+                    </tr>
+                    <tr>
+                        <td>Start date: </td>
+                        <td>${moment(obj.task.start).format('DD-MM-YYYY')}</td>
+                    </tr>
+                    <tr>
+                        <td>Deadline: </td>
+                        <td>${moment(obj.task.deadline).format('DD-MM-YYYY')}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>`;
+}
+
 function vendorNotificationMessage(obj) {
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
@@ -353,6 +397,7 @@ module.exports = {
     messageForClient, 
     requestMessageForVendor, 
     managerAssignmentNotifyingMessage,
+    managerTaskCompleteNotificationMessage,
     emailMessageForContact,
     vendorNotificationMessage
 };

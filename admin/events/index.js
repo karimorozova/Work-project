@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
 const { Vendors } = require('../models');
-const { sendEmail, managerNotifying } = require('../utils');
+const { sendEmail, notifyManagerProjectStarts } = require('../utils');
 
 emitter.on('testEvent', () => {
     setTimeout(async () => {
@@ -14,7 +14,7 @@ emitter.on('testEvent', () => {
 
 emitter.on('managersNotificationEmail', async (project) => {
     if(project.isStartAccepted) {
-        await managerNotifying(project);
+        await notifyManagerProjectStarts(project);
     }
 })
 

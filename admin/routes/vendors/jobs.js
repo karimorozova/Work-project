@@ -1,4 +1,4 @@
-const { getProjects, getProject } = require('../../projects');
+const { getProjects, getProject, taskCompleteNotifyPM } = require('../../projects');
 const { Projects } = require('../../models');
 
 async function getJobs(id) {
@@ -67,7 +67,7 @@ async function manageStatuses({project, steps, jobId, status}) {
     const task = project.tasks.find(item => item.taskId === step.taskId);
     try {
         if(status === "Completed") {
-            return await manageCompletedStatus({project, jobId, steps})
+            return await manageCompletedStatus({project, jobId, steps, task})
         }
         if(status === "Started" && task.status !== "Started") {
             return await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
@@ -84,10 +84,11 @@ async function manageStatuses({project, steps, jobId, status}) {
     }
 }
 
-async function manageCompletedStatus({project, jobId, steps}) {
+async function manageCompletedStatus({project, jobId, steps, task}) {
     try {
         if(isAllStepsCompleted({jobId, steps})) {
-            return await setTaskStatusAndSave({project, jobId, steps, status: "Ready for Delivery"});
+            await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval"});
+            return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
         if(step.name === "translate1") {

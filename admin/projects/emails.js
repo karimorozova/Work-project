@@ -1,7 +1,8 @@
-const { sendEmail } = require("../utils/mailTemplate");
-const { vendorNotificationMessage, emailMessageForContact, messageForClient } = require("../utils/emailMessages");
+const { sendEmail, managerNotifyMail } = require("../utils/mailTemplate");
+const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage } = require("../utils/emailMessages");
 const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
+const { User } = require("../models");
 
 async function notifyVendors(steps) {
     try {
@@ -33,8 +34,33 @@ async function getQuoteInfo(projectId) {
     const { contacts } = project.customer;
     quote.contact = contacts.find(item => item.leadContact);
     quote.firstName = quote.contact.firstName;
-    quote.surame = quote.contact.surame;
+    quote.surname = quote.contact.surname;
     return quote;
 }
 
-module.exports = { notifyVendors, getMessage };
+async function taskCompleteNotifyPM(project, task) {
+    try {
+        const manager = await User.findOne({"_id": project.projectManager.id}, {email: 1});
+        const message = await getPMnotificationMessage(project, task);
+        await managerNotifyMail(manager, message, "Task finish notification");
+    } catch(err) {
+        console.log(err);
+        console.log("Error in taskCompleteNotifyPM");
+    }
+}
+
+async function getPMnotificationMessage(project, task) {
+    try {
+        const service = await getOneService({"_id": task.service});
+        return message = managerTaskCompleteNotificationMessage({
+            ...project._doc,
+            service: service.title,
+            task
+        })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getPMnotificationMessage");
+    }
+}
+
+module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM };

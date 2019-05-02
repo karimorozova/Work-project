@@ -141,8 +141,8 @@ export default {
                     case 'Cancel':
                         await this.cancelTasks(checkedTasks);
                         break;
-                    case 'Deliver':
-                        console.log('delivering...')
+                    case 'Delivery Review':
+                        
                         break
                 }
             } catch(err) {
@@ -226,8 +226,12 @@ export default {
         }),
         availableActions() {
             let result = this.actions;
-            const completedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
+            const completedTask = this.allTasks.find(item => item.status === 'Pending Approval');
+            const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
             if(completedTask) {
+                result.push('Delivery Review')
+            }
+            if(approvedTask) {
                 result.push('Deliver')
             }
             return result;

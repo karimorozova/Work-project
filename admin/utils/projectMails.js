@@ -3,7 +3,7 @@ const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTempla
 const { managerAssignmentNotifyingMessage, requestMessageForVendor, emailMessageForContact } = require('./emailMessages');
 const { getClient } = require('../clients');
 
-async function managerNotifying(project) {
+async function notifyManagerProjectStarts(project) {
     try {
         const customer = await getClient({"_id": project.customer.id});
         const projectManager = await User.findOne({"_id": customer.projectManager._id});
@@ -24,7 +24,7 @@ async function managerNotifying(project) {
             await managerEmailsSend({project, projectManager, salesManager});
         }
     } catch(err) {
-        throw new Error("Error on sending notification to managers / managerNotifying");
+        throw new Error("Error on sending notification to managers / notifyManagerProjectStarts");
     }
 }
 
@@ -34,8 +34,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
     const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
     try {
-        await managerNotifyMail(projectManager, pmMessage);
-        await managerNotifyMail(salesManager, smMessage);
+        await managerNotifyMail(projectManager, pmMessage, 'Quote Accepted but translators were not assigned');
+        await managerNotifyMail(salesManager, smMessage, 'Quote Accepted but translators were not assigned');
     } catch(err) {
         throw new Error("Cannot send email to managers / managerEmailsSend");
     }
@@ -98,4 +98,4 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-module.exports = { managerNotifying, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact };
+module.exports = { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact };
