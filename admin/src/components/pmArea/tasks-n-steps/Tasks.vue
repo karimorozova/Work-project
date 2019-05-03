@@ -112,7 +112,6 @@ export default {
                 {label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "7%", cellClass: "tasks_centered"},
             ],
             selectedAction: "",
-            actions: ["Cancel"],
             tabs: ['Tasks', 'Steps'],
             isAllSelected: false,
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
@@ -252,14 +251,18 @@ export default {
             currentProject: 'getCurrentProject' 
         }),
         availableActions() {
-            let result = this.actions;
+            let result = ["Cancel"];
             const completedTask = this.allTasks.find(item => item.status === 'Pending Approval');
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
             if(completedTask) {
-                result.push('Delivery Review')
+                if(result.indexOf('Delivery Review') === -1) {
+                    result.push('Delivery Review')
+                }
             }
             if(approvedTask) {
-                result.push('Deliver')
+                if(result.indexOf('Deliver') === -1) {
+                    result.push('Deliver')
+                }
             }
             return result;
         }
