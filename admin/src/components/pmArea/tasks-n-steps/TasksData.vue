@@ -137,7 +137,8 @@ export default {
     methods: {
         ...mapActions({
             addProjectTasks: "addProjectTasks",
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            xtmCustomersGetting: "xtmCustomersGetting"
         }),
         setValue({option, refersTo}) {
             this.$emit("setValue", { option, refersTo })
