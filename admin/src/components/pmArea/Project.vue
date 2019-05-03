@@ -104,7 +104,8 @@ export default {
     },
     methods: {
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            customersGetting: "customersGetting"
         }),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
@@ -162,7 +163,17 @@ export default {
         },
         goToClientInfo() {
             this.$router.push(`/clients/${this.project.customer._id}`)
-        }
+        },
+        async getCustomers() {
+            try {
+                if(!this.allClients.length) {
+                    let result = await this.$http.get('/all-clients');
+                    this.customersGetting(result.body);
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
+            }
+        },
     },
     computed: {
         ...mapGetters({
@@ -190,6 +201,9 @@ export default {
         LabelValue,
         Button,
         ValidationErrors
+    },
+    created() {
+        this.getCustomers();
     },
     mounted() {
         this.getIndustries();
