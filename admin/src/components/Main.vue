@@ -5,10 +5,10 @@
                 h2.adminPortal ADMIN PORTAL
             .admin-top__search-block
                 .new-request
-                  .sel_project_block
+                  .sel_project_block(v-click-outside="hideAdditional")
                     .sel_project_block__proj
                       span New Project
-                      .additional(v-if="dropdownVisible" v-click-outside="hideAdditional")
+                      .additional(v-if="dropdownVisible")
                         .additional__listItem(target="_newtab" v-for='(proj, projIndex) in newProject' @click='gotoRequestPage(projIndex)') {{ proj.title }}
                     .sel_project_block__img-wrapper(@click="showDropdown")
                       .sel_project_block__image
@@ -17,27 +17,28 @@
                   .imgwrap(@click="showSlider")
                     img(src="../assets/images/Other/admin-button-icon.png" )
                     span.spwrap settings
-                .woman-wrapper
-                  img.woman-wrapper__photo(v-if="!user.photo" src="../assets/images/client-icon_image.png")
-                  img.woman-wrapper__photo(v-else :src="user.photo")
-                  .account-menu-wrapper(v-if="accountMenuVisible" v-click-outside="hideAccountMenu")
-                    .account-block
-                      .account-block__info
-                        .icon
-                          img(src="../assets/images/man.png")
-                        .personal__data
-                          .personal__data_name {{ user.firstName }} {{ user.lastName }}
-                          .personal__data_email {{ user.email }}
-                      .account-block__myaccount(@click="showAccountInfo")
-                        .human_icon
-                          img(src="../assets/images/man.png")
-                        .my_account My Account
-                      .account-block__exit(@click="signOut")
-                        .icon_exit
-                          img(src="../assets/images/sign-out.png")
-                        .sign_out Sign Out
-                .chevron-wrapper
-                  .chevron(@click="showAccountMenu")
+                .account-menu(v-click-outside="hideAccountMenu")
+                  .woman-wrapper
+                    img.woman-wrapper__photo(v-if="!user.photo" src="../assets/images/client-icon_image.png")
+                    img.woman-wrapper__photo(v-else :src="user.photo")
+                    .account-menu-wrapper(v-if="accountMenuVisible")
+                      .account-block
+                        .account-block__info
+                          .icon
+                            img(src="../assets/images/man.png")
+                          .personal__data
+                            .personal__data_name {{ user.firstName }} {{ user.lastName }}
+                            .personal__data_email {{ user.email }}
+                        .account-block__myaccount(@click="showAccountInfo")
+                          .human_icon
+                            img(src="../assets/images/man.png")
+                          .my_account My Account
+                        .account-block__exit(@click="signOut")
+                          .icon_exit
+                            img(src="../assets/images/sign-out.png")
+                          .sign_out Sign Out
+                  .chevron-wrapper
+                    .chevron(@click="showAccountMenu")
         .admin-main-wrapper
             .admin-navbar
               .admin-navbar__sidebar
@@ -372,7 +373,7 @@ export default {
     }
 
     .woman-wrapper {
-      margin: 0 3px 7px 15px;
+      margin: 0 3px 0 15px;
       border-radius: 30px;
       width: 33px;
       height: 33px;
@@ -687,6 +688,11 @@ export default {
       padding-top: 20px;
     }
   }
+}
+
+.account-menu {
+  display: flex;
+  align-items: center;
 }
 
 @font-face {
