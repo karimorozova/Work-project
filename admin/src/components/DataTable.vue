@@ -194,5 +194,10 @@ export default {
 .table_no-bottom-margin {
     margin-bottom: 0;
 }
+.review-body {
+    .table__body-row {
+        cursor: default;
+    }
+}
 
 </style>

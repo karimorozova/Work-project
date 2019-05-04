@@ -1,4 +1,6 @@
 const unirest = require('unirest');
+const https = require('https');
+const fs = require('fs');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
 const { metricsCalc } = require('../projects/calculations');
@@ -141,6 +143,19 @@ function getRequestOptions(obj) {
     };
 }
 
+function generateTargetFile({projectId, jobId}) {
+    return new Promise((resolve, reject) => {
+        unirest.post(`${xtmBaseUrl}/rest-api/projects/${projectId}/files/generate?jobIds=${jobId}&fileType=TARGET`)
+            .headers({"Authorization": xtmToken})
+            .end( (response) => {
+                if(response.error) {
+                   reject(response.error);
+                }
+                resolve(response.body);
+            }) 
+    })
+}
+
 function getTaskProgress(task) {
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${task.projectId}/metrics`)
@@ -163,4 +178,4 @@ function getTaskProgress(task) {
     })
 }
 
-module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress };
+module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile };

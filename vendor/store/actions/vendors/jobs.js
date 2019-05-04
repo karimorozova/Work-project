@@ -1,3 +1,5 @@
+import { downloadJobTargets } from "../../../utils/job-targets";
+
 export const getJobs = async function({ commit, dispatch, state}) {
     try {
         const result = await this.$axios.get(`/vendor/jobs?token=${state.token}`);
@@ -7,12 +9,16 @@ export const getJobs = async function({ commit, dispatch, state}) {
     }
 }
 
-export const setJobStatus = async function({commit, dispatch}, payload) {
+export const setJobStatus = async function({commit, dispatch, state}, payload) {
     try {
         const { jobId, status } = payload;
         await this.$axios.post('/vendor/job', { jobId, status });
+        if(status === "Completed") {
+            await downloadJobTargets(this, state.selectedJob);
+        }
         await dispatch("getJobs");
     } catch(err) {
+        console.log(err);
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
 }

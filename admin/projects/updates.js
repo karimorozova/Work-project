@@ -240,7 +240,7 @@ async function updateTaskTargetFiles({step, jobId, path}) {
         const project = await Projects.findOne({"steps._id": step._id});
         const tasks = project.tasks.map(task => {
             if(task.taskId === step.taskId) {
-                task.xtmJobs = getUpdatedXtmJobs(task.xtmJobs, jobId, path);
+                task.xtmJobs = getAfterPathUpdate(task.xtmJobs, jobId, path);
             }
             return task;
         })
@@ -251,7 +251,7 @@ async function updateTaskTargetFiles({step, jobId, path}) {
     }
 }
 
-function getUpdatedXtmJobs(xtmJobs, jobId, path) {
+function getAfterPathUpdate(xtmJobs, jobId, path) {
     return xtmJobs.map(item => {
         if(item.jobId === jobId) {
             item.targetFile = path;
@@ -260,4 +260,30 @@ function getUpdatedXtmJobs(xtmJobs, jobId, path) {
     })
 }
 
-module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles };
+async function getAfterApproveFile({taskId, jobId, isFileApproved}) {
+    try {
+        const project = await getProject({"tasks.taskId": taskId});
+        const tasks = project.tasks.map(task => {
+            if(task.taskId === taskId) {
+                task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
+            }
+            return task;
+        });
+        return updateProject({"_id": project.id}, { tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterApproveFile");
+    }
+}
+
+function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
+    return jobs.map(item => {
+        if(item.jobId === jobId) {
+            item.isFileApproved = isFileApproved;
+        }
+        return item;
+    })
+}
+
+module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, 
+    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile };

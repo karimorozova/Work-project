@@ -26,13 +26,13 @@ export default {
     align-items: center;
     &__icon {
         color: $light-brown;
-        font-size: 24px;
+        font-size: 20px;
         cursor: pointer;
         transition: all 0.4s;
-        margin-right: 10px;
+        margin-right: 5px;
     }
     &_green {
-        color: $green;
+        color: $green-approve;
         transform: rotateY(360deg);
     }
 }

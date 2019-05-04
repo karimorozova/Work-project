@@ -143,15 +143,22 @@ async function setTaskStatusAndSave({project, jobId, steps, status}) {
         }
         return item;
     })
-    let projectStatus = project.status === "Started" ? project.status : "Started";
-    const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery');
-    projectStatus = incompletedTasks ? projectStatus : "Ready for Delivery";
+    let projectStatus = getProjectStatus({project, status, updatedTasks});
     try {
         await Projects.updateOne({'steps._id': jobId}, { status: projectStatus, tasks: updatedTasks, steps });
     } catch(err) {
         console.log(err);
         console.log("Error in setTaskStatusAndSave");
     }
+}
+
+function getProjectStatus({project, status, updatedTasks}) {
+    let projectStatus = project.status;
+    if(projectStatus === "Approved" || projectStatus === "Started") {
+        return status === "Started" ? "In progress" : projectStatus;
+    }
+    const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery');
+    return incompletedTasks ? projectStatus : "Ready for Delivery";
 }
 
 function isAllStepsCompleted({jobId, steps}) {

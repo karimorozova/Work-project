@@ -1,5 +1,5 @@
 <template lang="pug">
-    .checkbox
+    .checkbox(:class="customClass")
         img.checkbox__image(v-if="!isChecked" src="../assets/images/unselected-checkbox.png" @click="check")
         img.checkbox__image(v-else src="../assets/images/selected-checkbox.png" @click="uncheck")   
 </template>
@@ -7,7 +7,8 @@
 <script>
 export default {
     props: {
-        isChecked: {type: Boolean}
+        isChecked: {type: Boolean},
+        customClass: {type: String}
     },
     methods: {
         check() {
@@ -25,6 +26,14 @@ export default {
 .checkbox {
     &__image {
         width: 18px;
+    }
+}
+
+.review-options {
+    display: flex;
+    align-items: center;
+    .checkbox__image {
+        width: 23px;
     }
 }
 

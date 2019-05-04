@@ -117,7 +117,8 @@ export default {
             }
             try {
                 const fileId = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId});
-                let fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, projectId: this.job.xtmProjectId, file: fileId.data[0]});
+                let fileLink = await this.$axios.post('/xtm/target-file', 
+                    {step: this.job, id: this.job.project_Id, projectId: this.job.xtmProjectId, file: {...fileId.data[0], fileName: file.fileName}});
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 this.setCurrentJob(fileLink.data.updatedProject);

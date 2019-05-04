@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Projects, Clients } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress } = require('../services/');
+const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress, generateTargetFile } = require('../services/');
 const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
 const fs = require('fs');
 const unirest = require('unirest');
@@ -447,14 +447,8 @@ router.post('/step-target', async (req, res) => {
 router.post('/generate-file', async (req, res) => {
     const { projectId, jobId } = req.body;
     try {
-        unirest.post(`${xtmBaseUrl}/rest-api/projects/${projectId}/files/generate?jobIds=${jobId}&fileType=TARGET`)
-            .headers({"Authorization": xtmToken})
-            .end( (response) => {
-                if(response.error) {
-                   return res.status(response.error.status).send(response.error.message + " XTM-generate file");;
-                }
-                res.send(response.body);
-            }) 
+        const generatedFiles = await generateTargetFile({projectId, jobId});
+        res.send(generatedFiles);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error / Cannot generate file in XTM');
@@ -468,14 +462,15 @@ router.post('/target-file', async (req, res) => {
         path: `projects/${projectId}/files/${file.fileId}/download?fileType=TARGET`,
     });
     try {
-        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/target-${step.name}-${file.fileId}.zip`);
+        const fileName = file.fileName.split('.')[0];
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/${step.name}-${fileName}.zip`);
         let reqq = https.request(options, (resp) => {
             resp.pipe(wstream);
         });
         reqq.end(); 
         wstream.on('finish', async () => {
-            const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path: `/projectFiles/${id}/target-${step.name}-${file.fileId}.zip`});
-            res.send({path: `/projectFiles/${id}/target-${step.name}-${file.fileId}.zip`, updatedProject});
+            const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path: `/projectFiles/${id}/${step.name}-${fileName}.zip`});
+            res.send({path: `/projectFiles/${id}/${step.name}-${fileName}.zip`, updatedProject});
         })
     } catch(err) {
         console.log(err);

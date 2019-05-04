@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
-const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage } = require("../../projects/");
+const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
+    cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
+    getAfterApproveFile } = require("../../projects/");
 const { clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
@@ -159,6 +161,19 @@ router.post("/step-status", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on setting step status");
+    }
+})
+
+router.post("/approve-files", async (req, res) => {
+    const { taskId, jobId, isFileApproved } = req.body;
+    try {
+        const updatedProject = await getAfterApproveFile({
+            taskId, jobId, isFileApproved
+        })
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approve files");
     }
 })
 
