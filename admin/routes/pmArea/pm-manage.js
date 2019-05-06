@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const fs = require("fs");
-const archiver = require("archiver");
 const { User, Clients } = require("../../models");
 const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
     cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
