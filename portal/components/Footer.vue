@@ -9,7 +9,7 @@
                 a.footer__link(href="https://www.google.com/maps/place/Pangea+Localization+Services/@34.6831861,33.0312479,15z/data=!4m5!3m4!1s0x0:0xd80067655ceaa5df!8m2!3d34.6831861!4d33.0312479" target="_blank") Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol
             p.footer__legal-text office : +35725252150
             p.footer__legal-text Reg. No. HE362046  VAT. No. 10362046H
-            p.footer__legal-text © 2016 
+            p.footer__legal-text © {{ year }} 
                 span.footer__legal-copywrite-text Pangea Translation Services (Cyprus) LTD
         .footer__item
             img(border="0" src="https://twb.translationcenter.org/workspace/display-badge/index/id/61931/Volunteer_Translator.jpg" alt="English to French & English to Arabic & English to Chinese volunteer translator")
@@ -23,7 +23,7 @@ import SocialIcons from './SocialIcons';
 export default {
     data() {
         return {
-            
+            year: new Date().getFullYear()
         }
     },
     components: {
