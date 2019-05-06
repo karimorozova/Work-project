@@ -285,5 +285,25 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
     })
 }
 
+async function getProjectAfterTasksUpdated({tasks, project, status}) {
+    const updatedTasks = project.tasks.map(task => {
+        if(tasks.indexOf(task.taskId) !== -1) {
+            task.status = status;
+        }
+        return task;
+    })
+    let projectStatus = project.status;
+    if(status = "Ready for Delivery") {
+        const notReadyTask = tasks.find(task => task.status !== "Ready for Delivery");
+        projectStatus = notReadyTask ? projectStatus : "Ready for Delivery";
+    }
+    try {
+        return await updateProject({"_id": project._id}, { tasks: updatedTasks, status: projectStatus});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getProjectAfterTasksUpdated");
+    }
+}
+
 module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, 
-    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile };
+    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, getProjectAfterTasksUpdated };

@@ -1,5 +1,5 @@
 const { sendEmail, managerNotifyMail } = require("../utils/mailTemplate");
-const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage } = require("../utils/emailMessages");
+const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, taskReadyMessage } = require("../utils/emailMessages");
 const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
 const { User } = require("../models");
@@ -63,4 +63,17 @@ async function getPMnotificationMessage(project, task) {
     }
 }
 
-module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM };
+async function notifyClientTaskReady({tasks, project}) {
+    try {
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        for(let taskId of tasks) {
+            const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
+            await sendEmail({to: contact.email, subject: "Task ready notification"}, message);
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyClientTaskReady");
+    }
+}
+
+module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady };

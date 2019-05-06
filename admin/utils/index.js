@@ -1,5 +1,5 @@
 const { sendEmail, clientQuoteEmail, managerNotifyMail } = require('./mailTemplate');
-const { applicationMessage, messageForClient, requestMessageForVendor, managerAssignmentNotifyingMessage, vendorNotificationMessage } = require('./emailMessages');
+const { applicationMessage, messageForClient, requestMessageForVendor, managerAssignmentNotifyingMessage, vendorNotificationMessage, taskReadyMessage } = require('./emailMessages');
 const { sendMail } = require('./mailhandler');
 const { sendMailClient } = require('./mailhandlerclient');
 const { sendMailPortal } = require('./mailhandlerportal');
@@ -32,5 +32,6 @@ module.exports = {
     stepEmailToVendor,
     sendEmailToContact,
     vendorNotificationMessage,
-    archiveFile
+    archiveFile,
+    taskReadyMessage
 }

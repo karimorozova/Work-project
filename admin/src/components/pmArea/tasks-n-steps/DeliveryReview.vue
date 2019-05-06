@@ -59,7 +59,8 @@ export default {
     methods: {
         ...mapActions({
             approveDeliveryFile: "approveDeliveryFile",
-            uploadTarget: "uploadTarget"
+            uploadTarget: "uploadTarget",
+            approveWithNotify: "approveWithNotify"
         }),
         close() {
             this.$emit("close")
@@ -124,8 +125,15 @@ export default {
         async saveChanges() {
             
         },
-        approve() {
-            console.log("Approving...")
+        async approve() {
+            try {
+                if(this.isNotify) {
+                    await this.approveWithNotify(this.stepFiles);
+                }
+            } catch(err) { 
+            } finally {
+                this.$emit("close");
+            }
         }
     },
     computed: {
