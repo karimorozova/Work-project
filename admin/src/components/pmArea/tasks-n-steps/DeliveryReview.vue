@@ -14,7 +14,7 @@
                     :isApproved="areFilesConverted"
                     text="Make sure to convert all doc files into PDF")
         .review__table
-            Table(:tableData="stepFiles" @approveFile="approveFile")
+            Table(:tableData="stepFiles" @approveFile="approveFile" @makeAction="makeFileAction" @uploadFile="uploadFile")
         .review__options(v-if="isAllChecked")
             .review__options-check
                 CheckBox(:isChecked="areOptions" 
@@ -48,34 +48,39 @@ export default {
             stepFiles: [],
             areFilesChecked: false,
             areFilesConverted: false,
-            areOptions: false,
-            isDeliver: false,
+            areOptions: true,
+            isDeliver: true,
             isNotify: false
         }
     },
     props: {
-        task: {type: Object}
+        tasks: {type: Array}
     },
     methods: {
         ...mapActions({
-            approveDeliveryFile: "approveDeliveryFile"
+            approveDeliveryFile: "approveDeliveryFile",
+            uploadTarget: "uploadTarget"
         }),
         close() {
             this.$emit("close")
         },
-        getStepFiles() {
-            const { xtmJobs } = this.task;
-            this.stepFiles = xtmJobs.reduce((prev, cur) => {
-                const fileName = cur.targetFile.split("/").pop();
-                prev.push({
-                    fileName,
-                    pair: `${this.task.sourceLanguage} >> ${this.task.targetLanguage}`,
-                    taskId: this.task.taskId,
-                    jobId: cur.jobId,
-                    isFileApproved: cur.isFileApproved
-                })
-                return [...prev];
-            }, [])
+        getStepsFiles() {
+            for(let task of this.tasks) {
+                const { xtmJobs } = task;
+                const files = xtmJobs.reduce((prev, cur) => {
+                    const fileName = cur.targetFile.split("/").pop();
+                    prev.push({
+                        fileName,
+                        pair: `${task.sourceLanguage} >> ${task.targetLanguage}`,
+                        taskId: task.taskId,
+                        jobId: cur.jobId,
+                        path: cur.targetFile,
+                        isFileApproved: cur.isFileApproved
+                    })
+                    return [...prev];
+                }, [])
+                this.stepFiles.push(...files);
+            }
         },
         toggle(e, prop) {
             this[prop] = !this[prop];
@@ -84,6 +89,30 @@ export default {
             this.areOptions = bool;
             this.isDeliver = bool;
             this.isNotify = false;
+        },
+        createLinkAndDownolad(href) {
+            let link = document.createElement('a');
+            link.href = __WEBPACK__API_URL__ + href;
+            link.target = "_blank";
+            link.click();
+        },
+        async makeFileAction({index, key}) {
+            const file = this.stepFiles[index];
+            if(key === 'download') {
+                this.createLinkAndDownolad(file.path);
+            }
+            if(key === 'delete') {
+                
+            }
+        },
+        async uploadFile({file, index}) {
+            const { path } = this.stepFiles[index];
+            const fileData = new FormData();
+            fileData.append("targetFile", file);
+            fileData.append("path", path);
+            try {
+                await this.uploadTarget(fileData);
+            } catch(err) {}
         },
         async approveFile({index}) {
             this.stepFiles[index].isFileApproved = !this.stepFiles[index].isFileApproved;
@@ -116,7 +145,7 @@ export default {
         Button
     },
     mounted() {
-        this.getStepFiles();
+        this.getStepsFiles();
     }
 }
 </script>

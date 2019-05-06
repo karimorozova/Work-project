@@ -16,7 +16,10 @@
             .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId }}
             .review-table__data(slot="action" slot-scope="{ row, index }")
                 .review-table__icons
-                    img.review-table__icon(v-for="(icon, key) in icons" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeAction(index, key)")
+                    template(v-for="(icon, key) in icons")
+                        img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeAction(index, key)")
+                        .review-table__upload(v-if="key === 'upload'")
+                            input.review-table__file-input(type="file" @change="(e) => uploadFile(e, index)")
                     i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
 </template>
 
@@ -48,6 +51,11 @@ export default {
         },
         makeAction(index, key) {
             this.$emit('makeAction', { index, key })
+        },
+        uploadFile(e, index) {
+            const file = e.target.files[0];
+            this.$emit('uploadFile', {file, index});
+            e.target.value = "";
         }
     },
     components: {
@@ -87,6 +95,31 @@ export default {
     }
     &__file-icon {
         margin-right: 5px;
+    }
+    &__upload {
+        position: relative;
+        background: url("../../../assets/images/Other/upload-icon.png");
+        background-repeat: no-repeat;
+        background-position-y: center;
+        width: 20px;
+        height: 21px;
+        overflow: hidden;
+        input[type=file],
+        input[type=file]::-webkit-file-upload-button {
+            cursor: pointer; 
+        }
+    } 
+    &__file-input {
+        padding-left: 0;
+        padding-right: 0;
+        width: 30px;
+        height: 22px;
+        border: none;
+        outline: none;
+        opacity: 0;
+        z-index: 2;
+        position: absolute;
+        left: -5px;
     }
     &_green {
         color: $green-approve;

@@ -1,9 +1,11 @@
 const router = require("express").Router();
+const fs = require("fs");
+const archiver = require("archiver");
 const { User, Clients } = require("../../models");
 const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
     cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
     getAfterApproveFile } = require("../../projects/");
-const { clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
+const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -174,6 +176,24 @@ router.post("/approve-files", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on approve files");
+    }
+})
+
+router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) => {
+    const fileData = {...req.body};
+    try {
+        const files = req.files["targetFile"];
+        const file = files[0];
+        const fileNameParts = file.filename.split('.');
+        if(fileNameParts.slice(-1).toString() === 'zip') {
+            await moveFile(files[0], `./dist${fileData.path}`);
+        } else {
+            await archiveFile({outputPath: `./dist${fileData.path}`, originFile: file});
+        }
+        res.send("");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on uploading target file");
     }
 })
 

@@ -78,7 +78,7 @@
             @notApprove="notApproveAction"
             @close="closeApproveModal")
     .tasks__review(v-if="isDeliveryReview")
-        DeliveryReview(@close="closeReview" :task="reviewTask")
+        DeliveryReview(@close="closeReview" :tasks="reviewTasks")
 </template>
 
 <script>
@@ -117,7 +117,7 @@ export default {
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             isDeliveryReview: false,
-            reviewTask: null
+            reviewTasks: []
         }
     },
     methods: {
@@ -133,9 +133,9 @@ export default {
             this.isApproveActionShow = true;
         },
         deliveryReviewAction() {
-            const task = this.allTasks.find(item => item.check && item.status === "Pending Approval");
-            if(task) {
-                this.reviewTask = task;
+            const checkedTasks = this.allTasks.filter(item => item.check && item.status === "Pending Approval");
+            if(checkedTasks.length) {
+                this.reviewTasks = checkedTasks;
                 this.isDeliveryReview = true;
             }
             this.selectedAction = "";
