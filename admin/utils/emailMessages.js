@@ -402,10 +402,11 @@ function taskReadyMessage(obj) {
                     <h3 class="detailsTitle">Step Details</h3>
                     <table class="details">
                         <tr>
+                            <td>Task ID:</td>
                             <td>${obj.taskId}</td>
                         </tr>
                         <tr>
-                            <td>Source language:</td>
+                            <td>Project ID:</td>
                             <td>${obj.project_id}</td>
                         </tr>
                     </table>
