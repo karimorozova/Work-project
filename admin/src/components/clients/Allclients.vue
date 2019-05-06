@@ -64,7 +64,7 @@ export default {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
             }
         },
-        async getXtmCustomers() {
+        async getAllXtmCustomers() {
             try {
                 if(!this.allXtmCustomers.length) {
                     let result = await this.$http.get('/xtm/xtm-customers');
@@ -121,7 +121,6 @@ export default {
     },
     created() {
         this.getCustomers();
-        // this.getXtmCustomers();
     },
     mounted() {
         this.storeCurrentClient({});

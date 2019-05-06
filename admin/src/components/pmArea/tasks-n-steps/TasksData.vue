@@ -215,7 +215,7 @@ export default {
                 elem.value = "";
             }
         },
-        checkForErrors() {
+        async checkForErrors() {
             let errors = [];
             if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
             if(!this.template) errors.push("Please, select Template.");
@@ -224,11 +224,13 @@ export default {
             if(errors.length) {
                 return this.$emit("showErrors", { errors });
             }
-            this.addTasks();
+            try {
+                await this.addTasks();
+            } catch(err) {}
         },
         async getCustomersFromXtm() {
             try {
-                if(!this.allXtmCustomers.length) {
+                if(!this.xtmCustomers.length) {
                     let result = await this.$http.get('/xtm/xtm-customers');
                     this.xtmCustomersGetting(result.body);
                 }
@@ -257,8 +259,8 @@ export default {
             })
             return { xtmId, template, source, service };
         },
-        addTasks() {
-            const { xtmId, template, source, service } = this.getTasksData();
+        async addTasks() {
+            const { xtmId, template, source, service } = await this.getTasksData();
             this.$emit("addTasks", { 
                 isJoinfiles: this.isJoinFiles, 
                 sourceFiles: this.sourceFiles,
