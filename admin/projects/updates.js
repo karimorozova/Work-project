@@ -296,7 +296,7 @@ async function getProjectAfterTasksUpdated({tasks, project, status}) {
     })
     let projectStatus = project.status;
     if(status = "Ready for Delivery") {
-        const notReadyTask = tasks.find(task => task.status !== "Ready for Delivery");
+        const notReadyTask = updatedTasks.find(task => task.status !== "Ready for Delivery");
         projectStatus = notReadyTask ? projectStatus : "Ready for Delivery";
     }
     try {

@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     filteredProjects() {
-      let statuses = ['Started', 'Approved'];
+      let statuses = ['Started', 'Approved', 'In progress'];
       return this.filterByStatus(statuses);
     },
     filteredQuotes() {
