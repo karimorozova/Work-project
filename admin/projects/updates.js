@@ -240,7 +240,8 @@ async function updateTaskTargetFiles({step, jobId, path}) {
         const project = await Projects.findOne({"steps._id": step._id});
         const tasks = project.tasks.map(task => {
             if(task.taskId === step.taskId) {
-                task.xtmJobs = getAfterPathUpdate(task.xtmJobs, jobId, path);
+                task.xtmJobs = getAfterPathUpdate({
+                    xtmJobs:task.xtmJobs, jobId, path, name: step.name});
             }
             return task;
         })
@@ -251,9 +252,10 @@ async function updateTaskTargetFiles({step, jobId, path}) {
     }
 }
 
-function getAfterPathUpdate(xtmJobs, jobId, path) {
+function getAfterPathUpdate({xtmJobs, jobId, path, name}) {
     return xtmJobs.map(item => {
         if(item.jobId === jobId) {
+            item[`${name}-targetFile`] = path;
             item.targetFile = path;
         }
         return item;

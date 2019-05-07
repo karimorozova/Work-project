@@ -75,8 +75,8 @@ export default {
         async downloadTargetFile(index) {
             const xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
             try {
-                if(xtmJob.targetFile) {
-                    return this.createLinkAndDownolad(xtmJob.targetFile);
+                if(xtmJob[`${this.step.name}-targetFile`]) {
+                    return this.createLinkAndDownolad(xtmJob[`${this.step.name}-targetFile`]);
                 }
                 const id = this.currentProject._id;
                 const fileId = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});

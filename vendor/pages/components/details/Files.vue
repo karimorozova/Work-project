@@ -31,7 +31,7 @@
                         img.job-files__image(src="../../../assets/images/download.png")
             template(slot="target" slot-scope="{ row, index }")
                 .job-files_flex-centered(v-if="row.category === 'Source file'")
-                    .job-files__link(v-if="getProgress(row) === 100 && job.status === 'Completed'")
+                    .job-files__link(v-if="getProgress(row) === 100 || job.status === 'Completed'")
                         img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
             template(slot="editor" slot-scope="{ row, index }")
                 .job-files__editor(v-if="job.status === 'Started' && row.category === 'Source file'")
@@ -112,7 +112,7 @@ export default {
         async downloadTarget(file) {
             const jobId = this.getFilesJobId(file);
             const existingTarget = this.getExistingTargetPath(jobId);
-            if(existingTarget) {
+            if(this.job.status === "Completed") {
                 return this.createLinkAndDownolad(existingTarget);
             }
             try {
@@ -134,7 +134,7 @@ export default {
         },
         getExistingTargetPath(jobId) {
             const xtmJob = this.job.xtmJobIds.find(item => item.jobId === jobId);
-            return xtmJob.targetFile;
+            return xtmJob[`${this.job.name}-targetFile`];
         },
         setCurrentJob(project) {
             const { tasks } = project;
