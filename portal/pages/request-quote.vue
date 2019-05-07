@@ -128,7 +128,7 @@
                 span.clarify Select
               .inner.date-file.file-types
                 span Supported File Types
-                .supported
+                .supported(v-click-outside='closeFiles')
                   .supported__icons
                     .supported__icons_images
                       img(src='../assets/images/file-types/in.png')
@@ -137,11 +137,11 @@
                       img(src='../assets/images/file-types/ini.png')
                       img(src='../assets/images/file-types/powerpoint1.png')
                       img(src='../assets/images/file-types/photoshop1.png')
-                    span.filesLink(v-on:click='showFiles') Full List
-                  .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
+                    span.filesLink(@click='showFiles') Full List
+                  .details__files-list(v-if='filesDrop')
                     .title
                       label SUPPORTED FILE TYPES
-                      .crossButton(@click="showFiles")
+                      .crossButton(@click="closeFiles")
                         i.fa.fa-times.close
                     .types
                       .textFiles.types__sector
@@ -504,11 +504,11 @@ export default {
       this.dialectsDrop = !this.dialectsDrop
     },
     showFiles() {
-      this.toggleFiles()
+      this.filesDrop = true;
     },
-    toggleFiles() {
-      this.filesDrop = !this.filesDrop
-    },
+    closeFiles() {
+      this.filesDrop= false;
+    }
     changeSourceSelect(event) {
       if(event.lang == this.selectLangSource) {
         this.selectLangSource = '';
