@@ -102,14 +102,16 @@
           if(item.status === 'Request Sent') {
             return item;
           }
-          return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started" && item.projectStatus !== "Approved"
+          return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== "Started"
+            && item.projectStatus !== "Approved" && item.projectStatus !== "In progress"
         })
       },
       openedJobs() {
         let statuses = this.jobStatuses.filter(item => item !== "Request Sent");
         statuses.push("Started");
         return this.jobs.filter(item => {
-          return statuses.indexOf(item.status) !== -1 && (item.projectStatus === "Started" || item.projectStatus === "Approved");          
+          return statuses.indexOf(item.status) !== -1 && (item.projectStatus === "Started" 
+            || item.projectStatus === "Approved" || item.projectStatus === "In progress");          
         })
       }
     },
