@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
     cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
-    getAfterApproveFile, notifyClientTaskReady, getProjectAfterTasksUpdated } = require("../../projects/");
+    getAfterApproveFile, notifyClientTaskReady, getProjectAfterTasksUpdated, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 
 router.post("/new-project", async (req, res) => {
@@ -205,6 +205,19 @@ router.post("/tasks-approve", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.get("/deliverables", async (req, res) => {
+    const { taskId } = req.query;
+    try {
+        const project = await getProject({"tasks.taskId": taskId});
+        const task = project.tasks.find(item => item.taskId === taskId);
+        const link = await getDeliverablesLink({taskId, projectId: project.id, jobs: task.xtmJobs});
+        res.send({link});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on downloading deliverables");
     }
 })
 

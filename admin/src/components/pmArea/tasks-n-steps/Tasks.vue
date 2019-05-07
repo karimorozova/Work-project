@@ -226,16 +226,14 @@ export default {
             this.isDeliveryReview = false;
         },
         async downloadFiles(task) {
-            const jobId = task.xtmJobs[task.xtmJobs.length-1].jobId;
             try {
-                const result = await this.$http.post('/xtm/generate-file', {projectId: task.projectId, jobId});
-                const file = await this.$http.get(`/xtm/delivery-file?fileId=${result.body[0].fileId}&id=${this.currentProject._id}&projectId=${task.projectId}&jobId=${jobId}&taskId=${task.taskId}`);
-                const href = file.body.path;
+                const result = await this.$http.get(`/pm-manage/deliverables?taskId=${task.taskId}`);
+                const href = result.body.link;
                 let link = document.createElement('a');
                 link.href = __WEBPACK__API_URL__ + href;
+                link.target = "_blank";
                 link.click();
             } catch(err) {
-                console.log(err);
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
             }
         },

@@ -1,6 +1,6 @@
 const { Projects } = require("../models");
 const { getProject } = require("./getProjects");
-const { storeFiles, deleteCopiedFiles } = require("./files");
+const { storeFiles } = require("./files");
 const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi");
 const moment = require("moment");
 
@@ -31,7 +31,6 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
         newTasksInfo.customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
         newTasksInfo.filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
         newTasksInfo.referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
-        await deleteCopiedFiles();
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
         await addTasksToXtm({newTasksInfo, project});
         return await getProject({"_id": newTasksInfo.projectId});

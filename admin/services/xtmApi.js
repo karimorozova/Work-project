@@ -1,6 +1,4 @@
 const unirest = require('unirest');
-const https = require('https');
-const fs = require('fs');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
 const { metricsCalc } = require('../projects/calculations');

@@ -1,7 +1,5 @@
+const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveFile } = require('../utils/movingFile');
-const fse = require('fs-extra');
-const fs = require('fs');
-const path = require('path');
 
 async function storeFiles(filesArr, projectId) {
     let storedFiles = [];
@@ -9,7 +7,7 @@ async function storeFiles(filesArr, projectId) {
         for(let file of filesArr) {
             const newPath = `./dist/projectFiles/${projectId}/${file.filename.replace(/\s+/g, '_')}`;
             try {
-                await fse.copy(file.path, newPath);
+                await moveFile(file, newPath);
             } catch(err) {
                 throw new Error("Error from storeFiels")
             }
@@ -19,19 +17,26 @@ async function storeFiles(filesArr, projectId) {
     return storedFiles;
 }
 
-async function deleteCopiedFiles() {
+async function getDeliverablesLink({jobs, projectId, taskId}) {
     try {
-        const directory = './dist/uploads/';
-        const files = await fse.readdir(directory);
-        for (const file of files) {
-            await fs.unlink(path.join(directory, file), (err) => {
-                if(err) throw err;
-            });
-        }
+        const files = getParsedFiles(jobs);
+        const outputPath = `./dist/projectFiles/${projectId}/deliverables-${taskId.replace(/\s+/g, '_')}.zip`;
+        await archiveMultipleFiles({outputPath, files});
+        return outputPath.split("./dist")[1];
     } catch(err) {
         console.log(err);
-        throw new Error("error on deleting files from uploads / deleteCopiedFiles")
+        console.log("Error in getDeliverablesLink");
     }
 }
 
-module.exports = { storeFiles, deleteCopiedFiles };
+function getParsedFiles(jobs) {
+    return jobs.reduce((prev, cur) => {
+        const filePathParts = cur.targetFile.split("/");
+        const fileName = filePathParts.slice(-1)[0];
+        const file = {path: `./dist${cur.targetFile}`, name: fileName};
+        prev.push(file);
+        return [...prev];
+    }, [])
+}
+
+module.exports = { storeFiles, getDeliverablesLink };
