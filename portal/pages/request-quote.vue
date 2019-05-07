@@ -138,42 +138,42 @@
                       img(src='../assets/images/file-types/powerpoint1.png')
                       img(src='../assets/images/file-types/photoshop1.png')
                     span.filesLink(v-on:click='showFiles') Full List
-            .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
-              .title
-                label SUPPORTED FILE TYPES
-                .crossButton(@click="showFiles")
-                  i.fa.fa-times.close
-              .types
-                .textFiles.types__sector
-                  .fileTypeTitle Text files
-                  .list
-                    li(v-for='type in fileTypes.text') 
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .designFiles.types__sector
-                  .fileTypeTitle Design files
-                  .list
-                    li(v-for='type in fileTypes.design') 
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .webFiles.types__sector
-                  .fileTypeTitle Web files
-                  .list
-                    li(v-for='type in fileTypes.web')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .translationFiles.types__sector
-                  .fileTypeTitle Translation files
-                  .list
-                    li(v-for='type in fileTypes.translation')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
-                .devFiles.types__sector
-                  .fileTypeTitle Dev files
-                  .list
-                    li(v-for='type in fileTypes.dev')
-                      span.dot &#9679;
-                      span.type-text {{ type }}
+                  .details__files-list(v-click-outside='showFiles' v-if='filesDrop')
+                    .title
+                      label SUPPORTED FILE TYPES
+                      .crossButton(@click="showFiles")
+                        i.fa.fa-times.close
+                    .types
+                      .textFiles.types__sector
+                        .fileTypeTitle Text files
+                        .list
+                          li(v-for='type in fileTypes.text') 
+                            span.dot &#9679;
+                            span.type-text {{ type }}
+                      .designFiles.types__sector
+                        .fileTypeTitle Design files
+                        .list
+                          li(v-for='type in fileTypes.design') 
+                            span.dot &#9679;
+                            span.type-text {{ type }}
+                      .webFiles.types__sector
+                        .fileTypeTitle Web files
+                        .list
+                          li(v-for='type in fileTypes.web')
+                            span.dot &#9679;
+                            span.type-text {{ type }}
+                      .translationFiles.types__sector
+                        .fileTypeTitle Translation files
+                        .list
+                          li(v-for='type in fileTypes.translation')
+                            span.dot &#9679;
+                            span.type-text {{ type }}
+                      .devFiles.types__sector
+                        .fileTypeTitle Dev files
+                        .list
+                          li(v-for='type in fileTypes.dev')
+                            span.dot &#9679;
+                            span.type-text {{ type }}
             .details__brief
               span.details__brief-title Enter a short brief
               textarea(rows='10' v-model='brief')
