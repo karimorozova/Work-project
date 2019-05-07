@@ -182,10 +182,12 @@ export default {
             this.$emit("setTargets", { lang });
         },
         uploadSourceFiles(event) {
-            for(let file of event.target.files) {
-                const isExist = this.sourceFiles.find(item => item.name === file.name);
-                if(!isExist) {
-                    this.sourceFiles.push(file);
+            if(event.target.files.length) {
+                for(let file of event.target.files) {
+                    const isExist = this.sourceFiles.find(item => item.name === file.name);
+                    if(!isExist) {
+                        this.sourceFiles.push(file);
+                    }
                 }
             }
         },
@@ -193,7 +195,9 @@ export default {
             this.isSourceFilesShow = !this.isSourceFilesShow;
         },
         uploadRefFiles(event) {
-            this.refFiles.push(event.target.files[0]);
+            if(event.target.files.length) {
+                this.refFiles.push(event.target.files[0]);
+            }
         },
         toggleRefFiles() {
             this.isRefFilesShow = !this.isRefFilesShow;
@@ -215,12 +219,21 @@ export default {
                 elem.value = "";
             }
         },
+        isRefFilesHasSource() {
+            if(!this.refFiles.length) return false;
+            for(let file of this.refFiles) {
+                const sourceFile = this.sourceFiles.find(item => item.name === file.name);
+                if(sourceFile) return true;
+            }
+            return false;
+        },
         async checkForErrors() {
             let errors = [];
             if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
             if(!this.template) errors.push("Please, select Template.");
             if(!this.targetLanguages.length) errors.push("Please, select Target language(s).");
             if(!this.sourceFiles.length) errors.push("Please, upload Source file(s).");
+            if(this.sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
             if(errors.length) {
                 return this.$emit("showErrors", { errors });
             }
