@@ -508,7 +508,7 @@ export default {
     },
     closeFiles() {
       this.filesDrop= false;
-    }
+    },
     changeSourceSelect(event) {
       if(event.lang == this.selectLangSource) {
         this.selectLangSource = '';
