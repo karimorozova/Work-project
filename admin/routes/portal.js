@@ -1,6 +1,6 @@
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
-const { getProject, getProjects, createProject, createTasks, updateProjectStatus } = require("../projects/");
+const { getProject, getProjects, createProject, createTasks, updateProjectStatus, getDeliverablesLink, notifyDeliverablesDownloaded } = require("../projects/");
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
@@ -8,6 +8,7 @@ const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
 const jwt = require("jsonwebtoken");
 const { upload } = require('../utils/');
+const  { getProjectAfterTasksUpdated } = require("../delivery");
 
 router.get('/', (req, res) => {
     res.send("portal");
@@ -240,5 +241,30 @@ router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles'
     }
 });
 
+router.get('/deliverables', checkClientContact, async (req, res) => {
+    const { taskId } = req.query;
+    try {
+        const project = await getProject({"tasks.taskId": taskId});
+        const task = project.tasks.find(item => item.taskId === taskId);
+        const link = await getDeliverablesLink({taskId, projectId: project.id, jobs: task.xtmJobs});
+        res.send({link});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on downloading deliverables");
+    }
+})
+
+router.post('/delivered', checkClientContact, async (req, res) => {
+    const { task } = req.body;
+    try {
+        const project = await getProject({"tasks.taskId": task.taskId});
+        const updatedProject = await getProjectAfterTasksUpdated({taskIds: [task.taskId], project, status: "Delivered"});    
+        await notifyDeliverablesDownloaded(task.taskId, project);
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on Project status update");
+    }
+})
 
 module.exports = router;

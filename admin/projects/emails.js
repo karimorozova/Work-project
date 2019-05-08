@@ -1,5 +1,5 @@
 const { sendEmail, managerNotifyMail } = require("../utils/mailTemplate");
-const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, taskReadyMessage } = require("../utils/emailMessages");
+const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, taskReadyMessage, deliverablesDownloadedMessage } = require("../utils/emailMessages");
 const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
 const { User } = require("../models");
@@ -89,4 +89,20 @@ async function sendClientDeliveries({taskIds, project}) {
     }
 }
 
-module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries };
+async function notifyDeliverablesDownloaded(taskId, project) {
+    try {
+        const projectManager = await User.findOne({"_id": project.projectManager.id});
+        const accManager = await User.findOne({"_id": project.customer.accountManager._id});
+        const pmMessage = deliverablesDownloadedMessage({
+            manager: projectManager, taskId, project_id: project.projectId})
+        const accManagerMessage = deliverablesDownloadedMessage({
+            manager: accManager, taskId, project_id: project.projectId})
+        await managerNotifyMail(projectManager, pmMessage, "Task delivery notification");
+        await managerNotifyMail(accManager, accManagerMessage, "Task delivery notification");
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyDeliverablesDownloaded");
+    }
+}
+
+module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded };

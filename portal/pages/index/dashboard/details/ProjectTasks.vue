@@ -11,7 +11,10 @@
             .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
-            .tasks-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
+            .tasks-table__status(slot="status" slot-scope="{ row }") {{ row.status }}
+                .tasks-table__timestamp(v-if="row.isDelivered")
+                    img.tasks-table__time-icon(src="../../../../assets/images/time_icon.png")
+                    .tasks-table__time-data {{ getDeliveredTime(row.deliveredTime) }}
             .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="getProgress(row)")
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
@@ -25,6 +28,7 @@
 <script>
 import DataTable from "~/components/Tables/DataTable";
 import ProgressLine from "~/components/ProgressLine";
+import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -37,10 +41,18 @@ export default {
                 {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "13%", padding: "0"},
                 {label: "Cost", headerKey: "headerCost", key: "cost", width: "10%", padding: "0"},
                 {label: " ", headerKey: "headerDownload", key: "download", width: "7%", padding: "0"}
-            ]
+            ],
+            domain: ""
         }
     },
     methods: {
+        ...mapActions({
+            alertToggle: "alertToggle",
+            updateTaskStatus: "updateTaskStatus"
+        }),
+        getDeliveredTime(date) {
+            return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
+        },
         getLanguagePairs(task) {
             let pair = "";
             for(let langPair of this.clientLanguages) {
@@ -52,10 +64,22 @@ export default {
             return pair;
         },
         isDownload(task) {
-            return task.status === 'Ready for Delivery'
+            return task.status === 'Ready for Delivery' || task.status === 'Delivered'
         },
-        download(row) {
-            console.log("downloading...")
+        async download(task) {
+            try {
+                const result = await this.$axios.get(`/portal/deliverables?taskId=${task.taskId}`);
+                const href = result.data.link;
+                let link = document.createElement('a');
+                link.href = this.domain + href;
+                link.target = "_blank";
+                link.click();
+                if(task.status === "Ready for Delivery") {
+                    await this.updateTaskStatus({task});
+                }
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
         },
         getProgress(task) {
             const { steps } = this.project;
@@ -75,6 +99,9 @@ export default {
             clientLanguages: "getCombinations"
         })
     },
+    mounted() {
+        this.domain = process.env.domain;
+    },
     components: {
         DataTable,
         ProgressLine
@@ -86,7 +113,7 @@ export default {
 @import "../../../../assets/scss/colors.scss";
 
 .tasks-table {
-    &__data {
+    &__data, &__status {
         height: 30px;
         box-sizing: border-box;
         display: flex;
@@ -99,8 +126,33 @@ export default {
     &__icon {
         cursor: pointer;
     }
-    &__progress {
+    &__progress, &__status {
         position: relative;
+    }
+    &__timestamp {
+        cursor: pointer;
+        position: absolute;
+        right: 3px;
+        top: 6px;
+        &:hover {
+            .tasks-table__time-data {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+    }
+    &__time-data {
+        position: absolute;
+        top: -2px;
+        width: 150px;
+        background-color: $white;
+        padding: 3px;
+        border-radius: 3px;
+        margin-left: 22px;
+        box-shadow: 0 0 10px $brown-shadow;
+        opacity: 0;
+        z-index: -2;
+        transition: all 0.2s;
     }
     &_centered {
         justify-content: center;

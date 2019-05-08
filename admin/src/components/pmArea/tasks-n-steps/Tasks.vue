@@ -57,7 +57,10 @@
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row)")
             template(slot="status" slot-scope="{ row }")
-                span.tasks__task-data {{ row.status }}
+                .tasks__task-status {{ row.status }}
+                    .tasks__timestamp(v-if="row.isDelivered")
+                        img.tasks__time-icon(src="../../../assets/images/time_icon.png")
+                        .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
             template(slot="receivables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.receivables") &euro;
                 span.tasks__task-data {{ row.finance.Price.receivables }}
@@ -88,6 +91,7 @@ import Tabs from "../../Tabs";
 import SelectSingle from "../../SelectSingle";
 const ApproveModal = () => import("../../ApproveModal");
 const DeliveryReview = () => import("./DeliveryReview");
+import moment from "moment";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -121,6 +125,9 @@ export default {
         }
     },
     methods: {
+        getDeliveredTime(date) {
+            return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
+        },
         onRowClicked({index}) {
             this.$emit("onRowClicked", {index: index})
         },
@@ -316,6 +323,34 @@ export default {
         display: flex;
         align-items: flex-start;
         justify-content: center;
+    }
+    &__task-status {
+        position: relative;
+    }
+    &__timestamp {
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        top: 0;
+        &:hover {
+            .tasks__time-data {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+    }
+    &__time-data {
+        position: absolute;
+        top: -2px;
+        width: 150px;
+        background-color: $white;
+        padding: 3px;
+        border-radius: 3px;
+        margin-left: 22px;
+        box-shadow: 0 0 10px $brown-shadow;
+        opacity: 0;
+        z-index: -2;
+        transition: all 0.2s;
     }
 }
 </style>

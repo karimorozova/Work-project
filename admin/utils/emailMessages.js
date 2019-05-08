@@ -414,6 +414,29 @@ function taskReadyMessage(obj) {
             </div>`;
 }
 
+function deliverablesDownloadedMessage(obj) {
+    const lastName = obj.manager.lastName || "";
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.manager.firstName} ${lastName},</h3>
+                <div class="all-info" style="padding: 0 15px 0 30px;">
+                    <p class="description" style="font-size: 18px;">
+                        Task deliverables were downloaded by client. 
+                    </p>
+                    <h3 class="detailsTitle">Details</h3>
+                    <table class="details">
+                        <tr>
+                            <td>Task ID:</td>
+                            <td>${obj.taskId}</td>
+                        </tr>
+                        <tr>
+                            <td>Project ID:</td>
+                            <td>${obj.project_id}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>`;
+}
+
 module.exports = { 
     applicationMessage, 
     messageForClient, 
@@ -422,5 +445,6 @@ module.exports = {
     managerTaskCompleteNotificationMessage,
     emailMessageForContact,
     vendorNotificationMessage,
-    taskReadyMessage
+    taskReadyMessage,
+    deliverablesDownloadedMessage
 };

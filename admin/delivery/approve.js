@@ -40,6 +40,8 @@ function getUpdatedTasks({taskIds, tasks, status}) {
     return tasks.map(task => {
         if(taskIds.indexOf(task.taskId) !== -1) {
             task.status = status;
+            task.isDelivered = status === "Delivered";
+            task.deliveredTime = new Date();
         }
         return task;
     })

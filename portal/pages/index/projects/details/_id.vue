@@ -70,6 +70,7 @@ export default {
 .details {
     color: $main-color;
     width: 100%;
+    box-sizing: border-box;
     padding: 30px;
     display: flex;
     justify-content: center;

@@ -3,7 +3,7 @@ const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, getDeliverablesLink } = require('./files');
 const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, 
     updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile } = require('./updates');
-const { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries } = require('./emails');
+const { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('./emails');
 const  { createProject, createTasks } = require('./create');
 
 module.exports = {
@@ -35,5 +35,6 @@ module.exports = {
     getAfterApproveFile,
     notifyClientTaskReady,
     getDeliverablesLink,
-    sendClientDeliveries
+    sendClientDeliveries,
+    notifyDeliverablesDownloaded
 }
