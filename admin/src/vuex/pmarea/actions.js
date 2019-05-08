@@ -52,3 +52,17 @@ export const approveDeliverable = async ({commit, dispatch}, payload) => {
         dispatch('decrementRequestCounter')
     }
 }
+
+export const deliverTasks = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const tasks = payload.filter(item => item.status === "Ready for Delivery");
+        const updatedProject = await Vue.http.post("/pm-manage/deliver", { tasks });
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Tasks delivered", isShow: true, type: "success"});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}

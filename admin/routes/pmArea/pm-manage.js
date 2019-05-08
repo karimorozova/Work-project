@@ -4,7 +4,7 @@ const { getProject, createProject, updateProject, changeProjectProp, cancelTasks
     cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
     getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
-const { getProjectAfterApprove, getProjectAfterTasksUpdated } = require("../../delivery");
+const { getProjectAfterApprove, getProjectAfterTasksUpdated, getAfterTasksDelivery } = require("../../delivery");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -230,6 +230,17 @@ router.get("/deliverables", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on downloading deliverables");
+    }
+})
+
+router.post("/deliver", async (req, res) => {
+    const { tasks } = req.body;
+    try {
+        const updatedProject = await getAfterTasksDelivery(tasks);
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on delivering tasks");
     }
 })
 

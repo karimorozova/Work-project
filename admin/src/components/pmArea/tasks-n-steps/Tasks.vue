@@ -172,7 +172,7 @@ export default {
                         await this.cancelTasks(checkedTasks);
                         break;
                     case 'Deliver':
-                        console.log('Delivering...');
+                        await this.deliverTasks(checkedTasks);
                         break
                 }
             } catch(err) {
@@ -248,7 +248,8 @@ export default {
             alertToggle: "alertToggle",
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
-            setProjectStatus: "setProjectStatus"
+            setProjectStatus: "setProjectStatus",
+            deliverTasks: "deliverTasks"
         })
     },
     computed: {
