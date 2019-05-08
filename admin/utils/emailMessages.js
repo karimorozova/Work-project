@@ -399,7 +399,7 @@ function taskReadyMessage(obj) {
                     <p class="description" style="font-size: 18px;">
                         Task is ready. 
                     </p>
-                    <h3 class="detailsTitle">Step Details</h3>
+                    <h3 class="detailsTitle">Details</h3>
                     <table class="details">
                         <tr>
                             <td>Task ID:</td>

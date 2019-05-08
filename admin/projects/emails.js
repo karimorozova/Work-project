@@ -63,12 +63,12 @@ async function getPMnotificationMessage(project, task) {
     }
 }
 
-async function notifyClientTaskReady({tasks, project}) {
+async function notifyClientTaskReady({taskIds, project}) {
     try {
         const contact = project.customer.contacts.find(item => item.leadContact);
-        for(let taskId of tasks) {
+        for(let taskId of taskIds) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: "Task ready notification"}, message);
+            await sendEmail({to: contact.email, subject: "TASK READY"}, message);
         }
     } catch(err) {
         console.log(err);
@@ -76,4 +76,17 @@ async function notifyClientTaskReady({tasks, project}) {
     }
 }
 
-module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady };
+async function sendClientDeliveries({taskIds, project}) {
+    try {
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        for(let taskId of taskIds) {
+            const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
+            await sendEmail({to: contact.email, subject: "DELIVERY"}, message);
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in sendClientDeliveries");
+    }
+}
+
+module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries };

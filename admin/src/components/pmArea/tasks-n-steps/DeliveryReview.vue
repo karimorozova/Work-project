@@ -60,7 +60,8 @@ export default {
         ...mapActions({
             approveDeliveryFile: "approveDeliveryFile",
             uploadTarget: "uploadTarget",
-            approveWithNotify: "approveWithNotify"
+            approveWithOption: "approveWithOption",
+            approveDeliverable: "approveDeliverable"
         }),
         close() {
             this.$emit("close")
@@ -99,6 +100,7 @@ export default {
         },
         async makeFileAction({index, key}) {
             const file = this.stepFiles[index];
+            if(file.isFileApproved) return;
             if(key === 'download') {
                 this.createLinkAndDownolad(file.path);
             }
@@ -126,10 +128,13 @@ export default {
             
         },
         async approve() {
+            const taskIds = this.stepFiles.map(item => item.taskId)
+                .filter((taskId, index, arr) => arr.indexOf(taskId) === index)
             try {
-                if(this.isNotify) {
-                    await this.approveWithNotify(this.stepFiles);
+                if(!this.isNotify && !this.isDeliver) {
+                    return await this.approveDeliverable(taskIds);
                 }
+                await this.approveWithOption({taskIds, isDeliver: this.isDeliver});    
             } catch(err) { 
             } finally {
                 this.$emit("close");

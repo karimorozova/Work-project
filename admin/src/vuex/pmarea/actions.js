@@ -26,12 +26,24 @@ export const uploadTarget = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const approveWithNotify = async ({commit, dispatch}, payload) => {
+export const approveWithOption = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
-        const tasks = payload.map(item => item.taskId)
-            .filter((taskId, index, arr) => arr.indexOf(taskId) === index)
-        const updatedProject = await Vue.http.post("/pm-manage/tasks-approve", { tasks });
+        const { taskIds, isDeliver } = payload;
+        const updatedProject = await Vue.http.post("/pm-manage/tasks-approve-notify", { taskIds, isDeliver });
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Success", isShow: true, type: "success"})
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const approveDeliverable = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.post("/pm-manage/tasks-approve", { taskIds: payload });
         await dispatch('setCurrentProject', updatedProject.data);
         dispatch('alertToggle', {message: "Success", isShow: true, type: "success"})
     } catch(err) {

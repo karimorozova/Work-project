@@ -2,8 +2,9 @@ const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
     cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
-    getAfterApproveFile, notifyClientTaskReady, getProjectAfterTasksUpdated, getDeliverablesLink } = require("../../projects/");
+    getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
+const { getProjectAfterApprove, getProjectAfterTasksUpdated } = require("../../delivery");
 
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
@@ -195,13 +196,24 @@ router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) =
     }
 })
 
-router.post("/tasks-approve", async (req, res) => {
-    const { tasks } = req.body;
+router.post("/tasks-approve-notify", async (req, res) => {
+    const { taskIds, isDeliver } = req.body;
     try {
-        const project = await getProject({"tasks.taskId": tasks[0]});
-        await notifyClientTaskReady({tasks, project});
-        const updateProject = await getProjectAfterTasksUpdated({tasks, project, status: "Ready for Delivery"});
-        res.send(updateProject);
+        const project = await getProject({"tasks.taskId": taskIds[0]});
+        const updatedProject = await getProjectAfterApprove({taskIds, project, isDeliver});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.post("/tasks-approve", async (req, res) => {
+    const { taskIds } = req.body;
+    try {
+        const project = await getProject({"tasks.taskId": taskIds[0]});
+        const updatedProject = await getProjectAfterTasksUpdated({taskIds, project, status: "Ready for Delivery"});
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on approving deliverable");

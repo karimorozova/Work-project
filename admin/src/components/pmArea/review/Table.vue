@@ -18,8 +18,8 @@
                 .review-table__icons
                     template(v-for="(icon, key) in icons")
                         img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeAction(index, key)")
-                        .review-table__upload(v-if="key === 'upload'")
-                            input.review-table__file-input(type="file" @change="(e) => uploadFile(e, index)")
+                        .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved}")
+                            input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
                     i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
 </template>
 
@@ -127,6 +127,10 @@ export default {
     &_opacity-04 {
         opacity: 0.4;
         cursor: default;
+        input[type=file],
+        input[type=file]::-webkit-file-upload-button {
+            cursor: default;
+        }
     }
 }
 

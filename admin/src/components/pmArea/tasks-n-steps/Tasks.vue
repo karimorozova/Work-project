@@ -68,7 +68,7 @@
                 span.tasks__money(v-if="+marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
-                img.tasks__delivery-image(v-if="row.status==='Ready for Delivery'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+                img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
     .tasks__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
