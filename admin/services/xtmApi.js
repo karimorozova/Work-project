@@ -1,10 +1,10 @@
 const unirest = require('unirest');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
-const { metricsCalc } = require('../projects/calculations');
+const { taskMetricsCalc, metricsCalc } = require('../projects/calculations');
+const { Clients } = require('../models');
 
 function saveTasks(object) {
-
     return new Promise(resolve => {
         unirest.post(`${xtmBaseUrl}/rest-api/projects`)
         .headers({"Authorization": xtmToken,
@@ -58,16 +58,26 @@ function saveTemplateTasks(object) {
     })    
 }
 
-function getMetrics(projectId) {
+function getMetrics({projectId, customerId}) {
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
-        .end(response => {
+        .end(async (response) => {
             if(response.error) {
-                return reject(response.error)
+                console.log("Error on getting metrics ");
+                reject(response.error);
             }
-            resolve(response.body)
+            try {
+                const metrics = response.body[0];
+                const { xtmMetrics, progress } = await metricsCalc(metrics);
+                const customer = await Clients.findOne({"_id": customerId});    
+                const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
+                resolve({taskMetrics, progress});
+            } catch(err) {
+                console.log("Error on getting metrics ");
+                reject(err);
+            }
         })
     })
 }

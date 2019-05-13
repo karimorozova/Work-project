@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services, Pricelist } = require('../models');
 const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
-const { receivablesCalc, payablesCalc, updateProjectCosts, getProject, updateProject, updateTaskMetrics, setDefaultStepVendors } = require('../projects/');
+const { payablesCalc, updateProjectCosts, getProject, updateProject, updateTaskMetrics, setDefaultStepVendors, getProjectWithUpdatedFinance } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
@@ -43,19 +43,7 @@ router.get('/costs', async (req, res) => {
   const { projectId } = req.query;
   try {
     let project = await getProject({"_id": projectId});
-    let projectToUpdate = {...project._doc, id: projectId};
-    for(let task of projectToUpdate.tasks) {
-      for(let step of projectToUpdate.steps) {
-        if(step.taskId === task.taskId) {
-          const receivables = step.finance['Price'].receivables ? {rate: step.clientRate, cost: step.finance['Price'].receivables}
-          : await receivablesCalc({task, project: projectToUpdate, step});
-          step.clientRate = receivables.rate;
-          step.finance['Price'].receivables = receivables.cost;
-        }
-      }
-      task.finance['Price'].receivables = projectToUpdate.steps.filter(item => item.taskId === task.taskId)
-      .reduce((init,cur) => init + +cur.finance['Price'].receivables, 0).toFixed(2);
-    }
+    let projectToUpdate = await getProjectWithUpdatedFinance(project);
     const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
     projectToUpdate.steps = steps;
     projectToUpdate.tasks = tasks;

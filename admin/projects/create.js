@@ -74,8 +74,8 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
             $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: newTasksInfo.service, projectId: xtmProject.projectId, 
                 start: project.createdAt, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
                 status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, receivables: "", 
-                payables: "", check: false, finance: {'Wordcount': {receivables: "", payables: ""}, 
-                'Price': {receivables: "", payables: ""}}}}}
+                payables: "", check: false, finance: {'Wordcount': {receivables: 0, payables: 0}, 
+                'Price': {receivables: 0, payables: 0}}}}}
             );
     } catch(err) {
         console.log(err);

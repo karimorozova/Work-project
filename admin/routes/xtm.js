@@ -3,6 +3,7 @@ const { upload } = require('../utils/');
 const { Projects, Clients } = require('../models');
 const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress, generateTargetFile } = require('../services/');
 const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
+const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
 const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -53,27 +54,24 @@ router.post('/update-matrix', async (req, res) => {
     }
 })
 
-router.get('/project-metrics', async (req, res) => {
-    const { projectId, customerId } = req.query;
+// router.get('/project-metrics', async (req, res) => {
+//     const { projectId, customerId } = req.query;
+//     try {
+//         const { taskMetrics, progress } = await getMetrics({projectId, customerId});
+//         // const updatedProject = await updateProjectMetrics({projectId, taskMetrics, progress});
+//         // res.send(updatedProject);
+//         res.send({taskMetrics, progress});
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send("Error on getting metrics ");
+//     }
+// })
+
+router.get('/metrics', async (req, res) => {
+    const { projectId } = req.query;
     try {
-        unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end(async (response) => {
-            if(response.error) {
-                throw new Error(response.error);
-            }
-            try {
-                const metrics = response.body[0];
-                const { xtmMetrics, progress } = await metricsCalc(metrics);
-                const customer = await Clients.findOne({"_id": customerId});    
-                const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
-                res.send({taskMetrics, progress});
-            } catch(err) {
-                console.log(err);
-                res.status(500).send("Error on getting metrics ");
-            }
-        })
+        const updatedProject = await updateProjectMetrics({projectId});
+        res.send("ok");
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting metrics ");
@@ -89,7 +87,7 @@ router.get('/update-progress', async (req, res) => {
         for(let task of tasks) {
             const { progress } = await getTaskProgress(task);
             steps = updateStepsProgress({task, steps, progress});
-            task.status = areAllStepsCompleted(steps, task.taskId) ? "Ready for Delivery" : task.status;
+            task.status = areAllStepsCompleted(steps, task.taskId) ? "Pending Approval" : task.status;
         }
         const result = await updateProject({"_id": projectId}, { steps, tasks });
         res.send(result);
@@ -100,109 +98,20 @@ router.get('/update-progress', async (req, res) => {
 })
 
 router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
-    let project = new Projects(req.body);
-    let todayStart = new Date();
-    todayStart.setUTCHours(0,0,0,0);
-    let todayEnd = new Date(todayStart);
-    todayEnd.setUTCHours(23,59,59,0);
-    let todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
-    let nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
-    project.status = "Open";
-    project.projectId = req.body.dateFormatted + ' ' + nextNumber;
-    let date = req.body.dateFormatted;
-    let xtmData = req.body;
-    let sourceLanguage = JSON.parse(xtmData.sourceLanguage);
-    let targetLanguages = JSON.parse(xtmData.targetLanguages);
-    project.sourceLanguage = sourceLanguage;
-    project.targetLanguages = targetLanguages;
-    let templateId;
-    let workflowId;
-    if(xtmData.template) {
-        templateId = xtmData.template;
-    }
-    if(xtmData.workflow) {
-        workflowId = xtmData.workflow;
-    }
-    let symbol = sourceLanguage.symbol.split('-');
-    let source = symbol[0].toLowerCase() + '_' + symbol[1];
-    let target = [];
-
-    const { sourceFiles, refFiles } = req.files;
-    let detFile = "";
-    if (sourceFiles) {
-        detFile = sourceFiles[0].path;
-    }
-
-    for(let i  = 0; i < targetLanguages.length; i++) {
-        target.push(targetLanguages[i].xtm);
-    }
-    let ids = [];
-    for(let i = 0; i < target.length; i++) {
-        let name = date + ` ${nextNumber} ` + '- ' + xtmData.projectName + ' (' + target[i].toUpperCase() + ') ';
-        let proj;
-        if(xtmData.customerId) {
-            proj = await saveTemplateTasks({
-                customerId: xtmData.customerId,
-                name: name,
-                source: source,
-                target: target[i],
-                file: detFile,
-                templateId: templateId,
-                workflowId: workflowId
-            });
-        } else {
-            proj = await saveTasks({
-                customerId: 23,
-                name: name,
-                source: source,
-                target: target[i],
-                file: detFile
-            });
-        }
-        project.xtmId = proj.body.projectId;
-        ids.push(proj.body.jobs[0].jobId);
-        project.jobs.push({id: proj.body.jobs[0].jobId, sourceLanguage: sourceLanguage.lang, targetLanguage: targetLanguages[i].lang, status: "In Progress", wordcount: "", cost: ""});
-        if(target.length - i == 1) {
-            await project.save();
-            let finalArray = await ids;
-            res.send(finalArray);
-            setTimeout(() => {
-                fs.unlink(detFile, (err) => {
-                    if(err) {
-                        console.log(err)
-                    }
-                });
-            },2000);
-        }    
-    }
+    res.send("ok");
 })
 
 router.get('/xtm-customers', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/customers`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'}) 
-        .end((response) => {
-            res.send(response.body);
-        })
-})
-
-router.get('/xtm-clientinfo', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/customers?fetchAddress=YES&ids=${req.query.id}`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'}) 
-        .end((response) => {
-            res.send(response.body);
-        })
-})
-
-router.post('/saveproject', async (req, res) => {
-    const project = { ...req.body };
     try {
-        const savedProject = await Projects.updateOne({"_id": project._id}, project);
-        res.send('Project saved!');
+        unirest.get(`${xtmBaseUrl}/rest-api/customers`)
+            .headers({"Authorization": xtmToken,
+            'Content-Type': 'application/json'}) 
+            .end((response) => {
+                res.send(response.body);
+            })
     } catch(err) {
         console.log(err);
-        res.status(500).send('Something wrong with project saving... ' + err);
+        console.log("Error on getting customers from XTM");
     }
 })
 
@@ -213,91 +122,8 @@ router.post('/update-project', async (req, res) => {
         res.send(savedProject);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Something wrong with project saving... ' + err);
+        res.status(500).send('Error on updating project');
     }
-})
-
-router.post('/savejobs', async (req, res) => {
-    const jobs = req.body.jobs;
-    const projectId = req.body.id;
-    try {
-        await Projects.updateOne({"_id": projectId}, {$set: {"jobs": jobs, metrics: true}});
-        res.send("Jobs saved")
-    }
-    catch(err) {
-        console.log(err)
-        res.status(500).send('Error on Jobs saving ' + err)
-    }
-})
-
-router.get('/newproject', async (req, res) => {
-    unirest.post(`${xtmBaseUrl}/rest-api/projects`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'multipart/form-data'}) 
-        .field('customerId', 23)
-        .field('name',  'Project-Test')
-        .field('sourceLanguage', 'pl_PL')
-        .field('targetLanguages', 'en_GB')
-        .field('workflowId', 2890)
-        .end( (response) => {
-            res.send('Done')
-        })
-})
-
-router.get('/metrics', async (req, res) => {
-    const projectId = parseInt(req.query.projectId);
-    try {
-        const result = await getMetrics(projectId);
-        res.send(result)
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting metrics " + err)
-    }
-})
-
-router.get('/status', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/status?fetchLevel=STEPS`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end( (response) => {
-        res.send(response.body)
-        })
-})
-
-router.get('/estimates', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/proposal`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end( (response) => {
-        res.send(response.body)
-        })
-})
-
-router.get('/jobs-metrics', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/projects/${req.query.projectId}/metrics/jobs?jobIds=${req.query.jobId}`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end( (response) => {
-        res.send(response.body)
-        })
-})
-
-router.get('/customer-projects', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/projects?customerIds=5041&Ids=5500`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end( (response) => {
-        res.send(response.body)
-        })
-})
-
-router.get('/projects-analysis', async (req, res) => {
-    unirest.get(`${xtmBaseUrl}/rest-api/projects/5500/analysis?fetchLevel=JOBS`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'application/json'})
-        .end( (response) => {
-        res.send(response.body)
-        })
 })
 
 router.get('/xtmwords', async (req, res) => {
@@ -341,9 +167,7 @@ router.get('/xtmwords', async (req, res) => {
     }
 
     xhr.onload = function (){
-    // let results = '<?xml version="1.0" encoding="UTF-8"?><soap:Envelope' + xhr.responseText.split('<soap:Envelope')[1].split('--uuid')[0];
     let results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
-    // console.log(parser.toJson(results));
     let object = JSON.parse(parser.toJson(results));
     let wordsTotal = object.projectMetrics.coreMetrics.totalWords;
     res.send(wordsTotal);

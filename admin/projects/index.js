@@ -5,6 +5,7 @@ const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setSte
     updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile } = require('./updates');
 const { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('./emails');
 const  { createProject, createTasks } = require('./create');
+const { getProjectWithUpdatedFinance } = require('./metrics');
 
 module.exports = {
     metricsCalc,
@@ -36,5 +37,6 @@ module.exports = {
     notifyClientTaskReady,
     getDeliverablesLink,
     sendClientDeliveries,
-    notifyDeliverablesDownloaded
+    notifyDeliverablesDownloaded,
+    getProjectWithUpdatedFinance
 }

@@ -64,16 +64,6 @@ export default {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
             }
         },
-        async getAllXtmCustomers() {
-            try {
-                if(!this.allXtmCustomers.length) {
-                    let result = await this.$http.get('/xtm/xtm-customers');
-                    this.xtmCustomersGetting(result.body);
-                }
-            } catch(err) {
-                this.alertToggle({message: "Error on getting XTM customers", isShow: true, type: "error"});
-            }
-        },
         closeSevLangs(data) {
             this.addSeveral = false
         },
@@ -108,8 +98,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            allClients: "getClients",
-            allXtmCustomers: "getXtmCustomers"
+            allClients: "getClients"
         }),
     },
     components: {

@@ -81,7 +81,7 @@ async function payablesCalc({task, project, step}) {
             return item.industry.id === project.industry.id
         }) : "";
         const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-        const rate = rateIndustry ? rateIndustry.rates[service.id].value : basicRate;
+        const rate = rateIndustry && rateIndustry.rates[service.id].value ? rateIndustry.rates[service.id].value : basicRate;
         step.finance['Price'].payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
         : calcCost(metrics, 'vendor', rate);
         step.vendorRate = rate;
@@ -217,7 +217,6 @@ async function updateProjectCosts(project) {
     let finance = {};
     finance['Wordcount'] = getWordsData(project);
     finance['Price'] = {'receivables': receivables, 'payables': payables};
-    let projectToUpdate = {};
     let discount = {};
     if(project.finance['Discount']) {
         discount = {...project.finance['Discount']};
@@ -225,9 +224,8 @@ async function updateProjectCosts(project) {
         finance['Price'].receivables -= discount.receivables;
         finance['Discount'] = discount;
     }
-    projectToUpdate = {...project, finance};
     try {
-        return await updateProject({"_id": project.id}, projectToUpdate);
+        return await updateProject({"_id": project.id}, {...project, finance});
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectCosts");

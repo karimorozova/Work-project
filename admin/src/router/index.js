@@ -20,7 +20,6 @@ import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Users from '@/components/Table/Users'
-import Clientrequest from '@/components/request-forms/Clientrequest'
 import ClientDetails from '@/components/clients/ClientDetails'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewClientInfo from '@/components/clients/NewClientInfo'
@@ -239,11 +238,6 @@ const router = new Router({
           path: 'reports',
           name: 'reports',
           component: ReportsSettings
-        },
-        {
-          path: 'translation-request',
-          name: 'translation',
-          component: Clientrequest
         }
       ]
     },

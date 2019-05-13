@@ -104,8 +104,8 @@ export default {
         wordsCalculation(metrics) {
             const repetitions = Object.keys(metrics).filter(item => {
                 return this.excludeKeys.indexOf(item) === -1;
-            }).reduce((init, cur) => {
-                return init + metrics[cur].value;
+            }).reduce((prev, cur) => {
+                return prev + metrics[cur].value;
             }, 0);
             const receivables = metrics.totalWords - metrics.nonTranslatable;
             const payables = receivables - repetitions;
@@ -126,61 +126,63 @@ export default {
                 if(this.currentProject.isMetricsExist) {
                     return await this.updateProgress();
                 }
-                let project = JSON.stringify(this.currentProject);
-                project = JSON.parse(project);
-                for(let task of project.tasks) {
-                    const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
-                    const { taskMetrics, progress } = metrics.body;
-                    task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
-                    task.finance.Wordcount = this.wordsCalculation(task.metrics);
-                    const keysArr = Object.keys(progress);
-                    for(const key in progress) {
-                        const existedTask = project.steps.find(item => {
-                            return item.taskId === task.taskId && item.name === key
-                        })
-                        if(!existedTask) {
-                            const {startDate, deadline} = this.getStepsDates({task, key});
-                            if(key !== "jobsMetrics") {
-                                project.steps.push({
-                                    taskId: task.taskId,
-                                    name: key,
-                                    source: task.sourceLanguage,
-                                    target: task.targetLanguage,
-                                    vendor: null,
-                                    start: startDate,
-                                    deadline: deadline,
-                                    progress: this.setStepsProgress(key, progress),
-                                    status: "Created",
-                                    receivables: "",
-                                    payables: "",
-                                    clientRate: "",
-                                    finance: {
-                                        'Wordcount': { ...task.finance.Wordcount },
-                                        'Price': {receivables: "", payables: ""}
-                                    },
-                                    vendorRate: "",
-                                    margin: "",
-                                    check: false,
-                                    vendorsClickedOffer: [],
-                                    isVendorRead: false
-                                })
-                            }
-                        } else {
-                            for(const step of project.steps) {
-                                if(step.taskId === task.taskId) {
-                                    step.progress = progress[step.name];
-                                }
-                            }
-                        }
-                    }
-                }
-                project.isMetricsExist = true;
-                await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
-                const updatedProject = await this.$http.get(`/service/costs?projectId=${project._id}`);
+                await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
+                // let project = JSON.stringify(this.currentProject);
+                // project = JSON.parse(project);
+                // for(let task of project.tasks) {
+                //     const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
+                //     const { taskMetrics, progress } = metrics.body;
+                //     task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
+                //     task.finance.Wordcount = this.wordsCalculation(task.metrics);
+                //     const keysArr = Object.keys(progress);
+                //     for(const key in progress) {
+                //         const existedTask = project.steps.find(item => {
+                //             return item.taskId === task.taskId && item.name === key
+                //         })
+                //         if(!existedTask) {
+                //             const {startDate, deadline} = this.getStepsDates({task, key});
+                //             if(key !== "jobsMetrics") {
+                //                 project.steps.push({
+                //                     taskId: task.taskId,
+                //                     name: key,
+                //                     source: task.sourceLanguage,
+                //                     target: task.targetLanguage,
+                //                     vendor: null,
+                //                     start: startDate,
+                //                     deadline: deadline,
+                //                     progress: this.setStepsProgress(key, progress),
+                //                     status: "Created",
+                //                     receivables: "",
+                //                     payables: "",
+                //                     clientRate: "",
+                //                     finance: {
+                //                         'Wordcount': { ...task.finance.Wordcount },
+                //                         'Price': {receivables: "", payables: ""}
+                //                     },
+                //                     vendorRate: "",
+                //                     margin: "",
+                //                     check: false,
+                //                     vendorsClickedOffer: [],
+                //                     isVendorRead: false
+                //                 })
+                //             }
+                //         } else {
+                //             for(let step of project.steps) {
+                //                 if(step.taskId === task.taskId) {
+                //                     step.progress = progress[step.name];
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                // project.isMetricsExist = true;
+                // await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
+                const updatedProject = await this.$http.get(`/service/costs?projectId=${this.currentProject._id}`);
                 await this.storeProject(updatedProject.body);
                 this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
+                console.log(err);
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
             }
         },
@@ -198,8 +200,8 @@ export default {
             let startDate = task.start; 
             let deadline = task.deadline; 
             if(task.stepsDates.length) {
-                const startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
-                const deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
+                startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
+                deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
             }
             return {startDate, deadline};
         },
