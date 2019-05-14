@@ -1,5 +1,5 @@
 <template lang="pug">
-.add-several(v-click-outside="closeSeveral")
+.add-several
     .add-several__main
         .add-several__close
             span.add-several__close-icon(@click="closeSeveral") +
@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import ClickOutside from "vue-click-outside";
 import ServiceMultiSelect from "../ServiceMultiSelect";
 import IndustrySelect from "../IndustrySelect";
 import SelectSingle from "../SelectSingle";
@@ -279,10 +278,7 @@ export default {
         ValidationErrors,
         LangsManage
     },
-    directives: {
-        ClickOutside
-    },
-    mounted() {
+    created() {
         this.getPricelists();
     }
 }

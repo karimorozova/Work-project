@@ -226,7 +226,7 @@ export default {
         ValidationErrors,
         NewPricelist
     },
-    mounted() {
+    created() {
         this.getPricelists();
     }
 }
