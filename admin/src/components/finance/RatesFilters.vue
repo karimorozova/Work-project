@@ -63,7 +63,7 @@ export default {
     },
     computed: {
         filteredServices() {
-            return this.serviceSelect.map(item => item.title);
+            return this.serviceSelect.length ? this.serviceSelect.map(item => item.title) : [];
         },
         filterIndustry() {
             let result = [];

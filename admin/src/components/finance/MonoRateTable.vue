@@ -383,7 +383,7 @@ export default {
     },
     computed: {
         servicesIds() {
-            return this.serviceSelect.map(item => item._id);
+            return this.serviceSelect.length ? this.serviceSelect.map(item => item._id) : [];
         },
         infoIndustries() {
             let result = [];
