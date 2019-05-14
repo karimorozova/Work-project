@@ -123,7 +123,7 @@ export default {
             ],
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
             stepsCounter: 2,
-            stepsDates: [{start: new Date(), deadline: new Date()}, {start: new Date(), deadline: new Date()}],
+            stepsDates: [{start: new Date(), deadline: ""}, {start: "", deadline: new Date()}],
             sourceFiles: [],
             refFiles: [],
             isStepsShow: false,
@@ -155,19 +155,7 @@ export default {
         },
         setWorkflow({option}) {
             const workFlow = this.workflowSteps.find(item => item.name === option);
-            this.stepsCounter = workFlow.id === 2890 ? 1 : 2;
-            this.getStepsDates(this.stepsCounter);
             this.$emit("setValue", { option: workFlow, refersTo: 'selectedWorkflow' });
-        },
-        getStepsDates(counter) {
-            if(counter === 1 && this.stepsDates.length === 2) {
-                this.stepsDates.pop();
-            } else {
-                this.stepsDates.push({
-                    start: this.currentProject.createdAt,
-                    deadline: this.currentProject.deadline
-                })
-            }
         },
         defaultStepDates() {
             this.stepsDates = [
@@ -227,6 +215,11 @@ export default {
             }
             return false;
         },
+        checkFirstStepDeadline() {
+            if(this.selectedWorkflow.id !== 2890) {
+                return this.stepsDates[0].deadline
+            }
+        },
         async checkForErrors() {
             let errors = [];
             if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
@@ -234,6 +227,7 @@ export default {
             if(!this.targetLanguages.length) errors.push("Please, select Target language(s).");
             if(!this.sourceFiles.length) errors.push("Please, upload Source file(s).");
             if(this.sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
+            if(!this.checkFirstStepDeadline()) errors.push("Please, set the deadline for Step 1.");
             if(errors.length) {
                 return this.$emit("showErrors", { errors });
             }
