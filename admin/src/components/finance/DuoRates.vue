@@ -252,9 +252,7 @@ export default {
                     await this.getServices();
                 }
             } catch(err) { }
-            let defaultServ = this.vuexServices.find(item => {
-                return item.symbol === 'tr';
-            });
+            let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {

@@ -259,9 +259,7 @@ export default {
                     await this.getServices();
                 }
             } catch(err) { }
-            let defaultServ = this.vuexServices.find(item => {
-                return item.symbol === 'tr';
-            });
+            let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {
@@ -290,7 +288,7 @@ export default {
             fullInfo: "getClientDuoCombs"
         }),
         servicesIds() {
-            return this.serviceSelect.map(item => item._id);
+            return this.serviceSelect.length ? this.serviceSelect.map(item => item._id) : [];
         },
         infoIndustries() {
             let result = [];
