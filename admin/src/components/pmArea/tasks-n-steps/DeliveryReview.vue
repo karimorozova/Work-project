@@ -24,8 +24,8 @@
             Options(v-if="areOptions"
                 :isDeliver="isDeliver"
                 :isNotify="isNotify"
-                @toggleDelivery="(e) => toggle(e, 'isDeliver')"
-                @toggleNotify="(e) => toggle(e, 'isNotify')"
+                @toggleDelivery="toggleDelivery"
+                @toggleNotify="toggleDelivery"
             )
         .review__button
             Button(v-if="isAllChecked"
@@ -83,6 +83,10 @@ export default {
                 }, [])
                 this.stepFiles.push(...files);
             }
+        },
+        toggleDelivery({bool}) {
+            this.isDeliver = bool;
+            this.isNotify = !bool;
         },
         toggle(e, prop) {
             this[prop] = !this[prop];

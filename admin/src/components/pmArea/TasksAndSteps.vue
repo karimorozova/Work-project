@@ -97,8 +97,8 @@ export default {
         setDate({date, prop, index}) {
             this.$emit("setDate", {date, prop, index});
         },
-        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service}) {
-            let tasksData = new FormData()
+        getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, service}) {
+            let tasksData = new FormData();
             tasksData.append('customerId', xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', template.id);
@@ -110,6 +110,10 @@ export default {
             tasksData.append('projectId', this.currentProject._id);
             tasksData.append('projectName', this.currentProject.projectName);
             tasksData.append('join', isJoinfiles);
+            return tasksData;
+        },
+        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service}) {
+            let tasksData = this.getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, service});
             if(sourceFiles.length) {
                 for(let file of sourceFiles) {
                     tasksData.append('sourceFiles', file)

@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { Projects, Clients } = require('../models');
-const { saveTasks, saveTemplateTasks, getMetrics, getRequestOptions, getTaskProgress, generateTargetFile } = require('../services/');
-const { getProject, updateProject, updateProjectCosts, metricsCalc, createTasks, calcCost, taskMetricsCalc, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
+const { getRequestOptions, getTaskProgress, generateTargetFile } = require('../services/');
+const { getProject, updateProject, updateProjectCosts, createTasks, calcCost, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
 const unirest = require('unirest');

@@ -240,10 +240,10 @@ function hasRateValue({service, vendorIndustries, stepIndustry}) {
 }
 
 async function updateProjectCosts(project) {
-    let receivables = project.tasks.reduce((prev, current) => {
+    let receivables = +project.tasks.reduce((prev, current) => {
         return +prev + +current.finance['Price'].receivables
     }, 0).toFixed(2);
-    const payables = project.tasks.reduce((prev, current) => {
+    const payables = +project.tasks.reduce((prev, current) => {
         return +prev + +current.finance['Price'].payables
     }, 0).toFixed(2);
     let finance = {};

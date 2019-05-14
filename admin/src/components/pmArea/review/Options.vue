@@ -1,21 +1,17 @@
 <template lang="pug">
     .options
-        .options__item(:class="{'options_brown': isDeliver}" @click="toggleDelivery") Deliver to Client
-        .options__item(:class="{'options_brown': isNotify}" @click="toggleNotify") Notify Client
+        .options__item(:class="{'options_brown': isDeliver}" @click="(e) => toggleDelivery(e, true)") Deliver to Client
+        .options__item(:class="{'options_brown': !isDeliver}" @click="(e) => toggleDelivery(e, false)") Notify Client
 </template>
 
 <script>
 export default {
     props: {
-        isDeliver: {type: Boolean}, 
-        isNotify: {type: Boolean}, 
+        isDeliver: {type: Boolean},
     },
     methods: {
-        toggleDelivery() {
-            this.$emit("toggleDelivery")
-        },
-        toggleNotify() {
-            this.$emit("toggleNotify")
+        toggleDelivery(e, bool) {
+            this.$emit("toggleDelivery", { bool })
         }
     }
 }

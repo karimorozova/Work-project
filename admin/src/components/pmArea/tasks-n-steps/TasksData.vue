@@ -251,19 +251,11 @@ export default {
                     await this.getCustomersFromXtm();
                 }
             } catch(err) { }
-            const xtmCustomer = this.xtmCustomers.find(item => {
-                return item.name === this.currentProject.customer.name
-            });
+            const xtmCustomer = this.xtmCustomers.find(item => item.name === this.currentProject.customer.name);
             const xtmId = xtmCustomer ? xtmCustomer.id : "";
-            const template = this.template ? this.templates.find(item => {
-                    return item.name === this.template
-                }) : {id: ""}
-            const source = this.languages.find(item => {
-                return item.symbol === this.sourceLanguage[0];
-            })
-            const service = this.services.find(item => {
-                return item.title === this.service
-            })
+            const template = this.template ? this.templates.find(item => item.name === this.template) : {id: ""};
+            const source = this.languages.find(item => item.symbol === this.sourceLanguage[0]);
+            const service = this.services.find(item => item.title === this.service);
             return { xtmId, template, source, service };
         },
         async addTasks() {
