@@ -48,7 +48,7 @@
           img.jobs__icon(v-if="progress(row.progress) >= 100" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
         .jobs__icons(v-if="isApproveReject(row)")
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
-        .jobs__icons(v-if="row.status === 'Accepted'")
+        .jobs__icons(v-if="isEnterIcon(row.status)")
           img.jobs__icon(src="../../../../../assets/images/enter-icon.png")
 </template>
 
@@ -112,6 +112,10 @@
       },
       showModal(index) {
         this.$emit("showModal", { index });
+      },
+      isEnterIcon(status) {
+        const statuses = ["Accepted", "Ready to Start", "Waiting to Start", "Started"];
+        return statuses.indexOf(status) !== -1;
       }
     },
     components: {

@@ -19,7 +19,7 @@
                     text="Are you sure you have completed your job and reviewed your work?"
                     approveValue="Complete" 
                     notApproveValue="Cancel")
-            Forbidden(v-if="isForbidden")
+            Forbidden(v-if="isForbidden" :message="forbiddenMessage")
 </template>
 
 <script>
@@ -33,7 +33,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-            isApproveModal: false
+            isApproveModal: false,
+            statuses: ["Quote sent", "Draft", "Requested"]
         }
     },
     methods: {
@@ -103,7 +104,17 @@ export default {
                 const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
                 return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
             }
+            if(this.job.name === "translate1" && this.statuses.indexOf(this.job.projectStatus) !== -1) {
+                return true;
+            } 
             return false;
+        },
+        forbiddenMessage() {
+            let message = "Project hasn't been approved yet.";
+            if(this.statuses.indexOf(this.job.projectStatus) === -1) {
+                message = "Sorry, you can't start the job until previous job is completed!";
+            }
+            return message;
         }
     },
     components: {

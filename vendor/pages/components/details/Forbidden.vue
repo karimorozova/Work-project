@@ -1,11 +1,13 @@
 <template lang="pug">
     .forbidden
-        p.forbidden__message Sorry, you can't start the job until previous job is completed!    
+        p.forbidden__message {{ message }}    
 </template>
 
 <script>
 export default {
-    
+    props: {
+        message: {type: String}
+    }
 }
 </script>
 
