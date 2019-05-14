@@ -11,7 +11,7 @@
     .project__all-info
         .project__info-row
             input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
-            input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name")
+            input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
             .project__date
                 LabelValue(label="Start Date and Time" :isRequired="isRequiredField")
                     Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
@@ -122,8 +122,13 @@ export default {
         closeErrors() {
             this.areErrorsExist = false;
         },
+        checkProjectName() {
+            const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
+            return regex.test(this.project.projectName);
+        },
         async checkForErrors() {
             this.errors = [];
+            if(!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.");
             if(!this.project.createdAt) this.errors.push("Please, set the start date.");
             if(!this.project.deadline) this.errors.push("Please, set the deadline date.");
             if(!this.project.customer.name) this.errors.push("Please, select a Client.");
@@ -204,8 +209,6 @@ export default {
     },
     created() {
         this.getCustomers();
-    },
-    mounted() {
         this.getIndustries();
     }
 }
