@@ -357,6 +357,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .duo-rates {
     position: relative;
     font-family: MyriadPro;
