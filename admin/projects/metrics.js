@@ -25,11 +25,11 @@ async function getProjectWithUpdatedFinance(project) {
     try {
         for(let step of steps) {
             let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);           
-            const receivables = step.finance.Price.receivables ? {rate: step.clientRate, cost: step.finance.Price.receivables}
+            const receivables = step.finance.Price.receivables ? {rate: step.clientRate, cost: +step.finance.Price.receivables}
             : await receivablesCalc({task: tasks[taskIndex], project: projectToUpdate, step});
             step.clientRate = receivables.rate;
             step.finance.Price.receivables = receivables.cost;
-            tasks[taskIndex].finance.Price.receivables += +step.finance.Price.receivables;
+            tasks[taskIndex].finance.Price.receivables = +(tasks[taskIndex].finance.Price.receivables+step.finance.Price.receivables).toFixed(2);
         }
         return {...projectToUpdate, tasks, steps};
     } catch(err) {

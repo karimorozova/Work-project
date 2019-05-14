@@ -126,7 +126,6 @@ export default {
             }
             try {
                 await this.addProjectTasks(tasksData);
-                this.$emit("tasksAdded", {id: this.currentProject._id});
                 this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
                 this.clearTasksFormData();
             } catch(err) {

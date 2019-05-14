@@ -10,7 +10,7 @@ async function notifyVendors(steps) {
             if(step.vendor && (step.status === 'Cancelled' || step.status === 'Cancelled Halfway')) {
                 const message = vendorNotificationMessage(step);
                 step["to"] = step.vendor.email;
-                step.subject = "Step cancelling notification!";
+                step.subject = "Step cancelling notification! (ID V007)";
                 await sendEmail(step, message);
             }
         }
@@ -42,7 +42,7 @@ async function taskCompleteNotifyPM(project, task) {
     try {
         const manager = await User.findOne({"_id": project.projectManager.id}, {email: 1});
         const message = await getPMnotificationMessage(project, task);
-        await managerNotifyMail(manager, message, "Task finish notification");
+        await managerNotifyMail(manager, message, "Task finish notification (ID I002)");
     } catch(err) {
         console.log(err);
         console.log("Error in taskCompleteNotifyPM");
@@ -68,7 +68,7 @@ async function notifyClientTaskReady({taskIds, project}) {
         const contact = project.customer.contacts.find(item => item.leadContact);
         for(let taskId of taskIds) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: "TASK READY"}, message);
+            await sendEmail({to: contact.email, subject: "TASK READY (ID C014)"}, message);
         }
     } catch(err) {
         console.log(err);
@@ -81,7 +81,7 @@ async function sendClientDeliveries({taskIds, project}) {
         const contact = project.customer.contacts.find(item => item.leadContact);
         for(let taskId of taskIds) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: "DELIVERY"}, message);
+            await sendEmail({to: contact.email, subject: "DELIVERY (ID C013)"}, message);
         }
     } catch(err) {
         console.log(err);
@@ -97,8 +97,8 @@ async function notifyDeliverablesDownloaded(taskId, project) {
             manager: projectManager, taskId, project_id: project.projectId})
         const accManagerMessage = deliverablesDownloadedMessage({
             manager: accManager, taskId, project_id: project.projectId})
-        await managerNotifyMail(projectManager, pmMessage, "Task delivery notification");
-        await managerNotifyMail(accManager, accManagerMessage, "Task delivery notification");
+        await managerNotifyMail(projectManager, pmMessage, "Task delivery notification (ID I006)");
+        await managerNotifyMail(accManager, accManagerMessage, "Task delivery notification (ID I006)");
     } catch(err) {
         console.log(err);
         console.log("Error in notifyDeliverablesDownloaded");

@@ -6,7 +6,6 @@
         ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
     .project-info__all-info
         TasksAndSteps(
-            @tasksAdded="tasksAdded"
             @getMetrics="getMetrics"
             @setVendor="setVendor"
             @setDate="setDate"
@@ -64,9 +63,6 @@ export default {
             sendClientQuote: "sendClientQuote",
             sendProjectDetails: "sendProjectDetails"
         }),
-        tasksAdded({id}) {
-            this.$emit("tasksAdded", { id });
-        },
         async toggleProjectOption({key}) {
             try {
                 const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
@@ -82,7 +78,6 @@ export default {
             }
             try {
                 await this.setStepVendor({vendor, index});
-                this.$emit("refreshProjects");
                 this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Internal service error. Cannot calculate payables for the step.", isShow: true, type: "error"})
@@ -115,7 +110,6 @@ export default {
             try {
                 const updatedData = await this.$http.get(`/xtm/update-progress?projectId=${this.currentProject._id}`);
                 await this.storeProject(updatedData.body);
-                this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are updated.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Cannot update metrics.", isShow: true, type: "error"})
@@ -129,7 +123,6 @@ export default {
                 await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
                 const updatedProject = await this.$http.get(`/service/costs?projectId=${this.currentProject._id}`);
                 await this.storeProject(updatedProject.body);
-                this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})

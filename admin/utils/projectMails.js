@@ -34,8 +34,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
     const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
     try {
-        await managerNotifyMail(projectManager, pmMessage, 'Quote Accepted but translators were not assigned');
-        await managerNotifyMail(salesManager, smMessage, 'Quote Accepted but translators were not assigned');
+        await managerNotifyMail(projectManager, pmMessage, 'Quote Accepted but translators were not assigned (ID I001)');
+        await managerNotifyMail(salesManager, smMessage, 'Quote Accepted but translators were not assigned (ID I001)');
     } catch(err) {
         throw new Error("Cannot send email to managers / managerEmailsSend");
     }
@@ -78,7 +78,7 @@ async function sendRequestToVendor(project, step) {
     requestInfo.brief = project.brief;
     const message = requestMessageForVendor(requestInfo);
     try {
-        await sendEmail({to: step.vendor.email, subject: 'Request Confirmation'}, message);
+        await sendEmail({to: step.vendor.email, subject: 'Request Confirmation (ID V001)'}, message);
     } catch(err) {
         throw new Error('Cannot send email to Vendor / sendRequestToVendor');
     }
@@ -92,7 +92,7 @@ async function sendEmailToContact(project, contact) {
         const service = await Services.findOne({"_id": project.tasks[0].service});
         projectInfo.service = service.title;
         const message = emailMessageForContact(projectInfo);
-        await clientQuoteEmail({contact, subject: 'Project information'}, message);
+        await clientQuoteEmail({contact, subject: 'Project information (ID C006)'}, message);
     } catch(err) {
         throw new Error('Cannot send email to contact / sendEmailToContact');
     }

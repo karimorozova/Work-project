@@ -63,10 +63,10 @@
                         .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
             template(slot="receivables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.receivables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.receivables") {{ row.finance.Price.receivables.toFixed(2) }}
+                span.tasks__task-data(v-if="row.finance.Price.receivables") {{ row.finance.Price.receivables }}
             template(slot="payables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.payables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.payables") {{ row.finance.Price.payables.toFixed(2) }}
+                span.tasks__task-data(v-if="row.finance.Price.payables") {{ row.finance.Price.payables }}
             template(slot="margin" slot-scope="{ row }")
                 span.tasks__money(v-if="+marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}

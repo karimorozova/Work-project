@@ -68,8 +68,7 @@ router.get('/update-progress', async (req, res) => {
     const { projectId } = req.query;
     try {
         const project = await getProject({"_id": projectId});
-        let steps = [...project.steps];
-        let tasks = [...project.tasks];
+        let {steps, tasks} = project;
         for(let task of tasks) {
             const { progress } = await getTaskProgress(task);
             steps = updateStepsProgress({task, steps, progress});

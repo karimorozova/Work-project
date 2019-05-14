@@ -12,21 +12,11 @@
                 @removeLangFilter="removeLangFilter"
                 @setFilter="setFilter"
             )
-        .all-projects__table(v-if="!showProjectDetails")
+        .all-projects__table
             ProjectsTable(
                 :allProjects="filteredProjects"
                 @selectProject="selectProject"
             )
-        .all-projects__project(v-if="showProjectDetails")
-            ProjectInfo(
-                :project="chosenProject"
-                @refreshProjects="refreshProjects"
-                @setProjectDefault="setProjectDefault"
-                @tasksAdded="tasksAdded"
-                :vendors="allVendors"
-            )
-        .all-projects__hide-details(v-if="showProjectDetails")
-            button.all-projects__but(@click="back") Back to projects
 </template>
 
 <script>
@@ -49,8 +39,6 @@ export default {
             projects: [],
             managers: [],
             jobs: [],
-            chosenProject: {},
-            showProjectDetails: false,
             jobsShow: false,
             selectedVendors: [{name: 'All'}],
         }
@@ -71,59 +59,13 @@ export default {
             this[to].push(lang.symbol);
         },
         selectProject({project}) {
-            this.chosenProject = project;
-            this.storeProject(this.chosenProject);
+            this.storeProject(project);
             this.$router.push(`/pm-project-details/${project._id}`);
-        },
-        setProjectDefault() {
-            this.$emit('setProjectDefault');
-        },
-        async tasksAdded({id}) {
-            await this.getProjects();
-            this.chosenProject = this.allProjects.find(item => {
-                return item._id === id
-            })
-        },
-        back() {
-            this.showProjectDetails = false;
-        },
-        changeVend(data) {
-            if(this.selectedVendors[0].name == 'All') {
-                this.selectedVendors = [];
-                this.selectedVendors.push(data.vendor);
-            } else {
-                if(this.filteredVendors.indexOf(data.vendor._id) != -1) {
-                    this.selectedVendors = this.selectedVendors.filter(item => {
-                        return item._id != data.vendor._id
-                    })
-                } else {
-                    this.selectedVendors.push(data.vendor);                    
-                }
-            }
-            if(!this.selectedVendors.length) {
-                this.selectedVendors = [{name: "All"}]
-            }
-        },
-        async refreshProjects() {
-            await this.getProjects();
         },
         async getProjects() {
             let projectsArray = await this.$http.get('/api/allprojects');
             this.projects = projectsArray.body;
             await this.setStoreProjects(projectsArray.body);
-        },
-        showJobs(id) {
-            this.jobsShow = true;
-            let project = this.allProjects.find(item => {
-                return item._id == id
-            });
-            this.jobs = project.jobs;
-        },
-        async sendMail(ind) {
-            let result = await this.$http.post('/clientsapi/mailtoclient', this.allProjects[ind]);
-        },
-        async vendorsMail() {
-            let result = await this.$http.post('/vendorsapi/mailtovendors', JSON.stringify(this.selectedVendors));
         },
         async getManagers() {
             const managers = await this.$http.get("/pm-manage/all-managers");
@@ -135,17 +77,6 @@ export default {
             allProjects: "getAllProjects",
             allCustomers: "getClients",
         }),
-        filteredVendors() {
-            let result = [];
-            if(this.selectedVendors[0].name == 'All') {
-                result = ["All"]
-            } else {
-                for(let ven of this.selectedVendors) {
-                    result.push(ven._id)
-                }
-            }
-            return result;
-        },
         filteredProjects() {
             let result = this.allProjects;
             if(this.statusFilter) {
@@ -209,70 +140,6 @@ export default {
     width: 1205px;
     box-shadow: 0 0 10px #68573E;
     padding: 15px;
-    &__hide-details {
-        margin-top: 20px;
-        width: 100%;
-        display: flex;
-        justify-content: flex-end;
-    }
-    &__but {
-        width: 160px;
-        padding: 3px;
-        color: white;
-        background-color: #D15F45;
-        border: none;
-        outline: none;
-        border-radius: 10px;
-        cursor: pointer;
-        box-shadow: 0 3px 10px #67573E;
-        &:active {
-            box-shadow: 0 0 5px #67573E;
-        }
-    }
-    &__arrows {
-        margin: 0 15px;
-    }
-}
-
-.vendors-select {
-    display: flex;
-    align-items: center;
-    &__title {
-        margin-bottom: 0;
-        margin-right: 10px;
-    }
-    .mail {
-        margin-left: 10px;
-    }
-}
-
-.buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-}
-
-.metrics {
-    width: 170px;
-    margin-right: 5px;
-    padding: 3px;
-    color: #FFF;
-    background-color: green;
-    cursor: pointer;
-}
-
-.mail {
-    width: 110px;
-    padding: 3px;
-    color: #FFF;
-    background-color: green;
-    cursor: pointer;
-}
-
-.disabled {
-    opacity: 0.4;
-    cursor: default;
 }
 
 </style>

@@ -62,8 +62,8 @@ async function receivablesCalc({task, project, step}) {
         } 
         const metrics = task.metrics;
         const rate = await getCustomerRate({task, industry: project.industry.id, customerId: project.customer.id});;
-        const cost = calcCost(metrics, 'client', rate);
-        return { cost, rate };
+        const cost = calcCost(metrics, 'client', rate).toFixed(2);
+        return { cost: +cost, rate };
     } catch(err) {
         console.log(err);
         console.log("Error in receivablesCalc");
@@ -104,8 +104,9 @@ async function payablesCalc({task, project, step}) {
 
 function getStepPayables({rate, metrics, step}) {
     let { finance } = step;
-    finance.Price.payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
-        : calcCost(metrics, 'vendor', rate);
+    const payables = step.name !== "translate1" ? metrics.totalWords*rate
+    : calcCost(metrics, 'vendor', rate);
+    finance.Price.payables = +payables.toFixed(2);
     return {...step, finance, vendorRate: rate};
 }
 
@@ -133,7 +134,7 @@ function calcCost(metrics, field, rate) {
         }
     }
     cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
-    return +cost.toFixed(2);
+    return cost;
 }
 
 async function getCustomerRate({task, industry, customerId}) {
@@ -169,7 +170,7 @@ async function calcProofingStep({task, project, words}) {
     try {
         const service = await getOneService({symbol: 'pr'});
         const rate = await getCustomerRate({task: {...task, "service": service.id}, industry: project.industry.id, customerId: project.customer.id});
-        const cost = (words*rate).toFixed(2);
+        const cost = +(words*rate).toFixed(2);
         return { cost, rate }
     } catch(err) {
         console.log(err);
@@ -189,7 +190,7 @@ async function setDefaultStepVendors(project) {
                 step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
                 step = await payablesCalc({task: tasks[taskIndex], project, step});
-                tasks[taskIndex].finance.Price.payables += +step.finance.Price.payables;
+                tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+step.finance.Price.payables).toFixed(2);
             }
         }
         return { steps, tasks };

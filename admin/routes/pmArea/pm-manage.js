@@ -88,7 +88,7 @@ router.post("/project-details", async (req, res) => {
     const { id, message } = req.body;
     try {
         const project = await getProject({"_id": id});
-        await clientQuoteEmail({...project.customer._doc, subject: "Project details"}, message);
+        await clientQuoteEmail({...project.customer._doc, subject: "Project details (ID C006)"}, message);
         res.send("Project details sent");
     } catch(err) {
         console.log(err);
@@ -101,7 +101,7 @@ router.post("/send-quote", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
-        await clientQuoteEmail({...project.customer._doc, subject }, message);
+        await clientQuoteEmail({...project.customer._doc, subject: `${subjec} (ID C001)` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {

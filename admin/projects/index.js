@@ -40,5 +40,5 @@ module.exports = {
     sendClientDeliveries,
     notifyDeliverablesDownloaded,
     getProjectWithUpdatedFinance,
-    getAfterPayablesUpdated
+    getAfterPayablesUpdated,
 }

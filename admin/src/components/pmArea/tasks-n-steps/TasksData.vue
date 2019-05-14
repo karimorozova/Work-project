@@ -219,6 +219,7 @@ export default {
             if(this.selectedWorkflow.id !== 2890) {
                 return this.stepsDates[0].deadline
             }
+            return true;
         },
         async checkForErrors() {
             let errors = [];
