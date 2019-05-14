@@ -1,4 +1,5 @@
-const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTaskMetrics, calcCost, taskMetricsCalc, setDefaultStepVendors } = require('./calculations');
+const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTaskMetrics, calcCost, 
+    taskMetricsCalc, setDefaultStepVendors, getAfterPayablesUpdated } = require('./calculations');
 const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, getDeliverablesLink } = require('./files');
 const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, 
@@ -38,5 +39,6 @@ module.exports = {
     getDeliverablesLink,
     sendClientDeliveries,
     notifyDeliverablesDownloaded,
-    getProjectWithUpdatedFinance
+    getProjectWithUpdatedFinance,
+    getAfterPayablesUpdated
 }

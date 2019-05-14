@@ -517,8 +517,8 @@ async function checkCollections() {
   await serviceDuoLangs();
   await fillDuoServiceRates();
   await fillMonoServiceRates();
-  await clientLangs();
-  await vendorLangs();
+  // await clientLangs();
+  // await vendorLangs();
   await fillPricelist();
 }
 

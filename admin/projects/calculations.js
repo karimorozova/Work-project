@@ -70,25 +70,56 @@ async function receivablesCalc({task, project, step}) {
     }
 }
 
+async function getAfterPayablesUpdated({projectId, step, index}) {
+    try {
+        const queryStr = `steps.${index}`;
+        let project = await updateProject({"_id": projectId}, {$set: {[queryStr]: step}});
+        let { tasks, steps } = project;
+        const taskIndex = tasks.findIndex(item => item.taskId == step.taskId);
+        const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.name === step.name);
+        tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, step.vendor._id);
+        steps[stepIndex] = await payablesCalc({task: tasks[taskIndex], project, step});
+        tasks[taskIndex].finance.Price.payables = steps.filter(item => item.taskId === tasks[taskIndex].taskId)
+        .reduce((prev, cur) => prev + +cur.finance.Price.payables, 0).toFixed(2);
+        return await updateProjectCosts({...project._doc, id: projectId, tasks, steps});
+      } catch(err) {
+        console.log(err);
+        console.log('Error in getAfterPayablesUpdated');
+      }
+}
+
 async function payablesCalc({task, project, step}) {
     try {
         const service = step.name !== "translate1" ? await Services.findOne({"symbol":'pr'}) 
         : await Services.findOne({"_id": task.service});
-        const metrics = task.metrics;
         const vendor = await getVendor({"_id": step.vendor._id});
+        const rate = getRate({task, project, vendor, service});
+        const { metrics } = task;
+        return getStepPayables({rate, metrics, step});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in payablesCalc");
+    }
+}
+
+function getStepPayables({rate, metrics, step}) {
+    let { finance } = step;
+    finance.Price.payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
+        : calcCost(metrics, 'vendor', rate);
+    return {...step, finance, vendorRate: rate};
+}
+
+function getRate({task, project, vendor, service}) {
+    try {
         const comb = getCombination({combs: vendor.languageCombinations, service, task});
         const rateIndustry = comb ? comb.industries.find(item => {
             return item.industry.id === project.industry.id
         }) : "";
         const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-        const rate = rateIndustry && rateIndustry.rates[service.id].value ? rateIndustry.rates[service.id].value : basicRate;
-        step.finance['Price'].payables = step.name !== "translate1" ? +(metrics.totalWords*rate).toFixed(2)
-        : calcCost(metrics, 'vendor', rate);
-        step.vendorRate = rate;
-        return step;
+        return rateIndustry && rateIndustry.rates[service.id].value ? rateIndustry.rates[service.id].value : basicRate;
     } catch(err) {
         console.log(err);
-        console.log("Error in payablesCalc");
+        console.log("Error in getRate");
     }
 }
 
@@ -158,6 +189,7 @@ async function setDefaultStepVendors(project) {
                 step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
                 step = await payablesCalc({task: tasks[taskIndex], project, step});
+                tasks[taskIndex].finance.Price.payables += +step.finance.Price.payables;
             }
         }
         return { steps, tasks };
@@ -208,11 +240,11 @@ function hasRateValue({service, vendorIndustries, stepIndustry}) {
 }
 
 async function updateProjectCosts(project) {
-    let receivables = project.tasks.reduce((init, current) => {
-        return +init + +current.finance['Price'].receivables
+    let receivables = project.tasks.reduce((prev, current) => {
+        return +prev + +current.finance['Price'].receivables
     }, 0).toFixed(2);
-    const payables = project.tasks.reduce((init, current) => {
-        return +init + +current.finance['Price'].payables
+    const payables = project.tasks.reduce((prev, current) => {
+        return +prev + +current.finance['Price'].payables
     }, 0).toFixed(2);
     let finance = {};
     finance['Wordcount'] = getWordsData(project);
@@ -247,10 +279,11 @@ function  wordsCalculation(task) {
     const excludeKeys = ["nonTranslatable", "totalWords"]
     const words = Object.keys(task.metrics).filter(item => {
         return excludeKeys.indexOf(item) === -1;
-    }).reduce((init, cur) => {
-        return init + task.metrics[cur].value;
+    }).reduce((prev, cur) => {
+        return prev + task.metrics[cur].value;
     }, 0)
     return words;
 }
 
-module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc };
+module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, 
+    updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc, getAfterPayablesUpdated };

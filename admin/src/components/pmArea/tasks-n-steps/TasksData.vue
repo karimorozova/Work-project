@@ -74,7 +74,7 @@
         .tasks-data__join-files
             input.tasks-data__check(type="checkbox" v-model="isJoinFiles")
             span.tasks-data__check-title Join Files
-    .tasks-data__default-dates
+    .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
         StepsDefaultDate(
             v-for="count in stepsCounter"
             :stepCounter="count"

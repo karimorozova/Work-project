@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services, Pricelist } = require('../models');
 const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
-const { payablesCalc, updateProjectCosts, getProject, updateProject, updateTaskMetrics, setDefaultStepVendors, getProjectWithUpdatedFinance } = require('../projects/');
+const { updateProjectCosts, getProject, getAfterPayablesUpdated, setDefaultStepVendors, getProjectWithUpdatedFinance } = require('../projects/');
 const { getAllRates } = require('../services/getRates'); 
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
@@ -58,23 +58,7 @@ router.get('/costs', async (req, res) => {
 router.post('/step-payables', async (req, res) => {
   let { projectId, step, index } = req.body;
   try {
-    const queryStr = `steps.${index}`;
-    let project = await updateProject({"_id": projectId}, {$set: {[queryStr]: step}});
-    let projectToUpdate = {...project._doc, id: projectId};
-    const taskIndex = project.tasks.findIndex(item => {
-      return item.taskId == step.taskId;
-    })
-    const updatedMetrics = await updateTaskMetrics(project.tasks[taskIndex].metrics, step.vendor._id);
-    let updatedTask = {...project.tasks[taskIndex]};
-    updatedTask.metrics = updatedMetrics;
-    const stepIndex = project.steps.findIndex(item => {
-      return item.taskId == step.taskId && item.name === step.name;
-    })
-    projectToUpdate.steps[stepIndex] = await payablesCalc({task: updatedTask, project, step});
-    updatedTask.finance['Price'].payables = projectToUpdate.steps.filter(item => item.taskId === updatedTask.taskId)
-    .reduce((init, cur) => init + +cur.finance['Price'].payables, 0).toFixed(2);
-    projectToUpdate.tasks[taskIndex] = updatedTask;
-    const updatedProject = await updateProjectCosts(projectToUpdate);
+    const updatedProject = await getAfterPayablesUpdated({ projectId, step, index});
     res.send(updatedProject);
   } catch(err) {
     console.log(err);
