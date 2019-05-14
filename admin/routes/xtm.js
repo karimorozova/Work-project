@@ -54,19 +54,6 @@ router.post('/update-matrix', async (req, res) => {
     }
 })
 
-// router.get('/project-metrics', async (req, res) => {
-//     const { projectId, customerId } = req.query;
-//     try {
-//         const { taskMetrics, progress } = await getMetrics({projectId, customerId});
-//         // const updatedProject = await updateProjectMetrics({projectId, taskMetrics, progress});
-//         // res.send(updatedProject);
-//         res.send({taskMetrics, progress});
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send("Error on getting metrics ");
-//     }
-// })
-
 router.get('/metrics', async (req, res) => {
     const { projectId } = req.query;
     try {

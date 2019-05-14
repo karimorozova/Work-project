@@ -1,5 +1,5 @@
 <template lang="pug">
-.project-info
+.project-info(v-if="currentProject._id")
     .project-info__title Project Details
     .project-info__all-info
         Project(:project="currentProject")
@@ -127,62 +127,11 @@ export default {
                     return await this.updateProgress();
                 }
                 await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
-                // let project = JSON.stringify(this.currentProject);
-                // project = JSON.parse(project);
-                // for(let task of project.tasks) {
-                //     const metrics = await this.$http.get(`/xtm/project-metrics?projectId=${task.projectId}&customerId=${project.customer._id}`);
-                //     const { taskMetrics, progress } = metrics.body;
-                //     task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
-                //     task.finance.Wordcount = this.wordsCalculation(task.metrics);
-                //     const keysArr = Object.keys(progress);
-                //     for(const key in progress) {
-                //         const existedTask = project.steps.find(item => {
-                //             return item.taskId === task.taskId && item.name === key
-                //         })
-                //         if(!existedTask) {
-                //             const {startDate, deadline} = this.getStepsDates({task, key});
-                //             if(key !== "jobsMetrics") {
-                //                 project.steps.push({
-                //                     taskId: task.taskId,
-                //                     name: key,
-                //                     source: task.sourceLanguage,
-                //                     target: task.targetLanguage,
-                //                     vendor: null,
-                //                     start: startDate,
-                //                     deadline: deadline,
-                //                     progress: this.setStepsProgress(key, progress),
-                //                     status: "Created",
-                //                     receivables: "",
-                //                     payables: "",
-                //                     clientRate: "",
-                //                     finance: {
-                //                         'Wordcount': { ...task.finance.Wordcount },
-                //                         'Price': {receivables: "", payables: ""}
-                //                     },
-                //                     vendorRate: "",
-                //                     margin: "",
-                //                     check: false,
-                //                     vendorsClickedOffer: [],
-                //                     isVendorRead: false
-                //                 })
-                //             }
-                //         } else {
-                //             for(let step of project.steps) {
-                //                 if(step.taskId === task.taskId) {
-                //                     step.progress = progress[step.name];
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-                // project.isMetricsExist = true;
-                // await this.$http.post('/xtm/update-project', {id: project._id, tasks: project.tasks, steps: project.steps, isMetricsExist: project.isMetricsExist});
                 const updatedProject = await this.$http.get(`/service/costs?projectId=${this.currentProject._id}`);
                 await this.storeProject(updatedProject.body);
                 this.$emit("refreshProjects");
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
-                console.log(err);
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
             }
         },
@@ -248,6 +197,16 @@ export default {
         },
         closePreview() {
             this.isEditAndSend = false;
+        },
+        async getProject() {
+            if(this.currentProject._id) return;
+            const { id } = this.$route.params;
+            try {
+                const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+                await this.storeProject(curProject.body);
+            } catch(err) {
+
+            }
         }
     },
     computed: {
@@ -265,15 +224,13 @@ export default {
         ProjectFinance,
         Preview
     },
-    mounted() {
+    created() {
+        this.getProject();
         this.getVendors();
-        if(!this.currentProject._id) {
-            this.$router.replace({name: "pm-projects"})
-        };
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
-            if(from.name === "client-details"){
+            if(from.name === "client-details") {
                 await vm.refreshCustomerInfo();
             }
         })

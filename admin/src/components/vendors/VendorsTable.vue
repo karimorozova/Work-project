@@ -335,7 +335,7 @@ export default {
         NativeLanguageSelect,
         Button
     },
-    mounted() {
+    created() {
         this.getVendors();
     }
 }

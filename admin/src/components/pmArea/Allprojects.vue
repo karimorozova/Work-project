@@ -73,7 +73,7 @@ export default {
         selectProject({project}) {
             this.chosenProject = project;
             this.storeProject(this.chosenProject);
-            this.$router.push({name: 'pm-project-details'});
+            this.$router.push(`/pm-project-details/${project._id}`);
         },
         setProjectDefault() {
             this.$emit('setProjectDefault');
@@ -129,19 +129,6 @@ export default {
             const managers = await this.$http.get("/pm-manage/all-managers");
             this.managers = managers.body;
         },
-        // async edit(i) {
-        //     let jobId = this.jobs[i].id;
-        //     this.$http.get(`../xtm/editor?jobId=${jobId}`)
-        //     .then(res => {
-        //         let link = document.createElement('a');
-        //         link.href = res.data;
-        //         link.target = '_blank';
-        //         link.click();
-        //     })
-        //     .catch(err => {
-        //         console.log(err)
-        //     })
-        // }
     },
     computed: {
         ...mapGetters({
@@ -203,7 +190,7 @@ export default {
             return result;
         }
     },
-    mounted() {
+    created() {
         this.getProjects();
         this.getManagers();
     },

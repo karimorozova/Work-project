@@ -207,7 +207,7 @@ const router = new Router({
           component: Projects
         },
         {
-          path: 'pm-project-details',
+          path: 'pm-project-details/:id',
           name: 'pm-project-details',
           component: ProjectInfo
         },

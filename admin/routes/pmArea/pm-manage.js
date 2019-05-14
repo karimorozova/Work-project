@@ -6,6 +6,17 @@ const { getProject, createProject, updateProject, changeProjectProp, cancelTasks
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 const { getProjectAfterApprove, getProjectAfterTasksUpdated, getAfterTasksDelivery } = require("../../delivery");
 
+router.get("/project", async (req, res) => {
+    const { id } = req.query;
+    try {
+        const project = await getProject({"_id": id});
+        res.send(project);
+    } catch(err) {
+        console.log(err);
+        console.log("Error on getting Project");
+    }
+})
+
 router.post("/new-project", async (req, res) => {
     let project = {...req.body};
     const client = await Clients.findOne({"_id": project.customer});
