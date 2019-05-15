@@ -78,7 +78,9 @@ export default {
         })
     },
     computed: {
-        vuexServices: "getVuexServices",
+        ...mapGetters({
+            vuexServices: "getVuexServices",
+        })
     },
     components: {
         DuoRates,
