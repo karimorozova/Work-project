@@ -41,7 +41,7 @@ function getUpdatedTasks({taskIds, tasks, status}) {
         if(taskIds.indexOf(task.taskId) !== -1) {
             task.status = status;
             task.isDelivered = status === "Delivered";
-            task.deliveredTime = new Date();
+            task.deliveredTime = task.deliveredTime || new Date();
         }
         return task;
     })

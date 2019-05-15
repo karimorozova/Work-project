@@ -212,15 +212,15 @@ router.get('/editor', async (req, res) => {
         }
         let xhr = createCORSRequest("POST", `${xtmBaseUrl}/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl`);
         if(!xhr){
-        console.log("XHR issue");
-        return;
+            console.log("XHR issue");
+            return;
         }
 
         xhr.onload = function (){
-        let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
-        let object = JSON.parse(parser.toJson(results));
-        let editorLink = object.editorURL;
-        res.send(editorLink);
+            let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
+            let object = JSON.parse(parser.toJson(results));
+            let editorLink = object.editorURL;
+            res.send(editorLink);
         }
 
         xhr.setRequestHeader('Content-Type', 'text/xml');
