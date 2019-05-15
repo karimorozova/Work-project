@@ -99,8 +99,8 @@
                 span.steps__money(v-if="row.finance.Price.payables") &euro;                
                 span.steps__step-data {{ row.finance.Price.payables }}
             template(slot="margin" slot-scope="{ row }")
-                span.steps__money(v-if="+marginCalc(row.finance.Price)") &euro;
-                span.steps__step-data(v-if="+marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
+                span.steps__money(v-if="marginCalc(row.finance.Price)") &euro;
+                span.steps__step-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
         transition(name="fade")
             .steps__info(v-if="isStepInfo")
                 StepInfo(

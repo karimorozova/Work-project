@@ -79,8 +79,8 @@ async function getAfterPayablesUpdated({projectId, step, index}) {
         const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.name === step.name);
         tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, step.vendor._id);
         steps[stepIndex] = await payablesCalc({task: tasks[taskIndex], project, step});
-        tasks[taskIndex].finance.Price.payables = steps.filter(item => item.taskId === tasks[taskIndex].taskId)
-        .reduce((prev, cur) => prev + +cur.finance.Price.payables, 0).toFixed(2);
+        tasks[taskIndex].finance.Price.payables = +(steps.filter(item => item.taskId === tasks[taskIndex].taskId)
+        .reduce((prev, cur) => prev + +cur.finance.Price.payables, 0).toFixed(2));
         return await updateProjectCosts({...project._doc, id: projectId, tasks, steps});
       } catch(err) {
         console.log(err);
@@ -104,9 +104,9 @@ async function payablesCalc({task, project, step}) {
 
 function getStepPayables({rate, metrics, step}) {
     let { finance } = step;
-    const payables = step.name !== "translate1" ? metrics.totalWords*rate
+    const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
     : calcCost(metrics, 'vendor', rate);
-    finance.Price.payables = +payables.toFixed(2);
+    finance.Price.payables = +(payables.toFixed(2));
     return {...step, finance, vendorRate: rate};
 }
 
@@ -117,7 +117,7 @@ function getRate({task, project, vendor, service}) {
             return item.industry.id === project.industry.id
         }) : "";
         const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-        return rateIndustry && rateIndustry.rates[service.id].value ? rateIndustry.rates[service.id].value : basicRate;
+        return rateIndustry && rateIndustry.rates[service.id].value ? +rateIndustry.rates[service.id].value : +basicRate;
     } catch(err) {
         console.log(err);
         console.log("Error in getRate");
