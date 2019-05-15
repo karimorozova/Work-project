@@ -3,7 +3,7 @@ const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTa
 const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, getDeliverablesLink } = require('./files');
 const { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, setStepsStatus, 
-    updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile } = require('./updates');
+    updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress } = require('./updates');
 const { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('./emails');
 const  { createProject, createTasks } = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
@@ -41,4 +41,5 @@ module.exports = {
     notifyDeliverablesDownloaded,
     getProjectWithUpdatedFinance,
     getAfterPayablesUpdated,
+    updateProjectProgress
 }

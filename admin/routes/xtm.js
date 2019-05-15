@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, getTaskProgress, generateTargetFile } = require('../services/');
-const { getProject, updateProject, updateProjectCosts, createTasks, calcCost, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
+const { getProject, updateProject, updateProjectCosts, createTasks, calcCost, updateProjectProgress, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles } = require('../projects/');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
 const unirest = require('unirest');
@@ -68,13 +68,7 @@ router.get('/update-progress', async (req, res) => {
     const { projectId } = req.query;
     try {
         const project = await getProject({"_id": projectId});
-        let {steps, tasks} = project;
-        for(let task of tasks) {
-            const { progress } = await getTaskProgress(task);
-            steps = updateStepsProgress({task, steps, progress});
-            task.status = areAllStepsCompleted(steps, task.taskId) ? "Pending Approval" : task.status;
-        }
-        const result = await updateProject({"_id": projectId}, { steps, tasks });
+        const result = await updateProjectProgress(project);
         res.send(result);
     } catch(err) {
         console.log(err);

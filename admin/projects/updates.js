@@ -1,12 +1,28 @@
 const { Projects } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { notifyVendors } = require('./emails');
+const { getTaskProgress } = require('../services');
 
 async function changeProjectProp(projectId, property) {
     const project = await getProject({"_id": projectId});
     let changedProject = {...project._doc};
     changedProject[property] = !changedProject[property]; 
     return await updateProject({"_id": projectId}, {...changedProject});
+}
+
+async function updateProjectProgress(project) {
+    let { steps, tasks } = project;
+    try {
+        for(let task of tasks) {
+            const { progress } = await getTaskProgress(task);
+            steps = updateStepsProgress({task, steps, progress});
+            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
+        }
+        return await updateProject({"_id": project.id}, { steps, tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateProjectProgress");
+    }
 }
 
 function cancelTasks(tasks, project) {
@@ -288,4 +304,4 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
 }
 
 module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, 
-    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile };
+    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress };
