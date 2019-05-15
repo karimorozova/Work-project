@@ -64,15 +64,29 @@ export default {
                 this.alertToggle({message: "Error on setting matrix data", isShow: true, type: "error"})
             }
         },
+        async getAllServices() {
+            try {
+                if(!this.vuexServices.length) {
+                    await this.getServices();
+                }
+            } catch(err) { }
+        },
         ...mapActions({
             alertToggle: "alertToggle",
-            setVendorsMatrixData: "setVendorsMatrixData"
+            setVendorsMatrixData: "setVendorsMatrixData",
+            getServices: "getServices"
         })
+    },
+    computed: {
+        vuexServices: "getVuexServices",
     },
     components: {
         DuoRates,
         MonoRates,
         FinanceMatrix
+    },
+    created() {
+        this.getAllServices();
     }
 }
 
