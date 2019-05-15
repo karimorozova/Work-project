@@ -253,15 +253,6 @@ export default {
                 this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
             }
         },
-        async defaultService() {
-            try {
-                if(!this.vuexServices.length) {
-                    await this.getServices();
-                }
-            } catch(err) { }
-            let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
-            this.serviceSelect = [defaultServ];
-        },
         defaultRates() {
             const duoServices = this.vuexServices.sort((a, b) => { 
                 if(a.sortIndex < b.sortIndex) return -1; 
@@ -272,6 +263,15 @@ export default {
                 init[key] = {value: 0, active: false};
                 return {...init}
             }, {});
+        },
+        async defaultService() {
+            try {
+                if(!this.vuexServices.length) {
+                    await this.getServices();
+                }
+            } catch(err) { }
+            let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
+            this.serviceSelect = [defaultServ];
         },
         ...mapActions({
             alertToggle: "alertToggle",
