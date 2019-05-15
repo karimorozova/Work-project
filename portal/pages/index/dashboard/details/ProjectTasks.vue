@@ -90,7 +90,7 @@ export default {
                     total+= +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2);
                 }
             }
-            return total/taskSteps.length;
+            return (total/taskSteps.length).toFixed(2);
         }
     },
     computed: {
