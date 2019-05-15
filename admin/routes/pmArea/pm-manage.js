@@ -101,7 +101,7 @@ router.post("/send-quote", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
-        await clientQuoteEmail({...project.customer._doc, subject: `${subjec} (ID C001)` }, message);
+        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID C001)` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {
