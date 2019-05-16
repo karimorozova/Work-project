@@ -32,7 +32,8 @@ export default {
             return this.percent < 100 ? 100 : 99;
         },
         presentedPercent() {
-            return this.percent > 0 && this.percent < 100 ? this.percent.toFixed(2) : this.percent;
+            let result = +this.percent;
+            return result > 0 && result < 100 ? result.toFixed(2) : result;
         }
     }
 }
