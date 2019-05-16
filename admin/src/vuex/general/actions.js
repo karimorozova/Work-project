@@ -81,7 +81,7 @@ export const updateCurrentProject = async ({ commit, state }, payload) => {
     commit('endRequest');
   } catch(err) {
     commit('endRequest');
-    throw new Error(err.message);
+    commit('alertingMessage', {message: err.message, isShow: true, type: "error"});
   }
 }
 export const addProjectTasks = async ({ commit }, payload) => {

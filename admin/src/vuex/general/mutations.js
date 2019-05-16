@@ -51,11 +51,13 @@ export const mutations = {
         state.currentProject[payload.prop] = payload.value;
     },
     stepDateStore(state, payload) {
-        state.currentProject.steps[payload.index][payload.prop] = payload.value;
-        if(payload.prop === 'deadline' && 
-            state.currentProject.steps[payload.index].taskId === state.currentProject.steps[payload.index + 1].taskId) {
-            state.currentProject.steps[payload.index + 1].start = payload.value;
+        let { steps } = state.currentProject;
+        const { index, prop, value } = payload;
+        steps[index][prop] = value;
+        if(prop === 'deadline' && steps[index].taskId === steps[index + 1].taskId) {
+            steps[index + 1].start = value;
         }
+        state.currentProject = { ...state.currentProject, steps };
     },
     stepVendorDelete(state, payload) {
         state.currentProject.steps[payload.index].vendor = "";
