@@ -54,7 +54,7 @@ export const mutations = {
         let { steps } = state.currentProject;
         const { index, prop, value } = payload;
         steps[index][prop] = value;
-        if(prop === 'deadline' && steps[index].taskId === steps[index + 1].taskId) {
+        if(prop === 'deadline' && index + 1 < steps.length && steps[index].taskId === steps[index + 1].taskId) {
             steps[index + 1].start = value;
         }
         state.currentProject = { ...state.currentProject, steps };
