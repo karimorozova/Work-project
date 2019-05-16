@@ -58,7 +58,7 @@
                 SelectSingle(
                     :selectedOption="selectedWorkflow.name" 
                     :options="workflowStepsNames" 
-                    placeholder="Service"
+                    placeholder="Workflow"
                     @chooseOption="setWorkflow"
                 ) 
         .tasks-data__column
@@ -261,6 +261,9 @@ export default {
         },
         async addTasks() {
             const { xtmId, template, source, service } = await this.getTasksData();
+            if(this.selectedWorkflow.id === 2890) {
+                this.stepsDates[0].deadline = this.currentProject.deadline;
+            }
             this.$emit("addTasks", { 
                 isJoinfiles: this.isJoinFiles, 
                 sourceFiles: this.sourceFiles,

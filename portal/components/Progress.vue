@@ -5,7 +5,7 @@
             <circle class="progress__circle" :cx="center" :cy="center" :r="radius" stroke="#938676" stroke-width="2"/>
             <circle class="progress__circle" :cx="center" :cy="center" :r="radius" stroke="#d15f45" :stroke-width="strokeWidth" :pathLength="pathLength" :stroke-dasharray="`${percent}, 999`"/>
             </g>
-            <text :x="center" :y="center" class="progress__text" dominant-baseline="central" text-anchor="middle">{{ percent }}%</text>
+            <text :x="center" :y="center" class="progress__text" dominant-baseline="central" text-anchor="middle">{{ presentedPercent }}%</text>
         </svg>
     </div>
 </template>
@@ -30,6 +30,9 @@ export default {
         },
         pathLength() {
             return this.percent < 100 ? 100 : 99;
+        },
+        presentedPercent() {
+            return this.percent > 0 && this.percent < 100 ? this.percent.toFixed(2) : this.percent;
         }
     }
 }

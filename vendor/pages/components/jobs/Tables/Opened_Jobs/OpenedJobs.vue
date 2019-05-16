@@ -114,7 +114,7 @@
         this.$emit("showModal", { index });
       },
       isEnterIcon(status) {
-        const statuses = ["Accepted", "Ready to Start", "Waiting to Start", "Started"];
+        const statuses = ["Accepted", "Ready to Start", "Started"];
         return statuses.indexOf(status) !== -1;
       }
     },

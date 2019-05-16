@@ -2,7 +2,7 @@
     .progress-line
         .progress-line__filler(:style="{width: progress + '%'}")
         .progress-line__tooltip 
-            span.progress-line__value {{ progress }}%    
+            span.progress-line__value {{ presentedPercent }}%    
 </template>
 
 <script>
@@ -10,6 +10,12 @@ export default {
     props: {
         progress: {
             type: [Number, String]
+        }
+    },
+    computed: {
+        presentedPercent() {
+            let result = +this.progress;
+            return result > 0 && result < 100 ? result.toFixed(2) : result;
         }
     }
 }
