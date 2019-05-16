@@ -20,7 +20,7 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            const status = project.isStartAccepted ? "Start" : "Approved";
+            const status = project.isStartAccepted ? "Started" : "Approved";
             await updateProjectStatus(projectId, status);
             await Projects.updateOne({"_id": projectId}, {$set: {isClientOfferClicked: true}});
             emitter.emit('managersNotificationEmail', project);
