@@ -42,14 +42,17 @@ async function getProjectWithUpdatedFinance(project) {
 
 function getTaskSteps({steps, progress, task}) {
     let updatedSteps = [...steps];
+    let counter = 1;
     for(const key in progress) {
         const existedTask = updatedSteps.find(item => {
             return item.taskId === task.taskId && item.name === key
         })
         if(!existedTask) {
             const {startDate, deadline} = getStepsDates({task, key});
+            let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
             if(key !== "jobsMetrics") {
                 updatedSteps.push({
+                    stepId: `${task.taskId} ${stepsIdCounter}`,
                     taskId: task.taskId,
                     name: key,
                     source: task.sourceLanguage,
@@ -72,6 +75,7 @@ function getTaskSteps({steps, progress, task}) {
                     vendorsClickedOffer: [],
                     isVendorRead: false
                 })
+                counter++;
             }
         } else {
             for(let step of updatedSteps) {

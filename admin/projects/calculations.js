@@ -186,7 +186,7 @@ async function setDefaultStepVendors(project) {
             let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
             let activeVendors = vendors.filter(item => item.status === "Active");
             let matchedVendors = await getMatchedVendors({activeVendors, step, project})
-            if(matchedVendors.length === 1) {
+            if(matchedVendors.length === 1 && !step.vendor) {
                 step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
                 step = await payablesCalc({task: tasks[taskIndex], project, step});

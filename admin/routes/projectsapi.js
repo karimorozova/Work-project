@@ -6,10 +6,9 @@ const { emitter } = require('../events');
 const { getProjectManageToken } = require("../middleware");
 
 router.get('/acceptquote', getProjectManageToken, async (req, res) => {
-    const mailDate = req.query.to;
+    const {to: mailDate, projectId } = req.query;
     const date = new Date().getTime();
     const expiry = date - mailDate;
-    const projectId = req.query.projectId;
     try {
         if(expiry > 900000) {
             res.set('Content-Type', 'text/html');
@@ -35,10 +34,9 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
 })
 
 router.get('/declinequote', async (req, res) => {
-    const mailDate = req.query.to;
+    const {to: mailDate, projectId } = req.query;
     const date = new Date().getTime();
     const expiry = date - mailDate;
-    const projectId = req.query.projectId;
     try {
         if(expiry > 900000) {
             res.set('Content-Type', 'text/html')
