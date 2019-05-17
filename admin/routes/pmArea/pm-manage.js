@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
-const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, 
-    cancelSteps, updateProjectStatus, notifyVendors, setStepsStatus, getMessage,
-    getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
+const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, updateProjectStatus, 
+    notifyVendors, setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 const { getProjectAfterApprove, getProjectAfterTasksUpdated, getAfterTasksDelivery } = require("../../delivery");
 
@@ -146,20 +145,6 @@ router.post("/cancel-tasks", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on cancelling tasks / cancel-tasks");
-    }
-})
-
-router.post("/cancel-steps", async (req, res) => {
-    const { checkedSteps, projectId } = req.body;
-    try {
-        const project = await getProject({"_id": projectId});
-        const { changedSteps, changedTasks } = cancelSteps(checkedSteps, project);
-        await notifyVendors(changedSteps);
-        const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
-        res.send(updatedProject);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on cancelling steps / cancel-steps");
     }
 })
 

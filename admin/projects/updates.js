@@ -89,26 +89,6 @@ function getTaskNewStatus(steps, taskId) {
     }
 }
 
-function cancelSteps(checkedSteps, project) {
-    const projectSteps = [...project.steps];
-    const projectTasks = [...project.tasks];
-    const stepIdentify = checkedSteps.map(item => {
-        return item.taskId + item.name;
-    })
-    const changedCheckedSteps = updateStepsStatuses({stepIdentify, steps:projectSteps, status: "Cancelled"});
-    const changedSteps = updateAllSteps(changedCheckedSteps);
-    const changedTasks = cancelledTasks(changedSteps, projectTasks);
-    return { changedSteps, changedTasks };
-}
-
-function cancelledTasks(changedSteps, arr) {
-    const updated = arr.map(task => {
-        task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
-        return task;
-    })
-    return updated;
-}
-
 function updateAllSteps(steps) {
     const translateSteps = steps.filter(item => item.name === "translate1").map(item => {
         return item.taskId + item.status;
@@ -303,5 +283,5 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
     })
 }
 
-module.exports = { changeProjectProp, cancelTasks, cancelSteps, updateProjectStatus, 
-    setStepsStatus, updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress };
+module.exports = { changeProjectProp, cancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
+    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress };

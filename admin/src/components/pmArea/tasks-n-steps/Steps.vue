@@ -167,7 +167,7 @@ export default {
             ],
             selectedVendors: [],
             isAllSelected: false,
-            actions: ["Mark as accept/reject" ,"Request confirmation", "Cancel"],
+            actions: ["Mark as accept/reject" ,"Request confirmation"],
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             activeIndex: -1,
@@ -253,14 +253,12 @@ export default {
                 switch (this.selectedAction) {
                     case "Request confirmation":
                         await this.requestConfirmation(checkedSteps);
-                        break
-                    case "Cancel":
-                        await this.cancelSteps(checkedSteps);
-                        break
+                        break;
                     case "Mark as accept/reject":
                         const status = this.getAcceptedStepStatus();
-                        await this.setStepsStatus({status, steps: checkedSteps});
-                        break
+                        const assignedSteps = checkedSteps.filter(item => item.vendor);
+                        await this.setStepsStatus({status, steps: assignedSteps});
+                        break;
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
@@ -308,21 +306,6 @@ export default {
                 this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error'});
-            }
-        },
-        async cancelSteps(steps) {
-            const filteredSteps = steps.filter(item => item.status !== "Completed");
-            if(!filteredSteps.length) return;
-            try {
-                if(this.allSteps.length === steps.length) {
-                    await setProjectStatus({status: "Cancelled"});
-                } else {
-                    const result = await this.$http.post('/pm-manage/cancel-steps', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
-                    await this.storeProject(result.body);
-                }
-                this.alertToggle({message: "Chosen steps are cancelled.", isShow: true, type: 'success'});
-            } catch(err) {
-                this.alertToggle({message: "Error: Cannot execute action.", isShow: true, type: 'error'});
             }
         },
         progress(prog) {
@@ -392,7 +375,7 @@ export default {
             let result = this.actions;
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
             if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
-                result= ["Request confirmation", "Cancel"];
+                result= ["Request confirmation"];
             }
             return result;
         }
