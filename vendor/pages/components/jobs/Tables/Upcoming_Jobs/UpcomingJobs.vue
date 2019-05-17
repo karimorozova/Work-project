@@ -10,7 +10,7 @@
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )
-      template(slot="headerProjectId" slot-scope="{ field }")
+      template(slot="headerJobId" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
       template(slot="headerProjectName" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
@@ -24,19 +24,19 @@
         .jobs__head-title {{ field.label }}
       template(slot="headerIcons" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
-      template(slot="projectId" slot-scope="{ row, index }")
-        .jobs__data(v-if="currentActive !== index") {{ row.projectId }}
+      template(slot="jobId" slot-scope="{ row, index }")
+        .jobs__data {{ row.stepId }}
       template(slot="projectName" slot-scope="{ row, index }")
-        .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
+        .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
         .jobs__data(v-if="row.name === 'translate1'") Translation
         .jobs__data(v-else) Proofing
       template(slot="status" slot-scope="{ row, index }")
-        .jobs__data(v-if="currentActive !== index") {{ row.status }}
+        .jobs__data {{ row.status }}
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
-        .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
+        .jobs__data {{ row.finance.Price.payables }}
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="isApproveReject(row)")
@@ -50,16 +50,21 @@
 
   export default {
     props: {
-      fields: {
-        type: Array
-      },
       jobs: {
         type: Array
       },
     },
     data() {
       return {
-        currentActive: -1,
+        fields: [
+          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "16%", padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "14%", padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "12%", padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+        ],
         areErrors: false,
         errors: [],
         isDeleting: false,
@@ -106,7 +111,7 @@
 .jobs {
   &__table {
     padding-top: 10px;
-    width: 1027px;
+    width: 1042px;
     margin: 0 auto;
   }
   &__data {

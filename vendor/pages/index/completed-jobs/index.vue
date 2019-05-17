@@ -24,7 +24,7 @@
             @closeErrors="closeErrors"
             @onRowClicked="chooseJob"
           )
-            template(slot="headerProjectId" slot-scope="{ field }")
+            template(slot="headerJobId" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
             template(slot="headerProjectName" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
@@ -36,8 +36,8 @@
               .jobs__head-title {{ field.label }}
             template(slot="headerInvoiceDate" slot-scope="{ field }")
               .jobs__head-title {{ field.label }}
-            template(slot="projectId" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.projectId }}
+            template(slot="jobId" slot-scope="{ row, index }")
+              .jobs__data(v-if="currentActive !== index") {{ row.stepId }}
             template(slot="projectName" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
             template(slot="type" slot-scope="{ row, index }")
@@ -63,11 +63,11 @@
     data() {
       return {
         fields: [
-          {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
+          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "18%", padding: "0"},
           {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "22%", padding: "0"},
           {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
           {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "17%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "18%", padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
           {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "16%", padding: "0"},
         ],
         isTableDropMenu: true,

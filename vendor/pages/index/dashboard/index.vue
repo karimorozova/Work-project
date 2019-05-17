@@ -4,7 +4,6 @@
             h3 Upcoming Jobs
             .jobs
                 UpcomingJobs(
-                    :fields="fields"
                     :jobs="upcomingJobs"
                     @makeAction="(e) => makeAction(e, 'upcomingJobs')"
                 )
@@ -12,7 +11,6 @@
             h3 Open Jobs
             .jobs
                 OpenedJobs(
-                    :fields="fields"
                     :jobs="openedJobs"
                     @showModal="showModal"
                     @makeAction="(e) => makeAction(e, 'openedJobs')"
@@ -42,16 +40,7 @@
   export default {
     data() {
       return {
-        fields: [
-          {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
-          {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "14%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
-          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
-        ],
-        jobStatuses: ["Request Sent", "Accepted", "Ready to Start", "Waiting to Start", "Created"],
+        jobStatuses: ["Request Sent", "Accepted", "Ready to Start", "Waiting to Start"],
         currentIndex: -1,
         isApproveModal: false
       }
@@ -138,7 +127,7 @@
     color: $main-color;
 
     .jobs {
-      width: 1047px;
+      width: 1062px;
       max-height: 600px;
       background-color: $white;
       box-shadow: 0 0 10px $main-color;

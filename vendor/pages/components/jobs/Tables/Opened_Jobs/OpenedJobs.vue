@@ -1,7 +1,7 @@
 <template lang="pug">
   .jobs__table
     DataTable(
-      :fields="fields"
+      :fields="tableFields"
       :tableData="jobs"
       :errors="errors"
       :areErrors="areErrors"
@@ -10,7 +10,7 @@
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )
-      template(slot="headerProjectId" slot-scope="{ field }")
+      template(slot="headerJobId" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
       template(slot="headerProjectName" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
@@ -26,8 +26,8 @@
         .jobs__head-title {{ field.label }}
       template(slot="headerIcons" slot-scope="{ field }")
         .jobs__head-title {{ field.label }}
-      template(slot="projectId" slot-scope="{ row, index }")
-        .jobs__data {{ row.projectId }}
+      template(slot="jobId" slot-scope="{ row, index }")
+        .jobs__data {{ row.stepId }}
       template(slot="projectName" slot-scope="{ row, index }")
         .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
@@ -68,14 +68,14 @@
     data(){
       return {
         fields: [
-          {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "12%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
-          {label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0"},
-          {label: "Progress", headerKey: "headerProgress", key: "progress", width: "10%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "11%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "11%", padding: "0"},
-          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: Math.floor(1042*0.16), padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1042*0.18), padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: Math.floor(1042*0.1), padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(1042*0.12), padding: "0"},
+          {label: "Progress", headerKey: "headerProgress", key: "progress", width: Math.floor(1042*0.1), padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: Math.floor(1042*0.12), padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042*0.12), padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
         ],
         areErrors: false,
         errors: [],
@@ -118,6 +118,23 @@
         return statuses.indexOf(status) !== -1;
       }
     },
+    computed: {
+      tableFields() {
+        const widthSumWithoutLast = this.fields.reduce((prev, cur) => {
+          if(cur.label !== 'Action') {
+            prev+= cur.width;
+          }
+          return prev;
+        }, 0)
+        return this.fields.map(field => {
+          if(field.label === "Action") {
+            field.width = 1042 - widthSumWithoutLast; 
+          }
+          field.width+= 'px';
+          return field;
+        })
+      }
+    },
     components: {
       DataTable,
       ProgressLine
@@ -134,7 +151,7 @@
 .jobs {
   &__table {
     padding-top: 10px;
-    width: 1027px;
+    width: 1042px;
     margin: 0 auto;
   }
   &__data {

@@ -1,6 +1,7 @@
 <template lang="pug">
 .step-info
     span.step-info__close(@click="closeInfo") +
+    .step-info__block Step Id - {{ step.stepId }}
     .step-info__block
         Vendor(
             :step="step"

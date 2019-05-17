@@ -4,7 +4,7 @@
             .data-block__item
                 LabelValue(title="Project Name" :isColon="true" :value="job.projectName")  
             .data-block__item
-                LabelValue(title="Project ID" :isColon="true" :value="job.projectId")  
+                LabelValue(title="Job ID" :isColon="true" :value="job.stepId")  
             .data-block__item
                 LabelValue(v-if="job.finance" title="Total Wordcount" :isColon="true" :value="job.finance.Wordcount.receivables")  
         .data-block
@@ -63,6 +63,9 @@ export default {
     flex-direction: column;
     justify-content: space-around;
     position: relative;
+    &:first-child {
+        width: 35%;
+    }
     &:last-child {
         width: 20%;
         display: flex;
