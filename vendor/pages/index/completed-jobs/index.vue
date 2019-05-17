@@ -15,7 +15,7 @@
         )
         .jobs__table
           DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="completedJobs"
             :errors="errors"
             :areErrors="areErrors"
@@ -58,18 +58,21 @@
   import DataTable from "~/components/Tables/DataTable";
   import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters";
   import { mapGetters, mapActions } from "vuex";
+  import tableFields from "~/mixins/tableFields";
 
   export default {
+    mixins: [tableFields],
     data() {
       return {
         fields: [
-          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "18%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "22%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "17%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "14%", padding: "0"},
-          {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "16%", padding: "0"},
+          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: Math.floor(1042*0.18), padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1042*0.22), padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: Math.floor(1042*0.14), padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: Math.floor(1042*0.18), padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042*0.14), padding: "0"},
+          {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: 0, padding: "0"},
         ],
+        tableWidth: 1042,
         isTableDropMenu: true,
         currentActive: -1,
         areErrors: false,
@@ -199,7 +202,7 @@
       color: $main-color;
 
       .jobs {
-        width: 1047px;
+        width: 1062px;
         height: auto;
         background-color: $white;
         box-shadow: 0 0 10px $main-color;
@@ -207,7 +210,7 @@
         padding-top: 15px;
 
         &__table {
-          width: 1027px;
+          width: 1042px;
           padding: 5px;
           margin: 0 auto;
         }

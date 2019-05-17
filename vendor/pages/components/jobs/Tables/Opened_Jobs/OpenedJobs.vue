@@ -58,8 +58,10 @@
   import moment from "moment";
   import ClickOutside from "vue-click-outside";
   import { mapGetters, mapActions } from "vuex";
+  import tableFields from "~/mixins/tableFields";
 
   export default {
+    mixins: [tableFields],
     props: {
       jobs: {
         type: Array
@@ -77,6 +79,7 @@
           {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042*0.12), padding: "0"},
           {label: "Action", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
         ],
+        tableWidth: 1042,
         areErrors: false,
         errors: [],
         isDeleting: false,
@@ -116,23 +119,6 @@
       isEnterIcon(status) {
         const statuses = ["Accepted", "Ready to Start", "Started"];
         return statuses.indexOf(status) !== -1;
-      }
-    },
-    computed: {
-      tableFields() {
-        const widthSumWithoutLast = this.fields.reduce((prev, cur) => {
-          if(cur.label !== 'Action') {
-            prev+= cur.width;
-          }
-          return prev;
-        }, 0)
-        return this.fields.map(field => {
-          if(field.label === "Action") {
-            field.width = 1042 - widthSumWithoutLast; 
-          }
-          field.width+= 'px';
-          return field;
-        })
       }
     },
     components: {

@@ -30,8 +30,10 @@
 import DataTable from "~/components/Tables/DataTable";
 import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
+import tableFields from "~/mixins/tableFields";
 
 export default {
+    mixins: [tableFields],
     props: {
         projects: {
             type: Array,
@@ -45,14 +47,15 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "14%", padding: "0"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "16%", padding: "0"},
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "12%", padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "12%", padding: "0"},
-                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "12%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: Math.floor(1010*0.14), padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1010*0.2), padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(1010*0.16), padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: Math.floor(1010*0.16), padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: Math.floor(1010*0.12), padding: "0"},
+                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: Math.floor(1010*0.12), padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"}
             ],
+            tableWidth: 1010,
             icons: {
                 approve: {src: require("../../../assets/images/Approve-icon.png")},
                 reject: {src: require("../../../assets/images/Reject-icon.png")}
@@ -75,18 +78,17 @@ export default {
                 total+= +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2);
             }
             return (total/steps.length).toFixed(2);
+        },
+        setFields() {
+            if(this.isOpenProjects) {
+                let progressElement = {...this.fields[this.fields.length-1], label: 'Progress', key: 'progress', width: Math.floor(1010*0.14)};
+                this.fields.pop();
+                this.fields.splice(3, 0, progressElement);
+            }
         }
     },
-    computed: {
-        tableFields() {
-            let result = [...this.fields];
-            if(this.isOpenProjects) {
-                let progressElement = {...result[result.length-1], label: 'Progress', key: 'progress'};
-                result.pop();
-                result.splice(3, 0, progressElement);
-            }
-            return result;
-        }
+    created() {
+        this.setFields()
     },
     components: {
         DataTable,

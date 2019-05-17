@@ -1,7 +1,7 @@
 <template lang="pug">
   .jobs__table
     DataTable(
-      :fields="fields"
+      :fields="tableFields"
       :tableData="jobs"
       :errors="errors"
       :areErrors="areErrors"
@@ -47,8 +47,10 @@
   import DataTable from "~/components/Tables/DataTable";
   import moment from "moment";
   import { mapGetters, mapActions } from "vuex";
+  import tableFields from "~/mixins/tableFields";
 
   export default {
+    mixins: [tableFields],
     props: {
       jobs: {
         type: Array
@@ -57,14 +59,15 @@
     data() {
       return {
         fields: [
-          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "16%", padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "14%", padding: "0"},
-          {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "14%", padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "12%", padding: "0"},
-          {label: "Action", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
+          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: Math.floor(1042*0.16), padding: "0"},
+          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1042*0.18), padding: "0"},
+          {label: "Type", headerKey: "headerType", key: "type", width: Math.floor(1042*0.14), padding: "0"},
+          {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(1042*0.14), padding: "0"},
+          {label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: Math.floor(1042*0.14), padding: "0"},
+          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042*0.12), padding: "0"},
+          {label: "Action", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
         ],
+        tableWidth: 1042,
         areErrors: false,
         errors: [],
         isDeleting: false,
