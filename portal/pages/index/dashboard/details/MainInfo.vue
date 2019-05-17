@@ -67,7 +67,7 @@ export default {
             for(let step of steps) {
                 total+= +(step.progress.wordsDone/step.progress.wordsTotal*100);
             }
-            return (total/steps.length).toFixed(2);
+            return +(total/steps.length).toFixed(2);
         }
     },
     computed: {

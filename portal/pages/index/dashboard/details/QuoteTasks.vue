@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-table
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="project.tasks"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -19,15 +19,18 @@
 <script>
 import DataTable from "~/components/Tables/DataTable";
 import { mapGetters, mapActions } from "vuex";
+import tableFields from "~/mixins/tableFields";
 
 export default {
+    mixins: [tableFields],
     data() {
         return {
             fields: [
-                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "60%", padding: "0"},
-                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "24%", padding: "0"},
-                {label: "Cost", headerKey: "headerCost", key: "cost", width: "16%", padding: "0"}
-            ]
+                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.64), padding: "0"},
+                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.20), padding: "0"},
+                {label: "Cost", headerKey: "headerCost", key: "cost", width: 0, padding: "0"}
+            ],
+            tableWidth: 735
         }
     },
     methods: {

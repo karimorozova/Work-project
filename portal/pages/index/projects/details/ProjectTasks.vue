@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-table
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="project.tasks"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -22,17 +22,20 @@
 <script>
 import DataTable from "~/components/Tables/DataTable";
 import { mapGetters, mapActions } from "vuex";
+import tableFields from "~/mixins/tableFields";
 
 export default {
+    mixins: [tableFields],
     data() {
         return {
             fields: [
-                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "50%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "15%", padding: "0"},
-                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "15%", padding: "0"},
-                {label: "Cost", headerKey: "headerCost", key: "cost", width: "12%", padding: "0"},
-                {label: " ", headerKey: "headerDownload", key: "download", width: "8%", padding: "0"}
-            ]
+                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.50), padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(735*0.16), padding: "0"},
+                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.14), padding: "0"},
+                {label: "Cost", headerKey: "headerCost", key: "cost", width: Math.floor(735*0.12), padding: "0"},
+                {label: " ", headerKey: "headerDownload", key: "download", width: 0, padding: "0"}
+            ],
+            tableWidth: 735
         }
     },
     methods: {

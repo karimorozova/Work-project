@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-table
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="project.tasks"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -30,19 +30,22 @@ import DataTable from "~/components/Tables/DataTable";
 import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
+import tableFields from "~/mixins/tableFields";
 
 export default {
+    mixins: [tableFields],
     data() {
         return {
             fields: [
-                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "44%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "14%", padding: "0"},
-                {label: "Progress", headerKey: "headerProgress", key: "progress", width: "12%", padding: "0"},
-                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "13%", padding: "0"},
-                {label: "Cost", headerKey: "headerCost", key: "cost", width: "10%", padding: "0"},
-                {label: " ", headerKey: "headerDownload", key: "download", width: "7%", padding: "0"}
+                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.44), padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(735*0.14), padding: "0"},
+                {label: "Progress", headerKey: "headerProgress", key: "progress", width: Math.floor(735*0.12), padding: "0"},
+                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.13), padding: "0"},
+                {label: "Cost", headerKey: "headerCost", key: "cost", width: Math.floor(735*0.1), padding: "0"},
+                {label: " ", headerKey: "headerDownload", key: "download", width: 0, padding: "0"}
             ],
-            domain: ""
+            domain: "",
+            tableWidth: 735
         }
     },
     methods: {
