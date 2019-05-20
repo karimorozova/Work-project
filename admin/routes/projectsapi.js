@@ -15,9 +15,9 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
             const project = await getProject({"_id": projectId});
-            if(project.isClientOfferClicked) {
+            if(project.isClientOfferClicked || project.status !== "Quote sent") {
                 res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
+                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Link is not valid anymore.</p></body>`)
             }
             const status = project.isStartAccepted ? "Started" : "Approved";
             await updateProjectStatus(projectId, status);
@@ -43,9 +43,9 @@ router.get('/declinequote', async (req, res) => {
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
             const project = await getProject({"_id": projectId});
-            if(project.isClientOfferClicked) {
+            if(project.isClientOfferClicked || project.status !== "Quote sent") {
                 res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
+                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Link is not valid anymore.</p></body>`)
             }
             const client = {...project.customer._doc, id: project.customer.id};
             const user = await User.findOne({"_id": client.projectManager._id});

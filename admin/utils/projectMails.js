@@ -24,7 +24,8 @@ async function notifyManagerProjectStarts(project) {
             await managerEmailsSend({project, projectManager, salesManager});
         }
     } catch(err) {
-        throw new Error("Error on sending notification to managers / notifyManagerProjectStarts");
+        console.log(err);
+        console.log("Error in notifyManagerProjectStarts");
     }
 }
 
@@ -37,7 +38,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
         await managerNotifyMail(projectManager, pmMessage, 'Quote Accepted but translators were not assigned (ID I001)');
         await managerNotifyMail(salesManager, smMessage, 'Quote Accepted but translators were not assigned (ID I001)');
     } catch(err) {
-        throw new Error("Cannot send email to managers / managerEmailsSend");
+        console.log(err);
+        console.log("Error in managerEmailsSend");
     }
 }
 
@@ -53,7 +55,8 @@ async function stepVendorsRequestSending(project, checkedSteps) {
         }
         return steps;
     } catch(err) {
-        throw new Error("Error on sending Request confirmation to vendor / stepVendorsRequestSending")
+        console.log(err);
+        console.log("Error in stepVendorsRequestSending")
     }
 }
 
@@ -80,7 +83,8 @@ async function sendRequestToVendor(project, step) {
     try {
         await sendEmail({to: step.vendor.email, subject: 'Request Confirmation (ID V001)'}, message);
     } catch(err) {
-        throw new Error('Cannot send email to Vendor / sendRequestToVendor');
+        console.log(err);
+        console.log('Error in sendRequestToVendor');
     }
 }
 
@@ -94,7 +98,8 @@ async function sendEmailToContact(project, contact) {
         const message = emailMessageForContact(projectInfo);
         await clientQuoteEmail({contact, subject: 'Project information (ID C006)'}, message);
     } catch(err) {
-        throw new Error('Cannot send email to contact / sendEmailToContact');
+        console.log(err);
+        console.log('Error in sendEmailToContact');
     }
 }
 

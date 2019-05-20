@@ -1,7 +1,8 @@
-const { Projects } = require('../models');
+const { Projects, User } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor } = require('./emails');
 const { getTaskProgress } = require('../services');
+const { notifyManagerProjectStarts, pmMail } = require('../utils');
 
 async function changeProjectProp(projectId, property) {
     const project = await getProject({"_id": projectId});
@@ -170,7 +171,12 @@ async function setNewProjectDetails(project, status) {
         if(status === "Started" || status === "Approved") {
             return await updateWithAcceptedSteps(project, status);
         }
-        return await updateProject({"_id": id}, { status })
+        if(status === "Rejected") {
+            const client = {...project.customer._doc, id: project.customer.id};
+            const user = await User.findOne({"_id": client.projectManager._id});
+            await pmMail(project, client, user);
+        }
+        return await updateProject({"_id": project.id}, { status })
     } catch(err) {
         console.log(err);
         console.log("Error in setNewProjectDetails");
@@ -185,6 +191,9 @@ async function updateWithAcceptedSteps(project, status) {
         }
     }
     try {
+        if(project.isStartAccepted) {
+            await notifyManagerProjectStarts(project);
+        }
         return await updateProject({"_id": project.id},{status, steps});
     } catch(err) {
         console.log(err);

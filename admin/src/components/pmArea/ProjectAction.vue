@@ -9,7 +9,10 @@
             @chooseOption="setAction"
         )
     .project-action__confirm(v-if="selectedAction")
-        Button(:value="buttonValue" @clicked="makeAction")
+        .project-action__button
+            Button(:value="approveButtonValue" @clicked="makeApprovedAction")
+        .project-action__button(v-if="isAlternativeAction")
+            Button(:value="alternativeButtonValue" @clicked="makeAlterAction")
 </template>
 
 <script>
@@ -27,17 +30,33 @@ export default {
         return {
             selectedAction: "",
             actions: ["Cancel"],
-            buttonValue: "Confirm"
+            approveButtonValue: "Confirm",
+            alternativeButtonValue: "Reject",
+            isAlternativeAction: false
         }
     },
     methods: {
+        setDefaults() {
+            this.selectedAction = "";
+            this.approveButtonValue = "Confirm";
+            this.isAlternativeAction = false;
+        },
         setAction({option}) {
             this.selectedAction = option;
+            this.isAlternativeAction = false;
             if(this.selectedAction === "Send a Quote" || this.selectedAction === "Send Project Details") {
-                this.buttonValue = "Edit & Send"
+                this.approveButtonValue = "Edit & Send"
+            }
+            if(this.selectedAction === "Cancel") {
+                this.approveButtonValue = "Confirm"
+            }
+            if(this.selectedAction === "Accept/Reject") {
+                this.approveButtonValue = "Accept";
+                this.alternativeButtonValue = "Reject",
+                this.isAlternativeAction = true
             }
         },
-        async makeAction() {
+        async makeApprovedAction() {
             try {
                 switch(this.selectedAction) {
                     case "Send a Quote":
@@ -48,15 +67,50 @@ export default {
                         const details = await this.$http.get(`/pm-manage/project-details?projectId=${this.project._id}`);
                         this.$emit("editAndSend", { message: details, subject: "details" });
                         break;
+                    case "Accept/Reject":
+                        await this.acceptQuote();
+                        break;
                     case "Cancel":
-                        this.$emit('setStatus', { option: 'Cancelled'});
+                        await this.setStatus('Cancelled');
                         break;
                 }
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot execute chosen action.', isShow: true, type: 'error'})
             } finally {
-                this.selectedAction = "";
+                this.setDefaults();
             }
+        },
+        async makeAlterAction() {
+            try {
+                switch(this.selectedAction) {
+                    case "Accept/Reject":
+                        await this.rejectQuote();
+                        break;
+                }
+            } catch(err) {
+                this.alertToggle({message: 'Internal server error. Cannot execute chosen action.', isShow: true, type: 'error'})
+            } finally {
+                this.setDefaults();
+            }
+        },
+        async setStatus(status) {
+            try {
+                await this.setProjectStatus({status});
+                this.alertToggle({message: "Project's status changed", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+        },
+        async acceptQuote() {
+            const status = this.project.isStartAccepted ? "Started" : "Approved";
+            try {
+                await this.setStatus(status);
+            } catch(err) { }
+        },
+        async rejectQuote() {
+            try {
+                await this.setStatus("Rejected");
+            } catch(err) { }
         },
         async sendQuote() {
             try {
@@ -72,7 +126,8 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            storeProject: "setCurrentProject"
+            storeProject: "setCurrentProject",
+            setProjectStatus: "setProjectStatus"
         }),
     },
     computed: {
@@ -80,9 +135,12 @@ export default {
             let result = this.actions;
             if(this.project.finance.Price.receivables && 
                 (this.project.status === "Draft" || this.project.status === "Requested")) {
-                result = ["Send a Quote", "Cancel"];
+                result = ["Send a Quote", "Accept/Reject", "Cancel"];
             }
-            if(this.project.status === "Started") {
+            if(this.project.status === "Quote sent") {
+                result = ["Accept/Reject", "Cancel"];
+            }
+            if(this.project.status === "Started" || this.project.status === "In progress") {
                 result = ["Send Project Details", "Cancel"];
             }
             if(this.isAnyTaskReady()) {
@@ -120,6 +178,14 @@ export default {
         height: 28px;
         position: relative;
         margin-bottom: 20px;
+    }
+    &__confirm {
+        display: flex;
+    }
+    &__button {
+        :first-child {
+            margin-right: 10px;
+        }
     }
 }
 </style>
