@@ -30,11 +30,26 @@ function cancelTasks(tasks, project) {
     let projectSteps = [...project.steps];
     const tasksIds = tasks.map(item => item.taskId);
     const inCompletedSteps = projectSteps.filter(item => item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1)
-        .map(step => step.taskId + step.name);
-    const cancelledSteps = updateStepsStatuses({stepIdentify: inCompletedSteps, steps: projectSteps, status: "Cancelled"});
-    const changedSteps = updateAllSteps(cancelledSteps);
+        .map(step => step.stepId);
+    const changedSteps = cancelSteps({stepIdentify: inCompletedSteps, steps: projectSteps});
     const changedTasks = cancellCheckedTasks(tasksIds, projectTasks, changedSteps);
     return { changedTasks, changedSteps };
+}
+
+function cancelSteps({stepIdentify, steps}) {
+    const updated = steps.map(item => {
+        if(stepIdentify.indexOf(item.stepId) !== -1) {
+            let newStatus = "Cancelled";
+            if(+item.progress.wordsDone > 0) {
+                newStatus = "Cancelled Halfway";
+                let finance = getStepNewFinance(item);
+                return {...item._doc, status: newStatus, finance};
+            }
+            item.status = newStatus;
+        }
+        return item;
+    })
+    return updated;
 }
 
 function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
@@ -89,28 +104,10 @@ function getTaskNewStatus(steps, taskId) {
     }
 }
 
-function updateAllSteps(steps) {
-    const translateSteps = steps.filter(item => item.name === "translate1").map(item => {
-        return item.taskId + item.status;
-    });
-    return steps.map(step => {
-        if(translateSteps.indexOf(step.taskId + "Cancelled") !== -1 || 
-            translateSteps.indexOf(step.taskId + "Cancelled Halfway") !== -1) {
-                step.status = "Cancelled";
-            }
-        return step;
-    })  
-}
-
 function updateStepsStatuses({steps, status, stepIdentify}) {
     const updated = steps.map(item => {
         if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
             let newStatus = status;
-            if(+item.progress.wordsDone > 0) {
-                newStatus = "Cancelled Halfway";
-                let finance = getStepNewFinance(item);
-                return {...item._doc, status: newStatus, finance};
-            }
             if(status === "Ready to Start" && item.name !== "translate1") {
                 newStatus = "Waiting to Start";
             }

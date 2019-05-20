@@ -29,6 +29,7 @@ const ProjectsSchema = new mongoose.Schema({
   },
   steps: [{
     vendor: {type: Schema.Types.ObjectId, ref: 'Vendors'},
+    stepId: "",
     taskId: "",
     name: "",
     source: "",
