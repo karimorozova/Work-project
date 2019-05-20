@@ -2,9 +2,9 @@ const { metricsCalc, receivablesCalc, payablesCalc, updateProjectCosts, updateTa
     taskMetricsCalc, setDefaultStepVendors, getAfterPayablesUpdated } = require('./calculations');
 const { getProject, getProjects, updateProject } = require('./getProjects');
 const { storeFiles, getDeliverablesLink } = require('./files');
-const { changeProjectProp, cancelTasks, updateProjectStatus, setStepsStatus, 
+const { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, 
     updateStepsProgress, areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress } = require('./updates');
-const { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('./emails');
+const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('./emails');
 const  { createProject, createTasks } = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 
@@ -21,9 +21,9 @@ module.exports = {
     taskMetricsCalc,
     calcCost,
     changeProjectProp,
-    cancelTasks,
+    getProjectAfterCancelTasks,
     updateProjectStatus,
-    notifyVendors,
+    stepCancelNotifyVendor,
     setDefaultStepVendors,
     setStepsStatus,
     createProject,

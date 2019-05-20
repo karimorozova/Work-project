@@ -4,10 +4,11 @@ const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
 const { User } = require("../models");
 
-async function notifyVendors(steps) {
+async function stepCancelNotifyVendor(steps) {
     try {
+        const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {
-            if(step.vendor && (step.status === 'Cancelled' || step.status === 'Cancelled Halfway')) {
+            if(step.vendor && notifyStepStatuses.indexOf(step.status) === -1) {
                 const message = vendorNotificationMessage(step);
                 step["to"] = step.vendor.email;
                 step.subject = "Step cancelling notification! (ID V007)";
@@ -16,7 +17,7 @@ async function notifyVendors(steps) {
         }
     } catch(err) {
         console.log(err);
-        console.log("Error in notifyVendors");
+        console.log("Error in stepCancelNotifyVendor");
     }
 }
 
@@ -105,4 +106,4 @@ async function notifyDeliverablesDownloaded(taskId, project) {
     }
 }
 
-module.exports = { notifyVendors, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded };
+module.exports = { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded };

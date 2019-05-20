@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
-const { getProject, createProject, updateProject, changeProjectProp, cancelTasks, updateProjectStatus, 
-    notifyVendors, setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
+const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
+    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 const { getProjectAfterApprove, getProjectAfterTasksUpdated, getAfterTasksDelivery } = require("../../delivery");
 
@@ -138,9 +138,7 @@ router.post("/cancel-tasks", async (req, res) => {
     const { tasks, projectId } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
-        await notifyVendors(changedSteps);
-        const updatedProject = await updateProject({"_id": projectId}, {tasks: changedTasks, steps: changedSteps});
+        const updatedProject = await getProjectAfterCancelTasks(tasks, project);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

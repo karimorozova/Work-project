@@ -1,6 +1,6 @@
 const { Projects } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
-const { notifyVendors } = require('./emails');
+const { stepCancelNotifyVendor } = require('./emails');
 const { getTaskProgress } = require('../services');
 
 async function changeProjectProp(projectId, property) {
@@ -25,15 +25,32 @@ async function updateProjectProgress(project) {
     }
 }
 
+async function getProjectAfterCancelTasks(tasks, project) {
+    try {
+        const { changedTasks, changedSteps, inCompletedSteps } = cancelTasks(tasks, project);
+        const Price = getUpdatedProjectFinance(changedTasks);
+        await stepCancelNotifyVendor(inCompletedSteps);
+        return await updateProject({"_id": project.id}, 
+            {tasks: changedTasks, steps: changedSteps, finance: {...project.finance, Price}});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getProjectAfterCancelTasks")
+    }
+}
+
 function cancelTasks(tasks, project) {
     let projectTasks = [...project.tasks];
     let projectSteps = [...project.steps];
     const tasksIds = tasks.map(item => item.taskId);
-    const inCompletedSteps = projectSteps.filter(item => item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1)
-        .map(step => step.stepId);
-    const changedSteps = cancelSteps({stepIdentify: inCompletedSteps, steps: projectSteps});
+    const inCompletedSteps = projectSteps.map(item => {
+        if(item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) {
+            return {...item._doc};
+        }
+    }).filter(item => !!item);
+    const stepIdentify = inCompletedSteps.map(step => step.stepId);
+    const changedSteps = cancelSteps({stepIdentify, steps: projectSteps});
     const changedTasks = cancellCheckedTasks(tasksIds, projectTasks, changedSteps);
-    return { changedTasks, changedSteps };
+    return { changedTasks, changedSteps, inCompletedSteps };
 }
 
 function cancelSteps({stepIdentify, steps}) {
@@ -135,11 +152,12 @@ async function updateProjectStatus(id, status) {
         if(status !== "Cancelled") {
             return await setNewProjectDetails(project, status);
         }
-        const { tasks } = project;
+        const { tasks, steps } = project;
+        const notifySteps = steps.map(item => { return {...item._doc}});
         const { changedTasks, changedSteps } = cancelTasks(tasks, project);
         const projectStatus = getProjectNewStatus(changedTasks, status);
         const Price = getUpdatedProjectFinance(changedTasks);
-        await notifyVendors(changedSteps);
+        await stepCancelNotifyVendor(notifySteps);
         return await updateProject({"_id": id}, { status: projectStatus, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps});
     } catch(err) {
         console.log(err);
@@ -178,8 +196,10 @@ function getUpdatedProjectFinance(tasks) {
     let receivables = 0;
     let payables = 0;
     for(let task of tasks) {
-        receivables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfReceivables : +task.finance.Price.receivables;
-        payables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfPayables : +task.finance.Price.payables;
+        if(task.status !== 'Cancelled') {
+            receivables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfReceivables : +task.finance.Price.receivables;
+            payables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfPayables : +task.finance.Price.payables;
+        }
     }
     return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) };
 }
@@ -280,5 +300,5 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
     })
 }
 
-module.exports = { changeProjectProp, cancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
+module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
     areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress };
