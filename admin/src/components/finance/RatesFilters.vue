@@ -3,12 +3,12 @@
     .rates-filters__item(v-if="form !== 'Mono'")
         label.rates-filters__title Source Language
         .rates-filters__drop-menu
-            LanguagesSelect(:selectedLang="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
+            LanguagesSelect(:selectedLangs="sourceSelect" :addAll="true" @chosenLang="setSourceFilter")
     .rates-filters__item
         label.rates-filters__title(v-if="form !== 'Mono'") Target Language
         label.rates-filters__title(v-else) Language
         .rates-filters__drop-menu
-            LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
+            LanguagesSelect(:selectedLangs="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu

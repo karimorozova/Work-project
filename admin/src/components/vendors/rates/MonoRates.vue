@@ -63,9 +63,6 @@ import RatesFilters from "../../finance/RatesFilters";
 import MonoRateTable from "../../finance/MonoRateTable";
 import SelectSingle from "../../SelectSingle";
 import ApproveModal from "../../ApproveModal";
-import LanguagesSelect from "../../LanguagesSelect";
-import Toggler from "../../Toggler";
-import IndustrySelect from "../../IndustrySelect";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -314,10 +311,7 @@ export default {
         RatesFilters,
         MonoRateTable,
         SelectSingle,
-        ApproveModal,
-        LanguagesSelect,
-        IndustrySelect,
-        Toggler
+        ApproveModal
     },
     directives: {
         ClickOutside

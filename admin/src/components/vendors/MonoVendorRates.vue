@@ -3,7 +3,7 @@
   .filters
     .filters__item
       label Language
-      LanguagesSelect(:selectedLang="targetSelect" :addAll="true" @chosenLang="chosenTarget")
+      LanguagesSelect(:selectedLangs="targetSelect" :addAll="true" @chosenLang="chosenTarget")
     .filters__item
       label Industry
       IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="chosenInd")
@@ -21,7 +21,7 @@
             td.drop-option 
               template(v-if='targetSelect.indexOf(info.targetLanguage.symbol) != -1 || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
               .inner-component(v-if="currentActive === index && !fullInfo[currentActive].icons.edit.active")
-                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLangs="[info.targetLanguage.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
             td(:class="{'add-shadow': currentActive === index && !fullInfo[currentActive].icons.edit.active}")
               input.rates(:value="indus.package" @input="changePackage" :readonly="info.icons.edit.active")
             td.drop-option              

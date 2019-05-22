@@ -16,11 +16,11 @@
                         td.duorates-table__drop-option 
                             template(v-if='currentActive !== index && isSourceFilter(info)') {{ info.sourceLanguage.lang }}
                             .inner-component(v-if="currentActive === index")
-                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
+                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLangs="[currentSource.symbol]" @chosenLang="changeSource" @scrollDrop="scrollDrop")
                         td.duorates-table__drop-option 
                             template(v-if='currentActive !== index && isSourceFilter(info) || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
                             .inner-component(v-if="currentActive === index")
-                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLangs="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
                         td.duorates-table__drop-option              
                             span(v-if="!info.industry.icon && currentActive !== index") {{ info.industry.name }}
                             .duorates-table__image

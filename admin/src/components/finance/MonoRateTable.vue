@@ -16,7 +16,7 @@
                         td.monorates-table__drop-option 
                             template(v-if='currentActive !== index || targetSelect[0] == "All"') {{ info.targetLanguage.lang }}
                             .inner-component(v-if="currentActive === index")
-                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLang="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
+                                LanguagesSelect(:parentIndex="index" :addAll="false" :selectedLangs="[currentTarget.symbol]" @chosenLang="changeTarget" @scrollDrop="scrollDrop")
                         td.monorates-table__drop-option
                             template(v-if='currentActive !== index') {{ info.package }}
                             .inner-component(v-if="currentActive === index")
