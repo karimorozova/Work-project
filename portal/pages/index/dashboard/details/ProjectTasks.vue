@@ -12,7 +12,7 @@
             .tasks-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
             .tasks-table__status(slot="status" slot-scope="{ row }") {{ row.status }}
-                .tasks-table__timestamp(v-if="row.isDelivered")
+                .tasks-table__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
                     img.tasks-table__time-icon(src="../../../../assets/images/time_icon.png")
                     .tasks-table__time-data {{ getDeliveredTime(row.deliveredTime) }}
             .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row }")

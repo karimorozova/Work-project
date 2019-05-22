@@ -23,6 +23,18 @@
                 Button(value="Approve Quote" buttonClass="tasks-approve" @makeAction="updateQuote('approve')")
             .main-info__button
                 Button(value="Reject Quote" @makeAction="updateQuote('reject')")
+        .main-info__buttons(v-if="project.status === 'Requested'")
+            .main-info__button
+                Button(value="Cancel Quote" @makeAction="showModal")
+        .main-info__modal(v-if="isApproveModal")
+            ApproveModal(
+                approveValue="Yes"
+                notApproveValue="No"
+                text="Are you sure?"
+                @approve="cancelQuote"
+                @notApprove="closeModal"
+                @close="closeModal"
+            )
 </template>
 
 <script>
@@ -52,7 +64,8 @@ export default {
         ...mapActions({
             selectProject: "selectProject",
             updateQuoteStatus: "updateQuoteStatus",
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            cancelCurrentQuote: "cancelQuote"
         }),
         async updateQuote(key) {
             try {
@@ -68,6 +81,18 @@ export default {
                 total+= +(step.progress.wordsDone/step.progress.wordsTotal*100);
             }
             return +(total/steps.length).toFixed(2);
+        },
+        showModal() {
+            this.isApproveModal = true;
+        },
+        closeModal() {
+            this.isApproveModal = false;
+        },
+        async cancelQuote() {
+            this.isApproveModal = false;
+            try {
+                await this.cancelCurrentQuote({id: this.project._id});
+            } catch(err) { }
         }
     },
     computed: {
@@ -143,6 +168,11 @@ export default {
         &:hover {
             transform: scale(1.1);
         }
+    }
+    &__modal {
+        position: absolute;
+        top: 50%;
+        left: 30%;
     }
 }
 

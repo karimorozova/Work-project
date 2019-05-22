@@ -9,6 +9,18 @@ export const updateQuoteStatus = async function({ commit, dispatch }, payload) {
     }
 }
 
+export const cancelQuote = async function({ commit, dispatch }, payload) {
+    try {
+        const { id } = payload;
+        const result = await this.$axios.put('/pm-manage/project-status', { id, status: 'Cancelled'})
+        commit('REPLACE_QUOTE', { id, updatedQuote: result.data});
+        dispatch('selectProject', result.data);
+        dispatch('alertToggle', {message: 'Quote cancelled', isShow: true, type: 'success'});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: 'error'});
+    }
+}
+
 export const selectProject = ({ commit }, payload) => {
     commit('SET_PROJECT', payload)
 }

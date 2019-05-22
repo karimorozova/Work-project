@@ -46,7 +46,7 @@ app.use(cookieParser());
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Methods", "GET, PUT, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, Content-Type, Authorization, token-header"

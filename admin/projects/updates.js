@@ -71,8 +71,9 @@ function cancelSteps({stepIdentify, steps}) {
 }
 
 function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
+    const unchangingStatuses = ['Ready for Delivery', 'Pending Approval', 'Delivered'];
     return projectTasks.map(task => {
-        if(tasksIds.indexOf(task.taskId) !== -1) {
+        if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
             task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
             if(task.status === "Cancelled Halfway") {
                 task.finance = getTaskNewFinance(changedSteps, task);
