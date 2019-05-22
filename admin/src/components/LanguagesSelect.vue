@@ -1,17 +1,17 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick" :class="customClass")
         .select
-            span.selected(v-if="selectedLang.length == 1" :class="{'no-opacity': selectedLang.length}") {{ selectedLang[0] }}
-            span.selected(v-if="!selectedLang.length") {{ placeholder }}
-            .selected(v-if="selectedLang.length > 1" :class="{'no-opacity': selectedLang.length}") 
-                span(v-for="lang in selectedLang") {{ lang }}; &nbsp;
+            span.selected(v-if="selectedLangs.length === 1" :class="{'no-opacity': selectedLangs.length}") {{ selectedLangs[0] }}
+            span.selected(v-if="!selectedLangs.length") {{ placeholder }}
+            .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}") 
+                span(v-for="lang in selectedLangs") {{ lang }}; &nbsp;
             .arrow-button(@click="showLangs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
         .drop(v-if="droppedLang")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: selectedLang.indexOf(language.symbol) != -1}")
+                    .checkbox__check(:class="{checked: selectedLangs.indexOf(language.symbol) != -1}")
                 span.drop__name(:class="{'left-pad': !isCheckboxShown}") {{ language.lang }}
 </template>
 
@@ -20,7 +20,7 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
-        selectedLang: {
+        selectedLangs: {
             type: Array
         },
         parentIndex: {

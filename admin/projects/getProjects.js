@@ -11,7 +11,7 @@ async function getProjects(obj) {
 async function getProject(obj) {
     return await Projects.findOne(obj)
         .populate('industry')
-        .populate('customer')
+        .populate('customer')        
         .populate('projectManager', ['firstName', 'lastName', 'photo'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }

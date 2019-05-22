@@ -1,18 +1,23 @@
 <template lang="pug">
 .tasks-data
+    .langs
+        TasksLangs(
+            :sourceLanguages="sourceLanguages"
+            @setSourceLanguage="setSourceLang"
+            @setTargets="setTargets")
     .tasks-data__main-info
         .tasks-data__column
-            .tasks-data__drop-menu
-                label.tasks-data__menu-title.tasks-data_relative Source Language
-                    Asterisk(:customStyle="asteriskStyle")
-                LanguagesSelect(
-                    placeholder="Source Languages"
-                    :langFilter="customerLangFilter.source"
-                    :single='true'
-                    :selectedLang="sourceLanguage"
-                    customClass="tasks-data__langs"
-                    @chosenLang="setSource"
-                )
+            //- .tasks-data__drop-menu
+                //- label.tasks-data__menu-title.tasks-data_relative Source Language
+                //-     Asterisk(:customStyle="asteriskStyle")
+                //- LanguagesSelect(
+                //-     placeholder="Source Languages"
+                //-     :langFilter="customerLangFilter.source"
+                //-     :single='true'
+                //-     :selectedLangs="sourceLanguages"
+                //-     customClass="tasks-data__langs"
+                //-     @chosenLang="setSource"
+                //- )
             .tasks-data__drop-menu
                 label.tasks-data__menu-title Template
                 SelectSingle(
@@ -22,17 +27,25 @@
                     refersTo="template"
                     @chooseOption="setValue"
                 )
+            .tasks-data__drop-menu
+                label.tasks-data__menu-title Workflow       
+                SelectSingle(
+                    :selectedOption="selectedWorkflow.name" 
+                    :options="workflowStepsNames" 
+                    placeholder="Workflow"
+                    @chooseOption="setWorkflow"
+                ) 
         .tasks-data__column
-            .tasks-data__drop-menu    
-                label.tasks-data__menu-title.tasks-data_relative Target Languages
-                    Asterisk(:customStyle="asteriskStyle")  
-                LanguagesSelect(
-                    placeholder="Target Languages"
-                    :langFilter="customerLangFilter.target"
-                    :selectedLang="targetLanguages"
-                    customClass="tasks-data__langs"
-                    @chosenLang="setTargets"
-                )
+            //- .tasks-data__drop-menu    
+            //-     label.tasks-data__menu-title.tasks-data_relative Target Languages
+            //-         Asterisk(:customStyle="asteriskStyle")  
+            //-     LanguagesSelect(
+            //-         placeholder="Target Languages"
+            //-         :langFilter="customerLangFilter.target"
+            //-         :selectedLangs="targetLanguages"
+            //-         customClass="tasks-data__langs"
+            //-         @chosenLang="setTargets"
+            //-     )
             .tasks-data__drop-menu
                 label.tasks-data__menu-title.tasks-data_relative Service
                     Asterisk(:customStyle="asteriskStyle")   
@@ -53,14 +66,14 @@
                             img.tasks-data__list-icon(src="../../../assets/images/arrow_open.png" :class="{'tasks-data_reversed-icon': isSourceFilesShow}")
                     .tasks-data__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
                         span.tasks-data__delete-file(@click="deleteFile(index, 'sourceFiles')") +
-            .tasks-data__drop-menu
-                label.tasks-data__menu-title Workflow       
-                SelectSingle(
-                    :selectedOption="selectedWorkflow.name" 
-                    :options="workflowStepsNames" 
-                    placeholder="Workflow"
-                    @chooseOption="setWorkflow"
-                ) 
+            //- .tasks-data__drop-menu
+            //-     label.tasks-data__menu-title Workflow       
+            //-     SelectSingle(
+            //-         :selectedOption="selectedWorkflow.name" 
+            //-         :options="workflowStepsNames" 
+            //-         placeholder="Workflow"
+            //-         @chooseOption="setWorkflow"
+            //-     ) 
         .tasks-data__column
             .tasks-data__upload-file
                 UploadFileButton(text="Reference Files")
@@ -88,6 +101,7 @@
 </template>
 
 <script>
+import TasksLangs from "./TasksLangs";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
 import LanguagesSelect from "../../LanguagesSelect";
@@ -104,7 +118,7 @@ export default {
         template: {
             type: String
         },
-        sourceLanguage: {
+        sourceLanguages: {
             type: Array
         },
         targetLanguages: {
@@ -140,6 +154,9 @@ export default {
             alertToggle: "alertToggle",
             xtmCustomersGetting: "xtmCustomersGetting"
         }),
+        setSourceLang({symbol}) {
+            this.$emit("setSourceLang", { symbol });
+        },
         setValue({option, refersTo}) {
             this.$emit("setValue", { option, refersTo })
         },
@@ -166,8 +183,8 @@ export default {
         setSource({lang}) {
             this.$emit("setSource", { lang })
         },
-        setTargets({lang}) {
-            this.$emit("setTargets", { lang });
+        setTargets({targets}) {
+            this.$emit("setTargets", { targets });
         },
         uploadSourceFiles(event) {
             if(event.target.files.length) {
@@ -225,6 +242,7 @@ export default {
             let errors = [];
             if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
             if(!this.template) errors.push("Please, select Template.");
+            if(!this.sourceLanguages.length) errors.push("Please, select Source language.");
             if(!this.targetLanguages.length) errors.push("Please, select Target language(s).");
             if(!this.sourceFiles.length) errors.push("Please, upload Source file(s).");
             if(this.sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
@@ -255,7 +273,7 @@ export default {
             const xtmCustomer = this.xtmCustomers.find(item => item.name === this.currentProject.customer.name);
             const xtmId = xtmCustomer ? xtmCustomer.id : "";
             const template = this.template ? this.templates.find(item => item.name === this.template) : {id: ""};
-            const source = this.languages.find(item => item.symbol === this.sourceLanguage[0]);
+            const source = this.languages.find(item => item.symbol === this.sourceLanguages[0]);
             const service = this.services.find(item => item.title === this.service);
             return { xtmId, template, source, service };
         },
@@ -317,6 +335,7 @@ export default {
         }
     },
     components: {
+        TasksLangs,
         SelectSingle,
         LanguagesSelect,
         UploadFileButton,

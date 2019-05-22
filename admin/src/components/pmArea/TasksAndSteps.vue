@@ -1,20 +1,22 @@
 <template lang="pug">
 .tasks-steps
     .tasks-steps__tasks-title Tasks and Steps
-    TasksData(
-        :selectedWorkflow="selectedWorkflow"
-        :template="template"
-        :sourceLanguage="sourceLanguage"
-        :targetLanguages="targetLangs"
-        :service="service"
-        @setValue="setValue"
-        @setSource="setSource"
-        @setTargets="setTargets"
-        @showErrors="showErrors"
-        @addTasks="addTasks"
-    )
-        template(slot="errors")
-            slot
+        img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData}")
+    transition(name="slide-fade")
+        TasksData(v-if="isTaskData"
+            :selectedWorkflow="selectedWorkflow"
+            :template="template"
+            :sourceLanguages="sourceLanguages"
+            :targetLanguages="targetLangs"
+            :service="service"
+            @setValue="setValue"
+            @setSourceLang="setSource"
+            @setTargets="setTargets"
+            @showErrors="showErrors"
+            @addTasks="addTasks"
+        )
+            template(slot="errors")
+                slot
     .tasks-steps__tables
         Tasks(v-if="currentProject.tasks.length && isTasksShow"
             :allTasks="currentProject.tasks"
@@ -42,9 +44,10 @@ export default {
         return {
             selectedWorkflow: {name:"2 Steps", id: 2917},
             template: "Standard processing",
-            sourceLanguage: ["EN-GB"],
+            sourceLanguages: [],
             targetLanguages: [],
             service: "",
+            isTaskData: false,
             isStepsShow: false,
             isTasksShow: true,
         }
@@ -55,6 +58,9 @@ export default {
             addProjectTasks: "addProjectTasks",
             getServices: "getServices"
         }),
+        toggleTaskData() {
+            this.isTaskData = !this.isTaskData;
+        },
         async defaultService() {
             try {
                 if(!this.services.length) {
@@ -71,16 +77,11 @@ export default {
         setValue({option, refersTo}) {
             this[refersTo] = option;
         },
-        setSource({lang}) {
-            this.sourceLanguage = [lang.symbol];
+        setSource({symbol}) {
+            this.sourceLanguages = symbol ? [symbol] : [];
         },
-        setTargets({lang}) {
-            const position = this.targetLangs.indexOf(lang.symbol);
-            if(position != -1) {
-                this.targetLanguages.splice(position, 1)
-            } else {
-                this.targetLanguages.push(lang);
-            }
+        setTargets({targets}) {
+            this.targetLanguages = targets;
         },
         showTab({tab}) {
             if(tab === 'Tasks') {
@@ -186,6 +187,9 @@ export default {
     }
     &__tasks-title {
         margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     &__menu-title {
         font-size: 14px;
@@ -193,5 +197,23 @@ export default {
     &__tables {
         position: relative;
     }
+    &__arrow {
+        cursor: pointer;
+    }
+    &_rotate {
+        transform: rotate(180deg);
+    }
 }
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
 </style>

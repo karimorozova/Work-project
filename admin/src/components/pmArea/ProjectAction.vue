@@ -135,7 +135,7 @@ export default {
             let result = this.actions;
             if(this.project.finance.Price.receivables && 
                 (this.project.status === "Draft" || this.project.status === "Requested")) {
-                result = ["Send a Quote", "Accept/Reject", "Cancel"];
+                result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
             }
             if(this.project.status === "Quote sent") {
                 result = ["Accept/Reject", "Cancel"];

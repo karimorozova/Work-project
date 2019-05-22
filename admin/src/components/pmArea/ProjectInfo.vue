@@ -194,11 +194,12 @@ export default {
             this.isEditAndSend = false;
         },
         async getProject() {
-            if(this.currentProject._id) return;
             const { id } = this.$route.params;
             try {
-                const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
-                await this.storeProject(curProject.body);
+                if(!this.currentProject._id) {
+                    const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+                    await this.storeProject(curProject.body);
+                }
             } catch(err) {
 
             }

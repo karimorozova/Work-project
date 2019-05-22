@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
+const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
@@ -10,6 +11,18 @@ router.get("/project", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         res.send(project);
+    } catch(err) {
+        console.log(err);
+        console.log("Error on getting Project");
+    }
+})
+
+router.get("/language-pairs", async (req, res) => {
+    const { customerId } = req.query;
+    try {
+        const customer = await getClient({"_id": customerId});
+        const { languageCombinations } = customer;
+        res.send(languageCombinations);
     } catch(err) {
         console.log(err);
         console.log("Error on getting Project");

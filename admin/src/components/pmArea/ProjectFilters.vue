@@ -29,7 +29,7 @@
                 LabelValue(label="Source Langs")
                     .filters__drop-menu.filters_medium-menu
                         LanguagesSelect(
-                            :selectedLang="sourceLangs"
+                            :selectedLangs="sourceLangs"
                             @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')"
                         )
         .filters__col
@@ -41,7 +41,7 @@
                 LabelValue(label="Target Langs")
                     .filters__drop-menu.filters_medium-menu
                         LanguagesSelect(
-                            :selectedLang="targetLangs"
+                            :selectedLangs="targetLangs"
                             @chosenLang="({lang}) => addLang({lang}, 'targetFilter')"
                         )
         .filters__col
