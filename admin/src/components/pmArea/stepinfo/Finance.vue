@@ -31,7 +31,7 @@
                     span.step-finance__money {{ totalSum.total }} &euro;
             .step-finance__summary
                 .step-finance__summary-value Margin: 
-                    span.step-finance__money {{ totalSum.margin }} &euro;
+                    span.step-finance__money {{ totalSum.margin.toFixed(2) }} &euro;
 </template>
 
 <script>
@@ -65,10 +65,10 @@ export default {
     },
     computed: {
         totalSum() {
-            const neededElement = this.financeData.find(item => {
+            const price = this.financeData.find(item => {
                 return item.title === "Price"
             })
-            return {total: neededElement.receivables, margin: neededElement.payables};
+            return {total: price.receivables, margin: price.receivables - price.payables};
         }
     },
     components: {

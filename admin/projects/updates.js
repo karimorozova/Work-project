@@ -86,7 +86,7 @@ function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
 function getTaskNewFinance(changedSteps, task) {
     const  { priceValues } = updateTaskNewFinance(changedSteps, task);
     const { finance } = task;
-    const Price = {...finance.Price, halfReceivables: priceValues.receivables, halfPayables: priceValues.payables};
+    const Price = {...finance.Price, halfReceivables: +(priceValues.receivables.toFixed(2)), halfPayables: +(priceValues.payables.toFixed(2))};
     const updatedFinance = {...finance, Price};
     return updatedFinance;
 }
@@ -143,8 +143,8 @@ function getStepNewFinance(step) {
     const done = progress.wordsDone/progress.wordsTotal;
     Wordcount.halfReceivables = Wordcount.receivables*done;
     Wordcount.halfPayables = Wordcount.payables*done;
-    Price.halfReceivables = Price.receivables*done;
-    Price.halfPayables = Price.payables*done;
+    Price.halfReceivables = +((Price.receivables*done).toFixed(2));
+    Price.halfPayables = +((Price.payables*done).toFixed(2));
     return { Wordcount, Price }
 }
 

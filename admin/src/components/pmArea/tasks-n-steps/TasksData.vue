@@ -1,23 +1,12 @@
 <template lang="pug">
 .tasks-data
-    .langs
+    .tasks-data__langs
         TasksLangs(
             :sourceLanguages="sourceLanguages"
             @setSourceLanguage="setSourceLang"
             @setTargets="setTargets")
     .tasks-data__main-info
         .tasks-data__column
-            //- .tasks-data__drop-menu
-                //- label.tasks-data__menu-title.tasks-data_relative Source Language
-                //-     Asterisk(:customStyle="asteriskStyle")
-                //- LanguagesSelect(
-                //-     placeholder="Source Languages"
-                //-     :langFilter="customerLangFilter.source"
-                //-     :single='true'
-                //-     :selectedLangs="sourceLanguages"
-                //-     customClass="tasks-data__langs"
-                //-     @chosenLang="setSource"
-                //- )
             .tasks-data__drop-menu
                 label.tasks-data__menu-title Template
                 SelectSingle(
@@ -36,16 +25,6 @@
                     @chooseOption="setWorkflow"
                 ) 
         .tasks-data__column
-            //- .tasks-data__drop-menu    
-            //-     label.tasks-data__menu-title.tasks-data_relative Target Languages
-            //-         Asterisk(:customStyle="asteriskStyle")  
-            //-     LanguagesSelect(
-            //-         placeholder="Target Languages"
-            //-         :langFilter="customerLangFilter.target"
-            //-         :selectedLangs="targetLanguages"
-            //-         customClass="tasks-data__langs"
-            //-         @chosenLang="setTargets"
-            //-     )
             .tasks-data__drop-menu
                 label.tasks-data__menu-title.tasks-data_relative Service
                     Asterisk(:customStyle="asteriskStyle")   
@@ -66,14 +45,6 @@
                             img.tasks-data__list-icon(src="../../../assets/images/arrow_open.png" :class="{'tasks-data_reversed-icon': isSourceFilesShow}")
                     .tasks-data__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
                         span.tasks-data__delete-file(@click="deleteFile(index, 'sourceFiles')") +
-            //- .tasks-data__drop-menu
-            //-     label.tasks-data__menu-title Workflow       
-            //-     SelectSingle(
-            //-         :selectedOption="selectedWorkflow.name" 
-            //-         :options="workflowStepsNames" 
-            //-         placeholder="Workflow"
-            //-         @chooseOption="setWorkflow"
-            //-     ) 
         .tasks-data__column
             .tasks-data__upload-file
                 UploadFileButton(text="Reference Files")
@@ -104,7 +75,6 @@
 import TasksLangs from "./TasksLangs";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
-import LanguagesSelect from "../../LanguagesSelect";
 import UploadFileButton from "../../UploadFileButton";
 import StepsDefaultDate from "./StepsDefaultDate";
 import Button from "../../Button";
@@ -318,26 +288,11 @@ export default {
             return this.workflowSteps.map(item => {
                 return item.name
             })
-        },
-        customerLangFilter() {
-            let result = {source: [], target: []};
-            const combs = this.currentProject.customer.languageCombinations;
-            for(let comb of combs) {
-                if(comb.source && !comb.source._id) {
-                    result.source.push(comb.source);
-                    result.target.push(comb.target);
-                } else if (comb.source && comb.source._id) {
-                    result.source.push(comb.source._id);
-                    result.target.push(comb.target._id);
-                }
-            }
-            return result;
         }
     },
     components: {
         TasksLangs,
         SelectSingle,
-        LanguagesSelect,
         UploadFileButton,
         StepsDefaultDate,
         Button,
@@ -392,12 +347,6 @@ export default {
         border-bottom: 1px solid $main-color;
         margin-bottom: 20px;
         padding-bottom: 10px;
-    }
-    &__tables {
-        position: relative;
-    }
-    &__tabs {
-        position: absolute;
     }
     &__upload-file {
         position: relative;

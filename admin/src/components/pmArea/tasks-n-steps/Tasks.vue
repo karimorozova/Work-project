@@ -58,15 +58,17 @@
                 ProgressLine(:progress="progress(row)")
             template(slot="status" slot-scope="{ row }")
                 .tasks__task-status {{ row.status }}
-                    .tasks__timestamp(v-if="row.isDelivered")
+                    .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
                         img.tasks__time-icon(src="../../../assets/images/time_icon.png")
                         .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
             template(slot="receivables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.receivables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.receivables") {{ row.finance.Price.receivables }}
+                span.tasks__task-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.receivables }}
+                span.tasks__task-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
             template(slot="payables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.payables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.payables") {{ row.finance.Price.payables }}
+                span.tasks__task-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.payables }}
+                span.tasks__task-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
             template(slot="margin" slot-scope="{ row }")
                 span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
@@ -207,7 +209,10 @@ export default {
             return date.split('T')[0].split('-').reverse().join('-');
         },
         marginCalc(finance) {
-            return (finance.receivables - finance.payables).toFixed(2);
+            if(!finance.halfReceivables) {
+                return (finance.receivables - finance.payables).toFixed(2);
+            }
+            return (finance.halfReceivables - finance.halfPayables).toFixed(2);
         },
         progress(task) {
             const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);

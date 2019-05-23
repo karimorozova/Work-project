@@ -42,6 +42,7 @@ export default {
     &__filler {
         background-color: $green;
         height: 100%;
+        max-width: 100%;
     }
     &__value {
         background-color: $white;

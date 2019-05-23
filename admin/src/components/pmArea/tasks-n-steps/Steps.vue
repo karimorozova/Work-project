@@ -94,10 +94,12 @@
                 span.steps__step-status {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
                 span.steps__money(v-if="row.finance.Price.receivables") &euro;
-                span.steps__step-data {{ row.finance.Price.receivables }}
+                span.steps__step-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.receivables }}
+                span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
             template(slot="payables" slot-scope="{ row }")
                 span.steps__money(v-if="row.finance.Price.payables") &euro;                
-                span.steps__step-data {{ row.finance.Price.payables }}
+                span.steps__step-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.payables }}
+                span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
             template(slot="margin" slot-scope="{ row }")
                 span.steps__money(v-if="marginCalc(row.finance.Price)") &euro;
                 span.steps__step-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
@@ -202,7 +204,10 @@ export default {
             : this.$emit('showTab', { tab: this.tabs[index] });
         },
         marginCalc(finance) {
-            return (finance.receivables - finance.payables).toFixed(2);
+            if(!finance.halfReceivables) {
+                return (finance.receivables - finance.payables).toFixed(2);
+            }
+            return (finance.halfReceivables - finance.halfPayables).toFixed(2);
         },
         getTask(index) {
             return this.tasks.find(item => {
