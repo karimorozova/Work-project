@@ -176,7 +176,7 @@
       completedJobs() {
         let result = [];
         if(this.jobs.length) {
-          result = this.jobs.filter(job => job.status === "Completed");
+          result = this.jobs.filter(job => job.status === "Completed" || job.status === "Cancelled Halfway");
         }
         return result;
       }
