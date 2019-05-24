@@ -28,6 +28,7 @@
                     Button(value="Submit" @makeAction="checkErrors")
         OrderInfo(
             :service="service.title"
+            :industry="selectedIndustry"
         )
 </template>
 

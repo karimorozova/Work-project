@@ -21,7 +21,7 @@
                     span.info-block__num 3
                 .info-block__title INDUSTRY:
                 .info-block__item
-                    span.info-block__text {{ industry }}
+                    span.info-block__text {{ selectedIndustry }}
             .info-block
                 .info-block__title SUGGESTED DEADLINE
                 .info-block__item
@@ -34,8 +34,8 @@ import moment from "moment";
 
 export default {
     props: {
-        service: {type: String, default: 'Select'},
-        industry: {type: String, default: 'Select'}
+        service: {type: String},
+        industry: {type: String}
     },
     computed: {
         ...mapGetters({
@@ -55,6 +55,9 @@ export default {
         },
         deadline() {
             return this.orderDetails.deadline ? moment(this.orderDetails.deadline).format("DD-MM-YYYY") : ""
+        },
+        selectedIndustry() {
+            return this.industry || 'Select';
         }
     }
     
