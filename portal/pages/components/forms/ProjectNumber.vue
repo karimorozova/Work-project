@@ -1,7 +1,7 @@
 <template lang="pug">
-    .project-name
-        TitleInput(title="PROJECT NAME:" :isAsterisk="true")
-            input.project-name__input(type="text" placeholder="Project Name" :value="orderDetails.projectName" @input="setProjectName")
+    .project-number
+        TitleInput(title="Client Project Number:")
+            input.project-number__input(type="text" placeholder="Project ID" :value="orderDetails.projectNumber" @input="setProjectNumber")
 </template>
 
 <script>
@@ -13,17 +13,17 @@ export default {
         ...mapActions({
             setOrderDetail: "setOrderDetail" 
         }),
-        setProjectName(e) {
+        setProjectNumber(e) {
             const value = e.target.value;
-            this.setOrderDetail({prop: 'projectName', value})
+            this.setOrderDetail({prop: 'projectNumber', value})
         }
     },
     computed: {
         ...mapGetters({
             orderDetails: "getOrderDetails"
         }),
-        projectName() {
-            return this.orderDetails.projectName || "";
+        projectNumber() {
+            return this.orderDetails.projectNumber || "";
         }
     },
     components: {
@@ -35,7 +35,7 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors.scss";
 
-.project-name {
+.project-number {
     &__input {
         box-sizing: border-box;
         height: 30px;
@@ -45,7 +45,6 @@ export default {
         border: 1px solid $main-color;
         border-radius: 5px;
         font-size: 14px;
-        margin-left: 12px;
         margin-top: 5px;
         &::-webkit-input-placeholder {
             opacity: 0.6; 

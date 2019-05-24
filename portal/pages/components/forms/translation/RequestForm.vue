@@ -8,6 +8,15 @@
                     .form__deadline
                         Deadline
                 .form__block
+                    .form__industry
+                        IndustriesDrop(
+                            :selectedIndustry="selectedIndustry"
+                            :industries="industries"
+                            @setIndustry="setIndustry"
+                        )
+                    .form__number
+                        ProjectNumber
+                .form__block
                     Languages
                 .form__block
                     ProjectDetails
@@ -28,6 +37,8 @@ import ProjectDetails from "./ProjectDetails";
 import Brief from "./Brief";
 import FormWrapper from "../FormWrapper";
 import ProjectName from "../ProjectName";
+import ProjectNumber from "../ProjectNumber";
+import IndustriesDrop from "./IndustriesDrop";
 import Deadline from "../Deadline";
 import QuoteDecision from "../QuoteDecision";
 import OrderInfo from "../OrderInfo";
@@ -41,6 +52,7 @@ export default {
     },
     data() {
         return {
+            selectedIndustry: ""
         }
     },
     methods: {
@@ -53,6 +65,11 @@ export default {
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
         },
+        setIndustry({option}) {
+            this.selectedIndustry = option;
+            const industry = this.clientIndustries.find(item => item.name === option);
+            this.setOrderDetail({prop: 'industry', value: industry._id});
+        },
         checkErrors() {
             this.$emit('checkErrors', {service: this.service});
         }
@@ -60,8 +77,12 @@ export default {
     computed: {
         ...mapGetters({
             services: "getAllServices",
-            orderDetails: "getOrderDetails"
+            orderDetails: "getOrderDetails",
+            clientIndustries: "getClientIndustries"
         }),
+        industries() {
+            return this.clientIndustries ? this.clientIndustries.map(item => item.name) : [];
+        },
         service() {
             return this.services.length ? this.services.find(item => item.symbol === this.requestService) : {title: 'Select'};
         },
@@ -79,6 +100,8 @@ export default {
     components: {
         FormWrapper,
         ProjectName,
+        ProjectNumber,
+        IndustriesDrop,
         Deadline,
         Languages,
         ProjectDetails,
@@ -116,10 +139,16 @@ export default {
         }
     }
     &__name {
-        width: 48%;
+        width: 247px;
     }
     &__deadline {
         width: fit-content;
+    }
+    &__industry {
+        position: relative;
+        width: 247px;
+        margin-left: 12px;
+        z-index: 20;
     }
     &_centered {
         justify-content: center;

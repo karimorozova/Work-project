@@ -69,6 +69,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .select-comp {
     width: 100%;
@@ -80,7 +81,7 @@ export default {
 .drop-select {
     position: absolute;
     width: 100%;
-    border: 1px solid #938676;
+    border: 1px solid $cell-border;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -90,7 +91,7 @@ export default {
         width: 100%;
         padding: 5px;
         outline: none;
-        border: 1px solid #938676;
+        border: 1px solid $cell-border;
         box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
     }
     .drop {
@@ -100,13 +101,14 @@ export default {
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        background-color: white;
-        border-top: 1px solid #938676;
+        background-color: $white;
+        border-top: 1px solid $cell-border;
         z-index: 6;
         &__item {
             align-items: center;
             padding: 5px;
-            border-bottom: .5px solid #BFB09D;
+            color: $main-color;
+            border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
@@ -119,7 +121,7 @@ export default {
         }
         .active {
             background-color: rgba(102, 86, 61, 0.7);
-            color: #FFF;
+            color: $white;
         }
         .test-options & {
             max-height: 60px;
@@ -137,6 +139,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
+    color: $main-color;
     cursor: pointer;
     .selected {
         width: 80%;
@@ -149,7 +152,8 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        border-right: 1px solid #938676;
+        border-right: 1px solid $cell-border;
+        color: $main-color;
         box-sizing: border-box;
     }
     .no-choice {
@@ -172,6 +176,14 @@ export default {
 .filters_height-30 {
     .select {
         height: 30px;
+    }
+}
+
+.translation-form {
+    border-radius: 5px;
+    border-color: $main-color;
+    .select {
+        height: 28px;
     }
 }
 

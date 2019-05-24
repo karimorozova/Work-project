@@ -27,6 +27,7 @@ export default {
             this.errors = [];
             if(!this.orderDetails.projectName) this.errors.push('Enter Project name');
             if(!this.orderDetails.deadline) this.errors.push('Set Suggested deadline');
+            if(!this.orderDetails.industry) this.errors.push('Select Industry');
             if(!this.orderDetails.source) this.errors.push('Select Source language');
             if(!this.orderDetails.targets || !this.orderDetails.targets.length) this.errors.push('Select Target language(s)');
             if(!this.orderDetails.detailFiles || !this.orderDetails.detailFiles.length) this.errors.push('Upload source file');

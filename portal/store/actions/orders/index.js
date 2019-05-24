@@ -45,7 +45,6 @@ export const submitForm = async function ({commit, dispatch, state}, payload) {
         source: JSON.stringify(state.orderDetails.source),
         targets: JSON.stringify(state.orderDetails.targets),
         createdAt: new Date(),
-        industry: state.clientInfo.industries[0]._id,
         customer: state.clientInfo._id,
         projectManager: state.clientInfo.projectManager._id,
         status: 'Requested',
