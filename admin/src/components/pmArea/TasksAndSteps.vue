@@ -58,6 +58,11 @@ export default {
             addProjectTasks: "addProjectTasks",
             getServices: "getServices"
         }),
+        setDefaultIsTaskData() {
+            if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
+                this.isTaskData = true;
+            }
+        },
         toggleTaskData() {
             this.isTaskData = !this.isTaskData;
         },
@@ -168,6 +173,7 @@ export default {
     },
     mounted() {
         this.defaultService();
+        this.setDefaultIsTaskData();
     }
 }
 </script>

@@ -5,59 +5,44 @@
             :sourceLanguages="sourceLanguages"
             @setSourceLanguage="setSourceLang"
             @setTargets="setTargets")
-    .tasks-data__main-info
-        .tasks-data__column
-            .tasks-data__drop-menu
-                label.tasks-data__menu-title Template
-                SelectSingle(
-                    :selectedOption="template"
-                    :options="allTemplates"
-                    placeholder="Template"
-                    refersTo="template"
-                    @chooseOption="setValue"
-                )
-            .tasks-data__drop-menu
-                label.tasks-data__menu-title Workflow       
-                SelectSingle(
-                    :selectedOption="selectedWorkflow.name" 
-                    :options="workflowStepsNames" 
-                    placeholder="Workflow"
-                    @chooseOption="setWorkflow"
-                ) 
-        .tasks-data__column
-            .tasks-data__drop-menu
-                label.tasks-data__menu-title.tasks-data_relative Service
-                    Asterisk(:customStyle="asteriskStyle")   
-                SelectSingle(
-                    :selectedOption="service" 
-                    :options="allServices" 
-                    placeholder="Service"
-                    refersTo="service"
-                    @chooseOption="setValue"
-                )     
-        .tasks-data__column
-            .tasks-data__upload-file
-                UploadFileButton(text="Source Files *")
-                    input.tasks-data__file-input.tasks-data__source-file(type="file" @change='uploadSourceFiles' multiple)
-                .tasks-data__files-list
-                    .tasks-data__files-expander(v-if="sourceFiles.length")
-                        .tasks-data__list-title(@click="toggleSourceFiles") Files list
-                            img.tasks-data__list-icon(src="../../../assets/images/arrow_open.png" :class="{'tasks-data_reversed-icon': isSourceFilesShow}")
-                    .tasks-data__loaded-file(v-if="isSourceFilesShow" v-for="(file, index) in sourceFiles") {{ file.name }}
-                        span.tasks-data__delete-file(@click="deleteFile(index, 'sourceFiles')") +
-        .tasks-data__column
-            .tasks-data__upload-file
-                UploadFileButton(text="Reference Files")
-                    input.tasks-data__file-input.tasks-data__ref-file(type="file" @change='uploadRefFiles' multiple)
-                .tasks-data__files-list
-                    .tasks-data__files-expander(v-if="refFiles.length")
-                        .tasks-data__list-title(@click="toggleRefFiles") Files list
-                            img.tasks-data__list-icon(src="../../../assets/images/arrow_open.png" :class="{'tasks-data_reversed-icon': isRefFilesShow}")
-                    .tasks-data__loaded-file(v-if="isRefFilesShow" v-for="(file, index) in refFiles") {{ file.name }}
-                        span.tasks-data__delete-file(@click="deleteFile(index, 'refFiles')") +
-        .tasks-data__join-files
-            input.tasks-data__check(type="checkbox" v-model="isJoinFiles")
-            span.tasks-data__check-title Join Files
+    .tasks-data__files
+        TasksFiles(
+            :refFiles="refFiles"
+            :sourceFiles="sourceFiles"
+            :isJoinFiles="isJoinFiles"
+            @uploadSourceFiles="uploadSourceFiles"
+            @uploadRefFiles="uploadRefFiles"
+            @deleteFile="deleteFile"
+            @toggleJoin="toggleJoin"
+        )
+    .tasks-data__drops
+        .tasks-data__drop-menu
+            label.tasks-data__menu-title Template
+            SelectSingle(
+                :selectedOption="template"
+                :options="allTemplates"
+                placeholder="Template"
+                refersTo="template"
+                @chooseOption="setValue"
+            )
+        .tasks-data__drop-menu
+            label.tasks-data__menu-title Workflow       
+            SelectSingle(
+                :selectedOption="selectedWorkflow.name" 
+                :options="workflowStepsNames" 
+                placeholder="Workflow"
+                @chooseOption="setWorkflow"
+            ) 
+        .tasks-data__drop-menu
+            label.tasks-data__menu-title.tasks-data_relative Service
+                Asterisk(:customStyle="asteriskStyle")   
+            SelectSingle(
+                :selectedOption="service" 
+                :options="allServices" 
+                placeholder="Service"
+                refersTo="service"
+                @chooseOption="setValue"
+            )     
     .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
         StepsDefaultDate(
             v-for="count in stepsCounter"
@@ -73,9 +58,9 @@
 
 <script>
 import TasksLangs from "./TasksLangs";
+import TasksFiles from "./TasksFiles";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
-import UploadFileButton from "../../UploadFileButton";
 import StepsDefaultDate from "./StepsDefaultDate";
 import Button from "../../Button";
 import { mapGetters, mapActions } from 'vuex';
@@ -112,8 +97,6 @@ export default {
             refFiles: [],
             isStepsShow: false,
             isTasksShow: true,
-            isSourceFilesShow: false,
-            isRefFilesShow: false,
             isJoinFiles: false,
             asteriskStyle: {"top": "-4px"}
         }
@@ -156,9 +139,9 @@ export default {
         setTargets({targets}) {
             this.$emit("setTargets", { targets });
         },
-        uploadSourceFiles(event) {
-            if(event.target.files.length) {
-                for(let file of event.target.files) {
+        uploadSourceFiles({files}) {
+            if(files.length) {
+                for(let file of files) {
                     const isExist = this.sourceFiles.find(item => item.name === file.name);
                     if(!isExist) {
                         this.sourceFiles.push(file);
@@ -166,26 +149,20 @@ export default {
                 }
             }
         },
-        toggleSourceFiles() {
-            this.isSourceFilesShow = !this.isSourceFilesShow;
-        },
-        uploadRefFiles(event) {
-            if(event.target.files.length) {
-                this.refFiles.push(event.target.files[0]);
+        uploadRefFiles({files}) {
+            if(files.length) {
+                this.refFiles.push(files[0]);
             }
         },
-        toggleRefFiles() {
-            this.isRefFilesShow = !this.isRefFilesShow;
-        },
-        deleteFile(index, prop) {
+        deleteFile({index, prop}) {
             this[prop].splice(index, 1);
             if(!this[prop].length) {
                 if(prop === "sourceFiles") {
                     this.isSourceFilesShow = false;
-                    return this.clearInputFiles(".tasks-data__source-file");
+                    return this.clearInputFiles(".files-upload__source-file");
                 }
                 this.isRefFilesShow = false;
-                return this.clearInputFiles(".tasks-data__ref-file");
+                return this.clearInputFiles(".files-upload__ref-file");
             }
         },
         clearInputFiles(str) {
@@ -193,6 +170,9 @@ export default {
             for(let elem of inputFiles) {
                 elem.value = "";
             }
+        },
+        toggleJoin() {
+            this.isJoinFiles = !this.isJoinFiles;
         },
         isRefFilesHasSource() {
             if(!this.refFiles.length) return false;
@@ -292,8 +272,8 @@ export default {
     },
     components: {
         TasksLangs,
+        TasksFiles,
         SelectSingle,
-        UploadFileButton,
         StepsDefaultDate,
         Button,
         Asterisk
@@ -309,8 +289,8 @@ export default {
 
 .tasks-data {
     position: relative;
-    &__main-info {
-        margin-bottom: 20px;
+    &__drops {
+        margin-bottom: 40px;
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -327,17 +307,6 @@ export default {
     &_relative {
         position: relative;
     }
-    &__column {
-        width: 20%;
-        height: 100px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: flex-start;
-        &:nth-of-type(4) {
-            height: 117px;
-        }
-    }
     &__default-dates {
         margin-bottom: 30px;
     }
@@ -348,62 +317,13 @@ export default {
         margin-bottom: 20px;
         padding-bottom: 10px;
     }
-    &__upload-file {
-        position: relative;
-        margin-top: 15px;
-    }
-    &__files-list {
-        box-sizing: border-box;
-        background-color: $white;
-        padding: 5px;
-        position: absolute;
-        bottom: 33px;
-        left: 0;
-        width: 100%;
-        overflow-x: hidden;
-    }
-    &__loaded-file {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-        align-items: center;
-        font-size: 12px;
-    }
-    &__delete-file {
-        transform: rotate(45deg);
-        cursor: pointer;
-        font-size: 18px;
-        font-weight: bold;
-        margin-right: 5px;
-    }
-    &__files-expander {
-        opacity: 0.7;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    &__list-icon {
-        margin-left: 5px;
-        transform: rotate(180deg);
-    }
-    &_reversed-icon {
-        transform: rotate(0);
-    }
-    &__list-title {
-        cursor: pointer;
+    &__files {
+        margin: 40px 0;
     }
     &__join-files {
         display: flex;
         align-items: flex-start;
         padding-top: 20px;
-    }
-    &__check {
-        margin-right: 5px;
-        cursor: pointer;
-    }
-    &__check-title {
-        font-size: 14px;
     }
 }
 
