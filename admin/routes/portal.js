@@ -254,12 +254,14 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
     }
 })
 
-router.post('/delivered', checkClientContact, async (req, res) => {
-    const { task } = req.body;
+router.post('/task-status', checkClientContact, async (req, res) => {
+    const { task, status } = req.body;
     try {
         const project = await getProject({"tasks.taskId": task.taskId});
-        const updatedProject = await getProjectAfterTasksUpdated({taskIds: [task.taskId], project, status: "Delivered"});    
-        await notifyDeliverablesDownloaded(task.taskId, project);
+        const updatedProject = await getProjectAfterTasksUpdated({taskIds: [task.taskId], project, status});    
+        if(status === 'Delivered') {
+            await notifyDeliverablesDownloaded(task.taskId, project);
+        }
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

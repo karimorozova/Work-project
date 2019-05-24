@@ -27,8 +27,8 @@ export const selectProject = ({ commit }, payload) => {
 
 export const updateTaskStatus = async function({commit, dispatch, state}, payload) {
     try {
-        const { task } = payload;
-        const updatedProject = await this.$axios.post('/portal/delivered', { task });
+        const { task, status } = payload;
+        const updatedProject = await this.$axios.post('/portal/task-status', { task, status });
         dispatch('selectProject', updatedProject.data);
         let projects = [...state.projects]
         const index = projects.findIndex(item => item._id === state.selectedProject._id);

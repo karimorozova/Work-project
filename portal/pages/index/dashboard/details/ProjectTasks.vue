@@ -20,8 +20,10 @@
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
             .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
                 .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
-            .tasks-table__data.tasks-table_centered(slot="download" slot-scope="{ row }")
-                img.tasks-table__icon(v-if="isDownload(row)" src="../../../../assets/images/download.png" @click="download(row)")
+            .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
+                .tasks-table__icons(v-if="isApproveReject(row)")
+                    img.tasks-table__icon(v-for="(icon, key) in icons" :src="icon.src" @click="makeDecision(row, key)")
+                img.tasks-table__download(v-if="isDownload(row)" src="../../../../assets/images/download.png" @click="download(row)")
 
 </template>
 
@@ -37,15 +39,19 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.44), padding: "0"},
+                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.42), padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(735*0.14), padding: "0"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: Math.floor(735*0.12), padding: "0"},
-                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.13), padding: "0"},
+                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.12), padding: "0"},
                 {label: "Cost", headerKey: "headerCost", key: "cost", width: Math.floor(735*0.1), padding: "0"},
-                {label: " ", headerKey: "headerDownload", key: "download", width: 0, padding: "0"}
+                {label: " ", headerKey: "headerDownload", key: "icons", width: 0, padding: "0"}
             ],
             domain: "",
-            tableWidth: 735
+            tableWidth: 735,
+            icons: {
+                approve: {src: require("../../../../assets/images/Approve-icon.png")},
+                reject: {src: require("../../../../assets/images/Reject-icon.png")}
+            }
         }
     },
     methods: {
@@ -66,8 +72,17 @@ export default {
             }
             return pair;
         },
+        isApproveReject(task) {
+            return task.status === 'Created'
+        },
         isDownload(task) {
             return task.status === 'Ready for Delivery' || task.status === 'Delivered'
+        },
+        async makeDecision(task, key) {
+            const status = key === 'approve' ? 'Approved' : 'Rejected'
+            try {
+                await this.updateTaskStatus({task, status});
+            } catch(err) { }
         },
         async download(task) {
             try {
@@ -78,7 +93,7 @@ export default {
                 link.target = "_blank";
                 link.click();
                 if(task.status === "Ready for Delivery") {
-                    await this.updateTaskStatus({task});
+                    await this.updateTaskStatus({task, status: 'Delivered'});
                 }
             } catch(err) {
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
@@ -126,7 +141,20 @@ export default {
     &__currency {
         margin-left: 3px;
     }
+    &__icons {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+    }
     &__icon {
+        cursor: pointer;
+        transition: all 0.2s;
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+    &__download {
         cursor: pointer;
     }
     &__progress, &__status {
