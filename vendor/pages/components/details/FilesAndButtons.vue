@@ -1,14 +1,14 @@
 <template lang="pug">
     .files-buttons
         Files
-        .files-buttons__terms(v-if="job.status !== 'Completed'")
+        .files-buttons__terms(v-if="isActiveStatus")
             TermsAgree(:job="job")
         .files-buttons__buttons(v-if="isButton && job.status !== 'Completed'" :class="{'files-buttons_opacity05': !job.isVendorRead}")
             .files-buttons__button(v-if="isStartButton")
                 Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
             .files-buttons__button(v-if="progress >= 100" )
                 Button(value="Complete" @makeAction="showModal")
-        .files-buttons__icons(v-if="areIcons && job.status !== 'Completed'")
+        .files-buttons__icons(v-if="areIcons && isActiveStatus")
             .files-buttons__icon(v-for="(icon, key) in icons")
                 img.files-buttons__image(:src="icon.icon" @click="makeAction(key)")
                 span.files-buttons__tooltip {{ key }}
@@ -65,6 +65,10 @@ export default {
             job: "getSelectedJob",
             allJobs: "getAllJobs"
         }),
+        isActiveStatus() {
+            const statuses = ['Cancelled', 'Cancelled Halfway', 'Completed'];
+            return statuses.indexOf(this.job.status) === -1;
+        },
         isStartButton() {
             return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";
         },
