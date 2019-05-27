@@ -2,13 +2,9 @@ const router = require('express').Router();
 const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
-const { Vendors, Projects } = require('../../models');
-const { getVendor, getVendorAfterUpdate } = require('./getVendors');
-const { saveHashedPassword, getPhotoLink, removeOldPhoto } = require('./info');
-const { getVendorRates } = require('./vendorRates');
-const { getJobs, updateStepProp } = require('./jobs');
+const { Vendors } = require('../../models');
+const { getVendor, getVendorRates, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldPhoto, getJobs, updateStepProp } = require('../../vendors');
 const { upload } = require('../../utils');
-
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {

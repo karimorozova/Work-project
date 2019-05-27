@@ -1,4 +1,4 @@
-const { Vendors } = require("../../models/");
+const { Vendors } = require("../models");
 
 async function getVendor(obj) {
     const vendor = await Vendors.findOne(obj)

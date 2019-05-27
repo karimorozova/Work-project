@@ -3,8 +3,8 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendors, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require('./vendors');
-const { Vendors, Projects } = require('../models');
+const { getVendor, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require('../vendors');
+const { Vendors } = require('../models');
 
 function moveFile(oldFile, vendorId) {
 

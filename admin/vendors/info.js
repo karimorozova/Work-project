@@ -1,7 +1,6 @@
-const { getVendor } = require('./getVendors');
-const { Vendors } = require('../../models');
+const { Vendors } = require('../models');
 const bcrypt = require('bcryptjs');
-const { moveFile } = require('../../utils/movingFile');
+const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
 
 async function saveHashedPassword(id, pass) {

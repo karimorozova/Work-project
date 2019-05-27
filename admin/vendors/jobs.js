@@ -1,5 +1,5 @@
-const { getProjects, getProject, taskCompleteNotifyPM } = require('../../projects');
-const { Projects } = require('../../models');
+const { getProjects, getProject, taskCompleteNotifyPM } = require('../projects');
+const { Projects } = require('../models');
 
 async function getJobs(id) {
     try {

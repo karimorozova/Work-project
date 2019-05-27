@@ -1,8 +1,8 @@
-const { Vendors, Services } = require("../../models/");
+const { Services } = require("../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
 const { getPricelist, replaceRates, replaceFromPrice, 
     includeAllIndustries, defaultRates, getAllUpdatedIndustries, 
-    getAfterDeleteRates, updateCombIndustries } = require("../../rates");
+    getAfterDeleteRates, updateCombIndustries } = require("../rates");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
