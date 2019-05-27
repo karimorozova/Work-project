@@ -57,8 +57,25 @@ export const deliverTasks = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const tasks = payload.filter(item => item.status === "Ready for Delivery");
-        const updatedProject = await Vue.http.post("/pm-manage/deliver", { tasks });
-        await dispatch('setCurrentProject', updatedProject.data);
+        if(tasks.length) {
+            const updatedProject = await Vue.http.post("/pm-manage/deliver", { tasks });
+            await dispatch('setCurrentProject', updatedProject.data);
+        }
+        dispatch('alertToggle', {message: "Tasks delivered", isShow: true, type: "success"});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const sendTasksDetails = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const tasks = payload.filter(task => task.status === "Created");
+        if(tasks.length) {
+            await Vue.http.post("/pm-manage/tasks-quote", { tasks });
+        }
         dispatch('alertToggle', {message: "Tasks delivered", isShow: true, type: "success"});
     } catch(err) {
         dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});

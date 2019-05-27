@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
-    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
+    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 
@@ -248,6 +248,17 @@ router.post("/deliver", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on delivering tasks");
+    }
+})
+
+router.post("/tasks-quote", async (req, res) => {
+    const { tasks } = req.body;
+    try {
+        await sendTasksQuote(tasks);
+        res.send('Quote sent');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending tasks quote");
     }
 })
 

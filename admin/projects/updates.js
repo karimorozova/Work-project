@@ -169,7 +169,7 @@ async function updateProjectStatus(id, status) {
 async function setNewProjectDetails(project, status) {
     try {
         if(status === "Started" || status === "Approved") {
-            return await getApprovedProject(project);
+            return await getApprovedProject(project, status);
         }
         if(status === "Rejected") {
             const client = {...project.customer._doc, id: project.customer.id};
@@ -187,12 +187,13 @@ async function getApprovedProject(project, status) {
     const taskIds = project.tasks.map(item => item.taskId);
     const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
     try {
-
-    } catch(err) {
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
         return await updateProject({"_id": project.id},{status, tasks, steps});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getApprovedProject");
     }
 }
 

@@ -176,15 +176,20 @@ export default {
                     case 'Deliver':
                         await this.deliverTasks(checkedTasks);
                         break
+                    case 'Send a Quote':
+                        await this.sendTasksDetails(checkedTasks);
+                        break
                 }
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
             } finally {
                 this.closeApproveModal();
+                this.unCehckAllTAsks();
             }
         },
         notApproveAction() {
             this.closeApproveModal();
+            this.unCehckAllTAsks();
         },
         async cancelTasks(tasks) {
             const filteredTasks = tasks.filter(item => item.status !== "Ready for Delivery" && item.status !== "Delivered");
@@ -254,7 +259,8 @@ export default {
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
             setProjectStatus: "setProjectStatus",
-            deliverTasks: "deliverTasks"
+            deliverTasks: "deliverTasks",
+            sendTasksDetails: "sendTasksDetails"
         })
     },
     computed: {
@@ -265,6 +271,7 @@ export default {
             let result = ["Cancel"];
             const completedTask = this.allTasks.find(item => item.status === 'Pending Approval');
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
+            const createdTask = this.allTasks.find(item => item.status === 'Created');
             if(completedTask) {
                 if(result.indexOf('Delivery Review') === -1) {
                     result.push('Delivery Review')
@@ -273,6 +280,11 @@ export default {
             if(approvedTask) {
                 if(result.indexOf('Deliver') === -1) {
                     result.push('Deliver')
+                }
+            }
+            if(createdTask) {
+                if(result.indexOf('Send a Quote') === -1) {
+                    result.push('Send a Quote')
                 }
             }
             return result;

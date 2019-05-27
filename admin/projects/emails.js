@@ -1,5 +1,6 @@
-const { sendEmail, managerNotifyMail } = require("../utils/mailTemplate");
-const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, taskReadyMessage, deliverablesDownloadedMessage } = require("../utils/emailMessages");
+const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
+const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, 
+    taskReadyMessage, deliverablesDownloadedMessage, tasksQuoteMessage } = require("../utils/emailMessages");
 const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
 const { User } = require("../models");
@@ -106,4 +107,21 @@ async function notifyDeliverablesDownloaded(taskId, project) {
     }
 }
 
-module.exports = { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded };
+async function sendTasksQuote(tasks) {
+    try {
+        const project = await getProject({"tasks.taskId": tasks[0].taskId});
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        for(let task of tasks) {
+            const service = await getOneService({"_id": task.service});
+            const quoteInfo = {...project._doc, task, contact, service: service.title};
+            const message = tasksQuoteMessage(quoteInfo);
+            await clientQuoteEmail({contact, subject: "Quote(s) (ID C001.1)"}, message);
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyDeliverablesDownloaded");
+    }
+
+}
+
+module.exports = { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded, sendTasksQuote };

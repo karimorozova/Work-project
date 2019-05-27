@@ -50,7 +50,7 @@ export default {
             if(this.selectedAction === "Cancel") {
                 this.approveButtonValue = "Confirm"
             }
-            if(this.selectedAction === "Accept/Reject") {
+            if(this.selectedAction === "Accept/Reject Quote") {
                 this.approveButtonValue = "Accept";
                 this.alternativeButtonValue = "Reject",
                 this.isAlternativeAction = true
@@ -67,7 +67,7 @@ export default {
                         const details = await this.$http.get(`/pm-manage/project-details?projectId=${this.project._id}`);
                         this.$emit("editAndSend", { message: details, subject: "details" });
                         break;
-                    case "Accept/Reject":
+                    case "Accept/Reject Quote":
                         await this.acceptQuote();
                         break;
                     case "Cancel":
@@ -83,7 +83,7 @@ export default {
         async makeAlterAction() {
             try {
                 switch(this.selectedAction) {
-                    case "Accept/Reject":
+                    case "Accept/Reject Quote":
                         await this.rejectQuote();
                         break;
                 }
@@ -138,7 +138,7 @@ export default {
                 result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
             }
             if(this.project.status === "Quote sent") {
-                result = ["Accept/Reject", "Cancel"];
+                result = ["Accept/Reject Quote", "Cancel"];
             }
             if(this.project.status === "Started" || this.project.status === "In progress") {
                 result = ["Send Project Details", "Cancel"];
