@@ -2,7 +2,8 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services, Pricelist } = require('../models');
 const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
-const { updateProjectCosts, getProject, getAfterPayablesUpdated, setDefaultStepVendors, getProjectWithUpdatedFinance } = require('../projects/');
+const { getProject, getProjectWithUpdatedFinance } = require('../projects/');
+const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../calculations');
 const { getAllRates } = require('../services/getRates'); 
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 

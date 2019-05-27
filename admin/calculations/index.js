@@ -1,8 +1,8 @@
-const { Projects, Services, Clients, Vendors } = require('../models');
+const { Services, Vendors } = require('../models');
 const { getVendor, getVendors } = require('../routes/vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { getOneService } = require('../services/getServices');
-const { updateProject } = require('./getProjects');
+const { updateProject } = require('../projects/getProjects');
 
 async function metricsCalc(metrics) {
     return new Promise((resolve, reject) => {

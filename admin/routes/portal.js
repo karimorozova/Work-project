@@ -8,7 +8,7 @@ const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
 const jwt = require("jsonwebtoken");
 const { upload } = require('../utils/');
-const  { getProjectAfterTasksUpdated } = require("../delivery");
+const  { setTasksDelieryStatus } = require("../delivery");
 
 router.get('/', (req, res) => {
     res.send("portal");
@@ -258,9 +258,12 @@ router.post('/task-status', checkClientContact, async (req, res) => {
     const { task, status } = req.body;
     try {
         const project = await getProject({"tasks.taskId": task.taskId});
-        const updatedProject = await getProjectAfterTasksUpdated({taskIds: [task.taskId], project, status});    
+        let updatedProject = {};
         if(status === 'Delivered') {
+            updatedProject = await setTasksDelieryStatus({taskIds: [task.taskId], project, status});    
             await notifyDeliverablesDownloaded(task.taskId, project);
+        } else {
+            // updatedProject = await 
         }
         res.send(updatedProject);
     } catch(err) {

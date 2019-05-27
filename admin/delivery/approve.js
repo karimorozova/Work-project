@@ -4,17 +4,17 @@ async function getProjectAfterApprove({taskIds, project, isDeliver}) {
     try {
         if(isDeliver) {
             await sendClientDeliveries({taskIds, project});
-            return await getProjectAfterTasksUpdated({taskIds, project, status: "Delivered"})
+            return await setTasksDelieryStatus({taskIds, project, status: "Delivered"})
         }
         await notifyClientTaskReady({taskIds, project});
-        return await getProjectAfterTasksUpdated({taskIds, project, status: "Ready for Delivery"});
+        return await setTasksDelieryStatus({taskIds, project, status: "Ready for Delivery"});
     } catch(err) {
         console.log(err);
         console.log("Error in getProjectAfterApprove");
     }
 }
 
-async function getProjectAfterTasksUpdated({taskIds, project, status}) {
+async function setTasksDelieryStatus({taskIds, project, status}) {
     const updatedTasks = getUpdatedTasks({taskIds, tasks: project.tasks, status});
     let projectStatus = project.status;
     if(status === "Ready for Delivery") {
@@ -27,7 +27,7 @@ async function getProjectAfterTasksUpdated({taskIds, project, status}) {
         return await updateProject({"_id": project._id}, { tasks: updatedTasks, status: projectStatus});
     } catch(err) {
         console.log(err);
-        console.log("Error in getProjectAfterTasksUpdated");
+        console.log("Error in setTasksDelieryStatus");
     }
 }
 
@@ -49,4 +49,4 @@ function getUpdatedTasks({taskIds, tasks, status}) {
     })
 }
 
-module.exports = { getProjectAfterApprove, getProjectAfterTasksUpdated }
+module.exports = { getProjectAfterApprove, setTasksDelieryStatus }

@@ -4,7 +4,7 @@ const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
-const { getProjectAfterApprove, getProjectAfterTasksUpdated, getAfterTasksDelivery } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDelieryStatus, getAfterTasksDelivery } = require("../../delivery");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -219,7 +219,7 @@ router.post("/tasks-approve", async (req, res) => {
     const { taskIds } = req.body;
     try {
         const project = await getProject({"tasks.taskId": taskIds[0]});
-        const updatedProject = await getProjectAfterTasksUpdated({taskIds, project, status: "Ready for Delivery"});
+        const updatedProject = await setTasksDelieryStatus({taskIds, project, status: "Ready for Delivery"});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

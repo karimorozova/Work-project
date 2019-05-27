@@ -170,7 +170,7 @@ async function updateProjectStatus(id, status) {
 async function setNewProjectDetails(project, status) {
     try {
         if(status === "Started" || status === "Approved") {
-            return await updateWithAcceptedSteps(project, status);
+            return await updateWithApprovedTasks(project, status);
         }
         if(status === "Rejected") {
             const client = {...project.customer._doc, id: project.customer.id};
@@ -184,21 +184,27 @@ async function setNewProjectDetails(project, status) {
     }
 }
 
-async function updateWithAcceptedSteps(project, status) {
-    let { steps } = project;
-    for(let step of steps) {
+async function updateWithApprovedTasks(project, status) {
+    const tasks = project.tasks.map(task => {
+        if(task.status === 'Created') {
+            task.status === 'Approved'
+        }
+        return task;
+    })
+    const steps = project.steps.map(step => {
         if(step.status === 'Accepted') {
             step.status = step.name === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
         }
-    }
+        return step;
+    })
     try {
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
-        return await updateProject({"_id": project.id},{status, steps});
+        return await updateProject({"_id": project.id},{status, tasks, steps});
     } catch(err) {
         console.log(err);
-        console.log("Error in updateWithAcceptedSteps");
+        console.log("Error in updateWithApprovedTasks");
     }
 }
 
