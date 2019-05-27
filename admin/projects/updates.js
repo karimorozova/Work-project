@@ -124,7 +124,7 @@ function getTaskNewStatus(steps, taskId) {
 }
 
 function updateStepsStatuses({steps, status, stepIdentify}) {
-    const updated = steps.map(item => {
+    return steps.map(item => {
         if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
             let newStatus = status;
             if(status === "Ready to Start" && item.name !== "translate1") {
@@ -134,7 +134,6 @@ function updateStepsStatuses({steps, status, stepIdentify}) {
         }
         return item;
     })
-    return updated;
 }
 
 function getStepNewFinance(step) {
@@ -170,7 +169,7 @@ async function updateProjectStatus(id, status) {
 async function setNewProjectDetails(project, status) {
     try {
         if(status === "Started" || status === "Approved") {
-            return await updateWithApprovedTasks(project, status);
+            return await getApprovedProject(project);
         }
         if(status === "Rejected") {
             const client = {...project.customer._doc, id: project.customer.id};
@@ -184,28 +183,33 @@ async function setNewProjectDetails(project, status) {
     }
 }
 
-async function updateWithApprovedTasks(project, status) {
-    const tasks = project.tasks.map(task => {
-        if(task.status === 'Created') {
-            task.status === 'Approved'
-        }
-        return task;
-    })
-    const steps = project.steps.map(step => {
-        if(step.status === 'Accepted') {
-            step.status = step.name === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
-        }
-        return step;
-    })
+async function getApprovedProject(project, status) {
+    const taskIds = project.tasks.map(item => item.taskId);
+    const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
     try {
+
+    } catch(err) {
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
         return await updateProject({"_id": project.id},{status, tasks, steps});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateWithApprovedTasks");
     }
+}
+
+function updateWithApprovedTasks({taskIds, project}) {
+    const tasks = project.tasks.map(task => {
+        if(task.status === 'Created' && taskIds.indexOf(task.taskId) !== -1) {
+            task.status = 'Approved'
+        }
+        return task;
+    })
+    const steps = project.steps.map(step => {
+        if(step.status === 'Accepted' && taskIds.indexOf(step.taskId) !== -1) {
+            step.status = step.name === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
+        }
+        return step;
+    })
+    return { tasks, steps }
 }
 
 function getUpdatedProjectFinance(tasks) {
@@ -317,4 +321,4 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
 }
 
 module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
-    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress };
+    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks };

@@ -1,8 +1,8 @@
-const { getProjectAfterApprove, setTasksDelieryStatus } = require("./approve");
+const { getProjectAfterApprove, setTasksDeliveryStatus } = require("./approve");
 const { getAfterTasksDelivery } = require("./tasks-deliver");
 
 module.exports = {
     getProjectAfterApprove,
-    setTasksDelieryStatus,
+    setTasksDeliveryStatus,
     getAfterTasksDelivery
 }

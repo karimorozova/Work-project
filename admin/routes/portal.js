@@ -1,18 +1,14 @@
-const { checkClientContact } = require('../middleware');
-const { getClient } = require('../clients');
-const { getProject, getProjects, createProject, createTasks, updateProjectStatus, getDeliverablesLink, notifyDeliverablesDownloaded } = require("../projects/");
 const router = require('express').Router();
 const fs = require('fs');
 const https = require('https');
-const { Clients, Projects } = require('../models');
-const { secretKey } = require('../configs');
 const jwt = require("jsonwebtoken");
+const { checkClientContact } = require('../middleware');
+const { getClient } = require('../clients');
+const { getProject, getProjects, createProject, createTasks, updateProjectStatus, getDeliverablesLink } = require("../projects/");
+const { getAfterTaskStatusUpdate } = require('../clients');
+const { Clients } = require('../models');
+const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
-const  { setTasksDelieryStatus } = require("../delivery");
-
-router.get('/', (req, res) => {
-    res.send("portal");
-});
 
 router.post("/auth", async (req, res, next) => {
   if (req.body.logemail) {
@@ -258,13 +254,7 @@ router.post('/task-status', checkClientContact, async (req, res) => {
     const { task, status } = req.body;
     try {
         const project = await getProject({"tasks.taskId": task.taskId});
-        let updatedProject = {};
-        if(status === 'Delivered') {
-            updatedProject = await setTasksDelieryStatus({taskIds: [task.taskId], project, status});    
-            await notifyDeliverablesDownloaded(task.taskId, project);
-        } else {
-            // updatedProject = await 
-        }
+        const updatedProject = await getAfterTaskStatusUpdate({task, project, status});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
