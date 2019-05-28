@@ -18,8 +18,11 @@
             .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="getProgress(row)")
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
-            .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
-                .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+            template(slot="cost" slot-scope="{ row }")
+                .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ row.finance.Price.receivables }}
+                    .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+                .tasks-table__data(v-if="isCancelledHalfway(row)") {{ row.finance.Price.halfReceivables }}
+                    .tasks-table__currency(v-if="row.finance.Price.halfReceivables") &euro;
             .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
                 .tasks-table__icons(v-if="isApproveReject(row)")
                     img.tasks-table__icon(v-for="(icon, key) in icons" :src="icon.src" @click="makeDecision(row, key)")
@@ -59,6 +62,9 @@ export default {
             alertToggle: "alertToggle",
             updateTaskStatus: "updateTaskStatus"
         }),
+        isCancelledHalfway(task) {
+            return task.status === 'Cancelled Halfway';
+        },
         getDeliveredTime(date) {
             return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
         },

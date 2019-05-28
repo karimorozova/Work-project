@@ -98,7 +98,7 @@ function updateTaskNewFinance(changedSteps, task) {
         if(step.status === "Cancelled Halfway") {
             priceValues.receivables+= +step.finance.Price.halfReceivables;
             priceValues.payables+= +step.finance.Price.halfPayables;
-        } else {
+        } else if(step.status === "Completed") {
             priceValues.receivables+= +step.finance.Price.receivables;
             priceValues.payables+= +step.finance.Price.payables;
         }
@@ -115,7 +115,7 @@ function getTaskNewStatus(steps, taskId) {
     if(completedSteps.length === taskSteps.length) {
         return "Pending Approval"
     }
-    if(halfCancelledSteps.length) {
+    if(halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
         return "Cancelled Halfway"
     }
     if(cancelledSteps.length === taskSteps.length) {
