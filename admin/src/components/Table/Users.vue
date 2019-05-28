@@ -61,9 +61,11 @@
 import SettingsTable from "./SettingsTable";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [scrollDrop],
     data() {
         return {
             fields: [
@@ -101,24 +103,15 @@ export default {
             saveUser: "saveUser",
             removeUser: "removeUser"
         }),
+        isScrollDrop(drop, elem) {
+            return drop && this.users.length >= 20;
+        },
         isActive(key, index) {
             if(this.currentActive === index) {
                 return key !== "edit";
             }
             if(this.currentActive !== index) {
                 return key !== "save" && key !== "cancel";
-            }
-        },
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            if(drop && this.users.length >= 20) {
-                let tbody = document.querySelector('.table__tbody');
-                setTimeout(() => {
-                    const offsetBottom = offsetTop + offsetHeight*2;
-                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                    if (offsetBottom > scrollBottom) {
-                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                    }
-                }, 100)
             }
         },
         isEditing() {

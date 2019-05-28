@@ -134,9 +134,11 @@ import SelectSingle from "../../SelectSingle";
 const Datepicker = () => import("../../Datepicker");
 import moment from "moment";
 import ClickOutside from "vue-click-outside";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+    mixins: [scrollDrop],
     props: {
         allSteps: {
             type: Array
@@ -177,24 +179,15 @@ export default {
             isAdditionalShow: true,
             chosenStep: {},
             infoIndex: -1,
-            isStepInfo: false
+            isStepInfo: false,
         }
     },
     methods: {
+        isScrollDrop(drop, elem) {
+            return drop && elem.clientHeight >= 320;
+        },
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY');
-        },
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            let tbody = document.querySelector('.table__tbody');
-            if(drop && tbody.clientHeight >= 320) {
-                setTimeout(() => {
-                    const offsetBottom = offsetTop + offsetHeight*2;
-                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                    if (offsetBottom > scrollBottom) {
-                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                    }
-                }, 100);
-            }
         },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
@@ -245,9 +238,7 @@ export default {
             }
         },
         getCheckedSteps() {
-            return this.allSteps.filter(item => {
-                return item.check 
-            })
+            return this.allSteps.filter(item => item.check);
         },
         async approveAction() {
             const checkedSteps = this.getCheckedSteps();
@@ -379,8 +370,12 @@ export default {
         stepActions() {
             let result = this.actions;
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
+            const completedStep = this.allSteps.find(item => item.status === "Completed");
             if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
                 result= ["Request confirmation"];
+            }
+            if(completedStep && result.indexOf("ReOpen") === -1) {
+                result.push("ReOpen");
             }
             return result;
         }

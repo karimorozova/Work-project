@@ -87,9 +87,11 @@ import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 import NativeLanguageSelect from "./NativeLanguageSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import Button from "../Button";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [scrollDrop],
     props: {
         nameFilter: {
             type: String
@@ -147,17 +149,8 @@ export default {
             updateIndustry: "updateIndustry",
             deleteCurrentVendor: "deleteCurrentVendor"
         }),
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            let tbody = document.querySelector('.table__tbody');
-            if(drop && tbody.clientHeight >= 600) {
-                setTimeout(() => {
-                    const offsetBottom = offsetTop + offsetHeight*2;
-                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                    if (offsetBottom > scrollBottom) {
-                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                    }
-                }, 100);
-            }
+        isScrollDrop(drop, elem) {
+            return drop && elem.clientHeight >= 600;
         },
         stopPropagation() {
             return

@@ -66,9 +66,11 @@
 import SettingsTable from "./SettingsTable";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [scrollDrop],
     data() {
         return {
             fields: [
@@ -109,17 +111,8 @@ export default {
                 return key !== "save" && key !== "cancel";
             }
         },
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            if(drop && this.services.length >= 20) {
-                let tbody = document.querySelector('.table__tbody');
-                setTimeout(() => {
-                    const offsetBottom = offsetTop + offsetHeight*2;
-                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                    if (offsetBottom > scrollBottom) {
-                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                    }
-                }, 100)
-            }
+        isScrollDrop(drop, elem) {
+            return drop && this.services.length >= 20;
         },
         uploadIcon(event) {
             this.iconFile.push(event.target.files[0]);
@@ -303,7 +296,8 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            getServices: "getServices"
+            getServices: "getServices",
+            servicesGetting: "servicesGetting"
         }),
     },
     computed: {
@@ -316,7 +310,7 @@ export default {
         SelectSingle,
         Add
     },
-    mounted() {
+    created() {
         this.getAllServices();
     }
 }

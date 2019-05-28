@@ -47,9 +47,11 @@ import ClickOutside from "vue-click-outside";
 import LanguagesSelect from "../LanguagesSelect";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [scrollDrop],
     props: {
         entity: {
             type: Object
@@ -98,7 +100,8 @@ export default {
                 edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
                 cancel: {image: require("../../assets/images/cancel_icon.jpg"), active: false},
                 delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            }
+            },
+            bodyClass: '.duorates-table__tbody'
         }
     },
     methods: {
@@ -178,18 +181,6 @@ export default {
         handleScroll() {
             let element = document.querySelector('.duorates-table__tbody');
             element.scrollTop = element.scrollHeight;
-        },
-        scrollDrop(data) {
-            if(data.drop) {
-                let tbody = document.querySelector('.duorates-table__tbody');
-                setTimeout(() => {
-                const offsetBottom = data.offsetTop + data.offsetHeight*2;
-                const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                if (offsetBottom > scrollBottom) {
-                    tbody.scrollTop = offsetBottom + data.offsetHeight*2 - tbody.offsetHeight;
-                }
-                }, 100)
-            }
         },
         changeSource({lang, index}) {
             this.currentSource = lang;

@@ -74,9 +74,11 @@ import ClientStatusSelect from "./ClientStatusSelect";
 import ClientLeadsourceSelect from "./ClientLeadsourceSelect";
 import MultiClientIndustrySelect from "./MultiClientIndustrySelect";
 import Button from "../Button";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+    mixins: [scrollDrop],
     props: {
         filterName: {
             type: String
@@ -128,24 +130,15 @@ export default {
                 await this.getAllClients();
             }
         },
+        isScrollDrop(drop, elem) {
+            return drop && elem.clientHeight >= 600;
+        },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
                 return key === 'save' || key === 'cancel';
             }
             if(this.currentEditingIndex === index) {
                 return key === 'edit'
-            }
-        },
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            let tbody = document.querySelector('.table__tbody');
-            if(drop && tbody.clientHeight >= 600) {
-                setTimeout(() => {
-                    const offsetBottom = offsetTop + offsetHeight*2;
-                    const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                    if (offsetBottom > scrollBottom) {
-                        tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                    }
-                }, 100);
             }
         },
         setStatus({status}) {

@@ -48,9 +48,11 @@ import LanguagesSelect from "../LanguagesSelect";
 import SelectSingle from "../SelectSingle";
 import Toggler from "../Toggler";
 import IndustrySelect from "../IndustrySelect";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [scrollDrop],
     props: {
         entity: {
             type: Object
@@ -97,7 +99,8 @@ export default {
                 edit: {image: require("../../assets/images/Other/edit-icon-qa.png"), active: false},
                 cancel: {image: require("../../assets/images/cancel_icon.jpg"), active: false},
                 delete: {image: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            }
+            },
+            bodyClass: '.monorates-table__tbody'
         }
     },
     methods: {
@@ -176,18 +179,6 @@ export default {
         handleScroll() {
             let element = document.querySelector('.monorates-table__tbody');
             element.scrollTop = element.scrollHeight;
-        },
-        scrollDrop({drop, offsetTop, offsetHeight}) {
-            if(drop) {
-                let tbody = document.querySelector('.monorates-table__tbody');
-                setTimeout(() => {
-                const offsetBottom = offsetTop + offsetHeight*2;
-                const scrollBottom = tbody.scrollTop + tbody.offsetHeight;
-                if (offsetBottom > scrollBottom) {
-                    tbody.scrollTop = offsetBottom + offsetHeight*2 - tbody.offsetHeight;
-                }
-                }, 100)
-            }
         },
         changeTarget({lang, index}) {
             this.currentTarget = lang;
