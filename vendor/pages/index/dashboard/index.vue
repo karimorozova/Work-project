@@ -63,9 +63,7 @@
         try {
           await this.setJobStatus({jobId, status: "Completed"});
           this.closeModal();
-        } catch(err) {
-
-        }
+        } catch(err) { }
       },
       formatDeadline(date) {
         return moment(date).format('DD-MMM-YYYY')

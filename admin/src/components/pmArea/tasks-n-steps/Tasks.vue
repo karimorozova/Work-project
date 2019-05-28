@@ -142,15 +142,16 @@ export default {
             this.isApproveActionShow = true;
         },
         deliveryReviewAction() {
-            const checkedTasks = this.allTasks.filter(item => item.check && item.status === "Pending Approval");
+            const validStatuses = ["Pending Approval", "Cancelled Halfway"];
+            const checkedTasks = this.allTasks.filter(item => item.check && validStatuses.indexOf(item.status) !== -1);
             if(checkedTasks.length) {
                 this.reviewTasks = checkedTasks;
                 this.isDeliveryReview = true;
             }
             this.selectedAction = "";
-            this.unCehckAllTAsks();
+            this.unCheckAllTAsks();
         },
-        unCehckAllTAsks() {
+        unCheckAllTAsks() {
             const unchecked = this.allTasks.map(item => {
                 item.check = false;
                 return item;
@@ -184,12 +185,12 @@ export default {
                 this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
             } finally {
                 this.closeApproveModal();
-                this.unCehckAllTAsks();
+                this.unCheckAllTAsks();
             }
         },
         notApproveAction() {
             this.closeApproveModal();
-            this.unCehckAllTAsks();
+            this.unCheckAllTAsks();
         },
         async cancelTasks(tasks) {
             const filteredTasks = tasks.filter(item => item.status !== "Ready for Delivery" && item.status !== "Delivered");
@@ -269,7 +270,7 @@ export default {
         }),
         availableActions() {
             let result = ["Cancel"];
-            const completedTask = this.allTasks.find(item => item.status === 'Pending Approval');
+            const completedTask = this.allTasks.find(item => item.status === 'Pending Approval' || item.status === "Cancelled Halfway");
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
             const createdTask = this.allTasks.find(item => item.status === 'Created');
             if(completedTask) {

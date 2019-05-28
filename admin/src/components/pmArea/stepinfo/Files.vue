@@ -80,7 +80,7 @@ export default {
                 }
                 const id = this.currentProject._id;
                 const fileId = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});
-                let fileLink = await this.$http.post('/xtm/target-file', {step: this.step, id, projectId: this.projectId, file: fileId.data[0]});
+                let fileLink = await this.$http.post('/xtm/target-file', {step: this.step, id, projectId: this.projectId, file: {...fileId.data[0], fileName: this.stepFiles[index].fileName}});
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 await this.storeProject(fileLink.data.updatedProject);
@@ -101,7 +101,8 @@ export default {
         }),
         isCompleted() {
             const { progress } = this.step;
-            return progress.wordsDone / progress.wordsTotal * 100 >= 100 && this.step.status === 'Completed';
+            return (progress.wordsDone / progress.wordsTotal * 100 >= 100 && this.step.status === 'Completed') 
+                || this.step.status === 'Cancelled Halfway';
         }
     },
     components: {

@@ -157,7 +157,7 @@ function getProjectStatus({project, status, updatedTasks}) {
     if(projectStatus === "Approved" || projectStatus === "Started") {
         return status === "Started" ? "In progress" : projectStatus;
     }
-    const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery');
+    const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery' && item.status !== 'Cancelled');
     return incompletedTasks ? projectStatus : "Ready for Delivery";
 }
 

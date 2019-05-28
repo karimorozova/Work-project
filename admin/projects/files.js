@@ -1,5 +1,9 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveFile } = require('../utils/movingFile');
+const { getRequestOptions } = require('../services/xtmApi');
+const { updateTaskTargetFiles, getTasksWithTargets } = require('./updates');
+const fs = require('fs');
+const https = require('https');
 
 async function storeFiles(filesArr, projectId) {
     let storedFiles = [];
@@ -39,4 +43,29 @@ function getParsedFiles(jobs) {
     }, [])
 }
 
-module.exports = { storeFiles, getDeliverablesLink };
+async function storeTargetFile({ step, id, projectId, file }) {
+    const options = getRequestOptions({
+        method: "GET",
+        path: `projects/${projectId}/files/${file.fileId}/download?fileType=TARGET`,
+    });
+    try {
+        const fileName = file.fileName.split('.')[0];
+        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/${step.name}-${fileName}.zip`);
+        let reqq = https.request(options, (resp) => {
+            resp.pipe(wstream);
+        });
+        reqq.end();
+        return new Promise((resolve, reject) => {
+            wstream.on('error', err => reject(err));
+            wstream.on('finish', async () => {
+                const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path: `/projectFiles/${id}/${step.name}-${fileName}.zip`});
+                resolve({path: `/projectFiles/${id}/${step.name}-${fileName}.zip`, updatedProject});
+            })
+        })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in storeTargetFile");
+    }
+}
+
+module.exports = { storeFiles, getDeliverablesLink, storeTargetFile };

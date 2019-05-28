@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, generateTargetFile } = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, updateTaskTargetFiles } = require('../projects/');
+const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile } = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../calculations');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
@@ -261,24 +261,12 @@ router.post('/generate-file', async (req, res) => {
 
 router.post('/target-file', async (req, res) => {
     const { step, id, projectId, file } = req.body;
-    const options = getRequestOptions({
-        method: "GET",
-        path: `projects/${projectId}/files/${file.fileId}/download?fileType=TARGET`,
-    });
     try {
-        const fileName = file.fileName.split('.')[0];
-        let wstream = fs.createWriteStream(`./dist/projectFiles/${id}/${step.name}-${fileName}.zip`);
-        let reqq = https.request(options, (resp) => {
-            resp.pipe(wstream);
-        });
-        reqq.end(); 
-        wstream.on('finish', async () => {
-            const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path: `/projectFiles/${id}/${step.name}-${fileName}.zip`});
-            res.send({path: `/projectFiles/${id}/${step.name}-${fileName}.zip`, updatedProject});
-        })
+        const result = await storeTargetFile({ step, id, projectId, file });
+        res.send(result);
     } catch(err) {
         console.log(err);
-        res.send(err);
+        res.status(500).send('Error / Cannot store target file');
     }
 })
 
