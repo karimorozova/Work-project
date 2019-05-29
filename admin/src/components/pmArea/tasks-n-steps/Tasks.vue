@@ -193,7 +193,9 @@ export default {
             this.unCheckAllTAsks();
         },
         async cancelTasks(tasks) {
-            const filteredTasks = tasks.filter(item => item.status !== "Ready for Delivery" && item.status !== "Delivered");
+            const validStatuses = ["Created", "Started", "Approved"];
+            const filteredTasks = tasks.filter(item => validStatuses.indexOf(item.status) !== -1);
+            if(!filteredTasks.length) return;
             try {
                 if(this.allTasks === tasks.length) {
                     await setProjectStatus({status: "Cancelled"});
