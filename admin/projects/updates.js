@@ -45,13 +45,16 @@ async function cancelTasks(tasks, project) {
     let projectTasks = [...project.tasks];
     let projectSteps = [...project.steps];
     const tasksIds = tasks.map(item => item.taskId);
-    const inCompletedSteps = projectSteps.map(item => {
-        if(item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) {
-            return {...item._doc};
-        }
-    }).filter(item => !!item);
-    const stepIdentify = inCompletedSteps.map(step => step.stepId);
-    const changedSteps = cancelSteps({stepIdentify, steps: projectSteps});
+    let inCompletedSteps = [];
+    if(projectSteps.length) {
+        inCompletedSteps = projectSteps.map(item => {
+            if(item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) {
+                return {...item._doc};
+            }
+        }).filter(item => !!item);
+    }
+    const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId): [];
+    const changedSteps = stepIdentify.length ? cancelSteps({stepIdentify, steps: projectSteps}) : [];
     const changedTasks = await cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId: project.id});
     return { changedTasks, changedSteps, inCompletedSteps };
 }
@@ -59,8 +62,8 @@ async function cancelTasks(tasks, project) {
 function cancelSteps({stepIdentify, steps}) {
     const updated = steps.map(item => {
         if(stepIdentify.indexOf(item.stepId) !== -1) {
-            let newStatus = "Cancelled";
-            if(+item.progress.wordsDone > 0) {
+            let newStatus = item.status !== 'Completed' ? "Cancelled" : item.status;
+            if(+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
                 newStatus = "Cancelled Halfway";
                 let finance = getStepNewFinance(item);
                 return {...item._doc, status: newStatus, finance};
@@ -133,14 +136,14 @@ function getTaskNewStatus(steps, taskId) {
     const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
     const completedSteps = taskSteps.filter(item => item === "Completed");
     const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
+    if(cancelledSteps.length === taskSteps.length || !steps.length) {
+        return "Cancelled"
+    }
     if(completedSteps.length === taskSteps.length) {
         return "Pending Approval"
     }
     if(halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
         return "Cancelled Halfway"
-    }
-    if(cancelledSteps.length === taskSteps.length) {
-        return "Cancelled"
     }
 }
 
@@ -175,11 +178,13 @@ async function updateProjectStatus(id, status) {
             return await setNewProjectDetails(project, status);
         }
         const { tasks, steps } = project;
-        const notifySteps = steps.map(item => { return {...item._doc}});
+        const notifySteps = steps.length ? steps.map(item => { return {...item._doc}}) : [];
         const { changedTasks, changedSteps } = await cancelTasks(tasks, project);
         const projectStatus = getProjectNewStatus(changedTasks, status);
         const Price = getUpdatedProjectFinance(changedTasks);
-        await stepCancelNotifyVendor(notifySteps);
+        if(notifySteps.length) {
+            await stepCancelNotifyVendor(notifySteps);
+        }
         return await updateProject({"_id": id}, { status: projectStatus, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps});
     } catch(err) {
         console.log(err);
