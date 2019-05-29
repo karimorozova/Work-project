@@ -3,6 +3,8 @@ const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor } = require('./emails');
 const { getTaskProgress } = require('../services');
 const { notifyManagerProjectStarts, pmMail } = require('../utils');
+const { generateTargetFile } = require('../services/xtmApi');
+const { storeTargetFile } = require('./files');
 
 async function changeProjectProp(projectId, property) {
     const project = await getProject({"_id": projectId});
@@ -28,7 +30,7 @@ async function updateProjectProgress(project) {
 
 async function getProjectAfterCancelTasks(tasks, project) {
     try {
-        const { changedTasks, changedSteps, inCompletedSteps } = cancelTasks(tasks, project);
+        const { changedTasks, changedSteps, inCompletedSteps } = await cancelTasks(tasks, project);
         const Price = getUpdatedProjectFinance(changedTasks);
         await stepCancelNotifyVendor(inCompletedSteps);
         return await updateProject({"_id": project.id}, 
@@ -39,7 +41,7 @@ async function getProjectAfterCancelTasks(tasks, project) {
     }
 }
 
-function cancelTasks(tasks, project) {
+async function cancelTasks(tasks, project) {
     let projectTasks = [...project.tasks];
     let projectSteps = [...project.steps];
     const tasksIds = tasks.map(item => item.taskId);
@@ -50,7 +52,7 @@ function cancelTasks(tasks, project) {
     }).filter(item => !!item);
     const stepIdentify = inCompletedSteps.map(step => step.stepId);
     const changedSteps = cancelSteps({stepIdentify, steps: projectSteps});
-    const changedTasks = cancellCheckedTasks(tasksIds, projectTasks, changedSteps);
+    const changedTasks = await cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId: project.id});
     return { changedTasks, changedSteps, inCompletedSteps };
 }
 
@@ -70,17 +72,36 @@ function cancelSteps({stepIdentify, steps}) {
     return updated;
 }
 
-function cancellCheckedTasks(tasksIds, projectTasks, changedSteps) {
+async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
     const unchangingStatuses = ['Ready for Delivery', 'Pending Approval', 'Delivered'];
-    return projectTasks.map(task => {
+    let tasks = [...projectTasks];
+    for(let task of tasks) {
         if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
             task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
             if(task.status === "Cancelled Halfway") {
                 task.finance = getTaskNewFinance(changedSteps, task);
+                task.xtmjobs = await updateXtmJobs({task, projectId, changedSteps});
             }
         }
-        return task;
-    })
+    }
+    return tasks;
+}
+
+async function updateXtmJobs({task, projectId, changedSteps}) {
+    const { xtmJobs } = task;
+    const step = changedSteps.find(item => item.taskId === task.taskId && item.status !== 'Cancelled');
+    try {
+        let updatedXtmJobs = [];
+        for(let job of xtmJobs) {
+            let generatedFiles = await generateTargetFile({projectId: task.projectId, jobId: job.jobId});
+            const { path } = await storeTargetFile({step, id: projectId, projectId: task.projectId, file: {...generatedFiles[0], fileName: job.fileName}});
+            updatedXtmJobs = getAfterPathUpdate({xtmJobs, jobId: job.jobId, path, name: step.name});
+        }
+        return updatedXtmJobs;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateXtmJobs");
+    }
 }
 
 function getTaskNewFinance(changedSteps, task) {

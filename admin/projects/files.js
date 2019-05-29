@@ -58,8 +58,7 @@ async function storeTargetFile({ step, id, projectId, file }) {
         return new Promise((resolve, reject) => {
             wstream.on('error', err => reject(err));
             wstream.on('finish', async () => {
-                const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path: `/projectFiles/${id}/${step.name}-${fileName}.zip`});
-                resolve({path: `/projectFiles/${id}/${step.name}-${fileName}.zip`, updatedProject});
+                resolve({path: `/projectFiles/${id}/${step.name}-${fileName}.zip`});
             })
         })
     } catch(err) {

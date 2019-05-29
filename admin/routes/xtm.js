@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, generateTargetFile } = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile } = require('../projects/');
+const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles} = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../calculations');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
@@ -262,8 +262,9 @@ router.post('/generate-file', async (req, res) => {
 router.post('/target-file', async (req, res) => {
     const { step, id, projectId, file } = req.body;
     try {
-        const result = await storeTargetFile({ step, id, projectId, file });
-        res.send(result);
+        const { path } = await storeTargetFile({ step, id, projectId, file });
+        const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path});
+        res.send({path, updatedProject});
     } catch(err) {
         console.log(err);
         res.status(500).send('Error / Cannot store target file');
