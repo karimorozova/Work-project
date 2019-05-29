@@ -139,10 +139,12 @@ export default {
             }
         },
         clearTasksFormData() {
-            this.template = "";
+            this.template = "Standard processing";
+            this.selectedWorkflow = {name:"2 Steps", id: 2917};
             this.targetLanguages = [];
             this.sourceFiles = [];
             this.refFiles = [];
+            this.isTaskData  = false;
         },
         getMetrics() {
             this.$emit("getMetrics");
