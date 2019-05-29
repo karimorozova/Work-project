@@ -10,7 +10,6 @@
     .settings__inner(v-if="isSidebar" :class='{"settings__open": slidebarVisible}')
       .settings__table
         router-view
-    //- Blanket(title='Welcome to the Pangea Admin' v-if="!isSidebar")
     Activities(v-if="!isSidebar")
 </template>
 
@@ -100,7 +99,7 @@ export default {
     transform: translateX(0);
   }
   &__inner {
-    width: 60%;
+    width: 100%;
   }
   &__open {
     transform: translate(15px);

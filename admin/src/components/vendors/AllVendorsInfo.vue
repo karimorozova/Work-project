@@ -91,7 +91,8 @@ export default {
   margin: 40px 40px 40px 0;
     &__table {
         padding: 20px;
-        width: 1100px;
+        max-width: 1100px;
+        width: calc(100% - 80px);
         min-height: 150px;
         box-shadow: 0 0 10px $brown-shadow;
     }

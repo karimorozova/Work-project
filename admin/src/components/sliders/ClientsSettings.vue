@@ -43,13 +43,11 @@ export default {
 <style lang="scss" scoped>
 .clients {
   display: flex;
-  width: calc(100% - 150px);
   &__all {
     padding-top: 20px;
     padding-left: 20px;
-  }
-  &__all {
-    width: 100%;
+    max-width: 1200px;
+    width: calc(100% - 60px);
   }
 }
 .title {

@@ -31,6 +31,9 @@ export default {
   min-height: 94vh;
   display: flex;
   width: 100%;
+  &__table {
+    max-width: calc(100% - 150px);
+  }
 }
 
 </style>

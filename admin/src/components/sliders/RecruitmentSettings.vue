@@ -48,6 +48,7 @@ export default {
   min-height: 94vh;
   &__main {
     padding: 20px;
+    width: calc(100% - 150px);
   }
 }
 

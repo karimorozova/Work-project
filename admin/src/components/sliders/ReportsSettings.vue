@@ -22,5 +22,6 @@ export default {
 .reports {
   width: 100%;
   padding: 40px;
+  box-sizing: border-box;
 }
 </style>

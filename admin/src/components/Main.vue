@@ -49,11 +49,12 @@
                       .title
                         span {{ note.title }}
                   .balloons
-            router-view(:isSidebar="isSidebar"
-              @refreshXtmCustomers="refreshXtmCustomers"
-              @getCustomerLangs='getCustomerLangs'
-              @refreshServices='refreshServices'
-              )
+            .admin-main-wrapper__inner
+              router-view(:isSidebar="isSidebar"
+                @refreshXtmCustomers="refreshXtmCustomers"
+                @getCustomerLangs='getCustomerLangs'
+                @refreshServices='refreshServices'
+                )
 </template>
 
 <script>
@@ -525,12 +526,13 @@ export default {
 .admin-main-wrapper {
   box-sizing: border-box;
   padding-top: 6vh;
-  padding-left: 150px;
   display: flex;
   height: 100%;
   position: relative;
+  width: 100%;
   &__inner {
-    width: 90%;
+    width: calc(100% - 150px);
+    margin-left: 150px;
   }
   .admin-navbar {
     font-family: MyriadPro;

@@ -268,7 +268,8 @@ export default {
         margin-bottom: 40px;
     }
     &__table {
-        width: 1024px;
+        max-width: 1024px;
+        width: calc(100% - 60px);
         padding: 10px;
         margin-top: 40px;
         box-sizing: border-box;

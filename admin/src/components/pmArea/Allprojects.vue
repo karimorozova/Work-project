@@ -137,7 +137,8 @@ export default {
 
 .all-projects {
     margin: 50px 20px 20px 20px;
-    width: 1205px;
+    max-width: 1205px;
+    width: calc(100% - 60px);
     box-shadow: 0 0 10px #68573E;
     padding: 15px;
 }

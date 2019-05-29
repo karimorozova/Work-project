@@ -123,7 +123,6 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     position: relative;
-    width: 65%;
 }
 
 .title {

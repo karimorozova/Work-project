@@ -270,7 +270,8 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .industries {
-    width: 933px;
+    max-width: 933px;
+    width: calc(100% - 190px);
     background-color: $white;
     padding: 20px;
     box-shadow: 0 0 10px $main-color;

@@ -39,6 +39,7 @@ export default {
     min-height: 100%;
     background-color: #fff;
     width: 175px;
+    min-width: 175px;
     box-shadow: 7px 1px 10px $brown-shadow;
     display: flex;
     flex-direction: column;
