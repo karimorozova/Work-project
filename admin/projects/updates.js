@@ -176,7 +176,7 @@ async function updateProjectStatus(id, status) {
         }
         const { tasks, steps } = project;
         const notifySteps = steps.map(item => { return {...item._doc}});
-        const { changedTasks, changedSteps } = cancelTasks(tasks, project);
+        const { changedTasks, changedSteps } = await cancelTasks(tasks, project);
         const projectStatus = getProjectNewStatus(changedTasks, status);
         const Price = getUpdatedProjectFinance(changedTasks);
         await stepCancelNotifyVendor(notifySteps);
