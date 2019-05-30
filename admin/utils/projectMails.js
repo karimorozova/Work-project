@@ -35,8 +35,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
     const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
     try {
-        await managerNotifyMail(projectManager, pmMessage, 'Quote Accepted but translators were not assigned (ID I001)');
-        await managerNotifyMail(salesManager, smMessage, 'Quote Accepted but translators were not assigned (ID I001)');
+        await managerNotifyMail(projectManager, pmMessage, `Quote Accepted but translators were not assigned (ID I001, ${project.projectId})`);
+        await managerNotifyMail(salesManager, smMessage, `Quote Accepted but translators were not assigned (ID I001, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in managerEmailsSend");
@@ -81,7 +81,7 @@ async function sendRequestToVendor(project, step) {
     requestInfo.brief = project.brief;
     const message = requestMessageForVendor(requestInfo);
     try {
-        await sendEmail({to: step.vendor.email, subject: 'Request Confirmation (ID V001)'}, message);
+        await sendEmail({to: step.vendor.email, subject: `Request Confirmation (ID V001, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in sendRequestToVendor');
@@ -96,7 +96,7 @@ async function sendEmailToContact(project, contact) {
         const service = await Services.findOne({"_id": project.tasks[0].service});
         projectInfo.service = service.title;
         const message = emailMessageForContact(projectInfo);
-        await clientQuoteEmail({contact, subject: 'Project information (ID C006)'}, message);
+        await clientQuoteEmail({contact, subject: `Project information (ID C006, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in sendEmailToContact');

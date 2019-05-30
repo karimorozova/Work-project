@@ -5,14 +5,14 @@ const { getProject } = require("./getProjects");
 const { getOneService } = require("../services/getServices");
 const { User } = require("../models");
 
-async function stepCancelNotifyVendor(steps) {
+async function stepCancelNotifyVendor(steps, projectId) {
     try {
         const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {
             if(step.vendor && notifyStepStatuses.indexOf(step.status) === -1) {
                 const message = vendorNotificationMessage(step);
                 step["to"] = step.vendor.email;
-                step.subject = "Step cancelling notification! (ID V007)";
+                step.subject = `Step cancelling notification! (ID V007, ${projectId})`;
                 await sendEmail(step, message);
             }
         }
@@ -44,7 +44,7 @@ async function taskCompleteNotifyPM(project, task) {
     try {
         const manager = await User.findOne({"_id": project.projectManager.id}, {email: 1});
         const message = await getPMnotificationMessage(project, task);
-        await managerNotifyMail(manager, message, "Task finish notification (ID I002)");
+        await managerNotifyMail(manager, message, `Task finish notification (ID I002, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in taskCompleteNotifyPM");
@@ -70,7 +70,7 @@ async function notifyClientTaskReady({taskIds, project}) {
         const contact = project.customer.contacts.find(item => item.leadContact);
         for(let taskId of taskIds) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: "TASK READY (ID C014)"}, message);
+            await sendEmail({to: contact.email, subject: `TASK READY (ID C014, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);
@@ -83,7 +83,7 @@ async function sendClientDeliveries({taskIds, project}) {
         const contact = project.customer.contacts.find(item => item.leadContact);
         for(let taskId of taskIds) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: "DELIVERY (ID C013)"}, message);
+            await sendEmail({to: contact.email, subject: `DELIVERY (ID C013, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);
@@ -99,8 +99,8 @@ async function notifyDeliverablesDownloaded(taskId, project) {
             manager: projectManager, taskId, project_id: project.projectId})
         const accManagerMessage = deliverablesDownloadedMessage({
             manager: accManager, taskId, project_id: project.projectId})
-        await managerNotifyMail(projectManager, pmMessage, "Task delivery notification (ID I006)");
-        await managerNotifyMail(accManager, accManagerMessage, "Task delivery notification (ID I006)");
+        await managerNotifyMail(projectManager, pmMessage, `Task delivery notification (ID I006, ${project.projectId})`);
+        await managerNotifyMail(accManager, accManagerMessage, `Task delivery notification (ID I006, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyDeliverablesDownloaded");
@@ -115,7 +115,7 @@ async function sendTasksQuote(tasks) {
             const service = await getOneService({"_id": task.service});
             const quoteInfo = {...project._doc, task, contact, service: service.title};
             const message = tasksQuoteMessage(quoteInfo);
-            await clientQuoteEmail({contact, subject: "Quote(s) (ID C001.1)"}, message);
+            await clientQuoteEmail({contact, subject: `Quote(s) (ID C001.1, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);
