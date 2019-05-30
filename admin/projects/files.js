@@ -1,23 +1,27 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveFile } = require('../utils/movingFile');
 const { getRequestOptions } = require('../services/xtmApi');
+const { getProject } = require('./getProjects');
 const fs = require('fs');
 const https = require('https');
 
 async function storeFiles(filesArr, projectId) {
-    let storedFiles = [];
-    if(filesArr.length) {
-        for(let file of filesArr) {
-            const newPath = `./dist/projectFiles/${projectId}/${file.filename.replace(/\s+/g, '_')}`;
-            try {
+    try {
+        const project = await getProject({"_id": projectId});
+        const { tasks } = project;
+        let storedFiles = [];
+        if(filesArr.length) {
+            for(let file of filesArr) {
+                const newPath = `./dist/projectFiles/${projectId}/${tasks.length+1}-${file.filename.replace(/\s+/g, '_')}`;
                 await moveFile(file, newPath);
-            } catch(err) {
-                throw new Error("Error from storeFiels")
+                storedFiles.push(newPath);
             }
-            storedFiles.push(newPath);
         }
+        return storedFiles;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in storeFiels")
     }
-    return storedFiles;
 }
 
 async function getDeliverablesLink({jobs, projectId, taskId}) {
