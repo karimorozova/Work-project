@@ -353,8 +353,10 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
 async function getAfterReopenSteps(steps, project) {
     try {
         const updatedSteps = setStepsStatus({steps, status: 'Started', project});
-        const updatedtasks = getTasksAfterReopen({steps, tasks: project.tasks});
-        return await updateProject({"_id": project.id}, { tasks: updatedtasks, steps: updatedSteps, status: "In prpogess" });
+        const stepIdentify = steps.map(item => item.taskId+item.name);
+        const chosenSteps = updatedSteps.filter(item => stepIdentify.indexOf(item.taskId+item.name) !== -1);
+        const updatedtasks = getTasksAfterReopen({steps: chosenSteps, tasks: project.tasks});
+        return await updateProject({"_id": project.id}, { tasks: updatedtasks, steps: updatedSteps, status: "In progress" });
     } catch(err) {
 
     }
@@ -363,9 +365,9 @@ async function getAfterReopenSteps(steps, project) {
 function getTasksAfterReopen({steps, tasks}) {
     let updatedTasks = [...tasks];
     for(let step of steps) {
-        if(step.status = 'Started') {
-            let task = updatedTasks.find(item => item.taskId === step.taskId);
-            task.status = "Started";
+        if(step.status === 'Started') {
+            let taskIndex = updatedTasks.findIndex(item => item.taskId === step.taskId);
+            updatedTasks[taskIndex].status = "Started";
         }
     }
     return updatedTasks;
