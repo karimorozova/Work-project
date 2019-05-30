@@ -25,8 +25,9 @@ const allowedOrigins = [
   "http://localhost:8081"
 ];
 
-const options = { useNewUrlParser: true, useFindAndModify: false };
-mongoose.connect(config.mongoDB.url, options);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.connect(config.mongoDB.url);
 
 app.use(logger('dev'));
 app.use(
