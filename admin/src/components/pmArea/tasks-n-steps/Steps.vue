@@ -110,7 +110,6 @@
                     :index="infoIndex"
                     :vendors="vendors"
                     :task="getTask(infoIndex)"
-                    @setStepVendor="(person) => setVendor(person, infoIndex)"
                     @closeStepInfo="closeStepInfo"
                 )
     .steps__approve-action(v-if="isApproveActionShow")

@@ -2,7 +2,7 @@
 .step-vendor
     .step-vendor__title Vendor:
     .step-vendor__info
-        .step-vendor__drop-menu(v-if="step.status === 'Created' || step.status === 'Rejected'")
+        .step-vendor__drop-menu(v-if="isVendorSelect")
             PersonSelect(
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="filteredVendors"
@@ -20,7 +20,7 @@
                 i.fa.fa-envelope
             .step-vendor__icon
                 i.fa.fa-slack
-    .step-vendor__options(v-if="!isVendorApproved")
+    .step-vendor__options(v-if="isVendorSelect")
         .step-vendor__check
             CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")
             .step-vendor__text Send next vendor after rejection
@@ -59,8 +59,15 @@ export default {
         currentVendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
-        setVendor({person}) {
-            this.$emit('setStepVendor', { person })
+        async setVendor({person}) {
+            if(this.vendor._id && person._id === this.vendor._id) return;
+            const index = this.currentProject.steps.findIndex(item => item._id === this.step._id);
+            try {
+                await this.setStepVendor({vendor: person, index});
+                this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Internal service error. Cannot set vendor for the step.", isShow: true, type: "error"})
+            }
         },
         toggleRadio(e, key) {
             this[key] = !this[key];
@@ -97,7 +104,8 @@ export default {
             }
         },
         ...mapActions({
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            setStepVendor: "setStepVendor"
         })
     },
     computed: {
@@ -116,9 +124,8 @@ export default {
         isTimeDouble() {
             return this.nextSendTime.length === 2;
         },
-        isVendorApproved() {
-            const statuses= ["Request Sent", "Created", "Rejected"]
-            return this.step.vendor && statuses.indexOf(this.step.status) === -1;
+        isVendorSelect() {
+            return this.step.status === 'Created' || this.step.status === 'Rejected';
         }
     },
     components: {

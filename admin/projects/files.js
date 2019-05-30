@@ -1,7 +1,6 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveFile } = require('../utils/movingFile');
 const { getRequestOptions } = require('../services/xtmApi');
-const { updateTaskTargetFiles, getTasksWithTargets } = require('./updates');
 const fs = require('fs');
 const https = require('https');
 

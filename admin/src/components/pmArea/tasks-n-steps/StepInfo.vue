@@ -7,7 +7,6 @@
             :step="step"
             :vendors="vendors"
             :vendor="step.vendor"
-            @setStepVendor="setStepVendor"
         )
     .step-info__block
         Finance(
@@ -62,9 +61,6 @@ export default {
     methods: {
         addFinanceData() {
             return
-        },
-        setStepVendor({person}) {
-            this.$emit("setStepVendor", { person });
         },
         getMatrixData(rateProp, prop) {
             if(this.step.name !== "translate1") {
