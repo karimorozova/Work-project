@@ -59,12 +59,16 @@ export default {
             getServices: "getServices"
         }),
         setDefaultIsTaskData() {
-            if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
+            if(this.currentProject.status === 'Delivered') {
+                this.isTaskData = false;
+            } else if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
                 this.isTaskData = true;
             }
         },
         toggleTaskData() {
-            this.isTaskData = !this.isTaskData;
+            if(this.currentProject.status !== 'Delivered') {
+                this.isTaskData = !this.isTaskData;
+            }
         },
         async defaultService() {
             try {

@@ -32,7 +32,7 @@ async function getProjectAfterCancelTasks(tasks, project) {
     try {
         const { changedTasks, changedSteps, inCompletedSteps } = await cancelTasks(tasks, project);
         const Price = getUpdatedProjectFinance(changedTasks);
-        await stepCancelNotifyVendor(inCompletedSteps);
+        await stepCancelNotifyVendor(inCompletedSteps, project.projectId);
         return await updateProject({"_id": project.id}, 
             {tasks: changedTasks, steps: changedSteps, finance: {...project.finance, Price}});
     } catch(err) {
@@ -80,7 +80,7 @@ async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projec
     let tasks = [...projectTasks];
     for(let task of tasks) {
         if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
-            task.status = getTaskNewStatus(changedSteps, task.taskId) || task.status;
+            task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
             if(task.status === "Cancelled Halfway") {
                 task.finance = getTaskNewFinance(changedSteps, task);
                 task.xtmjobs = await updateXtmJobs({task, projectId, changedSteps});
@@ -130,9 +130,8 @@ function updateTaskNewFinance(changedSteps, task) {
     return { priceValues };
 }
 
-function getTaskNewStatus(steps, taskId) {
-    const taskSteps = steps.filter(item => item.taskId === taskId)
-        .map(step => step.status);
+function getTaskStatusAfterCancel(steps, taskId) {
+    const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status);
     const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
     const completedSteps = taskSteps.filter(item => item === "Completed");
     const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway");
@@ -183,7 +182,7 @@ async function updateProjectStatus(id, status) {
         const projectStatus = getProjectNewStatus(changedTasks, status);
         const Price = getUpdatedProjectFinance(changedTasks);
         if(notifySteps.length) {
-            await stepCancelNotifyVendor(notifySteps);
+            await stepCancelNotifyVendor(notifySteps, project.projectId);
         }
         return await updateProject({"_id": id}, { status: projectStatus, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps});
     } catch(err) {
@@ -351,5 +350,27 @@ function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
     })
 }
 
+async function getAfterReopenSteps(steps, project) {
+    try {
+        const updatedSteps = setStepsStatus({steps, status: 'Started', project});
+        const updatedtasks = getTasksAfterReopen({steps, tasks: project.tasks});
+        return await updateProject({"_id": project.id}, { tasks: updatedtasks, steps: updatedSteps, status: "In prpogess" });
+    } catch(err) {
+
+    }
+}
+
+function getTasksAfterReopen({steps, tasks}) {
+    let updatedTasks = [...tasks];
+    for(let step of steps) {
+        if(step.status = 'Started') {
+            let task = updatedTasks.find(item => item.taskId === step.taskId);
+            task.status = "Started";
+        }
+    }
+    return updatedTasks;
+}
+
 module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
-    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets };
+    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets,
+    getAfterReopenSteps };

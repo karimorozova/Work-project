@@ -285,7 +285,8 @@ export default {
                     result.push('Deliver')
                 }
             }
-            if(createdTask) {
+            const projectStatuses = ["Draft", "Requested", "Quote sent", "Rejected"];
+            if(createdTask && projectStatuses.indexOf(this.currentProject.status) === -1) {
                 if(result.indexOf('Send a Quote') === -1) {
                     result.push('Send a Quote')
                 }

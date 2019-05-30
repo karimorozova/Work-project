@@ -255,6 +255,9 @@ export default {
                         const assignedSteps = checkedSteps.filter(item => item.vendor);
                         await this.setStepsStatus({status, steps: assignedSteps});
                         break;
+                    case "ReOpen":
+                        const steps = checkedSteps.filter(item => item.status === "Completed");
+                        await this.reopenSteps(steps);
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
@@ -358,7 +361,8 @@ export default {
             setProjectValue: "setProjectValue",
             storeProject: "setCurrentProject",
             setStepsStatus: "setStepsStatus",
-            setProjectStatus: "setProjectStatus"
+            setProjectStatus: "setProjectStatus",
+            reopenSteps: "reopenSteps"
         })
     },
     computed: {

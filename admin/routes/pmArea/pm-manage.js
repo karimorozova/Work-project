@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
-    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote } = require("../../projects/");
+    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 
@@ -100,7 +100,7 @@ router.post("/project-details", async (req, res) => {
     const { id, message } = req.body;
     try {
         const project = await getProject({"_id": id});
-        await clientQuoteEmail({...project.customer._doc, subject: "Project details (ID C006)"}, message);
+        await clientQuoteEmail({...project.customer._doc, subject: `Project details (ID C006, ${project.projectId})`}, message);
         res.send("Project details sent");
     } catch(err) {
         console.log(err);
@@ -113,7 +113,7 @@ router.post("/send-quote", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
-        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID C001)` }, message);
+        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID C001, ${project.projectId})` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {
@@ -169,6 +169,18 @@ router.post("/step-status", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on setting step status");
+    }
+})
+
+router.post("/steps-reopen", async (req, res) => {
+    const { steps } = req.body;
+    try {
+        const project = await getProject({"steps._id": steps[0]._id});
+        const updateProject = await getAfterReopenSteps(steps, project);
+        res.send(updateProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on reopening steps");
     }
 })
 

@@ -83,3 +83,18 @@ export const sendTasksDetails = async ({commit, dispatch}, payload) => {
         dispatch('decrementRequestCounter')
     }
 }
+
+export const reopenSteps = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        if(payload.length) {
+            const updatedProject = await Vue.http.post("/pm-manage/steps-reopen", { steps: payload });
+            await dispatch('setCurrentProject', updatedProject.data);
+        }
+        dispatch('alertToggle', {message: "Steps reopened", isShow: true, type: "success"});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
