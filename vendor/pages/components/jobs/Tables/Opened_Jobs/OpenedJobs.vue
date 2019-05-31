@@ -44,12 +44,11 @@
         .jobs__data {{ row.finance.Price.payables }}
           span.jobs__currency(v-if="row.finance.Price.payables") &euro;
       template(slot="icons" slot-scope="{ row, index }")
-        .jobs__icons(v-if="row.status === 'Started'")
-          img.jobs__icon(v-if="progress(row.progress) >= 100" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
-        .jobs__icons(v-if="isApproveReject(row)")
+        .jobs__icons(v-if="!isApproveReject(row)")
+          img.jobs__icon(v-if="isCompleteIcon(row)" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
+          img.jobs__icon(v-if="isEnterIcon(row.status)" src="../../../../../assets/images/enter-icon.png")
+        .jobs__icons(v-else)
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
-        .jobs__icons(v-if="isEnterIcon(row.status)")
-          img.jobs__icon(src="../../../../../assets/images/enter-icon.png")
 </template>
 
 <script>
@@ -110,15 +109,18 @@
       isApproveReject(row) {
         return row.status === "Request Sent" || row.status === "Created";
       },
+      isEnterIcon(status) {
+        const statuses = ["Accepted", "Ready to Start", "Started"];
+        return statuses.indexOf(status) !== -1;
+      },
+      isCompleteIcon(row) {
+        return this.progress(row.progress) >= 100 && row.status === "Started";
+      },
       progress(prog) {
         return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
       },
       showModal(index) {
         this.$emit("showModal", { index });
-      },
-      isEnterIcon(status) {
-        const statuses = ["Accepted", "Ready to Start", "Started"];
-        return statuses.indexOf(status) !== -1;
       }
     },
     components: {
