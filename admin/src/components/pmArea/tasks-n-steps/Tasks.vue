@@ -64,11 +64,11 @@
             template(slot="receivables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.receivables") &euro;
                 span.tasks__task-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.receivables }}
-                span.tasks__task-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
+                span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ row.finance.Price.halfReceivables }}
             template(slot="payables" slot-scope="{ row }")
                 span.tasks__money(v-if="row.finance.Price.payables") &euro;
                 span.tasks__task-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.payables }}
-                span.tasks__task-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
+                span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ row.finance.Price.halfPayables }}
             template(slot="margin" slot-scope="{ row }")
                 span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;
                 span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
