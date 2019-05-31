@@ -163,8 +163,7 @@ function getStepNewFinance(step) {
     const { progress, finance } = step;
     const { Wordcount, Price } = finance;
     const done = progress.wordsDone/progress.wordsTotal;
-    Wordcount.halfReceivables = Wordcount.receivables*done;
-    Wordcount.halfPayables = Wordcount.payables*done;
+    Wordcount.payables = progress.wordsDone;
     Price.halfReceivables = +((Price.receivables*done).toFixed(2));
     Price.halfPayables = +((Price.payables*done).toFixed(2));
     return { Wordcount, Price }

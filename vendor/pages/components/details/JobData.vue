@@ -10,8 +10,11 @@
         .data-block
             .data-block__item
                 LabelValue(title="Status" :isColon="true" :value="job.status")  
-            .data-block__item
+            .data-block__item(v-if="job.status !== 'Cancelled Halfway'")
                 LabelValue(v-if="job.finance" title="Total Cost" :isColon="true" :value="job.finance.Price.payables")
+                    span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
+            .data-block__item(v-else)
+                LabelValue(title="Total Cost" :isColon="true" :value="job.finance.Price.halfPayables")
                     span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
             .data-block__item
                 LabelValue(v-if="job.finance" title="Weighted Wordcount" :isColon="true" :value="job.finance.Wordcount.payables")
