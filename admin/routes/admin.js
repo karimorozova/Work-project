@@ -7,10 +7,8 @@ const { requiresLogin } = require('../middleware/index');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../configs');
 
-// GET /logout
 router.get('/logout', (req, res, next) => {
     if (req.session) {
-        // delete session object
         req.session.destroy((err) => {
             if (err) {
                 return next(err);

@@ -1,9 +1,5 @@
 <template lang="pug">
 .projects
-    Sidebar( 
-        title="PM-AREA" 
-        :links="sidebarLinks"
-    )
     .projects__table
         Allprojects
 </template>
@@ -28,7 +24,6 @@ export default {
 <style lang="scss" scoped>
 
 .projects {
-  min-height: 94vh;
   display: flex;
   width: 100%;
   &__table {

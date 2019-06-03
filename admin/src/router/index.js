@@ -30,6 +30,8 @@ import NewVendor from '@/components/vendors/NewVendor'
 import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
+import Requests from '@/components/pmArea/Requests'
+import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
 import { store } from '../vuex/store'
@@ -202,9 +204,23 @@ const router = new Router({
           ]
         },
         {
-          path: 'pm-projects',
-          name: 'pm-projects',
-          component: Projects
+          path: 'pm-area',
+          name: 'pm-area',
+          component: PmArea,
+          children: [
+            {
+              path: 'open-projects',
+              name: 'open-projects',
+              component: Projects,
+              props: true
+            },
+            {
+              path: 'requests',
+              name: 'requests',
+              component: Requests,
+              props: true
+            }
+          ]
         },
         {
           path: 'pm-project-details/:id',

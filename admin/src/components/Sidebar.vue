@@ -44,7 +44,7 @@ export default {
     display: flex;
     flex-direction: column;
     color: $main-color;
-    font-size: 22px;
+    font-size: 18px;
     transition: all 1s;
     position: relative;
     &__links {
