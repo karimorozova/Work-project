@@ -36,6 +36,35 @@
       .step-finance__toggle-option(@click="refreshFinance('receivables')" :class="{'step-finance_active-option': matrixOption === 'receivables'}") Receivables
       .step-finance__toggle-option(@click="refreshFinance('payables')" :class="{'step-finance_active-option': matrixOption === 'payables'}") Payables
     .step-finance__info-block(v-if="isInfoShown" :class="{'step-finance_block': isInfoShown}")
+      .step-finance__info-block-content
+        .step-finance__top-controls
+          span.step-finance__icons
+            img.step-finance__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'finance-icon_opacity': key === 'save' }")
+        .step-finance__info-body
+          .step-finance__left-body-block
+            .step-finance__rate._row
+              div Rate
+              div 0.08 €
+            .step-finance__quantity-R._row
+              div Quantity[Relative]:
+              div 12000
+            .step-finance__subtotal._row
+              div Subtotal
+              div 960.00 €
+          .step-finance__right-body-block
+            .step-finance__charge._row
+              div Minimum charge
+              div 0.00 €
+            .step-finance__quantity-T._row
+              div Quantity [Total]:
+              div 13000
+            .step-finance__discounts._row
+              div Surcharges
+              div +240 €
+        .step-finance__info-total
+              div Total:
+              div 1200 €
+
 </template>
 
 <script>
@@ -56,6 +85,10 @@ export default {
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
             ],
+          icons: {
+            save: {icon: require('../../../assets/images/Other/save-icon-qa-form.png')},
+            edit: {icon: require('../../../assets/images/Other/edit-icon-qa.png')},
+          },
             isInfoShown: false,
             matrixOption: "receivables",
             isTooltipShow: false,
@@ -63,6 +96,9 @@ export default {
         }
     },
     methods: {
+      makeAction(){
+        console.log('make action');
+      },
       refreshFinance(value) {
         if(this.matrixOption === value) {
           return
@@ -101,10 +137,55 @@ export default {
 .step-finance {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
-    &__info-block{
-      width:100%;
+    &__info-total {
+      padding: 20px;
+      display: flex;
+      div {
+        &:first-child{
+          margin-right: 116px;
+        }
+      }
+    }
+   .finance-icon_opacity {
+       opacity: 0.5;
+   }
+    &__icon{
+      margin-right: 10px;
+      cursor:pointer;
+    }
+    &__info-block {
+      width: calc(100% - 40px);
       border: 1px solid $cell-border;
       height: 295px;
+      padding: 20px;
+      &-content {
+        height: 100%;
+      }
+    }
+    &__top-controls{
+      height: 10%;
+      text-align: right;
+    }
+    &__info-body {
+      display: flex;
+      width:100%;
+      height:70%;
+      border-bottom: 2px solid $cell-background;
+      ._row {
+        padding:20px;
+        display:flex;
+        div {
+          width: 50%;
+        }
+      }
+    }
+    &__left-body-block {
+      width: 50%;
+      height: 100%;
+    }
+    &__right-body-block {
+      width: 50%;
+      height: 100%;
     }
     &__toggler {
       display: flex;
