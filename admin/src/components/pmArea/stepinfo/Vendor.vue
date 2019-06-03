@@ -60,7 +60,7 @@ export default {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
         async setVendor({person}) {
-            if(this.vendor._id && person._id === this.vendor._id) return;
+            if(this.vendor && this.vendor._id && person._id === this.vendor._id) return;
             const index = this.currentProject.steps.findIndex(item => item._id === this.step._id);
             try {
                 await this.setStepVendor({vendor: person, index});
