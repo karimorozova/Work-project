@@ -77,11 +77,11 @@ export default {
                 return this.step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
             });
             return vendor.languageCombinations.find(item => {
-                if(item.source && item.source.symbol === this.step.source && 
+                if(item.source && item.source.symbol === this.step.source &&
                     item.target.symbol === this.step.target) {
                         return this.hasRateValue({
-                                service: service._id, 
-                                vendorIndustries: item.industries, 
+                                service: service._id,
+                                vendorIndustries: item.industries,
                                 stepIndustry: this.currentProject.industry._id
                             });
                 }
