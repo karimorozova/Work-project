@@ -1,8 +1,8 @@
 <template lang="pug">
     .progress-line
-        .progress-line__filler(:style="{width: progress + '%'}")
+        .progress-line__filler(:style="{width: currentProgress + '%'}")
         .progress-line__tooltip 
-            span.progress-line__value {{ progress }}%    
+            span.progress-line__value {{ currentProgress }}%    
 </template>
 
 <script>
@@ -10,6 +10,11 @@ export default {
     props: {
         progress: {
             type: [Number, String]
+        }
+    },
+    computed: {
+        currentProgress() {
+            return !isNaN(this.progress) ? this.progress : 0;
         }
     }
 }

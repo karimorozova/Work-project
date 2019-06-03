@@ -367,6 +367,20 @@ const timezonesDefault = [
     "(UTC+13:00) Samoa"
 ]
 
+const emptyMetrics = {
+        iceMatch: {text: "ICE Match", value: 0},
+        fuzzyMatch75: {text: "75-84%", value: 0},
+        fuzzyMatch85: {text: "85-94%", value: 0},
+        fuzzyMatch95: {text: "95-99%", value: 0},
+        repeat: {text: "Repetitions", value: 0},
+        leveragedMatch: {text: "Leveraged Match", value: 0},
+        fuzzyRepeats75: {text: "Internal 75-84%", value: 0},
+        fuzzyRepeats85: {text: "Internal 85-94%", value: 0},
+        fuzzyRepeats95: {text: "Internal 95-99%", value: 0},
+        nonTranslatable: 0,
+        totalWords: 0
+    }
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
@@ -378,7 +392,8 @@ const defaultValue = {
     clientsDefault,
     vendorsDefault,
     leadSourcesDefault,
-    packagesDefault
+    packagesDefault,
+    emptyMetrics
 };
 
 module.exports = defaultValue;

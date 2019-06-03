@@ -3,23 +3,15 @@ const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { getOneService } = require('../services/getServices');
 const { updateProject } = require('../projects/getProjects');
+const { emptyMetrics } = require('../helpers/dbDefaultValue');
 
 async function metricsCalc(metrics) {
+    if(!metrics) {
+        return {xtmMetrics: emptyMetrics, progress: {'invalid': {}, jobsMetrics: []}};
+    }
     return new Promise((resolve, reject) => {
-        const xtmMetrics =  {
-            iceMatch: {text: "ICE Match", value: metrics.coreMetrics.iceMatchWords},
-            fuzzyMatch75: {text: "75-84%", value: metrics.coreMetrics.lowFuzzyMatchWords},
-            fuzzyMatch85: {text: "85-94%", value: metrics.coreMetrics.mediumFuzzyMatchWords},
-            fuzzyMatch95: {text: "95-99%", value: metrics.coreMetrics.highFuzzyMatchWords},
-            repeat: {text: "Repetitions", value: metrics.coreMetrics.repeatsWords},
-            leveragedMatch: {text: "Leveraged Match", value: metrics.coreMetrics.leveragedWords},
-            fuzzyRepeats75: {text: "Internal 75-84%", value: metrics.coreMetrics.lowFuzzyRepeatsWords},
-            fuzzyRepeats85: {text: "Internal 85-94%", value: metrics.coreMetrics.mediumFuzzyRepeatsWords},
-            fuzzyRepeats95: {text: "Internal 95-99%", value: metrics.coreMetrics.highFuzzyRepeatsWords},
-            nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
-            totalWords: metrics.coreMetrics.totalWords,
-        }     
-        const progress = {};
+        const xtmMetrics =  getFilledXtmMetrics(metrics);
+        let progress = {};
         for(const key in metrics.metricsProgress) {
             progress[key] = {
                 wordsTotal: metrics.metricsProgress[key].totalWordCount,
@@ -32,6 +24,22 @@ async function metricsCalc(metrics) {
         progress.jobsMetrics = [...metrics.jobsMetrics];
         resolve({xtmMetrics, progress});
     })
+}
+
+function getFilledXtmMetrics(metrics) {
+    return {
+        iceMatch: {text: "ICE Match", value: metrics.coreMetrics.iceMatchWords},
+        fuzzyMatch75: {text: "75-84%", value: metrics.coreMetrics.lowFuzzyMatchWords},
+        fuzzyMatch85: {text: "85-94%", value: metrics.coreMetrics.mediumFuzzyMatchWords},
+        fuzzyMatch95: {text: "95-99%", value: metrics.coreMetrics.highFuzzyMatchWords},
+        repeat: {text: "Repetitions", value: metrics.coreMetrics.repeatsWords},
+        leveragedMatch: {text: "Leveraged Match", value: metrics.coreMetrics.leveragedWords},
+        fuzzyRepeats75: {text: "Internal 75-84%", value: metrics.coreMetrics.lowFuzzyRepeatsWords},
+        fuzzyRepeats85: {text: "Internal 85-94%", value: metrics.coreMetrics.mediumFuzzyRepeatsWords},
+        fuzzyRepeats95: {text: "Internal 95-99%", value: metrics.coreMetrics.highFuzzyRepeatsWords},
+        nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
+        totalWords: metrics.coreMetrics.totalWords,
+    }
 }
 
 function taskMetricsCalc({metrics, matrix, prop}) {
@@ -269,9 +277,11 @@ function getWordsData(project) {
     let receivableWords = 0;
     let payableWords = 0;
     for(const task of project.tasks) {
-        const taskPayableWords = wordsCalculation(task);
-        receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
-        payableWords += task.metrics.totalWords - task.metrics.nonTranslatable - taskPayableWords;
+        if(task.metrics) {
+            const taskPayableWords = wordsCalculation(task);
+            receivableWords += task.metrics.totalWords - task.metrics.nonTranslatable;
+            payableWords += task.metrics.totalWords - task.metrics.nonTranslatable - taskPayableWords;
+        }
     }
     return {'receivables': receivableWords, 'payables': payableWords}
 }
