@@ -35,36 +35,35 @@
     .step-finance__toggler(v-if="isInfoShown")
       .step-finance__toggle-option(@click="refreshFinance('receivables')" :class="{'step-finance_active-option': matrixOption === 'receivables'}") Receivables
       .step-finance__toggle-option(@click="refreshFinance('payables')" :class="{'step-finance_active-option': matrixOption === 'payables'}") Payables
-    .step-finance__info-block(v-if="isInfoShown" :class="{'step-finance_block': isInfoShown}")
+    .step-finance__info-block(v-if="isInfoShown")
       .step-finance__info-block-content
         .step-finance__top-controls
           span.step-finance__icons
-            img.step-finance__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'finance-icon_opacity': key === 'save' }")
+            img.step-finance__icon(@click.stop="makeAction(key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'finance-icon_opacity': (key === 'save' && readonly) || (key === 'edit' && !readonly) }")
         .step-finance__info-body
           .step-finance__left-body-block
             .step-finance__rate._row
               div Rate
-              div 0.08 €
+              input(type="text" :value="receivables.rate" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__quantity-R._row
               div Quantity[Relative]:
-              div 12000
+              input(type="text" :value="receivables.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__subtotal._row
               div Subtotal
-              div 960.00 €
+              input(type="text" :value="receivables.subtotal" :readonly="readonly" :class="{focus: !readonly}")
           .step-finance__right-body-block
             .step-finance__charge._row
               div Minimum charge
-              div 0.00 €
+              input(type="text" :value="receivables.charge" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__quantity-T._row
               div Quantity [Total]:
-              div 13000
+              input(type="text" :value="receivables.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__discounts._row
               div Surcharges
-              div +240 €
+              input(type="text" :value="receivables.discounts" :readonly="readonly" :class="{focus: !readonly}")
         .step-finance__info-total
               div Total:
-              div 1200 €
-
+              input(type="text" :value="receivables.total" :readonly="readonly" :class="{focus: !readonly}")
 </template>
 
 <script>
@@ -92,12 +91,28 @@ export default {
             isInfoShown: false,
             matrixOption: "receivables",
             isTooltipShow: false,
-            isMatrixShown: true
+            isMatrixShown: true,
+            readonly: true,
+          receivables: {
+              rate: '0.08 €',
+              quantity_R: '12000',
+              subtotal: '960.00 €',
+              charge: '0.00 €',
+              quantity_total: '13000',
+              discounts: '+240 €',
+              total: '1200 €'
+          },
         }
     },
     methods: {
-      makeAction(){
-        console.log('make action');
+      makeAction(key){
+        if (key === 'edit') {
+          this.readonly = false;
+          console.log('make action', key);
+        } else if (key ===  'save') {
+          this.readonly = true;
+          console.log('make action', key);
+        }
       },
       refreshFinance(value) {
         if(this.matrixOption === value) {
@@ -137,9 +152,11 @@ export default {
 .step-finance {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
+
     &__info-total {
       padding: 20px;
       display: flex;
+      align-items: center;
       div {
         &:first-child{
           margin-right: 116px;
@@ -148,6 +165,7 @@ export default {
     }
    .finance-icon_opacity {
        opacity: 0.5;
+       pointer-events: none;
    }
     &__icon{
       margin-right: 10px;
@@ -174,10 +192,28 @@ export default {
       ._row {
         padding:20px;
         display:flex;
+        align-items: center;
         div {
           width: 50%;
         }
+
       }
+    }
+    input[type="text"] {
+      color:inherit;
+      font-family: inherit;
+      border: none;
+      outline: none;
+      text-align: left;
+      width: 100px;
+      border-radius: 18px;
+      padding: 5px;
+      &.focus {
+        border: 2px solid rgba(153, 142, 126, 0.8);
+      }
+    }
+    input[type="text"]:focus {
+      box-shadow: none;
     }
     &__left-body-block {
       width: 50%;
