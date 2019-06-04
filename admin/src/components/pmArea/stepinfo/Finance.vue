@@ -27,11 +27,14 @@
                     span.step-finance__money(v-if="showMoney(row, 'receivables')") &euro;
         .step-finance__results
             .step-finance__summary
-                .step-finance__summary-value Total:
-                    span.step-finance__money {{ totalSum.total }} &euro;
+              .step-finance__summary-value Profit:
+                span.step-finance__money {{ this.financeData[1].receivables- this.financeData[1].payables }} &euro;
             .step-finance__summary
-                .step-finance__summary-value Margin:
-                    span.step-finance__money {{ totalSum.margin.toFixed(2) }} &euro;
+              .step-finance__summary-value Margin:
+                span.step-finance__money + {{ ((this.financeData[1].receivables- this.financeData[1].payables)/this.financeData[1].receivables).toFixed(2) }} %
+            .step-finance__summary
+              .step-finance__summary-value Roi:
+                span.step-finance__money + {{ 0 }} %
     .step-finance__toggler(v-if="isInfoShown")
       .step-finance__toggle-option(@click="refreshFinance('receivables')" :class="{'step-finance_active-option': matrixOption === 'receivables'}") Receivables
       .step-finance__toggle-option(@click="refreshFinance('payables')" :class="{'step-finance_active-option': matrixOption === 'payables'}") Payables
@@ -44,26 +47,26 @@
           .step-finance__left-body-block
             .step-finance__rate._row
               div Rate
-              input(type="text" :value="receivables.rate" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.rate" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__quantity-R._row
               div Quantity[Relative]:
-              input(type="text" :value="receivables.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__subtotal._row
               div Subtotal
-              input(type="text" :value="receivables.subtotal" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.subtotal" :readonly="readonly" :class="{focus: !readonly}")
           .step-finance__right-body-block
             .step-finance__charge._row
               div Minimum charge
-              input(type="text" :value="receivables.charge" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.charge" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__quantity-T._row
               div Quantity [Total]:
-              input(type="text" :value="receivables.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__discounts._row
-              div Surcharges
-              input(type="text" :value="receivables.discounts" :readonly="readonly" :class="{focus: !readonly}")
+              div Discounts/Surcharges
+              input(type="text" :value="infoBlockData.discounts" :readonly="readonly" :class="{focus: !readonly}")
         .step-finance__info-total
               div Total:
-              input(type="text" :value="receivables.total" :readonly="readonly" :class="{focus: !readonly}")
+              input(type="text" :value="infoBlockData.total" :readonly="readonly" :class="{focus: !readonly}")
 </template>
 
 <script>
@@ -74,7 +77,10 @@ export default {
     props: {
         financeData: {
             type: Array
-        }
+        },
+        financeDataRate: {
+              type: Object
+          }
     },
     data() {
         return {
@@ -93,7 +99,7 @@ export default {
             isTooltipShow: false,
             isMatrixShown: true,
             readonly: true,
-          receivables: {
+          infoBlockData: {
               rate: '0.08 €',
               quantity_R: '12000',
               subtotal: '960.00 €',
@@ -108,13 +114,13 @@ export default {
       makeAction(key){
         if (key === 'edit') {
           this.readonly = false;
-          console.log('make action', key);
+          console.log('finance data: ', this.financeData);
         } else if (key ===  'save') {
           this.readonly = true;
-          console.log('make action', key);
         }
       },
       refreshFinance(value) {
+        console.log('value refresh: ', value);
         if(this.matrixOption === value) {
           return
         }
@@ -123,6 +129,26 @@ export default {
         // }
         this.matrixOption = value;
         this.$emit("refreshFinance", {costs: value});
+        if (value === 'payables') {
+          this.infoBlockData.rate = this.financeDataRate.vendorRate + ' €';
+          this.infoBlockData.quantity_R = this.financeData[0].payables;
+          this.infoBlockData.quantity_total = this.financeData[0].payables;
+          this.infoBlockData.total = this.financeData[1].payables;
+          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.vendorRate).toFixed(2) + '';
+          this.infoBlockData.discounts =  '0 €';
+          this.infoBlockData.charge = '0.00 €';
+        } else if (value === 'receivables') {
+          this.infoBlockData.rate = this.financeDataRate.clientRate  + ' €';
+          this.infoBlockData.quantity_R = this.financeData[0].receivables;
+          this.infoBlockData.quantity_total = this.financeData[0].receivables;
+          this.infoBlockData.total = this.financeData[1].receivables;
+          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2) + '';
+          this.infoBlockData.discounts =  '0 €';
+          this.infoBlockData.charge = '0.00 €';
+        }
+
+
+
       },
         toggleInfoShow() {
             this.isInfoShown = !this.isInfoShown;
@@ -142,6 +168,17 @@ export default {
     components: {
         DataTable,
         StepInfoTitle
+    },
+    mounted() {
+      console.log('financeData: ',this.financeData);
+      console.log('financeDataRate: ',this.financeDataRate);
+      this.infoBlockData.rate = this.financeDataRate.clientRate  + ' €';
+      this.infoBlockData.quantity_R = this.financeData[0].receivables;
+      this.infoBlockData.quantity_total = this.financeData[0].receivables;
+      this.infoBlockData.total = this.financeData[1].receivables;
+      this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2) + '';
+      this.infoBlockData.discounts =  '0 €';
+      this.infoBlockData.charge = '0.00 €';
     }
 }
 </script>
@@ -173,9 +210,11 @@ export default {
     }
     &__info-block {
       width: calc(100% - 40px);
-      border: 1px solid $cell-border;
+
       height: 295px;
       padding: 20px;
+      box-shadow: 1px 1px 11px $cell-background;
+
       &-content {
         height: 100%;
       }
@@ -262,11 +301,15 @@ export default {
     &__results {
         width: 25%;
         font-size: 18px;
+        padding: 10px;
+
+        box-shadow: 1px 1px 11px $cell-background;
     }
     &__summary-value {
         display: flex;
         width: 70%;
         justify-content: space-between;
+        margin-bottom: 5px;
     }
 }
 </style>

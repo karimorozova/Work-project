@@ -11,6 +11,7 @@
     .step-info__block
         Finance(
             :financeData="financeData"
+            :financeDataRate="financeDataRate"
             @addRow="addFinanceData"
             @refreshFinance="refreshFinance"
         )
@@ -161,10 +162,18 @@ export default {
                     title: cur,
                     receivables: +this.step.finance[cur].receivables,
                     payables: +this.step.finance[cur].payables,
-                    margin: +margin.toFixed(2)
+                    margin: +margin.toFixed(2),
+                    clientRate: this.step.clientRate,
+                    vendorRate: this.step.vendorRate
                     }
                 ]
             },[])
+        },
+        financeDataRate() {
+          return {
+            clientRate: this.step.clientRate,
+            vendorRate: this.step.vendorRate
+          }
         },
         stepFiles() {
             let result = [];
@@ -185,6 +194,7 @@ export default {
     },
     mounted() {
         this.getMatrixData('clientRate', 'client');
+        console.log('step: ', this.step);
     }
 }
 </script>
