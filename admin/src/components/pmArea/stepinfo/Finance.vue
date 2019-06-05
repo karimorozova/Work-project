@@ -42,31 +42,47 @@
           .step-finance__left-body-block
             .step-finance__rate._row
               div Rate
-              input(type="text" :value="infoBlockData.rate" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+               input(type="text" :value="infoBlockData.rate" :readonly="readonly" :class="{focus: !readonly}")
+               span  &nbsp;€
             .step-finance__quantity-R._row
               div Quantity[Relative]:
-              input(type="text" :value="infoBlockData.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+                input(type="text" :value="infoBlockData.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__subtotal._row
               div Subtotal
-              input(type="text" :value="infoBlockData.subtotal" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+                input(type="text" :value="infoBlockData.subtotal" :readonly="readonly" :class="{focus: !readonly}")
+                span  &nbsp;€
           .step-finance__right-body-block
             .step-finance__charge._row
               div Minimum charge
-              input(type="text" :value="infoBlockData.charge" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+                input(type="text" :value="infoBlockData.charge" :readonly="readonly" :class="{focus: !readonly}")
+                span  &nbsp;€
             .step-finance__quantity-T._row
               div Quantity [Total]:
-              input(type="text" :value="infoBlockData.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+                input(type="text" :value="infoBlockData.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__discounts._row
               div Discounts/Surcharges
-              input(type="text" :value="infoBlockData.discounts" :readonly="readonly" :class="{focus: !readonly}")
-        .step-finance__info-total
+              .input-wrapper
+                input(type="text" :value="infoBlockData.discounts" :readonly="readonly" :class="{focus: !readonly}")
+                span  &nbsp;€
+        .step-finance__info-body
+          .step-finance__left-body-block
+            .step-finance__rate._row
               div Total:
-              input(type="text" :value="infoBlockData.total" :readonly="readonly" :class="{focus: !readonly}")
+              .input-wrapper
+                input(type="text" :value="infoBlockData.total" :readonly="readonly" :class="{focus: !readonly}")
+                span  &nbsp;€
+    ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock")
 </template>
 
 <script>
 import DataTable from "../../DataTable";
 import StepInfoTitle from "./StepInfoTitle";
+import ValidationErrors from "../../ValidationErrors";
 
 export default {
     props: {
@@ -94,28 +110,32 @@ export default {
             isMatrixShown: true,
             readonly: true,
           infoBlockData: {
-              rate: '0.08 €',
-              quantity_R: '12000',
-              subtotal: '960.00 €',
-              charge: '0.00 €',
-              quantity_total: '13000',
-              discounts: '+240 €',
-              total: '1200 €'
+              rate: '',
+              quantity_R: '',
+              subtotal: '',
+              charge: '',
+              quantity_total: '',
+              discounts: '',
+              total: ''
           },
           financeData_PlusRate:[],
+          errors: ['one','two','three'],
+          areErrorsExist: false
         }
     },
     methods: {
+      closeErrorsBlock() {
+        this.areErrorsExist = false;
+        this.errors = [];
+      },
       makeAction(key){
         if (key === 'edit') {
           this.readonly = false;
-          console.log('finance data: ', this.financeData);
         } else if (key ===  'save') {
           this.readonly = true;
         }
       },
       refreshFinance(value) {
-        console.log('value refresh: ', value);
         if(this.matrixOption === value) {
           return
         }
@@ -125,21 +145,21 @@ export default {
         this.matrixOption = value;
         // this.$emit("refreshFinance", {costs: value});
         if (value === 'payables') {
-          this.infoBlockData.rate = this.financeDataRate.vendorRate + ' €';
+          this.infoBlockData.rate = this.financeDataRate.vendorRate;
           this.infoBlockData.quantity_R = this.financeData[0].payables;
           this.infoBlockData.quantity_total = this.financeData[0].payables;
           this.infoBlockData.total = this.financeData[1].payables;
-          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.vendorRate).toFixed(2) + '';
-          this.infoBlockData.discounts =  '0 €';
-          this.infoBlockData.charge = '0.00 €';
+          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.vendorRate).toFixed(2);
+          this.infoBlockData.discounts =  '0';
+          this.infoBlockData.charge = '0.00';
         } else if (value === 'receivables') {
-          this.infoBlockData.rate = this.financeDataRate.clientRate  + ' €';
+          this.infoBlockData.rate = this.financeDataRate.clientRate;
           this.infoBlockData.quantity_R = this.financeData[0].receivables;
           this.infoBlockData.quantity_total = this.financeData[0].receivables;
           this.infoBlockData.total = this.financeData[1].receivables;
-          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2) + '';
-          this.infoBlockData.discounts =  '0 €';
-          this.infoBlockData.charge = '0.00 €';
+          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2);
+          this.infoBlockData.discounts =  '0';
+          this.infoBlockData.charge = '0.00';
         }
       },
         toggleInfoShow() {
@@ -159,16 +179,17 @@ export default {
     },
     components: {
         DataTable,
-        StepInfoTitle
+        StepInfoTitle,
+        ValidationErrors
     },
     mounted() {
-      this.infoBlockData.rate = this.financeDataRate.clientRate  + ' €';
+      this.infoBlockData.rate = this.financeDataRate.clientRate;
       this.infoBlockData.quantity_R = this.financeData[0].receivables;
       this.infoBlockData.quantity_total = this.financeData[0].receivables;
       this.infoBlockData.total = this.financeData[1].receivables;
-      this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2) + '';
-      this.infoBlockData.discounts =  '0 €';
-      this.infoBlockData.charge = '0.00 €';
+      this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2);
+      this.infoBlockData.discounts =  '0';
+      this.infoBlockData.charge = '0.00';
       this.financeData_PlusRate = [...this.financeData];
       this.financeData_PlusRate.splice(this.financeData_PlusRate.length-1, 0 , {title: 'Rate',receivables: this.financeDataRate.clientRate, payables: this.financeDataRate.vendorRate});
     },
@@ -181,22 +202,11 @@ export default {
 .step-finance {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 10px;
-
-    &__info-total {
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      div {
-        &:first-child{
-          margin-right: 116px;
-        }
-      }
-    }
    .finance-icon_opacity {
        opacity: 0.5;
        pointer-events: none;
    }
-    &__icon{
+    &__icon {
       margin-right: 10px;
       cursor:pointer;
     }
@@ -227,22 +237,27 @@ export default {
         div {
           width: 50%;
         }
+      .input-wrapper{
+        width:25%;
+        display:flex;
+        align-items: center;
+      }
+      }
+    }
+        input[type="text"] {
+          color:inherit;
+          width: 100%;
+          font-family: inherit;
+          border: none;
+          outline: none;
+          text-align: left;
+          border-radius: 18px;
+          padding: 5px;
+          &.focus {
+            border: 2px solid rgba(153, 142, 126, 0.8);
+          }
+        }
 
-      }
-    }
-    input[type="text"] {
-      color:inherit;
-      font-family: inherit;
-      border: none;
-      outline: none;
-      text-align: left;
-      width: 100px;
-      border-radius: 18px;
-      padding: 5px;
-      &.focus {
-        border: 2px solid rgba(153, 142, 126, 0.8);
-      }
-    }
     input[type="text"]:focus {
       box-shadow: none;
     }
