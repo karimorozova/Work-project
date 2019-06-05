@@ -5,30 +5,25 @@
         .step-finance__table
             DataTable(
                 :fields="fields"
-                :tableData="financeData"
+                :tableData="financeData_PlusRate"
             )
                 template(slot="headerTitle" slot-scope="{ field }")
                 template(slot="headerReceivables" slot-scope="{ field }")
                     span.step-finance__label {{ field.label }}
                 template(slot="headerPayables" slot-scope="{ field }")
                     span.step-finance__label {{ field.label }}
-                template(slot="headerMargin" slot-scope="{ field }")
-                    span.step-finance__label {{ field.label }}
                 template(slot="title" slot-scope="{ row }")
                     span.step-finance__value {{ row.title }}
                 template(slot="receivables" slot-scope="{ row }")
                     span.step-finance__value {{ row.receivables }}
-                    span.step-finance__money(v-if="showMoney(row, 'receivables')") &euro;
+                    span.step-finance__money(v-if="showMoney(row, 'receivables')") &nbsp;&euro;
                 template(slot="payables" slot-scope="{ row }")
                     span.step-finance__value {{ row.payables }}
-                    span.step-finance__money(v-if="showMoney(row, 'payables')") &euro;
-                template(slot="margin" slot-scope="{ row }")
-                    span.step-finance__value {{ row.margin }}
-                    span.step-finance__money(v-if="showMoney(row, 'receivables')") &euro;
+                    span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
         .step-finance__results
             .step-finance__summary
               .step-finance__summary-value Profit:
-                span.step-finance__money {{ this.financeData[1].receivables- this.financeData[1].payables }} &euro;
+                span.step-finance__money {{ (this.financeData[1].receivables- this.financeData[1].payables).toFixed(2) }} &euro;
             .step-finance__summary
               .step-finance__summary-value Margin:
                 span.step-finance__money + {{ ((this.financeData[1].receivables- this.financeData[1].payables)/this.financeData[1].receivables).toFixed(2) }} %
@@ -85,10 +80,9 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Title", headerKey: "headerTitle", key: "title", width: "25%"},
-                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "25%"},
-                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
-                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: "33.33%"},
+                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "33.33%"},
+                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "33.33%"},
             ],
           icons: {
             save: {icon: require('../../../assets/images/Other/save-icon-qa-form.png')},
@@ -108,6 +102,7 @@ export default {
               discounts: '+240 €',
               total: '1200 €'
           },
+          financeData_PlusRate:[],
         }
     },
     methods: {
@@ -128,7 +123,7 @@ export default {
         //   return this.noVendorToolTip()
         // }
         this.matrixOption = value;
-        this.$emit("refreshFinance", {costs: value});
+        // this.$emit("refreshFinance", {costs: value});
         if (value === 'payables') {
           this.infoBlockData.rate = this.financeDataRate.vendorRate + ' €';
           this.infoBlockData.quantity_R = this.financeData[0].payables;
@@ -146,9 +141,6 @@ export default {
           this.infoBlockData.discounts =  '0 €';
           this.infoBlockData.charge = '0.00 €';
         }
-
-
-
       },
         toggleInfoShow() {
             this.isInfoShown = !this.isInfoShown;
@@ -170,8 +162,6 @@ export default {
         StepInfoTitle
     },
     mounted() {
-      console.log('financeData: ',this.financeData);
-      console.log('financeDataRate: ',this.financeDataRate);
       this.infoBlockData.rate = this.financeDataRate.clientRate  + ' €';
       this.infoBlockData.quantity_R = this.financeData[0].receivables;
       this.infoBlockData.quantity_total = this.financeData[0].receivables;
@@ -179,7 +169,9 @@ export default {
       this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2) + '';
       this.infoBlockData.discounts =  '0 €';
       this.infoBlockData.charge = '0.00 €';
-    }
+      this.financeData_PlusRate = [...this.financeData];
+      this.financeData_PlusRate.splice(this.financeData_PlusRate.length-1, 0 , {title: 'Rate',receivables: this.financeDataRate.clientRate, payables: this.financeDataRate.vendorRate});
+    },
 }
 </script>
 
