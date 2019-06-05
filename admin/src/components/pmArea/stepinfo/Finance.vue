@@ -43,38 +43,38 @@
             .step-finance__rate._row
               div Rate
               .input-wrapper
-               input(type="text" :value="infoBlockData.rate" :readonly="readonly" :class="{focus: !readonly}")
+               input(type="text" v-model="infoBlockData['Rate']" :readonly="readonly" :class="{focus: !readonly}")
                span  &nbsp;€
             .step-finance__quantity-R._row
               div Quantity[Relative]:
               .input-wrapper
-                input(type="text" :value="infoBlockData.quantity_R" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Quantity[Relative]']" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__subtotal._row
               div Subtotal
               .input-wrapper
-                input(type="text" :value="infoBlockData.subtotal" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Subtotal']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
           .step-finance__right-body-block
             .step-finance__charge._row
               div Minimum charge
               .input-wrapper
-                input(type="text" :value="infoBlockData.charge" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Minimum charge']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
             .step-finance__quantity-T._row
               div Quantity [Total]:
               .input-wrapper
-                input(type="text" :value="infoBlockData.quantity_total" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Quantity [Total]']" :readonly="readonly" :class="{focus: !readonly}")
             .step-finance__discounts._row
               div Discounts/Surcharges
               .input-wrapper
-                input(type="text" :value="infoBlockData.discounts" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Discounts/Surcharges']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
         .step-finance__info-body
           .step-finance__left-body-block
             .step-finance__rate._row
               div Total:
               .input-wrapper
-                input(type="text" :value="infoBlockData.total" :readonly="readonly" :class="{focus: !readonly}")
+                input(type="text" v-model="infoBlockData['Total']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock")
 </template>
@@ -110,20 +110,31 @@ export default {
             isMatrixShown: true,
             readonly: true,
           infoBlockData: {
-              rate: '',
-              quantity_R: '',
-              subtotal: '',
-              charge: '',
-              quantity_total: '',
-              discounts: '',
-              total: ''
+              'Rate': '',
+              'Quantity[Relative]': '',
+              'Subtotal': '',
+              'Minimum charge': '',
+              'Quantity [Total]': '',
+              'Discounts/Surcharges': '',
+              'Total': ''
           },
           financeData_PlusRate:[],
-          errors: ['one','two','three'],
+          errors: [],
           areErrorsExist: false
         }
     },
     methods: {
+       checkForErrors() {
+        let errors = [];
+        Object.keys(this.infoBlockData).map((key)=>{
+          if ((!parseFloat(this.infoBlockData[key]) && parseFloat(this.infoBlockData[key]) !==0) || String(this.infoBlockData[key]).includes(',') ) {
+            this.errors.push(`Field '${key}' is invalid`);
+          }
+        });
+        if(this.errors.length) {
+          this.areErrorsExist = true;
+        }
+      },
       closeErrorsBlock() {
         this.areErrorsExist = false;
         this.errors = [];
@@ -132,6 +143,12 @@ export default {
         if (key === 'edit') {
           this.readonly = false;
         } else if (key ===  'save') {
+          this.checkForErrors();
+          if (!this.areErrorsExist) {
+            console.log('Data to update at the server: ', this.infoBlockData);
+          } else {
+            console.log('There are errors!');
+          }
           this.readonly = true;
         }
       },
@@ -145,21 +162,21 @@ export default {
         this.matrixOption = value;
         // this.$emit("refreshFinance", {costs: value});
         if (value === 'payables') {
-          this.infoBlockData.rate = this.financeDataRate.vendorRate;
-          this.infoBlockData.quantity_R = this.financeData[0].payables;
-          this.infoBlockData.quantity_total = this.financeData[0].payables;
-          this.infoBlockData.total = this.financeData[1].payables;
-          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.vendorRate).toFixed(2);
-          this.infoBlockData.discounts =  '0';
-          this.infoBlockData.charge = '0.00';
+          this.infoBlockData['Rate'] = this.financeDataRate.vendorRate;
+          this.infoBlockData['Quantity[Relative]'] = this.financeData[0].payables;
+          this.infoBlockData['Quantity [Total]'] = this.financeData[0].payables;
+          this.infoBlockData['Total'] = this.financeData[1].payables;
+          this.infoBlockData['Subtotal'] = (this.infoBlockData['Quantity[Relative]'] * this.financeDataRate.vendorRate).toFixed(2);
+          this.infoBlockData['Discounts/Surcharges'] =  '0';
+          this.infoBlockData['Minimum charge'] = '0.00';
         } else if (value === 'receivables') {
-          this.infoBlockData.rate = this.financeDataRate.clientRate;
-          this.infoBlockData.quantity_R = this.financeData[0].receivables;
-          this.infoBlockData.quantity_total = this.financeData[0].receivables;
-          this.infoBlockData.total = this.financeData[1].receivables;
-          this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2);
-          this.infoBlockData.discounts =  '0';
-          this.infoBlockData.charge = '0.00';
+          this.infoBlockData['Rate'] = this.financeDataRate.clientRate;
+          this.infoBlockData['Quantity[Relative]'] = this.financeData[0].receivables;
+          this.infoBlockData['Quantity [Total]'] = this.financeData[0].receivables;
+          this.infoBlockData['Total'] = this.financeData[1].receivables;
+          this.infoBlockData['Subtotal'] = (this.infoBlockData['Quantity[Relative]'] * this.financeDataRate.clientRate).toFixed(2);
+          this.infoBlockData['Discounts/Surcharges'] =  '0';
+          this.infoBlockData['Minimum charge'] = '0.00';
         }
       },
         toggleInfoShow() {
@@ -183,13 +200,13 @@ export default {
         ValidationErrors
     },
     mounted() {
-      this.infoBlockData.rate = this.financeDataRate.clientRate;
-      this.infoBlockData.quantity_R = this.financeData[0].receivables;
-      this.infoBlockData.quantity_total = this.financeData[0].receivables;
-      this.infoBlockData.total = this.financeData[1].receivables;
-      this.infoBlockData.subtotal = (this.infoBlockData.quantity_R * this.financeDataRate.clientRate).toFixed(2);
-      this.infoBlockData.discounts =  '0';
-      this.infoBlockData.charge = '0.00';
+      this.infoBlockData['Rate'] = this.financeDataRate.clientRate;
+      this.infoBlockData['Quantity[Relative]'] = this.financeData[0].receivables;
+      this.infoBlockData['Quantity [Total]'] = this.financeData[0].receivables;
+      this.infoBlockData['Total'] = this.financeData[1].receivables;
+      this.infoBlockData['Subtotal'] = (this.infoBlockData['Quantity[Relative]'] * this.financeDataRate.clientRate).toFixed(2);
+      this.infoBlockData['Discounts/Surcharges'] = '0';
+      this.infoBlockData['Minimum charge'] = '0.00';
       this.financeData_PlusRate = [...this.financeData];
       this.financeData_PlusRate.splice(this.financeData_PlusRate.length-1, 0 , {title: 'Rate',receivables: this.financeDataRate.clientRate, payables: this.financeDataRate.vendorRate});
     },
