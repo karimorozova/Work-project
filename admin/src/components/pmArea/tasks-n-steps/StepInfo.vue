@@ -194,7 +194,6 @@ export default {
     },
     mounted() {
         this.getMatrixData('clientRate', 'client');
-        console.log('step: ', this.step);
     }
 }
 </script>

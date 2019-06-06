@@ -75,7 +75,7 @@
               .input-wrapper
                 input(type="text" v-model="infoBlockData['Discounts/Surcharges']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
-        .step-finance__info-body
+        .step-finance__info-total
           .step-finance__left-body-block
             .step-finance__rate._row
               div Total:
@@ -153,9 +153,9 @@ export default {
         } else if (key ===  'save') {
           this.checkForErrors();
           if (!this.areErrorsExist) {
-            console.log('Data to update at the server: ', this.infoBlockData);
+            // console.log('Data to update at the server: ', this.infoBlockData);
           } else {
-            console.log('There are errors!');
+            // console.log('There are errors!');
           }
           this.readonly = true;
         }
@@ -198,7 +198,7 @@ export default {
         totalSum() {
             const price = this.financeData.find(item => {
                 return item.title === "Price"
-            })
+            });
             return {total: price.receivables, margin: price.receivables - price.payables};
         }
     },
@@ -237,8 +237,7 @@ export default {
     }
     &__info-block {
       width: calc(100% - 40px);
-
-      height: 295px;
+      height: 255px;
       padding: 20px;
       box-shadow: 1px 1px 11px $cell-background;
 
@@ -256,9 +255,10 @@ export default {
       height:70%;
       border-bottom: 2px solid $cell-background;
       ._row {
-        padding:20px;
+        padding:10px 20px;
         display:flex;
         align-items: center;
+        min-height: 32px;
         div:first-child {
           width: 50%;
           font-weight: 600;
@@ -273,6 +273,28 @@ export default {
       }
       }
     }
+  &__info-total {
+    display: flex;
+    width:100%;
+    ._row {
+      padding:10px 20px;
+      display:flex;
+      align-items: center;
+      min-height: 32px;
+      div:first-child {
+        width: 50%;
+        font-weight: 600;
+      }
+      .input-wrapper{
+        width:25%;
+        display:flex;
+        align-items: center;
+        span {
+          opacity: 0.6;
+        }
+      }
+    }
+  }
         input[type="text"] {
           color:inherit;
           width: 100%;
