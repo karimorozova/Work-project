@@ -1,13 +1,13 @@
 const { sendEmail, clientQuoteEmail, managerNotifyMail } = require('./mailTemplate');
 const { applicationMessage, messageForClient, requestMessageForVendor, managerAssignmentNotifyingMessage, 
-    vendorNotificationMessage, taskReadyMessage, deliverablesDownloadedMessage } = require('./emailMessages');
+    vendorNotificationMessage, taskReadyMessage, deliverablesDownloadedMessage, vendorReassignmentMessage } = require('./emailMessages');
 const { sendMail } = require('./mailhandler');
 const { sendMailClient } = require('./mailhandlerclient');
 const { sendMailPortal } = require('./mailhandlerportal');
 const { clientMail } = require('./mailtoclients');
 const { pmMail } = require('./mailtopm');
 const { vendorMail } = require('./mailtovendor');
-const { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact } = require('./projectMails');
+const { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact, stepReassignedNotification } = require('./projectMails');
 const upload = require('./uploads');
 const { moveFile } = require('./movingFile');
 const { archiveFile } = require('./archiving');
@@ -35,5 +35,7 @@ module.exports = {
     vendorNotificationMessage,
     archiveFile,
     taskReadyMessage,
-    deliverablesDownloadedMessage
+    deliverablesDownloadedMessage,
+    vendorReassignmentMessage,
+    stepReassignedNotification
 }

@@ -1,6 +1,6 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage, requestMessageForVendor, emailMessageForContact } = require('./emailMessages');
+const { managerAssignmentNotifyingMessage, requestMessageForVendor, emailMessageForContact, vendorReassignmentMessage } = require('./emailMessages');
 const { getClient } = require('../clients');
 
 async function notifyManagerProjectStarts(project) {
@@ -40,6 +40,16 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     } catch(err) {
         console.log(err);
         console.log("Error in managerEmailsSend");
+    }
+}
+
+async function stepReassignedNotification(project, step) {
+    const message = vendorReassignmentMessage(step);
+    try {
+        await sendEmail({to: step.vendor.email, subject: `Step has been reassigned (ID V001.1, ${project.projectId})`}, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in stepReassignedNotification")
     }
 }
 
@@ -103,4 +113,4 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-module.exports = { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact };
+module.exports = { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact, stepReassignedNotification };

@@ -125,7 +125,8 @@ export default {
             return this.nextSendTime.length === 2;
         },
         isVendorSelect() {
-            return this.step.status === 'Created' || this.step.status === 'Rejected';
+            const statuses = ['Started', 'Cancelled', 'Cancelled Halfway', 'Completed'];
+            return statuses.indexOf(this.step.status) === -1;
         }
     },
     components: {

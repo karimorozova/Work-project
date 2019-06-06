@@ -55,7 +55,7 @@
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ row.source }} >> {{ row.target }}
             template(slot="vendor" slot-scope="{ row, index }")
-                .steps__vendor-menu(v-if="row.status === 'Created' || row.status === 'Rejected'")
+                .steps__vendor-menu(v-if="isVendorSelect(row.status)")
                     PersonSelect(
                         :persons="extendedVendors(index)"
                         :selectedPerson="vendorName(row.vendor)"
@@ -65,7 +65,7 @@
                         @togglePersonsData="toggleVendors"
                         @scrollDrop="scrollDrop"
                     )
-                span.steps__step-vendor(v-if="row.status !== 'Created' && row.status !== 'Rejected'") {{ vendorName(row.vendor) }}
+                span.steps__step-vendor(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
                     span.steps__step-no-select(v-if="!row.vendor") No Vendor
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
@@ -190,6 +190,10 @@ export default {
         },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
+        },
+        isVendorSelect(status) {
+            const validStatuses = ['Started', 'Cancelled', 'Cancelled Halfway', 'Completed'];
+            return validStatuses.indexOf(status) === -1;
         },
         showTab({index}) {
             return this.tabs[index] === 'Steps' ? true

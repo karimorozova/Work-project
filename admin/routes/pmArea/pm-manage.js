@@ -3,7 +3,7 @@ const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps } = require("../../projects/");
-const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact } = require("../../utils/");
+const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 
 router.get("/project", async (req, res) => {
@@ -144,6 +144,21 @@ router.post("/vendor-request", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending the Request Confirmation");
+    }
+})
+
+router.post("/vendor-assignment", async (req, res) => {
+    const { step, vendor } = req.body;
+    try {
+        const project = await getProject({"steps._id": step._id});
+        if(step.vendor) {
+            await stepReassignedNotification(project, step);
+        }
+        await stepVendorsRequestSending(project, [step]);
+        res.send('messages sent');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending emails to vendors");
     }
 })
 
