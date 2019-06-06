@@ -6,6 +6,9 @@
             DataTable(
                 :fields="fields"
                 :tableData="financeData_PlusRate"
+                :tableheadClass="'table__header'"
+                :tableheadRowClass="'table__header-row'"
+                :bodyRowClass="'table__body-row-custom'"
             )
                 template(slot="headerTitle" slot-scope="{ field }")
                 template(slot="headerReceivables" slot-scope="{ field }")
@@ -22,13 +25,16 @@
                     span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
         .step-finance__results
             .step-finance__summary
-              .step-finance__summary-value Profit:
+              .step-finance__summary-value
+                span Profit:
                 span.step-finance__money {{ (this.financeData[1].receivables- this.financeData[1].payables).toFixed(2) }} &euro;
             .step-finance__summary
-              .step-finance__summary-value Margin:
+              .step-finance__summary-value
+                span Margin:
                 span.step-finance__money + {{ ((this.financeData[1].receivables- this.financeData[1].payables)/this.financeData[1].receivables).toFixed(2) }} %
             .step-finance__summary
-              .step-finance__summary-value Roi:
+              .step-finance__summary-value
+                span ROI:
                 span.step-finance__money + {{ 0 }} %
     .step-finance__toggler(v-if="isInfoShown")
       .step-finance__toggle-option(@click="refreshFinance('receivables')" :class="{'step-finance_active-option': matrixOption === 'receivables'}") Receivables
@@ -125,7 +131,6 @@ export default {
     },
     methods: {
        checkForErrors() {
-        let errors = [];
         Object.keys(this.infoBlockData).map((key)=>{
           this.infoBlockData[key] = String(this.infoBlockData[key]).replace(/[^0-9.,]/g, '').replace(/,/g,'.');
           if ((!parseFloat(this.infoBlockData[key]) && parseFloat(this.infoBlockData[key]) !==0) || String(this.infoBlockData[key]).includes(',') ) {
@@ -254,13 +259,17 @@ export default {
         padding:20px;
         display:flex;
         align-items: center;
-        div {
+        div:first-child {
           width: 50%;
+          font-weight: 600;
         }
       .input-wrapper{
         width:25%;
         display:flex;
         align-items: center;
+        span {
+          opacity: 0.6;
+        }
       }
       }
     }
@@ -273,8 +282,10 @@ export default {
           text-align: left;
           border-radius: 18px;
           padding: 5px;
+          opacity: 0.6;
           &.focus {
-            border: 2px solid rgba(153, 142, 126, 0.8);
+            border: 1px solid rgba(153, 142, 126, 0.8);
+            opacity: 1;
           }
         }
 
@@ -314,29 +325,33 @@ export default {
     }
     &__info {
         margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
-        display: none;
+        display:none;
         transition: all 0.3s;
     }
     &_flex-display {
        display: flex;
     }
     &__table {
-        width: 70%;
+        width: 430px;
+        height: 130px;
+        margin-right: 20px;
     }
     &__results {
-        width: 25%;
-        font-size: 18px;
-        padding: 10px;
-
+        width: 128px;
+        height: 92px;
+        font-size: 14px;
+        padding: 20px 10px;
         box-shadow: 1px 1px 11px $cell-background;
     }
     &__summary-value {
         display: flex;
-        width: 70%;
         justify-content: space-between;
-        margin-bottom: 5px;
+      span{
+        width: 50%;
+      }
+    }
+    &__summary:not(:last-child){
+      margin-bottom: 20px;
     }
 }
 </style>
