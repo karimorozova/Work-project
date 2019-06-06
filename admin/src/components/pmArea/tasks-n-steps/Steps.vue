@@ -222,9 +222,11 @@ export default {
             this.$emit("setVendor", {vendor: { _id: person._id }, index});
         },
         async setAction({option}) {
-            this.selectedAction = option;
-            this.setModalTexts(option);
-            this.isApproveActionShow = true;
+            if(option !== "No action available") {
+                this.selectedAction = option;
+                this.setModalTexts(option);
+                this.isApproveActionShow = true;
+            }
         },
         setModalTexts(option) {
             this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
@@ -379,10 +381,13 @@ export default {
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
             const completedStep = this.allSteps.find(item => item.status === "Completed");
             if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
-                result= ["Request confirmation"];
+                result= [];
             }
             if(completedStep && result.indexOf("ReOpen") === -1) {
                 result.push("ReOpen");
+            }
+            if(!result.length) {
+                result = ["No action available"];
             }
             return result;
         }
