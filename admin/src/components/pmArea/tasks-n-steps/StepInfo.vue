@@ -11,7 +11,9 @@
     .step-info__block
         Finance(
             :financeData="financeData"
+            :financeDataRate="financeDataRate"
             @addRow="addFinanceData"
+            @refreshFinance="refreshFinance"
         )
     .step-info__block(v-if="step.name === 'translate1'")
         Matrix(
@@ -73,7 +75,7 @@ export default {
                         key: key,
                         active: false,
                         title: this.task.metrics[key].text,
-                        value: this.task.metrics[key][prop]*100, 
+                        value: this.task.metrics[key][prop]*100,
                         wordcount: this.task.metrics[key].value,
                         rate: +this.step[rateProp]*this.task.metrics[key][prop],
                         total: this.step[rateProp]*this.task.metrics[key][prop]*this.task.metrics[key].value
@@ -84,7 +86,7 @@ export default {
         },
         lastMatrixDateRow(rateProp) {
             const totalMatchedWords = this.matrixData.reduce((init, cur) => {
-                return init + cur.wordcount; 
+                return init + cur.wordcount;
             }, 0);
             const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
             const total = wordcount*this.step[rateProp];
@@ -117,7 +119,7 @@ export default {
             this.matrixData[index].active = !this.matrixData[index].active;
         },
         async updateMatrixValue({index, prop}) {
-            const property = prop === "receivables" ? "client" : "vendor" 
+            const property = prop === "receivables" ? "client" : "vendor"
             try {
             await this.updateMatrix({
                 projectId: this.currentProject._id,
@@ -138,6 +140,9 @@ export default {
             return costs === 'receivables' ? this.getMatrixData('clientRate', 'client')
             : this.getMatrixData('vendorRate', 'vendor')
         },
+        refreshFinance({costs}) {
+          console.log('refresh finance', costs);
+        },
         closeInfo() {
             this.$emit("closeStepInfo");
         },
@@ -157,10 +162,18 @@ export default {
                     title: cur,
                     receivables: +this.step.finance[cur].receivables,
                     payables: +this.step.finance[cur].payables,
-                    margin: +margin.toFixed(2)
+                    margin: +margin.toFixed(2),
+                    clientRate: this.step.clientRate,
+                    vendorRate: this.step.vendorRate
                     }
                 ]
             },[])
+        },
+        financeDataRate() {
+          return {
+            clientRate: this.step.clientRate,
+            vendorRate: this.step.vendorRate
+          }
         },
         stepFiles() {
             let result = [];
@@ -181,6 +194,7 @@ export default {
     },
     mounted() {
         this.getMatrixData('clientRate', 'client');
+        console.log('step: ', this.step);
     }
 }
 </script>
