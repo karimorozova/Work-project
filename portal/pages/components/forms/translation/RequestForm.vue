@@ -73,6 +73,11 @@ export default {
         },
         checkErrors() {
             this.$emit('checkErrors', {service: this.service});
+        },
+        setDefaultIndustry() {
+            if(this.clientIndustries.length === 1) {
+                this.setOrderDetail({prop: 'industry', value: this.clientIndustries[0]._id})
+            }
         }
     },
     computed: {
@@ -97,7 +102,15 @@ export default {
         quoteDecision() {
             return this.orderDetails.quoteDecision || "Send";
         }
-    },  
+    },
+    watch: {
+        clientIndustries: function(val) {
+            if (val.length === 1) {
+                this.selectedIndustry = val[0].name;
+                this.setOrderDetail({prop: 'industry', value: val[0]._id})
+            }
+        }
+    },
     components: {
         FormWrapper,
         ProjectName,

@@ -6,6 +6,7 @@
         ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
     .project-info__all-info
         TasksAndSteps(
+            :isFinishedStatus="isFinishedStatus"
             @getMetrics="getMetrics"
             @setVendor="setVendor"
             @setDate="setDate"
@@ -209,7 +210,11 @@ export default {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             allVendors: "getVendors"
-        })
+        }),
+        isFinishedStatus() {
+            const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Canclled Halfway'];
+            return finishedStatuses.indexOf(this.currentProject.status) !== -1;
+        }
     },
     components: {
         ValidationErrors,

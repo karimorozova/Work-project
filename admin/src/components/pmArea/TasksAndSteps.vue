@@ -1,9 +1,9 @@
 <template lang="pug">
 .tasks-steps
     .tasks-steps__tasks-title Tasks and Steps
-        img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData}")
+        img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
-        TasksData(v-if="isTaskData"
+        TasksData(v-if="isTaskData && !isFinishedStatus"
             :selectedWorkflow="selectedWorkflow"
             :template="template"
             :sourceLanguages="sourceLanguages"
@@ -40,6 +40,9 @@ import Steps from "./tasks-n-steps/Steps";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+    props: {
+        isFinishedStatus: {type: Boolean}
+    },
     data() {
         return {
             selectedWorkflow: {name:"2 Steps", id: 2917},
@@ -59,9 +62,7 @@ export default {
             getServices: "getServices"
         }),
         setDefaultIsTaskData() {
-            if(this.currentProject.status === 'Delivered') {
-                this.isTaskData = false;
-            } else if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
+            if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
                 this.isTaskData = true;
             }
         },

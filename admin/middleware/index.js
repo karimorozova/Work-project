@@ -117,6 +117,7 @@ const middleware = {
             '/new-client',
             '/quotes',
             '/pm-create-project',
+            '/pm-area',
             '/pm-area/open-projects',
             '/pm-area/requests',
             '/pm-projects',
