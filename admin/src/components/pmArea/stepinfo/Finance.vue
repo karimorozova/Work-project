@@ -127,8 +127,11 @@ export default {
        checkForErrors() {
         let errors = [];
         Object.keys(this.infoBlockData).map((key)=>{
+          this.infoBlockData[key] = String(this.infoBlockData[key]).replace(/[^0-9.,]/g, '').replace(/,/g,'.');
           if ((!parseFloat(this.infoBlockData[key]) && parseFloat(this.infoBlockData[key]) !==0) || String(this.infoBlockData[key]).includes(',') ) {
             this.errors.push(`Field '${key}' is invalid`);
+          } else {
+            this.infoBlockData[key] = parseFloat(this.infoBlockData[key]);
           }
         });
         if(this.errors.length) {
