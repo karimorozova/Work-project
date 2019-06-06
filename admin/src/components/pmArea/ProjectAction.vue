@@ -71,7 +71,7 @@ export default {
                         await this.acceptQuote();
                         break;
                     case "Cancel":
-                        await this.setStatus('Cancelled');
+                        await this.cancelProject();
                         break;
                 }
             } catch(err) {
@@ -92,6 +92,12 @@ export default {
             } finally {
                 this.setDefaults();
             }
+        },
+        async cancelProject() {
+            if(this.project.status === "Delivered" || this.project.status === "Closed") return;
+            try {
+                await this.setStatus('Cancelled');
+            } catch(err) { }
         },
         async setStatus(status) {
             try {
@@ -133,12 +139,9 @@ export default {
     computed: {
         filteredActions() {
             let result = this.actions;
-            if(this.project.finance.Price.receivables && 
-                (this.project.status === "Draft" || this.project.status === "Requested")) {
+            const nonStartedStatuses = ["Draft", "Quote sent", "Requested", "Cancelled"]
+            if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
                 result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
-            }
-            if(this.project.status === "Quote sent") {
-                result = ["Accept/Reject Quote", "Cancel"];
             }
             if(this.project.status === "Started" || this.project.status === "In progress") {
                 result = ["Send Project Details", "Cancel"];
