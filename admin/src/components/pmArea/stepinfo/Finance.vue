@@ -216,6 +216,7 @@
         }
       },
       refreshFinance(value) {
+        this.readonly = true;
         if (this.matrixOption === value) {
           return
         }
