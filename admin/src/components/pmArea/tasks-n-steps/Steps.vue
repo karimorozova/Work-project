@@ -215,7 +215,6 @@ export default {
             this.isStepInfo = true;
         },
         closeStepInfo() {
-            console.log('in steps');
             this.isStepInfo = false;
             this.infoIndex = -1;
         },

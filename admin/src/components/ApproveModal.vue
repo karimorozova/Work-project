@@ -2,11 +2,11 @@
 .approve-modal
     .approve-modal__text {{ text }}
     .approve-modal__buttons
-        .approve-modal__button(@click="approve")
+        .approve-modal__button(@click.stop="approve")
             Button(:value="approveValue")
-        .approve-modal__button(@click="notApprove")
+        .approve-modal__button(@click.stop="notApprove")
             Button(:value="notApproveValue")
-    span.approve-modal__close(@click="close") +
+    span.approve-modal__close(@click.stop="close") +
 </template>
 
 <script>
