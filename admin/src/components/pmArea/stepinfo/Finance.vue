@@ -82,16 +82,17 @@
               .input-wrapper
                 input(type="text" v-model="infoBlockData['Total']" :readonly="readonly" :class="{focus: !readonly}")
                 span  &nbsp;€
+        .step-finance__approve-action(v-if="selectedAction")
+            ApproveModal(
+                :text="customizedModalText"
+                approveValue="Yes"
+                notApproveValue="Cancel"
+                @approve="approveAction"
+                @notApprove="closeModal"
+                @close="closeModal"
+            )
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock")
-    .step-finance__approve-action(v-if="selectedAction" v-click-outside="closeModal")
-      ApproveModal(
-      :text="customizedModalText"
-      approveValue="Yes"
-      notApproveValue="Cancel"
-        @approve="approveAction"
-        @notApprove="closeModal"
-        @close="closeModal"
-      )
+    
 </template>
 
 <script>
@@ -99,7 +100,6 @@
   import StepInfoTitle from "./StepInfoTitle";
   import ValidationErrors from "../../ValidationErrors";
   import ApproveModal from "../../ApproveModal";
-  import ClickOutside from "vue-click-outside";
 
   export default {
     props: {
@@ -198,7 +198,7 @@
       },
       makeAction(key) {
         if (key === 'edit') {
-          this.customizedModalText = `You have changed the ${this.matrixOption === 'receivables' && 'client' || ' vendor' } rate. Are you sure?`;
+          this.customizedModalText = `Do you want to save changed rate value in ${this.matrixOption === "receivables" && "client's" || "vendor's" } rates?`;
           this.infoBlockDataCopy = {...this.infoBlockData};
           this.readonly = false;
         } else if (key === 'save') {
@@ -227,6 +227,7 @@
         } else if (value === 'receivables') {
           this.setReceivablesValues();
         }
+        this.closeModal();
       },
       toggleInfoShow() {
         this.isInfoShown = !this.isInfoShown;
@@ -249,9 +250,6 @@
       ValidationErrors,
       ApproveModal
     },
-    directives: {
-      ClickOutside
-    },
     mounted() {
       this.setReceivablesValues();
       this.financeData_PlusRate = [...this.financeData];
@@ -272,11 +270,14 @@
     padding: 10px;
     &__approve-action {
       position: absolute;
-      top: 58%;
-      left: 50%;
-      margin-left: -150px;
-      background-color: #FFF;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       z-index: 30;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .finance-icon_opacity {
       opacity: 0.5;
