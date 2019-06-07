@@ -144,6 +144,7 @@ export default {
           console.log('refresh finance', costs);
         },
         closeInfo() {
+            console.log('in step info');
             this.$emit("closeStepInfo");
         },
         ...mapActions({
