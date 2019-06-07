@@ -1,6 +1,6 @@
 <template lang="pug">
 .project-info(v-if="currentProject._id")
-    .project-info__title Project Details
+    .project-info__title Project Details : {{currentProject.projectId}}
     .project-info__all-info
         Project(:project="currentProject")
         ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
@@ -73,7 +73,7 @@ export default {
             }
         },
         async setVendor({vendor, index}) {
-            if(this.currentProject.steps[index].vendor && 
+            if(this.currentProject.steps[index].vendor &&
                 this.currentProject.steps[index].vendor._id === vendor._id) {
                     return
             }
@@ -142,8 +142,8 @@ export default {
             return stepProgress;
         },
         getStepsDates({task, key}) {
-            let startDate = task.start; 
-            let deadline = task.deadline; 
+            let startDate = task.start;
+            let deadline = task.deadline;
             if(task.stepsDates.length) {
                 startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
                 deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
@@ -162,7 +162,7 @@ export default {
         },
         async refreshCustomerInfo() {
             const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
-            await this.setProjectValue({prop: 'customer', value: client.body}); 
+            await this.setProjectValue({prop: 'customer', value: client.body});
         },
         showErrors({errors}) {
             this.errors = [...errors];
@@ -205,6 +205,9 @@ export default {
 
             }
         }
+    },
+    mounted() {
+      console.log('this.project: ', this.currentProject);
     },
     computed: {
         ...mapGetters({
