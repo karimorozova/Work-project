@@ -60,7 +60,6 @@ export default {
         },
         outClick(){
             this.isDropped = false;
-            this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: 0, offsetHeight: 0})
         },
         getPersonFullName(person) {
             return person.firstName + ' ' + person.surname;
