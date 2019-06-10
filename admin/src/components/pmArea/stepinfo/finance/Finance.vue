@@ -23,19 +23,7 @@
           template(slot="payables" slot-scope="{ row }")
             span.step-finance__value {{ row.payables }}
             span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
-      .step-finance__results
-        .step-finance__summary
-          .step-finance__summary-value
-            span Profit:
-            span.step-finance__money {{ (this.financeData[1].receivables- this.financeData[1].payables).toFixed(2) }} &euro;
-        .step-finance__summary
-          .step-finance__summary-value
-            span Margin:
-            span.step-finance__money + {{ ((this.financeData[1].receivables- this.financeData[1].payables)/this.financeData[1].receivables).toFixed(2) }} %
-        .step-finance__summary
-          .step-finance__summary-value
-            span ROI:
-            span.step-finance__money + {{ 0 }} %
+      Results(:financeData="financeData")
     .step-finance__toggler(v-if="isInfoShown")
       .step-finance__toggle-option(@click="refreshFinance('receivables')" :class="{'step-finance_active-option': matrixOption === 'receivables'}") Receivables
       .step-finance__toggle-option(@click="refreshFinance('payables')" :class="{'step-finance_active-option': matrixOption === 'payables'}") Payables
@@ -96,10 +84,11 @@
 </template>
 
 <script>
-  import DataTable from "../../DataTable";
+  import DataTable from "../../../DataTable";
   import StepInfoTitle from "./StepInfoTitle";
-  import ValidationErrors from "../../ValidationErrors";
-  import ApproveModal from "../../ApproveModal";
+  import ValidationErrors from "../../../ValidationErrors";
+  import ApproveModal from "../../../ApproveModal";
+  import Results from "./Results"
 
   export default {
     props: {
@@ -118,8 +107,8 @@
           {label: "Payables", headerKey: "headerPayables", key: "payables", width: "33.33%"},
         ],
         icons: {
-          save: {icon: require('../../../assets/images/Other/save-icon-qa-form.png')},
-          edit: {icon: require('../../../assets/images/Other/edit-icon-qa.png')},
+          save: {icon: require('../../../../assets/images/Other/save-icon-qa-form.png')},
+          edit: {icon: require('../../../../assets/images/Other/edit-icon-qa.png')},
         },
         isInfoShown: false,
         matrixOption: "receivables",
@@ -248,7 +237,8 @@
       DataTable,
       StepInfoTitle,
       ValidationErrors,
-      ApproveModal
+      ApproveModal,
+      Results
     },
     mounted() {
       this.setReceivablesValues();
@@ -263,7 +253,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
+  @import "../../../../assets/scss/colors";
 
   .step-finance {
     box-shadow: 0 0 5px $brown-shadow;
@@ -409,23 +399,6 @@
       width: 430px;
       height: 130px;
       margin-right: 20px;
-    }
-    &__results {
-      width: 128px;
-      height: 92px;
-      font-size: 14px;
-      padding: 20px 10px;
-      box-shadow: 1px 1px 11px $cell-background;
-    }
-    &__summary-value {
-      display: flex;
-      justify-content: space-between;
-      span {
-        width: 50%;
-      }
-    }
-    &__summary:not(:last-child) {
-      margin-bottom: 20px;
     }
   }
 </style>

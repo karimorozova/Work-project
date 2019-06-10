@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import StepInfoTitle from "./StepInfoTitle";
+import StepInfoTitle from "./finance/StepInfoTitle";
 import DataTable from "../../DataTable";
 
 export default {

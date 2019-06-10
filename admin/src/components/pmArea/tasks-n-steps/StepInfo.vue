@@ -34,7 +34,7 @@
 
 <script>
 import Vendor from "../stepinfo/Vendor";
-import Finance from "../stepinfo/Finance";
+import Finance from "../stepinfo/finance/Finance";
 import Matrix from "../stepinfo/Matrix";
 import Files from "../stepinfo/Files";
 import { mapGetters, mapActions } from 'vuex';

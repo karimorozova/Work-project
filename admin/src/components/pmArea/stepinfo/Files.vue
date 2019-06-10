@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import StepInfoTitle from "./StepInfoTitle";
+import StepInfoTitle from "./finance/StepInfoTitle";
 import DataTable from "../../DataTable";
 import { mapGetters, mapActions } from 'vuex';
 

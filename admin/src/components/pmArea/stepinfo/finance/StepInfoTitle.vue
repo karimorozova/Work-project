@@ -1,6 +1,6 @@
 <template lang="pug">
 .step-info-title(@click="click") {{ title }}
-    img.step-info-title__icon(src="../../../assets/images/open-close-arrow-brown.png" :class="{'step-info-title_reverse': isIconReversed}")
+    img.step-info-title__icon(src="../../../../assets/images/open-close-arrow-brown.png" :class="{'step-info-title_reverse': isIconReversed}")
 </template>
 
 <script>
