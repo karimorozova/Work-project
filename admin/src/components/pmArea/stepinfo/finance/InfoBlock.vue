@@ -55,7 +55,7 @@
             @notApprove="closeModal"
             @close="closeModal"
           )
-  ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock")
+    ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock")
 </template>
 
 <script>
