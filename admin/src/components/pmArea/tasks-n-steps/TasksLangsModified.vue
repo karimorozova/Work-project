@@ -57,8 +57,8 @@ export default {
             targetAll: [],
             targetChosen: [],
             languagePairs: [],
-            sourceAsteriskStyle: {right: '15px',  top: '-4px'},
-            targetAsteriskStyle: {right: '16px',  top: '-4px'},
+            sourceAsteriskStyle: {right: '15px',  top: '-2px'},
+            targetAsteriskStyle: {right: '16px',  top: '-2px'},
             langSearchValue: "",
             isSearching: false
         }

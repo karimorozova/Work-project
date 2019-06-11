@@ -63,57 +63,6 @@
            :deadline="stepsDates[count-1].deadline"
            @setDate="(e) => setDate(e, count)"
           )
-    .tasks-data__langs
-        TasksLangs(
-            :sourceLanguages="sourceLanguages"
-            @setSourceLanguage="setSourceLang"
-            @setTargets="setTargets")
-    .tasks-data__files
-        TasksFiles(
-            :refFiles="refFiles"
-            :sourceFiles="sourceFiles"
-            :isJoinFiles="isJoinFiles"
-            @uploadSourceFiles="uploadSourceFiles"
-            @uploadRefFiles="uploadRefFiles"
-            @deleteFile="deleteFile"
-            @toggleJoin="toggleJoin"
-        )
-    .tasks-data__drops
-        .tasks-data__drop-menu
-            label.tasks-data__menu-title Template
-            SelectSingle(
-                :selectedOption="template"
-                :options="allTemplates"
-                placeholder="Template"
-                refersTo="template"
-                @chooseOption="setValue"
-            )
-        .tasks-data__drop-menu
-            label.tasks-data__menu-title Workflow
-            SelectSingle(
-                :selectedOption="selectedWorkflow.name"
-                :options="workflowStepsNames"
-                placeholder="Workflow"
-                @chooseOption="setWorkflow"
-            )
-        .tasks-data__drop-menu
-            label.tasks-data__menu-title.tasks-data_relative Service
-                Asterisk(:customStyle="asteriskStyle")
-            SelectSingle(
-                :selectedOption="service"
-                :options="allServices"
-                placeholder="Service"
-                refersTo="service"
-                @chooseOption="setValue"
-            )
-    .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
-        StepsDefaultDate(
-            v-for="count in stepsCounter"
-            :stepCounter="count"
-            :start="stepsDates[count-1].start"
-            :deadline="stepsDates[count-1].deadline"
-            @setDate="(e) => setDate(e, count)"
-        )
     .tasks-data__add-tasks
             Button(value="Add tasks" @clicked="checkForErrors")
     slot(name="errors")
@@ -165,7 +114,7 @@ export default {
             isStepsShow: false,
             isTasksShow: true,
             isJoinFiles: false,
-            asteriskStyle: {"top": "-4px"},
+            asteriskStyle: {"top": "-2px"},
             positionStyle: {"margin-top": "3px"}
         }
     },
@@ -434,10 +383,8 @@ export default {
     }
     &__add-tasks {
         display: flex;
-        align-items: flex-end;
-        border-bottom: 1px solid $main-color;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
+        justify-content: center;
+        padding-top: 20px;
     }
     &__files {
         /*margin: 40px 0;*/
