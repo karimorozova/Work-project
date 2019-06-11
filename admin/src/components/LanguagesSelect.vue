@@ -1,13 +1,13 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick" :class="customClass")
         .select
-            span.selected(v-if="selectedLangs.length === 1" :class="{'no-opacity': selectedLangs.length}") {{ selectedLangs[0] }}
+            span.selected(v-if="selectedLangs.length === 1" :class="{'no-opacity': selectedLangs.length}" @click="showLangs") {{ selectedLangs[0] }}
             span.selected(v-if="!selectedLangs.length") {{ placeholder }}
-            .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}") 
+            .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}")
                 span(v-for="lang in selectedLangs") {{ lang }}; &nbsp;
             .arrow-button(@click="showLangs")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': droppedLang}")
-        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")        
+        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")
         .drop(v-if="droppedLang")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
@@ -190,9 +190,10 @@ export default {
     width: 100%;
     background-color: white;
     z-index: 5;
-    border: 1px solid #67573E;
-    border-radius: 5px;
     box-sizing: border-box;
+    box-shadow: 0 2px 15px rgba(104, 87, 62, .5);
+    border-radius: 10px;
+    border: none;
     .drop {
         font-size: 14px;
         width: 100%;
@@ -287,15 +288,14 @@ export default {
 .tasks-data__langs {
     overflow: hidden;
     .select {
-        height: 28px;
+        height: 36px;
         .selected {
-            width: 80%;
+            width: 93%;
             border-right: none;
-            height: 28px;
+            height: 36px;
         }
         .arrow-button {
-            width: 20%;
-            border-left: 1px solid #68573E;
+            width: 7%;
         }
     }
 }
