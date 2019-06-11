@@ -34,6 +34,35 @@
             )
       .tasks-data__right-block
         .tasks-data__right-block-title Service & Workflow
+        .tasks-data__workflow-wrapper
+          .tasks-data__drop-menu
+            label.tasks-data__menu-title.tasks-data_relative Service
+              Asterisk(:customStyle="asteriskStyle")
+            SelectSingle(
+              :selectedOption="service"
+              :options="allServices"
+              placeholder="Service"
+              refersTo="service"
+              @chooseOption="setValue"
+              :positionStyle="positionStyle"
+            )
+          .tasks-data__drop-menu
+            label.tasks-data__menu-title Workflow
+            SelectSingle(
+             :selectedOption="selectedWorkflow.name"
+             :options="workflowStepsNames"
+             placeholder="Workflow"
+             @chooseOption="setWorkflow"
+             :positionStyle="positionStyle"
+            )
+        .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
+          StepsDefaultDateModified(
+           v-for="count in stepsCounter"
+           :stepCounter="count"
+           :start="stepsDates[count-1].start"
+           :deadline="stepsDates[count-1].deadline"
+           @setDate="(e) => setDate(e, count)"
+          )
     .tasks-data__langs
         TasksLangs(
             :sourceLanguages="sourceLanguages"
@@ -98,6 +127,7 @@ import TasksFilesModified from "./TasksFilesModified";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
 import StepsDefaultDate from "./StepsDefaultDate";
+import StepsDefaultDateModified from "./StepsDefaultDateModified";
 import Button from "../../Button";
 import BigToggler from "@/components/BigToggler";
 import { mapGetters, mapActions } from 'vuex';
@@ -135,7 +165,8 @@ export default {
             isStepsShow: false,
             isTasksShow: true,
             isJoinFiles: false,
-            asteriskStyle: {"top": "-4px"}
+            asteriskStyle: {"top": "-4px"},
+            positionStyle: {"margin-top": "3px"}
         }
     },
     methods: {
@@ -314,6 +345,7 @@ export default {
         TasksFilesModified,
         SelectSingle,
         StepsDefaultDate,
+        StepsDefaultDateModified,
         Button,
         Asterisk,
         BigToggler
@@ -329,6 +361,12 @@ export default {
 
 .tasks-data {
     position: relative;
+    &__workflow-wrapper{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 50px;
+    }
     &__join {
       width: 145px;
       display: flex;
@@ -382,7 +420,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
-        height: 28px;
+        /*height: 28px;*/
         width: 191px;
     }
     &__menu-title {

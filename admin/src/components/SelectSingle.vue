@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}")
+    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}" :style="positionStyle")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
@@ -23,6 +23,9 @@ export default {
             type: Array
         },
         placeholder: {
+            type: String
+        },
+        positionStyle: {
             type: String
         },
         refersTo: {
@@ -77,7 +80,7 @@ export default {
         },
         activeClass(elem) {
             if(this.selectedOption == elem && elem != "Yes") return true;
-            if(elem == "Yes" && this.selectedOption && 
+            if(elem == "Yes" && this.selectedOption &&
             this.options.indexOf(this.selectedOption) === -1) return true;
             return false;
         },
@@ -129,7 +132,7 @@ export default {
         overflow-x: hidden;
         background-color: #FFF;
         border-top: 1px solid #67573E;
-        box-sizing: border-box; 
+        box-sizing: border-box;
         z-index: 10;
         &__search {
             width: 100%;

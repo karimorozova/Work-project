@@ -11,7 +11,7 @@
       <!-- Input -->
       <input
         :type="inline ? 'hidden' : 'text'"
-        :class="inputClass"
+        :class="[inputClass,inputClass2]"
         :name="name"
         :ref="refName"
         @click="showCalendarReadonly"
@@ -142,6 +142,7 @@ export default {
     },
     calendarClass: [String, Object],
     inputClass: [String, Object],
+    inputClass2: [String, Object],
     wrapperClass: [String, Object],
     mondayFirst: Boolean,
     clearButton: Boolean,
@@ -944,7 +945,7 @@ export default {
 	z-index: 100;
 	background: #fff;
 	width: 300px;
-  border: 1px solid #ccc;  
+  border: 1px solid #ccc;
 }
 @media (max-width: 350px) {
   .vdp-datepicker__calendar {
@@ -1073,7 +1074,7 @@ export default {
 .vdp-datepicker__calendar .cell.today {
   background-color: #D15F45;
   color: #FFF;
-  font-weight: bold;  
+  font-weight: bold;
 }
 
 .vdp-datepicker__calendar .cell.beforeToday {
@@ -1135,7 +1136,9 @@ export default {
   padding-left: 5px;
   outline: none;
 }
-
+.datepicker-custom-mod{
+  width: 192px;
+}
 .steps__custom-input {
   color: #68573E;
   border: none;
