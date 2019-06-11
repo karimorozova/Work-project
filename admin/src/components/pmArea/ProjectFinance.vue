@@ -92,7 +92,7 @@ export default {
             let result = Object.keys(finance).map(key => {
                 let margin = (finance[key].receivables - finance[key].payables).toFixed(2);
                 return {
-                    title: key, 
+                    title: key,
                     receivables: finance[key].receivables,
                     payables: finance[key].payables,
                     margin: margin
@@ -114,7 +114,7 @@ export default {
 
 .project-finance {
     box-sizing: border-box;
-    width: 60%;
+    width: 67%;
     margin: 20px;
     box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
     @media (max-width: 1600px) {

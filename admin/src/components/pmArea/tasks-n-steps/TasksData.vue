@@ -1,5 +1,39 @@
 <template lang="pug">
 .tasks-data
+    .new-wrapper
+      .tasks-data__left-block
+        .tasks-data__left-block-title File Preparation
+        .tasks-data__langs
+        TasksLangsModified(
+          :sourceLanguages="sourceLanguages"
+          @setSourceLanguage="setSourceLang"
+          @setTargets="setTargets")
+        .tasks-data__files
+          TasksFilesModified(
+            :refFiles="refFiles"
+            :sourceFiles="sourceFiles"
+            :isJoinFiles="isJoinFiles"
+            @uploadSourceFiles="uploadSourceFiles"
+            @uploadRefFiles="uploadRefFiles"
+            @deleteFile="deleteFile"
+            @toggleJoin="toggleJoin"
+          )
+        .tasks-data__join-files-wrapper
+          .tasks-data__join
+            span.tasks-data__toggler-title  Join Files
+            .tasks-data__toggler
+              BigToggler(:isOn="isJoinFiles" @toggle="toggleJoin")
+          .tasks-data__drop-menu
+            label.tasks-data__menu-title Template
+            SelectSingle(
+              :selectedOption="template"
+              :options="allTemplates"
+              placeholder="Template"
+              refersTo="template"
+              @chooseOption="setValue"
+            )
+      .tasks-data__right-block
+        .tasks-data__right-block-title Service & Workflow
     .tasks-data__langs
         TasksLangs(
             :sourceLanguages="sourceLanguages"
@@ -26,23 +60,23 @@
                 @chooseOption="setValue"
             )
         .tasks-data__drop-menu
-            label.tasks-data__menu-title Workflow       
+            label.tasks-data__menu-title Workflow
             SelectSingle(
-                :selectedOption="selectedWorkflow.name" 
-                :options="workflowStepsNames" 
+                :selectedOption="selectedWorkflow.name"
+                :options="workflowStepsNames"
                 placeholder="Workflow"
                 @chooseOption="setWorkflow"
-            ) 
+            )
         .tasks-data__drop-menu
             label.tasks-data__menu-title.tasks-data_relative Service
-                Asterisk(:customStyle="asteriskStyle")   
+                Asterisk(:customStyle="asteriskStyle")
             SelectSingle(
-                :selectedOption="service" 
-                :options="allServices" 
+                :selectedOption="service"
+                :options="allServices"
                 placeholder="Service"
                 refersTo="service"
                 @chooseOption="setValue"
-            )     
+            )
     .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
         StepsDefaultDate(
             v-for="count in stepsCounter"
@@ -58,11 +92,14 @@
 
 <script>
 import TasksLangs from "./TasksLangs";
+import TasksLangsModified from "./TasksLangsModified";
 import TasksFiles from "./TasksFiles";
+import TasksFilesModified from "./TasksFilesModified";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
 import StepsDefaultDate from "./StepsDefaultDate";
 import Button from "../../Button";
+import BigToggler from "@/components/BigToggler";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -88,7 +125,7 @@ export default {
             templates: [
                 {name: 'Excel segment limit', id: 'XLSwithLimit'},
                 {name: 'Multilingual Excel', id: 'multiexcel'},
-                {name: 'Standard processing', id: '247336FD'},        
+                {name: 'Standard processing', id: '247336FD'},
             ],
             workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
             stepsCounter: 2,
@@ -232,8 +269,8 @@ export default {
             if(this.selectedWorkflow.id === 2890) {
                 this.stepsDates[0].deadline = this.currentProject.deadline;
             }
-            this.$emit("addTasks", { 
-                isJoinfiles: this.isJoinFiles, 
+            this.$emit("addTasks", {
+                isJoinfiles: this.isJoinFiles,
                 sourceFiles: this.sourceFiles,
                 refFiles: this.refFiles,
                 stepsDates: this.stepsDates,
@@ -272,11 +309,14 @@ export default {
     },
     components: {
         TasksLangs,
+        TasksLangsModified,
         TasksFiles,
+        TasksFilesModified,
         SelectSingle,
         StepsDefaultDate,
         Button,
-        Asterisk
+        Asterisk,
+        BigToggler
     },
     mounted() {
         this.defaultStepDates();
@@ -289,6 +329,50 @@ export default {
 
 .tasks-data {
     position: relative;
+    &__join {
+      width: 145px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 63px;
+    }
+    &__join-files-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+    &__toggler-title {
+      font-size: 14px;
+      margin-right: 15px;
+    }
+    .new-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    &__left-block {
+      padding: 30px;
+      width:50%;
+      height:500px;
+      border:1px solid $brown-border;
+      border-radius: 10px;
+      margin-right: 15px;
+      &-title {
+        font-size:28px;
+        margin-bottom: 20px;
+
+      }
+    }
+    &__right-block {
+      padding: 30px;
+      width:50%;
+      height:500px;
+      border:1px solid $brown-border;
+      border-radius: 10px;
+      &-title {
+        font-size:28px;
+        margin-bottom: 20px;
+      }
+    }
+
     &__drops {
         margin-bottom: 40px;
         width: 100%;
@@ -318,7 +402,7 @@ export default {
         padding-bottom: 10px;
     }
     &__files {
-        margin: 40px 0;
+        /*margin: 40px 0;*/
     }
     &__join-files {
         display: flex;

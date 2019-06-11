@@ -190,7 +190,7 @@ export default {
 
 .tasks-steps {
     box-sizing: border-box;
-    width: 60%;
+    width: 67%;
     padding: 20px;
     margin-left: 20px;
     margin-right: 20px;
@@ -199,6 +199,7 @@ export default {
         width: 70%;
     }
     &__tasks-title {
+        font-size: 39px;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-between;

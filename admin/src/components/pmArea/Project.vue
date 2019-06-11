@@ -19,11 +19,11 @@
             .project__date
                 LabelValue(label="Deadline" :isRequired="isRequiredField")
                     Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
-                img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")                
+                img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__info-row
             .project__client
                 LabelValue(label="Client Name" :isRequired="isRequiredField")
-                    .project__client-link(v-if="project._id") 
+                    .project__client-link(v-if="project._id")
                         .project__link(@click="goToClientInfo") {{ project.customer.name }}
                     .project__drop-menu(v-else)
                         SelectSingle(
@@ -217,12 +217,12 @@ export default {
 <style lang="scss" scoped>
 .project {
     padding: 20px;
-    width: 60%;
+    width: 67%;
     display: flex;
     flex-direction: column;
     @media (max-width: 1600px) {
         width: 70%;
-    } 
+    }
     &__project-template {
         position: relative;
         width: 191px;
@@ -230,7 +230,7 @@ export default {
     }
     &__all-info {
         padding: 20px;
-        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5); 
+        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
     }
     &__info-row {
         width: 100%;

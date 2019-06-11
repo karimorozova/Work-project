@@ -2,7 +2,6 @@
 .upload-file
     span.upload-file__label(v-if="label") {{ label }}
     .upload-file__button
-        .upload-file__button-text {{ text }}
         slot
     span.upload-file__comment(v-if="comment") {{ comment }}
 </template>
@@ -41,11 +40,12 @@ export default {
         width: 150px;
         padding: 10px;
         margin-bottom: 5px;
-        border-radius: 10px;
+        border-radius: 7px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #d15f45;
+        /*background-color: #d15f45;*/
+        background: url("../assets/images/upload_button_icon.png") no-repeat center;
         &:hover {
-            box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);     
+            box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);
         }
         &:active {
             box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
@@ -54,7 +54,7 @@ export default {
             width: 100px;
         }
         .tasks-data & {
-            width: 191px;
+            width: 51px;
             height: 30px;
             padding: 0;
             margin-bottom: 0;
@@ -80,7 +80,7 @@ export default {
         opacity: 0;
         filter: alpha(opacity=0);
         font-size: 30px;
-        font-family: MyriadPro;             
+        font-family: MyriadPro;
     }
     &__label {
         font-size: 12px;
@@ -98,7 +98,7 @@ export default {
         opacity: 0;
         filter: alpha(opacity=0);
         font-size: 30px;
-        font-family: MyriadPro;  
+        font-family: MyriadPro;
     }
 }
 </style>
