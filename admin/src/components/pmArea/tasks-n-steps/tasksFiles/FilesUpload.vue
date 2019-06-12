@@ -54,8 +54,8 @@ export default {
         padding: 5px;
         position: absolute;
         bottom: 33px;
-        left: 0;
-        width: 100%;
+        left: -90px;
+        width: 150px;
         overflow-x: hidden;
     }
     &__loaded-file {
