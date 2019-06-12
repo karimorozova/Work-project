@@ -21,23 +21,24 @@ function getSteps(project, id) {
     let assignedSteps = [];
     let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id);
     for(let step of filteredSteps) {
-        const stepTask = tasks.find(item => item.taskId === step.taskId);
-        const prevStep = step.name !== 'translate1' ? steps.find(item => item.name === "translate1" && item.taskId === step.taskId) : "";
-        const prevStepProgress = prevStep ? prevStep.progress : "";
-        assignedSteps.push({...step._doc,
-            project_Id: project._id,
-            projectId: project.projectId, 
-            xtmProjectId: stepTask.projectId,
-            projectName: project.projectName,
-            projectStatus: project.status,
-            manager: project.projectManager,
-            industry: project.industry,
-            xtmJobIds: stepTask.xtmJobs,
-            sourceFiles: stepTask.sourceFiles,
-            refFiles: stepTask.refFiles,
-            prevStepProgress,
-            prevStepStatus: prevStep.status
-        });
+        if(step.name !== 'invalid') {
+            const stepTask = tasks.find(item => item.taskId === step.taskId);
+            const prevStep = step.name !== 'translate1' ? steps.find(item => item.name === "translate1" && item.taskId === step.taskId) : "";
+            assignedSteps.push({...step._doc,
+                project_Id: project._id,
+                projectId: project.projectId, 
+                xtmProjectId: stepTask.projectId,
+                projectName: project.projectName,
+                projectStatus: project.status,
+                manager: project.projectManager,
+                industry: project.industry,
+                xtmJobIds: stepTask.xtmJobs,
+                sourceFiles: stepTask.sourceFiles,
+                refFiles: stepTask.refFiles,
+                prevStepProgress: prevStep ? prevStep.progress : "",
+                prevStepStatus: prevStep ? prevStep.status : ""
+            });
+        }
     }
     return assignedSteps;
 }
