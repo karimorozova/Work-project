@@ -131,7 +131,6 @@ export default {
         }
     },
     mounted() {
-      console.log('this projects type at filters: ', this.projectsType);
       if (this.projectsType === 'requests') {
         this.statuses = [ "Requested"];
       }

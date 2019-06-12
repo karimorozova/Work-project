@@ -70,15 +70,14 @@ export default {
             this.$router.push(`/pm-project-details/${project._id}`);
         },
         async getProjects() {
-            let projectsArray = await this.$http.get('/api/allprojects');
-            this.projects = projectsArray.body;
+          let projectsArray;
             if (this.projectsType === 'requests') {
-                this.projects = projectsArray.body.filter((project)=>project.status === 'Requested');
-                this.statusFilter = 'Requested';
-            } else if (this.projectsType === 'openProjects') {
-              this.projects = projectsArray.body.filter((project)=>project.status !== 'Requested');
+              projectsArray = await this.$http.get('/api/allprojects?status=Requested');
+              this.statusFilter = 'Requested';
+            } else {
+              projectsArray = await this.$http.get('/api/allprojects?status=AllOthers');
             }
-            console.log('req projects: ', this.projects);
+            this.projects = projectsArray.body;
             await this.setStoreProjects(this.projects);
         },
         async getManagers() {

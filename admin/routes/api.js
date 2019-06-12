@@ -93,7 +93,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
   request.targetLanguages = JSON.parse(req.body.targetLanguages);
   request.service = JSON.parse(req.body.service);
-  
+
   await request.save();
   if (detailFiles) {
     for (let i = 0; i < detailFiles.length; i += 1) {
@@ -143,7 +143,7 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
   if (req.body.genBrief) {
     let obj = JSON.parse(req.body.genBrief);
-    
+
     await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
      \nDescription: ${obj.briefDescr};
      \nTargeted Audience: ${obj.briefAudience}; 
@@ -185,7 +185,7 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
   }
   sendMailClient(request);
   console.log("Saved");
-  
+
   res.send({
     message: "request was added"
   });
@@ -197,21 +197,21 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 
 router.get('/allprojects', async (req, res) => {
   try {
-    const projects = await getProjects({});
+    const projects = await getProjects(req.query);
     res.send(projects)
   } catch(err) {
       console.log(err);
       res.status(500);
       res.send('Something wrong with DB while getting projects!')
     }
-})
+});
 
 router.get('/languages', async (req, res) => {
   try {
     const languages = await Languages.find({});
     res.send(languages)
   } catch(err) {
-      console.log(err)
+      console.log(err);
       res.status(500);
       res.send('Something wrong with DB / Cannot get languages')
     }
@@ -222,7 +222,7 @@ router.get('/services', async (req, res) => {
   const services = await getManyServices({});
     res.send(services);
   } catch(err) {
-      console.log(err)
+      console.log(err);
       res.status(500);
       res.send('Something wrong with DB / Cannot get Services');
   }
@@ -240,7 +240,7 @@ router.get('/industries', async (req, res) => {
 });
 
 router.get('/timezones', async (req, res) => {
-  try {  
+  try {
     const timezones = await Timezones.find({});
     res.send(timezones)
   } catch(err) {
@@ -248,7 +248,7 @@ router.get('/timezones', async (req, res) => {
       res.status(500);
       res.send('Something wrong with DB / Cannot get Timezones');
   }
-})
+});
 
 router.put('/languages/:id', upload.fields([{name: "flag"}]), async (req, res) => {
   const { active, icon } = req.body;
@@ -272,7 +272,7 @@ router.get('/countries', (req, res) => {
     console.log(err)
     res.status(500).send("Error on getting countries");
   }
-})
+});
 
 router.get('/leadsources', async (req, res) => {
   try {
@@ -282,7 +282,7 @@ router.get('/leadsources', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on getting lead sources from DB")
   }
-})
+});
 
 router.post('/leadsource', async (req, res) => {
   const { leadSource } = req.body;
@@ -297,7 +297,7 @@ router.post('/leadsource', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on updating/creating a lead source")
   }
-})
+});
 
 router.delete('/leadsource/:id', async (req, res) => {
   const { id } = req.params;
@@ -311,7 +311,7 @@ router.delete('/leadsource/:id', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on deleting lead source");
   }
-})
+});
 
 router.get('/packages', async (req, res) => {
   try {
@@ -321,7 +321,7 @@ router.get('/packages', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on getting packages from DB")
   }
-})
+});
 
 router.post('/package', async (req, res) => {
   const { package } = req.body;
@@ -336,7 +336,7 @@ router.post('/package', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on updating/creating a package")
   }
-})
+});
 
 router.delete('/package/:id', async (req, res) => {
   const { id } = req.params;
@@ -350,6 +350,6 @@ router.delete('/package/:id', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on deleting package")
   }
-})
+});
 
 module.exports = router;
