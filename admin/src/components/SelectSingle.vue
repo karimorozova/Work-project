@@ -26,7 +26,7 @@ export default {
             type: String
         },
         positionStyle: {
-            type: String
+            type: Object
         },
         refersTo: {
             type: String

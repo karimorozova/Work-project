@@ -224,6 +224,7 @@ export default {
         position: absolute;
         top: -20px;
         font-size: 14px;
+        left: 100%;
     }
 }
 .select-lang-wrapper {

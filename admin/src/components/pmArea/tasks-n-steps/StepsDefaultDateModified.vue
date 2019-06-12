@@ -127,7 +127,7 @@ import { mapGetters, mapActions} from "vuex";
   padding: 12px 20px 0;
   background-color: $active-background;
   border: 1px solid $brown-border;
-  width: 492px;
+  width: 452px;
   margin-bottom: 50px;
   position: relative;
     &-wrapper{

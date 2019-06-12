@@ -206,9 +206,6 @@ export default {
             }
         }
     },
-    mounted() {
-      console.log('this.project: ', this.currentProject);
-    },
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject',
