@@ -5,17 +5,15 @@
 </template>
 
 <script>
-import Sidebar from '../Sidebar';
 import Allprojects from './Allprojects';
 
 export default {
     data() {
         return {
-            sidebarLinks: ['Open Projects']
+            
         }
     },
     components: {
-        Sidebar,
         Allprojects
     }
 }
@@ -24,11 +22,7 @@ export default {
 <style lang="scss" scoped>
 
 .projects {
-  display: flex;
-  width: 100%;
-  &__table {
-    max-width: calc(100% - 150px);
-  }
+  width: calc(100% - 150px);
 }
 
 </style>
