@@ -1,7 +1,9 @@
 <template lang="pug">
 .projects
     .projects__table
-        Allprojects
+        Allprojects(
+         projectsType="openProjects"
+         )
 </template>
 
 <script>

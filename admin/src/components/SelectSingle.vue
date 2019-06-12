@@ -38,7 +38,10 @@ export default {
         isTableDropMenu: {
             type: Boolean,
             default: false
-        }
+        },
+        projectsType: {
+          type: String
+        },
     },
     data() {
         return {
@@ -70,6 +73,9 @@ export default {
             this.searchValue = "";
         },
         toggleOptions(event) {
+            if (this.projectsType === 'requests') {
+              return
+            }
             this.isDropped = !this.isDropped;
             this.searchValue = "";
             this.showOptions(event);

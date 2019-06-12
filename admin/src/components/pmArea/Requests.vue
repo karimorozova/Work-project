@@ -1,17 +1,20 @@
 <template lang="pug">
     .requests
-        .requests__table Here should be a table with all requests
+        .requests__table
+          Allprojects(
+           projectsType="requests"
+          )
 </template>
 
 <script>
-
+import Allprojects from './Allprojects';
 export default {
     data() {
         return {};
     },
-    methods: {
-
-    }
+  components: {
+    Allprojects
+  }
 };
 
 </script>

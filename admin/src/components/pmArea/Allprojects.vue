@@ -11,6 +11,7 @@
                 @addLangFilter="addLangFilter"
                 @removeLangFilter="removeLangFilter"
                 @setFilter="setFilter"
+                :projectsType="projectsType"
             )
         .all-projects__table
             ProjectsTable(
@@ -27,6 +28,11 @@ import ProjectFilters from "./ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+  props: {
+    projectsType: {
+      type: String
+    },
+  },
     data() {
         return {
             clientFilter: "",
@@ -51,6 +57,7 @@ export default {
         }),
         setFilter({option, refersTo}) {
             this[refersTo] = option;
+            console.log('option: ', option, 'refers: ', refersTo);
         },
         removeLangFilter({from, position}) {
             this[from].splice(position, 1);
@@ -65,7 +72,14 @@ export default {
         async getProjects() {
             let projectsArray = await this.$http.get('/api/allprojects');
             this.projects = projectsArray.body;
-            await this.setStoreProjects(projectsArray.body);
+            if (this.projectsType === 'requests') {
+                this.projects = projectsArray.body.filter((project)=>project.status === 'Requested');
+                this.statusFilter = 'Requested';
+            } else if (this.projectsType === 'openProjects') {
+              this.projects = projectsArray.body.filter((project)=>project.status !== 'Requested');
+            }
+            console.log('req projects: ', this.projects);
+            await this.setStoreProjects(this.projects);
         },
         async getManagers() {
             const managers = await this.$http.get("/pm-manage/all-managers");

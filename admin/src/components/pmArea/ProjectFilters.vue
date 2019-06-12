@@ -10,6 +10,7 @@
                             placeholder="Select"
                             refersTo="statusFilter"
                             @chooseOption="setValue"
+                            :projectsType="projectsType"
                         )
             .filters__item
                 LabelValue(label="Project Manager")
@@ -67,7 +68,8 @@ export default {
         clientName: {type: String},
         sourceLangs: {type: Array},
         targetLangs: {type: Array},
-        managers: {type: Array}
+        managers: {type: Array},
+        projectsType: {type: String},
     },
     data() {
         return {
@@ -77,7 +79,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            statuses: ["Accepted", "Closed", "Cancelled", "Draft", "Open", "Rejected", "Requested"],
+            statuses: ["Accepted", "Closed", "Cancelled", "Draft", "Open", "Rejected"],
         }
     },
     methods: {
@@ -128,6 +130,12 @@ export default {
             })
         }
     },
+    mounted() {
+      console.log('this projects type at filters: ', this.projectsType);
+      if (this.projectsType === 'requests') {
+        this.statuses = [ "Requested"];
+      }
+    },
     components: {
         SelectSingle,
         SelectMulti,
@@ -171,7 +179,7 @@ export default {
         width: 148px;
     }
     &__text-input {
-        padding: 0 5px; 
+        padding: 0 5px;
         width: 156px;
         height: 28px;
         outline: none;
