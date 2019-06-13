@@ -22,11 +22,12 @@ export default {
 <style lang="scss" scoped>
 
 .requests {
-    display: flex;
-    width: 100%;
-    &__table {
-        max-width: calc(100% - 150px);
-    }
+    /*display: flex;*/
+    /*width: 100%;*/
+    width: calc(100% - 150px);
+    /*&__table {*/
+        /*max-width: calc(100% - 150px);*/
+    /*}*/
 }
 
 </style>

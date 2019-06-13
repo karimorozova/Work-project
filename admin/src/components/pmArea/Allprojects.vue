@@ -57,7 +57,6 @@ export default {
         }),
         setFilter({option, refersTo}) {
             this[refersTo] = option;
-            console.log('option: ', option, 'refers: ', refersTo);
         },
         removeLangFilter({from, position}) {
             this[from].splice(position, 1);
@@ -67,16 +66,14 @@ export default {
         },
         selectProject({project}) {
             this.storeProject(project);
-            this.$router.push(`/pm-project-details/${project._id}`);
+            this.$router.push(`/pm-project-details/${project._id}?status=${this.projectsType === 'requests' && 'Requested' || 'AllOthers' }`);
         },
         async getProjects() {
           let projectsArray;
             if (this.projectsType === 'requests') {
-              projectsArray = await this.$http.get('/api/allprojects?status=Requested');
               this.statusFilter = 'Requested';
-            } else {
-              projectsArray = await this.$http.get('/api/allprojects?status=AllOthers');
             }
+            projectsArray = await this.$http.get(`/api/allprojects?status=${this.projectsType === 'requests' && 'Requested' || 'AllOthers'}`);
             this.projects = projectsArray.body;
             await this.setStoreProjects(this.projects);
         },

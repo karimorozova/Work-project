@@ -48,6 +48,7 @@ export default {
             isEditAndSend: false,
             message: "",
             mailSubject: "",
+            projectStatus: "AllOthers"
         }
     },
     methods: {
@@ -228,6 +229,10 @@ export default {
     created() {
         this.getProject();
         this.getVendors();
+    },
+    mounted() {
+      this.projectStatus = this.$route.query.status;
+      console.log('status projectreal: ', this.projectStatus);
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {

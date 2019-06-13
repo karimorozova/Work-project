@@ -8,7 +8,7 @@
           :sourceLanguages="sourceLanguages"
           @setSourceLanguage="setSourceLang"
           @setTargets="setTargets")
-        .tasks-data__files
+        .tasks-data__files(v-if="true")
           TasksFilesModified(
             :refFiles="refFiles"
             :sourceFiles="sourceFiles"
@@ -18,6 +18,7 @@
             @deleteFile="deleteFile"
             @toggleJoin="toggleJoin"
           )
+        .tasks-data__files(v-else) False
         .tasks-data__join-files-wrapper
           .tasks-data__join
             span.tasks-data__toggler-title  Join Files
