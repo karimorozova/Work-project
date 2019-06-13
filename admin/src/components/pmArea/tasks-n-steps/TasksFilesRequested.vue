@@ -12,12 +12,16 @@
            refersTo="fileAction"
            @chooseOption="setValue"
           )
-    .tasks-files__table  Table
+    .tasks-files__table
+        FilesTable(
+          :allFiles="allFiles"
+          @selectItem="selectItem"
+        )
 </template>
 
 <script>
   import FilesUpload from "./tasksFiles/FilesUpload";
-  import DataTable from "../../DataTable";
+  import FilesTable from "./FilesTable";
   import SelectSingle from "../../SelectSingle";
   export default {
     props: {
@@ -29,6 +33,7 @@
       return {
         actions: ["Delete", "Download", "Approve"],
         fileAction: "",
+        allFiles: [{fileName:'translation1.doc', type:'Source file'},{fileName:'translation1.doc', type:'Source file'},{fileName:'translation1.doc', type:'Source file'}],
         isSourceFilesShow: false,
         isRefFilesShow: false,
       }
@@ -36,6 +41,9 @@
     methods: {
       setValue({option, refersTo}) {
         this[refersTo] = option;
+      },
+      selectItem() {
+        console.log('select item');
       },
       uploadSourceFiles({files}) {
         this.$emit('uploadSourceFiles', {files});
@@ -55,7 +63,7 @@
     },
     components: {
       FilesUpload,
-      DataTable,
+      FilesTable,
       SelectSingle
     }
   };
@@ -69,6 +77,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 15px;
     }
     &__header-action-wrapper {
       display: flex;

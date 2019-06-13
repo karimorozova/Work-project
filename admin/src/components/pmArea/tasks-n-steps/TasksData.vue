@@ -336,7 +336,7 @@ export default {
     &__left-block {
       padding: 30px;
       width:50%;
-      height:500px;
+      height:621px;
       border:1px solid $brown-border;
       border-radius: 10px;
       margin-right: 15px;
@@ -349,7 +349,7 @@ export default {
     &__right-block {
       padding: 30px;
       width:50%;
-      height:500px;
+      height:621px;
       border:1px solid $brown-border;
       border-radius: 10px;
       &-title {
