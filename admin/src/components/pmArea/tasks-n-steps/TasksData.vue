@@ -8,7 +8,7 @@
           :sourceLanguages="sourceLanguages"
           @setSourceLanguage="setSourceLang"
           @setTargets="setTargets")
-        .tasks-data__files(v-if="true")
+        .tasks-data__files(v-if="$route.query.status=== 'AllOthers'")
           TasksFilesModified(
             :refFiles="refFiles"
             :sourceFiles="sourceFiles"
@@ -18,7 +18,8 @@
             @deleteFile="deleteFile"
             @toggleJoin="toggleJoin"
           )
-        .tasks-data__files(v-else) False
+        .tasks-data__files(v-else)
+          TasksFilesRequested()
         .tasks-data__join-files-wrapper
           .tasks-data__join
             span.tasks-data__toggler-title  Join Files
@@ -70,13 +71,11 @@
 </template>
 
 <script>
-import TasksLangs from "./TasksLangs";
 import TasksLangsModified from "./TasksLangsModified";
-import TasksFiles from "./TasksFiles";
 import TasksFilesModified from "./TasksFilesModified";
+import TasksFilesRequested from "./TasksFilesRequested";
 import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
-import StepsDefaultDate from "./StepsDefaultDate";
 import StepsDefaultDateModified from "./StepsDefaultDateModified";
 import Button from "../../Button";
 import BigToggler from "@/components/BigToggler";
@@ -289,12 +288,10 @@ export default {
         }
     },
     components: {
-        TasksLangs,
         TasksLangsModified,
-        TasksFiles,
         TasksFilesModified,
+        TasksFilesRequested,
         SelectSingle,
-        StepsDefaultDate,
         StepsDefaultDateModified,
         Button,
         Asterisk,
