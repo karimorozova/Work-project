@@ -3,7 +3,7 @@
     .files-table
       DataTable(
        :fields="fields"
-       :tableData="allFiles"
+       :tableData="finalFilesArray"
        :hasScroll="hasScroll"
        bodyClass="all-projects"
        bodyRowClass="files-table-row-class"
@@ -37,11 +37,6 @@
   import { mapGetters, mapActions } from "vuex";
 
   export default {
-    props: {
-      allFiles: {
-        type: Array
-      }
-    },
     data() {
       return {
         fields: [
@@ -56,6 +51,7 @@
           trash: {icon: require('../../../assets/images/Other/delete-icon-qa-form.png')},
           checked: {icon: require('../../../assets/images/white-check-png-1.png')},
         },
+        finalFilesArray:[]
       }
     },
     methods: {
@@ -81,9 +77,27 @@
       }
     },
     computed: {
+      ...mapGetters({
+        currentProject: 'getCurrentProject',
+      }),
       hasScroll() {
-        return document.body.offsetWidth > 1024 && this.allFiles.length > 3;
+        return document.body.offsetWidth > 1024 && this.finalFilesArray.length > 3;
       }
+    },
+    mounted() {
+      let mediumFileArray = [];
+      this.currentProject.sourceFiles.map((el)=>{
+        const sourceFileName = el.split('/')[4];
+        mediumFileArray.push({fileName:sourceFileName, fileType:'Source file'})
+      });
+       this.finalFilesArray = [...mediumFileArray];
+       mediumFileArray = [];
+      this.currentProject.refFiles.map((el)=>{
+        const sourceFileName = el.split('/')[4];
+        mediumFileArray.push({fileName:sourceFileName, fileType:'Reference file'})
+      });
+      this.finalFilesArray = [...this.finalFilesArray,...mediumFileArray];
+
     },
     components: {
       DataTable

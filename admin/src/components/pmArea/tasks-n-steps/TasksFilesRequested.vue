@@ -13,9 +13,7 @@
            @chooseOption="setValue"
           )
     .tasks-files__table
-        FilesTable(
-          :allFiles="allFiles"
-        )
+        FilesTable
 </template>
 
 <script>
@@ -31,11 +29,6 @@
       return {
         actions: ["Delete", "Download", "Approve"],
         fileAction: "",
-        allFiles: [
-          {fileName:'translation1.doc', fileType:'Source file'},
-          {fileName:'translation1.doc', fileType:'Source file'},
-          {fileName:'translation1.doc', fileType:'Reference file'},
-          ],
         isSourceFilesShow: false,
         isRefFilesShow: false,
       }
