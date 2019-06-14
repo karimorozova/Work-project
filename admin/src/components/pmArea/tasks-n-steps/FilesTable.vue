@@ -19,14 +19,14 @@
         template(slot="fileId" slot-scope="{ row, index }")
           input.files-table__input-checkbox-inside-cell(type="checkbox" @change="onCheckBoxChanged(row,index)")
         template(slot="fileName" slot-scope="{ row }")
-          span.file-table__file-icon
+          span.files-table__file-icon
             img(src="../../../assets/images/file_icon.png" alt="")
           span {{ row.fileName }}
         template(slot="fileType" slot-scope="{ row }")
           span {{ row.fileType }}
-        template(slot="actions" slot-scope="{ row }")
+        template(slot="actions" slot-scope="{ row, index }")
           span.files-table__icons
-            img.files-table__icon(@click.stop="makeAction(key)" v-for="(icon, key) in icons" :src="icon.icon")
+            img.files-table__icon(@click.stop="makeAction(key, row, index)" v-for="(icon, key) in icons" :src="icon.icon")
     .add-row
       .add-row__plus(@click="addNewRow")
         span +
@@ -47,7 +47,7 @@
         fields: [
           {label: "", headerKey: "headerFile", key: "fileId", width: "10%"},
           {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "30%", cellClass:"flex-content"},
-          {label: "Type", headerKey: "headerType", key: "fileType", width: "25%"},
+          {label: "Type", headerKey: "headerType", key: "fileType", width: "25%", cellClass:"flex-content"},
           {label: "", headerKey: "headerActions", key: "actions", width: "35%"},
         ],
         icons: {
@@ -59,8 +59,8 @@
       }
     },
     methods: {
-      makeAction(key) {
-        console.log('make icon action ', key);
+      makeAction(key, row, index) {
+        console.log('make icon action ', key, row, index);
       },
       addNewRow() {
         console.log('add new row');

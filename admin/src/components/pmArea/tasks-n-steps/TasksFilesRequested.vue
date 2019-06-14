@@ -15,12 +15,10 @@
     .tasks-files__table
         FilesTable(
           :allFiles="allFiles"
-          @selectItem="selectItem"
         )
 </template>
 
 <script>
-  import FilesUpload from "./tasksFiles/FilesUpload";
   import FilesTable from "./FilesTable";
   import SelectSingle from "../../SelectSingle";
   export default {
@@ -46,9 +44,6 @@
       setValue({option, refersTo}) {
         this[refersTo] = option;
       },
-      selectItem() {
-        console.log('select item');
-      },
       uploadSourceFiles({files}) {
         this.$emit('uploadSourceFiles', {files});
       },
@@ -66,7 +61,6 @@
       }
     },
     components: {
-      FilesUpload,
       FilesTable,
       SelectSingle
     }

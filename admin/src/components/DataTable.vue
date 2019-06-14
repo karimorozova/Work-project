@@ -229,10 +229,10 @@
   .table__body-row-custom {
     height: 33px;
   }
-  .files-table-row-class{
+  .files-table-row-class {
     height: 41px;
   }
-  .flex-content{
+  .flex-content {
     display: flex;
     align-items: center;
   }
