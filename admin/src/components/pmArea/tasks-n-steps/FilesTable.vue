@@ -1,20 +1,35 @@
 <template lang="pug">
-  .projects-table
-    DataTable(
-     :fields="fields"
-     :tableData="allFiles"
-     :hasScroll="hasScroll"
-     bodyClass="all-projects"
-     @onRowClicked="onRowClicked"
-    )
-      template(slot="headerFile" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
-      template(slot="headerFileName" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
-      template(slot="headerType" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
-      template(slot="headerActions" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
+  div
+    .files-table
+      DataTable(
+       :fields="fields"
+       :tableData="allFiles"
+       :hasScroll="hasScroll"
+       bodyClass="all-projects"
+       bodyRowClass="files-table-row-class"
+      )
+        template(slot="headerFile" slot-scope="{ field }")
+          input.files-table__input-checkbox-inside-cell(type="checkbox" disabled=true)
+        template(slot="headerFileName" slot-scope="{ field }")
+          span.files-table__label {{ field.label }}
+        template(slot="headerType" slot-scope="{ field }")
+          span.files-table__label {{ field.label }}
+        template(slot="headerActions" slot-scope="{ field }")
+          span.files-table__label {{ field.label }}
+        template(slot="fileId" slot-scope="{ row, index }")
+          input.files-table__input-checkbox-inside-cell(type="checkbox" @change="onCheckBoxChanged(row,index)")
+        template(slot="fileName" slot-scope="{ row }")
+          span.file-table__file-icon
+            img(src="../../../assets/images/file_icon.png" alt="")
+          span {{ row.fileName }}
+        template(slot="fileType" slot-scope="{ row }")
+          span {{ row.fileType }}
+        template(slot="actions" slot-scope="{ row }")
+          span.files-table__icons
+            img.files-table__icon(@click.stop="makeAction(key)" v-for="(icon, key) in icons" :src="icon.icon")
+    .add-row
+      .add-row__plus(@click="addNewRow")
+        span +
 </template>
 
 <script>
@@ -30,16 +45,28 @@
     data() {
       return {
         fields: [
-          {label: "", headerKey: "headerFile", key: "fileId", width: "25%"},
-          {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "25%"},
-          {label: "Type", headerKey: "headerType", key: "type", width: "25%"},
-          {label: "", headerKey: "headerActions", key: "actions", width: "25%"},
+          {label: "", headerKey: "headerFile", key: "fileId", width: "10%"},
+          {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "30%", cellClass:"flex-content"},
+          {label: "Type", headerKey: "headerType", key: "fileType", width: "25%"},
+          {label: "", headerKey: "headerActions", key: "actions", width: "35%"},
         ],
+        icons: {
+          download: {icon: require('../../../assets/images/Other/Download-icon.png')},
+          upload: {icon: require('../../../assets/images/Other/upload-icon.png')},
+          trash: {icon: require('../../../assets/images/Other/delete-icon-qa-form.png')},
+          checked: {icon: require('../../../assets/images/white-check-png-1.png')},
+        },
       }
     },
     methods: {
-      async onRowClicked({index}) {
-        this.$emit("selectProject", {project: this.allProjects[index]})
+      makeAction(key) {
+        console.log('make icon action ', key);
+      },
+      addNewRow() {
+        console.log('add new row');
+      },
+      onCheckBoxChanged(row,index) {
+        console.log('check Box Changed!', row, index)
       },
       clientName(elem) {
         return elem.name;
@@ -55,7 +82,7 @@
     },
     computed: {
       hasScroll() {
-        return document.body.offsetWidth > 1024 && this.allFiles.length >= 3;
+        return document.body.offsetWidth > 1024 && this.allFiles.length > 3;
       }
     },
     components: {
@@ -65,21 +92,44 @@
 </script>
 
 <style lang="scss" scoped>
-  .projects-table {
-    min-height: 106px;
+  .files-table {
+    min-height: 121px;
+    &__icon {
+      height: 17px;
+      margin: 0 10px;
+    }
+    &__file-icon{
+      margin: 0 10px;
+    }
+    &__input-checkbox-inside-cell{
+      width: 20px;
+      height: 20px;
+      position: relative;
+      left: 9px;
+    }
     &__label {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    &__icon {
-      height: 100%;
-      width: 100%;
-      z-index: 100;
-    }
-    &__edit {
+  }
+  .add-row {
+    margin: 10px 0;
+    &__plus {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
+      border: 1px solid #BFB09D;
+      span {
+        font-size: 28px;
+        color: #BFB09D;
+        opacity: .7;
+      }
     }
   }
 </style>

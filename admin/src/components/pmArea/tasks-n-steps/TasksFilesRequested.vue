@@ -33,7 +33,11 @@
       return {
         actions: ["Delete", "Download", "Approve"],
         fileAction: "",
-        allFiles: [{fileName:'translation1.doc', type:'Source file'},{fileName:'translation1.doc', type:'Source file'},{fileName:'translation1.doc', type:'Source file'}],
+        allFiles: [
+          {fileName:'translation1.doc', fileType:'Source file'},
+          {fileName:'translation1.doc', fileType:'Source file'},
+          {fileName:'translation1.doc', fileType:'Reference file'},
+          ],
         isSourceFilesShow: false,
         isRefFilesShow: false,
       }
