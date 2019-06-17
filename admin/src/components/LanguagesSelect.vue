@@ -191,9 +191,8 @@ export default {
     background-color: white;
     z-index: 5;
     box-sizing: border-box;
-    box-shadow: 0 2px 15px rgba(104, 87, 62, .5);
-    border-radius: 10px;
-    border: none;
+    border: 1px solid #67573E;
+    border-radius: 5px;
     .drop {
         font-size: 14px;
         width: 100%;
@@ -286,17 +285,36 @@ export default {
 }
 
 .tasks-data__langs {
-    overflow: hidden;
-    .select {
-        height: 36px;
-        .selected {
-            width: 93%;
-            border-right: none;
-            height: 36px;
-        }
-        .arrow-button {
-            width: 7%;
-        }
+  overflow: hidden;
+  .select {
+    height: 28px;
+    .selected {
+      width: 80%;
+      border-right: none;
+      height: 28px;
     }
+    .arrow-button {
+      width: 20%;
+      border-left: 1px solid #68573E;
+    }
+  }
+}
+
+.tasks-data__langs-mod {
+  overflow: hidden;
+  box-shadow: 0 2px 15px rgba(104, 87, 62, .5);
+  border-radius: 10px;
+  border: none;
+  .select {
+    height: 36px;
+    .selected {
+      width: 93%;
+      border-right: none;
+      height: 36px;
+    }
+    .arrow-button {
+      width: 7%;
+    }
+  }
 }
 </style>

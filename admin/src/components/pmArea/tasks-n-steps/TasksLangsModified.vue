@@ -9,7 +9,7 @@
                 :langFilter="sourceFilter"
                 :single='true'
                 :selectedLangs="sourceLanguages"
-                customClass="tasks-data__langs"
+                customClass="tasks-data__langs-mod"
                 @chosenLang="setSource"
             )
     .target
