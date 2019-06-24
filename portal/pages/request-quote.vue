@@ -717,9 +717,6 @@ export default {
       try {
         const result = await this.$axios.$get('/api/industries');
         this.industries = result;
-        const otherIndex = result.findIndex(item => item.isLast);
-        const lastIndustry = result.splice(otherIndex, 1);
-        this.industries = [...result, lastIndustry[0]];
       } catch(err) {
         this.isServerError = true;
         this.serverErrMessage = 'Error on getting industries';
