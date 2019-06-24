@@ -25,6 +25,10 @@ const IndustriesSchema = new mongoose.Schema({
     package: {
         type: Number,
         default: 200,
+    },
+    isLast: {
+        type: Boolean,
+        default: false
     }
 });
 

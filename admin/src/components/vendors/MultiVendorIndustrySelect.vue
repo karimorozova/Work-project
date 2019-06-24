@@ -56,22 +56,16 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            await this.$http.get('/api/industries')
-            .then(response => {
-                let sortedArray = response.data.filter(item => {
-                    if (item.name != 'More') {
+            try {
+                const result = await this.$http.get('/api/industries')
+                this.industries = result.data.filter(item => {
+                    if (item.name !== 'More' && item.name !== 'Other') {
                         return item
                     }
                 });
-                sortedArray.sort( (a,b) => {
-                    if(a.name < b.name) return -1;
-                    if(a.name > b.name) return 1;
-                });
-                this.industries = sortedArray;
-            })
-            .catch(e => {
-                this.errors.push(e)
-            })
+            } catch(err) {
+                this.errors.push(err)             
+            }
         },
         outClick() {
             this.droppedInd = false;

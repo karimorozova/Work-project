@@ -62,23 +62,17 @@ export default {
         },
         async getIndustries() {
             if(!this.who) {
-                await this.$http.get('/api/industries')
-                .then(response => {
-                    let sortedArray = response.data.filter(item => {
-                        if (item.name != 'More') {
-                            return item
-                        }
-                    });
-                    sortedArray.sort( (a,b) => {
-                        if(a.name < b.name) return -1;
-                        if(a.name > b.name) return 1;
-                    });
-                    this.industries = sortedArray;
-                    this.industries.unshift({name: "All"})
-                })
-                .catch(e => {
-                    this.errors.push(e)
-                })
+                try {
+                const result = await this.$http.get('/api/industries');
+                this.industries = result.data.filter(item => {
+                    if (item.name !== 'More' && item.name !== 'Other') {
+                        return item
+                    }
+                });
+                this.industries.unshift({name: "All"})
+                } catch(err) {
+                    this.errors.push(err)
+                }
             } else {
                 let industries = JSON.stringify(this.who.industries);
                 industries = JSON.parse(industries);

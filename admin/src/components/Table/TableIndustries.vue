@@ -241,10 +241,6 @@ export default {
         async getIndustries() {
             try {
                 const industries = await this.$http.get("/api/industries");
-                this.industries = industries.body.sort((x, y) => {
-                    if (x.name > y.name) return 1;
-                    if (x.name < y.name) return -1;
-                });
             } catch(err) {
                 this.alertToggle({message: "Erorr on getting Industries", isShow: true, type: "error"});    
             }

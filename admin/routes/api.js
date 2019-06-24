@@ -235,8 +235,15 @@ router.get('/services', async (req, res) => {
 
 router.get('/industries', async (req, res) => {
   try {
-  const industries = await Industries.find({});
-    res.send(industries)
+    const industries = await Industries.find({});
+    const lastIndustryIndex = industries.findIndex(item => item.isLast);
+    const lastIndustry = industries.splice(lastIndustryIndex, 1);
+    const sortedIndustries = industries.sort( (a,b) => {
+        if(a.name < b.name) return -1;
+        if(a.name > b.name) return 1;
+    });
+    sortedIndustries.push(lastIndustry[0]);
+    res.send(sortedIndustries)
   } catch(err) {
     console.log(err);
     res.status(500);
