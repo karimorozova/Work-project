@@ -44,13 +44,13 @@
               .source__drop(v-if='sourceDrop' :style="{'max-height': maxSourceHeight + 'px'}")
                 .source__drop-list(v-for='language in sourceLangsArray')
                   .pair(@click='changeSourceSelect(language)')
-                    img(:src="'https://admin.pangea.global' + language.icon")
+                    img(:src="domain + language.icon")
                     span.list-item(:class="{ active: language.lang == sourceSelect.lang }") {{ language.lang }}
                       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language.lang == selectLangSource}")
                   .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangSource }")
                     template(v-for='(dialect in language.dialects')
                       .pair.pair_dialect(@click='changeSourceDialect(dialect)')
-                        img(:src="'https://admin.pangea.global' + dialect.icon")
+                        img(:src="domain + dialect.icon")
                         span.list-item(:class="{ active: dialect.lang == sourceSelect.lang }") {{ dialect.lang }}
             span Target Language(s)
             .select.target
@@ -63,20 +63,20 @@
               .target__drop(v-if='targetDrop' :style="{'max-height': maxTargetHeight + 'px'}")
                 .target__drop-list(v-for='language in targetLangsArray')
                   .pair(@click='changeTargetSelect(language)')
-                    img(:src="'https://admin.pangea.global' + language.icon")
+                    img(:src="domain + language.icon")
                     span.list-item(:class="{ active: language.check }") {{ language.lang }}
                       img.openIcon(src="../assets/images/open-icon.png" v-if="language.dialects" :class="{reverseOpenIcon: language.lang == selectLangTarget}")
                   .source__drop-list.dialect(v-if='language.dialects' :class="{ dialect_active : language.lang == selectLangTarget }")
                     template(v-for='dialect in language.dialects')
                       .pair.pair_dialect(@click='changeTargetDialect(dialect)')
-                        img(:src="'https://admin.pangea.global' + dialect.icon")              
+                        img(:src="domain + dialect.icon")              
                         span.list-item(:class="{ active: dialect.check }") {{ dialect.lang }}
           .number 
             span 3
             label.asterisk CHOOSE AN INDUSTRY 
           .industry
             .industry__item.casino(v-for="industry in dbIndustry" :class="{activeIndustry: industrySelect == industry.name}" @click='() => changeIndustry(industry)')
-              .image(:style="{ backgroundImage: 'url(' + 'https://admin.pangea.global' + industry.icon + ')' }")
+              .image(:style="{ backgroundImage: 'url(' + domain + industry.icon + ')' }")
               p.industry__name {{ industry.name }}
           .number
             span 4
@@ -296,29 +296,7 @@ export default {
         }
       },
       request: [],
-      industryList: {
-        legal: {
-          text: 'Legal'
-        },
-        hotel: {
-          text: 'Hotel & Real Estates'
-        },
-        trading: {
-          text: 'CFDs & Online Trading'
-        },
-        crypto: {
-          text: 'ICOs & Crypto-Currency'
-        },
-        casino: {
-          text: 'Casino, Poker & IGaming'
-        },
-        games: {
-          text: 'Video Games'
-        },
-        other: {
-          text: 'Other'
-        }
-      },
+      domain: "https://admin.pangea.global",
       infoSlide: false,
       isHelpSlide: false,
       deadlineDate: '',
@@ -739,6 +717,9 @@ export default {
       try {
         const result = await this.$axios.$get('/api/industries');
         this.industries = result;
+        const otherIndex = result.findIndex(item => item.isLast);
+        const lastIndustry = result.splice(otherIndex, 1);
+        this.industries = [...result, lastIndustry[0]];
       } catch(err) {
         this.isServerError = true;
         this.serverErrMessage = 'Error on getting industries';
@@ -946,6 +927,7 @@ export default {
     Footer
   },
   mounted(){
+      this.domain = process.env.domain;
     this.google();
     this.getServices();
     this.getLanguages();
