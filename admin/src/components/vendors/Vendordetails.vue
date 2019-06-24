@@ -129,7 +129,7 @@ export default {
             photoFile: [],
             isAddSeveral: false,
             genders: ["Male", "Female"],
-            sidebarLinks: ["General Information"],
+            sidebarLinks: [{title: "General Information"}],
             sidebarTitle: "VENDORS",
             errors: [],
             backPath: "/vendors",

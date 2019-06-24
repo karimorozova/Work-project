@@ -29,16 +29,16 @@ export default {
   data() {
     return {
       openQuotes: true,
-      sidebarLinks: ["Languages", "Services", "Industries", "Lead Sources", "Packages"],
+      sidebarLinks: [{title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
     };
   },
   methods: {
     onLinkClick({index}) {
-      const link = this.sidebarLinks[index];
+      const { title } = this.sidebarLinks[index];
       this.activeLinkIndex = index;
-      switch(link) {
+      switch(title) {
         case "Languages": 
           this.$router.push("/dashboard/langs");
           break;
@@ -68,7 +68,7 @@ export default {
     fullSideLinks() {
       let result = this.sidebarLinks;
       if(this.userGroup === "Administrators" || this.userGroup === "Developers") {
-        result.push("Users");
+        result.push({title: "Users"});
       }
       return result;
     }

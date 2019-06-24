@@ -17,7 +17,7 @@ export default {
     return {
       allClients: true,
       sidebarShow: false,
-      sidebarLinks: ["General Information"]
+      sidebarLinks: [{title: "General Information"}]
     }
   },
   methods: {

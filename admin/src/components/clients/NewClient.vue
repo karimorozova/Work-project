@@ -47,7 +47,7 @@ export default {
                 contacts: []
             },
             sidebarShow: true,
-            sidebarLinks: ["General Information"],
+            sidebarLinks: [{title: "General Information"}],
             asteriskStyle: {"top": "-4px"},
             isNewClient: true
         }

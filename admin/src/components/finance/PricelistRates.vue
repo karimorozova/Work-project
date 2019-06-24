@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import Sidebar from "../Sidebar";
 import DuoRates from "./DuoRates";
 import MonoRates from "./MonoRates";
 import Addseverallangs from "./Addseverallangs";
@@ -128,7 +127,6 @@ export default {
         }) 
     },
     components: {
-        Sidebar,
         MonoRates,
         DuoRates,
         Addseverallangs,

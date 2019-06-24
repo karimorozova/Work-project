@@ -113,7 +113,7 @@ export default {
             approveShow: false,
             photoFile: [],
             genders: ["Male", "Female"],
-            sidebarLinks: ["General Information"],
+            sidebarLinks: [{title: "General Information"}],
             asteriskStyle: {"top": "-4px"},
             errors: [],
             vendor: {

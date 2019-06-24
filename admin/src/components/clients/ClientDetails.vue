@@ -22,7 +22,7 @@ export default {
     data() {
         return {
             sidebarShow: true,
-            sidebarLinks: ["General Information"],
+            sidebarLinks: [{title: "General Information"}],
             fromRoute: "/clients",
             contactsPhotos: [],
             contactsPhotos: [],

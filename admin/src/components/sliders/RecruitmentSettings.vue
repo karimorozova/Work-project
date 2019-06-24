@@ -18,13 +18,13 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
-      sideBarLinks: ["Vendors"],
+      sideBarLinks: [{title: "Vendors"}],
       isAllVendorsShow: true
     }
   },
   methods: {
     onLinkClick({index}) {
-      if(this.sideBarLinks[index] === "Vendors") {
+      if(this.sideBarLinks[index].title === "Vendors") {
         this.isAllVendorsShow = true;
       }
     }

@@ -2,7 +2,7 @@
 .pm-area
     Sidebar( 
         title="PM-AREA" 
-        :links="links"
+        :links="sidebarLinks"
         :activeIndex="currentIndex"
         @onLinkClick="toggleLink"
     )
@@ -11,11 +11,12 @@
 
 <script>
 import Sidebar from '../Sidebar';
+import { mapGetters } from "vuex";
 
 export default {
     data() {
         return {
-            sidebarLinks: [
+            links: [
                 {title: 'Open Projects', routeName: 'open-projects'}, 
                 {title: 'Incoming Requests', routeName: 'requests'}
             ],
@@ -37,8 +38,18 @@ export default {
         }
     },
     computed: {
-        links() {
-            return this.sidebarLinks.map(item => item.title);
+        ...mapGetters({
+            requests: "getAllRequests",
+            projects: "getAllProjects"
+        }),
+        sidebarLinks() {
+            const requestsCounter = this.requests.length;
+            return this.links.map(item => {
+                if(item.routeName === 'requests') {
+                    item.counter = requestsCounter;
+                }
+                return item
+            });
         }
     },
     mounted() {

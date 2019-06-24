@@ -56,13 +56,10 @@
     },
     methods: {
       makeAction(key, row, index) {
-        console.log('make icon action ', key, row, index);
       },
       addNewRow() {
-        console.log('add new row');
       },
       onCheckBoxChanged(row,index) {
-        console.log('check Box Changed!', row, index)
       },
       clientName(elem) {
         return elem.name;
@@ -73,7 +70,6 @@
         }, "")
       },
       edit() {
-        console.log("edit");
       }
     },
     computed: {
