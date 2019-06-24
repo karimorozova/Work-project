@@ -240,7 +240,8 @@ export default {
         },
         async getIndustries() {
             try {
-                const industries = await this.$http.get("/api/industries");
+                const allIndustries = await this.$http.get("/api/industries");
+                this.industries = allIndustries.body;
             } catch(err) {
                 this.alertToggle({message: "Erorr on getting Industries", isShow: true, type: "error"});    
             }
