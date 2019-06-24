@@ -42,7 +42,6 @@ export default {
             managerFilter: "",
             startFilter: "",
             deadlineFilter: "",
-            projects: [],
             managers: [],
             jobs: [],
             jobsShow: false,
@@ -52,6 +51,7 @@ export default {
     methods: {
         ...mapActions({
             setStoreProjects: "setAllProjects",
+            setRequests: "setRequests",
             storeProject: "setCurrentProject",
             loadingToggle: "loadingToggle",
         }),
@@ -69,13 +69,20 @@ export default {
             this.$router.push(`/pm-project-details/${project._id}?status=${this.projectsType === 'requests' && 'Requested' || 'AllOthers' }`);
         },
         async getProjects() {
-          let projectsArray;
-            if (this.projectsType === 'requests') {
-              this.statusFilter = 'Requested';
+            try {
+                const projects = await this.$http.get('/api/allprojects?status=Others');
+                await this.setStoreProjects([...projects.body]);
+            } catch(err) {
+
             }
-            projectsArray = await this.$http.get(`/api/allprojects?status=${this.projectsType === 'requests' && 'Requested' || 'AllOthers'}`);
-            this.projects = projectsArray.body;
-            await this.setStoreProjects(this.projects);
+        },
+        async getRequests() {
+            try {
+                const requests = await this.$http.get('/api/allprojects?status=Requested');
+                await this.setRequests([...requests.body]);
+            } catch(err) {
+
+            }
         },
         async getManagers() {
             const managers = await this.$http.get("/pm-manage/all-managers");
@@ -85,10 +92,11 @@ export default {
     computed: {
         ...mapGetters({
             allProjects: "getAllProjects",
+            allRequests: "getAllRequests",
             allCustomers: "getClients",
         }),
         filteredProjects() {
-            let result = this.allProjects;
+            let result = this.projectsType !== 'requests' ? this.allProjects : this.allRequests;
             if(this.statusFilter) {
                 result = result.filter(item => {
                     return item.status === this.statusFilter;
@@ -133,6 +141,7 @@ export default {
     },
     created() {
         this.getProjects();
+        this.getRequests();
         this.getManagers();
     },
     components: {

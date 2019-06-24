@@ -196,13 +196,18 @@ router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 
 });
 
 router.get('/allprojects', async (req, res) => {
-  try {
-    const projects = await getProjects(req.query);
-    res.send(projects)
-  } catch(err) {
-      console.log(err);
-      res.status(500);
-      res.send('Something wrong with DB while getting projects!')
+    const { status } = req.query;
+    try {
+        let queryObj = {};
+        if(status) {
+            queryObj = status !== 'Requested' ? {status: {$ne:'Requested'}} : { status };
+        }
+        const projects = await getProjects(queryObj);
+        res.send(projects)
+    } catch(err) {
+        console.log(err);
+        res.status(500);
+        res.send('Something wrong with DB while getting projects!')
     }
 });
 

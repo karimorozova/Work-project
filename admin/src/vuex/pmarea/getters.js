@@ -1,0 +1,1 @@
+export const getAllRequests = state => state.requests;

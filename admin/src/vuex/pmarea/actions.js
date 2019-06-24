@@ -1,5 +1,7 @@
 import Vue from "vue";
 
+export const setRequests = ({commit}, payload) => commit('SET_REQUESTS', payload);
+
 export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
