@@ -174,26 +174,6 @@ router.get('/downloadTask', checkClientContact, (req, res) => {
     res.send(`https://admin.pangea.global/task${req.query.taskId}.zip`);
 });
 
-router.get('/job',async (req, res) => {
-    const id = req.query.projectId;
-    try {
-    res.send({jobById});
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting job information');
-    }
-});
-
-router.get('/tasksInfo', checkClientContact, async (req,res) => {
-    const id = req.query.quoteId;
-    try {
-        res.send({tasksOfQuote});
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting task information');
-    }
-});
-
 router.post('/approve-reject', checkClientContact, async (req, res) => {
     const { quote, key } = req.body;
     try {
