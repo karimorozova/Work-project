@@ -105,7 +105,7 @@ const sendMailClient = function(request) {
       </tr>
       <tr>
         <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">Industry</td>
-        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">${request.industry}</td>
+        <td style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%">${request.industry.name}</td>
       </tr>
       <tr>
         <td class="title" style="border: 0.8px solid rgba(102, 86, 61, 0.51);padding: 8px;width: 50%;font-weight: bold;border-right: 2px solid rgba(102, 86, 61, 0.51)">Reference Files:</td>
