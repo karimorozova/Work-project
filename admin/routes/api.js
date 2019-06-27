@@ -93,6 +93,7 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
   request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
   request.targetLanguages = JSON.parse(req.body.targetLanguages);
   request.service = JSON.parse(req.body.service);
+  request.industry = JSON.parse(req.body.industry);
 
   await request.save();
   if (detailFiles) {

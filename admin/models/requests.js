@@ -21,8 +21,8 @@ const RequestSchema = new mongoose.Schema({
     trim: true
   },
   industry: {
-    type: String,
-    default: '',
+    type: Object,
+    default: null,
     trim: true
   },
   contactEmail: {
