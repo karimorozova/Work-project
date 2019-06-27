@@ -1095,4 +1095,30 @@ export default {
   color: rgba(0, 0, 0, 0.4);
 }
 
+.request-quote__input {
+    font-size: 18px;
+    text-align: center;
+    opacity: 0.7;
+    border-radius: 10px;
+    border: none;
+    padding: 8px;
+    width: 150px;
+    border: 1px solid rgba(102, 86, 61, 0.5);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.7);    
+}
+
+@media (max-width: 768px) {
+    .quote-calendar {
+        right: -25px;   
+    } 
+}
+
+@media (max-width: 550px) {
+    .request-quote__input {
+        width: 110px;
+        font-size: 14px;
+        margin-left: 0;
+    }
+}
+
 </style>
