@@ -6,6 +6,7 @@ const state = {
   projects: [],
   token: "",
   orderDetails: {},
+  requestQuoteDetails: {},
   token: "",
   alertMessage: "",
   isAlert: false,

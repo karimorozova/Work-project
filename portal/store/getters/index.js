@@ -3,6 +3,7 @@ export const getAlertMessage = state => state.alertMessage;
 export const getAlertType = state => state.alertType;
 export const getToken = state => state.token;
 export const getRequestsCount = state => state.currentRequests;
+export const getRequestQuoteDetails = state => state.requestQuoteDetails;
 export const getAllProjects = state => state.projects;
 export const getAllServices = state => state.services;
 export const getUserInfo = state => state.user;

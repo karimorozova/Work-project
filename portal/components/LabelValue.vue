@@ -55,4 +55,25 @@ export default {
     }
 }
 
+.quote-item {
+    align-items: flex-start;
+    .pair__label {
+        font-size: 12px;
+    }
+    .pair__value {
+        width: 100%;
+    }
+}
+
+.label_required {
+    position: relative;
+    &:after {
+        content: "*";
+        position: absolute;
+        top: -3px;
+        right: -5px;
+        color: $red;
+    }
+}
+
 </style>
