@@ -1,5 +1,5 @@
 <template lang="pug">
-.validation(:class="{'validation_absolute': isAbsolute}")
+.validation(:class="[customClass, {'validation_absolute': isAbsolute}]")
     .validation__errors(:style="customStyles")
         .validation__messages
             .validation__errors-title Errors:
@@ -12,6 +12,9 @@ export default {
     props: {
         errors: {
             type: Array
+        },
+        customClass: {
+            type: String
         },
         customStyles: {
             type: Object
@@ -101,4 +104,18 @@ export default {
         cursor: pointer;
     }
 }
+
+.request-quote__errors {
+    .validation__errors {
+        margin-left: 0;
+        left: 40%;
+        @media (max-width: 1024px) {
+            left: 30%;
+        }
+        @media (max-width: 550px) {
+            left: 15%;
+        }
+    }
+}
+
 </style>
