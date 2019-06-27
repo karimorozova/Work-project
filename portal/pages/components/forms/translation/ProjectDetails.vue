@@ -33,7 +33,17 @@ export default {
             removeFile: "removeFile"
         }),
         setDetailFiles({ files }) {
-            this.setOrderDetail({prop: 'detailFiles', value: files});
+            if(this.detailFiles && this.detailFiles.length) {
+                let existingFiles = [...this.detailFiles];
+                const fileNames = existingFiles.map(item => item.name);
+                for(let file of files) {
+                    if(fileNames.indexOf(file.name) === -1) {
+                        existingFiles.push(file);
+                    }
+                }
+                return this.setOrderDetail({prop: 'detailFiles', value: [...existingFiles]});
+            }
+            this.setOrderDetail({prop: 'detailFiles', value: [...files]});
         },
         setRefFiles({ files }) {
             this.setOrderDetail({prop: 'refFiles', value: files});            
