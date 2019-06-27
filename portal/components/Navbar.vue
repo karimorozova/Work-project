@@ -37,7 +37,7 @@ export default {
 .navbar {
     display: flex;
     justify-content: center;
-    @media (max-width: 450px) {
+    @media (max-width: 580px) {
         flex-direction: column;
         align-items: center;
         padding-top: 15px;
