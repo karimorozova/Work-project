@@ -1,10 +1,10 @@
 <template lang="pug">
-.upload-file
+.upload-file(:class="customClass")
     span.upload-file__label {{ label }}
     .upload-file__button
         .upload-file__button-text {{ buttonTitle}}
-        input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
-    span.upload-file__comment Drag &amp; Drop
+        input.upload-file__input(type="file" @change='uploadFile' :multiple="isMultiple" :name="inputName")
+    span.upload-file__comment {{ comment }}
 </template>
 
 <script>
@@ -17,22 +17,28 @@ export default {
         buttonTitle : {
             type: String,
             default: "Upload"
-        }
+        },
+        comment: {
+            type: String,
+            default: "Drag & Drop"
+        },
+        inputName: {
+            type: String
+        },
+        isMultiple: {
+            type: Boolean,
+            default: true
+        },
+        customClass: { type: String }
     },
     data() {
         return {
-            files: []
+            
         }
     },
     methods: {
         uploadFile(event) {
-            for(let file of event.target.files) {
-                const isExist = this.files.find(item => item.name === file.name) 
-                if (!isExist) {
-                    this.files.push(file);
-                    this.$emit("uploadedFile", {files: this.files})
-                }
-            }
+            this.$emit("uploadedFile", {files: event.target.files});
         }
     }
 }
@@ -61,6 +67,9 @@ export default {
         &:active {
             box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
         }
+        @media (max-width: 550px) {
+            width: 120px;
+        }
         @media (max-width: 450px) {
             width: 100px;
         }
@@ -82,7 +91,11 @@ export default {
         opacity: 0;
         filter: alpha(opacity=0);
         font-size: 30px;
-        font-family: MyriadPro;             
+        font-family: MyriadPro;
+        @media (max-width: 550px) {
+            width: 140px;
+            right: 0;
+        }         
     }
     &__label {
         font-size: 12px;
