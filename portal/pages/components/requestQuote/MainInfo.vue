@@ -130,7 +130,7 @@ export default {
     }
     &__help-slide-button {
         top: 140px;
-        right: -29px;
+        right: -30px;
     }
     &_rotate-0 {
         transform: rotate(0);

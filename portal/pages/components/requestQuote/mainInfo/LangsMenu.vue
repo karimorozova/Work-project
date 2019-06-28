@@ -75,6 +75,7 @@ export default {
     width: 100%;
     box-shadow: 0 2px 10px $deep-brown;
     border-radius: 12px;
+    overflow: hidden;
     &:hover {
         box-shadow: 0 1px 10px $deep-brown;
     }
