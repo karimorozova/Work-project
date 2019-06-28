@@ -187,7 +187,7 @@ export default {
         @media (max-width: 768px) {
             width: 80%;
         }
-        @media (max-width: 450px) {
+        @media (max-width: 480px) {
             padding: 30px;
             margin: 10px 0;
         }

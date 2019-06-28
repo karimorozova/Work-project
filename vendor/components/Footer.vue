@@ -67,9 +67,14 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @media (max-width: 450px) {
+    @media (max-width: 620px) {
         flex-direction: column;
         width: 100%;
+        .footer__item {
+            &:last-child {
+                margin-top: 5px;
+            }
+        }
     }
     &-text {
         color: #fff;
