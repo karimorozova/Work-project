@@ -816,10 +816,10 @@
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
         if(this.copysendOption) {
-          const result = await this.$axios.$post('api/request', sendForm);
+          const result = await this.$axios.$post('/api/request', sendForm);
         }
         if(this.copystartOption) {
-          const result = await this.$axios.$post('api/project-request', sendForm);
+        //   const result = await this.$axios.$post('/api/request', sendForm);
         }
         this.clearForm();
       },

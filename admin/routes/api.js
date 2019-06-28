@@ -11,6 +11,7 @@ const reqq = require('request');
 const writeFile = require('write');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
+const { createNewRequest } = require("../requests");
 
 function moveFile(oldFile, requestId) {
 
@@ -63,137 +64,16 @@ router.get('/wordcount', async (req, res) => {
 
 
 router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
-  try {
-  const request = new Requests(req.body);
-  let projectName = "";
-  if (request.projectName) {
-    projectName = request.projectName;
-  }
-
-  if (req.body.genBrief) {
-    let obj = JSON.parse(req.body.genBrief);
-    await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
-     \nDescription: ${obj.briefDescr};
-     \nTargeted Audience: ${obj.briefAudience}; 
-     \nTitle: ${obj.briefTitle}; 
-     \nTopics: ${obj.briefTopics};
-     \nCovered points: ${obj.briefSure};
-     \nExamples: ${obj.briefExample}; 
-     \nStructure: ${JSON.stringify(obj.structure)};
-     \nStyle: ${obj.style}
-     \nTone of Voice: ${JSON.stringify(obj.tone)}
-     \nDesign: ${JSON.stringify(obj.design)}
-     \nSeo: ${JSON.stringify(obj.seo)}
-     \nCTA: ${obj.cta}`)
-  }
-
-  const detailFiles = req.files["detailFiles"];
-  const refFiles = req.files["refFiles"];
-
-  request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
-  request.targetLanguages = JSON.parse(req.body.targetLanguages);
-  request.service = JSON.parse(req.body.service);
-  request.industry = JSON.parse(req.body.industry);
-
-  await request.save();
-  if (detailFiles) {
-    for (let i = 0; i < detailFiles.length; i += 1) {
-      try {
-        let storedFile = await moveFile(detailFiles[i], request.id);
-        request.detailFiles.push(storedFile);
-      } catch(err) {
-        console.log(err);
-      }
-    }
-  }
-  if (refFiles) {
-    for (let i = 0; i < refFiles.length; i += 1) {
-      try {
-        let storedFile = await moveFile(refFiles[i], request.id);
-        request.refFiles.push(storedFile);
-      } catch(err) {
-        console.log(err);
-      }
-    }
-  }
-
-  await request.save();
-  if (projectName) {
-    await sendMailPortal(request);
-  } else {
-    await sendMail(request);
-  }
-  await sendMailClient(request);
-  console.log("Saved");
-  res.send({
-    message: "request was added"
-  });
+    try {
+        const requestData = req.body;
+        const detailFiles = req.files["detailFiles"];
+        const refFiles = req.files["refFiles"];
+        await createNewRequest({requestData, detailFiles, refFiles});
+        res.send({message: "request was added"});
   } catch (err) {
       console.log(err);
       res.status(500).send("Something went wrong while adding request")
     }
-});
-
-router.post('/project-request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
-  try {
-  const request = new Requests(req.body);
-  let projectName = "";
-  if (request.projectName) {
-    projectName = request.projectName;
-  }
-
-  if (req.body.genBrief) {
-    let obj = JSON.parse(req.body.genBrief);
-
-    await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
-     \nDescription: ${obj.briefDescr};
-     \nTargeted Audience: ${obj.briefAudience}; 
-     \nTitle: ${obj.briefTitle}; 
-     \nTopics: ${obj.briefTopics};
-     \nExamples: ${obj.briefExample}; 
-     \nStructure: ${JSON.stringify(obj.structure)};
-     \nStyle: ${obj.style}
-     \nTone of Voice: ${JSON.stringify(obj.tone)}
-     \nDesign: ${JSON.stringify(obj.design)}
-     \nSeo: ${JSON.stringify(obj.seo)}
-     \nCTA: ${obj.cta}`)
-  }
-
-  const detailFiles = req.files["detailFiles"];
-  const refFiles = req.files["refFiles"];
-
-  request.sourceLanguage = JSON.parse(req.body.sourceLanguage);
-  request.targetLanguages = JSON.parse(req.body.targetLanguages);
-  request.service = JSON.parse(req.body.service)
-
-  await request.save();
-  if (detailFiles) {
-    for (let i = 0; i < detailFiles.length; i += 1) {
-      request.detailFiles.push(moveFile(detailFiles[i], request.id));
-    }
-  }
-  if (refFiles) {
-    for (let i = 0; i < refFiles.length; i += 1) {
-      request.refFiles.push(moveFile(refFiles[i], request.id))
-    }
-  }
-
-  await request.save();
-  if (projectName) {
-    sendMailPortal(request)
-  } else {
-    sendMail(request);
-  }
-  sendMailClient(request);
-  console.log("Saved");
-
-  res.send({
-    message: "request was added"
-  });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Something went wrong while adding request")
-  }
 });
 
 router.get('/allprojects', async (req, res) => {

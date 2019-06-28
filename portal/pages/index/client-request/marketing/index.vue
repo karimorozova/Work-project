@@ -543,10 +543,10 @@
           sendForm.append("refFiles", this.refFiles[i]);
         }*/
         if(this.marksendOption) {
-          const result = await this.$axios.$post('api/request', sendForm);
+          const result = await this.$axios.$post('/api/request', sendForm);
         }
         if(this.markstartOption) {
-          const result = await this.$axios.$post('api/project-request', sendForm);
+        //   const result = await this.$axios.$post('/api/request', sendForm);
         }
         this.clearForm();
       },
