@@ -47,8 +47,8 @@ export default {
         targetLangs() {
             let result = "";
             if(this.orderDetails.targets && this.orderDetails.targets.length) {
-                result = this.orderDetails.targets.reduce((init, cur) => {
-                    return init + `${cur.lang}; `
+                result = this.orderDetails.targets.reduce((prev, cur) => {
+                    return prev + `${cur.lang}; `
                 },"") 
             }
             return result;
@@ -56,8 +56,8 @@ export default {
         detailFilesList() {
             let files = "";
             if(this.orderDetails.detailFiles && this.orderDetails.detailFiles.length) {
-                files = this.orderDetails.detailFiles.reduce((init, cur) => {
-                    return init + `${cur.name}; `
+                files = this.orderDetails.detailFiles.reduce((prev, cur) => {
+                    return prev + `${cur.name}; `
                 },"")
             }
             return files;
@@ -65,8 +65,8 @@ export default {
         refFilesList() {
             let files = "";
             if(this.orderDetails.refFiles && this.orderDetails.refFiles.length) {
-                files = this.orderDetails.refFiles.reduce((init, cur) => {
-                    return init + `${cur.name}; `
+                files = this.orderDetails.refFiles.reduce((prev, cur) => {
+                    return prev + `${cur.name}; `
                 },"")
             }
             return files;

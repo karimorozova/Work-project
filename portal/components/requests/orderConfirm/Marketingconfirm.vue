@@ -159,7 +159,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+
 .confirmation {
   color: #66573d;
   margin: 0 auto;
@@ -224,4 +225,5 @@ export default {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
 </style>

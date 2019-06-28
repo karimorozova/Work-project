@@ -48,7 +48,6 @@ import Multiselect from "vue-multiselect";
 import VueLodash from "vue-lodash";
 import TargetLang from "./TargetLang.vue";
 import Files from "./Files.vue";
-import Company from "./Company.vue";
 
 export default {
   props: {
@@ -210,15 +209,12 @@ export default {
       }
     }
   },
-  computed: {},
-  mounted() {},
   components: {
     Datepicker,
     Multiselect,
     VueLodash,
     "target-lang": TargetLang,
     files: Files,
-    company: Company
   }
 };
 </script>

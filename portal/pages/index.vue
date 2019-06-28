@@ -54,8 +54,6 @@
           span {{ breadCrumb1.toUpperCase() }}
           span.arrows(v-if="breadCrumb2") >>
           span(v-if="clientRequestShow") {{ serviceType }}
-        <!--Clientrequest(v-if="clientRequestShow" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou")-->
-        <!--Confirmorder(v-if="thanks" :thanksService="thanksService")-->
         nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 

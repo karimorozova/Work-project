@@ -62,8 +62,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import '../../../assets/styles/clientrequest/transthanks.scss';
+<style lang="scss" scoped>
 
 .detailsTable {
     width: 60%;
@@ -91,4 +90,5 @@ export default {
         }
     }
 }
+
 </style>
