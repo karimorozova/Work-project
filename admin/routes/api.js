@@ -1,32 +1,15 @@
 const router = require('express').Router();
 const axios = require('axios');
 const unirest = require('unirest');
-const { upload, sendMail, sendMailClient, sendMailPortal } = require('../utils/');
+const { upload } = require('../utils/');
 const fs = require('fs');
-const mv = require('mv');
-const { Requests, Languages, Industries, Timezones, LeadSource, Package } = require('../models');
-const { getProject, getProjects } = require('../projects/');
+const { Languages, Industries, Timezones, LeadSource, Package } = require('../models');
+const { getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
-const writeFile = require('write');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
-
-function moveFile(oldFile, requestId) {
-
-  let newFile = './dist/reqfiles/' + requestId + '/' + oldFile.filename;
-
-  mv(oldFile.path, newFile, {
-    mkdirp: true
-  }, function (err) {
-    if(err) {
-      console.log("moveFile error in posting request: " + err);
-    }
-  });
-
-  return oldFile.filename;
-}
 
 router.get('/wordcount', async (req, res) => {
   let link = req.query.web;

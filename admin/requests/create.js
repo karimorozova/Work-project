@@ -1,6 +1,7 @@
 const { Requests } = require("../models");
 const  { moveFile } = require("../utils/movingFile");
 const { sendMail, sendMailClient, sendMailPortal } = require('../utils');
+const writeFile = require('write');
 
 async function createNewRequest({requestData, detailFiles, refFiles}) {
     try {
