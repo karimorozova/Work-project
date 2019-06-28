@@ -42,7 +42,6 @@ export default {
         margin-bottom: 5px;
         border-radius: 7px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        /*background-color: #d15f45;*/
         background: url("../assets/images/upload_button_icon.png") no-repeat center;
         &:hover {
             box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);

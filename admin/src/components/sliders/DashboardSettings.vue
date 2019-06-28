@@ -15,7 +15,6 @@
 
 <script>
 import Sidebar from "../Sidebar";
-import Blanket from "../Blanket/Blanket";
 import Activities from "../reports/Activities"
 import { mapGetters } from "vuex";
 
@@ -75,7 +74,6 @@ export default {
   },
   components: {
     Sidebar,
-    Blanket,
     Activities
   }
 };

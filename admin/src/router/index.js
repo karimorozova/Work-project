@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
-import TasksReport from '@/components/TasksReport'
 import Main from '@/components/Main'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
 import RecruitmentSettings from '@/components/sliders/RecruitmentSettings'
@@ -45,11 +44,6 @@ const router = new Router({
       path: '/register',
       name: 'register',
       component: Register
-    },
-    {
-      path: '/tasks-report',
-      name: 'tasks-report',
-      component: TasksReport
     },
     {
       path: '/login',
