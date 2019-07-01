@@ -24,6 +24,7 @@
     "file-type": "^8.0.0",
     "form-data": "^2.3.2",
     "fs-extra": "^7.0.0",
+    "generate-password": "^1.4.2",
     "html-entities": "^1.2.1",
     "html-word-count": "^2.0.0",
     "jsonwebtoken": "^8.3.0",

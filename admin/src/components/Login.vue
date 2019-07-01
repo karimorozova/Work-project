@@ -1,6 +1,6 @@
 <template lang="pug">
   .login
-    .login__main(v-if="forgotLink")
+    .login__main
       .login__logo
         img.login__image(src="../assets/images/new-logo.png")
       form.login__form(@submit.prevent="sendForm")
@@ -14,11 +14,9 @@
           input.login__checkbox-input(type="checkbox")
           label.login__checkbox-label Remember me
         button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
-        span.login__forgot(@click="forget") Forgot Your Password?
-    passwordrestore(@loginVisible="forget" v-else)
+        router-link.login__forgot(to="/forgot") Forgot Your Password?
 </template>
 <script>
-import PasswordRestore from '../components/PasswordRestore';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -29,8 +27,7 @@ export default {
         logpassword: ""
       },
       isLogin: false,
-      isLoginWarning: false,
-      forgotLink: true
+      isLoginWarning: false
     };
   },
   methods: {
@@ -60,14 +57,13 @@ export default {
       loggingIn: "login",
       loggingOut: "logout"
     })
-  },
-  components: {
-    "passwordrestore": PasswordRestore
   }
 };
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
+
 .login {
   background-image: url("../assets/images/signin-background.jpg");
   display: flex;
@@ -80,7 +76,7 @@ export default {
     left: 50%;
     top: 50%;
     margin-top: -266px;
-    width: 436px;
+    width: 476px;
   }
   &__logo {
     display: flex;
@@ -99,6 +95,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
   }
   &__warning {
     margin-bottom: 5px;
@@ -154,9 +151,9 @@ export default {
     height: 35px;
     border-radius: 8px;
     font-size: 20px;
-    background-color: #4BA5A5;
-    color: #66563d;
-    opacity: 0.22;
+    background-color: $green;
+    color: $white;
+    opacity: 0.5;
   }
   &__forgot {
     color: #4280d3;
@@ -165,13 +162,16 @@ export default {
     cursor: pointer;
     align-self: flex-start;
     padding-left: 30px;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
   }
   &_shadow {
     box-shadow: 0 0 10px #66563d;
   }
   &_button-backgr {
     opacity: 1;
-    color: #fff;
   }
 }
 

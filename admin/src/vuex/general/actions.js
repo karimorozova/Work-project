@@ -178,6 +178,17 @@ export const alertToggle = ({ commit }, payload) => {
   }, 5000)
 }
 
+export const sendNewPassword = async ({ commit }, payload ) => {
+    commit('startRequest');
+    try {
+        await Vue.http.post('/reset-pass', {email: payload});
+        commit('endRequest');
+    } catch(err) {
+        commit('endRequest');
+        throw new Error(err.body);
+    }
+}
+
 export const login = ({ commit, state }, payload) => {
   commit('startRequest')
   return new Promise(resolve => {

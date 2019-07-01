@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
+import PasswordRestore from '@/components/PasswordRestore'
 import Main from '@/components/Main'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
 import RecruitmentSettings from '@/components/sliders/RecruitmentSettings'
@@ -49,6 +50,11 @@ const router = new Router({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+        path: '/forgot',
+        name: 'forgot',
+        component: PasswordRestore
     },
     {
       path: '/',
@@ -256,8 +262,10 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
-  if(!token && to.path !== '/login') {
-    next('/login')
+  if(to.path === '/forgot') {
+    next();
+  } else if(!token && to.path !== '/login') {
+    next('/login');
   } else if(token) {
     const date = Date.now();
     const expiryTime = new Date(JSON.parse(token).timestamp);

@@ -1,116 +1,137 @@
 <template lang="pug">
-.restoreMain
-    .restoreWrapper
-        .restoreForm(v-if="formVisible")
-            .emailWrapper
-                label Enter your email to get the link for reset your password:
-                input.notice(v-model='notice' placeholder='Enter your email' )
-            .buttonWrapper
-                span.buttonWrapper__backLabel(@click="backEvent") Back
-                button(@click='sendForm' v-model='notice' ) Send Link
+.restore
+    form.restore__form(@submit.prevent="send" v-if="isForm")
+        .restore__data
+            label.restore__comment Enter your email to get the instructions:
+            input.restore__email(v-model='email' placeholder='Enter your email' )
+        .restore__buttons
+            router-link.restore__back(to="/login") Back
+            button.restore__send(type="submit" :class="{'restore_opacity-1': email}") Send
+    .restore__errors(v-if="isError")
+        ValidationErrors(:errors="errors" @closeErrors="closeErrors" isAbsolute)
+    .restore__success(v-if="!isForm")
+        .restore__message Thank you. Please, check your email and follow instructions.
 </template>
 
 <script>
+import ValidationErrors from "./ValidationErrors";
+import { mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      notice: "",
-      formVisible: true
+        isForm: true,
+        email: "",
+        isError: false,
+        errors: []
     };
   },
   methods: {
-    backEvent(){
-      this.formVisible = false;
-      this.$emit('loginVisible', {forgotLink: true})
+    ...mapActions({
+        sendNewPassword: "sendNewPassword",
+        alertToggle: "alertToggle"
+    }),
+    async send() {
+        this.errors = [];
+        const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        if(!this.email || !regex.test(this.email)) {
+            this.errors = ["Please, enter valid email address"];
+            return this.isError = true;
+        }
+        try {
+            await this.sendNewPassword(this.email);
+            this.isForm = false;
+        } catch(err) {
+            this.alertToggle({message: err.message, isShow: true, type: "error"});
+        }
+    },
+    closeErrors() {
+        this.isError = false;
     }
   },
-  computed: {
-
+  components: {
+      ValidationErrors
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.restoreMain {
-  background-image: url("../assets/images/image-background.jpg");
-}
+@import "../assets/scss/colors.scss";
 
-.restoreWrapper {
-  position: absolute;
-  margin-left: -250px;
-  left: 50%;
-  top: 60%;
-  margin-top: -266px;
-  width: 436px;
-
-  .restoreForm {
-    padding: 1%;
-    margin: 0 auto;
-    width: 436px;
-    background-color: #fff;
-
-    .emailWrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-top: 2%;
-      margin-bottom: 3%;
-
-      label {
-        padding: 1% 0 3% 9%;
-        font-size: 20px;
-      }
-
-      .notice {
-        height: 41px;
-        width: 356px;
-        font-size: 20px;
-        color: #66563d;
-        padding-left: 3%;
-        border-radius: 8px;
-        border: 2px solid #dedede;
-        margin: 1% 0 3% 9%;
-        &::-webkit-input-placeholder {
-          opacity: 0.38;
-        }
-        &::-moz-placeholder {
-          opacity: 0.38;
-        }
-        &:-ms-input-placeholder {
-          opacity: 0.38;
-        }
-        &:focus {
-          box-shadow: 0 0 4px #66563d;
-          outline: none;
-        }
-      }
+.restore {
+  background-image: url("../assets/images/signin-background.jpg");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  &__form {
+    position: absolute;
+    margin-left: -250px;
+    left: 50%;
+    top: 60%;
+    margin-top: -266px;
+    width: 476px;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: $white;
+  }
+  &__data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  &__comment {
+      font-size: 22px;
+  }
+  &__email {
+    height: 41px;
+    width: 376px;
+    font-size: 20px;
+    color: $main-color;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 2px solid #dedede;
+    margin-top: 15px;
+    &::-webkit-input-placeholder {
+        opacity: 0.4;
     }
-
-    .buttonWrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4%;
-
-        button {
-            width: 142px;
-            height: 35px;
-            border-radius: 8px;
-            font-size: 20px;
-            background-color: #84ca8e;
-            color: #66563d;
-            margin-right: 5%;
-        }
-
-        &__backLabel {
-        color: #0000ff;
-        font-size: 20px;
-        margin-left: 9%;
-        cursor: pointer;
-        text-decoration: underline;
-      }
+    &:focus {
+        box-shadow: 0 0 4px $deep-brown;
+        outline: none;
     }
   }
+  &__buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  &__send {
+    width: 142px;
+    height: 35px;
+    border-radius: 8px;
+    font-size: 20px;
+    background-color: $green;
+    color: $white;
+    opacity: 0.5;
+  }
+  &__back {
+    color: #4280d3;
+    font-size: 20px;
+  }
+  &__success {
+    background-color: $white;
+    padding: 20px;
+    box-sizing: border-box;
+    color: $main-color;
+  }
+  &__message {
+    font-size: 20px;
+  }
+  &_opacity-1 {
+      opacity: 1;
+  }
 }
+
 </style>

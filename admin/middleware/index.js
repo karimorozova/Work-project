@@ -106,7 +106,7 @@ const middleware = {
     checkRoutes(req, res, next) {
         let routesArray = [
             '/register',
-            '/tasks-report',
+            '/forgot',
             '/login',
             '/account-info',
             '/dashboard',

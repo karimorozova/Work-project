@@ -2,10 +2,11 @@ const router = require('express').Router();
 const path = require('path');
 const { User, Requests, Reports } = require('../models');
 const { getVendors } = require('../vendors');
-const { getClients} = require('../clients');
+const { getClients } = require('../clients');
 const { requiresLogin } = require('../middleware/index');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../configs');
+const { setNewPassword } = require('../users');
 
 router.get('/logout', (req, res, next) => {
     if (req.session) {
@@ -18,6 +19,21 @@ router.get('/logout', (req, res, next) => {
         });
     }
 });
+
+router.post('/reset-pass', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({"email": email});
+        if(!user) {
+            return res.status(400).send("No such user"); 
+        }
+        await setNewPassword(user);
+        return res.send("new password sent");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Server error. Try again later.");
+    }
+})
 
 router.get('/all-clients', requiresLogin, async (req, res, next) => {
     try {
