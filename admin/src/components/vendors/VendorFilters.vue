@@ -76,8 +76,12 @@ export default {
     width: 100%;
     margin-bottom: 20px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    @media (max-width: 1300px) {
+        margin-bottom: 0;
+    }
     &__filter-title {
         margin-bottom: 0;
         margin-right: 10px;
@@ -90,6 +94,9 @@ export default {
         align-items: center;
         ::-webkit-input-placeholder {
             opacity: 0.5;
+        }
+        @media (max-width: 1300px) {
+            margin-bottom: 20px;
         }
     }
     &__input-field {

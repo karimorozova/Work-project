@@ -2,7 +2,7 @@
 .vendors
   .vendors__sidebar(v-if="sidebarShow")
     Sidebar(title="Vendors" :links="sidebarLinks")
-  .all-vendors(v-if="allVendors")
+  .vendors__all(v-if="allVendors")
     Allvendors(@vendorDetails="vendorDetailsShow" @cancelVendor="cancelVendor")
 </template>
 
@@ -42,7 +42,12 @@ export default {
 <style lang="scss" scoped>
 
 .vendors {
-  display: flex;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    &__all {
+        width: 100%;
+    }
 }
 
 </style>

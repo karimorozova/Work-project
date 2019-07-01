@@ -63,7 +63,6 @@ export default {
             this.storeCurrentVendor({});
         },
         setFilter({option}, prop) {
-          console.log('option, prop',{option}, prop);
             this[prop] = option;
         },
         ...mapActions({
@@ -88,10 +87,12 @@ export default {
 
 .all-vendors {
   position: relative;
-  margin: 40px 40px 40px 0;
+  margin-top: 40px;
+  width: 100%;
     &__table {
         padding: 20px;
-        max-width: 1100px;
+        box-sizing: border-box;
+        max-width: 1200px;
         width: calc(100% - 80px);
         min-height: 150px;
         box-shadow: 0 0 10px $brown-shadow;

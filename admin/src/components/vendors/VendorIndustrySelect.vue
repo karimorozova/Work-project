@@ -60,7 +60,7 @@ export default {
         async getIndustries() {
             try {
                 const allIndustries = await this.$http.get('/api/industries')
-                let sortedArray = result.data.filter(item => {
+                let sortedArray = allIndustries.data.filter(item => {
                     if (item.name !== 'More' && item.name !== 'Other') {
                         return item
                     }
@@ -68,7 +68,7 @@ export default {
                 if(this.isAllExist) {
                     sortedArray.unshift({name: "All"});
                 }
-                this.industries = sortedArray;
+                this.industries = [...sortedArray];
             } catch(err) {
                 this.errors.push(err)
             }
