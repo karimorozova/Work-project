@@ -35,14 +35,14 @@ async function getFilesInfo(obj) {
     let generic = "";
     try {
         if(iconFile) {
-            const newIconPath = `./dist/static/industries/${formattedDate}-${iconFile[0].filename}`;
+            const newIconPath = `./dist/industries/${formattedDate}-${iconFile[0].filename}`;
             await moveFile(iconFile[0], newIconPath);
-            icon = `/static/industries/${formattedDate}-${iconFile[0].filename}`;
+            icon = `/industries/${formattedDate}-${iconFile[0].filename}`;
         }
         if (genericFile) {
-            const newGenericPath = `./dist/static/industries/exel/${formattedDate}-${genericFile[0].filename}`;
+            const newGenericPath = `./dist/industries/exel/${formattedDate}-${genericFile[0].filename}`;
             await moveFile(genericFile[0], newGenericPath);
-            generic = `/static/industries/exel/${formattedDate}-${genericFile[0].filename}`;
+            generic = `/industries/exel/${formattedDate}-${genericFile[0].filename}`;
         }
         return { icon, generic };
     } catch(err) {
