@@ -4,8 +4,6 @@
       .login__logo
         img.login__image(src="../assets/images/new-logo.png")
       form.login__form(@submit.prevent="sendForm")
-        .login__warning
-          label.login__warning-message(v-if="isLoginWarning") Check your email or password
         .login__email
           input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
         .login__password
@@ -25,9 +23,7 @@ export default {
       form: {
         logemail: "",
         logpassword: ""
-      },
-      isLogin: false,
-      isLoginWarning: false
+      }
     };
   },
   methods: {

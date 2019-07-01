@@ -9,12 +9,13 @@ const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients } = require('../models');
 const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
+const { setClientsContactNewPassword } = require('../users');
 
 router.post("/auth", async (req, res, next) => {
-  if (req.body.logemail) {
+  if (req.body.logemail && req.body.logpassword) {
     Clients.authenticate(req.body.logemail, req.body.logpassword, async (error, data) => {
       if (error || !data) {
-        let err = new Error('Wrong email or password.');
+        let err = new Error();
         err.status = 401;
         res.status(401).send("Wrong email or password.");
       } else {
@@ -29,11 +30,26 @@ router.post("/auth", async (req, res, next) => {
       }
     });
   } else {
-    let err = new Error('All fields required.');
+    let err = new Error();
     err.status = 400;
     res.status(400).send("All fields required.");
   }
 });
+
+router.post("/reset-pass", async (req, res) => {
+    const { email } = req.body;
+    try {
+        const client = await Clients.findOne({"contacts.email": email});
+        if(!client) {
+            return res.status(400).send("No such user"); 
+        }
+        await setClientsContactNewPassword(client, email);
+        return res.send("new password sent");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Server error. Try again later.");
+    }
+})
 
 router.get('/projects', checkClientContact, async (req, res) => {
     const { token } = req.query;

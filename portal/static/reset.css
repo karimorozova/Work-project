@@ -10,7 +10,12 @@ html {
 }
 
 input, textarea {
-	color: #67573E;
+    color: #67573E;
+    font-family: MyriadPro;
+}
+
+button {
+    font-family: MyriadPro;
 }
 
 blockquote, q {

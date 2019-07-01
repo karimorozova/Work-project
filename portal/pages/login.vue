@@ -1,11 +1,9 @@
 <template lang="pug">
   .login
-    .login__main(v-if="forgotLink")
+    .login__main
       .login__logo
         img.login__image(src="../assets/images/new-logo.png")
       form.login__form(@submit.prevent="sendForm")
-        .login__warning
-          label.login__warning-message(v-if="isLoginWarning") Check your email or password
         .login__email
           input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
         .login__password
@@ -14,12 +12,10 @@
           input.login__checkbox-input(type="checkbox")
           label.login__checkbox-label Remember me
         button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
-        span.login__forgot(@click="forget") Forgot Your Password?
-    passwordrestore(@loginVisible="forget" v-else )
+        nuxt-link.login__forgot(to="/forgot") Forgot Your Password?
 </template>
 <script>
 
-  import PasswordRestore from '../components/PasswordRestore';
   import { mapActions } from "vuex";
 
   export default {
@@ -28,10 +24,7 @@
         form: {
           logemail: "",
           logpassword: ""
-        },
-        isLogin: false,
-        isLoginWarning: false,
-        forgotLink: true
+        }
       };
     },
     methods: {
@@ -42,7 +35,11 @@
           this.$router.push("/");
           this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
         } catch(err) {
-          this.alertToggle({message: err.message, isShow: true, type: "error"});
+            let message = err.message;
+            if(err.response && err.response.data) {
+                message = err.response.data;
+            }
+          this.alertToggle({message, isShow: true, type: "error"});
         }
       },
       forget(){
@@ -52,14 +49,13 @@
         alertToggle: "alertToggle",
         login: "login",
       })
-    },
-    components: {
-      "passwordrestore": PasswordRestore
     }
   };
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
+
   @font-face {
     font-family: MyriadPro;
     src: url('/assets/fonts/MyriadPro-Regular.otf');
@@ -77,7 +73,7 @@
       left: 50%;
       top: 50%;
       margin-top: -266px;
-      width: 436px;
+      width: 476px;
     }
     &__logo {
       display: flex;
@@ -96,6 +92,7 @@
       justify-content: center;
       flex-direction: column;
       align-items: center;
+      box-sizing: border-box;
     }
     &__warning {
       margin-bottom: 5px;
@@ -151,9 +148,9 @@
       height: 35px;
       border-radius: 8px;
       font-size: 20px;
-      background-color: #4BA5A5;
-      color: #66563d;
-      opacity: 0.22;
+      background-color: $green;
+      color: $white;
+      opacity: 0.5;
     }
     &__forgot {
       color: #4280d3;
@@ -162,13 +159,16 @@
       cursor: pointer;
       align-self: flex-start;
       padding-left: 30px;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
     }
     &_shadow {
       box-shadow: 0 0 10px #66563d;
     }
     &_button-backgr {
       opacity: 1;
-      color: #fff;
     }
   }
 
