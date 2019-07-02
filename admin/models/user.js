@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Schema = mongoose.Schema;
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -19,8 +20,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
   group: {
-    type: String,
-    trim: true
+    type: Schema.Types.ObjectId, ref: 'Group',
   },
   firstName: {
     type: String,
@@ -51,7 +51,7 @@ const UserSchema = new mongoose.Schema({
 }, { minimize: false });
 
 UserSchema.statics.authenticate = function (email, password, callback) {
-  User.findOne({ email: email })
+  User.findOne({ email: email }).populate("group")
     .exec((err, user) => {
       if (err) {
         return callback(err)
