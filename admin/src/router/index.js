@@ -5,7 +5,7 @@ import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
 import Main from '@/components/Main'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
-import RecruitmentSettings from '@/components/sliders/RecruitmentSettings'
+import Settings from '@/components/sliders/Settings'
 import VendorsSettings from '@/components/sliders/VendorsSettings'
 import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ClientsSettings from '@/components/sliders/ClientsSettings'
@@ -15,6 +15,7 @@ import Pricelists from '@/components/finance/Pricelists'
 import PricelistRates from '@/components/finance/PricelistRates'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
+import TableGroups from '@/components/Table/TableGroups'
 import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
@@ -26,11 +27,15 @@ import NewClientInfo from '@/components/clients/NewClientInfo'
 import ContactDetails from '@/components/clients/ContactDetails'
 import NewContactDetails from '@/components/clients/NewContactDetails'
 import Vendordetails from '@/components/vendors/Vendordetails'
+import ActiveVendors from '@/components/vendors/ActiveVendors'
+import PotentialVendors from '@/components/vendors/PotentialVendors'
+import InactiveVendors from '@/components/vendors/InactiveVendors'
 import NewVendor from '@/components/vendors/NewVendor'
 import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import Requests from '@/components/pmArea/Requests'
+import PrevProjects from '@/components/pmArea/PrevProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
@@ -84,13 +89,23 @@ const router = new Router({
         {
           path: 'dashboard',
           name: 'dashboard',
-          props: true,
           component: DashboardSettings,
+        },
+        {
+          path: 'settings',
+          name: 'settings',
+          component: Settings,
+          props: true,
           children: [
             {
               path: 'leadsources',
               name: 'leadsources',
               component: TableLeadsources
+            },
+            {
+              path: 'groups',
+              name: 'groups',
+              component: TableGroups
             },
             {
               path: 'packages',
@@ -113,6 +128,16 @@ const router = new Router({
               component: TableIndustries
             },
             {
+              path: 'pricelists',
+              name: 'pricelists',
+              component: Pricelists
+            },
+            {
+              path: 'rates',
+              name: 'rates',
+              component: PricelistRates
+            },
+            {
               path: 'users',
               name: 'users',
               component: Users
@@ -120,14 +145,29 @@ const router = new Router({
           ]
         },
         {
-          path: 'recruitment',
-          name: 'recruitment',
-          component: RecruitmentSettings
-        },
-        {
           path: 'vendors',
           name: 'vendors',
-          component: VendorsSettings
+          component: VendorsSettings,
+          children: [
+            {
+              path: 'active',
+              name: 'active-vendors',
+              props: true,
+              component: ActiveVendors
+            },
+            {
+              path: 'inactive',
+              name: 'inactive-vendors',
+              props: true,
+              component: InactiveVendors
+            },
+            {
+              path: 'potential',
+              name: 'potential-vendors',
+              props: true,
+              component: PotentialVendors
+            },
+          ]
         },
         {
           path: 'vendors/:id',
@@ -204,8 +244,8 @@ const router = new Router({
           ]
         },
         {
-          path: 'pm-area',
-          name: 'pm-area',
+          path: 'projects',
+          name: 'projects',
           component: PmArea,
           children: [
             {
@@ -219,36 +259,28 @@ const router = new Router({
               name: 'requests',
               component: Requests,
               props: true
+            },
+            {
+              path: 'prev-projects',
+              name: 'prev-projects',
+              component: PrevProjects
             }
           ]
         },
         {
-          path: 'pm-project-details/:id',
-          name: 'pm-project-details',
+          path: 'project-details/:id',
+          name: 'project-details',
           component: ProjectInfo
         },
         {
-          path: 'pm-create-project',
-          name: 'pm-create-project',
+          path: 'create-project',
+          name: 'create-project',
           component: CreateProject
         },
         {
           path: 'finance',
           name: 'finance',
-          component: FinanceSettings,
-          redirect: '/finance/pricelists',
-          children: [
-            {
-              path: 'pricelists',
-              name: 'pricelists',
-              component: Pricelists
-            },
-            {
-              path: 'rates',
-              name: 'rates',
-              component: PricelistRates
-            },
-          ]
+          component: FinanceSettings
         },
         {
           path: 'reports',
