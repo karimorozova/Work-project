@@ -78,7 +78,7 @@ export default {
         },
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
-            this.$router.push("/finance/rates");
+            this.$router.push("/settings/rates");
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
@@ -237,6 +237,7 @@ export default {
 
 .pricelists {
     margin: 20px;
+    margin-left: 0;
     &__table {
         width: 700px;
         box-shadow: 0 0 10px $main-color;

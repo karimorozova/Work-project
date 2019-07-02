@@ -143,9 +143,11 @@ export default {
 
 .finance-rates {
     margin: 20px;
+    margin-left: 0;
     &__price-info {
         display: flex;
         justify-content: space-between;
+        width: 906px;
     }
     &__title {
         font-size: 24px;
@@ -154,7 +156,8 @@ export default {
         margin: 20px 0;
         padding: 20px 10px;
         box-shadow: 0 0 15px #67573e9d;
-        width: 886px;
+        width: 906px;
+        box-sizing: border-box;
         position: relative;
     }
     &__drop-menus {
