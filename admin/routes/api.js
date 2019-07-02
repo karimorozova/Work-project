@@ -153,6 +153,10 @@ router.get('/countries', (req, res) => {
 router.get('/leadsources', async (req, res) => {
   try {
     const leadsources = await LeadSource.find({});
+    leadsources.sort((a, b) => {
+        if(a.source > b.source) return 1;
+        if(a.source < b.source) return -1;
+      });
     res.send(leadsources);
   } catch(err) {
     console.log(err);
@@ -192,6 +196,10 @@ router.delete('/leadsource/:id', async (req, res) => {
 router.get('/groups', async (req, res) => {
     try {
       const groups = await Group.find({});
+      groups.sort((a, b) => {
+          if(a.name > b.name) return 1;
+          if(a.name < b.name) return -1;
+        });
       res.send(groups);
     } catch(err) {
       console.log(err);
