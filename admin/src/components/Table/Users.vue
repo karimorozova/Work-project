@@ -41,14 +41,14 @@
                 .users__editing-data(v-else)
                     input.users__data-input(type="text" v-model="currentPosition")
             template(slot="group" slot-scope="{ row, index }")
-                .users__data(v-if="currentActive !== index") {{ row.group }}
+                .users__data(v-if="currentActive !== index") {{ row.group.name }}
                 .users__drop-menu(v-else)
                     SelectSingle(
                         :isTableDropMenu="isTableDropMenu"
                         placeholder="Select"
-                        :selectedOption="currentGroup"
-                        :options="groups"
-                        @chooseOption="(e) => setProp(e, 'currentGroup')"
+                        :selectedOption="currentGroup.name"
+                        :options="groupsNames"
+                        @chooseOption="setGroup"
                         @scrollDrop="scrollDrop"
                     )
             template(slot="icons" slot-scope="{ row, index }")
@@ -84,13 +84,13 @@ export default {
                 delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
             },
             isTableDropMenu: true,
-            groups: ["Administrators", "Accounting", "Developers", "Sales", "Project Managers", "Vendor Managers"],
+            groups: [],
             currentActive: -1,
             currentFirstName: "",
             currentLastName: "",
             currentEmail: "",
             currentPosition: "",
-            currentGroup: "",
+            currentGroup: null,
             areErrors: false,
             errors: [],
             isDeleting: false,
@@ -143,7 +143,7 @@ export default {
             if(!this.currentLastName) this.errors.push("Please, enter user's last name");
             if(!this.currentEmail || !this.isEmailValid() || !this.isEmailUnique(index)) this.errors.push("Email should be unique and not empty");
             if(!this.currentPosition) this.errors.push("Please, enter user's position");
-            if(!this.currentGroup) this.errors.push("Please, select user's group");
+            if(!this.currentGroup || !this.currentGroup.name) this.errors.push("Please, select user's group");
             if(this.errors.length) {
                 return this.areErrors = true;
             }
@@ -188,8 +188,8 @@ export default {
             this.currentPosition = this.users[index].position;
             this.currentGroup = this.users[index].group;
         },
-        setProp({option}, prop) {
-            this[prop] = option;
+        setGroup({option}) {
+            this.currentGroup = this.groups.find(item => item.name === option);
         },
         addUser() {
             if(this.currentActive !== -1) {
@@ -200,7 +200,7 @@ export default {
                 lastName: "",
                 email: "",
                 position: "",
-                group: ""
+                group: {name: ""}
             })
             this.setEditingData(this.users.length -1);
         },
@@ -241,7 +241,7 @@ export default {
             this.currentLastName = "";
             this.currentEmail = "";
             this.currentPosition = "";
-            this.currentGroup = "";
+            this.currentGroup = null;
             this.isDeleting = false;
         },
         closeErrors() {
@@ -254,6 +254,19 @@ export default {
             } catch(err) {
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
             }
+        },
+        async getGroups() {
+            try {
+                const result = await this.$http.get("/api/groups");
+                this.groups = result.body;
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
+        }
+    },
+    computed: {
+        groupsNames() {
+            return this.groups.map(item => item.name);
         }
     },
     components: {
@@ -263,6 +276,7 @@ export default {
     },
     mounted() {
         this.getUsers();
+        this.getGroups();
     }
 }
 </script>
