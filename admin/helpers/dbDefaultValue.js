@@ -210,6 +210,8 @@ const usersDefault = [
 
 const leadSourcesDefault = ["Advertising", "Friend", "Landing Pages", "Internet", "Social Media", "Website"]
 
+const groupsDefault = ["Administrators", "Sales", "Project Managers", "Vendor Managers", "Developers"]
+
 const servicesDefault = [
     {sortIndex: 1, xtrf: 11, symbol: "tr", formType: "Translation", icon: "/static/services/Translation_Localization.png", "active": true, "crud": false, languageForm: "Duo", calculationUnit: "Words", projectType: "regular", title: "Translation", source: true, languageCombinations: [], languages: {source: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH"], target: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH", "AF", "AR-EG", "AR-MA", "AR-SA", "AZ-LN", "BN-IN", "BS", "CS", "ES-419", "ES-AR", "FR-CA", "FR-CH", "HI", "HR", "HU", "IT", "IT-IT", "IT-CH", "JA", "KA", "KK", "KO", "LT", "LV", "NB", "NL", "PL", "PT-PT", "RO", "RU", "SL", "SR-LA", "SV-SE", "TE", "TK", "TL", "TR", "UK", "UR", "UZ", "VI", "ZH-CN", "ZH-SG", "ZH-HK", "ZH-MO", "ZH-TW"]}},
     {sortIndex: 2, xtrf: 11, symbol: "lo", formType: "Translation", icon: "/static/services/Translation_Localization.png", "active": true, "crud": false, languageForm: "Duo", calculationUnit: "Words", projectType: "regular", title: "Localization", source: true, languageCombinations: [], languages: {source: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH"], target: ["AR", "BG", "DA", "DE", "DE-DE", "DE-AT", "DE-CH", "EL", "EN", "EN-GB", "EN-US", "ES-ES", "ES-MX", "ET", "FA", "FI", "FR", "FR-FR", "FR-BE", "HE", "HY", "ID", "IS", "MO", "MR", "MS", "NL-NL", "NL-BE", "PA", "PT-BR", "SK", "TH", "AF", "AR-EG", "AR-MA", "AR-SA", "AZ-LN", "BN-IN", "BS", "CS", "ES-419", "ES-AR", "FR-CA", "FR-CH", "HI", "HR", "HU", "IT", "IT-IT", "IT-CH", "JA", "KA", "KK", "KO", "LT", "LV", "NB", "NL", "PL", "PT-PT", "RO", "RU", "SL", "SR-LA", "SV-SE", "TE", "TK", "TL", "TR", "UK", "UR", "UZ", "VI", "ZH-CN", "ZH-SG", "ZH-HK", "ZH-MO", "ZH-TW"]}},
@@ -392,6 +394,7 @@ const defaultValue = {
     clientsDefault,
     vendorsDefault,
     leadSourcesDefault,
+    groupsDefault,
     packagesDefault,
     emptyMetrics
 };

@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Package } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Package } = require('../models');
 const { getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
@@ -187,6 +187,45 @@ router.delete('/leadsource/:id', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on deleting lead source");
   }
+});
+
+router.get('/groups', async (req, res) => {
+    try {
+      const groups = await Group.find({});
+      res.send(groups);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on getting groups from DB")
+    }
+});
+
+router.post('/group', async (req, res) => {
+    const { group } = req.body;
+    try {
+        if(group._id) {
+        await Group.updateOne({"_id": group._id}, group);
+        return res.send("Updated");
+        }
+        await Group.create(group);
+        res.send("New group created");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on updating/creating a group")
+    }
+});
+
+router.delete('/group/:id', async (req, res) => {
+    const { id } = req.params;
+    if(!id) {
+        return res.send('Deleted unsaved group')
+    }
+    try {
+        await Group.deleteOne({"_id": id});
+        res.send('Deleted');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting group");
+    }
 });
 
 router.get('/packages', async (req, res) => {

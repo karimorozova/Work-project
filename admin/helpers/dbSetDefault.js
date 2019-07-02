@@ -10,6 +10,7 @@ const {
   Monorate,
   Timezones,
   LeadSource,
+  Group,
   Package,
   Clients,
   Vendors
@@ -24,19 +25,13 @@ const {
   industriesDefault,
   timezonesDefault,
   leadSourcesDefault,
+  groupsDefault,
   packagesDefault,
   clientsDefault,
   vendorsDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
-
-let instance = axios.create({
-  baseURL: 'https://pangea.s.xtrf.eu/home-api/',
-  headers: {
-    'X-AUTH-ACCESS-TOKEN': 'U0mLa6os4DIBAsXErcSUvxU0cj'
-  }
-});
 
 async function fillPackages() {
   try {
@@ -67,7 +62,26 @@ function fillLeadSources() {
       }
     })
     .catch(err => {
-      console.log('Something is wrong' + err)
+        console.log('Something is wrong' + err)
+    })
+}
+
+function fillGroups() {
+    return Group.find({})
+      .then(async groups => {
+        if(!groups.length) {
+          for(const group of groupsDefault) {
+            await new Group({ name: group }).save().then((times) => {
+  
+            }).catch(err => {
+              console.log(`Group ${group} hasn't been saved because of ${err.message}`)
+            })
+          }
+          console.log('Groups are saved!')
+        }
+    })
+    .catch(err => {
+        console.log('Something is wrong ' + err)
     })
 }
 
@@ -504,6 +518,7 @@ async function fillPricelist() {
 async function checkCollections() {
   await fillPackages();
   await fillLeadSources();
+  await fillGroups();
   await timeZones();
   await languages();
   await industries();

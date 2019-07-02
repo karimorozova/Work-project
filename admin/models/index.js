@@ -12,6 +12,7 @@ const Timezones = require('./timezones');
 const Clients = require('./clients');
 const Vendors = require('./vendors');
 const LeadSource = require('./leadSource');
+const Group = require('./group');
 const Package = require('./packages');
 const Zoho = require('./zoho');
 const ZohoReport = require('./zohoReport');
@@ -29,6 +30,7 @@ const Models = {
     Monorate,
     Timezones,
     LeadSource,
+    Group,
     Package,
     Clients,
     Vendors,
