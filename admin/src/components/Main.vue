@@ -13,10 +13,6 @@
                         .sel_project_block__img-wrapper(@click="showDropdown")
                             .sel_project_block__image
                                 img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
-                .dropdown-wrapper
-                    .imgwrap(@click="showSlider")
-                        img(src="../assets/images/Other/admin-button-icon.png" )
-                        span.spwrap settings
                 .account-menu(v-click-outside="hideAccountMenu")
                     .woman-wrapper
                         img.woman-wrapper__photo(v-if="!user.photo" src="../assets/images/client-icon_image.png")
@@ -69,18 +65,8 @@ export default {
                     active: true
                 },
                 {
-                    title: "RECRUITMENT",
-                    imgBrown: require("../assets/images/CATEGORIES/recruitment.png"),
-                    active: false
-                },
-                {
                     title: "VENDORS",
                     imgBrown: require("../assets/images/CATEGORIES/vendors.png"),
-                    active: false
-                },
-                {
-                    title: "LANGUAGES",
-                    imgBrown: require("../assets/images/CATEGORIES/languages.png"),
                     active: false
                 },
                 {
@@ -89,7 +75,7 @@ export default {
                     active: false
                 },
                 {
-                    title: "PM AREA",
+                    title: "PROJECTS",
                     imgBrown: require("../assets/images/CATEGORIES/pm-brown.png"),
                     active: false
                 },
@@ -101,6 +87,11 @@ export default {
                 {
                     title: "REPORTS",
                     imgBrown: require("../assets/images/CATEGORIES/report.png"),
+                    active: false
+                },
+                {
+                    title: "SETTINGS",
+                    imgBrown: require("../assets/images/Other/admin-button-icon.png"),
                     active: false
                 }
             ],
@@ -148,13 +139,9 @@ export default {
             this.$store.dispatch('allLanguages', allLangs);
         },
         gotoRequestPage(index) {
-            if (index == 0) {
-                this.$router.push({
-                    name: 'pm-create-project'
-                });
-                this.navbarList.forEach(item => {
-                    item.active = (item.title === 'PM AREA') ? true : false
-                })
+            if (index === 0) {
+                this.$router.push({name: 'create-project'});
+                this.checkForSpecifiedSideBar('project', 'PROJECTS');
             }
             this.hideAdditional();
         },
@@ -164,16 +151,18 @@ export default {
         checkForSpecifiedSideBar(address, title) {
             if (window.location.toString().indexOf(address) !== -1) {
                 this.navbarList.forEach(item => {
-                    item.active = (item.title == title) ? true : false
+                    item.active = item.title === title;
                 })
             }
         },
         toggleSideBar(isFirstRender) {
             const location = window.location.toString();
-            if (location.indexOf('pm-') !== -1) {
-                this.checkForSpecifiedSideBar('pm-', 'PM AREA');
+            if (location.indexOf('project') !== -1) {
+                this.checkForSpecifiedSideBar('project', 'PROJECTS');
             } else if (location.indexOf('new-client') !== -1) {
                 this.checkForSpecifiedSideBar('new-client', 'CLIENTS');
+            } else if (location.indexOf('vendor') !== -1) {
+                this.checkForSpecifiedSideBar('vendor', 'VENDORS');
             } else {
                 this.checkAddressForSideBar(isFirstRender);
             }
@@ -194,19 +183,6 @@ export default {
         hideAdditional() {
             this.dropdownVisible = false;
         },
-        showSlider() {
-            if (window.location.toString().indexOf('dashboard') == -1) {
-                this.$router.push('/dashboard')
-            }
-            for (let elem of this.navbarList) {
-                if (elem.title == 'DASHBOARD') {
-                    elem.active = true
-                } else {
-                    elem.active = false
-                }
-            }
-            this.isSidebar = true;
-        },
         hideAccountMenu() {
             this.accountMenuVisible = false;
         },
@@ -224,32 +200,33 @@ export default {
                     item.active = false;
                 }
             })
-
-            switch (index) {
-                case 0:
+            const title = this.navbarList[index].title;
+            this.changeRoute(title);
+        },
+        changeRoute(title) {
+            switch (title) {
+                case "DASHBOARD":
                     this.$router.push('/dashboard');
                     this.isSidebar = false;
                     break;
-                case 1:
-                    this.$router.push('/recruitment');
+                case "VENDORS":
+                    this.$router.push('/vendors/active');
                     break;
-                case 2:
-                    this.$router.push('/vendors');
-                    break;
-                case 3:
-                    this.$router.push('/languages');
-                    break;
-                case 4:
+                case "CLIENTS":
                     this.$router.push('/clients');
                     break;
-                case 5:
-                    this.$router.push('/pm-area');
+                case "PROJECTS":
+                    this.$router.push('/projects/open-projects');
                     break;
-                case 6:
+                case "FINANCE":
                     this.$router.push('/finance');
                     break;
-                case 7:
+                case "REPORTS":
                     this.$router.push('/reports');
+                    break;
+                case "SETTINGS":
+                    this.$router.push('/settings');
+                    this.isSidebar = true;
                     break;
             }
         },
@@ -337,34 +314,6 @@ export default {
         display: flex;
         justify-content: flex-end;
         align-items: center;
-
-        .dropdown-wrapper {
-            height: 34px;
-            width: 36px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .imgwrap {
-                display: flex;
-                position: relative;
-                cursor: pointer;
-
-                .spwrap {
-                    color: #fff;
-                    visibility: hidden;
-                    position: absolute;
-                    top: 3px;
-                    right: 41px;
-                }
-
-                &:hover {
-                    .spwrap {
-                        visibility: visible;
-                    }
-                }
-            }
-        }
 
         .woman-wrapper {
             margin: 0 3px 0 15px;
@@ -673,10 +622,7 @@ export default {
             width: 20%;
             justify-content: center;
             align-items: center;
-
-            img {
-                cursor: pointer;
-            }
+            cursor: pointer;
 
             .rotate {
                 transform: rotate(180deg);
