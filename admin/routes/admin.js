@@ -57,7 +57,7 @@ router.get('/all-vendors', requiresLogin, async (req, res, next) => {
 
 router.get('/users', requiresLogin, async (req, res, next) => {
     try {
-        const users = await User.find({},{"_id": 1, username: 1});
+        const users = await User.find({},{"_id": 1, username: 1}).populate('group');
         res.send(users)
     } catch(err) {
         console.log(err);
@@ -67,7 +67,7 @@ router.get('/users', requiresLogin, async (req, res, next) => {
 
 router.get('/users-full', requiresLogin, async (req, res, next) => {
     try {
-        const users = await User.find({},{password: 0});
+        const users = await User.find({},{password: 0}).populate('group');
         res.send(users)
     } catch(err) {
         console.log(err);
@@ -88,7 +88,7 @@ router.get('/user', requiresLogin, async (req, res, next) => {
         res.send({ ...loggedUser });
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on getting Users from DB");
+        res.status(500).send("Error on getting User from DB");
     }
 })
 
