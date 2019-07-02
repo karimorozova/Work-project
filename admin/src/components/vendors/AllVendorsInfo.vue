@@ -2,9 +2,6 @@
 .all-vendors
     .all-vendors__table
         VendorFilters(
-            :statusExcluded="statusExcluded"
-            :statusFilter="statusFilter"
-            :statuses="statuses"
             :industryFilter="industryFilter"
             :leadFilter="leadFilter"
             @setNameFilter="(option) => setFilter(option, 'nameFilter')"
@@ -19,7 +16,6 @@
             :industryFilter="industryFilter"
             :leadFilter="leadFilter"
             :statusFilter="statusFilter"
-            :statusExcluded="statusExcluded"
             @showVendorDetails="showVendorDetails"
         )
 </template>
@@ -32,19 +28,15 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        statusExcluded: {
-            type: String
-        },
-        statuses: {
-            type: Array
-        },
         isVendorAddExist: {
             type: Boolean
+        },
+        statusFilter: {
+            type: String
         }
     },
     data() {
         return {
-            statusFilter: "All",
             industryFilter: {name: "All"},
             leadFilter: "All",
             nameFilter: ""

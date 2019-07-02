@@ -79,7 +79,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            statuses: ["Accepted", "Closed", "Cancelled", "Draft", "Open", "Rejected"],
+            statuses: ["All", "Accepted", "Closed", "Cancelled", "Draft", "Open", "Rejected"],
         }
     },
     methods: {
@@ -93,7 +93,7 @@ export default {
             return moment(date).format('DD-MM-YYYY, HH:mm');
         },
         setValue({option, refersTo}) {
-            this.$emit('setFilter', {option: option, refersTo: refersTo})
+            this.$emit('setFilter', {option, refersTo})
         },
         startOpen() {
             this.$refs.startDate.showCalendar()
@@ -105,14 +105,14 @@ export default {
             const prop = (goal === 'sourceFilter') ? 'sourceLangs' : 'targetLangs';
             const position = this[prop].indexOf(lang.symbol);
             if(position != -1) {
-                this.$emit('removeLangFilter', {from: goal, position: position})
+                this.$emit('removeLangFilter', {from: goal, position})
             } else {
-                this.$emit('addLangFilter', {to: goal, lang: lang})
+                this.$emit('addLangFilter', {to: goal, lang})
             }
         },
         setClientName(event) {
             let option = event.target.value;
-            this.$emit('setFilter', {option: option, refersTo: 'clientFilter'})
+            this.$emit('setFilter', {option, refersTo: 'clientFilter'})
         }
     },
     computed: {

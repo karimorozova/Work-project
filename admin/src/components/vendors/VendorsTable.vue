@@ -99,9 +99,6 @@ export default {
         statusFilter: {
             type: String
         },
-        statusExcluded: {
-            type: String
-        },
         industryFilter: {
             type: [String, Object],
             default: ""
@@ -280,21 +277,13 @@ export default {
         }),
         filteredVendors() {
             let result = this.vuexVendors;
-            if(this.statusExcluded) {
-                result = result.filter(item => {
-                    if(this.statusExcluded === 'Potential') {
-                        return item.status == 'Potential'
-                    }
-                    return item.status !== 'Potential';
-                })
-            }
             if(this.nameFilter) {
                 result = result.filter(item => {
                     const name = item.firstName + " " + item.surname;
                     return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
                 })
             }
-            if(this.statusFilter && this.statusFilter !== 'All') {
+            if(this.statusFilter) {
                 result = result.filter(item => {
                     return item.status == this.statusFilter;
                 })

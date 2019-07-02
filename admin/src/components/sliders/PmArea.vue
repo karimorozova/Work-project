@@ -1,7 +1,7 @@
 <template lang="pug">
-.pm-area
+.projects-area
     Sidebar( 
-        title="PM-AREA" 
+        title="PROJECTS" 
         :links="sidebarLinks"
         :activeIndex="currentIndex"
         @onLinkClick="toggleLink"
@@ -12,30 +12,23 @@
 <script>
 import Sidebar from '../Sidebar';
 import { mapGetters } from "vuex";
+import defaultSidebarLinks from "@/mixins/defaultSidebarLinks";
 
 export default {
+    mixins: [defaultSidebarLinks],
     data() {
         return {
             links: [
                 {title: 'Open Projects', routeName: 'open-projects'}, 
-                {title: 'Incoming Requests', routeName: 'requests'}
+                {title: 'Incoming Requests', routeName: 'requests'},
+                {title: 'Previous Requests', routeName: 'prev-projects'}
             ],
-            currentIndex: 0
+            currentIndex: 0,
+            defaultRouteName: "projects"
         }
     },
     methods: {
-        toggleLink({index}) {
-            this.currentIndex = index;
-            const { routeName } = this.sidebarLinks[index];
-            this.$router.push({name: routeName});
-        },
-        setDefaultActiveLink() {
-            const { name } = this.$route;
-            if(name === 'pm-area') {
-                return this.currentIndex = 0;
-            }
-            this.currentIndex = this.sidebarLinks.findIndex(item => item.routeName === name);
-        }
+        
     },
     computed: {
         ...mapGetters({
@@ -52,13 +45,6 @@ export default {
             });
         }
     },
-    mounted() {
-        this.setDefaultActiveLink();
-        this.$router.push({name: this.sidebarLinks[this.currentIndex].routeName});
-    },
-    updated() {
-        this.setDefaultActiveLink();
-    },
     components: {
         Sidebar
     }
@@ -67,7 +53,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.pm-area {
+.projects-area {
     min-height: 94vh;
     display: flex;
     width: 100%;

@@ -7,10 +7,6 @@
         label.filters__filter-title Industry
         .filters__drop-menu
             VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
-    .filters__item(v-if="statusExcluded !== 'Potential'")
-        label.filters__filter-title Status
-        .filters__drop-menu
-            VendorStatusSelect(:selectedStatus="statusFilter" isAllExist="yes" @chosenStatus="chosenStatus")
     .filters__item
         label.filters__filter-title Lead Source
         .filters__drop-menu
@@ -20,7 +16,6 @@
 <script>
 import VendorIndustrySelect from "./VendorIndustrySelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
-import VendorStatusSelect from "./VendorStatusSelect";
 
 export default {
     props: {
@@ -31,9 +26,6 @@ export default {
             type: [Object, String]
         },
         leadFilter: {
-            type: String
-        },
-        statusExcluded: {
             type: String
         },
         statuses: {
@@ -64,7 +56,6 @@ export default {
     components: {
         VendorIndustrySelect,
         VendorLeadsourceSelect,
-        VendorStatusSelect
     }
 }
 </script>

@@ -38,7 +38,7 @@ export default {
             this.project = project;
             this.project.customer = customer;
             this.storeProject(this.project);
-            this.$router.push(`/pm-project-details/${project._id}`);
+            this.$router.push(`/project-details/${project._id}`);
         }
     },
     components: {

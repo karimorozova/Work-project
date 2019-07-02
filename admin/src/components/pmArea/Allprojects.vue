@@ -38,7 +38,7 @@ export default {
             clientFilter: "",
             sourceFilter: [],
             targetFilter: [],
-            statusFilter: "",
+            statusFilter: "All",
             managerFilter: "",
             startFilter: "",
             deadlineFilter: "",
@@ -66,7 +66,7 @@ export default {
         },
         selectProject({project}) {
             this.storeProject(project);
-            this.$router.push(`/pm-project-details/${project._id}?status=${this.projectsType === 'requests' && 'Requested' || 'AllOthers' }`);
+            this.$router.push(`/project-details/${project._id}`);
         },
         async getProjects() {
             try {
@@ -97,7 +97,7 @@ export default {
         }),
         filteredProjects() {
             let result = this.projectsType !== 'requests' ? this.allProjects : this.allRequests;
-            if(this.statusFilter) {
+            if(this.statusFilter && this.statusFilter !== 'All') {
                 result = result.filter(item => {
                     return item.status === this.statusFilter;
                 })

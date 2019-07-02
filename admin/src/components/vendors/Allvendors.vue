@@ -2,7 +2,6 @@
     .vendors-data
         .vendors-data__title All Vendors
         AllVendorsInfo(v-if="isAllVendorsShow"
-            statusExcluded="any"
             :statuses="statuses"
             :isVendorAddExist="isVendorAddExist"
         )

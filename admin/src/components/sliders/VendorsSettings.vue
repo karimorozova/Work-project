@@ -1,40 +1,38 @@
 <template lang="pug">
 .vendors
-  .vendors__sidebar(v-if="sidebarShow")
-    Sidebar(title="Vendors" :links="sidebarLinks")
-  .vendors__all(v-if="allVendors")
-    Allvendors(@vendorDetails="vendorDetailsShow" @cancelVendor="cancelVendor")
+  .vendors__sidebar
+    Sidebar(
+        title="VENDORS" 
+        :links="sidebarLinks"
+        :activeIndex="currentIndex"
+        @onLinkClick="toggleLink"
+        )
+  .vendors__all
+    router-view
 </template>
 
 <script>
-import Allvendors from '../vendors/Allvendors';
 import Sidebar from '../Sidebar';
-import { mapGetters, mapActions } from "vuex";
+import defaultSidebarLinks from "@/mixins/defaultSidebarLinks";
 
 export default {
+  mixins: [defaultSidebarLinks],
   data() {
     return {
-      sidebarShow: false,
-      allVendors: true,
-      sidebarLinks: [{title: "General Information"}]
+      sidebarLinks: [
+          {title: "Active", routeName: "active-vendors"}, 
+          {title: "Inactive", routeName: "inactive-vendors"}, 
+          {title: "Potential", routeName: "potential-vendors"}
+        ],
+      currentIndex: 0,
+      defaultRouteName: "vendors"
     }
   },
   methods: {
-    vendorDetailsShow(data) {
-      this.sidebarShow = true;
-    },
-    cancelVendor(data) {
-      this.sidebarShow = false;
-    },
-    ...mapActions({
-      loadingToggle: "loadingToggle"
-    })
+    
   },
   components: {
-    Allvendors,
     Sidebar
-  },
-  mounted() {
   }
 };
 </script>
@@ -45,6 +43,7 @@ export default {
     display: flex;
     width: 100%;
     box-sizing: border-box;
+    min-height: 94vh;
     &__all {
         width: 100%;
     }

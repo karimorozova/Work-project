@@ -70,12 +70,12 @@
                 .block-item
                     label.block-item__label.block-item_relative Vendor Status:
                         Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop-menu.block-item_high-index(:class="{'block-item_error-shadow': !currentVendor.status && isSaveClicked}")
+                    .block-item__drop-menu.block-item_high-index(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.status}")
                         VendorStatusSelect(isAllExist="no" :selectedStatus="currentVendor.status" @chosenStatus="chosenStatus")
                 .block-item
                     label Industries:
-                    .block-item__drop-menu(:class="{'block-item_error-shadow': !currentVendor.industries.length && isSaveClicked}")
-                        MultiVendorIndustrySelect(:selectedInd="currentVendor.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+                    .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
+                        MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
@@ -132,7 +132,6 @@ export default {
             sidebarLinks: [{title: "General Information"}],
             sidebarTitle: "VENDORS",
             errors: [],
-            backPath: "/vendors",
             isAvailablePairs: false,
             langPairs: [],
             addSeveralPriceId: "",
@@ -259,7 +258,7 @@ export default {
             this.updateVendorProp({prop: "status", value: option})
         },
         cancel() {
-            this.$router.push(this.backPath);
+            this.$router.go(-1);
         },
         async approveVendorDelete() {
             this.approveShow = false;
@@ -276,6 +275,18 @@ export default {
         },
         chosenInd({industry}) {
             this.updateIndustry(industry);
+        },
+        async getVendor() {
+            const id = this.$route.params.id;
+            try {
+                if(!this.curVendor._id) {
+                    const curVendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
+                    await this.storeCurrentVendor(curVendor.body);
+                    this.oldEmail = this.currentVendor.email;
+                }
+            } catch(err) {
+
+            }
         },
         ...mapActions({
             alertToggle: "alertToggle",
@@ -296,7 +307,7 @@ export default {
         }),
         selectedIndNames() {
             let result = [];
-            if(this.currentVendor.industries.length) {
+            if(this.currentVendor.industries && this.currentVendor.industries.length) {
                 for(let ind of this.currentVendor.industries) {
                     result.push(ind.name);
                 }
@@ -321,16 +332,11 @@ export default {
     directives: {
         ClickOutside
     },
+    created() {
+        this.getVendor();
+    },
     mounted() {
         this.oldEmail = this.currentVendor.email;
-    },
-    beforeRouteEnter(to, from, next) {
-        next(vm => {
-            if(from.path === '/recruitment') {
-                vm.sidebarTitle = "RECRUITMENT";
-                vm.backPath = from.path
-            }
-        })
     }
 }
 </script>
