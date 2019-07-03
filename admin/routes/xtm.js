@@ -1,11 +1,10 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { getRequestOptions, generateTargetFile } = require('../services/');
+const { getRequestOptions, generateTargetFile, getXtmCustomers} = require('../services/');
 const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles} = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../calculations');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
-const unirest = require('unirest');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const parser = require('xml2json');
 const https = require('https');
@@ -83,12 +82,8 @@ router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFile
 
 router.get('/xtm-customers', async (req, res) => {
     try {
-        unirest.get(`${xtmBaseUrl}/rest-api/customers`)
-            .headers({"Authorization": xtmToken,
-            'Content-Type': 'application/json'}) 
-            .end((response) => {
-                res.send(response.body);
-            })
+        const xtmCustomers = await getXtmCustomers();
+        res.send(xtmCustomers);
     } catch(err) {
         console.log(err);
         console.log("Error on getting customers from XTM");

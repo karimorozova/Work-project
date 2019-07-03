@@ -4,6 +4,21 @@ const { xtmToken, xtmBaseUrl } = require('../configs/');
 const { taskMetricsCalc, metricsCalc } = require('../calculations');
 const { Clients } = require('../models');
 
+function getXtmCustomers() {
+    return new Promise((resolve, reject) => {
+        unirest.get(`${xtmBaseUrl}/rest-api/customers`)
+            .headers({"Authorization": xtmToken,
+            'Content-Type': 'application/json'}) 
+            .end((response) => {
+                if(response.error) {
+                    console.log("err in getXtmCustomers");
+                    reject(response.error);
+                }
+                resolve(response.body);
+            })
+    })
+}
+
 function saveTasks(object) {
     return new Promise(resolve => {
         unirest.post(`${xtmBaseUrl}/rest-api/projects`)
@@ -186,4 +201,4 @@ function getTaskProgress(task) {
     })
 }
 
-module.exports = { saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile };
+module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile };

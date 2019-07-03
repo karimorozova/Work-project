@@ -126,6 +126,7 @@ const middleware = {
             '/projects/prev-projects',
             '/pm-projects',
             '/project-details',
+            '/request-details',
             '/finance',
             '/pricelists',
             '/reports',
