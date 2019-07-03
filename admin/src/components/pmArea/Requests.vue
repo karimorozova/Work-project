@@ -10,7 +10,8 @@
 import Allprojects from './Allprojects';
 export default {
     data() {
-        return {};
+        return {
+        };
     },
   components: {
     Allprojects

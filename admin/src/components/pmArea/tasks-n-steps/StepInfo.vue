@@ -156,9 +156,9 @@ export default {
             currentProject: "getCurrentProject"
         }),
         financeData() {
-            return Object.keys(this.step.finance).reduce((init, cur) => {
+            return Object.keys(this.step.finance).reduce((prev, cur) => {
                 const margin = this.step.finance[cur].receivables - this.step.finance[cur].payables;
-                return [...init, {
+                return [...prev, {
                     title: cur,
                     receivables: +this.step.finance[cur].receivables,
                     payables: +this.step.finance[cur].payables,

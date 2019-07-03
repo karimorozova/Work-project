@@ -66,6 +66,9 @@ export default {
         },
         selectProject({project}) {
             this.storeProject(project);
+            if(project.status === 'Requested') {
+                return this.$router.push(`/request-details/${project._id}`); 
+            }
             this.$router.push(`/project-details/${project._id}`);
         },
         async getProjects() {
@@ -143,6 +146,11 @@ export default {
         this.getProjects();
         this.getRequests();
         this.getManagers();
+    },
+    mounted() {
+        if(this.projectsType === "requests") {
+            this.statusFilter = "Requested";
+        }
     },
     components: {
         ProjectsTable,

@@ -63,6 +63,7 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
+        isRequestedStatus: {type: Boolean},
         status: {type: String},
         projectManager: {type: String},
         clientName: {type: String},
@@ -79,7 +80,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            statuses: ["All", "Accepted", "Closed", "Cancelled", "Draft", "Open", "Rejected"],
+            statuses: ["All", "Accepted", "Closed", "Cancelled", "Draft", "Open", "Quote sent", "Rejected"],
         }
     },
     methods: {
@@ -132,7 +133,7 @@ export default {
     },
     mounted() {
       if (this.projectsType === 'requests') {
-        this.statuses = [ "Requested"];
+        this.statuses = ["Requested"];
       }
     },
     components: {

@@ -21,7 +21,7 @@ export default {
             links: [
                 {title: 'Open Projects', routeName: 'open-projects'}, 
                 {title: 'Incoming Requests', routeName: 'requests'},
-                {title: 'Previous Requests', routeName: 'prev-projects'}
+                {title: 'Previous Projects', routeName: 'prev-projects'}
             ],
             currentIndex: 0,
             defaultRouteName: "projects"

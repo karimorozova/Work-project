@@ -51,6 +51,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         sourceLanguages: {type: Array},
+        isRequest: {type: Boolean}
     },
     data() {
         return {
@@ -65,7 +66,8 @@ export default {
     },
     methods: {
         ...mapActions({
-            storeProject: "storeProject"
+            storeProject: "storeProject",
+            setDataValue: "setTasksDataValue"
         }),
         sortLangs(arrProp) {
             this[arrProp].sort((a,b) => {
@@ -138,6 +140,9 @@ export default {
                     const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
                     await this.storeProject(curProject.body);
                 }
+                if(this.isRequest) {
+                    this.setRequestLanguages();
+                }
                 const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
                 this.setLanguages(langPairs.data);
             } catch(err) {
@@ -147,18 +152,27 @@ export default {
         setLanguages(langPairs) {
             this.languagePairs = langPairs;
             const pairsWithSource = langPairs.filter(item => item.source);
-            const englishPair = pairsWithSource.find(item => item.source.symbol === 'EN-GB');
-            const symbol = englishPair ? englishPair.source.symbol : "";
+            const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
+            const sourcePair =  pairsWithSource.find(item => item.source.symbol === pairSymbol);
+            const symbol = sourcePair ? sourcePair.source.symbol : "";
             this.$emit('setSourceLanguage', { symbol });
-            this.setDefaultTargets(pairsWithSource, englishPair);
+            this.setDefaultTargets(pairsWithSource, sourcePair);
         },
-        setDefaultTargets(pairs, eng) {
-            if(!eng) {
+        setDefaultTargets(pairs, sourcePair) {
+            if(!sourcePair) {
                 this.targetAll = pairs.map(pair => pair.target);
             } else {
-                this.setPossibleTargets(eng.source.symbol);
+                this.setPossibleTargets(sourcePair.source.symbol);
             }
             this.sortLangs('targetAll');
+        },
+        setRequestLanguages() {
+            const { symbol } = this.currentProject.sourceLanguage;
+            this.$emit('setSourceLanguage', { symbol });
+            this.setDataValue({prop: "source", value: this.currentProject.sourceLanguage});
+            this.setDataValue({prop: "source", value: this.currentProject.targetLanguages});
+            this.targetChosen = [...this.currentProject.targetLanguages];
+            this.sortLangs('targetChosen');
         }
     },
     computed: {

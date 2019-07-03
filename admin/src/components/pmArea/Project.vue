@@ -13,16 +13,16 @@
             input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
             input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
             .project__date
-                LabelValue(label="Start Date and Time" :isRequired="isRequiredField")
+                LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .project__date
-                LabelValue(label="Deadline" :isRequired="isRequiredField")
+                LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__info-row
             .project__client
-                LabelValue(label="Client Name" :isRequired="isRequiredField")
+                LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
                     .project__client-link(v-if="project._id")
                         .project__link(@click="goToClientInfo") {{ project.customer.name }}
                     .project__drop-menu(v-else)
@@ -35,7 +35,7 @@
                             @chooseOption="setValue"
                         )
             .project__industry
-                LabelValue(label="Industry" :isRequired="isRequiredField")
+                LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
                     .project__drop-menu
                         SelectSingle(
                             :selectedOption="selectedIndustry.name || project.industry.name"
@@ -44,7 +44,7 @@
                             placeholder="Industry"
                         )
             .project__number
-                LabelValue(label="Client Project Number")
+                LabelValue(label="Client Project Number" customClass="project_margin")
                     input.project__input-text(type="text" v-model="project.projectId" placeholder="Project Number")
         .project__info-row.project_no-margin
             .project__textarea
@@ -257,20 +257,11 @@ export default {
         }
     }
     &__date {
-        width: 33.5%;
+        width: fit-content;
         position: relative;
-        &:last-child {
-            width: 26%;
-        }
     }
-    &__client {
-        width: 30%;
-    }
-    &__industry {
-        width: 27%;
-    }
-    &__number {
-        width: 33%;
+    &__client, &__industry, &__number {
+        width: fit-content;
     }
     &__drop-menu {
         position: relative;

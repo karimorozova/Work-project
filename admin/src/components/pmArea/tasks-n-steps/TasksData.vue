@@ -1,72 +1,41 @@
 <template lang="pug">
 .tasks-data
     .new-wrapper
-      .tasks-data__left-block
-        .tasks-data__left-block-title File Preparation
-        .tasks-data__langs
-        TasksLangsModified(
-          :sourceLanguages="sourceLanguages"
-          @setSourceLanguage="setSourceLang"
-          @setTargets="setTargets")
-        .tasks-data__files(v-if="$route.query.status=== 'AllOthers'")
-          TasksFilesModified(
-            :refFiles="refFiles"
-            :sourceFiles="sourceFiles"
-            :isJoinFiles="isJoinFiles"
-            @uploadSourceFiles="uploadSourceFiles"
-            @uploadRefFiles="uploadRefFiles"
-            @deleteFile="deleteFile"
-            @toggleJoin="toggleJoin"
-          )
-        .tasks-data__files(v-else)
-          TasksFilesRequested()
-        .tasks-data__join-files-wrapper
-          .tasks-data__join
-            span.tasks-data__toggler-title  Join Files
-            .tasks-data__toggler
-              BigToggler(:isOn="isJoinFiles" @toggle="toggleJoin")
-          .tasks-data__drop-menu
-            label.tasks-data__menu-title Template
-            SelectSingle(
-              :selectedOption="template"
-              :options="allTemplates"
-              placeholder="Template"
-              refersTo="template"
-              @chooseOption="setValue"
-            )
-      .tasks-data__right-block
-        .tasks-data__right-block-title Service & Workflow
-        .tasks-data__workflow-wrapper
-          .tasks-data__drop-menu
-            label.tasks-data__menu-title.tasks-data_relative Service
-              Asterisk(:customStyle="asteriskStyle")
-            SelectSingle(
-              :selectedOption="service"
-              :options="allServices"
-              placeholder="Service"
-              refersTo="service"
-              @chooseOption="setValue"
-              :positionStyle="positionStyle"
-            )
-          .tasks-data__drop-menu
-            label.tasks-data__menu-title Workflow
-            SelectSingle(
-             :selectedOption="selectedWorkflow.name"
-             :options="workflowStepsNames"
-             placeholder="Workflow"
-             @chooseOption="setWorkflow"
-             :positionStyle="positionStyle"
-            )
-        .tasks-data__default-dates(v-if="selectedWorkflow.id !== 2890")
-          StepsDefaultDateModified(
-           v-for="count in stepsCounter"
-           :stepCounter="count"
-           :start="stepsDates[count-1].start"
-           :deadline="stepsDates[count-1].deadline"
-           @setDate="(e) => setDate(e, count)"
-          )
-    .tasks-data__add-tasks
-            Button(value="Add tasks" @clicked="checkForErrors")
+        .tasks-data__item
+            .tasks-data__item-title File Preparation
+            .tasks-data__langs
+                TasksLangsModified(
+                    :sourceLanguages="sourceLanguages"
+                    @setSourceLanguage="setSourceLang"
+                    @setTargets="setTargets"
+                    :isRequest="isRequest"
+                )
+            .tasks-data__files(v-if="currentProject.status !== 'Requested'")
+                TasksFilesModified
+            .tasks-data__files(v-else)
+                TasksFilesRequested
+            .tasks-data__join-files-wrapper
+                .tasks-data__join
+                    span.tasks-data__toggler-title  Join Files
+                    .tasks-data__toggler
+                        BigToggler(:isOn="isJoinFiles" @toggle="toggleJoin")
+                .tasks-data__drop-menu
+                    label.tasks-data__menu-title Template
+                    SelectSingle(
+                        :selectedOption="selectedTemplate"
+                        :options="allTemplates"
+                        placeholder="Template"
+                        @chooseOption="setTemplate"
+                    )
+        .tasks-data__item
+            ServiceAndWorkflow
+    .tasks-data__add-tasks(v-if="isProject")
+        Button(value="Add tasks" @clicked="checkForErrors")
+    .tasks-data__buttons(v-else)
+        .tasks-data__button
+            Button(value="Assign to PM")
+        .tasks-data__button
+            Button(value="Analyze")
     slot(name="errors")
 </template>
 
@@ -75,29 +44,14 @@ import TasksLangsModified from "./TasksLangsModified";
 import TasksFilesModified from "./TasksFilesModified";
 import TasksFilesRequested from "./TasksFilesRequested";
 import SelectSingle from "../../SelectSingle";
-import Asterisk from "../../Asterisk";
-import StepsDefaultDateModified from "./StepsDefaultDateModified";
+import ServiceAndWorkflow from "./ServiceAndWorkflow";
 import Button from "../../Button";
 import BigToggler from "@/components/BigToggler";
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
 
 export default {
     props: {
-        selectedWorkflow: {
-            type: Object
-        },
-        template: {
-            type: String
-        },
-        sourceLanguages: {
-            type: Array
-        },
-        targetLanguages: {
-            type: Array
-        },
-        service: {
-            type: String
-        },
+        isRequest: {type: Boolean}
     },
     data() {
         return {
@@ -106,160 +60,105 @@ export default {
                 {name: 'Multilingual Excel', id: 'multiexcel'},
                 {name: 'Standard processing', id: '247336FD'},
             ],
-            workflowSteps: [{name: "1 Step", id: 2890}, {name: "2 Steps", id: 2917}],
-            stepsCounter: 2,
-            stepsDates: [{start: new Date(), deadline: ""}, {start: "", deadline: new Date()}],
-            sourceFiles: [],
-            refFiles: [],
-            isStepsShow: false,
-            isTasksShow: true,
+            sourceLanguages: [],
+            targetLanguages: [],
             isJoinFiles: false,
-            asteriskStyle: {"top": "-2px"},
-            positionStyle: {"margin-top": "3px"}
         }
     },
     methods: {
         ...mapActions({
             addProjectTasks: "addProjectTasks",
             alertToggle: "alertToggle",
-            xtmCustomersGetting: "xtmCustomersGetting"
+            xtmCustomersGetting: "xtmCustomersGetting",
+            setDataValue: "setTasksDataValue"
         }),
-        setSourceLang({symbol}) {
-            this.$emit("setSourceLang", { symbol });
+        setSourceLang({ symbol }) {
+            const value = this.languages.find(item => item.symbol === symbol);
+            this.setDataValue({prop: "source", value});
+            this.setDataValue({prop: "targets", value: []});
+            this.sourceLanguages = [value.symbol];
         },
-        setValue({option, refersTo}) {
-            this.$emit("setValue", { option, refersTo })
+        setTemplate({ option }) {
+            const value = this.templates.find(item => item.name === option);
+            this.setDataValue({prop: "template", value});
         },
-        setDate({date, prop}, count) {
-            this.stepsDates[count-1][prop] = date;
-            if(this.stepsDates[count] && prop === "deadline") {
-                this.stepsDates[count].start = date;
-                const deadline = new Date(this.stepsDates[count].deadline);
-                if(date - deadline > 0) {
-                    this.stepsDates[count].deadline = date;
-                }
-            }
-        },
-        setWorkflow({option}) {
-            const workFlow = this.workflowSteps.find(item => item.name === option);
-            this.$emit("setValue", { option: workFlow, refersTo: 'selectedWorkflow' });
-        },
-        defaultStepDates() {
-            this.stepsDates = [
-                {start: this.currentProject.createdAt, deadline: ""},
-                {start: "", deadline: this.currentProject.deadline}
-            ]
-        },
-        setSource({lang}) {
-            this.$emit("setSource", { lang })
-        },
-        setTargets({targets}) {
-            this.$emit("setTargets", { targets });
-        },
-        uploadSourceFiles({files}) {
-            if(files.length) {
-                for(let file of files) {
-                    const isExist = this.sourceFiles.find(item => item.name === file.name);
-                    if(!isExist) {
-                        this.sourceFiles.push(file);
-                    }
-                }
-            }
-        },
-        uploadRefFiles({files}) {
-            if(files.length) {
-                this.refFiles.push(files[0]);
-            }
-        },
-        deleteFile({index, prop}) {
-            this[prop].splice(index, 1);
-            if(!this[prop].length) {
-                if(prop === "sourceFiles") {
-                    this.isSourceFilesShow = false;
-                    return this.clearInputFiles(".files-upload__source-file");
-                }
-                this.isRefFilesShow = false;
-                return this.clearInputFiles(".files-upload__ref-file");
-            }
-        },
-        clearInputFiles(str) {
-            let inputFiles = document.querySelectorAll(str);
-            for(let elem of inputFiles) {
-                elem.value = "";
-            }
+        setTargets({ targets }) {
+            this.setDataValue({prop: "targets", value: targets});
+            this.targetLanguages = [...targets];
         },
         toggleJoin() {
             this.isJoinFiles = !this.isJoinFiles;
+            this.setDataValue({prop: "isJoinFiles", value: this.isJoinFiles});
         },
         isRefFilesHasSource() {
-            if(!this.refFiles.length) return false;
-            for(let file of this.refFiles) {
-                const sourceFile = this.sourceFiles.find(item => item.name === file.name);
-                if(sourceFile) return true;
+            const { sourceFiles, refFiles } = this.tasksData;
+            if (!refFiles || !refFiles.length) return false;
+            for (let file of refFiles) {
+                const sourceFile = sourceFiles.find(item => item.name === file.name);
+                if (sourceFile) return true;
             }
             return false;
         },
-        checkFirstStepDeadline() {
-            if(this.selectedWorkflow.id !== 2890) {
-                return this.stepsDates[0].deadline
-            }
-            return true;
-        },
         async checkForErrors() {
             let errors = [];
-            if(!this.selectedWorkflow) errors.push("Please, select Workflow.");
-            if(!this.template) errors.push("Please, select Template.");
-            if(!this.sourceLanguages.length) errors.push("Please, select Source language.");
-            if(!this.targetLanguages.length) errors.push("Please, select Target language(s).");
-            if(!this.sourceFiles.length) errors.push("Please, upload Source file(s).");
-            if(this.sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
-            if(!this.checkFirstStepDeadline()) errors.push("Please, set the deadline for Step 1.");
-            if(errors.length) {
+            const { targets, sourceFiles } = this.tasksData;
+            if (!targets || !targets.length) errors.push("Please, select Target language(s).");
+            if (!sourceFiles || !sourceFiles.length) errors.push("Please, upload Source file(s).");
+            if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
+            if (errors.length) {
                 return this.$emit("showErrors", { errors });
             }
             try {
                 await this.addTasks();
-            } catch(err) {}
+            } catch (err) {
+                console.log(err);
+                this.alertToggle({message: "Error on adding tasks",isShow: true,type: "error"});
+            }
         },
         async getCustomersFromXtm() {
             try {
-                if(!this.xtmCustomers.length) {
+                if (!this.xtmCustomers.length) {
                     let result = await this.$http.get('/xtm/xtm-customers');
                     this.xtmCustomersGetting(result.body);
                 }
-            } catch(err) {
-                this.alertToggle({message: "Error on getting XTM customers", isShow: true, type: "error"});
+            } catch (err) {
+                this.alertToggle({message: "Error on getting XTM customers",isShow: true,type: "error"});
             }
         },
-        async getTasksData() {
+        async getXtmId() {
             try {
-                if(!this.xtmCustomers.length) {
+                if (!this.xtmCustomers.length) {
                     await this.getCustomersFromXtm();
                 }
-            } catch(err) { }
+            } catch (err) {}
             const xtmCustomer = this.xtmCustomers.find(item => item.name === this.currentProject.customer.name);
             const xtmId = xtmCustomer ? xtmCustomer.id : "";
-            const template = this.template ? this.templates.find(item => item.name === this.template) : {id: ""};
-            const source = this.languages.find(item => item.symbol === this.sourceLanguages[0]);
-            const service = this.services.find(item => item.title === this.service);
-            return { xtmId, template, source, service };
+            return { xtmId };
         },
         async addTasks() {
-            const { xtmId, template, source, service } = await this.getTasksData();
-            if(this.selectedWorkflow.id === 2890) {
-                this.stepsDates[0].deadline = this.currentProject.deadline;
-            }
+            const { xtmId } = await this.getXtmId();
+            const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
             this.$emit("addTasks", {
-                isJoinfiles: this.isJoinFiles,
-                sourceFiles: this.sourceFiles,
-                refFiles: this.refFiles,
-                stepsDates: this.stepsDates,
-                xtmId, template, source, service });
+                isJoinfiles: this.tasksData.isJoinFiles,
+                sourceFiles: this.tasksData.sourceFiles,
+                refFiles: this.tasksData.refFiles || [],
+                stepsDates: this.tasksData.stepsDates,
+                xtmId,
+                template: this.tasksData.template,
+                source,
+                targets: this.tasksData.targets,
+                service: this.tasksData.service,
+                workflow: this.tasksData.workflow.id
+            });
             this.clearInputFiles(".tasks-data__source-file");
             this.clearInputFiles(".tasks-data__ref-file");
-            this.sourceFiles = [];
-            this.refFiles = [];
-        }
+        },
+        clearInputFiles(str) {
+            let inputFiles = document.querySelectorAll(str);
+            for (let elem of inputFiles) {
+                elem.value = "";
+            }
+        },
     },
     computed: {
         ...mapGetters({
@@ -267,24 +166,22 @@ export default {
             languages: "getAllLanguages",
             services: "getVuexServices",
             xtmCustomers: "getXtmCustomers",
+            tasksData: "getTasksData"
         }),
         allServices() {
-            if(this.services.length) {
-                return this.services.map(item => {
-                    return item.title
-                })
+            if (this.services.length) {
+                return this.services.map(item => item.title);
             }
             return [];
         },
         allTemplates() {
-            return this.templates.map(item => {
-                return item.name
-            })
+            return this.templates.map(item => item.name);
         },
-        workflowStepsNames() {
-            return this.workflowSteps.map(item => {
-                return item.name
-            })
+        selectedTemplate() {
+            return this.tasksData.template ? this.tasksData.template.name : "";
+        },
+        isProject() {
+            return this.currentProject.status && this.currentProject.status !== "Requested";
         }
     },
     components: {
@@ -292,13 +189,12 @@ export default {
         TasksFilesModified,
         TasksFilesRequested,
         SelectSingle,
-        StepsDefaultDateModified,
         Button,
-        Asterisk,
+        ServiceAndWorkflow,
         BigToggler
     },
     mounted() {
-        this.defaultStepDates();
+        this.setDataValue({prop: "template", value: {name: 'Standard processing', id: '247336FD'}});
     }
 }
 </script>
@@ -308,54 +204,48 @@ export default {
 
 .tasks-data {
     position: relative;
-    &__workflow-wrapper{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 50px;
-    }
-    &__join {
-      width: 145px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 63px;
-    }
-    &__join-files-wrapper {
-      display: flex;
-      justify-content: space-between;
-    }
-    &__toggler-title {
-      font-size: 14px;
-      margin-right: 15px;
-    }
-    .new-wrapper {
-      display: flex;
-      align-items: stretch;
-    }
-    &__left-block {
-      padding: 30px;
-      width:50%;
-      /*height:621px;*/
-      border:1px solid $brown-border;
-      border-radius: 10px;
-      margin-right: 15px;
-      &-title {
-        font-size:28px;
-        margin-bottom: 20px;
 
-      }
+    &__workflow-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 50px;
     }
-    &__right-block {
-      padding: 30px;
-      width:50%;
-      /*height:621px;*/
-      border:1px solid $brown-border;
-      border-radius: 10px;
-      &-title {
-        font-size:28px;
-        margin-bottom: 20px;
-      }
+
+    &__join {
+        width: 145px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 63px;
+    }
+
+    &__join-files-wrapper {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__toggler-title {
+        font-size: 14px;
+        margin-right: 15px;
+    }
+
+    .new-wrapper {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__item {
+        padding: 30px;
+        width: 49%;
+        border: 1px solid $brown-border;
+        border-radius: 2px;
+        box-sizing: border-box;
+
+        &-title {
+            font-size: 21px;
+            margin-bottom: 20px;
+        }
     }
 
     &__drops {
@@ -365,33 +255,34 @@ export default {
         justify-content: space-between;
         padding-bottom: 25px;
     }
+
     &__drop-menu {
         position: relative;
-        /*height: 28px;*/
         width: 191px;
     }
+
     &__menu-title {
         font-size: 14px;
-    }
-    &_relative {
-        position: relative;
-    }
-    &__default-dates {
-        margin-bottom: 30px;
     }
     &__add-tasks {
         display: flex;
         justify-content: center;
         padding-top: 20px;
     }
-    &__files {
-        /*margin: 40px 0;*/
-    }
+
     &__join-files {
         display: flex;
         align-items: flex-start;
         padding-top: 20px;
     }
-}
+    &__buttons {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    &__button {
+        margin: 0 20px;
+    }
 
+}
 </style>

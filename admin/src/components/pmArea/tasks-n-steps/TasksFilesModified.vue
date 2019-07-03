@@ -23,34 +23,62 @@
 
 <script>
 import FilesUpload from "./tasksFiles/FilesUpload";
+import { mapActions } from "vuex";
 
 export default {
-    props: {
-        sourceFiles: { type: Array },
-        refFiles: { type: Array },
-        isJoinFiles: { type: Boolean }
-    },
     data() {
         return {
+            sourceFiles: [],
+            refFiles: [],
             isSourceFilesShow: false,
             isRefFilesShow: false,
         }
     },
     methods: {
+        ...mapActions({
+            setDataValue: "setTasksDataValue"
+        }),
         uploadSourceFiles({files}) {
+            if (files.length) {
+                for (let file of files) {
+                    const isExist = this.sourceFiles.find(item => item.name === file.name);
+                    if (!isExist) {
+                        this.sourceFiles.push(file);
+                    }
+                }
+            }
+            this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
             this.$emit('uploadSourceFiles', { files });
+        },
+        uploadRefFiles({ files }) {
+            if (files.length) {
+                this.refFiles.push(files[0]);
+            }
+            this.setDataValue({prop: "refFiles", value: this.refFiles});
+        },
+        deleteFile({ index }, prop ) {
+            this[prop].splice(index, 1);
+            this.setDataValue({prop, value: this[prop]});
+            if (!this[prop].length) {
+                if (prop === "sourceFiles") {
+                    this.isSourceFilesShow = false;
+                    return this.clearInputFiles(".files-upload__source-file");
+                }
+                this.isRefFilesShow = false;
+                return this.clearInputFiles(".files-upload__ref-file");
+            }
+        },
+        clearInputFiles(str) {
+            let inputFiles = document.querySelectorAll(str);
+            for (let elem of inputFiles) {
+                elem.value = "";
+            }
         },
         toggleSourceFiles() {
             this.isSourceFilesShow = !this.isSourceFilesShow;
         },
-        uploadRefFiles({files}) {
-            this.$emit('uploadRefFiles', { files });
-        },
         toggleRefFiles() {
             this.isRefFilesShow = !this.isRefFilesShow;
-        },
-        deleteFile({index}, prop) {
-            this.$emit('deleteFile', { index, prop });
         }
     },
     components: {

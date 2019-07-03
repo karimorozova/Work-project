@@ -4,16 +4,10 @@
         img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
         TasksData(v-if="isTaskData && !isFinishedStatus"
-            :selectedWorkflow="selectedWorkflow"
-            :template="template"
-            :sourceLanguages="sourceLanguages"
-            :targetLanguages="targetLangs"
-            :service="service"
             @setValue="setValue"
-            @setSourceLang="setSource"
-            @setTargets="setTargets"
             @showErrors="showErrors"
             @addTasks="addTasks"
+            :isProject="isProject"
         )
             template(slot="errors")
                 slot
@@ -45,11 +39,6 @@ export default {
     },
     data() {
         return {
-            selectedWorkflow: {name:"2 Steps", id: 2917},
-            template: "Standard processing",
-            sourceLanguages: [],
-            targetLanguages: [],
-            service: "",
             isTaskData: false,
             isStepsShow: false,
             isTasksShow: true,
@@ -59,7 +48,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             addProjectTasks: "addProjectTasks",
-            getServices: "getServices"
+            clearTasksData: "clearTasksData"
         }),
         setDefaultIsTaskData() {
             if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
@@ -71,27 +60,8 @@ export default {
                 this.isTaskData = !this.isTaskData;
             }
         },
-        async defaultService() {
-            try {
-                if(!this.services.length) {
-                    await this.getServices();
-                }
-            } catch(err) {
-                this.alertToggle({message: "Error on getting services from DB", isShow: true, type: "error"});
-            }
-            const service = this.services.find(item => {
-                return item.symbol === 'tr'
-            });
-            this.service = service.title;
-        },
         setValue({option, refersTo}) {
             this[refersTo] = option;
-        },
-        setSource({symbol}) {
-            this.sourceLanguages = symbol ? [symbol] : [];
-        },
-        setTargets({targets}) {
-            this.targetLanguages = targets;
         },
         showTab({tab}) {
             if(tab === 'Tasks') {
@@ -108,23 +78,23 @@ export default {
         setDate({date, prop, index}) {
             this.$emit("setDate", {date, prop, index});
         },
-        getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, service}) {
+        getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow}) {
             let tasksData = new FormData();
             tasksData.append('customerId', xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', template.id);
-            tasksData.append('workflow', this.selectedWorkflow.id);
+            tasksData.append('workflow', workflow);
             tasksData.append('stepsDates', JSON.stringify(stepsDates));
             tasksData.append('service', service._id);
             tasksData.append('source', JSON.stringify(source));
-            tasksData.append('targets', JSON.stringify(this.targetLanguages));
+            tasksData.append('targets', JSON.stringify(targets));
             tasksData.append('projectId', this.currentProject._id);
             tasksData.append('projectName', this.currentProject.projectName);
             tasksData.append('join', isJoinfiles);
             return tasksData;
         },
-        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, service}) {
-            let tasksData = this.getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, service});
+        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow}) {
+            let tasksData = this.getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow});
             if(sourceFiles.length) {
                 for(let file of sourceFiles) {
                     tasksData.append('sourceFiles', file)
@@ -138,18 +108,11 @@ export default {
             try {
                 await this.addProjectTasks(tasksData);
                 this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
-                this.clearTasksFormData();
+                this.isTaskData = false;
+                this.clearTasksData();
             } catch(err) {
                 this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
             }
-        },
-        clearTasksFormData() {
-            this.template = "Standard processing";
-            this.selectedWorkflow = {name:"2 Steps", id: 2917};
-            this.targetLanguages = [];
-            this.sourceFiles = [];
-            this.refFiles = [];
-            this.isTaskData  = false;
         },
         getMetrics() {
             this.$emit("getMetrics");
@@ -160,14 +123,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject',
-            services: "getVuexServices",
+            currentProject: 'getCurrentProject'
         }),
-        targetLangs() {
-            return this.targetLanguages.map(item => {
-                return item.symbol
-            })
-        },
         metricsButton() {
             return this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
         },
@@ -179,7 +136,6 @@ export default {
         Steps
     },
     mounted() {
-        this.defaultService();
         this.setDefaultIsTaskData();
     }
 }
@@ -199,7 +155,7 @@ export default {
         width: 70%;
     }
     &__tasks-title {
-        font-size: 39px;
+        font-size: 29px;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-between;

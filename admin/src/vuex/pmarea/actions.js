@@ -2,6 +2,10 @@ import Vue from "vue";
 
 export const setRequests = ({commit}, payload) => commit('SET_REQUESTS', payload);
 
+export const setTasksDataValue = ({commit}, payload) => commit('SET_TASKS_DATA_VALUE', payload);
+
+export const clearTasksData = ({commit}) => commit('CLEAR_DATA');
+
 export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
