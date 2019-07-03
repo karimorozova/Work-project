@@ -48,7 +48,8 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             addProjectTasks: "addProjectTasks",
-            clearTasksData: "clearTasksData"
+            clearTasksData: "clearTasksData",
+            getServices: "getServices"
         }),
         setDefaultIsTaskData() {
             if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
@@ -134,6 +135,9 @@ export default {
         Button,
         Tasks,
         Steps
+    },
+    created() {
+        this.getServices();
     },
     mounted() {
         this.setDefaultIsTaskData();

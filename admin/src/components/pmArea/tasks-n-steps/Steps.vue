@@ -332,7 +332,7 @@ export default {
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
-        checkForLanguages(vendor, index) {
+        async checkForLanguages(vendor, index) {
             const step = this.allSteps[index];
             const service = this.services.find(item => {
                 return step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
