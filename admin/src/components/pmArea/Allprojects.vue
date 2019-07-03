@@ -75,6 +75,7 @@ export default {
             try {
                 const projects = await this.$http.get('/api/allprojects?status=Others');
                 await this.setStoreProjects([...projects.body]);
+                console.log("projects ", projects.body);
             } catch(err) {
 
             }
@@ -120,7 +121,7 @@ export default {
                     return new Date(item.createdAt) >= this.startFilter
                 })
             }
-            if(this.startFilter) {
+            if(this.deadlineFilter) {
                 result = result.filter(item => {
                     return new Date(item.deadline) >= this.deadlineFilter
                 })
@@ -139,6 +140,7 @@ export default {
                     }
                 })
             }
+            console.log("filtered ", filteredProjects);
             return result;
         }
     },
