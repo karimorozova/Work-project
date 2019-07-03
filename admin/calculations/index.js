@@ -115,7 +115,7 @@ function getStepPayables({rate, metrics, step}) {
     const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
     : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
-    return {...step, finance, vendorRate: rate};
+    return {...step._doc, finance, vendorRate: rate};
 }
 
 function getRate({task, project, vendor, service}) {
@@ -190,15 +190,15 @@ async function setDefaultStepVendors(project) {
     try {
         let { steps, tasks } = project;
         const vendors = await getVendors();
-        for(let step of steps) {
-            let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+        for(let i = 0; i < steps.length; i++) {
+            let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
             let activeVendors = vendors.filter(item => item.status === "Active");
-            let matchedVendors = await getMatchedVendors({activeVendors, step, project})
-            if(matchedVendors.length === 1 && !step.vendor) {
-                step.vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
+            let matchedVendors = await getMatchedVendors({activeVendors, step: steps[i], project})
+            if(matchedVendors.length === 1 && !steps[i].vendor) {
+                steps[i].vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
-                step = await payablesCalc({task: tasks[taskIndex], project, step});
-                tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+step.finance.Price.payables).toFixed(2);
+                steps[i] = await payablesCalc({task: tasks[taskIndex], project, step: steps[i]});
+                tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+steps[i].finance.Price.payables).toFixed(2);
             }
         }
         return { steps, tasks };

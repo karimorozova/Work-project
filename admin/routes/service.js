@@ -46,9 +46,7 @@ router.get('/costs', async (req, res) => {
     let project = await getProject({"_id": projectId});
     let projectToUpdate = await getProjectWithUpdatedFinance(project);
     const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
-    projectToUpdate.steps = steps;
-    projectToUpdate.tasks = tasks;
-    const updatedProject = await updateProjectCosts(projectToUpdate);
+    const updatedProject = await updateProjectCosts({...projectToUpdate, steps, tasks});
     res.send(updatedProject);
   } catch(err) {
     console.log(err);
