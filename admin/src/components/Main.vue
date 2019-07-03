@@ -159,6 +159,8 @@ export default {
             const location = window.location.toString();
             if (location.indexOf('project') !== -1) {
                 this.checkForSpecifiedSideBar('project', 'PROJECTS');
+            } else if (location.indexOf('request') !== -1) {
+                this.checkForSpecifiedSideBar('request', 'PROJECTS');
             } else if (location.indexOf('new-client') !== -1) {
                 this.checkForSpecifiedSideBar('new-client', 'CLIENTS');
             } else if (location.indexOf('vendor') !== -1) {
