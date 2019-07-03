@@ -140,7 +140,7 @@ export default {
                     }
                 })
             }
-            console.log("filtered ", filteredProjects);
+            console.log("filtered ", result);
             return result;
         }
     },
