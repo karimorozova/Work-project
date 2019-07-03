@@ -115,7 +115,7 @@ function getStepPayables({rate, metrics, step}) {
     const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
     : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
-    return {...step._doc, finance, vendorRate: rate};
+    return {...step, finance, vendorRate: rate};
 }
 
 function getRate({task, project, vendor, service}) {

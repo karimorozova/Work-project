@@ -148,7 +148,7 @@ router.post("/vendor-request", async (req, res) => {
 })
 
 router.post("/vendor-assignment", async (req, res) => {
-    const { step, vendor } = req.body;
+    const { step } = req.body;
     try {
         const project = await getProject({"steps._id": step._id});
         if(step.vendor) {
