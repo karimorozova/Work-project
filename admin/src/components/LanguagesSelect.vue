@@ -288,6 +288,7 @@ export default {
   overflow: hidden;
   .select {
     height: 28px;
+    cursor: pointer;
     .selected {
       width: 80%;
       border-right: none;
@@ -295,7 +296,6 @@ export default {
     }
     .arrow-button {
       width: 20%;
-      border-left: 1px solid #68573E;
     }
   }
 }
@@ -308,12 +308,13 @@ export default {
   .select {
     height: 36px;
     .selected {
-      width: 93%;
+      width: 90%;
       border-right: none;
       height: 36px;
+      padding-left: 10px; 
     }
     .arrow-button {
-      width: 7%;
+      width: 10%;
     }
   }
 }

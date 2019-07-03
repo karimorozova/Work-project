@@ -1,5 +1,5 @@
 <template lang="pug">
-.pair
+.pair(:class="customClass")
     span.pair__label {{ label }}:
         Asterisk(v-if="isRequired" :customStyle="{top: '-4px'}")
     slot 
@@ -19,7 +19,8 @@ export default {
         isRequired: {
             type: Boolean,
             default: false
-        }
+        },
+        customClass : {type: String}
     },
     components: {
         Asterisk
@@ -57,4 +58,11 @@ export default {
         justify-content: flex-end;
     }
 }
+
+.project_margin {
+    .pair__label {
+        margin-right: 15px;
+    }
+}
+
 </style>

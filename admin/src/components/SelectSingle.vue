@@ -3,7 +3,7 @@
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
-            .arrow-button(@click="toggleOptions")
+            .arrow-button(@click="toggleOptions" :class="{'no-border': projectsType === 'requests'}")
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
             input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
@@ -51,6 +51,7 @@ export default {
     },
     methods: {
         showOptions(event) {
+            console.log('here');
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
                 if(item.localName == "tr" || item.className == "table__tbody-row") {
@@ -260,6 +261,11 @@ export default {
             width: 18%;
             border-left: 1px solid #bfb09d;
         }
+    }
+    .no-border {
+        border-left: none;
+        cursor: default;
+        opacity: 0;
     }
     .inner-component & {
         border: none;
