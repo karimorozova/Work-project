@@ -55,8 +55,10 @@
 import SettingsTable from "./SettingsTable";
 import Add from "../Add";
 import { mapGetters, mapActions } from "vuex";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
+    mixins: [crudIcons],
     data() {
         return {
             fields: [
@@ -73,12 +75,6 @@ export default {
             imageData: "",
             iconFile: [],
             genericFile: [],
-            icons: {
-                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
-                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
-                cancel: {icon: require("../../assets/images/cancel_icon.jpg")},
-                delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            },
             areErrors: false,
             errors: [],
             isDeleting: false,
@@ -86,14 +82,6 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
         uploadIcon(event) {
             this.iconFile.push(event.target.files[0]);
             const input = event.target;
@@ -114,10 +102,6 @@ export default {
         toggleActive(index) {
             if(this.currentActive !== index) return;
             this.industries[index].active = !this.industries[index].active;
-        },
-        isEditing() {
-            this.errors = ["Please, finish current edition first."];
-            this.areErrors = true;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {

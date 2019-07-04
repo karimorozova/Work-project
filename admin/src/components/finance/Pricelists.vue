@@ -42,8 +42,10 @@ import Add from "../Add";
 import ValidationErrors from "../ValidationErrors";
 import NewPricelist from "./pricelists/NewPricelist";
 import { mapGetters, mapActions } from "vuex";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
+    mixins: [crudIcons],
     data() {
         return {
             pricelists: [],
@@ -68,14 +70,6 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
             this.$router.push("/settings/rates");
@@ -108,6 +102,7 @@ export default {
             return duplicateIndex === -1;
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentName || !this.isNameUnique(index)) this.errors.push("The name should be unique and not empty.");
             if(this.errors.length) {

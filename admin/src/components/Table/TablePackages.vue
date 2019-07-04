@@ -35,8 +35,10 @@
 import SettingsTable from "./SettingsTable";
 import Add from "../Add";
 import { mapGetters, mapActions } from "vuex";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
+    mixins: [crudIcons],
     data() {
         return {
             fields: [
@@ -45,12 +47,6 @@ export default {
                 {label: "", headerKey: "headerIcons", key: "icons", width: "24%", padding: "0"},
             ],
             packages: [],
-            icons: {
-                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-                cancel: {icon: require("../../assets/images/cancel_icon.jpg"), active: true},
-                delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            },
             currentActive: -1,
             currentName: "",
             currentSize: "",
@@ -61,18 +57,6 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
-        isEditing() {
-            this.errors = ["Please, finish current edition first."];
-            this.areErrors = true;
-        },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
                 return this.isEditing();

@@ -91,9 +91,10 @@ import Add from "@/components/Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 import tableFields from "@/mixins/tableFields";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
-    mixins: [scrollDrop, tableFields],
+    mixins: [scrollDrop, tableFields, crudIcons],
     props: {
         firstStageSteps: {type: Array},
         secondStageSteps: {type: Array}
@@ -122,12 +123,6 @@ export default {
             iconFile: [],
             imageData: "",
             steps: [],
-            icons: {
-                save: {icon: require("../../../assets/images/Other/save-icon-qa-form.png")}, 
-                edit: {icon: require("../../../assets/images/Other/edit-icon-qa.png")},
-                cancel: {icon: require("../../../assets/images/cancel_icon.jpg")},
-                delete: {icon: require("../../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            },
             areErrors: false,
             errors: [],
             isDeleting: false,
@@ -136,14 +131,6 @@ export default {
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
         isScrollDrop(drop, elem) {
             return drop && this.services.length >= 20;
         },
@@ -168,10 +155,6 @@ export default {
         toggleActive(index) {
             if(this.currentActive !== index) return;
             this.services[index].active = !this.services[index].active;
-        },
-        isEditing() {
-            this.errors = ["Please, finish current edition first."];
-            this.areErrors = true;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {

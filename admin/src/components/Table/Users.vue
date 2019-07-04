@@ -63,9 +63,10 @@ import SelectSingle from "../SelectSingle";
 import Add from "../Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
-    mixins: [scrollDrop],
+    mixins: [scrollDrop, crudIcons],
     data() {
         return {
             fields: [
@@ -77,12 +78,6 @@ export default {
                 {label: "", headerKey: "headerIcons", key: "icons", width: "16%", padding: "0"},
             ],
             users: [],
-            icons: {
-                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png"), active: false}, 
-                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png"), active: true},
-                cancel: {icon: require("../../assets/images/cancel_icon.jpg"), active: true},
-                delete: {icon: require("../../assets/images/Other/delete-icon-qa-form.png"), active: true}
-            },
             isTableDropMenu: true,
             groups: [],
             currentActive: -1,
@@ -105,18 +100,6 @@ export default {
         }),
         isScrollDrop(drop, elem) {
             return drop && this.users.length >= 20;
-        },
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
-        isEditing() {
-            this.errors = ["Please, finish current edition first."];
-            this.areErrors = true;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {

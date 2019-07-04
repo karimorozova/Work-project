@@ -48,7 +48,7 @@
                     img.languages__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'languages_opacity': currentActive === index}")
             template(slot="icons" slot-scope="{ row, index }")
                 .languages__icons
-                    img.languages__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'languages_opacity': isActive(key, index)}")
+                    img.languages__icon(v-if="key !== 'delete'" v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'languages_opacity': isActive(key, index)}")
     .languages__pagination
         .languages__prev(@click="prevPage" :class="{'languages_non-active': !hasPrev}")
             span.languages__title Previous page
@@ -62,8 +62,10 @@
 import SettingsTable from "./SettingsTable";
 import { mapGetters, mapActions } from "vuex";
 import ClickOutside from "vue-click-outside";
+import crudIcons from "@/mixins/crudIcons";
 
 export default {
+    mixins: [crudIcons],
     data() {
         return {
             fields: [
@@ -82,24 +84,11 @@ export default {
             imageData: "",
             isTooltip1: false,
             isTooltip2: false,
-            icons: {
-                save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
-                edit: {icon: require("../../assets/images/Other/edit-icon-qa.png")},
-                cancel: {icon: require("../../assets/images/cancel_icon.jpg")}
-            },
             areErrors: false,
             errors: []
         }
     },
     methods: {
-        isActive(key, index) {
-            if(this.currentActive === index) {
-                return key !== "edit";
-            }
-            if(this.currentActive !== index) {
-                return key !== "save" && key !== "cancel";
-            }
-        },
         toPage(num) {
             if(this.currentActive !== -1) {
                 return this.isEditing();
@@ -139,10 +128,6 @@ export default {
         toggleActive(index) {
             if(this.currentActive !== index) return;
             this.languages[index].active = !this.languages[index].active;
-        },
-        isEditing() {
-            this.errors = ["Please, finish current edition first."];
-            this.areErrors = true;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
