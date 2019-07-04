@@ -30,6 +30,7 @@ export default {
     &__option {
         padding: 5px;
         width: 10%;
+        min-width: 107px;
         font-size: 14px;
         border: 1px solid $brown-border;
         border-bottom: none;

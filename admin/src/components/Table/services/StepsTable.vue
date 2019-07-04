@@ -1,6 +1,42 @@
 <template lang="pug">
     .steps
         .steps__table
+            SettingsTable(
+                :fields="tableFields"
+                :tableData="steps"
+                :errors="errors"
+                :areErrors="areErrors"
+                :isApproveModal="isDeleting"
+                @closeErrors="closeErrors"
+                @approve="deleteStep"
+                @notApprove="cancel"
+                @closeModal="cancel"
+            )
+                .steps__header(slot="headerTitle" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerStage1" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerStage2" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerEditor" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerActive" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
+                template(slot="title" slot-scope="{ row, index }")
+                    .steps__data(v-if="currentActive !== index") {{ row.title }}
+                    .steps__editing-data(v-else)
+                        input.steps__input(type="text" v-model="currentStep.title")
+                .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
+                .steps__data.steps_centered(slot="stage2" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isStage2', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage2')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index,'isStage2')" :class="{'steps_opacity': currentActive === index}")
+                .steps__data.steps_centered(slot="editor" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isEditor', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
+                .steps__data.steps_centered(slot="active" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
+                .steps__icons(slot="icons" slot-scope="{ row, index }")
+                    img.steps__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'steps_opacity': isActive(key, index)}")
+        Add(@add="addStep")
 </template>
 
 <script>
@@ -8,37 +44,188 @@ import SettingsTable from "../SettingsTable";
 import Add from "@/components/Add";
 import tableFields from "@/mixins/tableFields";
 import crudIcons from "@/mixins/crudIcons";
-import { mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     mixins: [tableFields, crudIcons],
+    props: {
+        steps: { type: Array }
+    },
     data() {
         return {
             fields: [
                 {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(700*0.24), padding: "0"},
-                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(700*0.12), padding: "0"},
-                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(700*0.12), padding: "0"},
-                {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(700*0.12), padding: "0"},
-                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(700*0.12), padding: "0"},
+                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(700*0.14), padding: "0"},
+                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(700*0.14), padding: "0"},
+                {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(700*0.14), padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(700*0.14), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
+            errors: [],
+            areErrors: false,
+            isDeleting: false,
+            deleteIndex: -1,
+            currentActive: -1,
+            currentStep: "",
+            tableWidth: 700
         }
     },
     methods: {
-
-    },
-    computed: {
-        ...mapGetters({
-            vuexSteps: "getVuexSteps"
-        })
+        ...mapActions({
+            alertToggle: "alertToggle"
+        }),
+        closeErrors() {
+            this.areErrors = false;
+        },
+        cancel() {
+            this.isDeleting = false;
+            this.currentActive = -1;
+            this.deleteIndex = -1;
+            this.currentStep = "";
+        },
+        addStep() {
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
+            this.currentStep = {
+                title: "",
+                isStage1: false,
+                isStage2: false,
+                isEditor: false,
+                isActive: false,
+            }
+            this.steps.push(this.currentStep);
+            this.currentActive = this.steps.length - 1; 
+        },
+        async deleteStep() {
+            const id = this.steps[this.deleteIndex]._id;
+            try {
+                await this.$http.delete(`/api/step/${id}`);
+                this.$emit("updateSteps");
+                this.alertToggle({message: "Step has been removed", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on removing Step", isShow: true, type: "error"});
+            } finally {
+                this.cancel();
+            }
+        },
+        isSelected(rowProp, index) {
+            if(this.currentActive === index) {
+                return this.currentStep[rowProp];
+            }
+            return this.steps[index][rowProp];
+        },
+        toggleActive(index, prop) {
+            if(this.currentActive === -1) return;
+            this.currentStep[prop] = !this.currentStep[prop];
+        },
+        async makeAction(index, key) {
+            if(this.currentActive !== -1 && this.currentActive !== index) {
+                return this.isEditing();
+            }
+            switch(key) {
+                case 'edit':
+                    this.currentActive = index;
+                    this.currentStep = {...this.steps[index]};
+                    break;
+                case 'cancel':
+                    this.currentActive = -1;
+                    this.$emit("setStepsWithId");
+                    break;
+                case 'delete':
+                    if(!this.steps[index]._id) {
+                        this.steps.splice(index, 1);
+                        return this.cancel();
+                    }
+                    this.deleteIndex = index;
+                    this.isDeleting = true;
+                    break;
+                case 'save':
+                    await this.checkErrors(index);
+                    break;
+            }
+        },
+        async checkErrors(index) {
+            if(this.currentActive === -1) return;
+            this.errors = [];
+            const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title);
+            if(!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty");
+            if(this.errors.length) {
+                return this.areErrors = true;
+            }
+            await this.saveChanges(index);
+            this.cancel();
+        },
+        async saveChanges(index) {
+            try {
+                await this.$http.post("/api/step", { step: this.currentStep });
+                this.$emit("updateSteps");
+                this.alertToggle({message: "Information saved", isShow: true, type: "success"});
+            } catch(err) {
+                this.alertToggle({message: "Error on savind step", isShow: true, type: "error"});
+            } finally {
+                this.cancel();
+            }
+        }
     },
     components: {
         SettingsTable,
         Add
+    },
+    beforeDestroy() {
+        this.$emit("setStepsWithId");
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
+.steps {
+    width: 700px;
+    &__data, &__editing-data {
+        height: 32px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    &__editing-data {
+        box-shadow: inset 0 0 7px $brown-shadow;
+    }
+    &__input {
+        box-sizing: border-box;
+        width: 100%;
+        border: none;
+        outline: none;
+        color: $main-color;
+    }
+    &__checkbox {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        opacity: 0.5;
+    }
+    &__icons {
+        padding-top: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__icon {
+        cursor: pointer;
+        opacity: 0.5;
+        margin-right: 8px;
+    }
+    &_centered {
+        justify-content: center;
+    }
+    &_opacity {
+        opacity: 1;
+    }
+    &_active {
+        box-shadow: inset 0 0 8px $brown-shadow;
+    }
+}
 
 </style>
