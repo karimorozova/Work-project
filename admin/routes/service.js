@@ -8,17 +8,18 @@ const { getAllRates } = require('../services/getRates');
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
-  const { title, languageForm, calculationUnit, active, symbol, sortIndex, projectType } = req.body;
+  const { title, languageForm, calculationUnit, steps, active, symbol, sortIndex, projectType } = req.body;
   const  { id } = req.params;
   const isActive = active === "true" ? true : false;
   const iconFile = req.files["icon"];
+  const serviceSteps = JSON.parse(steps);
   try {
     if(id === "new") {
       await createNewService({
-        title, active: isActive, iconFile, languageForm, calculationUnit, symbol, sortIndex, projectType
+        title, active: isActive, iconFile, languageForm, calculationUnit, symbol, sortIndex, projectType, steps: serviceSteps
       });
     } else {
-      await updateService({id, title, active: isActive, iconFile, languageForm, calculationUnit});
+      await updateService({id, title, active: isActive, iconFile, languageForm, calculationUnit, steps: serviceSteps});
     }
     res.send('Saved');
   } catch(err) {

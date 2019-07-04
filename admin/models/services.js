@@ -39,6 +39,13 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         default: 'Words'
     },
+    steps: [{
+        stage: {
+            type: String,
+            trim: true
+        },
+        step: { type: Schema.Types.ObjectId, ref: 'Step' }
+    }],
     source: {
         type: Boolean,
         default: false
@@ -47,30 +54,6 @@ const ServicesSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    languageCombinations: [{
-        source: {
-            type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        target: {
-            type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        industries: [{
-            industry: {
-                type: Schema.Types.ObjectId, ref: 'Industries',
-            },
-            rate: {
-                type: Number,
-                default: 0
-            },
-            package: {
-                type: Number
-            },
-            active: {
-                type: Boolean,
-                default: true
-            }
-        }]
-    }],
     xtrf: {
         type: String,
         default: '',

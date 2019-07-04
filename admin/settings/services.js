@@ -5,9 +5,9 @@ const fs = require('fs');
 async function createNewService(obj) {
     try {
         const icon = await getFilesInfo(obj);
-        const { title, active, languageForm, calculationUnit, symbol, sortIndex, projectType } = obj;
+        const { title, active, languageForm, calculationUnit, symbol, sortIndex, projectType, steps } = obj;
         await Services.create({
-            title, symbol, icon, active, languageForm, calculationUnit, sortIndex, projectType 
+            title, symbol, icon, active, languageForm, calculationUnit, sortIndex, projectType, steps
         });
     } catch(err) {
         console.log(err);
@@ -16,13 +16,13 @@ async function createNewService(obj) {
 }
 
 async function updateService(obj) {
-    const { id, title, active, languageForm, calculationUnit } = obj;
+    const { id, title, active, languageForm, calculationUnit, steps } = obj;
     try {
         const icon = await getFilesInfo(obj);
         const service = await Services.findById({"_id": id});
         const newIcon = icon ? icon : service.icon;
         await Services.updateOne({"_id": id}, 
-            {icon: newIcon, title, active, languageForm, calculationUnit});
+            {icon: newIcon, title, active, languageForm, calculationUnit, steps});
     } catch(err) {
         console.log(err);
         console.log("Error in updateService func");
