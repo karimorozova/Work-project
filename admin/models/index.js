@@ -13,6 +13,7 @@ const Clients = require('./clients');
 const Vendors = require('./vendors');
 const LeadSource = require('./leadSource');
 const Group = require('./group');
+const Step = require('./step');
 const Package = require('./packages');
 const Zoho = require('./zoho');
 const ZohoReport = require('./zohoReport');
@@ -31,6 +32,7 @@ const Models = {
     Timezones,
     LeadSource,
     Group,
+    Step,
     Package,
     Clients,
     Vendors,

@@ -5,6 +5,7 @@ import { finance } from "./finance/";
 import { vendors } from "./vendors/";
 import { clients } from "./clients/";
 import { pmarea } from "./pmarea/";
+import { settings } from "./settings/";
 
 
 Vue.use(Vuex);
@@ -15,6 +16,7 @@ export const store = new Vuex.Store({
         b: finance,
         c: vendors,
         d: clients,
-        e: pmarea
+        e: pmarea,
+        f: settings
     }
 });

@@ -51,7 +51,6 @@ export default {
     },
     methods: {
         showOptions(event) {
-            console.log('here');
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {
                 if(item.localName == "tr" || item.className == "table__tbody-row") {

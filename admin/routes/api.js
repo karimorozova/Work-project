@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Package } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package } = require('../models');
 const { getProjects } = require('../projects/');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
@@ -88,7 +88,7 @@ router.get('/languages', async (req, res) => {
 
 router.get('/services', async (req, res) => {
   try {
-  const services = await getManyServices({});
+    const services = await getManyServices();
     res.send(services);
   } catch(err) {
       console.log(err);
@@ -233,6 +233,45 @@ router.delete('/group/:id', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting group");
+    }
+});
+
+router.get('/steps', async (req, res) => {
+    try {
+      const steps = await Step.find({});
+      res.send(steps);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on getting steps from DB")
+    }
+});
+  
+router.post('/step', async (req, res) => {
+    const { step } = req.body;
+    try {
+      if(step._id) {
+        await Step.updateOne({"_id": step._id}, step);
+        return res.send('Updated');
+      }
+      await Step.create(step);
+      res.send('New step saved.');
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on updating/creating a step")
+    }
+});
+  
+router.delete('/step/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+      if(!id) {
+        return res.send("Deleted unsaved step");
+      }
+      await Step.deleteOne({"_id": id});
+      res.send("Step deleted");
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on deleting step")
     }
 });
 

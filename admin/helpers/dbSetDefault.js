@@ -11,6 +11,7 @@ const {
   Timezones,
   LeadSource,
   Group,
+  Step,
   Package,
   Clients,
   Vendors
@@ -26,6 +27,7 @@ const {
   timezonesDefault,
   leadSourcesDefault,
   groupsDefault,
+  stepsDefault,
   packagesDefault,
   clientsDefault,
   vendorsDefault
@@ -52,7 +54,7 @@ function fillLeadSources() {
     .then(async sources => {
       if(!sources.length) {
         for(const source of leadSourcesDefault) {
-          await new LeadSource({ source }).save().then((times) => {
+          await new LeadSource({ source }).save().then((res) => {
 
           }).catch(err => {
             console.log(`Leadsource ${source} hasn't been saved because of ${err.message}`)
@@ -71,7 +73,7 @@ function fillGroups() {
       .then(async groups => {
         if(!groups.length) {
           for(const group of groupsDefault) {
-            await new Group({ name: group }).save().then((times) => {
+            await new Group({ name: group }).save().then((res) => {
   
             }).catch(err => {
               console.log(`Group ${group} hasn't been saved because of ${err.message}`)
@@ -85,12 +87,31 @@ function fillGroups() {
     })
 }
 
+function fillSteps() {
+    return Step.find({})
+      .then(async steps => {
+        if(!steps.length) {
+          for(const step of stepsDefault) {
+            await new Step({ ...step }).save().then((res) => {
+  
+            }).catch(err => {
+              console.log(`Step ${step} hasn't been saved because of ${err.message}`)
+            })
+          }
+          console.log('Steps are saved!')
+        }
+    })
+    .catch(err => {
+        console.log('Something is wrong ' + err)
+    })
+}
+
 function timeZones() {
   return Timezones.find({})
     .then(async timezones => {
       if(!timezones.length) {
         for(const time of timezonesDefault) {
-          await new Timezones({zone: time}).save().then((times) => {
+          await new Timezones({zone: time}).save().then((res) => {
 
           }).catch(err => {
             console.log(`Timezone ${time} hasn't been saved because of ${err.message}`)
@@ -519,6 +540,7 @@ async function checkCollections() {
   await fillPackages();
   await fillLeadSources();
   await fillGroups();
+  await fillSteps();
   await timeZones();
   await languages();
   await industries();

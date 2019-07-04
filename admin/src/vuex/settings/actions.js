@@ -1,0 +1,1 @@
+export const setStepsFromDataBase = ({commit}, payload) => commit("SET_STEPS_FROM_DB", payload);
