@@ -39,4 +39,12 @@ export default {
         margin: 0;
     }
 }
+
+.finance-details {
+    justify-content: flex-start;
+    .pair__label {
+        width: 50%;
+        font-weight: bold;
+    }
+}
 </style>

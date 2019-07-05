@@ -91,7 +91,7 @@ export default {
                 },
                 {
                     title: "SETTINGS",
-                    imgBrown: require("../assets/images/Other/admin-button-icon.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/settings_icon_thin.png"),
                     active: false
                 }
             ],

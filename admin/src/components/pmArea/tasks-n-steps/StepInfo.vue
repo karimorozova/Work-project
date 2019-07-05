@@ -10,6 +10,7 @@
         )
     .step-info__block
         Finance(
+            :step="step"
             :financeData="financeData"
             :financeDataRate="financeDataRate"
             @addRow="addFinanceData"
@@ -170,10 +171,8 @@ export default {
             },[])
         },
         financeDataRate() {
-          return {
-            clientRate: this.step.clientRate,
-            vendorRate: this.step.vendorRate
-          }
+            const { clientRate, vendorRate } = this.step;
+            return { clientRate, vendorRate };
         },
         stepFiles() {
             let result = [];

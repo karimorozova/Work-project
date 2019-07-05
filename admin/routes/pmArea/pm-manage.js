@@ -289,4 +289,16 @@ router.post("/tasks-quote", async (req, res) => {
     }
 })
 
+router.post("/step-finance", async (req, res) => {
+    const { step } = req.body;
+    try {
+        const project = await getProject({"steps._id": step._id});
+        console.log("changing");
+        res.send("done");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on changing Step finance");
+    }
+})
+
 module.exports = router;
