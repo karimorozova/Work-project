@@ -97,3 +97,16 @@ export const deleteClientsCheckedRate = async ({commit, dispatch, state}, payloa
         throw new Error("Error on deleting rate");
     }
 }
+
+export const updateClientRate = async ({commit, dispatch}, payload) => {
+    commit("startRequest");
+    try {
+        const { step, rate } = payload;
+        const updatedClient = await Vue.http.post("/clientsapi/combination", { step, rate });
+        dispatch("storeClient", updatedClient.body);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        commit("endRequest");
+    }
+}

@@ -19,6 +19,7 @@ import ApproveModal from "../../../ApproveModal";
 import Tabs from "@/components/Tabs";
 import LabelVal from "@/components/LabelVal";
 import Details from "./Details";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -39,6 +40,10 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            updateStepFinance: "updateStepFinance",
+            updateClientRate: "updateClientRate"
+        }),
         setTab({index}) {
             this.selectedTab = this.tabs[index];
         },
@@ -59,11 +64,11 @@ export default {
 
         },
         async approveAction() {
-            try {
-                await this.save();
-            } catch(err) {
-
+            await this.save();
+            if(this.selectedTab === 'Receivables') {
+                return await this.updateClientRate({step: this.step, rate: this.changedData.rate});
             }
+            // return await updateVendorRate({step: this.step, rate: this.changedData.rate});
         },
         async save() {
             const { Price, Wordcount } = this.collectData(this.changedData);
@@ -75,10 +80,8 @@ export default {
                     [rateProp]: +this.changedData.rate
                 }
                 this.isModal = false;
-                await this.$http.post("/pm-manage/step-finance",{ step: changedStep });
-            } catch(err) {
-                console.log(err);
-            }
+                await this.updateStepFinance(changedStep);
+            } catch(err) { }
         },
         collectData(data) {
             const { rate, subtotal, quantityTotal, quantityRelative } = data;

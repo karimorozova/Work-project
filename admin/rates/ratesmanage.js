@@ -29,7 +29,7 @@ async function includeAllIndustries(industries, entityIndustries, languageForm) 
 }
 
 async function defaultRates(entityIndustries, languageForm) {
-    const industries = [...entityIndustries];
+    let industries = [...entityIndustries];
     try {
         const services = await Services.find({"languageForm": languageForm});
         const serviceRate = {value: 0, active: false};

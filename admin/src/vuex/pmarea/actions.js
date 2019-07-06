@@ -104,3 +104,16 @@ export const reopenSteps = async ({commit, dispatch}, payload) => {
         dispatch('decrementRequestCounter')
     }
 }
+
+export const updateStepFinance = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.post("/pm-manage/step-finance", { step: payload });
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Step finance updated", isShow: true, type: "success"});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}

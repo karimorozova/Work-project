@@ -1,4 +1,4 @@
-const { Clients, Services } = require("../models/");
+const { Languages, Services } = require("../models/");
 const { getAfterUpdate, getClient } = require("./getClients");
 const { 
     getPricelist, 
@@ -174,4 +174,48 @@ async function getNewFromPrice(initRate, comb, clientIndustries) {
     }
 }
 
-module.exports= { getClientRates, updateClientRates, deleteRate, addSeveralCombinations };
+async function getAfterCombinationsUpdated({project, step, rate}) {
+    const stepTask = project.tasks.find(item => item.taskId === step.taskId);
+    const rateService = stepTask.service;
+    const rateIndustry = project.industry.id;
+    try {
+        const client = await getClient({"_id": project.customer.id});
+        let { languageCombinations } = client;
+        const existingCombIndex = languageCombinations.findIndex(item => item.source && item.source.symbol === step.source && item.target.symbol === step.target);
+        if(existingCombIndex !== -1) {
+            languageCombinations[existingCombIndex].industries = getUpdateIndustriesForComb({
+                industries: languageCombinations[existingCombIndex].industries,
+                rateService, rateIndustry, rate
+            })
+            return await getAfterUpdate({"_id": client.id},{ languageCombinations })
+        }
+        return addNewCombination({id: client.id, languageCombinations, rateService, rateIndustry, rate});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterCombinationsUpdated");
+    }
+}
+
+async function addNewCombination({id, languageCombinations, rateService, rateIndustry, rate}) {
+    try {
+        const allIndustriesWithRates = await defaultRates(clientIndustries, "Duo");
+        const industries = getUpdateIndustriesForComb({industries: allIndustriesWithRates, rateIndustry, rateService, rate});
+        const updatedCombinations = [...languageCombinations, {source, target, industries}];
+        return await getAfterUpdate({"_id": id},{ languageCombinations: updatedCombinations });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in addNewCombination");
+    }
+}
+
+function getUpdateIndustriesForComb({industries, rateIndustry, rateService, rate}) {
+    return industries.map(item => {
+        if(item.industry.id === rateIndustry) {
+            item.rates[rateService].value = rate;
+            item.rates[rateService].active = true;
+        }
+        return item;
+    })
+}
+
+module.exports= { getClientRates, updateClientRates, deleteRate, addSeveralCombinations, getAfterCombinationsUpdated };

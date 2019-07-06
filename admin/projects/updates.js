@@ -372,6 +372,33 @@ function getTasksAfterReopen({steps, tasks}) {
     return updatedTasks;
 }
 
+async function getProjectAfterFinanceUpdated({project, steps, tasks}) {
+    try {
+        let { finance } = project;
+        finance.Price = getProjectFinancePrice(tasks);
+        return await updateProject({"_id": project.id}, { finance, steps, tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getProjectAfterFinanceUpdated");
+    }
+}
+
+function getProjectFinancePrice(tasks) {
+    const receivables = +(tasks.reduce((prev, cur) => {
+        if(cur.status === "Cancelled Halfway") {
+           return prev + cur.finance.Price.halfReceivables;
+        }
+        return prev + cur.finance.Price.receivables;
+    }, 0).toFixed(2));
+    const payables = +(tasks.reduce((prev, cur) => {
+        if(cur.status === "Cancelled Halfway") {
+           return prev + cur.finance.Price.halfPayables;
+        }
+        return prev + cur.finance.Price.payables;
+    }, 0).toFixed(2));
+    return { receivables, payables };
+}
+
 module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
     areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets,
-    getAfterReopenSteps };
+    getAfterReopenSteps, getProjectAfterFinanceUpdated };

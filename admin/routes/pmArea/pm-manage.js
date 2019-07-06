@@ -2,9 +2,11 @@ const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
-    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps } = require("../../projects/");
+    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
+const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
+const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -293,8 +295,10 @@ router.post("/step-finance", async (req, res) => {
     const { step } = req.body;
     try {
         const project = await getProject({"steps._id": step._id});
-        console.log("changing");
-        res.send("done");
+        const steps = getStepsWithFinanceUpdated(step, project);
+        const tasks = getTasksWithFinanceUpdated(step, {...project._doc, steps});
+        const updatedProject = await getProjectAfterFinanceUpdated({project, steps, tasks});
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on changing Step finance");
