@@ -51,13 +51,13 @@ export default {
         {
           title: "DASHBOARD",
           path: "/dashboard",
-          imgBrown: require("../assets/images/CATEGORIES/dashboard-brown.png"),
+          imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
           active: true
         },
         {
           title: "COMPLETED JOBS",
           path: "/completed-jobs",
-          imgBrown: require("../assets/images/CATEGORIES/Closed Jobs ICON(selected).png"),
+          imgBrown: require("../assets/images/CATEGORIES/COMPLETE-JOBS.png"),
           active: false
         }
       ],
