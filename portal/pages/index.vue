@@ -41,8 +41,8 @@
           ul.navbar__ulist
             li.navbar__ulist_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
               .image
-                img(v-if="!note.active" :src="note.imgWhite")
-                img(v-else :src="note.imgBrown")
+                img.navbar_no-filter-image(v-if="!note.active && note.imgWhite" :src="note.imgWhite")
+                img.navbar__image(v-else :src="note.imgBrown")
               .title(:class="{showTitle: true}")
                 span {{ note.title }}
           .logoImage(v-if="expander")
@@ -70,22 +70,19 @@
           {
             title: "DASHBOARD",
             path: "/dashboard",
-            imgWhite: require("../assets/images/dashboard.png"),
-            imgBrown: require("../assets/images/dashboard-brown.png"),
+            imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
             active: true
           },
           {
             title: "PROJECTS",
             path: "/projects",
-            imgWhite: require("../assets/images/projects.png"),
-            imgBrown: require("../assets/images/projects-brown.png"),
+            imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
             active: false
           },
           {
             title: "INVOICES",
             path: "/invoices",
-            imgWhite: require("../assets/images/invoices.png"),
-            imgBrown: require("../assets/images/invoices-brown.png"),
+            imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
             active: false
           },
           {
@@ -683,11 +680,17 @@
           .showTitle {
             opacity: 1;
           }
+          .navbar__image {
+              filter: brightness(300%);
+          }
         }
         .active {
           background-color: white;
           .title {
             color: #978d7e;
+          }
+          .navbar__image {
+              filter: none;
           }
         }
 
