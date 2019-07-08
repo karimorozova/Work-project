@@ -40,7 +40,9 @@
                 .admin-navbar__sidebar
                     ul.navbar__menu
                         li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
-                            .image
+                            .image(v-if="!note.active && note.imgWhite")
+                                img.image.navbar_no-filter(:src="note.imgWhite")
+                            .image(v-else)
                                 img(:src="note.imgBrown")
                             .title
                                 span {{ note.title }}
@@ -61,12 +63,13 @@ export default {
         return {
             navbarList: [{
                     title: "DASHBOARD",
-                    imgBrown: require("../assets/images/CATEGORIES/dashboard-brown.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
                     active: true
                 },
                 {
                     title: "VENDORS",
-                    imgBrown: require("../assets/images/CATEGORIES/vendors.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/VENDORS.png"),
+                    imgWhite: require("../assets/images/CATEGORIES/VENDORS2.png"),
                     active: false
                 },
                 {
@@ -81,17 +84,17 @@ export default {
                 },
                 {
                     title: "FINANCE",
-                    imgBrown: require("../assets/images/CATEGORIES/finance.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/FINANCE.png"),
                     active: false
                 },
                 {
                     title: "REPORTS",
-                    imgBrown: require("../assets/images/CATEGORIES/report.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/REPORTS.png"),
                     active: false
                 },
                 {
                     title: "SETTINGS",
-                    imgBrown: require("../assets/images/CATEGORIES/settings_icon_thin.png"),
+                    imgBrown: require("../assets/images/CATEGORIES/SETTINGS.png"),
                     active: false
                 }
             ],
@@ -550,9 +553,11 @@ export default {
                     img {
                         filter: brightness(300%);
                     }
+                    .navbar_no-filter {
+                        filter: none;
+                    }
                 }
             }
-
             .active {
                 background-color: white;
 
