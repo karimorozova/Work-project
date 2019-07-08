@@ -266,8 +266,9 @@ export default {
             if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
+            const vendor = this.filteredVendors[index];
             this.storeCurrentVendor(this.filteredVendors[index])
-            this.$router.push(`/vendors/${this.filteredVendors[index]._id}`);
+            this.$router.push(`/vendors/details/${vendor._id}`);
             this.$emit("showVendorDetails", {vendor: this.filteredVendors[index]});
         }
     },

@@ -9,7 +9,7 @@
             @setLeadFilter="(option) => setFilter(option, 'leadFilter')"
             @setIndustryFilter="(option) => setFilter(option, 'industryFilter')"
         )
-        .all-vendors__new-vendor(v-if="isVendorAddExist")
+        .all-vendors__new-vendor
             input.all-vendors__add-vendor(type="submit" value="Add vendor" @click="addVendor")
         VendorsTable(
             :nameFilter="nameFilter"
@@ -28,9 +28,6 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        isVendorAddExist: {
-            type: Boolean
-        },
         statusFilter: {
             type: String
         }
@@ -48,7 +45,7 @@ export default {
             this.storeCurrentVendor(vendor);
         },
         addVendor() {
-            this.$router.push("/new-vendor");
+            this.$router.push("/vendors/new-vendor");
         },
         closeVendorDetails() {
             this.isVendorDetails = false;

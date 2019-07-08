@@ -168,17 +168,17 @@ const router = new Router({
                             props: true,
                             component: PotentialVendors
                         },
+                        {
+                            path: 'details/:id',
+                            name: 'vendor-details',
+                            component: Vendordetails
+                        },
+                        {
+                            path: 'new-vendor',
+                            name: 'new-vendor',
+                            component: NewVendor
+                        },
                     ]
-                },
-                {
-                    path: 'vendors/:id',
-                    name: 'vendor-details',
-                    component: Vendordetails
-                },
-                {
-                    path: 'new-vendor',
-                    name: 'new-vendor',
-                    component: NewVendor
                 },
                 {
                     path: 'languages',

@@ -1,7 +1,5 @@
 <template lang="pug">
 .vendor-wrap
-    .vendor-wrap__sidebar
-        Sidebar(title="VENDORS" :links="sidebarLinks" linkClass="vendor-details")
     .vendor-info
         .buttons
             input.button(type="button" value="Save" @click="checkForErrors")
@@ -95,7 +93,6 @@ import NativeLanguageSelect from "./NativeLanguageSelect";
 import ValidationErrors from "../ValidationErrors";
 import SelectSingle from "../SelectSingle";
 import Asterisk from "../Asterisk";
-import Sidebar from "../Sidebar";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import { mapGetters, mapActions } from "vuex";
 
@@ -113,7 +110,6 @@ export default {
             approveShow: false,
             photoFile: [],
             genders: ["Male", "Female"],
-            sidebarLinks: [{title: "General Information"}],
             asteriskStyle: {"top": "-4px"},
             errors: [],
             vendor: {
@@ -241,7 +237,6 @@ export default {
         TimezoneSelect,
         ValidationErrors,
         SelectSingle,
-        Sidebar,
         Asterisk
     },
     directives: {

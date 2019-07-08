@@ -11,11 +11,16 @@ export default {
                 return this.currentIndex = 0;
             }
             this.currentIndex = this.sidebarLinks.findIndex(item => item.routeName === name);
+        },
+        goToRoute() {
+            if(this.currentIndex !== -1) {
+                this.$router.push({name: this.sidebarLinks[this.currentIndex].routeName});
+            }    
         }
     },
     mounted() {
         this.setDefaultActiveLink();
-        this.$router.push({name: this.sidebarLinks[this.currentIndex].routeName});
+        this.goToRoute();
     },
     updated() {
         this.setDefaultActiveLink();

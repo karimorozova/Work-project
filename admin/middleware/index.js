@@ -112,6 +112,7 @@ const middleware = {
             '/dashboard',
             '/settings',
             '/vendors',
+            '/vendors/details',
             '/vendors/active',
             '/vendors/inactive',
             '/vendors/potential',

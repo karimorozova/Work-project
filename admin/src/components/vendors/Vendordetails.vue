@@ -1,7 +1,5 @@
 <template lang="pug">
 .vendor-wrap
-    .vendor-wrap__sidebar
-        Sidebar(:title="sidebarTitle" :links="sidebarLinks" linkClass="vendor-details")
     .vendor-info
         .buttons
             input.button(type="button" value="Save" @click="checkForErrors")
@@ -109,7 +107,6 @@ import NativeLanguageSelect from "./NativeLanguageSelect";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import ValidationErrors from "../ValidationErrors";
 import SelectSingle from "../SelectSingle";
-import Sidebar from "../Sidebar";
 import Asterisk from "../Asterisk";
 import VendorRates from "./VendorRates";
 import Addseverallangs from "../finance/Addseverallangs";
@@ -129,8 +126,6 @@ export default {
             photoFile: [],
             isAddSeveral: false,
             genders: ["Male", "Female"],
-            sidebarLinks: [{title: "General Information"}],
-            sidebarTitle: "VENDORS",
             errors: [],
             isAvailablePairs: false,
             langPairs: [],
@@ -279,13 +274,13 @@ export default {
         async getVendor() {
             const id = this.$route.params.id;
             try {
-                if(!this.curVendor._id) {
-                    const curVendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
-                    await this.storeCurrentVendor(curVendor.body);
+                if(!this.currentVendor._id) {
+                    const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
+                    await this.storeCurrentVendor(vendor.body);
                     this.oldEmail = this.currentVendor.email;
                 }
             } catch(err) {
-
+                this.alertToggle({message: "Error on getting Vendor's info", isShow: true, type: "error"});
             }
         },
         ...mapActions({
@@ -326,8 +321,7 @@ export default {
         Asterisk,
         Addseverallangs,
         AvailablePairs,
-        SelectSingle,
-        Sidebar
+        SelectSingle
     },
     directives: {
         ClickOutside
