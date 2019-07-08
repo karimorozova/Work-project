@@ -174,7 +174,7 @@ async function getNewFromPrice(initRate, comb, clientIndustries) {
     }
 }
 
-async function getAfterCombinationsUpdated({project, step, rate}) {
+async function getClientAfterCombinationsUpdated({project, step, rate}) {
     const stepTask = project.tasks.find(item => item.taskId === step.taskId);
     const rateService = stepTask.service;
     const rateIndustry = project.industry.id;
@@ -192,14 +192,20 @@ async function getAfterCombinationsUpdated({project, step, rate}) {
         return addNewCombination({id: client.id, languageCombinations, rateService, rateIndustry, rate});
     } catch(err) {
         console.log(err);
-        console.log("Error in getAfterCombinationsUpdated");
+        console.log("Error in getClientAfterCombinationsUpdated");
     }
 }
 
 async function addNewCombination({id, languageCombinations, rateService, rateIndustry, rate}) {
     try {
         const allIndustriesWithRates = await defaultRates(clientIndustries, "Duo");
-        const industries = getUpdateIndustriesForComb({industries: allIndustriesWithRates, rateIndustry, rateService, rate});
+        const combinationsIndustries = allIndustriesWithRates.map(item => {
+            return {
+                industry: item,
+                rates: item.rates
+            }
+        })
+        const industries = getUpdateIndustriesForComb({industries: combinationsIndustries, rateIndustry, rateService, rate});
         const updatedCombinations = [...languageCombinations, {source, target, industries}];
         return await getAfterUpdate({"_id": id},{ languageCombinations: updatedCombinations });
     } catch(err) {
@@ -218,4 +224,4 @@ function getUpdateIndustriesForComb({industries, rateIndustry, rateService, rate
     })
 }
 
-module.exports= { getClientRates, updateClientRates, deleteRate, addSeveralCombinations, getAfterCombinationsUpdated };
+module.exports= { getClientRates, updateClientRates, deleteRate, addSeveralCombinations, getClientAfterCombinationsUpdated };

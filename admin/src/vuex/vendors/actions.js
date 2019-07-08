@@ -5,6 +5,11 @@ export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp',
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
 export const storeVendorDuoRates = ({commit}, payload) => commit('setVendorDuoRates', payload);
 export const storeVendorMonoRates = ({commit}, payload) => commit('setVendorMonoRates', payload);
+export const storeVendor = ({commit, rootState}, payload) => {
+    const index = rootState.a.vendors.findIndex(item => item._id === payload._id);
+    rootState.a.vendors.splice(index, 1, payload);
+}
+
 export const getVendorDuoCombinations = async ({commit, dispatch, state}) => {
     commit("startRequest");
     try {
@@ -151,5 +156,18 @@ export const setVendorsMatrixData = async ({commit, dispatch, rootState, state},
     } catch(err) {
         commit("endRequest");
         throw new Error("Error on updating matrix data");
+    }
+}
+
+export const updateVendorRate = async ({commit, dispatch}, payload) => {
+    commit("startRequest");
+    try {
+        const { step, rate } = payload;
+        const updatedVendor = await Vue.http.post("/vendorsapi/combination", { step, rate });
+        dispatch("storeVendor", updatedVendor.body);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        commit("endRequest");
     }
 }

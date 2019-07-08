@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload, clientMail } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
-const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations, updateClientInfo, getAfterCombinationsUpdated} = require('../clients');
+const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 
@@ -81,7 +81,7 @@ router.post('/combination', async (req, res) => {
     const { step, rate } = req.body;
     try {
         const project = await getProject({"steps._id": step._id});
-        const updatedClient = await getAfterCombinationsUpdated({project, step, rate});
+        const updatedClient = await getClientAfterCombinationsUpdated({project, step, rate});
         res.send(updatedClient);
     } catch(err) {
         console.log(err);

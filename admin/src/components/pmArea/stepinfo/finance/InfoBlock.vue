@@ -42,7 +42,8 @@ export default {
     methods: {
         ...mapActions({
             updateStepFinance: "updateStepFinance",
-            updateClientRate: "updateClientRate"
+            updateClientRate: "updateClientRate",
+            updateVendorRate: "updateVendorRate"
         }),
         setTab({index}) {
             this.selectedTab = this.tabs[index];
@@ -66,9 +67,11 @@ export default {
         async approveAction() {
             await this.save();
             if(this.selectedTab === 'Receivables') {
-                return await this.updateClientRate({step: this.step, rate: this.changedData.rate});
+                return await this.updateClientRate({step: this.step, rate: +this.changedData.rate});
             }
-            // return await updateVendorRate({step: this.step, rate: this.changedData.rate});
+            if(this.step.vendor) {
+                return await this.updateVendorRate({step: this.step, rate: +this.changedData.rate});
+            }
         },
         async save() {
             const { Price, Wordcount } = this.collectData(this.changedData);

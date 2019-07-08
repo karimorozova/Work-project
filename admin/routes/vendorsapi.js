@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations, getVendorAfterCombinationsUpdated } = require('../vendors');
 const { Vendors } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -77,6 +77,18 @@ router.delete('/rate/:id', async (req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting rates of Vendor");
+    }
+})
+
+router.post('/combination', async (req, res) => {
+    const { step, rate } = req.body;
+    try {
+        const project = await getProject({"steps._id": step._id});
+        const updatedVendor = await getVendorAfterCombinationsUpdated({project, step, rate});
+        res.send(updatedVendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on adding combination for Client");
     }
 })
 

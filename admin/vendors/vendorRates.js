@@ -1,4 +1,4 @@
-const { Services } = require("../models/");
+const { Services, Languages } = require("../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
 const { getPricelist, replaceRates, replaceFromPrice, 
     includeAllIndustries, defaultRates, getAllUpdatedIndustries, 
@@ -209,4 +209,114 @@ async function getNewFromPrice(initRate, comb, vendorIndustries) {
     }
 }
 
-module.exports= { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations };
+async function getVendorAfterCombinationsUpdated({project, step, rate}) {
+    const stepTask = project.tasks.find(item => item.taskId === step.taskId);
+    const rateService = stepTask.service;
+    const rateIndustry = project.industry.id;
+    try {
+        const vendor = await getVendor({"_id": step.vendor._id});
+        return await getWihtUpdatedCombs({vendor, step, rate, rateService, rateIndustry});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getVendorAfterCombinationsUpdated");
+    }
+}
+
+async function getWihtUpdatedCombs({vendor, step, rate, rateService, rateIndustry}) {
+    let { languageCombinations } = vendor;
+    const existingCombIndex = languageCombinations.findIndex(item => item.source && item.source.symbol === step.source && item.target.symbol === step.target);
+    try {
+        if(existingCombIndex !== -1) {
+            return await manageExistingCombination({
+                vendor, rate, rateService, rateIndustry, combIndex: existingCombIndex
+            })
+        } else {
+            return await addCombination({vendor, step, rate, rateService, rateIndustry});
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getWihtUpdatedCombs");
+    }
+}
+
+async function manageExistingCombination({vendor, rate, rateService, rateIndustry, combIndex}) {
+    let { languageCombinations } = vendor;
+    const industries = getUpdatedVendorIndustries(vendor, rateIndustry);
+    try {
+        let updatedCombinations = await getUpdatedCombs({
+            combinations: languageCombinations, industries, rate, rateService, rateIndustry, combIndex
+        });
+        return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: updatedCombinations, industries});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageExistingCombination");
+    }
+}
+
+async function getUpdatedCombs({combinations, industries, rate, rateService, rateIndustry, combIndex}) {
+    let updatedCombs = [];
+    try {
+        for(let i = 0; i < combinations.length; i++) {
+            let comb = combinations[i]
+            if(i !== combIndex) {
+                updatedCombs.push(comb);
+            } else {
+                const rateIndex = comb.industries.findIndex(item => item.industry.id === rateIndustry);
+                if(rateIndex !== -1) {
+                    comb.industries[rateIndex].rates[rateService].value = rate;
+                    comb.industries[rateIndex].rates[rateService].active = true;
+                } else {
+                    const ratesWithAllIndustries = await defaultRates(industries, "Duo");
+                    let changingRate = ratesWithAllIndustries.find(item => item.id === rateIndustry);
+                    changingRate.rates[rateService].value = rate;
+                    changingRate.rates[rateService].active = true;
+                    comb.industries.push(changingRate);
+                }
+                updatedCombs.push(comb);
+            }
+        }
+        return updatedCombs;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getUpdatedCombs");
+    }
+}
+
+function getUpdatedVendorIndustries(vendor, rateIndustry) {
+    let { industries } = vendor;
+    const industryIndex = industries.findIndex(item => item.id === rateIndustry);
+    if(industryIndex === -1) {
+        industries.push(rateIndustry);
+    }
+    return industries;
+}
+
+async function addCombination({vendor, step, rate, rateService, rateIndustry}) {
+    const industries = getUpdatedVendorIndustries(vendor, rateIndustry);
+    try {
+        const source = await Languages.findOne({symbol: step.source});
+        const target = await Languages.findOne({symbol: step.target});
+        const allIndustriesWithRates = await defaultRates(industries, "Duo");
+        const newRateIndustries = allIndustriesWithRates.map(item => {
+            let rates = Object.keys(item.rates).reduce((prev, cur) => {
+                prev[cur] = {...item.rates[cur]};
+                return prev;
+            },{})
+            if(item.id === rateIndustry) {
+                rates[rateService].value = rate;
+                rates[rateService].active = true;
+            }
+            return {
+                industry: item.id,
+                rates
+            };
+        })
+        const newComb = {source, target, industries: newRateIndustries};
+        return await getVendorAfterUpdate({"_id": vendor.id}, { industries, $push: {languageCombinations: newComb} });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in addCombination");
+    }
+}
+
+module.exports= { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations, getVendorAfterCombinationsUpdated };
