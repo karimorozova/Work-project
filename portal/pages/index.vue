@@ -88,8 +88,8 @@
           {
             title: "DOCUMENTS",
             path: "/documents",
-            imgWhite: require("../assets/images/documents.png"),
-            imgBrown: require("../assets/images/documents-brown.png"),
+            imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
+            imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
             active: false
           }
         ],
