@@ -5,6 +5,7 @@ const { upload } = require('../utils/');
 const fs = require('fs');
 const { Languages, Industries, Timezones, LeadSource, Group, Step, Package } = require('../models');
 const { getProjects } = require('../projects/');
+const { getClientRequests } = require('../clientRequests');
 const { getManyServices } = require('../services/');
 const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
@@ -70,8 +71,17 @@ router.get('/allprojects', async (req, res) => {
         res.send(projects)
     } catch(err) {
         console.log(err);
-        res.status(500);
-        res.send('Something wrong with DB while getting projects!')
+        res.status(500).send('Something wrong with DB while getting projects!');
+    }
+});
+
+router.get('/all-requests', async (req, res) => {
+    try {
+        const requests = await getClientRequests();
+        res.send(requests);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Something wrong with DB while getting requests!');
     }
 });
 
@@ -81,8 +91,7 @@ router.get('/languages', async (req, res) => {
     res.send(languages)
   } catch(err) {
       console.log(err);
-      res.status(500);
-      res.send('Something wrong with DB / Cannot get languages')
+      res.status(500).send('Something wrong with DB / Cannot get languages');
     }
 });
 
@@ -92,8 +101,7 @@ router.get('/services', async (req, res) => {
     res.send(services);
   } catch(err) {
       console.log(err);
-      res.status(500);
-      res.send('Something wrong with DB / Cannot get Services');
+      res.status(500).send('Something wrong with DB / Cannot get Services');
   }
 });
 
@@ -110,8 +118,7 @@ router.get('/industries', async (req, res) => {
     res.send(sortedIndustries)
   } catch(err) {
     console.log(err);
-    res.status(500);
-    res.send('Something wrong with DB / Cannot get Industries');
+    res.status(500).send('Something wrong with DB / Cannot get Industries');
   }
 });
 
@@ -121,8 +128,7 @@ router.get('/timezones', async (req, res) => {
     res.send(timezones)
   } catch(err) {
       console.log(err);
-      res.status(500);
-      res.send('Something wrong with DB / Cannot get Timezones');
+      res.status(500).send('Something wrong with DB / Cannot get Timezones');
   }
 });
 

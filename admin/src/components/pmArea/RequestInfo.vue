@@ -1,13 +1,10 @@
 <template lang="pug">
-.project-info(v-if="currentProject._id")
-    .project-info__title Request Details : {{currentProject.projectId}}
-    .project-info__all-info
-        Project(:project="currentProject")
-        ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
-    .project-info__all-info
+.request-info
+    .request-info__title Request Details : {{currentProject.requestId}}
+    .request-info__all-info
+        Request(:request="currentProject")
+    .request-info__all-info
         RequestTasksData(
-            @getMetrics="getMetrics"
-            @setVendor="setVendor"
             @setDate="setDate"
             @showErrors="showErrors"
             :isRequest="isRequest")
@@ -16,26 +13,17 @@
                 :isAbsolute="isBlockAbsoulte"
                 @closeErrors="closeErrorsBlock"
             )
-        .project-info__action(v-if="currentProject.status !== 'Closed'")
-            ProjectAction(
-                :project="currentProject"
-                @editAndSend="editAndSend"
-                @setStatus="setStatus")
 </template>
 
 <script>
 const ValidationErrors = () => import("../ValidationErrors");
-import Project from "./Project";
-import ProjectShortDetails from "./ProjectShortDetails";
-import ProjectAction from "./ProjectAction";
+import Request from "./Request";
 import RequestTasksData from "./RequestTasksData";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
     data() {
         return {
-            statuses: ["Accepted", "Draft", "Open", "Ready"],
-            excludeKeys: ["nonTranslatable", "totalWords"],
             errors: [],
             areErrorsExist: false,
             isBlockAbsoulte: true,
@@ -48,16 +36,9 @@ export default {
     methods: {
         ...mapActions({
             setProjectValue: "setProjectValue",
-            setProjectStatus: "setProjectStatus",
             storeProject: "setCurrentProject",
-            vendorsSetting: "vendorsSetting",
             alertToggle: 'alertToggle',
-            removeStepVendor: 'removeStepVendor',
-            setStepVendor: 'setStepVendor',
-            setStepDate: 'setStepDate',
-            updateCurrentProject: "updateCurrentProject",
-            sendClientQuote: "sendClientQuote",
-            sendProjectDetails: "sendProjectDetails"
+            updateCurrentProject: "updateCurrentProject"
         }),
         async toggleProjectOption({key}) {
             try {
@@ -67,93 +48,11 @@ export default {
                 this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
             }
         },
-        async setVendor({vendor, index}) {
-            if(this.currentProject.steps[index].vendor &&
-                this.currentProject.steps[index].vendor._id === vendor._id) {
-                    return
-            }
-            try {
-                await this.setStepVendor({vendor, index});
-                this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
-            } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot calculate payables for the step.", isShow: true, type: "error"})
-            }
-        },
         async setDate({date, prop, index}) {
             try {
                 await this.setStepDate({value: date, prop, index});
                 await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
-                await this.getMetrics();
             } catch(err) {console.log(err)}
-        },
-        async setStatus({option}) {
-            try {
-                await this.setProjectStatus({status: option});
-                this.alertToggle({message: "Project's status changed", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: err.message, isShow: true, type: "error"});
-            }
-        },
-        wordsCalculation(metrics) {
-            const repetitions = Object.keys(metrics).filter(item => {
-                return this.excludeKeys.indexOf(item) === -1;
-            }).reduce((prev, cur) => {
-                return prev + metrics[cur].value;
-            }, 0);
-            const receivables = metrics.totalWords - metrics.nonTranslatable;
-            const payables = receivables - repetitions;
-            return { receivables, payables };
-        },
-        async updateProgress() {
-            try {
-                const updatedData = await this.$http.get(`/xtm/update-progress?projectId=${this.currentProject._id}`);
-                await this.storeProject(updatedData.body);
-                this.alertToggle({message: "Metrics are updated.", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Internal server error. Cannot update metrics.", isShow: true, type: "error"})
-            }
-        },
-        async getMetrics() {
-            try {
-                if(this.currentProject.isMetricsExist) {
-                    return await this.updateProgress();
-                }
-                await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
-                const updatedProject = await this.$http.get(`/service/costs?projectId=${this.currentProject._id}`);
-                await this.storeProject(updatedProject.body);
-                this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
-            }
-        },
-        setStepsProgress(name, progress) {
-            const { jobsMetrics } = progress;
-            let stepProgress = progress[name];
-            for(let metrics of jobsMetrics) {
-                const { jobId, metricsProgress } = metrics;
-                const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[name];
-                stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
-            }
-            return stepProgress;
-        },
-        getStepsDates({task, key}) {
-            let startDate = task.start;
-            let deadline = task.deadline;
-            if(task.stepsDates.length) {
-                startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
-                deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
-            }
-            return {startDate, deadline};
-        },
-        async getVendors() {
-            try{
-                if(!this.allVendors.length) {
-                    const result = await this.$http.get('/all-vendors');
-                    this.vendorsSetting(result.body);
-                }
-            } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot get Vendors.", isShow: true, type: "error"})
-            }
         },
         async refreshCustomerInfo() {
             const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
@@ -172,11 +71,11 @@ export default {
             this.message = message.data.message;
             this.mailSubject = subject;
         },
-        async getProject() {
+        async getRequest() {
             const { id } = this.$route.params;
             try {
                 if(!this.currentProject._id) {
-                    const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+                    const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
                     await this.storeProject(curProject.body);
                 }
             } catch(err) {
@@ -196,14 +95,11 @@ export default {
     },
     components: {
         ValidationErrors,
-        Project,
-        ProjectShortDetails,
-        ProjectAction,
+        Request,
         RequestTasksData,
     },
     created() {
-        this.getProject();
-        this.getVendors();
+        this.getRequest();
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
@@ -218,7 +114,7 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 
-.project-info {
+.request-info {
     position: relative;
     width: 100%;
     display: flex;

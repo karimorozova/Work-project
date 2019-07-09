@@ -7,6 +7,7 @@ const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSendi
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
+const { getClientRequest } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -16,6 +17,17 @@ router.get("/project", async (req, res) => {
     } catch(err) {
         console.log(err);
         console.log("Error on getting Project");
+    }
+})
+
+router.get("/request", async (req, res) => {
+    const { id } = req.query;
+    try {
+        const request = await getClientRequest({"_id": id});
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        console.log("Error on getting Request");
     }
 })
 

@@ -46,7 +46,7 @@ export default {
             this.setOrderDetail({prop: 'detailFiles', value: [...files]});
         },
         setRefFiles({ files }) {
-            this.setOrderDetail({prop: 'refFiles', value: files});            
+            this.setOrderDetail({prop: 'refFiles', value: [...files]});            
         },
         deleteFile(e, index, arr) {
             this.removeFile({prop: arr, index})

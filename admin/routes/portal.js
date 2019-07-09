@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getProject, getProjects, createProject, updateProjectStatus, getDeliverablesLink, storeFiles } = require("../projects/");
+const { createRequest, storeRequestFiles } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients } = require('../models');
 const { secretKey } = require('../configs');
@@ -217,19 +218,19 @@ router.get('/reject', checkClientContact, async (req, res) => {
 });
 
 router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-    let {source, targets, quoteDecision, service, xtmCustomerId, ...project } = req.body;
+    let {source, targets, quoteDecision, xtmCustomerId, ...request } = req.body;
     try {
         const sourceLanguage = JSON.parse(source);
         const targetLanguages = JSON.parse(targets);
-        let createdProject = await createProject({...project, sourceLanguage, targetLanguages});
+        let createdRequest = await createRequest({...request, sourceLanguage, targetLanguages});
         const { detailFiles: sourceFiles, refFiles } = req.files;
-        createdProject.sourceFiles = await storeFiles(sourceFiles, createdProject.id);
-        createdProject.refFiles = refFiles ? await storeFiles(refFiles, createdProject.id) : [];
-        createdProject.save();
-        res.send(createdProject);
+        createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);
+        createdRequest.refFiles = refFiles ? await storeRequestFiles(refFiles, createdRequest.id) : [];
+        createdRequest.save();
+        res.send(createdRequest);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on creating a project!');
+        res.status(500).send('Error on creating a request!');
     }
 });
 

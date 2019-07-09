@@ -50,8 +50,6 @@ export default {
     },
     methods: {
         ...mapActions({
-            setStoreProjects: "setAllProjects",
-            setRequests: "setRequests",
             storeProject: "setCurrentProject",
             loadingToggle: "loadingToggle",
         }),
@@ -70,22 +68,6 @@ export default {
                 return this.$router.push(`/request-details/${project._id}`); 
             }
             this.$router.push(`/project-details/${project._id}`);
-        },
-        async getProjects() {
-            try {
-                const projects = await this.$http.get('/api/allprojects?status=Others');
-                await this.setStoreProjects([...projects.body]);
-            } catch(err) {
-
-            }
-        },
-        async getRequests() {
-            try {
-                const requests = await this.$http.get('/api/allprojects?status=Requested');
-                await this.setRequests([...requests.body]);
-            } catch(err) {
-
-            }
         },
         async getManagers() {
             const managers = await this.$http.get("/pm-manage/all-managers");
@@ -143,8 +125,6 @@ export default {
         }
     },
     created() {
-        this.getProjects();
-        this.getRequests();
         this.getManagers();
     },
     mounted() {

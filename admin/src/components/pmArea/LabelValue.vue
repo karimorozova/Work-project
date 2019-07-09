@@ -50,10 +50,6 @@ export default {
         align-items: center;
         flex-direction: column;
     }
-    .project__textarea & {
-        flex-direction: column;
-        align-items: flex-start;
-    }
     .filters__date &, .filters_flex-end & {
         justify-content: flex-end;
     }
@@ -63,6 +59,11 @@ export default {
     .pair__label {
         margin-right: 15px;
     }
+}
+
+.project_textarea {
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 </style>

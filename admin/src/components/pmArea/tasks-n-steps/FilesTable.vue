@@ -3,61 +3,64 @@
     .files-table
       DataTable(
        :fields="fields"
-       :tableData="finalFilesArray"
+       :tableData="allFiles"
        :hasScroll="hasScroll"
        bodyClass="all-projects"
        bodyRowClass="files-table-row-class"
       )
         template(slot="headerFile" slot-scope="{ field }")
-          input.files-table__input-checkbox-inside-cell(type="checkbox" disabled=true)
+          .files-table__checkbox
+            input.files-table__check-input(type="checkbox")
         template(slot="headerFileName" slot-scope="{ field }")
-          span.files-table__label {{ field.label }}
+          .files-table__label {{ field.label }}
         template(slot="headerType" slot-scope="{ field }")
-          span.files-table__label {{ field.label }}
+          .files-table__label {{ field.label }}
         template(slot="headerActions" slot-scope="{ field }")
-          span.files-table__label {{ field.label }}
+          .files-table__label {{ field.label }}
         template(slot="fileId" slot-scope="{ row, index }")
-          input.files-table__input-checkbox-inside-cell(type="checkbox" @change="onCheckBoxChanged(row,index)")
-        template(slot="fileName" slot-scope="{ row }")
-          span.files-table__file-icon
+          .files-table__data.files-table_padding-left-10
+            input.files-table__check-input(type="checkbox" @change="onCheckBoxChanged(row,index)" :checked="row.isApproved")
+        template(slot="fileName" slot-scope="{ row, index }")
+          .files-table__data.files-table_relative
             img(src="../../../assets/images/file_icon.png" alt="")
-          span {{ row.fileName }}
-        template(slot="fileType" slot-scope="{ row }")
-          span {{ row.fileType }}
+            span.files-table__name {{ row.fileName }}
+                span.files-table__full-name {{ row.fileName }}
+        template(slot="type" slot-scope="{ row }")
+          .files-table__data {{ row.type }}
         template(slot="actions" slot-scope="{ row, index }")
-          span.files-table__icons
+          .files-table__icons
             img.files-table__icon(@click.stop="makeAction(key, row, index)" v-for="(icon, key) in icons" :src="icon.icon")
-    .add-row
-      .add-row__plus(@click="addNewRow")
-        span +
+            i.files-table__check-icon.fa.fa-check-circle(:class="{'files-table_green': row.isApproved}")
+    Add(@add="addFile")
 </template>
 
 <script>
-  import DataTable from "../../DataTable";
+  import DataTable from "@/components/DataTable";
+  import Add from "@/components/Add";
   import { mapGetters, mapActions } from "vuex";
 
   export default {
     data() {
       return {
         fields: [
-          {label: "", headerKey: "headerFile", key: "fileId", width: "10%"},
-          {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "30%", cellClass:"flex-content"},
-          {label: "Type", headerKey: "headerType", key: "fileType", width: "25%", cellClass:"flex-content"},
-          {label: "", headerKey: "headerActions", key: "actions", width: "35%"},
+          {label: "", headerKey: "headerFile", key: "fileId", width: "8%", padding: 0},
+          {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "40%", padding: 0},
+          {label: "Type", headerKey: "headerType", key: "type", width: "25%", padding: 0},
+          {label: "", headerKey: "headerActions", key: "actions", width: "27%", padding: 0},
         ],
         icons: {
           download: {icon: require('../../../assets/images/Other/Download-icon.png')},
           upload: {icon: require('../../../assets/images/Other/upload-icon.png')},
           trash: {icon: require('../../../assets/images/Other/delete-icon-qa-form.png')},
-          checked: {icon: require('../../../assets/images/white-check-png-1.png')},
         },
-        finalFilesArray:[]
+        allFiles:[],
+        showIndex: -1
       }
     },
     methods: {
       makeAction(key, row, index) {
       },
-      addNewRow() {
+      addFile() {
       },
       onCheckBoxChanged(row,index) {
       },
@@ -70,6 +73,17 @@
         }, "")
       },
       edit() {
+      },
+      parseFilesToArray() {
+        const sourceFiles = this.currentProject.sourceFiles.map(item => {
+            item.type = "Source File";
+            return item;
+        })
+        const refFiles = this.currentProject.refFiles.length ? this.currentProject.refFiles.map(item => {
+            item.type = "Reference File";
+            return item;
+        }) : [];
+        this.allFiles.push(...sourceFiles, ...refFiles);
       }
     },
     computed: {
@@ -77,51 +91,81 @@
         currentProject: 'getCurrentProject',
       }),
       hasScroll() {
-        return document.body.offsetWidth > 1024 && this.finalFilesArray.length > 3;
+        return document.body.offsetWidth > 1024 && this.allFiles.length > 3;
       }
     },
     mounted() {
-      let mediumFileArray = [];
-      this.currentProject.sourceFiles.map((el)=>{
-        const sourceFileName = el.split('/')[4];
-        mediumFileArray.push({fileName:sourceFileName, fileType:'Source file'})
-      });
-       this.finalFilesArray = [...mediumFileArray];
-       mediumFileArray = [];
-      this.currentProject.refFiles.map((el)=>{
-        const sourceFileName = el.split('/')[4];
-        mediumFileArray.push({fileName:sourceFileName, fileType:'Reference file'})
-      });
-      this.finalFilesArray = [...this.finalFilesArray,...mediumFileArray];
-
+      this.parseFilesToArray();
     },
     components: {
-      DataTable
+      DataTable,
+      Add
     }
   }
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
   .files-table {
-    min-height: 121px;
-    &__icon {
-      height: 17px;
-      margin: 0 10px;
+    &__data, &__icons {
+        height: 30px;
+        box-sizing: border-box;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+    }
+    &__icons {
+        justify-content: space-around;
+        width: 90%;
     }
     &__file-icon{
-      margin: 0 10px;
+        margin-right: 5px;
     }
-    &__input-checkbox-inside-cell{
-      width: 20px;
-      height: 20px;
-      position: relative;
-      left: 9px;
+    &__name {
+        &:hover {
+            position: relative;
+            .files-table__full-name {
+                display: block;
+                z-index: 5;
+            }
+        }
+    }
+    &__full-name {
+        position: absolute;
+        background-color: $white;
+        padding: 3px;
+        display: none;
+        max-width: 400px;
+        top: -3px;
+        left: 0;
+        z-index: -1
+    }
+    &__checkbox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__check-input {
+        width: 18px;
+        height: 18px;
     }
     &__label {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    &__check-icon {
+        font-size: 16px;
+        color: $light-brown;
+        cursor: pointer;
+    }
+    &_padding-left-10 {
+        padding-left: 10px;
+    }
+    &_green {
+        color: $green-approve;
     }
   }
   .add-row {

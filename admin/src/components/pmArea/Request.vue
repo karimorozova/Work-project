@@ -1,63 +1,50 @@
 <template lang="pug">
-.project
-    //- .project__project-template(v-if="!project.projectId")
-    //-     SelectSingle(
-    //-         :selectedOption="project.template"
-    //-         :options="templates"
-    //-         placeholder="Project Template"
-    //-         refersTo="template"
-    //-         @chooseOption="setValue"
-    //-     )
-    .project__all-info
-        .project__info-row
-            input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
-            input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
-            .project__date
+.request
+    .request__all-info
+        .request__info-row.request_right-padding-20
+            input.request__name(type="text" v-model="request.projectName" placeholder="Project Name")
+            .request__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
-                img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
-            .project__date
-                LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
-                img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
-        .project__info-row
-            .project__client
+                    Datepicker(v-model="request.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
+                img.request__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
+            .request__date
+                LabelValue(label="Requested Deadline" :isRequired="isRequiredField" customClass="project_margin")
+                    Datepicker(v-model="request.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                img.request__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+                i.request__check-icon.fa.fa-check-circle
+        .request__info-row.request_right-padding-20
+            .request__client
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
-                    .project__client-link(v-if="project._id")
-                        .project__link(@click="goToClientInfo") {{ project.customer.name }}
-                    .project__drop-menu(v-else)
+                    .request__client-link(v-if="request._id")
+                        .request__link(@click="goToClientInfo") {{ customerName }}
+                    .request__drop-menu(v-else)
                         SelectSingle(
-                            :selectedOption="project.customer.name"
+                            :selectedOption="customerName"
                             :options="allClients"
                             :hasSearch="isSearchClient"
                             placeholder="Name"
                             refersTo="customer"
                             @chooseOption="setValue"
                         )
-            .project__industry
+            .request__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
-                    .project__drop-menu
+                    .request__drop-menu
                         SelectSingle(
-                            :selectedOption="selectedIndustry.name || project.industry.name"
+                            :selectedOption="industryName"
                             :options="industriesList"
                             @chooseOption="setIndustry"
                             placeholder="Industry"
                         )
-            .project__number
+            .request__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
-                    input.project__input-text(type="text" v-model="project.projectId" placeholder="Project Number")
-        .project__info-row.project_no-margin
-            .project__textarea
+                    input.request__input-text(type="text" v-model="request.projectId" placeholder="Project Number")
+        .request__info-row.request_no-margin
+            .request__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
-                    textarea.project__text(type="text" rows="10" v-model="project.brief")
-            .project__textarea
+                    textarea.request__text(type="text" rows="10" v-model="request.brief")
+            .request__textarea
                 LabelValue(label="Internal Notes" customClass="project_textarea")
-                    textarea.project__text(type="text" rows="10" v-model="project.notes")
-        .project__button(v-if="!project.projectId")
-            Button(
-                value="Create Project"
-                @clicked="checkForErrors"
-            )
+                    textarea.request__text(type="text" rows="10" v-model="request.notes")
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors")
@@ -69,24 +56,20 @@ import SelectMulti from "../SelectMulti";
 import ValidationErrors from "../ValidationErrors";
 import Datepicker from "../Datepicker";
 import LabelValue from "./LabelValue";
-import Button from "../Button";
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        project: {
+        request: {
             type: Object,
+            default: () => {
+                return {}
+            }
         }
     },
     data() {
         return {
-            templates: [
-                "template 1",
-                "template 2",
-                "template 3",
-            ],
-            selectedIndustry: "",
             industries: [],
             disabled: {
                 to: moment().add(-1, 'day').endOf('day').toDate()
@@ -112,8 +95,8 @@ export default {
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});
-            if(refersTo === 'customer' && this.project.customer.industries.length == 1) {
-                this.selectedIndustry = this.project.customer.industries[0];
+            if(refersTo === 'customer' && this.request.customer.industries.length == 1) {
+                this.selectedIndustry = this.request.customer.industries[0];
             }
         },
         setIndustry({option}) {
@@ -124,37 +107,7 @@ export default {
         },
         checkProjectName() {
             const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
-            return regex.test(this.project.projectName);
-        },
-        async checkForErrors() {
-            this.errors = [];
-            if(!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.");
-            if(!this.project.createdAt) this.errors.push("Please, set the start date.");
-            if(!this.project.deadline) this.errors.push("Please, set the deadline date.");
-            if(!this.project.customer.name) this.errors.push("Please, select a Client.");
-            if(!this.selectedIndustry) this.errors.push("Please, choose an industry.");
-            if(this.errors.length) {
-                this.areErrorsExist = true;
-                return
-            }
-            try {
-                await this.createProject();
-            } catch(err) {
-                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
-            }
-        },
-        async createProject() {
-            this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
-            this.project.industry = this.selectedIndustry._id;
-            const customer = {...this.project.customer};
-            this.project.customer = customer._id;
-            try {
-                const newProject = await this.$http.post("/pm-manage/new-project", this.project);
-                this.$emit('projectCreated', {project: newProject.body, customer: customer});
-                this.alertToggle({message: "New Project has been created", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
-            }
+            return regex.test(this.request.projectName);
         },
         async getIndustries() {
             const industries = await this.$http.get('/api/industries');
@@ -167,7 +120,7 @@ export default {
             this.$refs.deadline.showCalendar();
         },
         goToClientInfo() {
-            this.$router.push(`/clients/${this.project.customer._id}`)
+            this.$router.push(`/clients/${this.request.customer._id}`)
         },
         async getCustomers() {
             try {
@@ -184,19 +137,25 @@ export default {
         ...mapGetters({
             allClients: "getClients"
         }),
+        customerName() {
+            return this.request.customer ? this.request.customer.name : ""
+        },
+        industryName() {
+            if(this.request.industry) {
+                return this.request.industry.name
+            }
+            return "";
+        },
         industriesList() {
             let result = this.industries;
-            if(this.project.customer.name) {
-                const industries = this.project.customer.industries;
+            if(this.request.customer) {
+                const industries = this.request.customer.industries;
                 if(industries[0].name) {
                     return result = industries;
                 }
                 return result = result.filter(item => industries.indexOf(item._id) !== -1);
             }
             return result;
-        },
-        nameOfProject() {
-            return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;
         }
     },
     components: {
@@ -204,7 +163,6 @@ export default {
         SelectMulti,
         Datepicker,
         LabelValue,
-        Button,
         ValidationErrors
     },
     created() {
@@ -215,18 +173,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.project {
+@import "../../assets/scss/colors.scss";
+
+.request {
     padding: 20px;
     width: 67%;
     display: flex;
     flex-direction: column;
     @media (max-width: 1600px) {
         width: 70%;
-    }
-    &__project-template {
-        position: relative;
-        width: 191px;
-        margin-bottom: 60px;
     }
     &__all-info {
         padding: 20px;
@@ -238,6 +193,7 @@ export default {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 40px;
+        box-sizing: border-box;
         ::-webkit-input-placeholder {
             color: #68573E;
             opacity: 0.47;
@@ -259,6 +215,14 @@ export default {
     &__date {
         width: fit-content;
         position: relative;
+    }
+    &__check-icon {
+        font-size: 18px;
+        color: $light-brown;
+        cursor: pointer;
+        position: absolute;
+        right: -24px;
+        top: 4px;
     }
     &__client, &__industry, &__number {
         width: fit-content;
@@ -318,8 +282,14 @@ export default {
         text-align: center;
         margin-top: 30px;
     }
+    &_green {
+        color: $green-approve;
+    }
     &_no-margin {
         margin-bottom: 0;
+    }
+    &_right-padding-20 {
+        padding-right: 20px; 
     }
 }
 

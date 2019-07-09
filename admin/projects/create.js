@@ -14,8 +14,8 @@ async function createProject(project) {
         const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
         project.status = project.status || "Draft";
         project.projectId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
-        const createProject = await Projects.create(project);
-        return await getProject({"_id": createProject.id});
+        const createdProject = await Projects.create(project);
+        return await getProject({"_id": createdProject.id});
     } catch(err) {
         console.log(err);
         console.log('Error in createProject');

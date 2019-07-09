@@ -32,21 +32,21 @@
         template(slot="headerEdit" slot-scope="{ field }")
             span.projects-table__label
         template(slot="projectId" slot-scope="{ row }")
-            span {{ row.projectId }}
+            span {{ getId(row) }}
         template(slot="clientName" slot-scope="{ row }")
             span {{ clientName(row.customer) }}
         template(slot="projectName" slot-scope="{ row }")
             span {{ row.projectName }}
         template(slot="languages" slot-scope="{ row }")
-            span {{ projectLangs(row.tasks) }}
+            span {{ projectLangs(row) }}
         template(slot="status" slot-scope="{ row }")
             span {{ row.status }}
         template(slot="receivables" slot-scope="{ row }")
-            span(v-if="row.finance.Price.receivables") &euro;
-            span {{ row.finance.Price.receivables }}
+            span(v-if="row.finance && row.finance.Price.receivables") &euro;
+                span {{ row.finance.Price.receivables }}
         template(slot="payables" slot-scope="{ row }")
-            span(v-if="row.finance.Price.payables") &euro;
-            span {{ row.finance.Price.payables }}
+            span(v-if="row.finance && row.finance.Price.payables") &euro;
+                span {{ row.finance.Price.payables }}
         template(slot="roi" slot-scope="{ row }")
             span {{ row.roi }}
         template(slot="createdAt" slot-scope="{ row }") 
@@ -92,12 +92,23 @@ export default {
         async onRowClicked({index}) {
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
+        getId(row) {
+            return row.projectId || row.requestId;
+        },
         clientName(elem) {
             return elem.name;
         },
-        projectLangs(arr) {
-            return arr.reduce((init, cur) => {
-                return init + cur.sourceLanguage + ' >> ' + cur.targetLanguage + '; '
+        projectLangs(row) {
+            if(row.tasks) {
+                return row.tasks.reduce((prev, cur) => {
+                    return prev + cur.sourceLanguage + ' >> ' + cur.targetLanguage + '; '
+                }, "")
+            }
+            return this.getRequestLangs(row);
+        },
+        getRequestLangs(row) {
+            return row.targetLanguages.reduce((prev, cur) => {
+                return prev + `${row.sourceLanguage.symbol} >> ${cur.symbol}; `;
             }, "")
         },
         edit() {
