@@ -233,4 +233,7 @@
     display: flex;
     align-items: center;
   }
+  .request-files_table {
+      max-height: 136px;
+  }
 </style>

@@ -117,3 +117,39 @@ export const updateStepFinance = async ({commit, dispatch}, payload) => {
         dispatch('decrementRequestCounter')
     }
 }
+
+export const addFileToRequest = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedRequest = await Vue.http.post("/pm-manage/request-file", payload);
+        await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const removeRequestFile = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedRequest = await Vue.http.post("/pm-manage/remove-request-file", payload);
+        await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const toggleRequestFileApprovement = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedRequest = await Vue.http.post("/pm-manage/file-approvement", payload);
+        await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}

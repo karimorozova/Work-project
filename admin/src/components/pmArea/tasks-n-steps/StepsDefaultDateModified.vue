@@ -162,6 +162,7 @@ import { mapGetters, mapActions} from "vuex";
         background-color: #fff;
         position: relative;
         bottom: 22px;
+        padding: 0 5px;
     }
     &__image {
         position: absolute;

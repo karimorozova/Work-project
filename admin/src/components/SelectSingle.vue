@@ -52,8 +52,9 @@ export default {
     methods: {
         showOptions(event) {
             let elementsObj = event.composedPath();
+            const classNames = ["table__tbody-row", "table__body-row"];
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr" || item.className == "table__tbody-row") {
+                if(item.localName == "tr" || classNames.indexOf(item.className) !== -1) {
                     return item;
                 }
             });

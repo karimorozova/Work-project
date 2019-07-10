@@ -7,7 +7,7 @@ const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSendi
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
-const { getClientRequest } = require("../../clientRequests");
+const { getClientRequest, addRequestFile, removeRequestFile } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -314,6 +314,54 @@ router.post("/step-finance", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on changing Step finance");
+    }
+})
+
+router.post("/request-file", upload.fields([{name: "newFile"}]) ,async (req, res) => {
+    const { id, oldFile } = req.body;
+    const files = req.files["newFile"];
+    const existingFile = JSON.parse(oldFile);
+    const prop = existingFile.type === 'Source File' ? "sourceFiles" : "refFiles";
+    try {
+        let request = await getClientRequest({"_id": id});
+        const requestFiles = await addRequestFile({request, files, existingFile, prop});
+        request[prop] = requestFiles;
+        await request.save();
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving request file");
+    }
+})
+
+router.post("/remove-request-file", async (req, res) => {
+    const { id, prop, path } = req.body;
+    try {
+        let request = await getClientRequest({"_id": id});
+        request[prop] = await removeRequestFile({path, files: request[prop]});
+        await request.save();
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing request file");
+    }
+})
+
+router.post("/file-approvement", async (req, res) => {
+    const { id, file, prop } = req.body;
+    try {
+        let request = await getClientRequest({"_id": id});
+        request[prop] = request[prop].map(item => {
+            if(item.fileName === file.fileName && item.path === file.path) {
+                return {...item, isApproved: file.isApproved}
+            }
+            return item;
+        })
+        await request.save();
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approvement of request file");
     }
 })
 
