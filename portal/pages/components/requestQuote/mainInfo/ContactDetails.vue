@@ -11,14 +11,16 @@
                         input.contact-details__input(type="text" @input="(e) => setValue(e, 'contactEmail')")
                 .contact-details__item
                     LabelValue(title="Phone Number" customClass="pair_column-flex quote-item" labelClass="label_required")
-                        input.contact-details__input(type="number" @input="(e) => setValue(e, 'phone')")
+                        input.contact-details__input(type="number" ref="phone" @input="(e) => setValue(e, 'phone')")
             .contact-details__right
                 .contact-details__item
                     LabelValue(title="Company Name" customClass="pair_column-flex quote-item" labelClass="label_required")
                         input.contact-details__input(type="text" @input="(e) => setValue(e, 'companyName')")
                 .contact-details__item
                     LabelValue(title="Website" customClass="pair_column-flex quote-item")
-                        input.contact-details__input(type="text" @input="(e) => setValue(e, 'web')")
+                        input.contact-details__input(type="text" 
+                            pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" 
+                            @input="(e) => setValue(e, 'web')")
                 .contact-details__item
                     LabelValue(title="Skype Name" customClass="pair_column-flex quote-item")
                         input.contact-details__input(type="text" @input="(e) => setValue(e, 'skype')")
@@ -36,7 +38,15 @@ export default {
         }),
         setValue(e, prop) {
             const { value } = e.target;
+            if(prop === 'phone') {
+                return this.setPhone(value);
+            }
             this.setDetail({prop, value});
+        },
+        setPhone(value) {
+            const phoneValue = value.length > 19 ? value.slice(0, 19) : value;
+            this.$refs.phone.value = phoneValue;
+            this.setDetail({prop: 'phone', value: phoneValue});
         }
     },
     components: {
