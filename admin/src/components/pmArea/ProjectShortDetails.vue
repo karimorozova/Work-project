@@ -112,7 +112,7 @@ export default {
     width: 20%;
     margin-top: 20px;
     padding: 10px 20px;
-    box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+    box-shadow: 0 3px 20px $brown-shadow;
     display: flex;
     flex-direction: column;
     align-items: flex-start;

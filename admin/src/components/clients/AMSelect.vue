@@ -42,8 +42,8 @@ export default {
         },
         async getManagers() {
             try {
-            const result = await this.$http.get('/users')
-            this.managers = result.data;
+                const result = await this.$http.get('/users')
+                this.managers = result.data;
             } catch(err) {
                 console.log(err);
             }  

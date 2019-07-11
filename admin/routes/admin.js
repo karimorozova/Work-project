@@ -57,7 +57,8 @@ router.get('/all-vendors', requiresLogin, async (req, res, next) => {
 
 router.get('/users', requiresLogin, async (req, res, next) => {
     try {
-        const users = await User.find({},{"_id": 1, username: 1}).populate('group');
+        const users = await User.find({},{
+            "_id": 1, username: 1, firstName: 1, lastName: 1}).populate('group');
         res.send(users)
     } catch(err) {
         console.log(err);

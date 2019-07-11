@@ -3,6 +3,7 @@
     .request-info__title Request Details : {{currentProject.requestId}}
     .request-info__all-info
         Request(:request="currentProject")
+        RequestShortDetails(:request="currentProject")
     .request-info__all-info
         RequestTasksData(
             @setDate="setDate"
@@ -18,6 +19,7 @@
 <script>
 const ValidationErrors = () => import("../ValidationErrors");
 import Request from "./Request";
+import RequestShortDetails from "./RequestShortDetails";
 import RequestTasksData from "./RequestTasksData";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -85,17 +87,13 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject',
-            allVendors: "getVendors"
-        }),
-        isFinishedStatus() {
-            const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Canclled Halfway'];
-            return finishedStatuses.indexOf(this.currentProject.status) !== -1;
-        }
+            currentProject: 'getCurrentProject'
+        })
     },
     components: {
         ValidationErrors,
         Request,
+        RequestShortDetails,
         RequestTasksData,
     },
     created() {
