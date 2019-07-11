@@ -59,6 +59,14 @@ export default {
     &__title {
         font-size: 12px;
         margin-bottom: 5px;
+        position: relative;
+        &:after {
+            content: "*";
+            position: absolute;
+            color: red;
+            top: -3px;
+            right: -5px;
+        }
     }
     &__picker {
         position: relative;

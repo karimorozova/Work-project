@@ -33,7 +33,8 @@ export default {
             this.areErrors = false;
         },
         async sendForm() {
-
+            const detailFiles = this.requestDetails.detailFiles || [];
+            const refFiles = this.requestDetails.refFiles || [];
             let sendForm = new FormData();
 
             sendForm.append("date", this.requestDetails.deadline);
@@ -51,10 +52,10 @@ export default {
             sendForm.append("accountManager", "None selected");
             sendForm.append("brief", this.requestDetails.brief);
             sendForm.append("createdAt", new Date());
-            for(var i = 0; i < this.requestDetails.detailFiles.length; i++){
-            sendForm.append("detailFiles", this.requestDetails.detailFiles[i]);
+            for(var i = 0; i < detailFiles.length; i++){
+            sendForm.append("detailFiles", detailFiles[i]);
             }
-            sendForm.append("refFiles", this.requestDetails.refFiles[0]);
+            sendForm.append("refFiles", refFiles[0]);
             try {
                 const result = await this.$axios.$post('/api/request', sendForm);
                 window.location.href = "https://www.pangea.global/thank-you";

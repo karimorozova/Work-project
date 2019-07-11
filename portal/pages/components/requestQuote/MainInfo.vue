@@ -21,16 +21,38 @@ export default {
         return {
             errors: [],
             isDetails: false,
-            isHelpInfo: false
+            isHelpInfo: false,
+            supportedFilesExtensions: [
+                "doc", "docx", "xls", "xlsx", "xlsm", "ppt", "pptx", "sxw", "odt", "ods", "odp", "vdx",
+                "pdf", "rtf", "txt","fxg", "svg", "mif", "idml", "sdf", "svg", "html", "htm", "xhtml", 
+                "xht", "asp", "aspx", "php", "dita", "tpl", "xlf", "xliff", "sdlxliff", "txml", "ttx",
+                "yml", "yaml", "properties", "resx", "ini", "strings"
+            ]
         }
     },
     methods: {
+        isUnsupportedFile() {
+            const detailFiles = this.requestDetails.detailFiles || [];
+            const refFiles = this.requestDetails.refFiles || [];
+            const allFiles = [...detailFiles, ...refFiles];
+            if(allFiles.length) {
+                for(let file of allFiles) {
+                    const extension = file.name.split(".").pop();
+                    if(this.supportedFilesExtensions.indexOf(extension) === -1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
         async checkData() {
             this.errors = [];
             if(!this.requestDetails.service) this.errors.push("Select service type");
             if(this.requestDetails.service && !this.checkSource()) this.errors.push("Select source language");
             if(!this.requestDetails.targetLanguages || !this.requestDetails.targetLanguages.length) this.errors.push("Select target language(s)");
             if(!this.requestDetails.industry) this.errors.push("Select industry");
+            if(!this.requestDetails.deadline) this.errors.push("Set the deadline, please");
+            if(this.isUnsupportedFile()) this.errors.push("Please, see the list of supported types of files");
             if(!this.requestDetails.contactName) this.errors.push("Please, enter contact name");
             if(!this.checkEmail()) this.errors.push("Please, enter valid email address");
             if(!this.requestDetails.phone) this.errors.push("Please, enter contact phone number");
