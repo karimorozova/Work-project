@@ -9,9 +9,9 @@
                 img.request__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .request__date
                 LabelValue(label="Requested Deadline" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="request.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                    Datepicker(v-model="request.deadline" :highlighted="highlighted" monday-first=true :inputClass="deadlineClass" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.request__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
-                i.request__check-icon.fa.fa-check-circle
+                i.request__check-icon.fa.fa-check-circle(@click="approveDeadline" :class="{'request_green': request.isDeadlineApproved}")
         .request__info-row.request_right-padding-20
             .request__client
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
@@ -42,6 +42,7 @@
             .request__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
                     textarea.request__text(type="text" rows="10" v-model="request.brief")
+                i.request__check-icon.fa.fa-check-circle.request_left-90(@click="approveBrief" :class="{'request_green': request.isBriefApproved}")
             .request__textarea
                 LabelValue(label="Internal Notes" customClass="project_textarea")
                     textarea.request__text(type="text" rows="10" v-model="request.notes")
@@ -88,7 +89,8 @@ export default {
     methods: {
         ...mapActions({
             alertToggle: "alertToggle",
-            customersGetting: "customersGetting"
+            customersGetting: "customersGetting",
+            approveRequestProp: "approveRequestProp"
         }),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
@@ -121,6 +123,16 @@ export default {
         },
         goToClientInfo() {
             this.$router.push(`/clients/${this.request.customer._id}`)
+        },
+        async approveDeadline() {
+            try {
+                await this.approveRequestProp({id: this.request._id, prop: "isDeadlineApproved"});
+            } catch(err) { }
+        },
+        async approveBrief() {
+            try {
+                await this.approveRequestProp({id: this.request._id, prop: "isBriefApproved"});
+            } catch(err) { }
         },
         async getCustomers() {
             try {
@@ -156,6 +168,9 @@ export default {
                 return result = result.filter(item => industries.indexOf(item._id) !== -1);
             }
             return result;
+        },
+        deadlineClass() {
+            return this.request.isDeadlineApproved ? "datepicker-custom" : "datepicker-custom request_background";
         }
     },
     components: {
@@ -256,6 +271,7 @@ export default {
     }
     &__textarea {
         width: 43%;
+        position: relative;
     }
     &__text {
         width: 100%;
@@ -290,6 +306,10 @@ export default {
     }
     &_right-padding-20 {
         padding-right: 20px; 
+    }
+    &_left-90 {
+        left: 90px;
+        top: 0;
     }
 }
 

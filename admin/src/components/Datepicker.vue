@@ -1175,4 +1175,8 @@ export default {
 .steps__calendar-custom .cell.day-header {
   font-size: 12px;
 }
+
+.request_background {
+    background-color: rgba(229, 105, 97, 0.24);
+}
 </style>

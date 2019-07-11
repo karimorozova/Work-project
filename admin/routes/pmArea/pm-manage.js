@@ -365,4 +365,17 @@ router.post("/file-approvement", async (req, res) => {
     }
 })
 
+router.post("/prop-approvement", async (req, res) => {
+    const { id, prop } = req.body;
+    try {
+        let request = await getClientRequest({"_id": id});
+        request[prop] = !request[prop];
+        request.save();
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approvement of request file");
+    }
+})
+
 module.exports = router;

@@ -153,3 +153,15 @@ export const toggleRequestFileApprovement = async ({commit, dispatch}, payload) 
         dispatch('decrementRequestCounter')
     }
 }
+
+export const approveRequestProp = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedRequest = await Vue.http.post("/pm-manage/prop-approvement", payload);
+        await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
