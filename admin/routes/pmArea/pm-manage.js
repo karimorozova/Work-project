@@ -7,7 +7,7 @@ const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSendi
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
-const { getClientRequest, addRequestFile, removeRequestFile } = require("../../clientRequests");
+const { getClientRequest, addRequestFile, removeRequestFile, removeRequestFiles } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -339,6 +339,24 @@ router.post("/remove-request-file", async (req, res) => {
     try {
         let request = await getClientRequest({"_id": id});
         request[prop] = await removeRequestFile({path, files: request[prop]});
+        await request.save();
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing request file");
+    }
+})
+
+router.post("/delete-request-files", async (req, res) => {
+    const { id, sourceFiles, refFiles } = req.body;
+    try {
+        let request = await getClientRequest({"_id": id});
+        if(sourceFiles.length) {
+            request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles);
+        }
+        if(refFiles.length) {
+            request.refFiles = await removeRequestFiles(refFiles, request.refFiles);
+        }
         await request.save();
         res.send(request);
     } catch(err) {

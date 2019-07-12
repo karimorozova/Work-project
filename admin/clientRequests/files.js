@@ -34,6 +34,19 @@ async function addRequestFile({request, files, existingFile, prop}) {
     }
 }
 
+async function removeRequestFiles(removingFiles, requestFiles) {
+    const removingPaths = removingFiles.map(item => item.path);
+    try {
+        for(let file of removingFiles) {
+            await deleteOldFile(`./dist${file.path}`);
+        }
+        return requestFiles.filter(item => removingPaths.indexOf(item.path) === -1);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeRequestFiles");
+    }
+}
+
 async function removeRequestFile({path, files}) {
     try {
         await deleteOldFile(`./dist${path}`);
@@ -50,10 +63,10 @@ function deleteOldFile(path) {
             if(err) {
                 reject(err)
             } else {
-            resolve(res)
+                resolve(res)
             }
         });
     })
 }
 
-module.exports = { storeRequestFiles, addRequestFile, removeRequestFile };
+module.exports = { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles };

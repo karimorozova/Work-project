@@ -1,6 +1,6 @@
 const { getClientRequest, getClientRequests, updateClientRequest } = require("./get");
 const { createRequest } = require("./create");
-const { storeRequestFiles, addRequestFile, removeRequestFile } = require("./files");
+const { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles } = require("./files");
 
 module.exports = { 
     getClientRequest, 
@@ -9,5 +9,6 @@ module.exports = {
     createRequest,
     storeRequestFiles,
     addRequestFile,
-    removeRequestFile
+    removeRequestFile,
+    removeRequestFiles
 };

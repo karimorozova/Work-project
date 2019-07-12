@@ -154,6 +154,27 @@ export const toggleRequestFileApprovement = async ({commit, dispatch}, payload) 
     }
 }
 
+export const approveRequestFiles = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter');
+    let { id, sourceFiles, refFiles } = payload;
+    sourceFiles = sourceFiles.map(item => {
+        const {isChecked, type, ...file } = item;
+        return {...file}
+    })
+    refFiles = refFiles.map(item => {
+        const {isChecked, type, ...file } = item;
+        return {...file}
+    })
+    try {
+        await dispatch('setRequestValue', {id, prop: "sourceFiles", value: sourceFiles});
+        await dispatch('setRequestValue', {id, prop: "refFiles", value: refFiles});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
 export const approveRequestProp = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
@@ -170,6 +191,18 @@ export const setRequestValue = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/set-value", payload);
+        await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const deleteRequestFiles = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedRequest = await Vue.http.post("/pm-manage/delete-request-files", payload);
         await dispatch('setCurrentProject', updatedRequest.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
