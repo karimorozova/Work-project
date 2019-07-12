@@ -27,6 +27,7 @@ export default {
         }),
         setSource({language}) {
             this.setDetail({prop: 'sourceLanguage', value: language});
+            this.setDetail({prop: 'targetLanguages', value: []});
         },
         setTargets({language}) {
             let targets = this.selectedTargets.map(item => {return {...item}});
