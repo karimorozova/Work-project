@@ -90,6 +90,7 @@ export default {
                 {
                     title: "REPORTS",
                     imgBrown: require("../assets/images/CATEGORIES/REPORTS.png"),
+                    imgWhite: require("../assets/images/CATEGORIES/REPORTS2.png"),
                     active: false
                 },
                 {
