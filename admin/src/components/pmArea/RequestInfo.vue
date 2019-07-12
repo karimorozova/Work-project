@@ -54,7 +54,7 @@ export default {
             try {
                 await this.setStepDate({value: date, prop, index});
                 await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
-            } catch(err) {console.log(err)}
+            } catch(err) { }
         },
         async refreshCustomerInfo() {
             const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);

@@ -66,7 +66,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            storeProject: "storeProject",
+            storeProject: "setCurrentProject",
             setDataValue: "setTasksDataValue"
         }),
         sortLangs(arrProp) {
@@ -137,7 +137,8 @@ export default {
         async getLanguagePairs() {
             try {
                 if(!this.currentProject._id) {
-                    const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+                    const id = this.$route.params.id;
+                    const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
                     await this.storeProject(curProject.body);
                 }
                 if(this.isRequest) {
