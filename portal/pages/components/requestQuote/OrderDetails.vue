@@ -8,7 +8,7 @@
                     span.info-block__text {{ service }}
             .info-block
                 SectionTitle(number="2" text="LANGUAGE(S):" customClass="details-titles")
-                .info-block__item
+                .info-block__item(v-if="isServiceDuo")
                     span.info-block__label Source:
                     span.info-block__text {{ source }}
                 .info-block__item
@@ -39,6 +39,9 @@ export default {
         }),
         service() {
             return this.requestDetails.service ? this.requestDetails.service.title : "Select";
+        },
+        isServiceDuo() {
+            return this.requestDetails.service ? this.requestDetails.service.languageForm === "Duo" : true;
         },
         source() {
             return this.requestDetails.sourceLanguage ? this.requestDetails.sourceLanguage.lang : "Select";

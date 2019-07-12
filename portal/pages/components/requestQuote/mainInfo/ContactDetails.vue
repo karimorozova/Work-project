@@ -11,7 +11,7 @@
                         input.contact-details__input(type="text" @input="(e) => setValue(e, 'contactEmail')")
                 .contact-details__item
                     LabelValue(title="Phone Number" customClass="pair_column-flex quote-item" labelClass="label_required")
-                        input.contact-details__input(type="number" ref="phone" @input="(e) => setValue(e, 'phone')")
+                        input.contact-details__input(type="text" pattern="^[0-9]+$" ref="phone" @input="(e) => setValue(e, 'phone')")
             .contact-details__right
                 .contact-details__item
                     LabelValue(title="Company Name" customClass="pair_column-flex quote-item" labelClass="label_required")
@@ -44,7 +44,10 @@ export default {
             this.setDetail({prop, value});
         },
         setPhone(value) {
-            const phoneValue = value.length > 19 ? value.slice(0, 19) : value;
+            const regex = /^[0-9]+$/;
+            const characters = value.split("").filter(item => regex.test(item));
+            const clearedValue = characters.join("");
+            const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
             this.$refs.phone.value = phoneValue;
             this.setDetail({prop: 'phone', value: phoneValue});
         }
@@ -80,11 +83,6 @@ export default {
     }
     &__item {
         width: 100%;
-        ::-webkit-inner-spin-button, 
-        ::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
     }
     &__input {
         width: 100%;

@@ -70,9 +70,9 @@ export default {
         },
         checkSource() {
             if(this.requestDetails.service.languageForm === 'Duo') {
-                return this.requestDetails.sourceLanguage && this.requestDetails.sourceLanguage.lang !== 'Select'
+                return this.requestDetails.sourceLanguage && this.requestDetails.sourceLanguage.lang !== 'Select';
             }
-            return false;
+            return true;
         },
         async checkCaptcha() {
             let captchaValidation = await grecaptcha.getResponse();
