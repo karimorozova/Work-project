@@ -219,10 +219,15 @@ export default {
             this.currentEditingIndex = -1;
             const client = this.filteredClients[this.deletingClientIndex];
             try {
+                const hasRelatedDocs = await this.$http.get(`/clientsapi/any-doc?id=${client._id}`);
+                if(hasRelatedDocs.body) {
+                    return this.alertToggle({message: "The client has related documents and cannot be deleted", isShow: true, type: "error"});
+                }
                 const result = await this.$http.delete(`/clientsapi/deleteclient/${client._id}`);
                 await this.removeClient(client._id);
                 this.alertToggle({message: "Client removed", isShow: true, type: "success"});
             } catch(err) {
+                console.log(err)
                 this.alertToggle({message: "Server error / Cannot delete the Client", isShow: true, type: "error"});
             }
         },

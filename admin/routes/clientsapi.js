@@ -5,6 +5,7 @@ const fse = require('fs-extra');
 const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
+const { getClientRequest } = require('../clientRequests');
 
 router.get('/client', async (req, res) => {
     let { id } = req.query;
@@ -174,6 +175,19 @@ router.post('/update-matrix', async (req, res) => {
         res.send({updatedClient: result});
     } catch(err) {
         res.status(500).send("Error on updating matrix");
+    }
+})
+router.get('/any-doc', async (req, res) => {
+    const { id } = req.query;
+    try {
+        const request = await getClientRequest({"customer": id});
+        if(request) {
+            return res.send(request);
+        }
+        const project = await getProject({"customer": id});
+        res.send(project);
+    } catch(err) {
+        res.status(500).send("Error on getting any document of client");
     }
 })
 
