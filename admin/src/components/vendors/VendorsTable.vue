@@ -231,6 +231,10 @@ export default {
             this.currentEditingIndex = -1;
             const vendor = this.filteredVendors[this.deletingVendorIndex];
             try {
+                const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${vendor._id}`);
+                if(isAssigned.body) {
+                    return this.alertToggle({message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error"});
+                }
                 await this.deleteCurrentVendor({id: vendor._id});
                 this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
             } catch(err) {

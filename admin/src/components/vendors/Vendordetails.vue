@@ -78,7 +78,7 @@
         .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
                 @addSevLangs="addSevLangs")
-        .delete-approve(v-if="approveShow")
+        .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
@@ -121,7 +121,7 @@ export default {
             vendorShow: true,
             imageExist: false,
             timezones: [],
-            approveShow: false,
+            isApproveModal: false,
             asteriskStyle: {"top": "-4px"},
             photoFile: [],
             isAddSeveral: false,
@@ -168,10 +168,10 @@ export default {
             }
         },
         deleteVendor() {
-            this.approveShow = true;
+            this.isApproveModal = true;
         },
         cancelApprove() {
-            this.approveShow = false;
+            this.isApproveModal = false;
         },
         previewPhoto() {
             let input = document.getElementsByClassName('photo-file')[0];
@@ -256,11 +256,15 @@ export default {
             this.$router.go(-1);
         },
         async approveVendorDelete() {
-            this.approveShow = false;
+            this.isApproveModal = false;
             if(!this.currentVendor._id) {
                 return this.cancel();
             }
             try {
+                const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${this.currentVendor._id}`);
+                if(isAssigned.body) {
+                    return this.alertToggle({message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error"});
+                }
                 await this.deleteCurrentVendor({id: this.currentVendor._id});
                 this.alertToggle({message: "Vendor removed", isShow: true, type: "success"});
                 this.$router.go(-1);

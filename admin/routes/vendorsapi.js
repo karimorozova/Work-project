@@ -159,4 +159,14 @@ router.post('/update-matrix', async (req, res) => {
     }
 })
 
+router.get('/any-step', async (req, res) => {
+    const { id } = req.query;
+    try {
+        const project = await getProject({"steps.vendor": id});
+        res.send(project);
+    } catch(err) {
+        res.status(500).send("Error on gettinf any step with current Vendor");
+    }
+})
+
 module.exports = router;
