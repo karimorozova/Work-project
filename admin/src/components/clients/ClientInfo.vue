@@ -75,7 +75,7 @@
     .title Billing Informations
     .client-info__billing
         ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
-    .delete-approve(v-if="approveShow")
+    .delete-approve(v-if="isApproveModal")
         p Are you sure you want to delete?
         input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
         input.button(type="button" value="Delete" @click="approveClientDelete")
@@ -125,7 +125,7 @@ export default {
     },
     data() {
         return {
-            approveShow: false,
+            isApproveModal: false,
             clientShow: true,
             contactShow: false,
             contactInd: 0,
@@ -216,7 +216,7 @@ export default {
             this.updateClientContact({index, contact});
         },
         deleteClient() {
-            this.approveShow = true;
+            this.isApproveModal = true;
         },
         contactLeadError() {
             return this.currentClient.contacts.find(item => item.leadContact);
@@ -244,7 +244,7 @@ export default {
             return contacts;
         },
         cancelApprove() {
-            this.approveShow = false;
+            this.isApproveModal = false;
         },
         chosenInd({industry}) {
             let industries = [...this.currentClient.industries];
@@ -333,7 +333,12 @@ export default {
         },
         async approveClientDelete() {
             const id = this.currentClient._id;
+            this.isApproveModal = false;
             try {
+                const hasRelatedDocs = await this.$http.get(`/clientsapi/any-doc?id=${id}`);
+                if(hasRelatedDocs.body) {
+                    return this.alertToggle({message: "The client has related documents and cannot be deleted", isShow: true, type: "error"});
+                }
                 const result = await this.$http.delete(`/clientsapi/deleteclient/${id}`);
                 await this.removeClient(id);
                 this.alertToggle({message: "Client has been removed", isShow: true, type: "success"});

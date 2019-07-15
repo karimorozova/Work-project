@@ -227,7 +227,6 @@ export default {
                 await this.removeClient(client._id);
                 this.alertToggle({message: "Client removed", isShow: true, type: "success"});
             } catch(err) {
-                console.log(err)
                 this.alertToggle({message: "Server error / Cannot delete the Client", isShow: true, type: "error"});
             }
         },
