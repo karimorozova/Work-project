@@ -123,9 +123,14 @@ export default {
             const index = this.deleteIndex;
             const id = this.groups[index]._id;
             try {
-                await this.$http.delete(`/api/group/${id}`);
-                this.groups.splice(index, 1);
-                this.alertToggle({message: "Group deleted", isShow: true, type: 'success'})
+                const isAnyUserOfGroup = await this.$http.get(`/api/group-user?id=${id}`);
+                if(isAnyUserOfGroup.body) {
+                    this.alertToggle({message: "ERROR! There is a user of the group in DataBase.", isShow: true, type: 'error'})
+                } else {
+                    await this.$http.delete(`/api/group/${id}`);
+                    this.groups.splice(index, 1);
+                    this.alertToggle({message: "Group deleted", isShow: true, type: 'success'})
+                }
             } catch(err) {
                 this.alertToggle({message: "Error on group deleting", isShow: true, type: 'error'})
             }

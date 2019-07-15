@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, User } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
 const { getManyServices } = require('../services/');
@@ -241,6 +241,17 @@ router.delete('/group/:id', async (req, res) => {
         res.status(500).send("Error on deleting group");
     }
 });
+
+router.get('/group-user', async (req, res) => {
+    const { id } = req.query;
+    try {
+        const user = await User.findOne({group: id},{firstName: 1});
+        res.send(user);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting any user of group");
+    }
+})
 
 router.get('/steps', async (req, res) => {
     try {
