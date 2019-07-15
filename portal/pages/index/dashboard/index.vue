@@ -22,7 +22,10 @@ export default {
   props: {
     projects: {
       type: Array
-    }
+    },
+    requests: {
+      type: Array
+    },
   },
   data() {
     return {
@@ -65,7 +68,8 @@ export default {
     },
     filteredQuotes() {
       let statuses = ['Quote sent', 'Requested'];
-      return this.filterByStatus(statuses);
+      const projects = this.filterByStatus(statuses);
+      return [...this.requests, ...projects];
     }
   },
   components: {

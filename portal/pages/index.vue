@@ -54,7 +54,7 @@
           span {{ breadCrumb1.toUpperCase() }}
           span.arrows(v-if="breadCrumb2") >>
           span(v-if="clientRequestShow") {{ serviceType }}
-        nuxt-child(:client='client' :user="user" :projects="projects" :quotes="quotes" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
+        nuxt-child(:client='client' :user="user" :projects="projects" :requests="requests" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 
 <script>
@@ -97,7 +97,6 @@
         openProjects: true,
         expander: false,
         accountMenuVisible: false,
-        quotes: [],
         newProject: [
           {title: "Translation", path: "/translation"},
           {title: "Copywriting", path: "/copywriting"},
@@ -189,7 +188,7 @@
         requestInfo: "requestInfo",
         loadLangs: "loadLangs",
         servicesGetting: "servicesGetting",
-        getProjects: "getProjects"
+        getProjectsAndRequests: "getProjectsAndRequests",
       })
     },
     watch: {
@@ -207,7 +206,7 @@
       this.mainPageRender();
       this.setToken();
       this.getServices();
-      this.getProjects();
+      this.getProjectsAndRequests();
       this.breadCrumb1 = this.$route.path.split('/')[1];
       this.breadCrumb2 = this.$route.path.split('/')[2];
     },
@@ -217,6 +216,7 @@
     computed: {
       ...mapGetters({
         projects: "getAllProjects",
+        requests: "getAllRequests",
         user: "getUserInfo",
         client: "getClientInfo"
       })

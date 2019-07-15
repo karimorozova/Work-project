@@ -32,6 +32,12 @@ export default {
             return moment(date).format("DD-MM-YYYY")
         },
         getServices() {
+            if(this.project.status === 'Requested') {
+                return this.project.service.title;
+            }
+            return this.getProjectServices();
+        },
+        getProjectServices() {
             let projectServices = "";
             const { tasks } = this.project;
             const tasksServices = tasks.map(item => item.service).filter((item, index, arr) => {

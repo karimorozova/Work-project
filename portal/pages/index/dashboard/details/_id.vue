@@ -23,17 +23,18 @@ export default {
     },
     methods: {
         ...mapActions({
-            getProjects: "getProjects",
+            getProjectsAndRequests: "getProjectsAndRequests",
             selectProject: "selectProject",
             alertToggle: "alertToggle"
         }),
         async getProjectInfo() {
             const { id } = this.$route.params;
             try {
-                if(!this.allProjects.length) {
-                    await this.getProjects();
+                if(!this.allProjects.length || !this.allRequests.length) {
+                    await this.getProjectsAndRequests();
                 }
-                const currentProject = this.allProjects.find(item => item._id === id);
+                const projectsAndRequests = [...this.allProjects, ...this.allRequests];
+                const currentProject = projectsAndRequests.find(item => item._id === id);
                 await this.selectProject(currentProject);
             } catch(err) {
 
@@ -43,7 +44,8 @@ export default {
     computed: {
         ...mapGetters({
             project: "getSelectedProject",
-            allProjects: "getAllProjects"
+            allProjects: "getAllProjects",
+            allRequests: "getAllRequests"
         }),
         title() {
             let result = "Quote Details";

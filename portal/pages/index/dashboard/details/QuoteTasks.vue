@@ -2,17 +2,19 @@
     .tasks-table
         DataTable(
             :fields="tableFields"
-            :tableData="project.tasks"
+            :tableData="tableData"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
-            .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
+            .tasks-table__data(slot="wordcount" slot-scope="{ row }")
+                .tasks-table__finance(v-if="project.status !== 'Requested'") {{ row.finance.Wordcount.receivables }}
+                .tasks-table__finance(v-else) -
             .tasks-table__data(slot="cost" slot-scope="{ row }")
-                .tasks-table__cost(v-if="project.status !== 'Requested'") {{ row.finance.Price.receivables }}
+                .tasks-table__finance(v-if="project.status !== 'Requested'") {{ row.finance.Price.receivables }}
                     span.tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
-                .tasks-table__cost(v-else) -
+                .tasks-table__finance(v-else) -
 
 </template>
 
@@ -34,7 +36,13 @@ export default {
         }
     },
     methods: {
-        getLanguagePairs(task) {
+        getLanguagePairs(row) {
+            if(this.project.status === "Requested") {
+                return `${this.project.sourceLanguage.lang} => ${row.lang}`
+            }
+            return this.getQuotePairs(row);
+        },
+        getQuotePairs(task) {
             let pair = "";
             for(let langPair of this.clientLanguages) {
                 if(langPair.source.symbol === task.sourceLanguage && 
@@ -49,7 +57,13 @@ export default {
         ...mapGetters({
             project: "getSelectedProject",
             clientLanguages: "getCombinations"
-        })
+        }),
+        tableData() {
+            if(this.project.status !== 'Requested') {
+                return this.project.tasks;
+            }
+            return this.project.targetLanguages;
+        }
     },
     components: {
         DataTable

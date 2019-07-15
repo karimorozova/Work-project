@@ -4,6 +4,7 @@ const state = {
   user: {},
   services: [],
   projects: [],
+  requests: [],
   token: "",
   orderDetails: {},
   requestQuoteDetails: {},

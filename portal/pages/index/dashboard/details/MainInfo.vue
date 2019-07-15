@@ -4,7 +4,9 @@
             .data-block
                 .data-block__item
                     LabelValue(title="Project Name" :isColon="isColon" :value="project.projectName")  
-                .data-block__item
+                .data-block__item(v-if="project.status === 'Requested'")
+                    LabelValue(title="Request ID" :isColon="isColon" :value="project.requestId")
+                .data-block__item(v-else)
                     LabelValue(title="Project ID" :isColon="isColon" :value="project.projectId")  
             .data-block
                 .data-block__item
@@ -98,7 +100,8 @@ export default {
     computed: {
         ...mapGetters({
             project: "getSelectedProject",
-            allProjects: "getAllProjects"
+            allProjects: "getAllProjects",
+            allRequests: "getAllRequests"
         }),
         isQuote() {
             const statuses = ['Quote sent', 'Requested'];
