@@ -96,6 +96,13 @@ export default {
                 isApproved: false,
                 isChecked: false
             })
+            setTimeout( () => {
+                this.handleScroll();
+            }, 0);
+        },
+        handleScroll() {
+            let element = document.querySelector('.request-files_table');
+            element.scrollTop = element.scrollHeight;
         },
         async deleteCheckedFiles() {
             const sourceFiles = this.allFiles.filter(item => item.isChecked && item.type === "Source File");
