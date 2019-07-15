@@ -80,7 +80,7 @@
                         img.services__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
                 template(slot="icons" slot-scope="{ row, index }")
                     .services__icons
-                        img.services__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'services_opacity': isActive(key, index)}")
+                        img.services__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'services_opacity': isActive(key, index)}")
         Add(@add="addService")
 </template>
 
@@ -353,7 +353,11 @@ export default {
         ...mapGetters({
             vuexServices: "getVuexServices",
             vuexSteps: "getVuexSteps"
-        })
+        }),
+        manageIcons() {
+            const { "delete": del, ...result } = this.icons;
+            return result;
+        }
     },
     components: {
         SettingsTable,

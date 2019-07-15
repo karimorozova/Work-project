@@ -47,7 +47,7 @@
                     img.industries__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'industries_opacity': currentActive === index}")
             template(slot="icons" slot-scope="{ row, index }")
                 .industries__icons
-                    img.industries__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'industries_opacity': isActive(key, index)}")
+                    img.industries__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'industries_opacity': isActive(key, index)}")
     Add(@add="addIndustry")
 </template>
 
@@ -236,6 +236,12 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle"
         }),
+    },
+    computed: {
+        manageIcons() {
+            const { "delete": del, ...result } = this.icons;
+            return result;
+        }
     },
     components: {
         SettingsTable,

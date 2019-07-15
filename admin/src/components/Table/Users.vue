@@ -53,7 +53,7 @@
                     )
             template(slot="icons" slot-scope="{ row, index }")
                 .users__icons
-                    img.users__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'users_opacity': isActive(key, index)}")
+                    img.users__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'users_opacity': isActive(key, index)}")
     Add(@add="addUser")
 </template>
 
@@ -250,6 +250,10 @@ export default {
     computed: {
         groupsNames() {
             return this.groups.map(item => item.name);
+        },
+        manageIcons() {
+            const { "delete": del, ...result } = this.icons;
+            return result;
         }
     },
     components: {
