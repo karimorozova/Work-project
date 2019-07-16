@@ -1,7 +1,5 @@
 <template lang="pug">
 .clients-wrap
-    .clients-wrap__sidebar(v-if="sidebarShow")
-        Sidebar(title="CLIENTS" :links="sidebarLinks" linkClass="client-details")
     router-view(
         :index="contactInd"
         :contactsPhotos="contactsPhotos"
@@ -15,14 +13,11 @@
 </template>
 
 <script>
-import Sidebar from '../Sidebar';
 import { mapGetters, mapActions} from "vuex";
 
 export default {
     data() {
         return {
-            sidebarShow: true,
-            sidebarLinks: [{title: "General Information"}],
             fromRoute: "/clients",
             contactsPhotos: [],
             contactsPhotos: [],
@@ -77,6 +72,7 @@ export default {
             storeCurrentClient: "storeCurrentClient",
             storeClientContact: "storeClientContact",
             updateClientContact: "updateClientContact",
+            getAllClients: "getAllClients",
         })
     },
     computed: {
@@ -84,9 +80,6 @@ export default {
             allClients: "getClients",
             currentClient: "getCurrentClient"
         })
-    },
-    components: {
-        Sidebar
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {

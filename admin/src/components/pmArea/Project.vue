@@ -167,7 +167,7 @@ export default {
             this.$refs.deadline.showCalendar();
         },
         goToClientInfo() {
-            this.$router.push(`/clients/${this.project.customer._id}`)
+            this.$router.push(`/clients/details/${this.project.customer._id}`)
         },
         async getCustomers() {
             try {

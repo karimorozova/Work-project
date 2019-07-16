@@ -23,6 +23,7 @@ import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import Users from '@/components/Table/Users'
 import ClientDetails from '@/components/clients/ClientDetails'
+import Allclients from '@/components/clients/Allclients'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewClientInfo from '@/components/clients/NewClientInfo'
 import ContactDetails from '@/components/clients/ContactDetails'
@@ -187,60 +188,66 @@ const router = new Router({
                 },
                 {
                     path: 'clients',
-                    name: 'clients',
+                    name: '',
                     component: ClientsSettings,
-                },
-                {
-                    path: 'new-client',
-                    name: 'new-client',
-                    component: NewClient,
-                    redirect: { name: 'new-client-info' },
-                    props: true,
                     children: [
                         {
                             path: '',
-                            name: 'new-client-info',
-                            component: NewClientInfo,
+                            name: 'clients',
+                            component: Allclients,
                             props: true
                         },
                         {
-                            path: 'new_contact',
-                            name: 'new_contact',
-                            component: NewContactDetails,
-                            props: true
+                            path: 'details/:id',
+                            name: '',
+                            component: ClientDetails,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'client-info',
+                                    component: ClientInfo,
+                                    props: true
+                                },
+                                {
+                                    path: 'new-contact',
+                                    name: 'new-contact',
+                                    component: NewContactDetails,
+                                    props: true
+                                },
+                                {
+                                    path: 'contact/:index',
+                                    name: 'contact',
+                                    component: ContactDetails,
+                                    props: true
+                                }
+                            ]
                         },
                         {
-                            path: '_contact/:index',
-                            name: '_contact',
-                            component: ContactDetails,
-                            props: true
-                        }
-                    ]
-                },
-                {
-                    path: 'clients/:id',
-                    name: 'client-details',
-                    component: ClientDetails,
-                    redirect: { name: 'client-info' },
-                    props: true,
-                    children: [
-                        {
-                            path: '',
-                            name: 'client-info',
-                            component: ClientInfo,
-                            props: true
-                        },
-                        {
-                            path: 'new-contact',
-                            name: 'new-contact',
-                            component: NewContactDetails,
-                            props: true
-                        },
-                        {
-                            path: 'contact/:index',
-                            name: 'contact',
-                            component: ContactDetails,
-                            props: true
+                            path: 'new-client',
+                            name: '',
+                            component: NewClient,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: '_info',
+                                    component: NewClientInfo,
+                                    props: true
+                                },
+                                {
+                                    path: 'new_contact',
+                                    name: 'new_contact',
+                                    component: NewContactDetails,
+                                    props: true
+                                },
+                                {
+                                    path: '_contact/:index',
+                                    name: '_contact',
+                                    component: ContactDetails,
+                                    props: true
+                                }
+                            ]
                         }
                     ]
                 },

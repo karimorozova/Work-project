@@ -231,7 +231,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
-            if(from.name === "client-details") {
+            if(from.name === "client-info") {
                 await vm.refreshCustomerInfo();
             }
         })

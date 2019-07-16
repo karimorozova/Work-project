@@ -1,7 +1,5 @@
 <template lang="pug">
     .new-client-wrap
-        .new-client-wrap__sidebar(v-if="sidebarShow")
-            Sidebar(title="CLIENTS" :links="sidebarLinks" linkClass="client-details")
         router-view(
             :isNewClient="isNewClient"
             :client="client"
@@ -17,7 +15,6 @@
 </template>
 
 <script>
-import Sidebar from '../Sidebar';
 import { mapGetters, mapActions} from "vuex";
 
 export default {
@@ -46,8 +43,6 @@ export default {
                 industries: [],
                 contacts: []
             },
-            sidebarShow: true,
-            sidebarLinks: [{title: "General Information"}],
             asteriskStyle: {"top": "-4px"},
             isNewClient: true
         }
@@ -99,10 +94,7 @@ export default {
         ...mapGetters({
             allClients: "getClients"
         })
-    },
-    components: {
-        Sidebar
-  }
+    }
 }
 </script>
 
@@ -113,6 +105,7 @@ export default {
     position: relative;
     display: flex;
     width: 100%;
+    box-sizing: border-box;
     min-height: 94vh;
 }
 

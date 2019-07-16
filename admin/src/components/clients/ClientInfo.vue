@@ -17,12 +17,12 @@
             .block-item
                 label.block-item__label.block-item_relative Industry:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': !currentClient.industries.length && isSaveClicked}")
+                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
                     MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             .block-item
                 label.block-item__label.block-item_relative Status:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': !currentClient.status && isSaveClicked}")
+                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.status}")
                     ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
         .gen-info__block
             .block-item
@@ -43,17 +43,17 @@
             .block-item
                 label.block-item__label.block-item_relative Account Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': !currentClient.accountManager && isSaveClicked}")
+                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
                     AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
             .block-item
                 label.block-item__label.block-item_relative Sales Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': !currentClient.salesManager && isSaveClicked}")
+                .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.salesManager}")
                     AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
             .block-item
                 label.block-item__label.block-item_relative Project Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': !currentClient.projectManager && isSaveClicked}")
+                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.projectManager}")
                     AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
     .title Contact Details
     .client-info__contacts-info
@@ -352,10 +352,8 @@ export default {
         },
         async getClientInfo() {
             if(!this.currentClient._id) {
-                const client = this.allClients.find(item => item._id === this.$route.params.id);
-                let str = JSON.stringify(client);
-                const curClient = JSON.parse(str);
-                this.storeCurrentClient(curClient);
+                const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`)
+                this.storeCurrentClient(client.body);
             }
         },
         ...mapActions({
@@ -378,7 +376,7 @@ export default {
         }),
         selectedIndNames() {
             let result = [];
-            if(this.currentClient.industries.length) {
+            if(this.currentClient.industries && this.currentClient.industries.length) {
                 for(let ind of this.currentClient.industries) {
                     result.push(ind.name);
                 }

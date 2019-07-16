@@ -271,9 +271,8 @@ export default {
                 return
             }
             const vendor = this.filteredVendors[index];
-            this.storeCurrentVendor(this.filteredVendors[index])
+            this.storeCurrentVendor(vendor);
             this.$router.push(`/vendors/details/${vendor._id}`);
-            this.$emit("showVendorDetails", {vendor: this.filteredVendors[index]});
         }
     },
     computed: {

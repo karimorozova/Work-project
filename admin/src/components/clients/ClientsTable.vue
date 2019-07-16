@@ -238,7 +238,7 @@ export default {
             if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
-            this.$emit('showClientDetails', {id: this.filteredClients[index]._id});
+            this.$router.push(`/clients/details/${this.filteredClients[index]._id}`);
         },
         stopPropagation() {
             return
@@ -252,6 +252,9 @@ export default {
             storeClient: "storeClient",
             removeClient: "removeClient"
         })
+    },
+    created() {
+        this.getClients();
     },
     computed: {
         ...mapGetters({

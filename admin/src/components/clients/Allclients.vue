@@ -1,7 +1,7 @@
 <template lang="pug">
     .all-clients
-        .title(v-if="!clientData") All Clients
-        .all-clients__table(v-if="!clientData")
+        .title All Clients
+        .all-clients__table
             .filters
                 .filters__block
                     .filters-item
@@ -20,7 +20,7 @@
                         label Lead Source
                         .filters__drop-menu
                             ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
-                .filters__block
+                .filters__block.filters_flex-end
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
                 :filterName="filterName"
@@ -42,7 +42,6 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-            clientData: false,
             filterName: "",
             filterStatus: "All",
             industryFilter: {name: 'All'},
@@ -68,7 +67,6 @@ export default {
             this.addSeveral = false
         },
         clientCancel() {
-            this.clientData = false;
             this.$emit('clientCancel');
         },
         async showClientDetails({id}) {
@@ -76,10 +74,10 @@ export default {
             let str = JSON.stringify(client);
             const currentClient = JSON.parse(str);
             await this.storeCurrentClient(currentClient);
-            this.$router.push(`/clients/${id}`);
+            this.$router.push(`/clients/details/${id}`);
         },
         addClient() {
-            this.$router.push('/new-client');
+            this.$router.push('/clients/new-client');
         },
         chosenLeadsource({leadSource}) {
             this.filterLeadsource = leadSource;
@@ -157,6 +155,9 @@ label {
     }
     &_high-index {
         z-index: 10;
+    }
+    &_flex-end {
+        align-items: flex-end;
     }
 }
 

@@ -1,54 +1,53 @@
 <template lang="pug">
 .clients
-  .clients__sidebar(v-if="sidebarShow")
+  .clients__sidebar
     Sidebar(title="Clients" :links="sidebarLinks" linkClass="client-details")
-  .clients__all(v-if="allClients")
-    Allclients(@chosenClient="chosenClient"
-      @clientCancel="clientCancel")
+  .clients__all
+    router-view(
+        @chosenClient="chosenClient"
+        @clientCancel="clientCancel")
 </template>
 
 <script>
-import Allclients from '../clients/Allclients';
 import Sidebar from '../Sidebar';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      allClients: true,
-      sidebarShow: false,
+      isSidebar: false,
       sidebarLinks: [{title: "General Information"}]
     }
   },
   methods: {
     clientCancel(data) {
-      this.sidebarShow = false;
+      this.isSidebar = false;
     },
     chosenClient(data) {
-      this.sidebarShow = true;
+      this.isSidebar = true;
     },
     ...mapActions({
       loadingToggle: "loadingToggle"
     })
   },
   components: {
-    Allclients,
     Sidebar
-  },
-  mounted() {
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .clients {
-  display: flex;
-  &__all {
-    padding-top: 20px;
-    padding-left: 20px;
-    max-width: 1200px;
-    width: calc(100% - 60px);
-  }
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 94vh;
+    &__all {
+        padding-top: 20px;
+        padding-left: 20px;
+        max-width: 1200px;
+        width: calc(100% - 60px);
+    }
 }
 .title {
   font-size: 22px;

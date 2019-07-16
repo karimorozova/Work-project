@@ -24,10 +24,12 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedInd: {
-            type: Array
+            type: Array,
+            default: () => []
         },
         filteredIndustries: {
             type: Array,
+            default: () => []
         },
         parentInd: {
             type: Number

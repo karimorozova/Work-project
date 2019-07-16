@@ -230,7 +230,7 @@ export default {
                 const newClient = {...result.body.client};
                 await this.addNewClient(newClient);
                 this.alertToggle({message: "New Client saved", isShow: true, type: "success"});
-                this.$router.push(`/clients/${newClient._id}`);
+                this.$router.push(`/clients/details/${newClient._id}`);
             } catch(err) {
                 this.alertToggle({message: "Internal server error on updating Client info", isShow: true, type: "error"})
             }  

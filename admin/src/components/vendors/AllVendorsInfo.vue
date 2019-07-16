@@ -16,15 +16,12 @@
             :industryFilter="industryFilter"
             :leadFilter="leadFilter"
             :statusFilter="statusFilter"
-            @showVendorDetails="showVendorDetails"
         )
 </template>
 
 <script>
 import VendorsTable from "./VendorsTable";
-import Vendordetails from "./Vendordetails";
 import VendorFilters from "./VendorFilters";
-import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -40,32 +37,15 @@ export default {
         }
     },
     methods: {
-        showVendorDetails({vendor}) {
-            this.isVendorDetails = true;
-            this.storeCurrentVendor(vendor);
-        },
         addVendor() {
             this.$router.push("/vendors/new-vendor");
         },
-        closeVendorDetails() {
-            this.isVendorDetails = false;
-            this.storeCurrentVendor({});
-        },
         setFilter({option}, prop) {
             this[prop] = option;
-        },
-        ...mapActions({
-            storeCurrentVendor: "storeCurrentVendor"
-        })
-    },
-    computed: {
-        ...mapGetters({
-            currentVendor: "getCurrentVendor"
-        })
+        }
     },
     components: {
         VendorsTable,
-        Vendordetails,
         VendorFilters
     }
 }

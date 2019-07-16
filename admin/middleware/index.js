@@ -118,6 +118,7 @@ const middleware = {
             '/vendors/potential',
             '/languages',
             '/clients',
+            '/clients/details',
             '/new-client',
             '/quotes',
             '/create-project',
