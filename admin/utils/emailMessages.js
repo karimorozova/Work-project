@@ -23,14 +23,14 @@ function applicationMessage(obj) {
     let coverLetterFiles = "";
     let education = "";
     let positions = "";
-    if(obj.cvFiles) {
+    if(obj.cvFiles.length) {
         cvFiles = obj.cvFiles.reduce((initial, current, index) => {
-            return initial + `<a href="${apiUrl}/${current.split('./dist/')[1]}" download target='_self'>cvFile${index+1}</a>; `
+            return initial + `<a href="${apiUrl}${current}" download target='_self'>cvFile${index+1}</a>; `
         }, "")
     }
-    if(obj.coverLetterFiles) {
+    if(obj.coverLetterFiles.length) {
         coverLetterFiles = obj.coverLetterFiles.reduce((initial, current, index) => {
-            return initial + `<a href="${apiUrl}/${current.split('./dist/')[1]}" download target='_self'>coverLetterFile${index+1}</a>; `
+            return initial + `<a href="${apiUrl}${current}" download target='_self'>coverLetterFile${index+1}</a>; `
         }, "")
     }
     if(obj.languagePairs) {

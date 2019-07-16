@@ -24,33 +24,27 @@ router.post("/send-form", upload.any(), async (req, res) => {
         let motherTongue = await Languages.find({"_id": person.native});
         person.native = motherTongue[0].lang;
         person.languagePairs = languagePairs;
-        const cvFiles = req.files.filter(item => {
-            return item.fieldname == "cvFile"
-        })
-        const coverLetterFiles = req.files.filter(item => {
-            return item.fieldname == "coverLetterFile"
-        })
+        const cvFiles = req.files["cvFile"];
+        const coverLetterFiles = req.files["coverLetterFile"];
+        person.cvFiles = [];
+        person.coverLetterFiles = [];
         if(cvFiles) {
             let counter = 1
-            person.cvFiles = [];
             for(let cv of cvFiles) {
-                    let nameArr = cv.filename.split('.');
-                    let newFileName = `cvFile${counter}.${nameArr[nameArr.length-1]}`;
-                    let path = `./dist/application/${vendor.id}/${newFileName}`;
-                    let filePath = await moveFile(cv, path);
-                    person.cvFiles.push(filePath);
+                    let newFileName = `cvFile${counter}_${cv.filename}`;
+                    const path = `/application/${vendor.id}/${newFileName}`;
+                    await moveFile(cv, `./dist${path}`);
+                    person.cvFiles.push(path);
                     counter++;
             }
         }
         if(coverLetterFiles) {
             let counter = 1
-            person.coverLetterFiles = [];
             for(let cv of coverLetterFiles) {
-                    let nameArr = cv.filename.split('.');
-                    let newFileName = `coverLetterFile${counter}.${nameArr[nameArr.length-1]}`;
-                    let path = `./dist/application/${vendor.id}/${newFileName}`;
-                    let filePath = moveFile(cv, path);
-                    person.coverLetterFiles.push(filePath);
+                    let newFileName = `coverLetterFile${counter}_${cv.filename}`;
+                    const path = `/application/${vendor.id}/${newFileName}`;
+                    await moveFile(cv, `./dist${path}`);
+                    person.coverLetterFiles.push(path);
                     counter++;
             }
         }
