@@ -7,8 +7,11 @@ const sendEmail = function (obj, msg) {
             to: `${obj.to}`, // pm@pangea.global list of receivers
             subject: `${obj.subject}`, // Subject line
             text: "plain text", // plain text body
-            html: "<b>" + msg + "</b>" // html body
+            html: "<b>" + msg + "</b>", // html body
         };
+        if(obj.attachments && obj.attachments.length) {
+            mailOptions.attachments = obj.attachments;
+        }
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {

@@ -1,5 +1,6 @@
 const { Vendors, Languages } = require("../models");
 const { moveFile, sendEmail, applicationMessage } = require("../utils");
+const fs = require("fs");
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
     try {
@@ -27,12 +28,21 @@ async function sendEmailToManager(personData, vendor) {
         emailData.languagePairs = await getLanguagePairs(personData.languagePairs);
         emailData.cvFiles = [...vendor.cvFiles];
         emailData.coverLetterFiles = [...vendor.coverLetterFiles];
+        emailData.attachments = getFilesAttachments([...emailData.cvFiles, ...emailData.coverLetterFiles]);
         const message = applicationMessage(emailData);
         await sendEmail(emailData, message);
     } catch(err) {
         console.log(err);
         console.log("Error in sendEmailToManager");
     }
+}
+function getFilesAttachments(files) {
+    return files.reduce((prev, cur) => {
+        const filename = cur.split("/").pop();
+        const content = fs.createReadStream(`./dist${cur}`);
+        prev.push({filename, content});
+        return [...prev];
+    }, [])
 }
 
 function getParsedData(person) {
