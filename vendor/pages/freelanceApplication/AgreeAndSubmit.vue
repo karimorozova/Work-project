@@ -58,6 +58,19 @@ export default {
 
             }
         },
+        getFilesSummarizedSize(files) {
+            return files.reduce((prev, cur) => {
+                return prev + cur.size/1000000;
+            }, 0)
+        },
+        areCvFilesTooBig(files) {
+            const sum = this.getFilesSummarizedSize(files); 
+            return sum > 20;
+        },
+        areCoverLetterFilesTooBig(files) {
+            const sum = this.getFilesSummarizedSize(files); 
+            return sum > 2;
+        },
         async checkForm() {
             this.errors = [];
             try {
@@ -69,6 +82,10 @@ export default {
                 if(!this.person.timezone) this.errors.push("Please select your timezone.");
                 if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
                 if(!this.person.cvFiles || (this.person.cvFiles && !this.person.cvFiles.length)) this.errors.push("Please upload CV file.");
+                if(this.person.cvFiles && this.person.cvFiles.length && this.areCvFilesTooBig(this.person.cvFiles)) this.errors.push("All CV files should have summarized size not more than 20Mb");
+                if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
+                    this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");
+                }
                 if(!this.person.position) this.errors.push("Please select position(s).");
                 if(!this.person.translationExp) this.errors.push("Please select years of experience.");
                 if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");

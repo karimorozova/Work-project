@@ -15,6 +15,7 @@ const sendEmail = function (obj, msg) {
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {
+                console.log(error);
                 rej(error);
             }
         console.log('Message sent: %s', info.messageId);
