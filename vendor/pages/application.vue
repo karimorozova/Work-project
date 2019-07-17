@@ -133,11 +133,17 @@ export default {
                     sendData.append(`parsing-${key}`, JSON.stringify(this.person[key]))
                 }
             }
-            await this.$axios.post("/vendors/application/send-form", sendData);
-            window.top.location.href = "https://www.pangea.global/thank-you-vendor";
+            try {
+                await this.$axios.post("/vendors/application/send-form", sendData);
+                window.top.location.href = "https://www.pangea.global/thank-you-vendor";
+                this.saveForm({});
+            } catch(err) {
+                this.alertToggle({message: "Error on submitting the form", isShow: true, type: "error"});
+            }
         },
         ...mapActions({
-            saveForm: 'setApplicationForm'
+            saveForm: 'setApplicationForm',
+            alertToggle: 'alertToggle'
         })
     },
     components: {

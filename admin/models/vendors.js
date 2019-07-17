@@ -138,6 +138,14 @@ const VendorSchema = new mongoose.Schema({
             fuzzyRepeats85: {text: "Internal 85-94%", rate: 0.6},
             fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.25}
         }
+    },
+    cvFiles: {
+        type: Array,
+        default: []
+    },
+    coverLetterFiles: {
+        type: Array,
+        default: []
     }
 }, { minimize: false });
 
