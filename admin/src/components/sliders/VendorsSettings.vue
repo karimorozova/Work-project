@@ -20,6 +20,7 @@ export default {
   data() {
     return {
       sidebarLinks: [
+          {title: "All", routeName: "all-vendors"}, 
           {title: "Active", routeName: "active-vendors"}, 
           {title: "Inactive", routeName: "inactive-vendors"}, 
           {title: "Potential", routeName: "potential-vendors"}

@@ -287,7 +287,7 @@ export default {
                     return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
                 })
             }
-            if(this.statusFilter) {
+            if(this.statusFilter && this.statusFilter !== 'All') {
                 result = result.filter(item => {
                     return item.status == this.statusFilter;
                 })

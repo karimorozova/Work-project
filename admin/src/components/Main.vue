@@ -216,7 +216,7 @@ export default {
                     this.isSidebar = false;
                     break;
                 case "VENDORS":
-                    this.$router.push('/vendors/active');
+                    this.$router.push('/vendors');
                     break;
                 case "CLIENTS":
                     this.$router.push('/clients');

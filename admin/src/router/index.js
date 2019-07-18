@@ -29,6 +29,7 @@ import NewClientInfo from '@/components/clients/NewClientInfo'
 import ContactDetails from '@/components/clients/ContactDetails'
 import NewContactDetails from '@/components/clients/NewContactDetails'
 import Vendordetails from '@/components/vendors/Vendordetails'
+import AllVendorsTable from '@/components/vendors/AllVendorsTable'
 import ActiveVendors from '@/components/vendors/ActiveVendors'
 import PotentialVendors from '@/components/vendors/PotentialVendors'
 import InactiveVendors from '@/components/vendors/InactiveVendors'
@@ -148,9 +149,15 @@ const router = new Router({
                 },
                 {
                     path: 'vendors',
-                    name: 'vendors',
+                    name: '',
                     component: VendorsSettings,
                     children: [
+                        {
+                            path: '',
+                            name: 'all-vendors',
+                            props: true,
+                            component: AllVendorsTable
+                        },
                         {
                             path: 'active',
                             name: 'active-vendors',
