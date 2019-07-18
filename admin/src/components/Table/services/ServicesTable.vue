@@ -89,7 +89,7 @@ import SettingsTable from "../SettingsTable";
 import SelectSingle from "@/components/SelectSingle";
 import Add from "@/components/Add";
 import scrollDrop from "@/mixins/scrollDrop";
-import { mapGetters, mapActions } from "vuex";
+import { mapActions } from "vuex";
 import tableFields from "@/mixins/tableFields";
 import crudIcons from "@/mixins/crudIcons";
 
@@ -214,7 +214,7 @@ export default {
                 } else {
                     await this.updateService(id, newData)
                 }
-                await this.getServices();
+                await this.getAllServices();
                 this.alertToggle({message: "Saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Erorr on saving Service", isShow: true, type: "error"});
@@ -334,9 +334,7 @@ export default {
                     if (x.title > y.title) return 1;
                     if (x.title < y.title) return -1;
                 });
-                if(!this.vuexServices.length) {
-                    await this.servicesGetting(this.services);
-                }
+                await this.servicesGetting(this.services);
             } catch(err) {
                 this.alertToggle({message: "Erorr on getting Services", isShow: true, type: "error"});
             }
@@ -351,9 +349,6 @@ export default {
         }),
     },
     computed: {
-        ...mapGetters({
-            vuexServices: "getVuexServices"
-        }),
         manageIcons() {
             const { "delete": del, ...result } = this.icons;
             return result;
