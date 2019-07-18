@@ -293,6 +293,7 @@ export default {
                     }
                     if(this.origin === "vendor") {
                         await this.saveVendorRates(info);
+                        this.$emit('updateVendor');
                     }
                     this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
                 } catch(err) {

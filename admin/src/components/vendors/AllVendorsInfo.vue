@@ -4,18 +4,27 @@
         VendorFilters(
             :industryFilter="industryFilter"
             :leadFilter="leadFilter"
+            :sourceLangs="sourceLangs"
+            :targetLangs="targetLangs"
+            :step="stepFilter.title"
             @setNameFilter="(option) => setFilter(option, 'nameFilter')"
             @setStatusFilter="(option) => setFilter(option, 'statusFilter')"
             @setLeadFilter="(option) => setFilter(option, 'leadFilter')"
             @setIndustryFilter="(option) => setFilter(option, 'industryFilter')"
+            @removeLangFilter="removeLangFilter"
+            @addLangFilter="addLangFilter"
+            @setAllLangs="setAllLangs"
+            @setStepFilter="setStepFilter"
         )
         .all-vendors__new-vendor
             input.all-vendors__add-vendor(type="submit" value="Add vendor" @click="addVendor")
         VendorsTable(
             :nameFilter="nameFilter"
             :industryFilter="industryFilter"
-            :leadFilter="leadFilter"
+            :sourceFilter="sourceLangs"
+            :targetFilter="targetLangs"
             :statusFilter="statusFilter"
+            :stepFilter="stepFilter"
         )
 </template>
 
@@ -32,7 +41,9 @@ export default {
     data() {
         return {
             industryFilter: {name: "All"},
-            leadFilter: "All",
+            sourceLangs: ["All"],
+            targetLangs: ["All"],
+            stepFilter: {title: "All"},
             nameFilter: ""
         }
     },
@@ -42,7 +53,25 @@ export default {
         },
         setFilter({option}, prop) {
             this[prop] = option;
-        }
+        },
+        setStepFilter({step}) {
+            this.stepFilter = step;
+        },
+        setAllLangs({prop}) {
+            this[prop] = ["All"];
+        },
+        removeLangFilter({prop, position}) {
+            this[prop].splice(position, 1);
+            if(this[prop].length === 0) {
+                this[prop] = ["All"];
+            }
+        },
+        addLangFilter({prop, lang}) {
+            if(this[prop].indexOf('All') !== -1) {
+                this[prop] = [];
+            }
+            this[prop].push(lang.symbol);
+        },
     },
     components: {
         VendorsTable,

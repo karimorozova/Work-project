@@ -4,6 +4,7 @@
         Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTab")
     .table(v-if="isServices")
         ServicesTable(
+            :allSteps="steps"
             :firstStageSteps="firstStageSteps"
             :secondStageSteps="secondStageSteps"
         )
@@ -18,7 +19,7 @@
 import ServicesTable from "./services/ServicesTable";
 import StepsTable from "./services/StepsTable";
 import Tabs from "@/components/Tabs";
-import  { mapActions, mapGetters } from "vuex";
+import  { mapActions } from "vuex";
 
 export default {
     data() {
@@ -56,9 +57,6 @@ export default {
         }
     },
     computed: {
-        ...mapGetters({
-            vuexSteps: "getVuexSteps"
-        }),
         firstStageSteps() {
             let result = [];
             if(this.steps.length) {

@@ -77,7 +77,8 @@
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
-                @addSevLangs="addSevLangs")
+                @addSevLangs="addSevLangs"
+                @updateVendor="updateVendor")
         .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")

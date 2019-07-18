@@ -29,6 +29,7 @@
         @showValidationErrors="showValidationErrors"
         @showNotUniqueWarning="showNotUniqueWarning"
         @addNewRow="addNewRow"
+        @updateVendor="updateVendor"
     )
     .duo-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
@@ -269,6 +270,9 @@ export default {
             } catch(err) { }
             let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
             this.serviceSelect = [defaultServ];
+        },
+        updateVendor() {
+            this.$emit("updateVendor");
         },
         ...mapActions({
             alertToggle: "alertToggle",

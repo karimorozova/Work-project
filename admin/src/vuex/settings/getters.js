@@ -1,0 +1,1 @@
+export const getVuexSteps = state => state.steps;

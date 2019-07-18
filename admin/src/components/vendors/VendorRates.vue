@@ -14,7 +14,8 @@
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
             .vendor-rates__drop(v-if="isDuoRatesShow")
                 DuoRates(:vendor="vendor" 
-                    @addSevLangs="addSevLangs")
+                    @addSevLangs="addSevLangs"
+                    @updateVendor="updateVendor")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
             .vendor-rates____open
                 .vendor-rates__select(@click="matrixToggler")
@@ -70,6 +71,9 @@ export default {
                     await this.getServices();
                 }
             } catch(err) { }
+        },
+        updateVendor() {
+            this.$emit("updateVendor");
         },
         ...mapActions({
             alertToggle: "alertToggle",

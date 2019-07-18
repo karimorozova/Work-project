@@ -96,6 +96,7 @@ import crudIcons from "@/mixins/crudIcons";
 export default {
     mixins: [scrollDrop, tableFields, crudIcons],
     props: {
+        allSteps: {type: Array},
         firstStageSteps: {type: Array},
         secondStageSteps: {type: Array}
     },
@@ -250,8 +251,8 @@ export default {
         },
         getStepsInfo() {
             let steps = [];
-            const stage1 = this.vuexSteps.find(item => item.title === this.currentStep1);
-            const stage2 = this.vuexSteps.find(item => item.title === this.currentStep2);
+            const stage1 = this.allSteps.find(item => item.title === this.currentStep1);
+            const stage2 = this.allSteps.find(item => item.title === this.currentStep2);
             if(stage1) steps.push({stage: 'stage1', step: stage1._id});
             if(stage2) steps.push({stage: 'stage2', step: stage2._id});
             return steps;
@@ -351,8 +352,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            vuexServices: "getVuexServices",
-            vuexSteps: "getVuexSteps"
+            vuexServices: "getVuexServices"
         }),
         manageIcons() {
             const { "delete": del, ...result } = this.icons;

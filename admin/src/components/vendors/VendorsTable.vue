@@ -88,10 +88,11 @@ import NativeLanguageSelect from "./NativeLanguageSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import Button from "../Button";
 import scrollDrop from "@/mixins/scrollDrop";
+import vendorsFiltered from "@/mixins/vendorsFiltered";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    mixins: [scrollDrop],
+    mixins: [scrollDrop, vendorsFiltered],
     props: {
         nameFilter: {
             type: String
@@ -103,8 +104,16 @@ export default {
             type: [String, Object],
             default: ""
         },
-        leadFilter: {
-            type: String
+        sourceFilter: {
+            type: Array,
+            default: () => []
+        },
+        targetFilter: {
+            type: Array,
+            default: () => []
+        },
+        stepFilter: {
+            type: Object
         }
     },
     data() {
@@ -144,7 +153,8 @@ export default {
             updateCurrentVendor: "updateCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry",
-            deleteCurrentVendor: "deleteCurrentVendor"
+            deleteCurrentVendor: "deleteCurrentVendor",
+            getServices: "getServices"
         }),
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 600;
@@ -278,33 +288,8 @@ export default {
     computed: {
         ...mapGetters({
             vuexVendors: "getVendors",
+            services: "getVuexServices"
         }),
-        filteredVendors() {
-            let result = this.vuexVendors;
-            if(this.nameFilter) {
-                result = result.filter(item => {
-                    const name = item.firstName + " " + item.surname;
-                    return name.toLowerCase().indexOf(this.nameFilter.toLowerCase()) != -1;
-                })
-            }
-            if(this.statusFilter && this.statusFilter !== 'All') {
-                result = result.filter(item => {
-                    return item.status == this.statusFilter;
-                })
-            }
-            if(this.industryFilter && this.industryFilter.name !== 'All') {
-                result = result.filter(item => {
-                    const industryIds = item.industries.map(indus => indus._id);
-                    return industryIds.indexOf(this.industryFilter._id) !== -1;
-                })
-            }
-            if(this.leadFilter && this.leadFilter !== 'All') {
-                result = result.filter(item => {
-                    return item.leadSource == this.leadFilter;
-                })
-            }
-            return result;
-        },
         selectedIndNames() {
             let result = [];
             for(let ind of this.industrySelected) {

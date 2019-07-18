@@ -127,6 +127,7 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    height: 32px;
     .all-projects__filters & {
         height: 28px;
     }
@@ -136,7 +137,7 @@ export default {
         padding: 0 5px;
         font-size: 14px;
         opacity: 0.7;
-        height: 32px;
+        height: 100%;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -144,7 +145,6 @@ export default {
         .all-projects__filters & {
             border-right: none;
             width: 76%;
-            height: 28px;
         }
         .inner-component & {
             border-right: 1px solid #bfb09d;
@@ -292,7 +292,6 @@ export default {
     .selected {
       width: 80%;
       border-right: none;
-      height: 28px;
     }
     .arrow-button {
       width: 20%;
@@ -310,12 +309,17 @@ export default {
     .selected {
       width: 90%;
       border-right: none;
-      height: 36px;
       padding-left: 10px; 
     }
     .arrow-button {
       width: 10%;
     }
   }
+}
+
+.vendors-filter {
+    .select {
+        height: 28px;
+    }
 }
 </style>
