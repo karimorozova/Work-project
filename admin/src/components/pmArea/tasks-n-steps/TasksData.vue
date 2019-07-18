@@ -2,6 +2,8 @@
 .tasks-data
     .new-wrapper
         .tasks-data__item
+                ServiceAndWorkflow
+        .tasks-data__item
             .tasks-data__item-title File Preparation
             .tasks-data__langs
                 TasksLangsModified(
@@ -27,8 +29,6 @@
                         placeholder="Template"
                         @chooseOption="setTemplate"
                     )
-        .tasks-data__item
-            ServiceAndWorkflow
     .tasks-data__add-tasks(v-if="isProject")
         Button(value="Add tasks" @clicked="checkForErrors")
     .tasks-data__buttons(v-else)
