@@ -393,6 +393,11 @@ const emptyMetrics = {
         totalWords: 0
     }
 
+const instructionsDefault = [
+    {type: "Test", content: "Test content", isSpecific: false},
+    {type: "Test specified", content: "Test content specified", isSpecific: true},
+]
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
@@ -407,7 +412,8 @@ const defaultValue = {
     groupsDefault,
     stepsDefault,
     packagesDefault,
-    emptyMetrics
+    emptyMetrics,
+    instructionsDefault
 };
 
 module.exports = defaultValue;

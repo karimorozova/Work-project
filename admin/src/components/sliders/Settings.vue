@@ -20,7 +20,10 @@ export default {
   data() {
     return {
       openQuotes: true,
-      sidebarLinks: [{title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, {title: "Pricelists"}, {title: "Groups"}],
+      sidebarLinks: [
+          {title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, 
+          {title: "Pricelists"}, {title: "Instructions"}, {title: "Groups"}
+          ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
     };
@@ -47,6 +50,9 @@ export default {
           break;
         case "Pricelists":
           this.$router.push("/settings/pricelists");
+          break;
+        case "Instructions":
+          this.$router.push("/settings/instructions");
           break;
         case "Groups":
           this.$router.push("/settings/groups");

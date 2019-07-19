@@ -131,6 +131,7 @@ const middleware = {
             '/request-details',
             '/finance',
             '/pricelists',
+            '/instructions',
             '/reports',
             '/translation-request',
             '/zoho-code'

@@ -21,6 +21,7 @@ import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
+import Instructions from '@/components/Table/Instructions'
 import Users from '@/components/Table/Users'
 import ClientDetails from '@/components/clients/ClientDetails'
 import Allclients from '@/components/clients/Allclients'
@@ -134,6 +135,11 @@ const router = new Router({
                             path: 'pricelists',
                             name: 'pricelists',
                             component: Pricelists
+                        },
+                        {
+                            path: 'instructions',
+                            name: 'instructions',
+                            component: Instructions
                         },
                         {
                             path: 'rates',

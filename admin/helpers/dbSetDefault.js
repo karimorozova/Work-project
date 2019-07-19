@@ -14,7 +14,8 @@ const {
   Step,
   Package,
   Clients,
-  Vendors
+  Vendors,
+  Instruction
 } = require('../models');
 
 const {
@@ -30,7 +31,8 @@ const {
   stepsDefault,
   packagesDefault,
   clientsDefault,
-  vendorsDefault
+  vendorsDefault,
+  instructionsDefault
 } = require('./dbDefaultValue');
 
 const axios = require('axios');
@@ -47,6 +49,20 @@ async function fillPackages() {
     console.log("Error on filling default Packages");
     console.log(err);
   }
+}
+
+async function fillInstructions() {
+    try {
+        const instructions = await Instruction.find();
+        if(!instructions.length) {
+            for(let instruction of instructionsDefault) {
+                await new Instruction(instruction).save();
+            }
+        }
+    } catch(err) {
+        console.log("Error on filling default Instructions");
+        console.log(err);
+    }
 }
 
 function fillLeadSources() {
@@ -538,6 +554,7 @@ async function fillPricelist() {
 
 async function checkCollections() {
   await fillPackages();
+  await fillInstructions();
   await fillLeadSources();
   await fillGroups();
   await fillSteps();

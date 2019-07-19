@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, User } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, User } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
 const { getManyServices } = require('../services/');
@@ -329,6 +329,42 @@ router.delete('/package/:id', async (req, res) => {
     console.log(err);
     res.status(500).send("Error on deleting package")
   }
+});
+
+router.get('/instructions', async (req, res) => {
+    try {
+        const instructions = await Instruction.find({});
+        res.send(instructions);
+    } catch(err) {
+        console.log(err);   
+        res.status(500).send("Error on getting instructions from DB")
+    }
+})
+
+router.post('/instructions', async (req, res) => {
+    const { instruction } = req.body;
+    try {
+        if(instruction._id) {
+            await Instruction.updateOne({"_id": instruction._id}, instruction);
+            return res.send('Updated');
+        }
+        await Instruction.create(instruction);
+        res.send('New instruction saved.');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on updating/creating a instruction")
+    }
+  });
+  
+  router.delete('/instructions/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Instruction.deleteOne({"_id": id});
+        res.send("Package deleted");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting instruction")
+    }
 });
 
 module.exports = router;

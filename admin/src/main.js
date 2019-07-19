@@ -42,6 +42,10 @@ Vue.http.interceptors.push((request, next) => {
 Vue.use(VueLodash);
 Vue.config.productionTip = false
 
+Vue.config.errorHandler = (err, vm, info) => {
+    console.log(`Error: ${err.toString()}\nInfo: ${info}`);
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -18,6 +18,7 @@ const Package = require('./packages');
 const Zoho = require('./zoho');
 const ZohoReport = require('./zohoReport');
 const ClientRequest = require('./clientRequest');
+const Instruction = require('./instruction')
 
 const Models = {
     Languages,
@@ -39,7 +40,8 @@ const Models = {
     Vendors,
     Zoho,
     ZohoReport,
-    ClientRequest
+    ClientRequest,
+    Instruction
 };
 
 module.exports = Models;
