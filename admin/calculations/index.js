@@ -115,7 +115,7 @@ function getStepPayables({rate, metrics, step}) {
     const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
     : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
-    return {...step, finance, vendorRate: rate};
+    return {...step._doc, finance, vendorRate: rate};
 }
 
 function getRate({task, project, vendor, service}) {
@@ -266,7 +266,7 @@ async function updateProjectCosts(project) {
         finance['Discount'] = discount;
     }
     try {
-        return await updateProject({"_id": project.id}, {...project, finance});
+        return await updateProject({"_id": project.id}, { ...project, finance });
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectCosts");

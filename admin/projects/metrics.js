@@ -117,9 +117,9 @@ function setStepsProgress(name, progress) {
 function getStepsDates({task, key}) {
     let startDate = task.start; 
     let deadline = task.deadline; 
-    if(task.stepsDates.length) {
+    if(task.stepsDates.length && task.stepsDates.length > 1) {
         startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
-        deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;
+        deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;        
     }
     return {startDate, deadline};
 }
