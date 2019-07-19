@@ -23,7 +23,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            getProjects: "getProjects",
+            getProjects: "getProjectsAndRequests",
             selectProject: "selectProject",
             alertToggle: "alertToggle"
         }),
@@ -58,7 +58,7 @@ export default {
         MainInfo,
         OtherInfo
     },
-    mounted() {
+    created() {
         this.getProjectInfo();
     }
 }
