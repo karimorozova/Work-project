@@ -13,7 +13,7 @@
             template(slot="type" slot-scope="{ row, index }")
                 .i-table__data(v-if="currentActive !== index") {{ row.type }}
                 .i-table__editing-data(v-else)
-                    input.i-table__text(type="text" v-model="currentInstruction.type")
+                    input.i-table__input(type="text" v-model="currentInstruction.type")
             template(slot="content" slot-scope="{ row, index }")
                 .i-table__data(v-if="currentActive !== index") {{ row.content }}
                 .i-table__editing-data(v-else)
@@ -76,7 +76,7 @@ export default {
                 case "delete":
                     await this.deleteInstruction(index);
                     break;
-                case "save":
+                default:
                     await this.checkErrors(index);
             }
         },
@@ -150,37 +150,31 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors.scss";
-
+@import "../../../assets/styles/settingsTable";
 
 .i-table {
-    &__data, &__editing-data, &__icons {
+    &__data {
+        @extend %table-data;
         height: 52px;
-        padding: 0 5px;
-        display: flex;
-        align-items: center;
-        box-sizing: border-box;
     }
     &__editing-data {
-        box-shadow: 0 0 10px $deep-brown;
-        padding: 0;
+        @extend %table-data;
+        height: 52px;
+        box-shadow: inset 0 0 7px $brown-shadow;
     }
-    &__text {
-        resize: none;
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        border: none;
-        padding: 0 5px;
-        color: $main-color;
-        outline: none;
+    &__input {
+        @extend %table-text-input;
     }
     &__icons {
-        justify-content: center;
+        @extend %table-icons;
     }
     &__icon {
-        cursor: pointer;
-        opacity: 0.5;
-        margin-right: 8px;
+        @extend %table-icon;
+    }
+    &__text {
+        @extend %table-text-input;
+        resize: none;
+        background-color: transparent;
     }
     &_opacity {
         opacity: 1;

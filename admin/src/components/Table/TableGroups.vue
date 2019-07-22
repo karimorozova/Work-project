@@ -167,40 +167,26 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable";
 
 .groups {
+    @extend %setting-table;
     width: 400px;
-    background-color: $white;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
-    &__data, &__editing-data {
-        height: 32px;
-        padding: 0 5px;
-        display: flex;
-        align-items: center;
-        box-sizing: border-box;
+    &__data {
+        @extend %table-data;
     }
     &__editing-data {
+        @extend %table-data;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__input {
-        box-sizing: border-box;
-        width: 100%;
-        border: none;
-        outline: none;
-        color: $main-color;
+        @extend %table-text-input;
     }
     &__icons {
-        padding-top: 3px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @extend %table-icons;
     }
     &__icon {
-        cursor: pointer;
-        opacity: 0.5;
-        margin-right: 8px;
+        @extend %table-icon;
     }
     &_opacity {
         opacity: 1;

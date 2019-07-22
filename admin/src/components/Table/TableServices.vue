@@ -85,15 +85,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable";
 
 .services-wrapper {
+    @extend %setting-table;
     min-width: 50%;
     width: fit-content;
-    background-color: $white;
     box-sizing: border-box;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
 }
 
 </style>

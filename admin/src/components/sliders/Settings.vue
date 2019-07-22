@@ -22,7 +22,7 @@ export default {
       openQuotes: true,
       sidebarLinks: [
           {title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, 
-          {title: "Pricelists"}, {title: "Instructions"}, {title: "Groups"}
+          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}
           ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
@@ -51,6 +51,12 @@ export default {
         case "Pricelists":
           this.$router.push("/settings/pricelists");
           break;
+        case "Cancellation Reasons":
+          this.$router.push("/settings/cancel-reasons");
+          break;
+        case "Discount Chart":
+          this.$router.push("/settings/discount-chart");
+          break;
         case "Instructions":
           this.$router.push("/settings/instructions");
           break;
@@ -72,6 +78,7 @@ export default {
       let result = this.sidebarLinks;
       if(this.userGroup.name === "Administrators" || this.userGroup.name === "Developers") {
         result.push({title: "Users"});
+        result.push({title: "Groups"});
       }
       return result;
     }

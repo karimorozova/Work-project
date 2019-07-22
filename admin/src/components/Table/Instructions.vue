@@ -72,13 +72,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable";
 
 .instructions {
+    @extend %setting-table;
     max-width: 800px;
-    background-color: $white;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
 }
 
 </style>

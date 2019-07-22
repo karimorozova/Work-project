@@ -247,13 +247,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable";
 
 .languages {
+    @extend %setting-table;
     width: 933px;
-    background-color: $white;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
     &__table {
         height: 550px;
     }
@@ -274,12 +272,14 @@ export default {
         width: 100px;
     }
     &__data {
-        height: 32px;
-        padding: 0 5px;
-        display: flex;
-        align-items: center;
-        box-sizing: border-box;
+        @extend %table-data;
         position: relative;
+    }
+    &__icons {
+        @extend %table-icons;
+    }
+    &__icon {
+        @extend %table-icon;
     }
     &__checkbox {
         width: 22px;
@@ -326,17 +326,6 @@ export default {
     &_current {
         border: 1px solid gold;
         padding: 4px;
-    }
-    &__icons {
-        padding-top: 3px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    &__icon {
-        cursor: pointer;
-        opacity: 0.5;
-        margin-right: 8px;
     }
     &_opacity {
         opacity: 1;

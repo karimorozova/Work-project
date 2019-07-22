@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, User } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, User } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
 const { getManyServices } = require('../services/');
@@ -364,6 +364,49 @@ router.post('/instructions', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on deleting instruction")
+    }
+});
+
+router.get('/reasons', async (req, res) => {
+    try {
+      const reasons = await CancelReason.find({});
+      reasons.sort((a, b) => {
+          if(a.reason > b.reason) return 1;
+          if(a.reason < b.reason) return -1;
+        });
+      res.send(reasons);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on getting reasons from DB")
+    }
+});
+  
+router.post('/reason', async (req, res) => {
+    const { reason } = req.body;
+    try {
+      if(reason._id) {
+        await CancelReason.updateOne({"_id": reason._id}, {...reason});
+        return res.send("Updated");
+      }
+      await CancelReason.create(reason);
+      res.send("New reason created");
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on updating/creating a reason")
+    }
+});
+  
+router.delete('/reason/:id', async (req, res) => {
+    const { id } = req.params;
+    if(!id) {
+      return res.send('Deleted unsaved reason')
+    }
+    try {
+      await CancelReason.deleteOne({"_id": id});
+      res.send('Deleted');
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on deleting reason");
     }
 });
 

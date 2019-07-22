@@ -172,13 +172,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable";
 
 .packages {
+    @extend %setting-table;
     width: 600px;
-    background-color: $white;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
     &__data, &__editing-data {
         height: 32px;
         padding: 0 5px;

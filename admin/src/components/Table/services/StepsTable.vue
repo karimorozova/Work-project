@@ -116,7 +116,7 @@ export default {
             return this.steps[index][rowProp];
         },
         toggleActive(index, prop) {
-            if(this.currentActive === -1) return;
+            if(this.currentActive === -1 || this.currentActive !== index) return;
             this.currentStep[prop] = !this.currentStep[prop];
         },
         async makeAction(index, key) {
@@ -180,42 +180,31 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors.scss";
+@import "../../../assets/styles/settingsTable";
 
 .steps {
     width: 700px;
-    &__data, &__editing-data {
-        height: 32px;
-        padding: 0 5px;
-        display: flex;
-        align-items: center;
-        box-sizing: border-box;
+    &__data {
+        @extend %table-data;
     }
     &__editing-data {
+        @extend %table-data;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__input {
-        box-sizing: border-box;
-        width: 100%;
-        border: none;
-        outline: none;
-        color: $main-color;
+        @extend %table-text-input;
+    }
+    &__icons {
+        @extend %table-icons;
+    }
+    &__icon {
+        @extend %table-icon;
     }
     &__checkbox {
         width: 22px;
         height: 22px;
         cursor: pointer;
         opacity: 0.5;
-    }
-    &__icons {
-        padding-top: 3px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    &__icon {
-        cursor: pointer;
-        opacity: 0.5;
-        margin-right: 8px;
     }
     &_centered {
         justify-content: center;

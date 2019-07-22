@@ -15,7 +15,9 @@ const {
   Package,
   Clients,
   Vendors,
-  Instruction
+  Instruction,
+  CancelReason,
+  DiscountChart
 } = require('../models');
 
 const {
@@ -32,10 +34,10 @@ const {
   packagesDefault,
   clientsDefault,
   vendorsDefault,
-  instructionsDefault
+  instructionsDefault,
+  cancelReasonsDefault,
+  discountChartsDefault
 } = require('./dbDefaultValue');
-
-const axios = require('axios');
 
 async function fillPackages() {
   try {
@@ -61,6 +63,34 @@ async function fillInstructions() {
         }
     } catch(err) {
         console.log("Error on filling default Instructions");
+        console.log(err);
+    }
+}
+
+async function fillCancelReasons() {
+    try {
+        const cancelReasons = await CancelReason.find();
+        if(!cancelReasons.length) {
+            for(let cancelReason of cancelReasonsDefault) {
+                await new CancelReason(cancelReason).save();
+            }
+        }
+    } catch(err) {
+        console.log("Error on filling default Cancel Reasons");
+        console.log(err);
+    }
+}
+
+async function fillDiscountCharts() {
+    try {
+        const discountCharts = await DiscountChart.find();
+        if(!discountCharts.length) {
+            for(let chart of discountChartsDefault) {
+                await new DiscountChart(chart).save();
+            }
+        }
+    } catch(err) {
+        console.log("Error on filling default Discount Charts");
         console.log(err);
     }
 }
@@ -555,6 +585,8 @@ async function fillPricelist() {
 async function checkCollections() {
   await fillPackages();
   await fillInstructions();
+  await fillCancelReasons();
+  await fillDiscountCharts();
   await fillLeadSources();
   await fillGroups();
   await fillSteps();

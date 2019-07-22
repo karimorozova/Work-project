@@ -379,23 +379,35 @@ const timezonesDefault = [
     "(UTC+13:00) Samoa"
 ]
 
+const emptyCharts = {
+    iceMatch: {text: "ICE Match", value: 0},
+    fuzzyMatch75: {text: "75-84%", value: 0},
+    fuzzyMatch85: {text: "85-94%", value: 0},
+    fuzzyMatch95: {text: "95-99%", value: 0},
+    repeat: {text: "Repetitions", value: 0},
+    leveragedMatch: {text: "Leveraged Match", value: 0},
+    fuzzyRepeats75: {text: "Internal 75-84%", value: 0},
+    fuzzyRepeats85: {text: "Internal 85-94%", value: 0},
+    fuzzyRepeats95: {text: "Internal 95-99%", value: 0}
+}
+
 const emptyMetrics = {
-        iceMatch: {text: "ICE Match", value: 0},
-        fuzzyMatch75: {text: "75-84%", value: 0},
-        fuzzyMatch85: {text: "85-94%", value: 0},
-        fuzzyMatch95: {text: "95-99%", value: 0},
-        repeat: {text: "Repetitions", value: 0},
-        leveragedMatch: {text: "Leveraged Match", value: 0},
-        fuzzyRepeats75: {text: "Internal 75-84%", value: 0},
-        fuzzyRepeats85: {text: "Internal 85-94%", value: 0},
-        fuzzyRepeats95: {text: "Internal 95-99%", value: 0},
-        nonTranslatable: 0,
-        totalWords: 0
-    }
+    ...emptyCharts,
+    nonTranslatable: 0,
+    totalWords: 0
+}
+
+const discountChartsDefault = [
+    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}}
+]
 
 const instructionsDefault = [
     {type: "Test", content: "Test content", isSpecific: false},
     {type: "Test specified", content: "Test content specified", isSpecific: true},
+]
+
+const cancelReasonsDefault = [
+    {reason: "Reason 1"}, {reason: "Reason 2"}, {reason: "Reason 3"}
 ]
 
 const defaultValue = {
@@ -413,7 +425,9 @@ const defaultValue = {
     stepsDefault,
     packagesDefault,
     emptyMetrics,
-    instructionsDefault
+    instructionsDefault,
+    cancelReasonsDefault,
+    discountChartsDefault
 };
 
 module.exports = defaultValue;
