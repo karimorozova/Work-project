@@ -398,7 +398,8 @@ const emptyMetrics = {
 }
 
 const discountChartsDefault = [
-    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}}
+    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}},
+    {name: "Chart 2", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}}
 ]
 
 const instructionsDefault = [

@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, User } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
 const { getManyServices } = require('../services/');
@@ -356,7 +356,7 @@ router.post('/instructions', async (req, res) => {
     }
   });
   
-  router.delete('/instructions/:id', async (req, res) => {
+router.delete('/instructions/:id', async (req, res) => {
     const { id } = req.params;
     try {
         await Instruction.deleteOne({"_id": id});
@@ -407,6 +407,20 @@ router.delete('/reason/:id', async (req, res) => {
     } catch(err) {
       console.log(err);
       res.status(500).send("Error on deleting reason");
+    }
+});
+
+router.get('/discount-charts', async (req, res) => {
+    try {
+      const charts = await DiscountChart.find({});
+      charts.sort((a, b) => {
+          if(a.name > b.name) return 1;
+          if(a.name < b.name) return -1;
+        });
+      res.send(charts);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send("Error on getting discount charts from DB")
     }
 });
 

@@ -15,6 +15,7 @@ const zohoRouter = require('./zoho');
 const clientsapiRouter = require('./clientsapi');
 const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
+const settingsUpdate = require('./settings/updates');
 
 router.use('/', admin);
 router.use('/api', apiRouter);
@@ -30,5 +31,6 @@ router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 router.use('/vendors/application', vendorApplicationRouter);
 router.use('/projectsapi', projectsRouter);
+router.use('/settings-update', settingsUpdate);
 
 module.exports = router;
