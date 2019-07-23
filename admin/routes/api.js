@@ -424,4 +424,15 @@ router.get('/discount-charts', async (req, res) => {
     }
 });
 
+router.get('/chart', async (req, res) => {
+    const { name } = req.query;
+    try {
+        const chart = await DiscountChart.findOne({name});
+        res.send(chart);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting chart by name");
+    }
+})
+
 module.exports = router;

@@ -12,7 +12,7 @@
                 .discount-chart__head-title(slot="headerClient" slot-scope="{ field }") {{ field.label }}
                 .discount-chart__head-title(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
                 .discount-chart__head-title(slot="headerActive" slot-scope="{ field }") {{ field.label }}
-                .discount-chart__data(slot="name" slot-scope="{ row }") {{ row.name }}
+                .discount-chart__data.discount-chart_pointer(slot="name" slot-scope="{ row, index }" @click="showChartDetails(index)") {{ row.name }}
                 .discount-chart__data.discount-chart_centered(slot="client" slot-scope="{ row, index }")
                     CheckBox(:isChecked="row.isClientDefault" @check="(e) => toggleDefault(e, index, 'isClientDefault')" @uncheck="(e) => toggleDefault(e, index, 'isClientDefault')")
                 .discount-chart__data.discount-chart_centered(slot="vendor" slot-scope="{ row, index }")
@@ -51,6 +51,9 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle"
         }),
+        showChartDetails(index) {
+            this.$router.push(`/settings/matrix/${this.charts[index].name}`);
+        },
         openNewChart() {
             this.isCreatingNew = true;
         },
@@ -125,6 +128,9 @@ export default {
     }
     &_centered {
         justify-content: center;
+    }
+    &_pointer {
+        cursor: pointer;
     }
 }
 
