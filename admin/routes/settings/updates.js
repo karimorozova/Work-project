@@ -4,7 +4,11 @@ const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Inst
 router.post('/chart-update', async (req, res) => {
     const { chart } = req.body;
     try {
-        await DiscountChart.updateOne({"_id": chart._id}, { ...chart});
+        if(!chart._id) {
+            await DiscountChart.create(chart);
+        } else {
+            await DiscountChart.updateOne({"_id": chart._id}, { ...chart});
+        }
         res.send('updated');
     } catch(err) {
         console.log(err);

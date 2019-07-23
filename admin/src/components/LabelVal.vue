@@ -47,4 +47,8 @@ export default {
         font-weight: bold;
     }
 }
+
+.new-chart-label {
+    font-size: 14px;
+}
 </style>
