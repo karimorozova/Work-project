@@ -190,8 +190,20 @@ export const approveRequestProp = async ({commit, dispatch}, payload) => {
 export const setRequestValue = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
-        const updatedRequest = await Vue.http.post("/pm-manage/set-value", payload);
+        const updatedRequest = await Vue.http.post("/pm-manage/request-value", payload);
         await dispatch('setCurrentProject', updatedRequest.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
+export const setProjectValue = async ({commit, dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.post("/pm-manage/project-value", payload);
+        await dispatch('setCurrentProject', updatedProject.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
     } finally {

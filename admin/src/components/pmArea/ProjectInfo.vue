@@ -3,7 +3,8 @@
     .project-info__title Project Details : {{currentProject.projectId}}
     .project-info__all-info
         Project(:project="currentProject")
-        ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
+        //- ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
+        GeneralInstructions(:project="currentProject")
     .project-info__all-info
         TasksAndSteps(
             :isFinishedStatus="isFinishedStatus"
@@ -30,7 +31,8 @@
 <script>
 const ValidationErrors = () => import("../ValidationErrors");
 import Project from "./Project";
-import ProjectShortDetails from "./ProjectShortDetails";
+// import ProjectShortDetails from "./ProjectShortDetails";
+import GeneralInstructions from "./GeneralInstructions";
 import ProjectAction from "./ProjectAction";
 import ProjectFinance from "./ProjectFinance";
 import TasksAndSteps from "./TasksAndSteps";
@@ -219,7 +221,8 @@ export default {
     components: {
         ValidationErrors,
         Project,
-        ProjectShortDetails,
+        // ProjectShortDetails,
+        GeneralInstructions,
         ProjectAction,
         TasksAndSteps,
         ProjectFinance,

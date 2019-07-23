@@ -5,6 +5,7 @@ async function getProjects(obj) {
         .populate('industry')
         .populate('customer')
         .populate('projectManager', ['firstName', 'lastName', 'photo'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
@@ -13,6 +14,7 @@ async function getProject(obj) {
         .populate('industry')
         .populate('customer')
         .populate('projectManager', ['firstName', 'lastName', 'photo'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
@@ -21,6 +23,7 @@ async function updateProject(query, update) {
         .populate('industry')
         .populate('customer')
         .populate('projectManager', ['firstName', 'lastName', 'photo'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 

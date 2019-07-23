@@ -7,7 +7,7 @@ const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSendi
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
-const { getClientRequest, addRequestFile, removeRequestFile, removeRequestFiles } = require("../../clientRequests");
+const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -396,16 +396,25 @@ router.post("/prop-approvement", async (req, res) => {
     }
 })
 
-router.post("/set-value", async (req, res) => {
+router.post("/request-value", async (req, res) => {
     const { id, prop, value } = req.body;
     try {
-        let request = await getClientRequest({"_id": id});
-        request[prop] = value;
-        request.save();
-        res.send(request);
+        const updatedRequest = await updateClientRequest({"_id": id}, {[prop]: value});
+        res.send(updatedRequest);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on approvement of request file");
+        res.status(500).send("Error on saving request property value");
+    }
+})
+
+router.post("/project-value", async (req, res) => {
+    const { id, prop, value } = req.body;
+    try {
+        const updatedProject = await updateProject({"_id": id}, {[prop]: value});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving project property value");
     }
 })
 

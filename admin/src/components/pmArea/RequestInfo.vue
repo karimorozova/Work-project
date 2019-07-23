@@ -3,7 +3,8 @@
     .request-info__title Request Details : {{currentProject.requestId}}
     .request-info__all-info
         Request(:request="currentProject")
-        RequestShortDetails(:request="currentProject")
+        //- RequestShortDetails(:request="currentProject")
+        GeneralInstructions(:project="currentProject")
     .request-info__all-info
         RequestTasksData(
             @setDate="setDate"
@@ -19,7 +20,8 @@
 <script>
 const ValidationErrors = () => import("../ValidationErrors");
 import Request from "./Request";
-import RequestShortDetails from "./RequestShortDetails";
+// import RequestShortDetails from "./RequestShortDetails";
+import GeneralInstructions from "./GeneralInstructions";
 import RequestTasksData from "./RequestTasksData";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -93,7 +95,8 @@ export default {
     components: {
         ValidationErrors,
         Request,
-        RequestShortDetails,
+        // RequestShortDetails,
+        GeneralInstructions,
         RequestTasksData,
     },
     created() {

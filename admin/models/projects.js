@@ -76,6 +76,9 @@ const ProjectsSchema = new mongoose.Schema({
   projectManager: {
     type: Schema.Types.ObjectId, ref: 'User'
   },
+  accountManager: {
+    type: Schema.Types.ObjectId, ref: 'User'
+  },
   service: {
     type: Schema.Types.ObjectId, ref: 'Services'
   },
