@@ -326,6 +326,7 @@ export default {
             this.currentActive = -1;
         },
         setDefaultValues() {
+            console.log("outClick");
             if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
                 this.fullInfo.splice(this.currentActive, 1);
             }
