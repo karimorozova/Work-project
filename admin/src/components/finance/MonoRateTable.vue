@@ -163,6 +163,7 @@ export default {
             this.setDefaultValues();
         },
         outClick() {
+            console.log("outClick");
             if(!this.isErrors) {
                 this.setDefaultValues();
             }
@@ -326,7 +327,7 @@ export default {
             this.currentActive = -1;
         },
         setDefaultValues() {
-            console.log("outClick");
+            console.log("setDefaultValues");
             if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
                 this.fullInfo.splice(this.currentActive, 1);
             }
