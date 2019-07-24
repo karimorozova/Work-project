@@ -154,7 +154,7 @@ async function getNewFromPrice(initRate, comb) {
 
 function resetRates(rates) {
     return Object.keys(rates).reduce((prev, curKey) => {
-        prev[curKey] = {value: 0, active: false};
+        prev[curKey] = {value: 0, active: false, min: 1};
         return {...prev};
     }, {});
 };
@@ -164,7 +164,7 @@ function replaceRates(industryRates, services) {
         if(services.indexOf(curKey) !== -1) {
             prev[curKey] = {...industryRates[curKey]};
         } else {
-            prev[curKey] = {value: 0, active: false};
+            prev[curKey] = {value: 0, active: false, min: 1};
         }
         return {...prev}
     }, {})
