@@ -1,23 +1,69 @@
 const { Services, Industries, Pricelist, Duorate } = require("../models/");
+const { getPricelist, updateCombIndustries } = require('../rates');
 
-async function updateRate(rate, infoIndustries, languageForm) {
-  try {
-    let industries = await includeAllIndustries(rate.industries, languageForm);
-    if(infoIndustries[0].name == "All") {
-      const updatedIndustries = updateRateForAll(industries, infoIndustries[0].rates);
-      return { updatedIndustries };
+async function updatePricelistRate(info, priceId) {
+    const { languageForm } = info;
+    try {
+        if(info.industries[0].name === "All") {
+            return await createNewForAllIndustries({...info, priceId});
+        }
+        const industries = info.industries.map(item => {
+                return {industry: {id: item._id}, rates: item.rates}
+            })
+        const priceList = await getPricelist({"_id": priceId});
+        let { combinations } = priceList;
+        const updatedCombs = languageForm === "Duo" ? await updateDuo({info, combinations, industries}) : await updateMono({info, combinations, industries});
+        return Pricelist.updateOne({"_id": priceId}, {combinations: updatedCombs});
+    } catch(err) {
+        console.log("Error from updatePricelistRate");
+        console.log(err);
     }
-    for(let industry of industries) {
-      const index = infoIndustries.findIndex(item => item._id === industry.industry);
-      if(index !== -1) {
-        industry.rates = infoIndustries[index].rates; 
-      }
+}
+
+async function updateMono({info, combinations, industries}) {
+    const { package, targetLanguage } = info;
+    try {
+        const allUpdatedIndustries = await includeAllIndustries(industries, 'Mono');
+        const pairIndex = combinations.findIndex(item => item.package && item.target.id === targetLanguage._id && item.package === package);
+        if(pairIndex !== -1) {
+            const combIndustries = combinations[pairIndex].industries;
+            combIndustriesWithAll = await includeAllIndustries(combIndustries, 'Mono');
+            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
+        } else {
+            combinations.push({
+                target: targetLanguage._id,
+                package,
+                industries: allUpdatedIndustries
+            })
+        }
+        return combinations;
+    } catch(err) {
+        console.log("Error from updateMono");
+        console.log(err);
     }
-    return { updatedIndustries: industries };
-  } catch(err) {
-    console.log("Error from updateRate!");
-    console.log(err);
-  }
+}
+
+async function updateDuo({info, combinations, industries}) {
+    const { sourceLanguage, targetLanguage } = info;
+    try {
+        const allUpdatedIndustries = await includeAllIndustries(industries, 'Duo');
+        const pairIndex = combinations.findIndex(item => item.source && item.source.id === sourceLanguage._id && item.target.id === targetLanguage._id);
+        if(pairIndex !== -1) {
+            const combIndustries = combinations[pairIndex].industries;
+            combIndustriesWithAll = await includeAllIndustries(combIndustries, 'Duo');
+            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
+        } else {
+            combinations.push({
+                target: targetLanguage._id,
+                source: sourceLanguage._id,
+                industries: allUpdatedIndustries
+            })
+        }
+        return combinations;
+    } catch(err) {
+        console.log("Error from updateDuo");
+        console.log(err);
+    }
 }
 
 function updateRateForAll(industries, rates) {
@@ -30,7 +76,7 @@ async function createNewRate(info, priceId) {
   const { sourceLanguage, targetLanguage, package, industries, languageForm } = info;
   try {
     if(info.industries[0].name === "All") {
-      return await createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm });
+      return await createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm, priceId });
     }
     const modifiedIndustries = industries.map(item => {
       const industry = {...item, id: item._id}
@@ -52,7 +98,7 @@ async function createNewRate(info, priceId) {
   }
 }
 
-async function createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm }) {
+async function createNewForAllIndustries({ sourceLanguage, targetLanguage, package, industries, languageForm, priceId }) {
   try {
     const rateIndustries = await defaultRates(languageForm);
     const allIndustries = rateIndustries.map(item => {
@@ -204,4 +250,4 @@ async function updateExistingCombination(industries, rate) {
 }
 
 
-module.exports = { updateRate, createNewRate, deleteRate, updateLangCombs };
+module.exports = { updatePricelistRate, deleteRate, updateLangCombs };

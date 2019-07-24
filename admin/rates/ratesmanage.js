@@ -84,8 +84,9 @@ function updateRates(industries, allIndustries) {
 function updateCombIndustries(combIndustries, industries) {
     let updatedIndustries = [...combIndustries];
     for(let industry of industries) {
+        let industryId = industry._id || industry.industry.id;
         const rateIndex = updatedIndustries.findIndex(item => {
-            return item.industry.id === industry._id || item.industry === industry._id}
+            return item.industry.id === industryId || item.industry === industryId}
         );
         if(rateIndex !== -1) {
             updatedIndustries[rateIndex].rates = industry.rates;

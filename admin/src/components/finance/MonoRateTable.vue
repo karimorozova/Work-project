@@ -36,7 +36,7 @@
                                     Toggler(:isActive="service.active" @toggle="toggleActive(index, servKey)" :isDisabled="currentActive !== index" :class="{'monorates-table_transparent': currentActive !== index}")
                         td.monorates-table__icons-field
                             template(v-for="(icon, key) in icons")
-                                img.monorates-table__crud-icon(:src="icon.image" @click="action(index, key)" :class="{'active-icon': isActive(key, index)}") 
+                                img.monorates-table__crud-icon(:src="icon.image" @click="makeAction(index, key)" :class="{'active-icon': isActive(key, index)}") 
     .add-row
         .add-row__plus(@click="addNewRow")
             span +
@@ -199,16 +199,14 @@ export default {
                 this.industrySelected.push({name: 'All'})
             }
         },
-        async action(index, key) {
+        async makeAction(index, key) {
             if(this.currentActive !== -1) {
                 if(index !== this.currentActive) {
                     return this.$emit("showEditingError");
                 }
             }
             if(key === 'save') {
-                if(this.currentActive !== index) {
-                return
-                }
+                if(this.currentActive !== index) return;
                 return await this.checkErrors(index);
             }
 

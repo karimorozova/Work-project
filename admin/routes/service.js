@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services, Pricelist } = require('../models');
-const { createNewRate, updateRate, deleteRate, updateLangCombs } = require('../services/');
+const { updatePricelistRate, deleteRate, updateLangCombs } = require('../services/');
 const { getProject, getProjectWithUpdatedFinance } = require('../projects/');
 const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../calculations');
 const { getAllRates } = require('../services/getRates'); 
@@ -67,25 +67,14 @@ router.post('/step-payables', async (req, res) => {
 })
 
 router.post('/rates', async (req, res) => {
-  try {
-    const { info, priceId } = req.body;
-    const { industries, languageForm, id } = info;
-    const priceList = await Pricelist.findOne({"_id": priceId}).populate("combinations.industries.industry");
-    let { combinations } = priceList;
-    let rateIndex = id ? combinations.findIndex(item => item.id === id) : -1;
-    if(rateIndex !== -1) {
-      const rate = combinations[rateIndex];
-      const { updatedIndustries } = await updateRate(rate, industries, languageForm);
-      combinations[rateIndex].industries = updatedIndustries;
-      await Pricelist.updateOne({"_id": priceId}, {"combinations": combinations});
-      return res.send("Prcielist's rate Updated");
+    try {
+        const { info, priceId } = req.body;
+        const result = await updatePricelistRate(info, priceId);
+        res.send(result);
+    } catch(err) {
+        console.log(err)
+        res.status(500).send('Error on adding/updating the rate');
     }
-    const result = await createNewRate(info, priceId);
-    res.send(result);
-  } catch(err) {
-      console.log(err)
-      res.status(500).send('Error on adding/updating the rate');
-  }
 })
 
 router.post('/several-langs', async (req, res) => {
