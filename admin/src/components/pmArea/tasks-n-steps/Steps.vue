@@ -47,7 +47,7 @@
             template(slot="headerMargin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
-                input.steps__step-data(type="checkbox" v-model="row.check" @change="selectStep")
+                input.steps__step-data(type="checkbox" v-model="row.check")
                 .steps__info-icon(@click="showStepDetails(index)")
                     i.fa.fa-info-circle
             template(slot="name" slot-scope="{ row }")
@@ -315,15 +315,12 @@ export default {
         progress(prog) {
             return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
         },
-        async selectAll() {
-            let steps = [];
-            for(const step of this.allSteps) {
-                steps.push({...step, check: this.isAllSelected})
-            }
-            await this.setProjectValue({value: steps, prop: 'steps'});
-        },
-        async selectStep() {
-            await this.setProjectValue({value: this.allSteps, prop: 'steps'});
+        selectAll() {
+            const steps = this.allSteps.map(item => {
+                item.check = this.isAllSelected;
+                return item;
+            }) 
+            this.setProjectProp({value: steps, prop: 'steps'});
         },
         vendorName(vendor) {
             const surname = vendor && (vendor.surname && vendor.surname !== "undefined") ? vendor.surname : "";
@@ -363,7 +360,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            setProjectValue: "setProjectValue",
+            setProjectProp: "setProjectProp",
             storeProject: "setCurrentProject",
             setStepsStatus: "setStepsStatus",
             setProjectStatus: "setProjectStatus",

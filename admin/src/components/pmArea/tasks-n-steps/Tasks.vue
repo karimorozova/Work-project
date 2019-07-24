@@ -45,7 +45,7 @@
             template(slot="headerDelivery" slot-scope="{ field }")
                 span.tasks__label {{ field.label }}
             template(slot="check" slot-scope="{ row }")
-                input.tasks__task-data(type="checkbox" v-model="row.check" @change="selectTask")
+                input.tasks__task-data(type="checkbox" v-model="row.check")
             template(slot="taskId" slot-scope="{ row }")
                 span.tasks__task-data {{ row.taskId }}
             template(slot="language" slot-scope="{ row }")
@@ -233,10 +233,7 @@ export default {
             for(const task of this.allTasks) {
                 tasks.push({...task, check: this.isAllSelected})
             }
-            await this.setProjectValue({value: tasks, prop: 'tasks'});
-        },
-        async selectTask() {
-            await this.setProjectValue({value: this.allTasks, prop: 'tasks'});
+            await this.setProjectProp({value: tasks, prop: 'tasks'});
         },
         closeApproveModal() {
             this.isApproveActionShow = false;
@@ -259,7 +256,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            setProjectValue: "setProjectValue",
+            setProjectProp: "setProjectProp",
             storeProject: "setCurrentProject",
             setProjectStatus: "setProjectStatus",
             deliverTasks: "deliverTasks",

@@ -54,7 +54,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            setProjectValue: "setProjectValue",
+            setProjectProp: "setProjectProp",
             setProjectStatus: "setProjectStatus",
             storeProject: "setCurrentProject",
             vendorsSetting: "vendorsSetting",
@@ -164,7 +164,7 @@ export default {
         },
         async refreshCustomerInfo() {
             const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
-            await this.setProjectValue({prop: 'customer', value: client.body});
+            await this.setProjectProp({prop: 'customer', value: client.body});
         },
         showErrors({errors}) {
             this.errors = [...errors];

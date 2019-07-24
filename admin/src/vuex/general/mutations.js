@@ -47,7 +47,7 @@ export const mutations = {
     storeCurrentProject(state, payload) {
         state.currentProject = payload
     },
-    storeProjectValue(state, payload) {
+    storeProjectProp(state, payload) {
         state.currentProject[payload.prop] = payload.value;
     },
     stepDateStore(state, payload) {
