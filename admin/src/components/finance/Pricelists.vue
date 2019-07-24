@@ -7,7 +7,9 @@
         )
             template(slot="headerName" slot-scope="{ field }")
                 .pricelists__head-title {{ field.label }}
-            template(slot="headerDefault" slot-scope="{ field }")
+            template(slot="headerClientDefault" slot-scope="{ field }")
+                .pricelists__head-title {{ field.label }}
+            template(slot="headerVendorDefault" slot-scope="{ field }")
                 .pricelists__head-title {{ field.label }}
             template(slot="headerActive" slot-scope="{ field }")
                 .pricelists__head-title {{ field.label }}
@@ -18,12 +20,19 @@
                     .pricelists__rates-link {{ row.name }}
                 .pricelists__editing-data(v-else)
                     input.pricelists__text(type="text" v-model="currentName")
-            template(slot="default" slot-scope="{ row, index }")
+            template(slot="clientDefault" slot-scope="{ row, index }")
                 .pricelists__data.pricelists_centered
-                    input.pricelists__check(type="checkbox" :checked="row.isDefault" :disabled="row.isDefault" @change="(e) => setDefaultPricelist(e, index)")
+                    CheckBox(:isChecked="row.isClientDefault" 
+                        @check="(e) => setDefaultPricelist(e, index, 'isClientDefault')"
+                        @uncheck="(e) => setDefaultPricelist(e, index, 'isClientDefault')")
+            template(slot="vendorDefault" slot-scope="{ row, index }")
+                .pricelists__data.pricelists_centered
+                    CheckBox(:isChecked="row.isVendorDefault" 
+                        @check="(e) => setDefaultPricelist(e, index, 'isVendorDefault')"
+                        @uncheck="(e) => setDefaultPricelist(e, index, 'isVendorDefault')")
             template(slot="active" slot-scope="{ row, index }")
                 .pricelists__data.pricelists_centered
-                    input.pricelists__check(type="checkbox" :checked="row.isActive" :disabled="currentActive !== index")
+                    Toggler(:isDisabled="false" :isActive="row.isActive" @toggle="toggleActive(index)")
             template(slot="icons" slot-scope="{ row, index }")
                 .pricelists__icons
                     img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
@@ -39,6 +48,8 @@
 <script>
 import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
+import CheckBox from "../CheckBox";
+import Toggler from "../Toggler";
 import ValidationErrors from "../ValidationErrors";
 import NewPricelist from "./pricelists/NewPricelist";
 import { mapGetters, mapActions } from "vuex";
@@ -50,10 +61,11 @@ export default {
         return {
             pricelists: [],
             fields: [
-                {label: "Name", headerKey: "headerName", key: "name", width: "40%", padding: "0"},
-                {label: "Default", headerKey: "headerDefault", key: "default", width: "15%", padding: "0"},
-                {label: "Active", headerKey: "headerActive", key: "active", width: "15%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "30%", padding: "0"},
+                {label: "Name", headerKey: "headerName", key: "name", width: "30%", padding: "0"},
+                {label: "Default Client", headerKey: "headerClientDefault", key: "clientDefault", width: "20%", padding: "0"},
+                {label: "Default Vendor", headerKey: "headerVendorDefault", key: "vendorDefault", width: "20%", padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: "10%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "20%", padding: "0"},
             ],
             icons: {
                 save: {icon: require("../../assets/images/Other/save-icon-qa-form.png")}, 
@@ -133,7 +145,7 @@ export default {
                 isActive: false
             }
             try {
-                await this.$http.post("/prices/new-pricelist", pricelist);
+                await this.$http.post("/prices/new-pricelist", { pricelist });
                 await this.getPricelists();
                 this.alertToggle({message: "Pricelist saved.", isShow: true, type: "success"});
             } catch(err) {
@@ -153,23 +165,37 @@ export default {
             if(!id) {
                 return this.pricelists.slice(index, 1);
             }
+            const { isClientDefault, isVendorDefault } = this.pricelists[index];
             try {
-                await this.$http.delete(`/prices/pricelist/${id}`, {body: {isDefault: this.pricelists[index].isDefault}});
+                await this.$http.delete(`/prices/pricelist/${id}`, {body: { isClientDefault, isVendorDefault }});
                 await this.getPricelists();
-                this.alertToggle({message: "Changes saved", isShow: true, type: "success"});
+                this.alertToggle({message: "Pricelist deleted", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on deleting pricelist.", isShow: true, type: "error"});
             }
         },
-        async setDefaultPricelist(e, index) {
-            const isDefault = e.target.checked;
-            if(!isDefault) return;
+        async setDefaultPricelist(e, index, prop) {
+            if(this.pricelists[index][prop]) return;
+            const newDefaultPriceId = this.pricelists[index]._id;
+            const currentDefaultPrice = this.pricelists.find(item => item[prop]);
+            const exDefaultPriceId = currentDefaultPrice._id;
             try {
-                await this.$http.post("/prices/set-default", {id: this.pricelists[index]._id, isDefault});
+                await this.$http.post("/prices/set-default", {
+                    newDefaultPriceId, exDefaultPriceId, prop
+                    });
                 await this.getPricelists();
-                this.alertToggle({message: "Pricelist deleted.", isShow: true, type: "success"});
+                this.alertToggle({message: "Changes saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error: Cannot set the default pricelist", isShow: true, type: "error"});
+            }
+        },
+        async toggleActive(index) {
+            const isActive = !this.pricelists[index].isActive;
+            try {
+                await this.$http.post("/prices/activeness", {id: this.pricelists[index]._id, isActive});
+                await this.getPricelists();
+            } catch(err) {
+                this.alertToggle({message: "Error: Cannot toggle the property", isShow: true, type: "error"});
             }
         },
         async refreshPricelists() {
@@ -218,6 +244,8 @@ export default {
     components: {
         SettingsTable,
         Add,
+        Toggler,
+        CheckBox,
         ValidationErrors,
         NewPricelist
     },
@@ -229,22 +257,18 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+@import "../../assets/styles/settingsTable.scss";
 
 .pricelists {
     margin: 20px;
     margin-left: 0;
+    position: relative;
     &__table {
-        width: 700px;
-        box-shadow: 0 0 10px $main-color;
-        padding: 20px;
-        position: relative;
+        @extend %setting-table;
+        width: 800px;
     }
-    &__data, &__editing-data {
-        box-sizing: border-box;
-        padding: 5px;
-        height: 28px;
-        display: flex;
-        align-items: center;
+    &__data {
+        @extend %table-data;
     }
     &_pointer {
         cursor: pointer;
@@ -256,26 +280,17 @@ export default {
         }
     }
     &__editing-data {
+        @extend %table-data;
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__text {
-        box-sizing: border-box;
-        padding-left: 3px;
-        width: 100%;
-        border: none;
-        outline: none;
-        color: $main-color;
+        @extend %table-text-input;
     }
     &__icons {
-        padding-top: 3px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @extend %table-icons;
     }
     &__icon {
-        cursor: pointer;
-        opacity: 0.5;
-        margin-right: 8px;
+        @extend %table-icon;
     }
     &_opacity {
         opacity: 1;
@@ -285,10 +300,17 @@ export default {
         justify-content: center;
     }
     &__new {
-        width: 600px;
-        margin-top: 20px;
-        padding: 20px;
-        box-shadow: 0 0 10px $main-color;
+        width: 800px;
+        padding: 0 20px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.1);
     }
 }
 </style>

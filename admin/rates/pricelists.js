@@ -2,44 +2,44 @@ const { Pricelist, Industries, Services } = require("../models");
 const { getPricelist } = require("./getrates");
 
 async function saveNewPricelist(pricelist) {
-    const { name, isActive, isDefault, copyName } = pricelist;
+    const { name, isActive, isClientDefault, isVendorDefault, copyName } = pricelist;
     try {
         const donorPricelist = copyName ? await Pricelist.findOne({"name": copyName}) : "";
         const combinations = donorPricelist ? [...donorPricelist.combinations] : [];
-        return await createNewPricelist({name, isActive, isDefault, combinations});
+        return await Pricelist.create({name, isClientDefault, isVendorDefault, isActive, combinations});
     } catch(err) {
         console.log(err);
         console.log("Error in saveNewPricelist");
     }
 }
 
-async function createNewPricelist({name, isActive, isDefault, combinations}) {
+async function deletePricelist(id, isClientDefault, isVendorDefault) {
     try {
-        if(isDefault) {
-            await Pricelist.updateOne({"isDefault": true}, {"isDefault": !isDefault});
-            return await Pricelist.create({name, isDefault, isActive, combinations});
-        }
-        return await Pricelist.create({name, isDefault, isActive, combinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in createNewPricelist");
-    }
-}
-
-async function deletePricelist(id, isDefault) {
-    try {
-        if(!isDefault) {
+        if(!isClientDefault && !isVendorDefault) {
             return await Pricelist.deleteOne({"_id": id});
         }
         const firstPrice = await Pricelist.find().limit(1);
+        const defaultId = firstPrice[0].id;
         if(firstPrice.length) {
-            const defaultId = firstPrice[0].id;
             await Pricelist.deleteOne({"_id": id});
-            await Pricelist.updateOne({"_id": defaultId}, {isDefault: isDefault});
+            await setDefaultPrice(defaultId, isClientDefault, isVendorDefault);
         } 
     } catch(err) {
         console.log(err);
         console.log("Error in deletePricelist");
+    }
+}
+
+async function setDefaultPrice(defaultId, isClientDefault, isVendorDefault) {
+    try {
+        if(isClientDefault && isVendorDefault) {
+          return await Pricelist.updateOne({"_id": defaultId}, { isClientDefault, isVendorDefault });
+        }
+        isClientDefault ? await Pricelist.updateOne({"_id": defaultId}, { isClientDefault })
+                : await Pricelist.updateOne({"_id": defaultId}, { isVendorDefault });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setDefaultPrice");
     }
 }
 

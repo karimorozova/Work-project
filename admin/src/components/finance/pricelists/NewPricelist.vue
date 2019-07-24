@@ -1,50 +1,48 @@
 <template lang="pug">
-.new-price
-    .new-price__title Add a new Pricelist
-    .new-price__main
-        .new-price__block
-            .new-price__item
-                LabelVal(text="Name:")
-                    input.new-price__text(type="text" v-model="pricelistName")
-            .new-price__item
-                LabelVal(text="Copy from:")
-                    .new-price__drop-menu
-                        SelectSingle(
-                            :options="pricesNames"
-                            :selectedOption="selectedPricelist"
-                            @chooseOption="setPricelistForCopy"
-                            placeholder="Select"
-                        )
-        .new-price__block
-            .new-price__item.new-price_less-width
-                LabelVal(text="Default:")
-                    Toggler(
-                        :isDisabled="isTogglerDisabled" 
-                        :isActive="isPricelistDefault"
-                        @toggle="toggleDefault")
-            .new-price__item.new-price_less-width
-                LabelVal(text="Active:")
-                    Toggler(
-                        :isDisabled="isTogglerDisabled"
-                        :isActive="isPricelistActive"
-                        @toggle="toggleActive")
-    .new-price__buttons
-        .new-price__save
-            Button(value="Save" @clicked="checkForErrors")
-        .new-price__cancel
-            Button(value="Cancel" @clicked="cancel")
-    ValidationErrors(v-if="isErrorExist" 
-        :errors="errors"
-        :isAbsolute="isAbsolute"
-        @closeErrors="closeErrors")
+    .new-price(:class="{'new-price_top-50': pricelists.length < 3}")
+        .new-price__title Add a new Pricelist
+        .new-price__row
+            .new-price__col
+                .new-price__item
+                    LabelVal(text="Name" customClass="new-chart-label")
+                        input.new-price__text(type="text" v-model="pricelistName")
+                .new-price__item
+                    LabelVal(text="Copy from" customClass="new-chart-label")
+                        .new-price__drop-menu
+                            SelectSingle(
+                                :options="pricesNames"
+                                :selectedOption="selectedPricelist"
+                                @chooseOption="setPricelistForCopy"
+                                placeholder="Select"
+                            )
+            .new-price__col.new-price_width-120
+                .new-price__item
+                    LabelVal(text="Default Client" customClass="new-chart-label")
+                        CheckBox(:isChecked="isClientDefault" @check="(e) => toggleProp(e, 'isClientDefault')" @uncheck="(e) => toggleProp(e, 'isClientDefault')")
+                .new-price__item
+                    LabelVal(text="Default Vendor" customClass="new-chart-label")
+                        CheckBox(:isChecked="isVendorDefault" @check="(e) => toggleProp(e, 'isVendorDefault')" @uncheck="(e) => toggleProp(e, 'isVendorDefault')")
+                .new-price__item
+                    LabelVal(text="Active" customClass="new-chart-label")
+                        CheckBox(:isChecked="isActive" @check="(e) => toggleProp(e, 'isActive')" @uncheck="(e) => toggleProp(e, 'isActive')")
+        .new-price__buttons
+            .new-price__button
+                Button(value="Save" @clicked="checkForErrors")
+            .new-price__button
+                Button(value="Cancel" @clicked="cancel")
+        ValidationErrors(v-if="isErrorExist" 
+            :errors="errors"
+            :isAbsolute="isAbsolute"
+            @closeErrors="closeErrors")
 </template>
 
 <script>
-import LabelVal from "../../LabelVal";
-import Toggler from "../../Toggler";
-import SelectSingle from "../../SelectSingle";
-import ValidationErrors from "../../ValidationErrors";
-import Button from "../../Button";
+import LabelVal from "@/components/LabelVal";
+import Toggler from "@/components/Toggler";
+import CheckBox from "@/components/CheckBox";
+import SelectSingle from "@/components/SelectSingle";
+import ValidationErrors from "@/components/ValidationErrors";
+import Button from "@/components/Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -56,9 +54,9 @@ export default {
     data() {
         return {
             pricelistName: "",
-            isTogglerDisabled: false,
-            isPricelistDefault: false,
-            isPricelistActive: false,
+            isClientDefault: false,
+            isVendorDefault: false,
+            isActive: false,
             selectedPricelist: "",
             isErrorExist: "",
             errors: [],
@@ -66,11 +64,8 @@ export default {
         }
     },
     methods: {
-        toggleDefault() {
-            this.isPricelistDefault = !this.isPricelistDefault;
-        },
-        toggleActive() {
-            this.isPricelistActive = !this.isPricelistActive;
+        toggleProp(e, prop) {
+            this[prop] = !this[prop];
         },
         isNameUnique() {
             const duplicateName = this.pricelists.find(item => {
@@ -93,15 +88,33 @@ export default {
             const pricelist = {
                 name: this.pricelistName,
                 copyName: this.selectedPricelist,
-                isDefault: this.isPricelistDefault,
-                isActive: this.isPricelistActive
+                isClientDefault: this.isClientDefault,
+                isVendorDefault: this.isVendorDefault,
+                isActive: this.isActive
             } 
             try {
-                await this.$http.post("/prices/new-pricelist", pricelist);
+                await this.$http.post("/prices/new-pricelist", { pricelist });
+                await this.updateDefaultPricelists();
                 this.$emit('saved');
                 this.alertToggle({message: "Pricelist saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error: Cannot save pricelist", isShow: true, type: "error"});
+            }
+        },
+        async updateDefaultPricelists() {
+            try {
+                if(this.isClientDefault) {
+                    let defaultClientPrice = this.pricelists.find(item => item.isClientDefault);
+                    defaultClientPrice.isClientDefault = false;
+                    await this.$http.post('/prices/pricelist', { pricelist: {...defaultClientPrice} });
+                }
+                if(this.isVendorDefault) {
+                    let defaultVendorPrice = this.pricelists.find(item => item.isVendorDefault);
+                    defaultVendorPrice.isVendorDefault = false;
+                    await this.$http.post('/prices/pricelist', { pricelist: {...defaultVendorPrice} });
+                }
+            } catch(err) {
+                this.alertToggle({message: "Error on updating Pircelist", isShow: true, type: "error"});
             }
         },
         cancel() {
@@ -123,6 +136,7 @@ export default {
     components: {
         LabelVal,
         Toggler,
+        CheckBox,
         SelectSingle,
         ValidationErrors,
         Button
@@ -134,31 +148,37 @@ export default {
 @import "../../../assets/scss/colors.scss";
 
 .new-price {
+    width: 60%;
     display: flex;
     flex-direction: column;
     position: relative;
+    background-color: $white;
+    box-shadow: 0 0 10px $brown-shadow;
+    padding: 20px;
+    &_top-50 {
+        top: 50px;
+    }
     &__title {
-        font-size: 24px;
         margin-bottom: 20px;
     }
-    &__main {
+    &__row {
         display: flex;
         justify-content: space-between;
     }
-    &__block {
-        width: 46%;
-        &:last-child {
-            width: 30%;
-        }
+    &__col {
+        width: 270px;
+    }
+    &_width-120 {
+        width: 120px;
     }
     &__item {
         margin-bottom: 20px;
     }
     &__text {
         width: 191px;
-        height: 28px;
+        height: 30px;
         color: $main-color;
-        padding-left: 5px;
+        padding: 0 5px;
         box-sizing: border-box;
         border: 1px solid $main-color;
         border-radius: 5px;
@@ -171,18 +191,14 @@ export default {
     &__drop-menu {
         position: relative;
         width: 191px;
-        height: 28px;
-    }
-    &_less-width {
-        width: 80%;
+        height: 30px;
     }
     &__buttons {
         display: flex;
         justify-content: flex-end;
-        margin-top: 20px;
     }
-    &__save {
-        margin-right: 15px;
+    &__button {
+        margin-left: 15px;
     }
 }
 </style>

@@ -166,6 +166,10 @@ export default {
         border-radius: 5px;
         outline: none;
         color: $main-color;
+        transition: all 0.2s;
+        &:focus {
+            box-shadow: 0 0 5px $brown-shadow;
+        }
     }
     &__drop-menu {
         position: relative;
