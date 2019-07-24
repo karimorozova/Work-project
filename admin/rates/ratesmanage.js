@@ -33,10 +33,10 @@ async function defaultRates(entityIndustries, languageForm) {
     try {
         const services = await Services.find({"languageForm": languageForm});
         const serviceRate = {value: 0, active: false};
-        const rates = services.reduce((init, cur) => {
+        const rates = services.reduce((prev, cur) => {
             const key = cur.id;
-            init[key] = {...serviceRate};
-            return {...init};
+            prev[key] = {...serviceRate};
+            return {...prev};
         }, {});
         for(let industry of industries) {
             industry["rates"] = {...rates};
@@ -121,8 +121,8 @@ function getDeletedRates(industry, servicesIds) {
 function isAllRatesDeleted(industries) {
     let sum = 0;
     for(let elem of industries) {
-      sum += Object.keys(elem.rates).reduce((init, cur) => {
-        return init + elem.rates[cur].value;
+      sum += Object.keys(elem.rates).reduce((prev, cur) => {
+        return prev + elem.rates[cur].value;
       }, 0)
     }
     return sum === 0

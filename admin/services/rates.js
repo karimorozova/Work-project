@@ -102,11 +102,11 @@ async function defaultRates(languageForm) {
   try {
     const industries = await Industries.find();
     const services = await Services.find({languageForm: languageForm});
-    const serviceRate = {value: 0, active: false};
-    const rates = services.reduce((init, cur) => {
+    const serviceRate = {value: 0, active: false, min: 1};
+    const rates = services.reduce((prev, cur) => {
         const key = cur.id;
-        init[key] = {...serviceRate};
-        return {...init}
+        prev[key] = {...serviceRate};
+        return {...prev}
     }, {});
     for(let industry of industries) {
       industry["rates"] = {...rates}; 
@@ -157,6 +157,7 @@ function deletedRates(elem, services) {
   for(let id of services) {
     rates[id].value = 0;
     rates[id].active = false;
+    rates[id].min = 1;
   }
   return { industry: elem.industry, rates };
 }

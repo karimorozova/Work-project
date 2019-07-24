@@ -120,13 +120,13 @@ async function copyFromPrice(obj) {
 }
 
 function replaceFromPrice({ curRates, initRates, services }) {
-    const copiedRates = Object.keys(curRates).reduce((init, curKey) => {
+    const copiedRates = Object.keys(curRates).reduce((prev, curKey) => {
         if(services.indexOf(curKey) !== -1) {
-            init[curKey] = {...initRates[curKey]}
+            prev[curKey] = {...initRates[curKey]}
         } else {
-            init[curKey] = {...curRates[curKey]}
+            prev[curKey] = {...curRates[curKey]}
         }
-        return {...init};
+        return {...prev};
     }, {})
     return copiedRates;
 }
@@ -153,20 +153,20 @@ async function getNewFromPrice(initRate, comb) {
 }
 
 function resetRates(rates) {
-    return Object.keys(rates).reduce((init, curKey) => {
-        init[curKey] = {value: 0, active: false};
-        return {...init};
+    return Object.keys(rates).reduce((prev, curKey) => {
+        prev[curKey] = {value: 0, active: false};
+        return {...prev};
     }, {});
 };
 
 function replaceRates(industryRates, services) {
-    let rates = Object.keys(industryRates).reduce((init, curKey) => {
+    let rates = Object.keys(industryRates).reduce((prev, curKey) => {
         if(services.indexOf(curKey) !== -1) {
-            init[curKey] = {...industryRates[curKey]};
+            prev[curKey] = {...industryRates[curKey]};
         } else {
-            init[curKey] = {value: 0, active: false};
+            prev[curKey] = {value: 0, active: false};
         }
-        return {...init}
+        return {...prev}
     }, {})
     return rates;
 }
@@ -176,10 +176,10 @@ async function defaultRates(languageForm) {
         const industries = await Industries.find();
         const services = await Services.find({languageForm: languageForm});
         const serviceRate = {value: 0, active: false};
-        const rates = services.reduce((init, cur) => {
+        const rates = services.reduce((prev, cur) => {
             const key = cur.id;
-            init[key] = {...serviceRate};
-            return {...init}
+            prev[key] = {...serviceRate};
+            return {...prev}
         }, {});
         for(let industry of industries) {
             industry["rates"] = {...rates}; 
