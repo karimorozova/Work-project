@@ -571,7 +571,7 @@ async function fillPricelist() {
     if(!pricelists.length) {
       await Pricelist.create({
         name: 'Basic',
-        isCleintDefault: true,
+        isClientDefault: true,
         isVendorDefault: true,
         isActive: true,
         combinations: duoRates
