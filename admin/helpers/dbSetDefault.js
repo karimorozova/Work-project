@@ -505,14 +505,14 @@ async function fillDuoServiceRates() {
       const services = await Services.find({"languageForm": "Duo"});
       const duoCombinations = await serviceDuoLangs();
       const translation = duoCombinations.filter(item => item.service === "tr");
-      const duoServices = services.reduce((init, cur) => {
+      const duoServices = services.reduce((prev, cur) => {
         let rate = 0;
         if(cur.symbol === "tr") rate = 0.08;
         if(cur.symbol === "pr") rate = 0.017;
         if(cur.symbol === "qt") rate = 0.028;
         const key = cur._id;
-        init[key] = {value: rate, active: true};
-        return {...init}
+        prev[key] = {value: rate, active: true, min: 10};
+        return {...prev}
       }, {});
       const combs = translation;
       for(let comb of combs) {
@@ -538,14 +538,14 @@ async function fillMonoServiceRates() {
       const services = await Services.find({"languageForm": "Mono"});
       const monoCombinations = await serviceMonoLangs();
       const copywriting = monoCombinations.filter(item => item.service === "co");
-      const monoServices = services.reduce((init, cur) => {
+      const monoServices = services.reduce((prev, cur) => {
         let rate = 0;
         if(cur.symbol === "co") rate = 0.1; 
         if(cur.symbol === "bl") rate = 0.11;
         if(cur.symbol === "sw") rate = 0.12;
         const key = cur._id;
-        init[key] = {value: rate, active: true};
-        return {...init}
+        prev[key] = {value: rate, active: true, min: 10};
+        return {...prev}
       }, {});
       const combs = copywriting;
       for(let comb of combs) {
@@ -571,7 +571,8 @@ async function fillPricelist() {
     if(!pricelists.length) {
       await Pricelist.create({
         name: 'Basic',
-        isDefault: true,
+        isCleintDefault: true,
+        isVendorDefault: true,
         isActive: true,
         combinations: duoRates
       });
