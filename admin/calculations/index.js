@@ -115,7 +115,7 @@ function getStepPayables({rate, metrics, step}) {
     const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
     : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
-    return {...step._doc, finance, vendorRate: rate};
+    return {...step, finance, vendorRate: rate};
 }
 
 function getRate({task, project, vendor, service}) {
@@ -197,7 +197,7 @@ async function setDefaultStepVendors(project) {
             if(matchedVendors.length === 1 && !steps[i].vendor) {
                 steps[i].vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
-                steps[i] = await payablesCalc({task: tasks[taskIndex], project, step: steps[i]});
+                steps[i] = await payablesCalc({task: tasks[taskIndex], project, step: steps[i]._doc});
                 tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+steps[i].finance.Price.payables).toFixed(2);
             }
         }
