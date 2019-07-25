@@ -9,7 +9,7 @@
                     th(v-for="head in tableHeader")
                         .table__head-title {{ head.title }}
             tbody.monorates-table__tbody
-                template(v-for="(info, index) in fullInfo" v-if="isTargetFilter(info)")
+                template(v-for="(info, index) in fullInfo" v-if="isTargetFilter(info) && isPackageFilter(info)")
                     tr(v-if="isIndustryFilter(info) && isCurrentServiceRateZero(info, index)")
                         td.monorates-table__check
                             input.monorates-table__check-input(type="checkbox" v-model="info.check")
@@ -75,6 +75,9 @@ export default {
         serviceSelect: {
             type: Array
         },
+        packageFilter: {
+            type: Array
+        },
         isErrors: {
             type: Boolean
         }
@@ -135,19 +138,22 @@ export default {
         isTargetFilter(info) {
             return (this.targetSelect.indexOf(info.targetLanguage.symbol) !== -1 || this.targetSelect[0] === 'All');
         },
+        isPackageFilter(info) {
+            return this.packageFilter.indexOf(info.package) !== -1 || this.packageFilter[0] === 'All';
+        },
         isIndustryFilter(info) {
             let industriesNames = this.industryFilter.map(item => item.name);
             return (industriesNames.indexOf(info.industry.name) !== -1 || this.industryFilter[0].name === 'All');
         },
-        isAllFiters(info, index) {
+        isAllFilters(info, index) {
             return this.isIndustryFilter(info) && this.isCurrentServiceRateZero(info, index)
                 && this.isTargetFilter(info) 
-                && this.isIndustryFilter(info)
+                && this.isPackageFilter(info)
         },
         toggleAllCheck() {
             for(let index in this.fullInfo) {
                 let info = this.fullInfo[index];
-                if(this.isAllFiters(info, index)) {
+                if(this.isAllFilters(info, index)) {
                     this.fullInfo[index].check = this.isAllChecked;
                 }
             }
@@ -163,7 +169,6 @@ export default {
             this.setDefaultValues();
         },
         outClick() {
-            console.log("outClick");
             if(!this.isErrors) {
                 this.setDefaultValues();
             }
@@ -327,7 +332,6 @@ export default {
             this.currentActive = -1;
         },
         setDefaultValues() {
-            console.log("setDefaultValues");
             if(this.currentActive !== -1 && !this.fullInfo[this.currentActive].id) {
                 this.fullInfo.splice(this.currentActive, 1);
             }
@@ -412,7 +416,7 @@ export default {
         isNoChecked() {
             for(let index in this.fullInfo) {
                 let info = this.fullInfo[index];
-                if(this.isAllFiters(info, index) && !info.check) {
+                if(this.isAllFilters(info, index) && !info.check) {
                     return true;
                 }
             }

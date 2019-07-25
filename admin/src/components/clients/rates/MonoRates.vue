@@ -6,9 +6,11 @@
             :targetSelect="targetSelect"
             :serviceSelect="serviceSelect"
             :industryFilter="industryFilter"
+            :packageFilter="packageFilter"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
             @setServiceFilter="setServiceFilter"
+            @setPackageFilter="setPackageFilter"
         )
     .mono-rates__action(v-if="isAnyChecked")
         SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
@@ -20,6 +22,7 @@
         :industryFilter="industryFilter"
         :filterIndustry="filterIndustry"
         :serviceSelect="serviceSelect"
+        :packageFilter="packageFilter"
         :isErrors="isAnyError"
         @showEditingError="showEditingError"
         @showValidationErrors="showValidationErrors"
@@ -75,6 +78,7 @@ export default {
         return {
             isAllChecked: false,
             targetSelect: ["All"],
+            packageFilter: ["All"],
             industryFilter: [{name: "All"}],
             industrySelected: [{name: 'All'}],
             serviceSelect: [{}],
@@ -198,6 +202,18 @@ export default {
                 this.industryFilter.push({
                 name: 'All'
                 })
+            }
+        },
+        setPackageFilter({option}) {
+            const position = this.packageFilter.indexOf(option);
+            this.packageFilter = this.packageFilter.filter(item => item !== 'All');
+            if(position !== -1) {
+                this.packageFilter.splice(position, 1);
+            } else {
+                this.packageFilter.push(option);
+            }
+            if(option === 'All' || !this.packageFilter.length) {
+                return this.packageFilter = ['All']
             }
         },
         showEditingError() {

@@ -9,6 +9,10 @@
         label.rates-filters__title(v-else) Language
         .rates-filters__drop-menu
             LanguagesSelect(:selectedLangs="targetSelect" :addAll="true" @chosenLang="setTargetFilter")
+    .rates-filters__item(v-if="form === 'Mono'")
+        label.rates-filters__title Package
+        .rates-filters__drop-menu
+            SelectMulti(:options="packages" :selectedOptions="packageFilter" @chooseOptions="setPackageFilter")
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu
@@ -23,6 +27,7 @@
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
 import ServiceMultiSelect from "../ServiceMultiSelect";
+import SelectMulti from "../SelectMulti";
 
 export default {
     props: {
@@ -40,11 +45,14 @@ export default {
         },
         serviceSelect: {
             type: Array
+        },
+        packageFilter: {
+            type: Array
         }
     },
     data() {
         return {
-
+            packages: []
         }
     },
     methods: {
@@ -59,7 +67,19 @@ export default {
         },
         setServiceFilter({service}) {
             this.$emit('setServiceFilter', {service});
-        }
+        },
+        setPackageFilter({option}) {
+            this.$emit('setPackageFilter', {option});
+        },
+        async getPackages() {
+            try {
+                const result = await this.$http.get("/api/packages");
+                this.packages = result.body.map(item => item.size);
+                this.packages.unshift("All");
+            } catch(err) {
+
+            }
+        },
     },
     computed: {
         filteredServices() {
@@ -78,7 +98,11 @@ export default {
     components: {
         LanguagesSelect,
         IndustrySelect,
-        ServiceMultiSelect
+        ServiceMultiSelect,
+        SelectMulti
+    },
+    created() {
+        this.getPackages();
     }
 }
 </script>

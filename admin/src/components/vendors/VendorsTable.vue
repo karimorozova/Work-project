@@ -11,7 +11,7 @@
             span.vendors-table__header-label {{ field.label }}
         template(slot="headerStatus" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
-        template(slot="headerLanguageCombination" slot-scope="{ field }")
+        template(slot="headerLanguagePair" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
         template(slot="headerNative" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
@@ -35,7 +35,7 @@
                     @scrollDrop="scrollDrop"
                 )
             .vendors-table__no-drop(v-else) {{ row.status }}
-        template(slot="languageCombination" slot-scope="{ row }")
+        template(slot="languagePair" slot-scope="{ row }")
             .vendors-table__combinations {{ getLanguageCombs(row) }}
         template(slot="native" slot-scope="{ row, index }")
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
@@ -121,7 +121,7 @@ export default {
             fields: [
                 {label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "13%", padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "10%", padding: "0"},
-                {label: "Language Combination", headerKey: "headerLanguageCombination", key: "languageCombination", width: "18%", cellClass: "vendors-table_scroll-y"},
+                {label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "18%", cellClass: "vendors-table_scroll-y"},
                 {label: "Native Language", headerKey: "headerNative", key: "native", width: "16%", padding: "0"},
                 {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "15%", padding: "0"},
                 {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "8%", padding: "0"},

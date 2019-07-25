@@ -173,6 +173,12 @@ export default {
         .filters & {
             width: 24%;
         }
+        .rates-filters__item & {
+            width: 18%;
+        }
+    }
+    .rates-filters__item & {
+        height: 32px;
     }
 }
 

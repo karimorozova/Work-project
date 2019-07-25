@@ -3,14 +3,14 @@
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMonoRatesShow}")
         .vendor-rates__open 
             .vendor-rates__select(@click="monoRatesToggler")
-                span.vendor-rates__label Mono
+                span.vendor-rates__label Package
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMonoRatesShow}") 
             .vendor-rates__drop(v-if="isMonoRatesShow")
                 MonoRates(:vendor="vendor")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isDuoRatesShow}")
         .vendor-rates__open
             .vendor-rates__select(@click="duoRatesToggler")
-                span.vendor-rates__label Duo
+                span.vendor-rates__label Wordcount
                 img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
             .vendor-rates__drop(v-if="isDuoRatesShow")
                 DuoRates(:vendor="vendor" 
@@ -19,7 +19,7 @@
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
             .vendor-rates____open
                 .vendor-rates__select(@click="matrixToggler")
-                    span.vendor-rates__label Matrix
+                    span.vendor-rates__label Discount Chart
                     img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMatrixShow}") 
                 .vendor-rates__drop(v-if="isMatrixShow")
                     FinanceMatrix(:entity="vendor" @setMatrixData="setMatrixData")
