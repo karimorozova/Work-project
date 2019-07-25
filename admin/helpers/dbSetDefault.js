@@ -600,8 +600,8 @@ async function checkCollections() {
   await requests();
   await projects();
   await users();
-  await serviceMonoLangs();
-  await serviceDuoLangs();
+//   await serviceMonoLangs();
+//   await serviceDuoLangs();
   await fillDuoServiceRates();
   await fillMonoServiceRates();
   // await clientLangs();
