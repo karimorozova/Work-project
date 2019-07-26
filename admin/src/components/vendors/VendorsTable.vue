@@ -13,6 +13,8 @@
             span.vendors-table__header-label {{ field.label }}
         template(slot="headerLanguagePair" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
+        template(slot="headerMonoLanguage" slot-scope="{ field }")
+            span.vendors-table__header-label {{ field.label }}
         template(slot="headerNative" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
         template(slot="headerIndustry" slot-scope="{ field }")
@@ -37,6 +39,8 @@
             .vendors-table__no-drop(v-else) {{ row.status }}
         template(slot="languagePair" slot-scope="{ row }")
             .vendors-table__combinations {{ getLanguageCombs(row) }}
+        template(slot="monLanguage" slot-scope="{ row }")
+            .vendors-table__combinations
         template(slot="native" slot-scope="{ row, index }")
             .vendors-table__drop-menu(v-if="currentEditingIndex === index")
                 NativeLanguageSelect(
@@ -119,14 +123,15 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "13%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "10%", padding: "0"},
-                {label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "18%", cellClass: "vendors-table_scroll-y"},
-                {label: "Native Language", headerKey: "headerNative", key: "native", width: "16%", padding: "0"},
-                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "15%", padding: "0"},
-                {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "8%", padding: "0"},
-                {label: "TQI", headerKey: "headerTqi", key: "tqi", width: "8%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "3px"},        
+                {label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "12%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "8%", padding: "0"},
+                {label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "14%", cellClass: "vendors-table_scroll-y"},
+                {label: "Mono Language", headerKey: "headerMonoLanguage", key: "monoLanguage", width: "14%", cellClass: "vendors-table_scroll-y"},
+                {label: "Native Language", headerKey: "headerNative", key: "native", width: "14%", padding: "0"},
+                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "14%", padding: "0"},
+                {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "7%", padding: "0"},
+                {label: "TQI", headerKey: "headerTqi", key: "tqi", width: "6%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "11%", padding: "3px"},        
             ],
             icons: {
                 save: {icon: require('../../assets/images/Other/save-icon-qa-form.png')},
