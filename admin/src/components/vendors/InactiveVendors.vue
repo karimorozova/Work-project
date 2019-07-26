@@ -1,5 +1,5 @@
 <template lang="pug">
-    .inactive
+    .inactive-vendors
         AllVendorsInfo(
             statusFilter="Inactive"
             )
@@ -7,25 +7,18 @@
 
 <script>
 import AllVendorsInfo from "./AllVendorsInfo";
+
 export default {
-  data() {
-    return {
-      
+    components: {
+        AllVendorsInfo
     }
-  },
-  methods: {
-    
-  },
-  components: {
-    AllVendorsInfo
-  }
 }
 </script>
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 
-.inactive {
+.inactive-vendors {
     padding: 20px;
     width: calc(100% - 150px);
 }

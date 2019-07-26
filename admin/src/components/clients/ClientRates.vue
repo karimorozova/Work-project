@@ -3,21 +3,21 @@
         .client-rates__block(:class="{'client-rates_straight-angle': isMonoRatesShow}")
             .client-rates__open 
                 .client-rates__select(@click="monoRatesToggler")
-                    span.client-rates__label Mono
+                    span.client-rates__label Package
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMonoRatesShow}") 
                 .client-rates__drop(v-if="isMonoRatesShow")
                     MonoRates(:client="client")
         .client-rates__block(:class="{'client-rates_straight-angle': isDuoRatesShow}")
             .client-rates__open
                 .client-rates__select(@click="duoRatesToggler")
-                    span.client-rates__label Duo
+                    span.client-rates__label Wordcount
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
                 .client-rates__drop(v-if="isDuoRatesShow")
                     DuoRates(:client="client" @addSevLangs="addSevLangs")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open
                 .client-rates__select(@click="matrixToggler")
-                    span.client-rates__label Matrix
+                    span.client-rates__label Discount Chart
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMatrixShow}") 
                 .client-rates__drop(v-if="isMatrixShow")
                     FinanceMatrix(:entity="client" @setMatrixData="setMatrixData")

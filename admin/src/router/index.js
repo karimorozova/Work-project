@@ -28,6 +28,9 @@ import CancelReasons from '@/components/Table/CancelReasons'
 import Users from '@/components/Table/Users'
 import ClientDetails from '@/components/clients/ClientDetails'
 import Allclients from '@/components/clients/Allclients'
+import ActiveClients from '@/components/clients/ActiveClients'
+import InactiveClients from '@/components/clients/InactiveClients'
+import PotentialClients from '@/components/clients/PotentialClients'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewClientInfo from '@/components/clients/NewClientInfo'
 import ContactDetails from '@/components/clients/ContactDetails'
@@ -225,9 +228,27 @@ const router = new Router({
                     children: [
                         {
                             path: '',
-                            name: 'clients',
+                            name: 'all-clients',
                             component: Allclients,
                             props: true
+                        },
+                        {
+                            path: 'active',
+                            name: 'active-clients',
+                            props: true,
+                            component: ActiveClients
+                        },
+                        {
+                            path: 'inactive',
+                            name: 'inactive-clients',
+                            props: true,
+                            component: InactiveClients
+                        },
+                        {
+                            path: 'potential',
+                            name: 'potential-clients',
+                            props: true,
+                            component: PotentialClients
                         },
                         {
                             path: 'details/:id',

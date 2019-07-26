@@ -1,6 +1,5 @@
 <template lang="pug">
     .all-clients
-        .title All Clients
         .all-clients__table
             .clients-filters
                 .clients-filters__row
@@ -34,10 +33,15 @@ import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    props: {
+        filterStatus: {
+            type: String,
+            default: "All"
+        }
+    },
     data() {
         return {
             filterName: "",
-            filterStatus: "All",
             industryFilter: {name: 'All'},
             filterLeadsource: "All",
             industrySelected: [],
