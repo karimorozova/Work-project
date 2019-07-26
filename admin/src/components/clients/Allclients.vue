@@ -2,25 +2,20 @@
     .all-clients
         .title All Clients
         .all-clients__table
-            .filters
-                .filters__block
-                    .filters-item
+            .clients-filters
+                .clients-filters__row
+                    .clients-filters__item
                         label Name
-                        input.filter__input-field(type="text" placeholder="Company Name" v-model="filterName")
-                    .filters-item
-                        label Status
-                        .filters__drop-menu
-                            ClientStatusSelect(:isAllExist="isAllStatusExist" :selectedStatus="filterStatus" @chosenStatus="chosenStatus")
-                .filters__block
-                    .filters-item
+                        input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="filterName")
+                    .clients-filters__item
                         label Industry
-                        .filters__drop-menu.filters_high-index
+                        .clients-filters__drop-menu
                             ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
-                    .filters-item
+                    .clients-filters__item
                         label Lead Source
-                        .filters__drop-menu
+                        .clients-filters__drop-menu
                             ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
-                .filters__block.filters_flex-end
+                .clients-filters__row.clients-filters_flex-end
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
                 :filterName="filterName"
@@ -35,7 +30,6 @@
 import ClientsTable from "./ClientsTable";
 import ClientIndustrySelect from '../clients/ClientIndustrySelect';
 import MultiClientIndustrySelect from '../clients/MultiClientIndustrySelect';
-import ClientStatusSelect from '../clients/ClientStatusSelect';
 import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
 import { mapGetters, mapActions } from "vuex";
 
@@ -103,7 +97,6 @@ export default {
         ClientsTable,
         ClientIndustrySelect,
         MultiClientIndustrySelect,
-        ClientStatusSelect,
         ClientLeadsourceSelect,
     },
     created() {
@@ -121,6 +114,13 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     position: relative;
+    &__table {
+        margin: 40px 40px 40px 0;
+        padding: 20px;
+        font-size: 14px;
+        font-weight: normal;
+        box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
+    }
 }
 
 .title {
@@ -131,49 +131,48 @@ label {
     margin-bottom: 0;
 }
 
-.filters {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.clients-filters {
     margin-bottom: 20px;
-    &__block {
-        width: 24%;
+    &__row {
         display: flex;
-        flex-direction: column;
         justify-content: space-between;
-        &:nth-of-type(2) {
-            width: 28%;
-        }
-        &:last-child {
-            width: 20%;
-        }
+        align-items: center;
     }
     &__drop-menu {
         width: 191px;
         height: 28px;
         position: relative;
+        margin-left: 15px;
+    }
+    &__input-field {
+        margin-left: 15px;
+        width: 191px;
+        height: 28px;
+        padding-left: 5px;
+        border: 1px solid #67573E;
+        color: #67573E;
+        border-radius: 5px;
+        outline: none;
+        box-sizing: border-box;
+    }
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        ::-webkit-input-placeholder {
+            opacity: 0.5;
+        }
     }
     &_high-index {
         z-index: 10;
     }
     &_flex-end {
-        align-items: flex-end;
-    }
-}
-
-.filters-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    &:first-child {
-        margin-bottom: 20px;
-    }
-    ::-webkit-input-placeholder {
-        opacity: 0.5;
+       justify-content: flex-end;
     }
 }
 
 .add-button {
+    margin-top: 20px;
     width: 190px;
     height: 26px;
     color: white;
@@ -184,117 +183,6 @@ label {
     background-color: #D15F45;
     border: 1px solid #D15F45;
     cursor: pointer;
-}
-
-.filter__input-field {
-    width: 191px;
-    height: 28px;
-    padding-left: 5px;
-    border: 1px solid #67573E;
-    border-radius: 5px;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.all-clients__table {
-    margin: 40px 40px 40px 0;
-    padding: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
-}
-
-.drop-option {
-  position: relative;
-  .inner-component {
-    position: absolute;
-    background-color: #fff;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 5;
-  }
-  &__image {
-    display: flex;
-    align-items: center;
-    max-height: 21px;
-    .titleTooltip {
-      position: absolute;
-      display: none;
-      color: #D15F45;
-      font-size: 12px;
-      top: 8px;
-      left: 35px;
-    }
-    &:hover {
-      .titleTooltip {
-        display: block;
-      }
-    }
-    img {
-        max-width: 21px;
-    }
-  }
-}
-tr {
-    cursor: pointer;
-}
-.head-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5px;
-}
-
-.contact-info {
-    border: none;
-    outline: none;
-    width: 109px;
-    margin: 2px;
-    padding: 3px 0 3px 5px;
-}
-
-.editing {
-    box-shadow: inset 0 0 8px rgba(103, 87, 62, 0.75);
-}
-
-.outer-check {
-    margin: 0 auto;
-    width: 14px;
-    height: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    border: 1px solid #67573E;
-    cursor: pointer;
-    .inner-check {
-        width: 68%;
-        height: 68%;
-        border-radius: 50%;
-        background-color: #FFF;
-    }
-    .checked {
-        background-color: #67573E;
-    }
-}
-
-.crud-icons {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    img {
-        cursor: pointer;
-    }
-}
-
-.not-active {
-    opacity: 0.5;
-}
-
-input {
-    color: #67573E;
 }
 
 </style>
