@@ -277,20 +277,6 @@ router.post('/step', async (req, res) => {
       res.status(500).send("Error on updating/creating a step")
     }
 });
-  
-router.delete('/step/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-      if(!id) {
-        return res.send("Deleted unsaved step");
-      }
-      await Step.deleteOne({"_id": id});
-      res.send("Step deleted");
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on deleting step")
-    }
-});
 
 router.get('/packages', async (req, res) => {
   try {

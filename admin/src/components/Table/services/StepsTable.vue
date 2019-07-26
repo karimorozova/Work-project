@@ -35,7 +35,7 @@
                     img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
                 .steps__icons(slot="icons" slot-scope="{ row, index }")
-                    img.steps__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'steps_opacity': isActive(key, index)}")
+                    img.steps__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'steps_opacity': isActive(key, index)}")
         Add(@add="addStep")
 </template>
 
@@ -97,18 +97,6 @@ export default {
             this.steps.push(this.currentStep);
             this.currentActive = this.steps.length - 1; 
         },
-        async deleteStep() {
-            const id = this.steps[this.deleteIndex]._id;
-            try {
-                await this.$http.delete(`/api/step/${id}`);
-                this.$emit("updateSteps");
-                this.alertToggle({message: "Step has been removed", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Error on removing Step", isShow: true, type: "error"});
-            } finally {
-                this.cancel();
-            }
-        },
         isSelected(rowProp, index) {
             if(this.currentActive === index) {
                 return this.currentStep[rowProp];
@@ -131,14 +119,6 @@ export default {
                 case 'cancel':
                     this.currentActive = -1;
                     this.$emit("setStepsWithId");
-                    break;
-                case 'delete':
-                    if(!this.steps[index]._id) {
-                        this.steps.splice(index, 1);
-                        return this.cancel();
-                    }
-                    this.deleteIndex = index;
-                    this.isDeleting = true;
                     break;
                 case 'save':
                     await this.checkErrors(index);
@@ -166,6 +146,12 @@ export default {
             } finally {
                 this.cancel();
             }
+        }
+    },
+    computed: {
+        manageIcons() {
+            const { "delete": del, ...result } = this.icons;
+            return result;
         }
     },
     components: {
