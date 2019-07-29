@@ -141,6 +141,7 @@ export default {
             this.errors = [];
             const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title);
             if(!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty");
+            if(!this.currentStep.calculationUnit) this.errors.push("Please, select calculation unit.");
             if(this.errors.length) {
                 return this.areErrors = true;
             }
