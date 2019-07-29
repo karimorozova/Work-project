@@ -11,12 +11,12 @@ const MonorateSchema = new mongoose.Schema({
   industries: [{
     industry: {
       type: Schema.Types.ObjectId, ref: 'Industries'
-    },
-    rates: {
-      type: Object,
-      default: {}
     }
-  }]
+  }],
+  rates: {
+    type: Object,
+    default: {}
+  }
 },{ minimize: false });
 
 const Monorate = mongoose.model('Monorate', MonorateSchema);

@@ -11,12 +11,12 @@ const DuorateSchema = new mongoose.Schema({
   industries: [{
     industry: {
       type: Schema.Types.ObjectId, ref: 'Industries'
-    },
-    rates: {
-      type: Object,
-      default: {}
     }
-  }]
+  }],
+  rates: {
+    type: Object,
+    default: {}
+  }
 },{ minimize: false });
 
 const Duorate = mongoose.model('Duorate', DuorateSchema);

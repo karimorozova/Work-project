@@ -6,6 +6,10 @@ const StepSchema = new mongoose.Schema({
         default : '', 
         trim : true 
     },
+    calculationUnit: {
+        type: String,
+        default: 'Words'
+    },
     isStage1: {
         type: Boolean
     },
