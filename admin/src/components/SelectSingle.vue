@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}" :style="positionStyle")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
@@ -42,6 +42,9 @@ export default {
         projectsType: {
           type: String
         },
+        customClass: {
+            type: String
+        }
     },
     data() {
         return {

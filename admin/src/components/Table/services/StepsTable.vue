@@ -6,13 +6,10 @@
                 :tableData="steps"
                 :errors="errors"
                 :areErrors="areErrors"
-                :isApproveModal="isDeleting"
                 @closeErrors="closeErrors"
-                @approve="deleteStep"
-                @notApprove="cancel"
-                @closeModal="cancel"
             )
                 .steps__header(slot="headerTitle" slot-scope="{ field }") {{ field.label }}
+                .steps__header(slot="headerUnit" slot-scope="{ field }") {{ field.label }}
                 .steps__header(slot="headerStage1" slot-scope="{ field }") {{ field.label }}
                 .steps__header(slot="headerStage2" slot-scope="{ field }") {{ field.label }}
                 .steps__header(slot="headerEditor" slot-scope="{ field }") {{ field.label }}
@@ -22,6 +19,16 @@
                     .steps__data(v-if="currentActive !== index") {{ row.title }}
                     .steps__editing-data(v-else)
                         input.steps__input(type="text" v-model="currentStep.title")
+                template(slot="calculationUnit" slot-scope="{ row, index }")
+                    .steps__data(v-if="currentActive !== index") {{ row.calculationUnit }}
+                    .steps__drop-menu(v-else)
+                        SelectSingle(
+                            :isTableDropMenu="true"
+                            :selectedOption="currentStep.calculationUnit"
+                            :options="units"
+                            @chooseOption="setUnit"
+                            @scrollDrop="scrollDrop"
+                        )
                 .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
@@ -41,33 +48,35 @@
 
 <script>
 import SettingsTable from "../SettingsTable";
+import SelectSingle from "@/components/SelectSingle";
 import Add from "@/components/Add";
 import tableFields from "@/mixins/tableFields";
 import crudIcons from "@/mixins/crudIcons";
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapActions } from "vuex";
 
 export default {
-    mixins: [tableFields, crudIcons],
+    mixins: [tableFields, crudIcons, scrollDrop],
     props: {
         steps: { type: Array }
     },
     data() {
         return {
             fields: [
-                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(700*0.24), padding: "0"},
-                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(700*0.14), padding: "0"},
-                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(700*0.14), padding: "0"},
-                {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(700*0.14), padding: "0"},
-                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(700*0.14), padding: "0"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(850*0.20), padding: "0"},
+                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(850*0.16), padding: "0"},
+                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(850*0.12), padding: "0"},
+                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(850*0.12), padding: "0"},
+                {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(850*0.12), padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(850*0.12), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
+            units: ["Words", "Hours", "Packages"],
             errors: [],
             areErrors: false,
-            isDeleting: false,
-            deleteIndex: -1,
             currentActive: -1,
             currentStep: "",
-            tableWidth: 700
+            tableWidth: 850
         }
     },
     methods: {
@@ -78,10 +87,11 @@ export default {
             this.areErrors = false;
         },
         cancel() {
-            this.isDeleting = false;
             this.currentActive = -1;
-            this.deleteIndex = -1;
             this.currentStep = "";
+        },
+        setUnit({option}) {
+            this.currentStep.calculationUnit = option;
         },
         addStep() {
             if(this.currentActive !== -1) {
@@ -89,6 +99,7 @@ export default {
             }
             this.currentStep = {
                 title: "",
+                calculationUnit: "",
                 isStage1: false,
                 isStage2: false,
                 isEditor: false,
@@ -156,6 +167,7 @@ export default {
     },
     components: {
         SettingsTable,
+        SelectSingle,
         Add
     },
     beforeDestroy() {
@@ -169,7 +181,7 @@ export default {
 @import "../../../assets/styles/settingsTable";
 
 .steps {
-    width: 700px;
+    width: 850px;
     &__data {
         @extend %table-data;
     }
@@ -185,6 +197,9 @@ export default {
     }
     &__icon {
         @extend %table-icon;
+    }
+    &__drop-menu {
+        position: relative;
     }
     &__checkbox {
         width: 22px;
