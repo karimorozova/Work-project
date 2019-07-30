@@ -32,17 +32,21 @@ async function getMonoRate(obj) {
 
 async function getPricelist(obj) {
     const pricelist = await Pricelist.findOne(obj)
-        .populate("combinations.source")
-        .populate("combinations.target")
-        .populate("combinations.industries.industry");
+        .populate("duoRates.source")
+        .populate("duoRates.target")
+        .populate("duoRates.industries.industry")
+        .populate("monoRates.target")
+        .populate("monoRates.industries.industry");
     return pricelist;
 }
 
 async function getPricelists(obj) {
     const pricelist = await Pricelist.find(obj)
-        .populate("combinations.source")
-        .populate("combinations.target")
-        .populate("combinations.industries.industry");
+        .populate("duoRates.source")
+        .populate("duoRates.target")
+        .populate("duoRates.industries")
+        .populate("monoRates.target")
+        .populate("monoRates.industries");
     return pricelist;
 }
 

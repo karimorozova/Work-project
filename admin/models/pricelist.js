@@ -23,9 +23,7 @@ const PricelistSchema = new mongoose.Schema({
             type: Schema.Types.ObjectId, ref: 'Language'
         },
         industries: [{
-            industry: {
-                type: Schema.Types.ObjectId, ref: 'Industries'
-            }
+            type: Schema.Types.ObjectId, ref: 'Industries'
         }],
         rates: {
             type: Object,
@@ -40,10 +38,8 @@ const PricelistSchema = new mongoose.Schema({
             type: String,
             trim: true
         },
-        industries: [{
-            industry: {
-                type: Schema.Types.ObjectId, ref: 'Industries'
-            }
+        industries: [{    
+            type: Schema.Types.ObjectId, ref: 'Industries'
         }],
         rates: {
             type: Object,
