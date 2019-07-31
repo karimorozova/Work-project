@@ -18,15 +18,14 @@
         .rates-filters__drop-menu
             IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .rates-filters__item
-        label.rates-filters__title Service
+        label.rates-filters__title Steps
         .rates-filters__drop-menu
-            ServiceMultiSelect(:form="form" :selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
+            SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setStepsFilter")
 </template>
 
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceMultiSelect from "../ServiceMultiSelect";
 import SelectMulti from "../SelectMulti";
 
 export default {
@@ -43,10 +42,13 @@ export default {
         industryFilter: {
             type: Array
         },
-        serviceSelect: {
+        selectedSteps: {
             type: Array
         },
         packageFilter: {
+            type: Array
+        },
+        steps: {
             type: Array
         }
     },
@@ -65,8 +67,8 @@ export default {
         setIndustryFilter({industry}) {
             this.$emit('setIndustryFilter', {industry});
         },
-        setServiceFilter({service}) {
-            this.$emit('setServiceFilter', {service});
+        setStepsFilter({option}) {
+            this.$emit('setStepsFilter', {option});
         },
         setPackageFilter({option}) {
             this.$emit('setPackageFilter', {option});
@@ -82,8 +84,8 @@ export default {
         },
     },
     computed: {
-        filteredServices() {
-            return this.serviceSelect.length ? this.serviceSelect.map(item => item.title) : [];
+        selectedStepsTitles() {
+            return this.selectedSteps.length ? this.selectedSteps.map(item => item.title) : [];
         },
         filterIndustry() {
             let result = [];
@@ -98,7 +100,6 @@ export default {
     components: {
         LanguagesSelect,
         IndustrySelect,
-        ServiceMultiSelect,
         SelectMulti
     },
     created() {

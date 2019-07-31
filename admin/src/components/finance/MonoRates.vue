@@ -4,30 +4,35 @@
         RatesFilters(
             form="Mono"
             :targetSelect="targetSelect"
-            :serviceSelect="serviceSelect"
+            :selectedSteps="selectedSteps"
             :industryFilter="industryFilter"
             :packageFilter="packageFilter"
+            :steps="filteredSteps"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
-            @setServiceFilter="setServiceFilter"
             @setPackageFilter="setPackageFilter"
+            @setStepsFilter="setStepsFilter"
         )
     .mono-rates__action(v-if="isAnyChecked")
         SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
-    MonoRateTable(
-        origin="global"
-        :fullInfo="fullInfo"
-        :targetSelect="targetSelect"
-        :industryFilter="industryFilter"
-        :filterIndustry="filterIndustry"
-        :serviceSelect="serviceSelect"
-        :packageFilter="packageFilter"
-        :isErrors="isAnyError"
-        @showEditingError="showEditingError"
-        @showValidationErrors="showValidationErrors"
-        @showNotUniqueWarning="showNotUniqueWarning"
-        @addNewRow="addNewRow"
-    )
+    MonoTable(
+        :industries="industries"
+        :selectedSteps="selectedSteps"
+        )
+    //- MonoRateTable(
+    //-     origin="global"
+    //-     :fullInfo="fullInfo"
+    //-     :targetSelect="targetSelect"
+    //-     :industryFilter="industryFilter"
+    //-     :filterIndustry="filterIndustry"
+    //-     :selectedSteps="selectedSteps"
+    //-     :packageFilter="packageFilter"
+    //-     :isErrors="isAnyError"
+    //-     @showEditingError="showEditingError"
+    //-     @showValidationErrors="showValidationErrors"
+    //-     @showNotUniqueWarning="showNotUniqueWarning"
+    //-     @addNewRow="addNewRow"
+    //- )
     .mono-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
             text="Are you sure?"
@@ -62,7 +67,8 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import RatesFilters from "./RatesFilters";
-import MonoRateTable from "./MonoRateTable";
+import MonoTable from "./ratesTables/MonoTable";
+// import MonoRateTable from "./MonoRateTable";
 import SelectSingle from "../SelectSingle";
 import ApproveModal from "../ApproveModal";
 import { mapGetters, mapActions } from "vuex";
@@ -78,7 +84,9 @@ export default {
             packageFilter: ["All"],
             industryFilter: [{name: "All"}],
             industrySelected: [{name: 'All'}],
-            serviceSelect: [{}],
+            selectedSteps: [{}],
+            defaultStep: {},
+            industries: [],
             heads: [
                 { title: "Language" },
                 { title: "Package" },
@@ -126,7 +134,7 @@ export default {
         },
         async deleteRate(info) {
             const deletedRate = {
-                servicesIds: this.servicesIds,
+                stepsIds: this.stepsIds,
                 industries: [info.industry],
                 languageForm: "Mono"
             }
@@ -151,17 +159,23 @@ export default {
         toggleActive(index, key) {
             this.changedRate[key].active = !this.changedRate[key].active;
         },
-        setServiceFilter({service}) {
-            const index = this.serviceSelect.findIndex(item => item._id === service._id);
+        setStepsFilter({option}) {        
+            const index = this.selectedSteps.findIndex(item => {
+                return item.title === option
+            });
             if(index !== -1) {
-                this.serviceSelect.splice(index, 1);
+                this.selectedSteps.splice(index, 1);
             } else {
-                this.serviceSelect.push(service);
+                const step = this.vuexSteps.find(item => item.title === option);
+                this.selectedSteps.push(step);
             }
-            if(!this.serviceSelect.length) {
-                this.defaultService();
+            if(!this.selectedSteps.length) {
+                return this.selectedSteps = [this.defaultStep];
             }
-            this.serviceSelect.sort((a, b) => {return a.sortIndex - b.sortIndex});
+            this.selectedSteps.sort((a, b) => {
+                if(a.title > b.title) return 1;
+                if(a.title < b.title) return -1;
+            });
         },
         setTargetFilter({lang}) {
             if(this.targetSelect[0] == 'All') {
@@ -233,26 +247,19 @@ export default {
                 industry: {name: "All", rates: {...this.defaultRates()}},
             });
         },
-        async getAllCombinations() {
+        async setDefaultStep() {
             try {
-                await this.getMonoCombinations();
-            } catch(err) {
-                this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
-            }
-        },
-        async defaultService() {
-            try {
-                if(!this.vuexServices.length) {
-                    await this.getServices();
+                if(!this.vuexSteps.length) {
+                    await this.getSteps();
                 }
             } catch(err) { }
-            let defaultServ = this.vuexServices.find(item => {
-                return item.symbol === 'co';
+            this.defaultStep = this.vuexSteps.find(item => {
+                return item.symbol === 'copywriting';
             });
-            this.serviceSelect = [defaultServ];
+            this.selectedSteps = [this.defaultStep];
         },
         defaultRates() {
-            const duoServices = this.vuexServices.sort((a, b) => { 
+            const duoServices = this.vuexSteps.sort((a, b) => { 
                 if(a.sortIndex < b.sortIndex) return -1; 
                 if(a.sortIndex > b.sortIndex) return 1;
             }).filter(item => item.languageForm === "Mono");
@@ -262,23 +269,31 @@ export default {
                 return {...init}
             }, {});
         },
+        async getIndustries() {
+            try {
+                const result = await this.$http.get("/api/industries");
+                this.industries = result.body.map(item => item._id).sort();
+            } catch(err) {
+                this.alertToggle({message: "Erorr on getting Industries", isShow: true, type: "error"});    
+            }
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             getMonoCombinations: "getMonoCombinations",
             storeMonoRates: "storeMonoRates",
             deleteServiceRate: "deleteServiceRate",
             deleteCheckedRate: "deleteCheckedRate",
-            getServices: "getServices"
+            getSteps: "getSteps"
         })
     },
     computed: {
         ...mapGetters({
-            vuexServices: "getVuexServices",
+            vuexSteps: "getVuexSteps",
             fullInfo: "getMonoRates",
             currentPrice: "getCurrentPrice"
         }),
-        servicesIds() {
-            return this.serviceSelect.map(item => item._id);
+        stepsIds() {
+            return this.selectedSteps.map(item => item._id);
         },
         infoIndustries() {
             let result = [];
@@ -294,9 +309,12 @@ export default {
             for(let i = 0; i < 4; i++) {
                 result.push(this.heads[i])
             }
-            if(this.serviceSelect.length) {
-                this.serviceSelect.sort((a, b) => { return a.sortIndex - b.sortIndex});
-                result.splice(-1, 0, ...this.serviceSelect)
+            if(this.selectedSteps.length) {
+                this.selectedSteps.sort((a, b) => { 
+                    if(a.title > b.title) return 1;
+                    if(a.title < b.title) return -1;
+                });
+                result.splice(-1, 0, ...this.selectedSteps)
             }
             return result;
         },
@@ -322,11 +340,15 @@ export default {
         },
         isAnyError() {
             return this.isEditing || this.isNotUnique || this.showValidError;
+        },
+        filteredSteps() {
+            return this.vuexSteps.filter(item => item.calculationUnit === 'Packages').map(item => item.title);
         }
     },
     components: {
         RatesFilters,
-        MonoRateTable,
+        // MonoRateTable,
+        MonoTable,
         SelectSingle,
         ApproveModal
     },
@@ -334,8 +356,8 @@ export default {
         ClickOutside
     },
     created() {
-        this.defaultService();
-        this.getAllCombinations();
+        this.setDefaultStep();
+        this.getIndustries();
     },
     beforeDestroy() {
         this.storeMonoRates([]);
@@ -347,7 +369,7 @@ export default {
 .mono-rates {
     position: relative;
     font-family: MyriadPro;
-    width: 872px;
+    width: 972px;
     &__action {
         position: relative;
         height: 28px;

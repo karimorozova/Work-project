@@ -104,6 +104,7 @@ export default {
                 isStage2: false,
                 isEditor: false,
                 isActive: false,
+                symbol: ""
             }
             this.steps.push(this.currentStep);
             this.currentActive = this.steps.length - 1; 
@@ -139,7 +140,7 @@ export default {
         async checkErrors(index) {
             if(this.currentActive === -1) return;
             this.errors = [];
-            const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title);
+            const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title.trim());
             if(!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty");
             if(!this.currentStep.calculationUnit) this.errors.push("Please, select calculation unit.");
             if(this.errors.length) {
@@ -150,6 +151,7 @@ export default {
         },
         async saveChanges(index) {
             try {
+                this.currentStep.symbol = this.currentStep.title.toLowerCase().trim().replace(/ /g,"_");
                 await this.$http.post("/api/step", { step: this.currentStep });
                 this.$emit("updateSteps");
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});

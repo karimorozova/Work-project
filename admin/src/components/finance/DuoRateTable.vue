@@ -297,7 +297,7 @@ export default {
                     }
                     this.alertToggle({message: 'The rate has been saved.', isShow: true, type: 'success'});
                 } catch(err) {
-                    this.alertToggle({message: 'Internal serer error. Cannot save the rate.', isShow: true, type: 'error'});
+                    this.alertToggle({message: 'Internal server error. Cannot save the rate.', isShow: true, type: 'error'});
                 }
                 this.setDefaultValues();
             } else {
