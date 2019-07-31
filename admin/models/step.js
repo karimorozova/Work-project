@@ -21,6 +21,11 @@ const StepSchema = new mongoose.Schema({
     },
     isActive: {
         type: Boolean
+    },
+    symbol: {
+        type : String, 
+        default : '', 
+        trim : true
     }
 });
 
