@@ -130,9 +130,6 @@ export default {
     &__thead-row, &__tbody-row {
         display: flex;
     }
-    &_scroll-padding {
-        padding-right: 15px;
-    }
     &_bottom-bordered {
         border-bottom: 0.5px solid $cell-border;
     }

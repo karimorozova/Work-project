@@ -12,7 +12,7 @@
                         span Mono
                         img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': monoDrop}") 
                     .finance-rates__rates-drop(v-if="monoDrop")
-                        MonoRates(:services="services")
+                        MonoRates
             .finance-rates__duo(:class="{'finance-rates_straight-angle': duoDrop}")
                 .finance-rates__open-rates
                     .finance-rates__select(@click="openDuo")

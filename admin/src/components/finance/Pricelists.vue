@@ -84,6 +84,8 @@ export default {
     methods: {
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
+            this.storeMonoRates([...this.pricelists[index].monoRates]);
+            this.storeDuoRates([...this.pricelists[index].duoRates]);
             this.$router.push("/settings/rates");
         },
         async makeAction(index, key) {
@@ -233,6 +235,8 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             storeCurrentPrice: "storeCurrentPrice",
+            storeMonoRates: "storeMonoRates",
+            storeDuoRates: "storeDuoRates",
             storePricelists: "storePricelists"
         })
     },

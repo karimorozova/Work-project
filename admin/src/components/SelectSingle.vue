@@ -302,4 +302,10 @@ export default {
     }
 }
 
+.rates-table {
+    .select {
+        height: 34px;
+    }
+}
+
 </style>

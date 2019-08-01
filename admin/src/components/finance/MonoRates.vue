@@ -18,6 +18,8 @@
     MonoTable(
         :industries="industries"
         :selectedSteps="selectedSteps"
+        :fullInfo="fullInfo"
+        @addNewRow="addNewRow"
         )
     //- MonoRateTable(
     //-     origin="global"
@@ -242,9 +244,10 @@ export default {
             this.targetSelect = ["All"];
             this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
-                targetLanguage: "",
+                target: {},
                 package: "",
-                industry: {name: "All", rates: {...this.defaultRates()}},
+                industries: [{name: "All"}],
+                rates: {...this.defaultRates()},
             });
         },
         async setDefaultStep() {
@@ -259,14 +262,10 @@ export default {
             this.selectedSteps = [this.defaultStep];
         },
         defaultRates() {
-            const duoServices = this.vuexSteps.sort((a, b) => { 
-                if(a.sortIndex < b.sortIndex) return -1; 
-                if(a.sortIndex > b.sortIndex) return 1;
-            }).filter(item => item.languageForm === "Mono");
-            return duoServices.reduce((init, cur) => {
-                const key = cur._id;
-                init[key] = {value: 0, active: false};
-                return {...init}
+            const packageSteps = this.vuexSteps.filter(item => item.calculationUnit === "Packages");
+            return packageSteps.reduce((prev, cur) => {
+                prev[cur._id] = {value: 0, min: 5, active: false};
+                return {...prev}
             }, {});
         },
         async getIndustries() {
@@ -295,39 +294,39 @@ export default {
         stepsIds() {
             return this.selectedSteps.map(item => item._id);
         },
-        infoIndustries() {
-            let result = [];
-            if(this.industrySelected.length) {
-                for(let elem of this.industrySelected) {
-                result.push(elem.name);
-                }
-            }
-            return result;
-        },
-        tableHeader() {
-            let result = [];
-            for(let i = 0; i < 4; i++) {
-                result.push(this.heads[i])
-            }
-            if(this.selectedSteps.length) {
-                this.selectedSteps.sort((a, b) => { 
-                    if(a.title > b.title) return 1;
-                    if(a.title < b.title) return -1;
-                });
-                result.splice(-1, 0, ...this.selectedSteps)
-            }
-            return result;
-        },
-        tableWidth() {
-            let result = 870;
-            let cols = this.tableHeader.length;
-            if(cols > 5) {
-                let count = cols - 5;
-                result += 164*count;
-            }
-            result += 'px';
-            return result;
-        },
+        // infoIndustries() {
+        //     let result = [];
+        //     if(this.industrySelected.length) {
+        //         for(let elem of this.industrySelected) {
+        //         result.push(elem.name);
+        //         }
+        //     }
+        //     return result;
+        // },
+        // tableHeader() {
+        //     let result = [];
+        //     for(let i = 0; i < 4; i++) {
+        //         result.push(this.heads[i])
+        //     }
+        //     if(this.selectedSteps.length) {
+        //         this.selectedSteps.sort((a, b) => { 
+        //             if(a.title > b.title) return 1;
+        //             if(a.title < b.title) return -1;
+        //         });
+        //         result.splice(-1, 0, ...this.selectedSteps)
+        //     }
+        //     return result;
+        // },
+        // tableWidth() {
+        //     let result = 870;
+        //     let cols = this.tableHeader.length;
+        //     if(cols > 5) {
+        //         let count = cols - 5;
+        //         result += 164*count;
+        //     }
+        //     result += 'px';
+        //     return result;
+        // },
         isAnyChecked() {
             let result = false;
             for(let info of this.fullInfo) {
@@ -358,9 +357,6 @@ export default {
     created() {
         this.setDefaultStep();
         this.getIndustries();
-    },
-    beforeDestroy() {
-        this.storeMonoRates([]);
     }
 };
 </script>

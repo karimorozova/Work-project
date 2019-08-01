@@ -18,12 +18,37 @@
                 .mono-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
                 .mono-table__data(slot="check" slot-scope="{ row }")
                     input.mono-table__check(type="checkbox")
-                .mono-table__data(slot="language" slot-scope="{ row }") {{ row.target.lang }}
-                .mono-table__data(slot="package" slot-scope="{ row }") {{ row.package }}
-                template(slot="industry" slot-scope="{ row }")
-                    .mono-table__data(v-if="isAllIndusties(row.industries)") All
-                    .mono-table__data(v-else)
-                        img.mono-table__image(v-for="elem of row.industries" :src="domain + elem.icon")
+                template(slot="language" slot-scope="{ row, index }")
+                    .mono-table__data(v-if="currentActive !== index") {{ row.target.lang }}
+                    .mono-table__drop-menu(v-else)
+                        LanguagesSelect(
+                            @scrollDrop="scrollDrop" 
+                            :selectedLangs="[currentInfo.target.symbol]" 
+                            :addAll="false"
+                            customClass="table-drop"
+                            @chosenLang="setTarget")
+                template(slot="package" slot-scope="{ row, index }")
+                    .mono-table__data(v-if="currentActive !== index") {{ row.package }}
+                    .mono-table__drop-menu(v-else)
+                        SelectSingle(
+                            @scrollDrop="scrollDrop"
+                            :options="packages"
+                            :selectedOption="currentInfo.package" 
+                            customClass="table-drop-menu rates-table"
+                            @chooseOption="setPackage")
+                template(slot="industry" slot-scope="{ row, index }")
+                    template(v-if="currentActive !== index")
+                        .mono-table__data(v-if="isAllIndusties(row.industries)") All
+                        .mono-table__data(v-else)
+                            img.mono-table__image(v-for="elem of row.industries" :src="domain + elem.icon")
+                    template(v-if="currentActive === index")
+                        .mono-table__drop-menu
+                            IndustrySelect(
+                                @scrollDrop="scrollDrop"
+                                :selectedInd="currentInfo.industries" 
+                                :filteredIndustries="industriesNames"
+                                customClass="table-drop"
+                                @chosenInd="setIndustry")
                 template(v-for="step in selectedSteps" :slot="step.symbol" slot-scope="{ row, index }")
                     .mono-table__data.mono-table_space-between
                         span.mono-table__text(v-if="currentActive !== index") {{ row.rates[step._id].value }}
@@ -36,21 +61,25 @@
                 .mono-table__icons(slot="icons" slot-scope="{ row, index }")
                     img.mono-table__icon(v-for="(icon, key) in icons" :src="icon.icon" :class="{'mono-table_opacity': isActive(key, index)}" @click="makeAction(key, index)")
         .mono-table__add
-            Add
+            Add(@add="addNewRow")
 </template>
 
 <script>
+import LanguagesSelect from "@/components/LanguagesSelect";
+import IndustrySelect from "@/components/IndustrySelect";
+import SelectSingle from "@/components/SelectSingle";
 import RatesTable from './RatesTable';
 import Toggler from '@/components/Toggler';
 import Add from '@/components/Add';
 import crudIcons from '@/mixins/crudIcons';
+import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    mixins: [crudIcons],
+    mixins: [crudIcons, scrollDrop],
     props: {
-        industries: { type: Array },
-        selectedSteps: { type: Array }
+        industries: { type: Array, default: () => [] },
+        selectedSteps: { type: Array, default: () => [] }
     },
     data() {
         return {
@@ -62,6 +91,7 @@ export default {
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
             ],
+            packages: [],
             domain: "localhost:3001",
             defaultStep: {},
             defaultStepSymbol: "copywriting",
@@ -74,8 +104,23 @@ export default {
     },
     methods: {
         ...mapActions({
-            getSteps: "getSteps"
+            getSteps: "getSteps",
+            alertToggle: "alertToggle"
         }),
+        isScrollDrop(drop, elem) {
+            return drop && this.fullInfo.length >= 4;
+        },
+        handleScroll() {
+            let element = document.querySelector('.table__tbody');
+            element.scrollTop = element.scrollHeight;
+        },
+        addNewRow() {
+            this.$emit("addNewRow");
+            this.setEditingData(this.fullInfo.length-1);
+            setTimeout(() => {
+                this.handleScroll();
+            }, 0)
+        },
         async makeAction(key, index) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
                 return this.isEditing();
@@ -85,14 +130,46 @@ export default {
                     this.setEditingData(index);
                     break;
                 case "cancel": 
-                    this.currentActive = -1;
+                    this.cancelEdition(index);
                     break;
+            }
+        },
+        cancelEdition(index) {
+            this.currentActive = -1;
+            if(!this.fullInfo[index]._id) {
+                this.fullInfo.pop();
+            }
+            this.currentInfo = null;
+        },
+        setTarget({lang}) {
+            this.currentInfo.target = lang;
+        },
+        setPackage({option}) {
+            this.currentInfo.package = option;
+        },
+        setIndustry({industry}) {
+            if(industry.name !== 'All') {
+                this.currentInfo.industries = this.currentInfo.industries.filter(item => item.name !== 'All');
+            } else {
+                return this.currentInfo.industries = [{name: "All"}];
+            }
+            const position = this.industriesNames.indexOf(industry.name);
+            if(position === -1) {
+                this.currentInfo.industries.push(industry);
+            } else {
+                this.currentInfo.industries.splice(position, 1);
+                if(!this.currentInfo.industries.length) {
+                    this.currentInfo.industries = [{name: "All"}];
+                }
             }
         },
         setEditingData(index) {
             this.currentActive = index;
             const stringifiedCopy = JSON.stringify(this.fullInfo[index]);
             this.currentInfo = JSON.parse(stringifiedCopy);
+            if(this.isAllIndusties(this.currentInfo.industries)) {
+                this.currentInfo.industries = [{name: "All"}]
+            }
         },
         isAllIndusties(rateIndustries) {
             const rateIndustriesIds = rateIndustries.map(item => item._id).sort();
@@ -107,20 +184,22 @@ export default {
         closeErrors() {
             this.areErrors = false;
             this.errors = [];
+        },
+        async getPackages() {
+            try {
+                const result = await this.$http.get("/api/packages");
+                this.packages = result.body.map(item => item.size);
+            } catch(err) {
+                this.alertToggle({message: "Error on getting packages", isShow: true, type: "error"});
+            }
         }
     },
     computed: {
         ...mapGetters({
             steps: "getVuexSteps",
+            fullInfo: "getMonoRates",
             currentPrice: "getCurrentPrice"
         }),
-        fullInfo() {
-            let result = [];
-            if(this.currentPrice.monoRates && this.currentPrice.monoRates.length) {
-                result = this.currentPrice.monoRates;
-            }
-            return result;
-        },
         tableFields() {
             let fields = this.fields.map(item => item);
             fields = fields.filter(item => !item.isStepTitle);
@@ -138,12 +217,21 @@ export default {
         },
         stepsIds() {
             return this.selectedSteps.map(item => item._id);
+        },
+        industriesNames() {
+            return this.currentInfo.industries.map(item => item.name);
         }
     },
     components: {
+        LanguagesSelect,
+        IndustrySelect,
+        SelectSingle,
         RatesTable,
         Toggler,
         Add
+    },
+    created() {
+        this.getPackages()
     },
     mounted() {
         this.domain = __WEBPACK__API_URL__;
@@ -161,9 +249,14 @@ export default {
     &__table {
         max-width: 972px;
         overflow-x: overlay;
+        position: relative;
     }
     &__add {
         margin: 5px 0 10px 0;
+    }
+    &__drop-menu {
+        position: relative;
+        height: 100%;
     }
     &__data {
         @extend %table-data;
