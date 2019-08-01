@@ -6,19 +6,26 @@
             Button(value="Back" @clicked="goBack")
     .finance-rates__rates
         .finance-rates__drop-menus
-            .finance-rates__mono(:class="{'finance-rates_straight-angle': monoDrop}")
+            .finance-rates__block(:class="{'finance-rates_straight-angle': isMonoDrop}")
                 .finance-rates__open-rates 
-                    .finance-rates__select(@click="openMono")
-                        span Mono
-                        img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': monoDrop}") 
-                    .finance-rates__rates-drop(v-if="monoDrop")
+                    .finance-rates__select(@click="(e) => toggleRates(e, 'isMonoDrop')")
+                        span Packages
+                        img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': isMonoDrop}") 
+                    .finance-rates__rates-drop(v-if="isMonoDrop")
                         MonoRates
-            .finance-rates__duo(:class="{'finance-rates_straight-angle': duoDrop}")
+            .finance-rates__block(:class="{'finance-rates_straight-angle': isWordcountDrop}")
                 .finance-rates__open-rates
-                    .finance-rates__select(@click="openDuo")
-                        span Duo
-                        img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': duoDrop}") 
-                    .finance-rates__rates-drop(v-if="duoDrop")
+                    .finance-rates__select(@click="(e) => toggleRates(e, 'isWordcountDrop')")
+                        span Wordcount
+                        img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': isWordcountDrop}") 
+                    .finance-rates__rates-drop(v-if="isWordcountDrop")
+                        DuoRates(@addSevLangs="addSevLangs")
+            .finance-rates__block(:class="{'finance-rates_straight-angle': isHoursDrop}")
+                .finance-rates__open-rates
+                    .finance-rates__select(@click="(e) => toggleRates(e, 'isHoursDrop')")
+                        span Hours
+                        img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': isHoursDrop}") 
+                    .finance-rates__rates-drop(v-if="isHoursDrop")
                         DuoRates(@addSevLangs="addSevLangs")
         Addseverallangs(v-if="isAddSeveral"
             origin="global"
@@ -45,8 +52,9 @@ export default {
     },
     data() {
         return {
-            monoDrop: false,
-            duoDrop: false,
+            isMonoDrop: false,
+            isWordcountDrop: false,
+            isHoursDrop: false,
             isAddSeveral: false,
             isAvailablePairs: false,
             langPairs: [],
@@ -91,16 +99,8 @@ export default {
             await this.getDuoCombinations(this.serviceAfterAddSeveral);
             this.alertToggle({message, isShow, type});
         },
-        openMono() {
-            if(!this.monoDrop) {
-            }
-            this.monoDrop = !this.monoDrop;
-        },
-        openDuo() {
-            if(this.duoDrop) {
-                this.storeDuoRates({});
-            }
-            this.duoDrop = !this.duoDrop;
+        toggleRates(e, prop) {
+            this[prop] = !this[prop];
         },
         goBack() {
             this.$router.go(-1);
@@ -167,7 +167,7 @@ export default {
         display: flex;
         flex-direction: column;
     }
-    &__mono, &__duo {
+    &__block {
         width: 100%;
         max-height: 500px;
         display: flex;
@@ -175,9 +175,10 @@ export default {
         box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
         border-radius: 10px;
         padding: 0 3px;
-    }
-    &__mono {
         margin-bottom: 60px;
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
     &_straight-angle {
         border-radius: 0;
