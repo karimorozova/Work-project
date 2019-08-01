@@ -76,3 +76,14 @@ export const deleteCheckedRate = async ({commit}, payload) => {
     commit('endRequest');
 }
 export const storeCurrentPrice = ({commit}, payload) => commit('setCurrentPrice', payload);
+export const setAllMonoStepsForRates = ({commit, state}, payload) => {
+    const combinations = state.monoRates.map(item => {
+        for(let id of payload) {
+            if(Object.keys(item.rates).indexOf(id) === -1) {
+                item.rates[id] = { value: 0, min: 5, active: false }
+            }
+        }
+        return item;
+    })
+    commit("setMonoRates", combinations);
+}

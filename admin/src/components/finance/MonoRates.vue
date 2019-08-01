@@ -260,6 +260,8 @@ export default {
                 return item.symbol === 'copywriting';
             });
             this.selectedSteps = [this.defaultStep];
+            const stepIds = this.vuexSteps.filter(item => item.calculationUnit === "Packages").map(item => item._id);
+            this.setAllMonoStepsForRates(stepIds);
         },
         defaultRates() {
             const packageSteps = this.vuexSteps.filter(item => item.calculationUnit === "Packages");
@@ -282,7 +284,8 @@ export default {
             storeMonoRates: "storeMonoRates",
             deleteServiceRate: "deleteServiceRate",
             deleteCheckedRate: "deleteCheckedRate",
-            getSteps: "getSteps"
+            getSteps: "getSteps",
+            setAllMonoStepsForRates: "setAllMonoStepsForRates"
         })
     },
     computed: {
