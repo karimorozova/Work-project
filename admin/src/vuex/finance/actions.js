@@ -83,7 +83,26 @@ export const setAllMonoStepsForRates = ({commit, state}, payload) => {
                 item.rates[id] = { value: 0, min: 5, active: false }
             }
         }
+        item.isChecked = false;
         return item;
     })
     commit("setMonoRates", combinations);
+}
+export const toggleRateCheck = ({commit, state}, payload) => {
+    const { prop, id, isChecked } = payload;
+    const combinations = state[prop].map(item => {
+        if(item._id === id) {
+            item.isChecked = isChecked;
+        }
+        return item;
+    })
+    prop === 'monoRates' ? commit("setMonoRates", combinations) : commit("setDuoRates", combinations);
+}
+export const toggleAllRatesCheck = ({commit, state}, payload) => {
+    const { prop, isChecked } = payload;
+    const combinations = state[prop].map(item => {
+        item.isChecked = isChecked;
+        return item;
+    })
+    prop === 'monoRates' ? commit("setMonoRates", combinations) : commit("setDuoRates", combinations);
 }

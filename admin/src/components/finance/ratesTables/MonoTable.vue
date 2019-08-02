@@ -9,15 +9,17 @@
                 @closeErrors="closeErrors"
             )
                 .mono-table__header(slot="headerCheck" slot-scope="{ field }")
-                    input.mono-table__check(type="checkbox")
+                    //- input.mono-table__check(type="checkbox" @change="toggleAllChecks" :checked="isAllChecked")
+                    CheckBox(:isChecked="isAllChecked" @check="(e) => toggleAllChecks(e, true)" @uncheck="(e) => toggleAllChecks(e, false)" :isWhite="true")
                 .mono-table__header(slot="headerLanguage" slot-scope="{ field }") {{ field.label }}
                 .mono-table__header(slot="headerPackage" slot-scope="{ field }") {{ field.label }}
                 .mono-table__header(slot="headerIndustry" slot-scope="{ field }") {{ field.label }}
                 template(v-for="(step, stepIndex) in selectedSteps" :slot="'headerStep'+(stepIndex+1)" slot-scope="{ field }")
                     .mono-table__header {{ field.label }}
                 .mono-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
-                .mono-table__data(slot="check" slot-scope="{ row }")
-                    input.mono-table__check(type="checkbox")
+                .mono-table__data(slot="check" slot-scope="{ row, index }")
+                    //- input.mono-table__check(type="checkbox" @change="(e) => toggleCheck(e, index)" :checked="row.isChecked")
+                    CheckBox(:isChecked="row.isChecked" @check="(e) => toggleCheck(e, index, true)" @uncheck="(e) => toggleCheck(e, index, false)")
                 template(slot="language" slot-scope="{ row, index }")
                     .mono-table__data(v-if="currentActive !== index") {{ row.target.lang }}
                     .mono-table__drop-menu(v-else)
@@ -68,6 +70,7 @@
 import LanguagesSelect from "@/components/LanguagesSelect";
 import IndustrySelect from "@/components/IndustrySelect";
 import SelectSingle from "@/components/SelectSingle";
+import CheckBox from "@/components/CheckBox";
 import RatesTable from './RatesTable';
 import Toggler from '@/components/Toggler';
 import Add from '@/components/Add';
@@ -105,7 +108,9 @@ export default {
     methods: {
         ...mapActions({
             getSteps: "getSteps",
-            alertToggle: "alertToggle"
+            alertToggle: "alertToggle",
+            toggleRateCheck: "toggleRateCheck",
+            toggleAllRatesCheck: "toggleAllRatesCheck"
         }),
         isScrollDrop(drop, elem) {
             return drop && this.fullInfo.length >= 4;
@@ -113,6 +118,13 @@ export default {
         handleScroll() {
             let element = document.querySelector('.table__tbody');
             element.scrollTop = element.scrollHeight;
+        },
+        toggleCheck(e, index, bool) {
+            const id = this.fullInfo[index]._id;
+            this.toggleRateCheck({prop: 'monoRates', id, isChecked: bool});
+        },
+        toggleAllChecks(e, bool) {
+            this.toggleAllRatesCheck({prop: 'monoRates', isChecked: bool});
         },
         addNewRow() {
             this.$emit("addNewRow");
@@ -220,12 +232,17 @@ export default {
         },
         industriesNames() {
             return this.currentInfo.industries.map(item => item.name);
+        },
+        isAllChecked() {
+            const unChecked = this.fullInfo.find(item => !item.isChecked);
+            return !unChecked;
         }
     },
     components: {
         LanguagesSelect,
         IndustrySelect,
         SelectSingle,
+        CheckBox,
         RatesTable,
         Toggler,
         Add

@@ -13,28 +13,17 @@
             @setPackageFilter="setPackageFilter"
             @setStepsFilter="setStepsFilter"
         )
-    .mono-rates__action(v-if="isAnyChecked")
-        SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
+    .mono-rates__action
+        .mono-rates__drop-menu
+            SelectSingle(v-if="isAnyChecked" :options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
+        .mono-rates__button
+            Button(value="Import rates")
     MonoTable(
         :industries="industries"
         :selectedSteps="selectedSteps"
         :fullInfo="fullInfo"
         @addNewRow="addNewRow"
         )
-    //- MonoRateTable(
-    //-     origin="global"
-    //-     :fullInfo="fullInfo"
-    //-     :targetSelect="targetSelect"
-    //-     :industryFilter="industryFilter"
-    //-     :filterIndustry="filterIndustry"
-    //-     :selectedSteps="selectedSteps"
-    //-     :packageFilter="packageFilter"
-    //-     :isErrors="isAnyError"
-    //-     @showEditingError="showEditingError"
-    //-     @showValidationErrors="showValidationErrors"
-    //-     @showNotUniqueWarning="showNotUniqueWarning"
-    //-     @addNewRow="addNewRow"
-    //- )
     .mono-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
             text="Are you sure?"
@@ -70,9 +59,9 @@
 import ClickOutside from "vue-click-outside";
 import RatesFilters from "./RatesFilters";
 import MonoTable from "./ratesTables/MonoTable";
-// import MonoRateTable from "./MonoRateTable";
 import SelectSingle from "../SelectSingle";
 import ApproveModal from "../ApproveModal";
+import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -124,7 +113,7 @@ export default {
         async deleteChecked() {
             try {
                 for(let info of this.fullInfo) {
-                    if(info.check) {
+                    if(info.isChecked) {
                         await this.deleteRate(info);
                     } 
                 }
@@ -297,48 +286,8 @@ export default {
         stepsIds() {
             return this.selectedSteps.map(item => item._id);
         },
-        // infoIndustries() {
-        //     let result = [];
-        //     if(this.industrySelected.length) {
-        //         for(let elem of this.industrySelected) {
-        //         result.push(elem.name);
-        //         }
-        //     }
-        //     return result;
-        // },
-        // tableHeader() {
-        //     let result = [];
-        //     for(let i = 0; i < 4; i++) {
-        //         result.push(this.heads[i])
-        //     }
-        //     if(this.selectedSteps.length) {
-        //         this.selectedSteps.sort((a, b) => { 
-        //             if(a.title > b.title) return 1;
-        //             if(a.title < b.title) return -1;
-        //         });
-        //         result.splice(-1, 0, ...this.selectedSteps)
-        //     }
-        //     return result;
-        // },
-        // tableWidth() {
-        //     let result = 870;
-        //     let cols = this.tableHeader.length;
-        //     if(cols > 5) {
-        //         let count = cols - 5;
-        //         result += 164*count;
-        //     }
-        //     result += 'px';
-        //     return result;
-        // },
         isAnyChecked() {
-            let result = false;
-            for(let info of this.fullInfo) {
-                if(info.check) {
-                    result = true;
-                    return result;
-                }
-            }
-            return result;
+            return this.fullInfo.find(item => item.isChecked);
         },
         isAnyError() {
             return this.isEditing || this.isNotUnique || this.showValidError;
@@ -349,10 +298,10 @@ export default {
     },
     components: {
         RatesFilters,
-        // MonoRateTable,
         MonoTable,
         SelectSingle,
-        ApproveModal
+        ApproveModal,
+        Button
     },
     directives: {
         ClickOutside
@@ -370,10 +319,17 @@ export default {
     font-family: MyriadPro;
     width: 972px;
     &__action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 28px;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    &__drop-menu {
         position: relative;
         height: 28px;
         width: 20%;
-        margin-bottom: 15px;
     }
     &__approve-action {
         position: absolute;
