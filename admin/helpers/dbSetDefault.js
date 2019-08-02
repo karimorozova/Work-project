@@ -467,7 +467,7 @@ function getMonoCombinations({languages, industries, steps}) {
     let combinations = [];
     for(let lang of languages) {
         combinations.push({
-            package: 200,
+            packageSize: 200,
             target: lang.id,
             industries,
             rates
