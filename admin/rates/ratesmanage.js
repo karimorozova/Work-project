@@ -2,16 +2,16 @@ const { Pricelist, Step, Industries } = require("../models");
 const { getUpdatedPricelist } = require("./getrates");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
-    const { prop, _id, package, industries, target, rates } = rateInfo;
+    const { prop, _id, packageSize, industries, target, rates } = rateInfo;
     try {
         let updatedRates = [];
         if(_id) {
             updatedRates = await manageExistingRate({
-                _id, package, industries, target, rates, priceRates: pricelist[prop]
+                _id, packageSize, industries, target, rates, priceRates: pricelist[prop]
             });
         } else {
             updatedRates = await addNewRate({
-                package, industries, target, rates, priceRates: pricelist[prop]
+                packageSize, industries, target, rates, priceRates: pricelist[prop]
             });
         }
         return await getUpdatedPricelist({"_id": pricelist.id}, {[prop]: updatedRates});
@@ -21,22 +21,65 @@ async function getAfterRatesSaved(rateInfo, pricelist) {
     }
 }
 
-async function manageExistingRate({_id, package, industries, target, rates, priceRates}) {
+async function manageExistingRate({_id, packageSize, industries, target, rates, priceRates}) {
     try {
         if(industries[0].name === 'All') {
             const allIndustries = await Industries.find();
-            return priceRates.map(item=> {
-                if(item.id === _id) {
-                    item.rates = rates;
-                    item.industries = allIndustries;
-                }
-                return item;
-            })
+            const changingPair = priceRates.find(item => item.id === _id);
+            let updatedRates = priceRates.filter(item => {
+                if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
+                return true;
+            });
+            updatedRates.push({...changingPair._doc, industries: allIndustries, rates});
+            return updatedRates;
+        } else {
+            return manageNotAllIndustriesrate({_id, packageSize, industries, target, rates, priceRates})
         }
     } catch(err) {
         console.log(err);
         console.log("Error in manageExistingRate");
     }
+}
+
+function manageNotAllIndustriesrate({_id, packageSize, industries, target, rates, priceRates}) {
+    const industriesIds = industries.map(item => item._id);
+    let updatedRates = [...priceRates];
+    let samePairIndex = updatedRates.findIndex(item => {
+        return item.packageSize === packageSize && target.lang === item.target.lang
+            && areEqual(item.rates, rates)
+    })
+    if(samePairIndex !== -1) {
+        for(let industry of industries) {
+            const industryIndex = updatedRates[samePairIndex].industries.findIndex(item => item.id === industry._id);
+            if(industryIndex === -1) {
+                updatedRates[samePairIndex].industries.push(industry);
+            }
+        }
+    } else {
+        updatedRates.push({target, packageSize, industries, rates});  
+    }
+    updatedRates = updatedRates.map(item => {
+        if(item.id === _id) {
+            item.industries = filterIndustries(item.industries, industriesIds);
+        }
+        return item;
+    })
+    return updatedRates.filter(item => item.industries.length);
+}
+
+function filterIndustries(itemIndustries, industriesIds) {
+    return itemIndustries.filter(item => {
+        return industriesIds.indexOf(item.id) === -1;
+    })
+}
+
+function areEqual(itemRates, rates) {
+    for(let key in itemRates) {
+        if(JSON.stringify(itemRates[key]) !== JSON.stringify(rates[key])) {
+            return false
+        }
+    }
+    return true;
 }
 
 async function includeAllIndustries(industries, entityIndustries, languageForm) {

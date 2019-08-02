@@ -41,7 +41,7 @@
                 li Target: 
                     span.info-item {{ uniqueComb.target }}
                 li Package: 
-                    span.info-item {{ uniqueComb.package }}
+                    span.info-item {{ uniqueComb.packageSize }}
             span.close(@click="closeUnique") +
     .edition-message(v-if="isEditing")
         .message
@@ -89,7 +89,7 @@ export default {
             selectedAction: "",
             isNotUnique: false,
             isEditing: false,
-            uniqueComb: {source: "", package: ""},
+            uniqueComb: {source: "", packageSize: ""},
             showValidError: false,
             validErrors: []
         }
@@ -235,7 +235,7 @@ export default {
             this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
                 target: {},
-                package: "",
+                packageSize: "",
                 industries: [{name: "All"}],
                 rates: {...this.defaultRates()},
             });

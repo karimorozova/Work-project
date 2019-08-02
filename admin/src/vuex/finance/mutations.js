@@ -3,7 +3,10 @@ export const mutations = {
         state.duoRates = payload;
     },
     setMonoRates(state, payload) {
-        state.monoRates = payload;
+        state.monoRates = payload.sort((a,b) => {
+            if(a.target.lang > b.target.lang) return 1;
+            if(a.target.lang < b.target.lang) return -1;
+        });
     },
     setServiceWhenAddSeveral(state, payload) {
         state.serviceWhenAddSeveral = payload

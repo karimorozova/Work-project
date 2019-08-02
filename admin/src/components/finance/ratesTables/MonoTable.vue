@@ -28,12 +28,12 @@
                             customClass="table-drop"
                             @chosenLang="setTarget")
                 template(slot="package" slot-scope="{ row, index }")
-                    .mono-table__data(v-if="currentActive !== index") {{ row.package }}
+                    .mono-table__data(v-if="currentActive !== index") {{ row.packageSize }}
                     .mono-table__drop-menu(v-else)
                         SelectSingle(
                             @scrollDrop="scrollDrop"
                             :options="packages"
-                            :selectedOption="currentInfo.package" 
+                            :selectedOption="currentInfo.packageSize" 
                             customClass="table-drop-menu rates-table"
                             @chooseOption="setPackage")
                 template(slot="industry" slot-scope="{ row, index }")
@@ -170,7 +170,7 @@ export default {
             this.currentInfo.target = lang;
         },
         setPackage({option}) {
-            this.currentInfo.package = option;
+            this.currentInfo.packageSize = option;
         },
         setIndustry({industry}) {
             if(industry.name !== 'All') {
