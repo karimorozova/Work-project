@@ -23,6 +23,7 @@
         :selectedSteps="selectedSteps"
         :fullInfo="fullInfo"
         @addNewRow="addNewRow"
+        @refreshRates="refreshRates"
         )
     .mono-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
@@ -239,6 +240,10 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
+        refreshRates() {
+            this.storeMonoRates(this.currentPrice.monoRates);
+            this.setAllSteps();
+        },
         async setDefaultStep() {
             try {
                 if(!this.vuexSteps.length) {
@@ -249,6 +254,9 @@ export default {
                 return item.symbol === 'copywriting';
             });
             this.selectedSteps = [this.defaultStep];
+            this.setAllSteps();
+        },
+        setAllSteps() {
             const stepIds = this.vuexSteps.filter(item => item.calculationUnit === "Packages").map(item => item._id);
             this.setAllMonoStepsForRates(stepIds);
         },

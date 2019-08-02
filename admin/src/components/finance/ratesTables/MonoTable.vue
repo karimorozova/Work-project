@@ -9,7 +9,6 @@
                 @closeErrors="closeErrors"
             )
                 .mono-table__header(slot="headerCheck" slot-scope="{ field }")
-                    //- input.mono-table__check(type="checkbox" @change="toggleAllChecks" :checked="isAllChecked")
                     CheckBox(:isChecked="isAllChecked" @check="(e) => toggleAllChecks(e, true)" @uncheck="(e) => toggleAllChecks(e, false)" :isWhite="true")
                 .mono-table__header(slot="headerLanguage" slot-scope="{ field }") {{ field.label }}
                 .mono-table__header(slot="headerPackage" slot-scope="{ field }") {{ field.label }}
@@ -18,7 +17,6 @@
                     .mono-table__header {{ field.label }}
                 .mono-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
                 .mono-table__data(slot="check" slot-scope="{ row, index }")
-                    //- input.mono-table__check(type="checkbox" @change="(e) => toggleCheck(e, index)" :checked="row.isChecked")
                     CheckBox(:isChecked="row.isChecked" @check="(e) => toggleCheck(e, index, true)" @uncheck="(e) => toggleCheck(e, index, false)")
                 template(slot="language" slot-scope="{ row, index }")
                     .mono-table__data(v-if="currentActive !== index") {{ row.target.lang }}
@@ -110,7 +108,8 @@ export default {
             getSteps: "getSteps",
             alertToggle: "alertToggle",
             toggleRateCheck: "toggleRateCheck",
-            toggleAllRatesCheck: "toggleAllRatesCheck"
+            toggleAllRatesCheck: "toggleAllRatesCheck",
+            saveMonoRates: "saveMonoRates"
         }),
         isScrollDrop(drop, elem) {
             return drop && this.fullInfo.length >= 4;
@@ -144,11 +143,25 @@ export default {
                 case "cancel": 
                     this.cancelEdition(index);
                     break;
+                case "save":
+                    await this.save();
+                    break;
             }
+        },
+        async save() {
+            const rates = Object.keys(this.currentInfo.rates).reduce((prev, cur) => {
+                const value = +this.currentInfo.rates[cur].value;
+                const min = +this.currentInfo.rates[cur].min;
+                prev[cur] = {...this.currentInfo.rates[cur], value, min};
+                return {...prev};
+            }, {})
+            await this.saveMonoRates({...this.currentInfo, rates});
+            this.$emit("refreshRates");
+            this.cancelEdition();
         },
         cancelEdition(index) {
             this.currentActive = -1;
-            if(!this.fullInfo[index]._id) {
+            if(index && !this.fullInfo[index]._id) {
                 this.fullInfo.pop();
             }
             this.currentInfo = null;

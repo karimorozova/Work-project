@@ -1,8 +1,9 @@
-const { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist, getPricelists, parseIndustries } = require("./getrates");
+const { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist, getPricelists, getUpdatedPricelist, parseIndustries } = require("./getrates");
 const { saveNewPricelist, deletePricelist, checkPriceForPairs, addSeveralLangs, replaceRates, replaceFromPrice } = require("./pricelists");
-const { includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries } = require("./ratesmanage");
+const { getAfterRatesSaved, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries } = require("./ratesmanage");
 
 module.exports = {
+    getAfterRatesSaved,
     getDuoRates,
     getDuoRate,
     getMonoRates,
@@ -11,6 +12,7 @@ module.exports = {
     deletePricelist,
     getPricelist,
     getPricelists,
+    getUpdatedPricelist,
     checkPriceForPairs,
     addSeveralLangs,
     replaceRates,

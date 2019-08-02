@@ -39,16 +39,17 @@ export const getMonoCombinations = async ({commit, state}, payload) => {
         throw new Error("Error on getting Mono rates");
     }
 }
-export const saveGlobalRates = async ({commit, dispatch, state}, payload) => {
+
+export const saveMonoRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
+    const priceId = state.currentPrice._id;
     try {
-        const priceId = state.currentPrice._id;
-        await Vue.http.post('/service/rates', {info: payload, priceId});
-        payload.languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
-        commit('endRequest');
+        const result = await Vue.http.post('/rates-manage/combination', { priceId, ...payload, prop: 'monoRates' });
+        commit("setCurrentPrice", result.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on saving rate");
     }
 }
 export const deleteServiceRate = async ({commit, dispatch, state}, payload) => {

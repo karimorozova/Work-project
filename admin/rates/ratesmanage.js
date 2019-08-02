@@ -1,4 +1,43 @@
-const { Services } = require("../models");
+const { Pricelist, Step, Industries } = require("../models");
+const { getUpdatedPricelist } = require("./getrates");
+
+async function getAfterRatesSaved(rateInfo, pricelist) {
+    const { prop, _id, package, industries, target, rates } = rateInfo;
+    try {
+        let updatedRates = [];
+        if(_id) {
+            updatedRates = await manageExistingRate({
+                _id, package, industries, target, rates, priceRates: pricelist[prop]
+            });
+        } else {
+            updatedRates = await addNewRate({
+                package, industries, target, rates, priceRates: pricelist[prop]
+            });
+        }
+        return await getUpdatedPricelist({"_id": pricelist.id}, {[prop]: updatedRates});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterRatesSaved");
+    }
+}
+
+async function manageExistingRate({_id, package, industries, target, rates, priceRates}) {
+    try {
+        if(industries[0].name === 'All') {
+            const allIndustries = await Industries.find();
+            return priceRates.map(item=> {
+                if(item.id === _id) {
+                    item.rates = rates;
+                    item.industries = allIndustries;
+                }
+                return item;
+            })
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageExistingRate");
+    }
+}
 
 async function includeAllIndustries(industries, entityIndustries, languageForm) {
     try {
@@ -129,4 +168,4 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-module.exports = { includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }
+module.exports = { getAfterRatesSaved, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }

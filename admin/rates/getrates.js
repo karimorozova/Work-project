@@ -34,14 +34,24 @@ async function getPricelist(obj) {
     const pricelist = await Pricelist.findOne(obj)
         .populate("duoRates.source")
         .populate("duoRates.target")
-        .populate("duoRates.industries.industry")
+        .populate("duoRates.industries")
         .populate("monoRates.target")
-        .populate("monoRates.industries.industry");
+        .populate("monoRates.industries");
     return pricelist;
 }
 
 async function getPricelists(obj) {
     const pricelist = await Pricelist.find(obj)
+        .populate("duoRates.source")
+        .populate("duoRates.target")
+        .populate("duoRates.industries")
+        .populate("monoRates.target")
+        .populate("monoRates.industries");
+    return pricelist;
+}
+
+async function getUpdatedPricelist(query, update) {
+    const pricelist = await Pricelist.findOneAndUpdate(query, update, {new: true})
         .populate("duoRates.source")
         .populate("duoRates.target")
         .populate("duoRates.industries")
@@ -91,4 +101,4 @@ function includeAllServices(elemRates, serviceIds) {
     return rates;
 }
 
-module.exports = { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist, getPricelists, parseIndustries }
+module.exports = { getDuoRates, getDuoRate, getMonoRates, getMonoRate, getPricelist, getPricelists, getUpdatedPricelist, parseIndustries }
