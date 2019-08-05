@@ -130,6 +130,9 @@ export default {
             this.currentInfo.rates[stepId].active = !this.currentInfo.rates[stepId].active;
         },
         addNewRow() {
+            if(this.currentActive !== -1) {
+                return this.isEditing();
+            }
             this.$emit("addNewRow");
             this.setEditingData(this.fullInfo.length-1);
             setTimeout(() => {
@@ -148,11 +151,31 @@ export default {
                     this.cancelEdition(index);
                     break;
                 case "save":
-                    await this.save();
+                    await this.checkErrors();
                     break;
                 case "delete":
                     await this.deleteRate(index);
             }
+        },
+        async checkErrors(index) {
+            this.errors = [];
+            if(!this.currentInfo.target.lang) this.errors.push("Please, set the language");
+            if(!this.currentInfo.packageSize) this.errors.push("Please, set the package size");
+            if(this.notValidRates()) this.errors.push("Please, enter valid rates values");
+            if(this.errors.length) {
+                return this.areErrors = true;
+            }
+            await this.save();
+        },
+        notValidRates() {
+            const regex = /^\d*\.?\d+$/;
+            const ratesKeys = Object.keys(this.currentInfo.rates);
+            for(let key of ratesKeys) {
+                if(!regex.test(this.currentInfo.rates[key].value) || !regex.test(this.currentInfo.rates[key].min)) {
+                    return true;
+                }
+            }
+            return false;
         },
         async deleteRate(index) {
             if(!this.fullInfo[index]._id) {

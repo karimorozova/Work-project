@@ -34,26 +34,6 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
-    .unique-message(v-if="isNotUnique")
-        .message
-            p The combination you want to add already exists!
-            .message__info-list
-                li Target: 
-                    span.info-item {{ uniqueComb.target }}
-                li Package: 
-                    span.info-item {{ uniqueComb.packageSize }}
-            span.close(@click="closeUnique") +
-    .edition-message(v-if="isEditing")
-        .message
-            p Please finish the current edition first!
-            span.close(@click="closeEditionMessage") +
-    .error-message(v-if="showValidError")
-        .message
-            p Please finish the current edition first!
-            .message__info-list
-                li(v-for="error in validErrors")
-                    span.info-item {{ error }}
-            span.close(@click="closeErrorMessage") +
 </template>
 
 <script>
@@ -122,33 +102,6 @@ export default {
                 this.alertToggle({message: 'Internal server error. Cannot delete rates.', isShow: true, type: 'error'});
             }
         },
-        async deleteRate(info) {
-            const deletedRate = {
-                stepsIds: this.stepsIds,
-                industries: [info.industry],
-                languageForm: "Mono"
-            }
-            try {
-                await this.deleteCheckedRate({ id: info.id, priceId: this.currentPrice._id, deletedRate });
-            } catch(err) {
-                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
-            }
-        },
-        closeErrorMessage() {
-            this.showValidError = false;
-        },
-        closeUnique() {
-            this.isNotUnique = false;
-        },
-        closeEditionMessage() {
-            this.isEditing = false
-        },
-        changeRate(e, servKey) {
-            this.changedRate[servKey].value = +event.target.value
-        },
-        toggleActive(index, key) {
-            this.changedRate[key].active = !this.changedRate[key].active;
-        },
         setStepsFilter({option}) {        
             const index = this.selectedSteps.findIndex(item => {
                 return item.title === option
@@ -172,7 +125,7 @@ export default {
                 this.targetSelect = [];
                 this.targetSelect.push(lang.symbol)
             } else {
-                let index = this.targetSelect.indexOf(lang.symbol);
+                const index = this.targetSelect.indexOf(lang.symbol);
                 if(index != -1) {
                     this.targetSelect.splice(index, 1);
                 } else {
@@ -187,22 +140,15 @@ export default {
             if(this.industryFilter[0].name == 'All') {
                 this.industryFilter.splice(0, 1, industry);
             } else {
-                let hasIndustry = false;
-                for(let i in this.industryFilter) {
-                if(this.industryFilter[i].name == industry.name) {
-                    this.industryFilter.splice(i, 1);
-                    hasIndustry = true;
-                }
-                }
-                if(!hasIndustry) {
-                this.industryFilter.push(industry);
+                const index = this.industryFilter.findIndex(item => item.name === industry.name);
+                if(index !== -1) {
+                    this.industryFilter.splice(index, 1);
+                } else {
+                    this.industryFilter.push(industry);
                 }
             }
             if(!this.industryFilter.length || industry.name == 'All') {
-                this.industryFilter = [];
-                this.industryFilter.push({
-                name: 'All'
-                })
+                this.industryFilter = [{name: 'All'}]
             }
         },
         setPackageFilter({option}) {
@@ -216,17 +162,6 @@ export default {
             if(option === 'All' || !this.packageFilter.length) {
                 return this.packageFilter = ['All']
             }
-        },
-        showEditingError() {
-            this.isEditing = true;
-        },
-        showValidationErrors({validErrors}) {
-            this.validErrors = [...validErrors];
-            this.showValidError = true;
-        },
-        showNotUniqueWarning({source, target}) {
-            this.uniqueComb = {source, target}; 
-            this.isNotUnique = true;    
         },
         addNewRow() {
             this.targetSelect = ["All"];
@@ -294,9 +229,6 @@ export default {
         },
         isAnyChecked() {
             return this.fullInfo.find(item => item.isChecked);
-        },
-        isAnyError() {
-            return this.isEditing || this.isNotUnique || this.showValidError;
         },
         filteredSteps() {
             return this.vuexSteps.filter(item => item.calculationUnit === 'Packages').map(item => item.title);
