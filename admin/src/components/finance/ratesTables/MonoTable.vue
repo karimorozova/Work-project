@@ -109,7 +109,8 @@ export default {
             alertToggle: "alertToggle",
             toggleRateCheck: "toggleRateCheck",
             toggleAllRatesCheck: "toggleAllRatesCheck",
-            saveMonoRates: "saveMonoRates"
+            saveMonoRates: "saveMonoRates",
+            deletePriceRate: "deletePriceRate"
         }),
         isScrollDrop(drop, elem) {
             return drop && this.fullInfo.length >= 4;
@@ -149,7 +150,19 @@ export default {
                 case "save":
                     await this.save();
                     break;
+                case "delete":
+                    await this.deleteRate(index);
             }
+        },
+        async deleteRate(index) {
+            if(!this.fullInfo[index]._id) {
+                return this.cancelEdition(index);
+            }
+            try {
+                await this.deletePriceRate({id: this.fullInfo[index]._id, prop: 'monoRates'});
+                this.$emit("refreshRates");
+                this.cancelEdition();
+            } catch(err) { }
         },
         async save() {
             const rates = Object.keys(this.currentInfo.rates).reduce((prev, cur) => {

@@ -47,34 +47,36 @@ export const saveMonoRates = async ({commit, dispatch, state}, payload) => {
         const result = await Vue.http.post('/rates-manage/combination', { priceId, ...payload, prop: 'monoRates' });
         commit("setCurrentPrice", result.body);
     } catch(err) {
-        dispatch("alertToggle", {message: err.data, isShow:true, type: "error"});
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
     } finally {
         commit('endRequest');
     }
 }
-export const deleteServiceRate = async ({commit, dispatch, state}, payload) => {
+export const deletePriceRate = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
+        const { id, prop } = payload;
         const priceId = state.currentPrice._id;
-        await dispatch('deleteCheckedRate', {...payload, priceId});
-        const { languageForm } = payload.deletedRate;
-        languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
-        commit('endRequest');
+        const updatedPrice = await Vue.http.post('/rates-manage/remove-rate', { priceId, rateId: id, prop });
+        commit("setCurrentPrice", updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on deleting rate");
     }
 }
-export const deleteCheckedRate = async ({commit}, payload) => {
+export const deletePriceRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
-        await Vue.http.delete(`/service/rate/${payload.priceId}`, {body: {...payload.deletedRate, id: payload.id}});
-        commit('endRequest');
+        const { checkedIds, prop } = payload;
+        const priceId = state.currentPrice._id;
+        const updatedPrice = await Vue.http.post('/rates-manage/remove-rates', { priceId, checkedIds, prop });
+        commit("setCurrentPrice", updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on deleting rate");
     }
-    commit('endRequest');
 }
 export const storeCurrentPrice = ({commit}, payload) => commit('setCurrentPrice', payload);
 export const setAllMonoStepsForRates = ({commit, state}, payload) => {

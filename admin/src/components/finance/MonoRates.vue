@@ -112,16 +112,14 @@ export default {
             this.closeModal();
         },
         async deleteChecked() {
+            const checked = this.fullInfo.filter(item => item.isChecked);
+            if(!checked.length) return;
+            const checkedIds = checked.map(item => item._id);
             try {
-                for(let info of this.fullInfo) {
-                    if(info.isChecked) {
-                        await this.deleteRate(info);
-                    } 
-                }
-                await this.getMonoCombinations();
-                this.alertToggle({message: 'Rates deleted.', isShow: true, type: 'success'});
+                await this.deletePriceRates({checkedIds, prop: 'monoRates'});
+                this.refreshRates();
             } catch(err) {
-                this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
+                this.alertToggle({message: 'Internal server error. Cannot delete rates.', isShow: true, type: 'error'});
             }
         },
         async deleteRate(info) {
@@ -280,7 +278,7 @@ export default {
             getMonoCombinations: "getMonoCombinations",
             storeMonoRates: "storeMonoRates",
             deleteServiceRate: "deleteServiceRate",
-            deleteCheckedRate: "deleteCheckedRate",
+            deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
             setAllMonoStepsForRates: "setAllMonoStepsForRates"
         })
