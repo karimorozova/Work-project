@@ -15,12 +15,12 @@ async function getAfterRatesSaved(rateInfo, pricelist) {
 }
 
 async function managePairRates({packageSize, industries, target, rates, priceRates}) {
-    if(!priceRates.length) {
-        return [{packageSize, industries, target, rates}];
-    }
     try {
+        const allIndustries = await Industries.find();
         if(industries[0].name === 'All') {
-            const allIndustries = await Industries.find();
+            if(!priceRates.length) {
+                return [{packageSize, industries: allIndustries, target, rates}]
+            }
             let updatedRates = priceRates.filter(item => {
                 if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
                 return true;
@@ -28,6 +28,9 @@ async function managePairRates({packageSize, industries, target, rates, priceRat
             updatedRates.push({target, packageSize, industries: allIndustries, rates});
             return updatedRates;
         } else {
+            if(!priceRates.length) {
+                return [{packageSize, industries, target, rates}]
+            }
             return manageNotAllIndustriesrate({packageSize, industries, target, rates, priceRates})
         }
     } catch(err) {
