@@ -1,5 +1,5 @@
 const { Pricelist, Step, Industries } = require("../models");
-const { getUpdatedPricelist } = require("./getrates");
+const { getUpdatedPricelist, getPricelist } = require("./getrates");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
     const { prop, packageSize, industries, target, rates } = rateInfo;
@@ -15,6 +15,9 @@ async function getAfterRatesSaved(rateInfo, pricelist) {
 }
 
 async function managePairRates({packageSize, industries, target, rates, priceRates}) {
+    if(!priceRates.length) {
+        return [{packageSize, industries, target, rates}];
+    }
     try {
         if(industries[0].name === 'All') {
             const allIndustries = await Industries.find();
@@ -35,38 +38,42 @@ async function managePairRates({packageSize, industries, target, rates, priceRat
 
 function manageNotAllIndustriesrate({packageSize, industries, target, rates, priceRates}) {
     const industriesIds = industries.map(item => item._id);
-    let updatedRates = [...priceRates];
-    let samePairIndex = updatedRates.findIndex(item => {
-        return item.packageSize === packageSize && target.lang === item.target.lang
-            && areEqual(item.rates, rates)
-    })
-    if(samePairIndex !== -1) {
-        for(let industry of industries) {
-            const industryIndex = updatedRates[samePairIndex].industries.findIndex(item => item.id === industry._id);
-            if(industryIndex === -1) {
-                updatedRates[samePairIndex].industries.push(industry);
-            }
-        }
+    let updatedRates = priceRates.filter(item => {
+        if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
+        return true;
+    });
+    let samePairs = priceRates.filter(item => item.packageSize === packageSize && target.lang === item.target.lang);
+    if(samePairs.length) {
+        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds}));
     } else {
         updatedRates.push({target, packageSize, industries, rates});  
     }
-    return getFinalRates({updatedRates, packageSize, target, industriesIds});
-}
-
-function getFinalRates({updatedRates, packageSize, target, industriesIds}) {
-    updatedRates = updatedRates.map(item => {
-        if(item.target.lang === target.lang && item.packageSize === packageSize) {
-            item.industries = filterIndustries(item.industries, industriesIds);
-        }
-        return item;
-    })
     return updatedRates.filter(item => item.industries.length);
 }
 
-function filterIndustries(itemIndustries, industriesIds) {
-    return itemIndustries.filter(item => {
-        return industriesIds.indexOf(item.id) === -1;
+function manageSamePairs({samePairs, rates, industriesIds}) {
+    let sameRateIndex = samePairs.findIndex(item => areEqual(item.rates, rates));
+    let managedRates = samePairs.map((item, index) => {
+        let industries = [];
+        if(sameRateIndex === index) {
+            industries = item.industries.map(industry => industry.id);
+            industries.push(industriesIds);
+            industries = industries.filter((value, index, self) => self.indexOf(value) === index);    
+        } else {
+            industries = item.industries.filter(industry => industriesIds.indexOf(industry.id) === -1);
+        }
+        item.industries = industries;
+        return item;
     })
+    if(sameRateIndex === -1) {
+        managedRates.push({
+            target: samePairs[0].target,
+            packageSize: samePairs[0].packageSize,
+            industries: industriesIds,
+            rates
+        })
+    }
+    return managedRates;
 }
 
 function areEqual(itemRates, rates) {
@@ -78,6 +85,44 @@ function areEqual(itemRates, rates) {
     return true;
 }
 
+async function getAfterAddSeveralMono(priceId, ratesData) {
+    let { copyRates, industries, stepsIds, packages, targets } = ratesData;
+    if(industries[0] === 'All') {
+        industries = [{name: 'All'}]
+    }
+    const targetsIds = targets.map(item => item._id);
+    const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    try {
+        const price = await getPricelist({"_id": priceId});
+        let monoRates = price.monoRates.length ? [...price.monoRates] : [];
+        for(let pair of allAvailablePairs) {
+            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
+            const { packageSize, target } = pair;
+            monoRates = await managePairRates({
+                packageSize, industries, target, rates: copiedRates, priceRates: monoRates
+            });
+        }
+        return await getUpdatedPricelist({"_id": priceId}, { monoRates });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterAddSeveralMono");
+    }
+}
+
+function getRatesToCopy(pairRates, stepsIds) {
+    return Object.keys(pairRates).reduce((prev, cur) => {
+        if(stepsIds.indexOf(cur) !== -1) {
+            prev[cur] = pairRates[cur]
+        } else {
+            prev[cur] = {value: 0, min: 5, active: false}
+        }
+        return {...prev}
+    }, {})
+}
+
+/////////////////////////////////////////////
+// Old version of logic and functionality //
+////////////////////////////////////////////
 async function includeAllIndustries(industries, entityIndustries, languageForm) {
     try {
         const allIndustries = await defaultRates(entityIndustries, languageForm);
@@ -207,4 +252,4 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-module.exports = { getAfterRatesSaved, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }
+module.exports = { getAfterRatesSaved, getAfterAddSeveralMono, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }

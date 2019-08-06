@@ -40,6 +40,7 @@
         :steps="filteredSteps"
         :isDuo="false"
         :packages="packages"
+        @addSeveralRates="addSeveralRates"
         @closeSeveral="closeImportRates")
 </template>
 
@@ -178,6 +179,13 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
+        async addSeveralRates({ratesData}) {
+            try {
+                await this.addSeveralMonoRates({ratesData});
+                this.refreshRates();
+                this.isImportRates = false;
+            } catch(err) { }
+        },
         refreshRates() {
             this.storeMonoRates(this.currentPrice.monoRates);
             this.setAllSteps();
@@ -224,9 +232,8 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            getMonoCombinations: "getMonoCombinations",
+            addSeveralMonoRates: "addSeveralMonoRates",
             storeMonoRates: "storeMonoRates",
-            deleteServiceRate: "deleteServiceRate",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
             setAllMonoStepsForRates: "setAllMonoStepsForRates"

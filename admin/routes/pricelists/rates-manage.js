@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { getPricelist, getUpdatedPricelist, getAfterRatesSaved } = require('../../rates');
+const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterAddSeveralMono } = require('../../rates');
 
 router.post('/combination', async (req, res) => {
     const { priceId, ...rateInfo } = req.body;
@@ -33,6 +33,17 @@ router.post('/remove-rates', async (req, res) => {
         const updatedPricelist = await getUpdatedPricelist({"_id": priceId}, {
             $pull: {[prop]: {'_id': {$in: checkedIds}}}    
         })
+        res.send(updatedPricelist);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rate from pricelist");
+    }
+})
+
+router.post('/several-mono', async (req, res) => {
+    const { priceId, ratesData } = req.body;
+    try {
+        const updatedPricelist = await getAfterAddSeveralMono(priceId, ratesData);
         res.send(updatedPricelist);
     } catch(err) {
         console.log(err);

@@ -23,20 +23,17 @@ export const getDuoCombinations = async ({commit, state}, payload) => {
         throw new Error("Error on getting Duo rates");
     }
 }
-export const getMonoCombinations = async ({commit, state}, payload) => {
+export const addSeveralMonoRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
-        const id = state.currentPrice._id;
-        const result = await Vue.http.get(`/service/parsed-rates?form=Mono&id=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
-            if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;
-        })
-        commit('setMonoRates', rates);
-        commit('endRequest');
+        const priceId = state.currentPrice._id;
+        const { ratesData } = payload;
+        const updatedPrice = await Vue.http.post('/rates-manage/several-mono', { ratesData, priceId });
+        commit('setCurrentPrice', updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on getting Mono rates");
     }
 }
 

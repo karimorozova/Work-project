@@ -49,7 +49,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         origin: {
-            type: String
+            type: String,
+            default: 'global'
         },
         who: {
             type: Object
@@ -97,51 +98,47 @@ export default {
         },
         checkErrors() {
             this.errors = [];
-            if(!this.selectedPrice._id) this.errors.push('Please, select pricelist');
-            if(!this.target.chosen.length) this.errors.push('Choose target languages');
-            if(!this.selectedSteps.length) this.errors.push('Please, select services');
-            if(!this.selectedInd.length) this.errors.push('Please, select industries');
-            if(this.errors.length) {
-                return this.areErrors = true;
+            if(!this.selectedPrice._id) {
+                this.errors.push('Please, select pricelist');
             } else {
-                this.addLangCombinations();
+                if(!this.target.chosen.length) this.errors.push('Please, select target languages');
+                if(!this.selectedPackages.length) this.errors.push('Please, select packages');
+                if(!this.selectedSteps.length) this.errors.push('Please, select steps');
+                if(!this.selectedInd.length) this.errors.push('Please, select industries');
+                if(this.errors.length) {
+                    return this.areErrors = true;
+                }
             }
+            this.addLangCombinations();
         },
         closeErrors() {
             this.areErrors = false;
         },
         setPrice({option}) {
             this.selectedPrice = option;
-            this.priceLangs();
+            this.setPriceLangs();
             this.sortLangArray(this.target.all);
         },
-        priceLangs() {
+        setPriceLangs() {
             const notUniqueTargets =  this.selectedPrice.monoRates.map(item => item.target);
             this.target.all = notUniqueTargets.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
             this.target.chosen = [];            
         },
-        collectCombinations() {
-            let combinations = [];
+        collectData() {
             const industries = this.selectedInd[0].name === 'All' ? ['All'] : this.selectedInd.map(item => item._id);
+            const packages = this.selectedPackages[0] === 'All' ? this.packages.filter(item => item !== 'All') : this.selectedPackages;
             const stepsIds = this.selectedSteps.map(item => item._id);
-            for(let source of this.source.chosen) {
-                for(let target of this.target.chosen) {
-                    if(source._id !== target._id) {
-                        combinations.push({
-                            source,
-                            target,
-                            industries,
-                            stepsIds
-                        })
-                    }
-                }
-            }
-            return combinations;
+            return {
+                copyRates: this.selectedPrice.monoRates,
+                industries, 
+                stepsIds, 
+                packages,                  
+                targets: this.target.chosen
+            };
         },
-        async addLangCombinations() {
-            const combinations = this.collectCombinations();
-            const priceId = this.selectedPrice._id;
-            this.$emit("checkCombinations", { priceId, combinations });
+        addLangCombinations() {
+            const ratesData = this.collectData();
+            this.$emit("addSeveralRates", { ratesData });
         },
         closeSeveral() {
             if(this.isAvailablePairs) return;

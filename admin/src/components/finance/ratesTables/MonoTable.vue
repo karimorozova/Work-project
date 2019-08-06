@@ -151,7 +151,7 @@ export default {
                     this.cancelEdition(index);
                     break;
                 case "save":
-                    await this.checkErrors();
+                    await this.checkErrors(index);
                     break;
                 case "delete":
                     await this.deleteRate(index);
@@ -165,7 +165,7 @@ export default {
             if(this.errors.length) {
                 return this.areErrors = true;
             }
-            await this.save();
+            await this.save(index);
         },
         notValidRates() {
             const regex = /^\d*\.?\d+$/;
@@ -187,7 +187,7 @@ export default {
                 this.cancelEdition();
             } catch(err) { }
         },
-        async save() {
+        async save(index) {
             const rates = Object.keys(this.currentInfo.rates).reduce((prev, cur) => {
                 const value = +this.currentInfo.rates[cur].value;
                 const min = +this.currentInfo.rates[cur].min;
