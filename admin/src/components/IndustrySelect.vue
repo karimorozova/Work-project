@@ -1,11 +1,11 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick" :class="customClass")
         .select
-            .selected
-                template(v-if="selectedInd.length && selectedInd[0].name !== 'All'")
+            .selected(v-if="selectedInd.length")
+                template(v-if="selectedInd[0].name !== 'All'")
                     img(v-for="name in selectedInd" :src="name.icon") 
-                template(v-if="selectedInd.length && selectedInd[0].name === 'All'") All
-                template(v-if="!selectedInd.length") Select
+                template(v-if="selectedInd[0].name === 'All'") All
+            .selected.select_opacity-05(v-if="!selectedInd.length") Select
             .arrow-button(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
@@ -150,8 +150,8 @@ export default {
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
         height: 100%;
     }
-    .no-choice {
-        opacity: 0.6;
+    &_opacity-05 {
+        opacity: 0.5;
     }
 }
 .drop-select {

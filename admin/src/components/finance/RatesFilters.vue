@@ -50,11 +50,9 @@ export default {
         },
         steps: {
             type: Array
-        }
-    },
-    data() {
-        return {
-            packages: []
+        },
+        packages: {
+            type: Array
         }
     },
     methods: {
@@ -72,16 +70,7 @@ export default {
         },
         setPackageFilter({option}) {
             this.$emit('setPackageFilter', {option});
-        },
-        async getPackages() {
-            try {
-                const result = await this.$http.get("/api/packages");
-                this.packages = result.body.map(item => item.size);
-                this.packages.unshift("All");
-            } catch(err) {
-
-            }
-        },
+        }
     },
     computed: {
         selectedStepsTitles() {
@@ -101,9 +90,6 @@ export default {
         LanguagesSelect,
         IndustrySelect,
         SelectMulti
-    },
-    created() {
-        this.getPackages();
     }
 }
 </script>

@@ -8,6 +8,7 @@
             :industryFilter="industryFilter"
             :packageFilter="packageFilter"
             :steps="filteredSteps"
+            :packages="packages"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
             @setPackageFilter="setPackageFilter"
@@ -17,9 +18,10 @@
         .mono-rates__drop-menu
             SelectSingle(v-if="isAnyChecked" :options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
         .mono-rates__button
-            Button(value="Import rates")
+            Button(value="Import rates" @clicked="showImportRates")
     MonoTable(
         :industries="industries"
+        :packages="packages"
         :selectedSteps="selectedSteps"
         :fullInfo="fullInfo"
         @addNewRow="addNewRow"
@@ -34,6 +36,11 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
+    AddseveralMono(v-if="isImportRates" 
+        :steps="filteredSteps"
+        :isDuo="false"
+        :packages="packages"
+        @closeSeveral="closeImportRates")
 </template>
 
 <script>
@@ -43,6 +50,7 @@ import MonoTable from "./ratesTables/MonoTable";
 import SelectSingle from "../SelectSingle";
 import ApproveModal from "../ApproveModal";
 import Button from "../Button";
+import AddseveralMono from "./AddseveralMono";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -59,19 +67,10 @@ export default {
             selectedSteps: [{}],
             defaultStep: {},
             industries: [],
-            heads: [
-                { title: "Language" },
-                { title: "Package" },
-                { title: "Industry" },
-                { title: "" }
-            ],
+            packages: [],
             actions: ["Delete"],
             selectedAction: "",
-            isNotUnique: false,
-            isEditing: false,
-            uniqueComb: {source: "", packageSize: ""},
-            showValidError: false,
-            validErrors: []
+            isImportRates: false
         }
     },
     methods: {
@@ -80,6 +79,12 @@ export default {
         },
         closeModal() {
             this.selectedAction = "";
+        },
+        showImportRates() {
+            this.isImportRates = true;
+        },
+        closeImportRates() {
+            this.isImportRates = false;
         },
         async approveAction() {
             if(this.selectedAction === "Delete") {
@@ -208,6 +213,15 @@ export default {
                 this.alertToggle({message: "Erorr on getting Industries", isShow: true, type: "error"});    
             }
         },
+        async getPackages() {
+            try {
+                const result = await this.$http.get("/api/packages");
+                this.packages = result.body.map(item => item.size);
+                this.packages.unshift("All");
+            } catch(err) {
+
+            }
+        },
         ...mapActions({
             alertToggle: "alertToggle",
             getMonoCombinations: "getMonoCombinations",
@@ -239,7 +253,8 @@ export default {
         MonoTable,
         SelectSingle,
         ApproveModal,
-        Button
+        Button,
+        AddseveralMono
     },
     directives: {
         ClickOutside
@@ -247,6 +262,7 @@ export default {
     created() {
         this.setDefaultStep();
         this.getIndustries();
+        this.getPackages();
     }
 };
 </script>

@@ -80,7 +80,8 @@ export default {
     mixins: [crudIcons, scrollDrop],
     props: {
         industries: { type: Array, default: () => [] },
-        selectedSteps: { type: Array, default: () => [] }
+        selectedSteps: { type: Array, default: () => [] },
+        packages: { type: Array, default: () => [] }
     },
     data() {
         return {
@@ -92,7 +93,6 @@ export default {
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
             ],
-            packages: [],
             domain: "localhost:3001",
             defaultStep: {},
             defaultStepSymbol: "copywriting",
@@ -248,14 +248,6 @@ export default {
         closeErrors() {
             this.areErrors = false;
             this.errors = [];
-        },
-        async getPackages() {
-            try {
-                const result = await this.$http.get("/api/packages");
-                this.packages = result.body.map(item => item.size);
-            } catch(err) {
-                this.alertToggle({message: "Error on getting packages", isShow: true, type: "error"});
-            }
         }
     },
     computed: {
@@ -298,9 +290,6 @@ export default {
         RatesTable,
         Toggler,
         Add
-    },
-    created() {
-        this.getPackages()
     },
     mounted() {
         this.domain = __WEBPACK__API_URL__;
