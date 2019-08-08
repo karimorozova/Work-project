@@ -100,6 +100,7 @@ export default {
             this.errors = [];
             if(!this.selectedPrice._id) {
                 this.errors.push('Please, select pricelist');
+                return this.areErrors = true;
             } else {
                 if(!this.target.chosen.length) this.errors.push('Please, select target languages');
                 if(!this.selectedPackages.length) this.errors.push('Please, select packages');

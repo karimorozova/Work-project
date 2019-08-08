@@ -14,6 +14,11 @@ export default {
                 this[mainProp].push(option);
             }
         },
+        setSourceFilter({lang}) {
+            this.sourceSelect = this.sourceSelect.filter(item => item !== 'All');
+            const index = this.sourceSelect.indexOf(lang.symbol);
+            this.setFilters({mainProp: "sourceSelect", option: lang.symbol, index});
+        },
         setTargetFilter({lang}) {
             this.targetSelect = this.targetSelect.filter(item => item !== 'All');
             const index = this.targetSelect.indexOf(lang.symbol);
@@ -30,7 +35,10 @@ export default {
             this.setFilters({mainProp: "industryFilter", option: industry, index, isIndustry: true});
         },
         fitlterRates() {
-            let result = this.currentPrice.monoRates;
+            let result = this.rateForm === "monoRates" ? this.currentPrice.monoRates : this.currentPrice.duoRates;
+            if(this.sourceSelect.length && this.sourceSelect[0] !== 'All') {
+                result = result.filter(item => this.sourceSelect.indexOf(item.source.symbol) !== -1);
+            }
             if(this.targetSelect.length && this.targetSelect[0] !== 'All') {
                 result = result.filter(item => this.targetSelect.indexOf(item.target.symbol) !== -1);
             }
@@ -40,7 +48,7 @@ export default {
             if(this.industryFilter.length && this.industryFilter[0].name !== 'All') {
                 result = result.filter(item => this.hasIndustry(item.industries))
             }
-            this.storeMonoRates(result);
+            this.rateForm === "monoRates" ? this.storeMonoRates(result) : this.storeDuoRates(result);
         },
         hasIndustry(industries) {
             return industries.find(item => this.industryFilterNames.indexOf(item.name) !== -1);

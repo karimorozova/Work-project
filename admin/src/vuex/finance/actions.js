@@ -37,11 +37,11 @@ export const addSeveralMonoRates = async ({commit, dispatch, state}, payload) =>
     }
 }
 
-export const saveMonoRates = async ({commit, dispatch, state}, payload) => {
+export const savePricelistRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     const priceId = state.currentPrice._id;
     try {
-        const result = await Vue.http.post('/rates-manage/combination', { priceId, ...payload, prop: 'monoRates' });
+        const result = await Vue.http.post('/rates-manage/combination', { priceId, ...payload });
         commit("setCurrentPrice", result.body);
     } catch(err) {
         dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
@@ -87,6 +87,18 @@ export const setAllMonoStepsForRates = ({commit, state}, payload) => {
         return item;
     })
     commit("setMonoRates", combinations);
+}
+export const setAllDuoStepsForRates = ({commit, state}, payload) => {
+    const combinations = state.duoRates.map(item => {
+        for(let id of payload) {
+            if(Object.keys(item.rates).indexOf(id) === -1) {
+                item.rates[id] = { value: 0, min: 5, active: false }
+            }
+        }
+        item.isChecked = false;
+        return item;
+    })
+    commit("setDuoRates", combinations);
 }
 export const toggleRateCheck = ({commit, state}, payload) => {
     const { prop, id, isChecked } = payload;
