@@ -109,9 +109,7 @@ export default {
             }
         },
         setStepsFilter({option}) {        
-            const index = this.selectedSteps.findIndex(item => {
-                return item.title === option
-            });
+            const index = this.selectedSteps.findIndex(item => item.title === option);
             if(index !== -1) {
                 this.selectedSteps.splice(index, 1);
             } else {
@@ -126,48 +124,30 @@ export default {
                 if(a.title < b.title) return -1;
             });
         },
-        setTargetFilter({lang}) {
-            if(this.targetSelect[0] == 'All') {
-                this.targetSelect = [];
-                this.targetSelect.push(lang.symbol)
+        setFilters({mainProp, option, index , isIndustry}) {
+            if(index !== -1) {
+                this[mainProp].splice(index, 1);
             } else {
-                const index = this.targetSelect.indexOf(lang.symbol);
-                if(index != -1) {
-                    this.targetSelect.splice(index, 1);
-                } else {
-                    this.targetSelect.push(lang.symbol)
-                }
+                this[mainProp].push(option);
             }
-            if(lang.lang == 'All' || !this.targetSelect.length) {
-                this.targetSelect = ['All'];
+            if(option === 'All' || option.name === 'All' || !this[mainProp].length) {
+                isIndustry ? this[mainProp] = [{name: 'All'}] : this[mainProp] = ['All'];
             }
         },
-        setIndustryFilter({industry}) {
-            if(this.industryFilter[0].name == 'All') {
-                this.industryFilter.splice(0, 1, industry);
-            } else {
-                const index = this.industryFilter.findIndex(item => item.name === industry.name);
-                if(index !== -1) {
-                    this.industryFilter.splice(index, 1);
-                } else {
-                    this.industryFilter.push(industry);
-                }
-            }
-            if(!this.industryFilter.length || industry.name == 'All') {
-                this.industryFilter = [{name: 'All'}]
-            }
+        setTargetFilter({lang}) {
+            this.targetSelect = this.targetSelect.filter(item => item !== 'All');
+            const index = this.targetSelect.indexOf(lang.symbol);
+            this.setFilters({mainProp: "targetSelect", option: lang.symbol, index});
         },
         setPackageFilter({option}) {
-            const position = this.packageFilter.indexOf(option);
+            const index = this.packageFilter.indexOf(option);
             this.packageFilter = this.packageFilter.filter(item => item !== 'All');
-            if(position !== -1) {
-                this.packageFilter.splice(position, 1);
-            } else {
-                this.packageFilter.push(option);
-            }
-            if(option === 'All' || !this.packageFilter.length) {
-                return this.packageFilter = ['All']
-            }
+            this.setFilters({mainProp: "packageFilter", option, index});
+        },
+        setIndustryFilter({industry}) {
+            this.industryFilter = this.industryFilter.filter(item => item.name !== 'All');
+            const index = this.industryFilter.findIndex(item => item.name === industry.name);
+            this.setFilters({mainProp: "industryFilter", option: industry, index, isIndustry: true});
         },
         addNewRow() {
             this.targetSelect = ["All"];
