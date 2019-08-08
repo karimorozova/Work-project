@@ -110,12 +110,8 @@ export default {
         },
         setStepsFilter({option}) {        
             const index = this.selectedSteps.findIndex(item => item.title === option);
-            if(index !== -1) {
-                this.selectedSteps.splice(index, 1);
-            } else {
-                const step = this.vuexSteps.find(item => item.title === option);
-                this.selectedSteps.push(step);
-            }
+            const step = this.vuexSteps.find(item => item.title === option);
+            this.changeFilter({index, mainProp: 'selectedSteps', option: step});
             if(!this.selectedSteps.length) {
                 return this.selectedSteps = [this.defaultStep];
             }
@@ -125,13 +121,16 @@ export default {
             });
         },
         setFilters({mainProp, option, index , isIndustry}) {
+            this.changeFilter({index, mainProp, option});
+            if(option === 'All' || option.name === 'All' || !this[mainProp].length) {
+                isIndustry ? this[mainProp] = [{name: 'All'}] : this[mainProp] = ['All'];
+            }
+        },
+        changeFilter({index, mainProp, option}) {
             if(index !== -1) {
                 this[mainProp].splice(index, 1);
             } else {
                 this[mainProp].push(option);
-            }
-            if(option === 'All' || option.name === 'All' || !this[mainProp].length) {
-                isIndustry ? this[mainProp] = [{name: 'All'}] : this[mainProp] = ['All'];
             }
         },
         setTargetFilter({lang}) {
