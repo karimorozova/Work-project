@@ -53,8 +53,10 @@ import ApproveModal from "../ApproveModal";
 import Button from "../Button";
 import AddseveralMono from "./AddseveralMono";
 import { mapGetters, mapActions } from "vuex";
+import ratesFilters from "@/mixins/ratesFilters";
 
 export default {
+    mixins: [ratesFilters],
     props: {
         
     },
@@ -119,34 +121,6 @@ export default {
                 if(a.title > b.title) return 1;
                 if(a.title < b.title) return -1;
             });
-        },
-        setFilters({mainProp, option, index , isIndustry}) {
-            this.changeFilter({index, mainProp, option});
-            if(option === 'All' || option.name === 'All' || !this[mainProp].length) {
-                isIndustry ? this[mainProp] = [{name: 'All'}] : this[mainProp] = ['All'];
-            }
-        },
-        changeFilter({index, mainProp, option}) {
-            if(index !== -1) {
-                this[mainProp].splice(index, 1);
-            } else {
-                this[mainProp].push(option);
-            }
-        },
-        setTargetFilter({lang}) {
-            this.targetSelect = this.targetSelect.filter(item => item !== 'All');
-            const index = this.targetSelect.indexOf(lang.symbol);
-            this.setFilters({mainProp: "targetSelect", option: lang.symbol, index});
-        },
-        setPackageFilter({option}) {
-            const index = this.packageFilter.indexOf(option);
-            this.packageFilter = this.packageFilter.filter(item => item !== 'All');
-            this.setFilters({mainProp: "packageFilter", option, index});
-        },
-        setIndustryFilter({industry}) {
-            this.industryFilter = this.industryFilter.filter(item => item.name !== 'All');
-            const index = this.industryFilter.findIndex(item => item.name === industry.name);
-            this.setFilters({mainProp: "industryFilter", option: industry, index, isIndustry: true});
         },
         addNewRow() {
             this.targetSelect = ["All"];

@@ -212,19 +212,15 @@ export default {
             this.currentInfo.packageSize = option;
         },
         setIndustry({industry}) {
-            if(industry.name !== 'All') {
-                this.currentInfo.industries = this.currentInfo.industries.filter(item => item.name !== 'All');
-            } else {
-                return this.currentInfo.industries = [{name: "All"}];
-            }
+            this.currentInfo.industries = this.currentInfo.industries.filter(item => item.name !== 'All');
             const position = this.industriesNames.indexOf(industry.name);
             if(position === -1) {
                 this.currentInfo.industries.push(industry);
             } else {
                 this.currentInfo.industries.splice(position, 1);
-                if(!this.currentInfo.industries.length) {
-                    this.currentInfo.industries = [{name: "All"}];
-                }
+            }
+            if(!this.currentInfo.industries.length || industry.name === 'All') {
+                this.currentInfo.industries = [{name: "All"}];
             }
         },
         setEditingData(index) {
@@ -278,7 +274,7 @@ export default {
             return this.currentInfo.industries.map(item => item.name);
         },
         isAllChecked() {
-            const unChecked = this.fullInfo.find(item => !item.isChecked);
+            const unChecked = this.fullInfo.length ? this.fullInfo.find(item => !item.isChecked) : true;
             return !unChecked;
         }
     },
