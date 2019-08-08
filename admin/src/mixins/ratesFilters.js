@@ -50,5 +50,8 @@ export default {
         industryFilterNames() {
             return this.industryFilter.map(item => item.name);
         }
+    },
+    mounted() {
+        this.fitlterRates();
     }
 }

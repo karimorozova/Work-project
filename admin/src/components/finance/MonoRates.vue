@@ -123,8 +123,6 @@ export default {
             });
         },
         addNewRow() {
-            this.targetSelect = ["All"];
-            this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
                 target: {},
                 packageSize: "",
@@ -140,6 +138,9 @@ export default {
             } catch(err) { }
         },
         refreshRates() {
+            this.targetSelect = ["All"];
+            this.packageFilter = ["All"];
+            this.industryFilter = [{name: "All"}];
             this.storeMonoRates(this.currentPrice.monoRates);
             this.setAllSteps();
         },
