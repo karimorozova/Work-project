@@ -23,19 +23,19 @@
                     .duo-table__drop-menu(v-else)
                         LanguagesSelect(
                             @scrollDrop="scrollDrop" 
-                            :selectedLangs="[currentInfo.target.symbol]" 
+                            :selectedLangs="[currentInfo.source.symbol]" 
                             :addAll="false"
                             customClass="table-drop"
-                            @chosenLang="setTarget")
+                            @chosenLang="setSource")
                 template(slot="target" slot-scope="{ row, index }")
                     .duo-table__data(v-if="currentActive !== index") {{ row.target.lang }}
                     .duo-table__drop-menu(v-else)
                         LanguagesSelect(
                             @scrollDrop="scrollDrop" 
-                            :selectedLangs="[currentInfo.source.symbol]" 
+                            :selectedLangs="[currentInfo.target.symbol]" 
                             :addAll="false"
                             customClass="table-drop"
-                            @chosenLang="setSource")
+                            @chosenLang="setTarget")
                 template(slot="industry" slot-scope="{ row, index }")
                     template(v-if="currentActive !== index")
                         .duo-table__data(v-if="isAllIndusties(row.industries)") All

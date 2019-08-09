@@ -66,11 +66,12 @@ export default {
             if(!this.who) {
                 try {
                 const result = await this.$http.get('/api/industries');
-                this.industries = result.data.filter(item => {
-                    if (item.name !== 'More' && item.name !== 'Other') {
-                        return item
-                    }
-                });
+                this.industries = result.data;
+                // this.industries = result.data.filter(item => {
+                //     if (item.name !== 'More' && item.name !== 'Other') {
+                //         return item
+                //     }
+                // });
                 this.industries.unshift({name: "All"})
                 } catch(err) {
                     this.errors.push(err)

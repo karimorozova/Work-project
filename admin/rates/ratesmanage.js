@@ -2,11 +2,18 @@ const { Pricelist, Step, Industries } = require("../models");
 const { getUpdatedPricelist, getPricelist } = require("./getrates");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
-    const { prop, packageSize, industries, target, rates } = rateInfo;
+    const { prop, packageSize, industries, source, target, rates } = rateInfo;
     try {
-        let updatedRates = await managePairRates({
+        let updatedRates = [];
+        if(prop === 'monoRates') {
+            updatedRates = await manageMonoPairRates({
                 packageSize, industries, target, rates, priceRates: pricelist[prop]
             });
+        } else {
+            updatedRates = await manageDuoPairRates({
+                source, target, industries, rates, priceRates: pricelist[prop]
+            });
+        }
         return await getUpdatedPricelist({"_id": pricelist.id}, {[prop]: updatedRates});
     } catch(err) {
         console.log(err);
@@ -14,7 +21,9 @@ async function getAfterRatesSaved(rateInfo, pricelist) {
     }
 }
 
-async function managePairRates({packageSize, industries, target, rates, priceRates}) {
+/////// Mono rates managing start ///////
+
+async function manageMonoPairRates({packageSize, industries, target, rates, priceRates}) {
     try {
         const allIndustries = await Industries.find();
         if(industries[0].name === 'All') {
@@ -31,15 +40,15 @@ async function managePairRates({packageSize, industries, target, rates, priceRat
             if(!priceRates.length) {
                 return [{packageSize, industries, target, rates}]
             }
-            return manageNotAllIndustriesrate({packageSize, industries, target, rates, priceRates})
+            return manageMonoNotAllIndustriesRate({packageSize, industries, target, rates, priceRates})
         }
     } catch(err) {
         console.log(err);
-        console.log("Error in managePairRates");
+        console.log("Error in manageMonoPairRates");
     }
 }
 
-function manageNotAllIndustriesrate({packageSize, industries, target, rates, priceRates}) {
+function manageMonoNotAllIndustriesRate({packageSize, industries, target, rates, priceRates}) {
     const industriesIds = industries.map(item => item._id);
     let updatedRates = priceRates.filter(item => {
         if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
@@ -47,45 +56,11 @@ function manageNotAllIndustriesrate({packageSize, industries, target, rates, pri
     });
     let samePairs = priceRates.filter(item => item.packageSize === packageSize && target.lang === item.target.lang);
     if(samePairs.length) {
-        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds}));
+        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds, form: 'mono'}));
     } else {
         updatedRates.push({target, packageSize, industries, rates});  
     }
     return updatedRates.filter(item => item.industries.length);
-}
-
-function manageSamePairs({samePairs, rates, industriesIds}) {
-    let sameRateIndex = samePairs.findIndex(item => areEqual(item.rates, rates));
-    let managedRates = samePairs.map((item, index) => {
-        let industries = [];
-        if(sameRateIndex === index) {
-            industries = item.industries.map(industry => industry.id);
-            industries.push(industriesIds);
-            industries = industries.filter((value, index, self) => self.indexOf(value) === index);    
-        } else {
-            industries = item.industries.filter(industry => industriesIds.indexOf(industry.id) === -1);
-        }
-        item.industries = industries;
-        return item;
-    })
-    if(sameRateIndex === -1) {
-        managedRates.push({
-            target: samePairs[0].target,
-            packageSize: samePairs[0].packageSize,
-            industries: industriesIds,
-            rates
-        })
-    }
-    return managedRates;
-}
-
-function areEqual(itemRates, rates) {
-    for(let key in itemRates) {
-        if(JSON.stringify(itemRates[key]) !== JSON.stringify(rates[key])) {
-            return false
-        }
-    }
-    return true;
 }
 
 async function getAfterAddSeveralMono(priceId, ratesData) {
@@ -110,6 +85,82 @@ async function getAfterAddSeveralMono(priceId, ratesData) {
         console.log(err);
         console.log("Error in getAfterAddSeveralMono");
     }
+}
+
+/////// Mono rates managing end ///////
+
+/////// Duo rates managing start ///////
+
+async function manageDuoPairRates({source, target, industries, rates, priceRates}) {
+    try {
+        const allIndustries = await Industries.find();
+        if(industries[0].name === 'All') {
+            if(!priceRates.length) {
+                return [{source, target, industries: allIndustries, rates}]
+            }
+            let updatedRates = priceRates.filter(item => {
+                if(item.source.lang === source.lang && item.target.lang === target.lang) return false;
+                return true;
+            });
+            updatedRates.push({source, target, industries: allIndustries, rates});
+            return updatedRates;
+        } else {
+            if(!priceRates.length) {
+                return [{source, target, industries, rates}]
+            }
+            return manageDuoNotAllIndustriesRate({source, target, industries, rates, priceRates})
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageDuoPairRates");
+    }
+}
+
+function manageDuoNotAllIndustriesRate({source, target, industries, rates, priceRates}) {
+    const industriesIds = industries.map(item => item._id);
+    let updatedRates = priceRates.filter(item => {
+        if(item.source.lang === source.lang && item.target.lang === target.lang) return false;
+        return true;
+    });
+    let samePairs = priceRates.filter(item => item.source.lang === source.lang && target.lang === item.target.lang);
+    if(samePairs.length) {
+        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds, form: 'duo'}));
+    } else {
+        updatedRates.push({source, target, industries, rates});  
+    }
+    return updatedRates.filter(item => item.industries.length);
+}
+
+/////// Duo rates manage end ///////
+
+function manageSamePairs({samePairs, rates, industriesIds, form}) {
+    let sameRateIndex = samePairs.findIndex(item => areEqual(item.rates, rates));
+    let managedRates = samePairs.map((item, index) => {
+        let industries = [];
+        if(sameRateIndex === index) {
+            industries = item.industries.map(industry => industry.id);
+            industries.push(industriesIds);
+            industries = industries.filter((value, index, self) => self.indexOf(value) === index);    
+        } else {
+            industries = item.industries.filter(industry => industriesIds.indexOf(industry.id) === -1);
+        }
+        item.industries = industries;
+        return item;
+    })
+    if(sameRateIndex === -1) {
+        form === 'mono' ? managedRates.push({target: samePairs[0].target, packageSize: samePairs[0].packageSize, industries: industriesIds, rates})
+            : managedRates.push({source: samePairs[0].source, target: samePairs[0].target, industries: industriesIds, rates})
+    }
+    return managedRates;
+}
+
+function areEqual(itemRates, rates) {
+    for(let key in itemRates) {
+        if(JSON.stringify(itemRates[key]) !== JSON.stringify(rates[key])) {
+            return false
+        }
+    }
+    return true;
 }
 
 function getRatesToCopy(pairRates, stepsIds) {
