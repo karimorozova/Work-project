@@ -93,7 +93,7 @@ export default {
     directives: {
         ClickOutside
     },
-    mounted () {
+    created () {
         this.getIndustries()
     }
 }

@@ -1,7 +1,7 @@
 export default {
     data() {
         return {
-            domain: "localhost:3001",
+            domain: "http://localhost:3001",
             currentActive: -1,
             currentInfo: null,
             areErrors: false,
