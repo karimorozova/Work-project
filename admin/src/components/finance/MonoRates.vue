@@ -87,7 +87,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             addSeveralMonoRates: "addSeveralMonoRates",
-            storeMonoRates: "storeMonoRates",
+            storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
             setAllMonoStepsForRates: "setAllMonoStepsForRates"

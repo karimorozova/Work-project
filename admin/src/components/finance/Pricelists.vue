@@ -84,9 +84,9 @@ export default {
     methods: {
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
-            this.storeMonoRates([...this.pricelists[index].monoRates]);
-            this.storeWordsRates([...this.pricelists[index].wordsRates]);
-            this.storeHoursRates([...this.pricelists[index].hoursRates]);
+            this.storePriceRates({prop: 'monoRates', value: [...this.pricelists[index].monoRates]});
+            this.storePriceRates({prop: 'wordsRates', value: [...this.pricelists[index].wordsRates]});
+            this.storePriceRates({prop: 'hoursRates', value: [...this.pricelists[index].hoursRates]});
             this.$router.push("/settings/rates");
         },
         async makeAction(index, key) {
@@ -236,9 +236,7 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             storeCurrentPrice: "storeCurrentPrice",
-            storeMonoRates: "storeMonoRates",
-            storeWordsRates: "storeWordsRates",
-            storeHoursRates: "storeHoursRates",
+            storePriceRates: "storePriceRates",
             storePricelists: "storePricelists"
         })
     },

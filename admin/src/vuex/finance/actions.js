@@ -3,9 +3,10 @@ import Vue from "vue";
 export const addFinanceProperty = ({commit, rootState}, payload) => {
     rootState.a.currentProject.finance = {...rootState.a.currentProject.finance, 'Select': payload};
 };
-export const storeWordsRates = ({commit}, payload) => commit('setWordsRates', payload);
-export const storeHoursRates = ({commit}, payload) => commit('setHoursRates', payload);
-export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
+// export const storeWordsRates = ({commit}, payload) => commit('setWordsRates', payload);
+// export const storeHoursRates = ({commit}, payload) => commit('setHoursRates', payload);
+// export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
+export const storePriceRates = ({commit}, payload) => commit('SET_PRICE_RATES', payload);
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
 

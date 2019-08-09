@@ -105,7 +105,7 @@ export default {
             savePricelistRates: "savePricelistRates",
             deletePriceRate: "deletePriceRate"
         }),
-        async checkErrors(index) {
+        async checkErrors() {
             this.errors = [];
             if(!this.currentInfo.source.lang) this.errors.push("Please, set the source language");
             if(!this.currentInfo.target.lang) this.errors.push("Please, set the target language");
@@ -113,7 +113,7 @@ export default {
             if(this.errors.length) {
                 return this.areErrors = true;
             }
-            await this.save(index);
+            await this.save();
         }
     },
     computed: {

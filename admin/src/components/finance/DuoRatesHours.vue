@@ -69,7 +69,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            storeHoursRates: "storeHoursRates",
+            storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
             setAllDuoStepsForRates: "setAllDuoStepsForRates"

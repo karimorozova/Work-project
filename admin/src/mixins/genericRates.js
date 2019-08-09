@@ -74,12 +74,8 @@ export default {
             this.targetSelect = ["All"];
             this.packageFilter = ["All"];
             this.industryFilter = [{name: "All"}];
-            if(this.rateForm === 'monoRates') {
-                this.storeMonoRates(this.currentPrice.monoRates);
-            } else {
-                this.calcUnit === 'Words' ? this.storeWordsRates(this.currentPrice.duoRates) : this.storeHoursRates(this.currentPrice.duoRates);
-            }
-             
+            const prop = this.rateForm;
+            this.storePriceRates({prop, value: this.currentPrice[prop]});             
             this.setAllSteps();
         },
         async setDefaultStep() {
