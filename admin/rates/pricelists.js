@@ -5,8 +5,10 @@ async function saveNewPricelist(pricelist) {
     const { name, isActive, isClientDefault, isVendorDefault, copyName } = pricelist;
     try {
         const donorPricelist = copyName ? await Pricelist.findOne({"name": copyName}) : "";
-        const combinations = donorPricelist ? [...donorPricelist.combinations] : [];
-        return await Pricelist.create({name, isClientDefault, isVendorDefault, isActive, combinations});
+        const { monoRates = [], wordsRates = [], hoursRates = [] } = donorPricelist ? donorPricelist : {};
+        return await Pricelist.create({
+            name, isClientDefault, isVendorDefault, isActive, monoRates, wordsRates, hoursRates
+        });
     } catch(err) {
         console.log(err);
         console.log("Error in saveNewPricelist");
@@ -97,26 +99,26 @@ async function addSeveralLangs(obj) {
 }
 
 async function copyFromPrice(obj) {
-    const { curIndustries, initRate, comb } = obj;
-    const { services, industries } = comb;
-    try {
-    let currentWithAllIndustries = await includeAllIndustries(curIndustries, "Duo");
-    const initIndustries = [...initRate.industries];
-    for(let industry of currentWithAllIndustries) {
-        const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
-        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
-            industry.rates = replaceFromPrice({
-                curRates: industry.rates, 
-                initRates: initIndustries[initIndex].rates,
-                services
-            })
-        }
-    }
-    return currentWithAllIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log('Error in copyFromPrice');
-    }
+    // const { curIndustries, initRate, comb } = obj;
+    // const { services, industries } = comb;
+    // try {
+    // let currentWithAllIndustries = await includeAllIndustries(curIndustries, "Duo");
+    // const initIndustries = [...initRate.industries];
+    // for(let industry of currentWithAllIndustries) {
+    //     const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
+    //     if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
+    //         industry.rates = replaceFromPrice({
+    //             curRates: industry.rates, 
+    //             initRates: initIndustries[initIndex].rates,
+    //             services
+    //         })
+    //     }
+    // }
+    // return currentWithAllIndustries;
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log('Error in copyFromPrice');
+    // }
 }
 
 function replaceFromPrice({ curRates, initRates, services }) {
