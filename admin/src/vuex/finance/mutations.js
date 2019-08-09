@@ -13,9 +13,6 @@ export const mutations = {
             });
         }
     },
-    setServiceWhenAddSeveral(state, payload) {
-        state.serviceWhenAddSeveral = payload
-    },
     setCurrentPrice(state, payload) {
         state.currentPrice = {...payload};
     },
