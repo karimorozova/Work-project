@@ -1,8 +1,6 @@
 const { Services, Languages } = require("../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
-const { getPricelist, replaceRates, replaceFromPrice, 
-    includeAllIndustries, defaultRates, getAllUpdatedIndustries, 
-    getAfterDeleteRates, updateCombIndustries } = require("../rates");
+const { getPricelist, replaceRates, replaceFromPrice } = require("../rates");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)
@@ -75,62 +73,62 @@ async function updateVendorRates(ratesInfo) {
 }
 
 async function updateMonoRates(vendor, info) {
-    const combinations = vendor.languageCombinations;
-    const { industries, package, targetLanguage } = info;
-    try {
-        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.package && item.target.id === info.targetLanguage._id && item.package === package);
-        if(pairIndex !== -1) {
-            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
-            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
-        } else {
-            combinations.push({
-                target: targetLanguage._id,
-                package,
-                industries: allUpdatedIndustries
-            })
-        }
-        return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateMonoRates");
-    }
+    // const combinations = vendor.languageCombinations;
+    // const { industries, package, targetLanguage } = info;
+    // try {
+    //     const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+    //     const pairIndex = combinations.findIndex(item => item.package && item.target.id === info.targetLanguage._id && item.package === package);
+    //     if(pairIndex !== -1) {
+    //         const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
+    //         combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
+    //     } else {
+    //         combinations.push({
+    //             target: targetLanguage._id,
+    //             package,
+    //             industries: allUpdatedIndustries
+    //         })
+    //     }
+    //     return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in updateMonoRates");
+    // }
 }
 
 async function updateDuoRates(vendor, info) {
-    const combinations = vendor.languageCombinations;
-    const { industries, sourceLanguage, targetLanguage } = info;
-    try {
-        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.source && item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
-        if(pairIndex !== -1) {
-            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
-            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
-        } else {
-            combinations.push({
-                source: sourceLanguage._id,
-                target: targetLanguage._id,
-                industries: allUpdatedIndustries
-            })
-        }
-        return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateDuoRates");
-    }
+    // const combinations = vendor.languageCombinations;
+    // const { industries, sourceLanguage, targetLanguage } = info;
+    // try {
+    //     const allUpdatedIndustries = await getAllUpdatedIndustries(industries, vendor.industries, info.languageForm);
+    //     const pairIndex = combinations.findIndex(item => item.source && item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
+    //     if(pairIndex !== -1) {
+    //         const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, vendor.industries, info.languageForm);
+    //         combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
+    //     } else {
+    //         combinations.push({
+    //             source: sourceLanguage._id,
+    //             target: targetLanguage._id,
+    //             industries: allUpdatedIndustries
+    //         })
+    //     }
+    //     return await getVendorAfterUpdate({"_id": vendor.id}, {languageCombinations: combinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in updateDuoRates");
+    // }
 }
 
 async function deleteRate(deleteInfo, id) {
-    const {vendorId, industries, servicesIds} = deleteInfo;
-    try {
-        const vendor = await getVendor({"_id": vendorId});
-        const combinations = [...vendor.languageCombinations];
-        const updatedCombinations = getAfterDeleteRates({industries, servicesIds, combinations, id});
-        return await getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: updatedCombinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in deleteRate");
-    }
+    // const {vendorId, industries, servicesIds} = deleteInfo;
+    // try {
+    //     const vendor = await getVendor({"_id": vendorId});
+    //     const combinations = [...vendor.languageCombinations];
+    //     const updatedCombinations = getAfterDeleteRates({industries, servicesIds, combinations, id});
+    //     return await getVendorAfterUpdate({"_id": vendorId}, {languageCombinations: updatedCombinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in deleteRate");
+    // }
 }
 
 async function addSeveralCombinations({priceId,vendorId, combinations}) {
@@ -167,46 +165,46 @@ async function addSeveralCombinations({priceId,vendorId, combinations}) {
 }
 
 async function copyFromPrice(obj) {
-    const { curIndustries, initRate, vendorIndustries, comb } = obj;
-    const { services, industries } = comb;
-    try {
-        const initIndustries = [...initRate.industries];
-        let currentWithAllIndustries = await includeAllIndustries(curIndustries, vendorIndustries, "Duo");
-    for(let industry of currentWithAllIndustries) {
-        const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
-        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
-            industry.rates = replaceFromPrice({
-                curRates: industry.rates, 
-                initRates: initIndustries[initIndex].rates,
-                services
-            })
-        }
-    }
-    return currentWithAllIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log('Error in copyFromPrice');
-    }
+    // const { curIndustries, initRate, vendorIndustries, comb } = obj;
+    // const { services, industries } = comb;
+    // try {
+    //     const initIndustries = [...initRate.industries];
+    //     let currentWithAllIndustries = await includeAllIndustries(curIndustries, vendorIndustries, "Duo");
+    // for(let industry of currentWithAllIndustries) {
+    //     const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
+    //     if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
+    //         industry.rates = replaceFromPrice({
+    //             curRates: industry.rates, 
+    //             initRates: initIndustries[initIndex].rates,
+    //             services
+    //         })
+    //     }
+    // }
+    // return currentWithAllIndustries;
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log('Error in copyFromPrice');
+    // }
 }
 
 async function getNewFromPrice(initRate, comb, vendorIndustries) {
-    const { industries, services } = comb;
-    const initIndustries = [...initRate.industries];
-    let newRateIndustries = [];
-    try {
-        let ratesWithAllIndustries = await defaultRates(vendorIndustries, "Duo");
-        for(let industry of ratesWithAllIndustries) {
-            const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
-            if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
-                industry.rates = replaceRates(initIndustries[initIndex].rates, services);
-            }
-            newRateIndustries.push({ industry: industry.id, rates: industry.rates });
-        }
-        return newRateIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getNewFromPrice");
-    }
+    // const { industries, services } = comb;
+    // const initIndustries = [...initRate.industries];
+    // let newRateIndustries = [];
+    // try {
+    //     let ratesWithAllIndustries = await defaultRates(vendorIndustries, "Duo");
+    //     for(let industry of ratesWithAllIndustries) {
+    //         const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
+    //         if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
+    //             industry.rates = replaceRates(initIndustries[initIndex].rates, services);
+    //         }
+    //         newRateIndustries.push({ industry: industry.id, rates: industry.rates });
+    //     }
+    //     return newRateIndustries;
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in getNewFromPrice");
+    // }
 }
 
 async function getVendorAfterCombinationsUpdated({project, step, rate}) {
@@ -254,32 +252,32 @@ async function manageExistingCombination({vendor, rate, rateService, rateIndustr
 }
 
 async function getUpdatedCombs({combinations, industries, rate, rateService, rateIndustry, combIndex}) {
-    let updatedCombs = [];
-    try {
-        for(let i = 0; i < combinations.length; i++) {
-            let comb = combinations[i]
-            if(i !== combIndex) {
-                updatedCombs.push(comb);
-            } else {
-                const rateIndex = comb.industries.findIndex(item => item.industry.id === rateIndustry);
-                if(rateIndex !== -1) {
-                    comb.industries[rateIndex].rates[rateService].value = rate;
-                    comb.industries[rateIndex].rates[rateService].active = true;
-                } else {
-                    const ratesWithAllIndustries = await defaultRates(industries, "Duo");
-                    let changingRate = ratesWithAllIndustries.find(item => item.id === rateIndustry);
-                    changingRate.rates[rateService].value = rate;
-                    changingRate.rates[rateService].active = true;
-                    comb.industries.push(changingRate);
-                }
-                updatedCombs.push(comb);
-            }
-        }
-        return updatedCombs;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getUpdatedCombs");
-    }
+    // let updatedCombs = [];
+    // try {
+    //     for(let i = 0; i < combinations.length; i++) {
+    //         let comb = combinations[i]
+    //         if(i !== combIndex) {
+    //             updatedCombs.push(comb);
+    //         } else {
+    //             const rateIndex = comb.industries.findIndex(item => item.industry.id === rateIndustry);
+    //             if(rateIndex !== -1) {
+    //                 comb.industries[rateIndex].rates[rateService].value = rate;
+    //                 comb.industries[rateIndex].rates[rateService].active = true;
+    //             } else {
+    //                 const ratesWithAllIndustries = await defaultRates(industries, "Duo");
+    //                 let changingRate = ratesWithAllIndustries.find(item => item.id === rateIndustry);
+    //                 changingRate.rates[rateService].value = rate;
+    //                 changingRate.rates[rateService].active = true;
+    //                 comb.industries.push(changingRate);
+    //             }
+    //             updatedCombs.push(comb);
+    //         }
+    //     }
+    //     return updatedCombs;
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in getUpdatedCombs");
+    // }
 }
 
 function getUpdatedVendorIndustries(vendor, rateIndustry) {
@@ -292,31 +290,31 @@ function getUpdatedVendorIndustries(vendor, rateIndustry) {
 }
 
 async function addCombination({vendor, step, rate, rateService, rateIndustry}) {
-    const industries = getUpdatedVendorIndustries(vendor, rateIndustry);
-    try {
-        const source = await Languages.findOne({symbol: step.source});
-        const target = await Languages.findOne({symbol: step.target});
-        const allIndustriesWithRates = await defaultRates(industries, "Duo");
-        const newRateIndustries = allIndustriesWithRates.map(item => {
-            let rates = Object.keys(item.rates).reduce((prev, cur) => {
-                prev[cur] = {...item.rates[cur]};
-                return prev;
-            },{})
-            if(item.id === rateIndustry) {
-                rates[rateService].value = rate;
-                rates[rateService].active = true;
-            }
-            return {
-                industry: item.id,
-                rates
-            };
-        })
-        const newComb = {source, target, industries: newRateIndustries};
-        return await getVendorAfterUpdate({"_id": vendor.id}, { industries, $push: {languageCombinations: newComb} });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in addCombination");
-    }
+    // const industries = getUpdatedVendorIndustries(vendor, rateIndustry);
+    // try {
+    //     const source = await Languages.findOne({symbol: step.source});
+    //     const target = await Languages.findOne({symbol: step.target});
+    //     const allIndustriesWithRates = await defaultRates(industries, "Duo");
+    //     const newRateIndustries = allIndustriesWithRates.map(item => {
+    //         let rates = Object.keys(item.rates).reduce((prev, cur) => {
+    //             prev[cur] = {...item.rates[cur]};
+    //             return prev;
+    //         },{})
+    //         if(item.id === rateIndustry) {
+    //             rates[rateService].value = rate;
+    //             rates[rateService].active = true;
+    //         }
+    //         return {
+    //             industry: item.id,
+    //             rates
+    //         };
+    //     })
+    //     const newComb = {source, target, industries: newRateIndustries};
+    //     return await getVendorAfterUpdate({"_id": vendor.id}, { industries, $push: {languageCombinations: newComb} });
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in addCombination");
+    // }
 }
 
 module.exports= { getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations, getVendorAfterCombinationsUpdated };

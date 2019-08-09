@@ -1,29 +1,11 @@
-const { Languages, Services } = require("../models/");
 const { getAfterUpdate, getClient } = require("./getClients");
 const { 
     getPricelist, 
     replaceRates, 
-    replaceFromPrice, 
-    includeAllIndustries, 
-    defaultRates, 
-    getAllUpdatedIndustries, 
-    getAfterDeleteRates, 
-    updateCombIndustries } = require("../rates");
+    replaceFromPrice } = require("../rates");
 
 async function getClientRates({client, form}) {
-    // const combinations = form === "Duo" ? client.languageCombinations.filter(item => item.source)
-    // : client.languageCombinations.filter(item => !item.source);
-    // try {
-    //     const ratesServices = await Services.find({languageForm: form});
-    //     const serviceIds = ratesServices.map(item => item.id);
-    //     let fullInfo = [];
-    //     for(let rate of combinations) {
-    //         fullInfo.push(...parseIndustries(rate, serviceIds, form));    
-    //     }
-    //     return fullInfo;
-    // } catch(err) {
-    //     console.log("from function getClientRates " + err);   
-    // }
+    
 }
 
 async function updateClientRates(ratesInfo) {
@@ -39,62 +21,62 @@ async function updateClientRates(ratesInfo) {
 }
 
 async function updateMonoRates(client, info) {
-    const combinations = client.languageCombinations;
-    const { industries, package, targetLanguage } = info;
-    try {
-        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.package && item.target.id === info.targetLanguage._id && item.package === package);
-        if(pairIndex !== -1) {
-            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, client.industries, info.languageForm);
-            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);;
-        } else {
-            combinations.push({
-                target: targetLanguage._id,
-                package,
-                industries: allUpdatedIndustries
-            })
-        }
-        return await getAfterUpdate({"_id": client.id}, {languageCombinations: combinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateMonoRates");
-    }
+    // const combinations = client.languageCombinations;
+    // const { industries, package, targetLanguage } = info;
+    // try {
+    //     const allUpdatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
+    //     const pairIndex = combinations.findIndex(item => item.package && item.target.id === info.targetLanguage._id && item.package === package);
+    //     if(pairIndex !== -1) {
+    //         const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, client.industries, info.languageForm);
+    //         combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);;
+    //     } else {
+    //         combinations.push({
+    //             target: targetLanguage._id,
+    //             package,
+    //             industries: allUpdatedIndustries
+    //         })
+    //     }
+    //     return await getAfterUpdate({"_id": client.id}, {languageCombinations: combinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in updateMonoRates");
+    // }
 }
 
 async function updateDuoRates(client, info) {
-    const combinations = client.languageCombinations;
-    const { industries, sourceLanguage, targetLanguage } = info;
-    try {
-        const allUpdatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
-        const pairIndex = combinations.findIndex(item => item.source && item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
-        if(pairIndex !== -1) {
-            const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, client.industries, info.languageForm);
-            combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
-        } else {
-            combinations.push({
-                source: sourceLanguage._id,
-                target: targetLanguage._id,
-                industries: allUpdatedIndustries
-            })
-        }
-        return await getAfterUpdate({"_id": client.id}, {languageCombinations: combinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateDuoRates");
-    }
+    // const combinations = client.languageCombinations;
+    // const { industries, sourceLanguage, targetLanguage } = info;
+    // try {
+    //     const allUpdatedIndustries = await getAllUpdatedIndustries(industries, client.industries, info.languageForm);
+    //     const pairIndex = combinations.findIndex(item => item.source && item.source.id === info.sourceLanguage._id && item.target.id === info.targetLanguage._id);
+    //     if(pairIndex !== -1) {
+    //         const combIndustriesWithAll = await getAllUpdatedIndustries(combinations[pairIndex].industries, client.industries, info.languageForm);
+    //         combinations[pairIndex].industries = updateCombIndustries(combIndustriesWithAll, industries);
+    //     } else {
+    //         combinations.push({
+    //             source: sourceLanguage._id,
+    //             target: targetLanguage._id,
+    //             industries: allUpdatedIndustries
+    //         })
+    //     }
+    //     return await getAfterUpdate({"_id": client.id}, {languageCombinations: combinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in updateDuoRates");
+    // }
 }
 
 async function deleteRate(deleteInfo, id) {
-    const {clientId, industries, servicesIds} = deleteInfo;
-    try {
-        const client = await getClient({"_id": clientId});
-        const combinations = [...client.languageCombinations];
-        const updatedCombinations = getAfterDeleteRates({industries, servicesIds, combinations, id});
-        return await getAfterUpdate({"_id": clientId}, {languageCombinations: updatedCombinations});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in deleteRate");
-    }
+    // const {clientId, industries, servicesIds} = deleteInfo;
+    // try {
+    //     const client = await getClient({"_id": clientId});
+    //     const combinations = [...client.languageCombinations];
+    //     const updatedCombinations = getAfterDeleteRates({industries, servicesIds, combinations, id});
+    //     return await getAfterUpdate({"_id": clientId}, {languageCombinations: updatedCombinations});
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in deleteRate");
+    // }
 }
 
 async function addSeveralCombinations({priceId, clientId, combinations}) {
@@ -131,46 +113,27 @@ async function addSeveralCombinations({priceId, clientId, combinations}) {
 }
 
 async function copyFromPrice(obj) {
-    const { curIndustries, initRate, clientIndustries, comb } = obj;
-    const { services, industries } = comb;
-    try {
-        const initIndustries = [...initRate.industries];
-        let currentWithAllIndustries = await includeAllIndustries(curIndustries, clientIndustries, "Duo");
-    for(let industry of currentWithAllIndustries) {
-        const initIndex = initIndustries.findIndex(item => item.industry.id === industry.industry);
-        if(initIndex !== -1 && (industries.indexOf(industry.industry) !== -1 || industries[0] === 'All')) {
-            industry.rates = replaceFromPrice({
-                curRates: industry.rates, 
-                initRates: initIndustries[initIndex].rates,
-                services
-            })
-        }
-    }
-    return currentWithAllIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log('Error in copyFromPrice');
-    }
+    
 }
 
 async function getNewFromPrice(initRate, comb, clientIndustries) {
-    const { industries, services } = comb;
-    const initIndustries = [...initRate.industries];
-    let newRateIndustries = [];
-    try {
-        let ratesWithAllIndustries = await defaultRates(clientIndustries, "Duo");
-        for(let industry of ratesWithAllIndustries) {
-            const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
-            if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
-                industry.rates = replaceRates(initIndustries[initIndex].rates, services);
-            }
-            newRateIndustries.push({ industry: industry.id, rates: industry.rates });
-        }
-        return newRateIndustries;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getNewFromPrice");
-    }
+    // const { industries, services } = comb;
+    // const initIndustries = [...initRate.industries];
+    // let newRateIndustries = [];
+    // try {
+    //     let ratesWithAllIndustries = await defaultRates(clientIndustries, "Duo");
+    //     for(let industry of ratesWithAllIndustries) {
+    //         const initIndex = initIndustries.findIndex(item => item.industry.id === industry.id);
+    //         if(industries.indexOf(industry.id) !== -1 || industries[0] === 'All') {
+    //             industry.rates = replaceRates(initIndustries[initIndex].rates, services);
+    //         }
+    //         newRateIndustries.push({ industry: industry.id, rates: industry.rates });
+    //     }
+    //     return newRateIndustries;
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in getNewFromPrice");
+    // }
 }
 
 async function getClientAfterCombinationsUpdated({project, step, rate}) {
@@ -196,21 +159,21 @@ async function getClientAfterCombinationsUpdated({project, step, rate}) {
 }
 
 async function addNewCombination({id, languageCombinations, rateService, rateIndustry, rate}) {
-    try {
-        const allIndustriesWithRates = await defaultRates(clientIndustries, "Duo");
-        const combinationsIndustries = allIndustriesWithRates.map(item => {
-            return {
-                industry: item,
-                rates: item.rates
-            }
-        })
-        const industries = getUpdateIndustriesForComb({industries: combinationsIndustries, rateIndustry, rateService, rate});
-        const updatedCombinations = [...languageCombinations, {source, target, industries}];
-        return await getAfterUpdate({"_id": id},{ languageCombinations: updatedCombinations });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in addNewCombination");
-    }
+    // try {
+    //     const allIndustriesWithRates = await defaultRates(clientIndustries, "Duo");
+    //     const combinationsIndustries = allIndustriesWithRates.map(item => {
+    //         return {
+    //             industry: item,
+    //             rates: item.rates
+    //         }
+    //     })
+    //     const industries = getUpdateIndustriesForComb({industries: combinationsIndustries, rateIndustry, rateService, rate});
+    //     const updatedCombinations = [...languageCombinations, {source, target, industries}];
+    //     return await getAfterUpdate({"_id": id},{ languageCombinations: updatedCombinations });
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in addNewCombination");
+    // }
 }
 
 function getUpdateIndustriesForComb({industries, rateIndustry, rateService, rate}) {
