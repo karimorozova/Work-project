@@ -34,7 +34,6 @@ import DuoRatesWords from "./DuoRatesWords";
 import DuoRatesHours from "./DuoRatesHours";
 import MonoRates from "./MonoRates";
 import Button from "../Button";
-import AvailablePairs from "./pricelists/AvailablePairs";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -45,11 +44,7 @@ export default {
         return {
             isMonoDrop: false,
             isWordcountDrop: false,
-            isHoursDrop: false,
-            isAddSeveral: false,
-            isAvailablePairs: false,
-            langPairs: [],
-            addSeveralPriceId: ""
+            isHoursDrop: false
         };
     },
     methods: {
@@ -72,8 +67,7 @@ export default {
         MonoRates,
         DuoRatesWords,
         DuoRatesHours,
-        Button,
-        AvailablePairs
+        Button
     },
     created() {
         this.getSteps();
