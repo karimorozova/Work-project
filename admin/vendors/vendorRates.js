@@ -1,6 +1,6 @@
 const { Services, Languages } = require("../models/");
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
-const { getPricelist, replaceRates, replaceFromPrice } = require("../rates");
+const { getPricelist } = require("../rates");
 
 async function getVendorRates({vendor, form}) {
     const combinations = form === "Duo" ? vendor.languageCombinations.filter(item => item.source)

@@ -1,8 +1,5 @@
 const { getAfterUpdate, getClient } = require("./getClients");
-const { 
-    getPricelist, 
-    replaceRates, 
-    replaceFromPrice } = require("../rates");
+const { getPricelist } = require("../rates");
 
 async function getClientRates({client, form}) {
     
