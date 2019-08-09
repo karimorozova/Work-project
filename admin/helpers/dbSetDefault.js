@@ -432,11 +432,13 @@ async function getRates() {
         const languages = await Languages.find().limit(10);
         const englishLang = await Languages.findOne({symbol: "EN-GB"});
         const industries = await Industries.find();
-        const duoSteps = await Step.find({calculationUnit: {$ne: "Packages"}});
+        const wordsSteps = await Step.find({calculationUnit: "Words"});
+        const hoursSteps = await Step.find({calculationUnit: "Hours"});
         const monoSteps = await Step.find({calculationUnit: "Packages"});
-        const duoRates = getDuoCombinations({languages, englishLang, industries, steps: duoSteps});
+        const wordsRates = getDuoCombinations({languages, englishLang, industries, steps: wordsSteps});
+        const hoursRates = getDuoCombinations({languages, englishLang, industries, steps: hoursSteps});
         const monoRates = getMonoCombinations({languages, industries, steps: monoSteps});
-        return {duoRates, monoRates};
+        return {wordsRates, hoursRates, monoRates};
     } catch(err) {
         console.log(err);
     }
@@ -478,7 +480,7 @@ function getMonoCombinations({languages, industries, steps}) {
 
 async function fillPricelist() {
   try {
-    const { duoRates, monoRates } = await getRates();
+    const { wordsRates, hoursRates, monoRates } = await getRates();
     let pricelists = await Pricelist.find();
     if(!pricelists.length) {
       await Pricelist.create({
@@ -487,7 +489,8 @@ async function fillPricelist() {
         isVendorDefault: true,
         isActive: true,
         monoRates,
-        duoRates
+        wordsRates,
+        hoursRates
       });
     }
   } catch(err) {
@@ -497,25 +500,25 @@ async function fillPricelist() {
 }
 
 async function checkCollections() {
-  await fillPackages();
-  await fillInstructions();
-  await fillCancelReasons();
-  await fillDiscountCharts();
-  await fillLeadSources();
-  await fillGroups();
-  await fillSteps();
-  await timeZones();
-  await languages();
-  await industries();
-  await services();
-  await clients();
-  await vendors();
-  await requests();
-  await projects();
-  await users();
-  // await clientLangs();
-  // await vendorLangs();
-  await fillPricelist();
+    await fillPackages();
+    await fillInstructions();
+    await fillCancelReasons();
+    await fillDiscountCharts();
+    await fillLeadSources();
+    await fillGroups();
+    await fillSteps();
+    await timeZones();
+    await languages();
+    await industries();
+    await services();
+    await clients();
+    await vendors();
+    await requests();
+    await projects();
+    await users();
+    // await clientLangs();
+    // await vendorLangs();
+    await fillPricelist();
 }
 
 module.exports = checkCollections();

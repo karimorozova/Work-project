@@ -15,7 +15,22 @@ const PricelistSchema = new mongoose.Schema({
     isActive: {
         type: Boolean
     },
-    duoRates: [{ 
+    wordsRates: [{ 
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language',
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        industries: [{
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        }],
+        rates: {
+            type: Object,
+            default: {}
+        }
+    }],
+    hoursRates: [{ 
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
         },
