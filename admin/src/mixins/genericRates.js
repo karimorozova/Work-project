@@ -64,7 +64,7 @@ export default {
         },
         async addSeveralRates({ratesData}) {
             try {
-                await this.addSeveralMonoRates({ratesData});
+                await this.addSeveralPriceRates({ratesData, prop: this.rateForm});
                 this.refreshRates();
                 this.isImportRates = false;
             } catch(err) { }

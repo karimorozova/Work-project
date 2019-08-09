@@ -38,7 +38,6 @@
         )
     AddseveralMono(v-if="isImportRates" 
         :steps="filteredSteps"
-        :isDuo="false"
         :packages="packages"
         @addSeveralRates="addSeveralRates"
         @closeSeveral="closeImportRates")
@@ -77,16 +76,9 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
-        async addSeveralRates({ratesData}) {
-            try {
-                await this.addSeveralMonoRates({ratesData});
-                this.refreshRates();
-                this.isImportRates = false;
-            } catch(err) { }
-        },
         ...mapActions({
             alertToggle: "alertToggle",
-            addSeveralMonoRates: "addSeveralMonoRates",
+            addSeveralPriceRates: "addSeveralPriceRates",
             storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",

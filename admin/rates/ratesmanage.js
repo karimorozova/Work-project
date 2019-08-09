@@ -21,6 +21,18 @@ async function getAfterRatesSaved(rateInfo, pricelist) {
     }
 }
 
+async function getAfterAddSeveralRates({priceId, ratesData, prop}) {
+    try {
+        if(prop === 'monoRates') {
+            return await getAfterAddSeveralMono(priceId, ratesData);
+        }
+        return await getAfterAddSeveralDuo({priceId, ratesData, prop});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterAddSeveralRates");
+    }
+}
+
 /////// Mono rates managing start ///////
 
 async function manageMonoPairRates({packageSize, industries, target, rates, priceRates}) {
@@ -76,7 +88,7 @@ async function getAfterAddSeveralMono(priceId, ratesData) {
         for(let pair of allAvailablePairs) {
             let copiedRates = getRatesToCopy(pair.rates, stepsIds);
             const { packageSize, target } = pair;
-            monoRates = await managePairRates({
+            monoRates = await manageMonoPairRates({
                 packageSize, industries, target, rates: copiedRates, priceRates: monoRates
             });
         }
@@ -129,6 +141,31 @@ function manageDuoNotAllIndustriesRate({source, target, industries, rates, price
         updatedRates.push({source, target, industries, rates});  
     }
     return updatedRates.filter(item => item.industries.length);
+}
+
+async function getAfterAddSeveralDuo({priceId, ratesData, prop}) {
+    let { copyRates, industries, stepsIds, sources, targets } = ratesData;
+    if(industries[0] === 'All') {
+        industries = [{name: 'All'}]
+    }
+    const sourcesIds = sources.map(item => item._id);
+    const targetsIds = targets.map(item => item._id);
+    const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    try {
+        const price = await getPricelist({"_id": priceId});
+        let updatedRates = price[prop].length ? [...price[prop]] : [];
+        for(let pair of allAvailablePairs) {
+            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
+            const { source, target } = pair;
+            updatedRates = await manageDuoPairRates({
+                source, industries, target, rates: copiedRates, priceRates: updatedRates
+            });
+        }
+        return await getUpdatedPricelist({"_id": priceId}, { [prop]: updatedRates });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getAfterAddSeveralDuo");
+    }
 }
 
 /////// Duo rates manage end ///////
@@ -306,4 +343,4 @@ function isAllRatesDeleted(industries) {
     return sum === 0
 }
 
-module.exports = { getAfterRatesSaved, getAfterAddSeveralMono, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }
+module.exports = { getAfterRatesSaved, getAfterAddSeveralRates, includeAllIndustries, defaultRates, getAllUpdatedIndustries, getAfterDeleteRates, updateCombIndustries }

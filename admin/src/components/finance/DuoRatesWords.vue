@@ -35,6 +35,12 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
+    Addseverallangs(v-if="isImportRates"
+        :ratesName="rateForm"
+        :steps="filteredSteps"
+        :packages="packages"
+        @addSeveralRates="addSeveralRates"
+        @closeSeveral="closeImportRates")
 </template>
 
 <script>
@@ -43,6 +49,7 @@ import RatesFilters from "./RatesFilters";
 import DuoTable from "./ratesTables/DuoTable";
 import SelectSingle from "../SelectSingle";
 import Button from "../Button";
+import Addseverallangs from "./Addseverallangs";
 import ApproveModal from "../ApproveModal";
 import ratesFilters from "@/mixins/ratesFilters";
 import genericRates from "@/mixins/genericRates";
@@ -74,7 +81,8 @@ export default {
             storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
-            setAllStepsForRates: "setAllStepsForRates"
+            setAllStepsForRates: "setAllStepsForRates",
+            addSeveralPriceRates: "addSeveralPriceRates"
         })
     },
     computed: {
@@ -89,7 +97,8 @@ export default {
         DuoTable,
         SelectSingle,
         ApproveModal,
-        Button
+        Button,
+        Addseverallangs
     },
     directives: {
         ClickOutside

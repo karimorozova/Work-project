@@ -8,12 +8,12 @@ export const storePriceRates = ({commit}, payload) => commit('SET_PRICE_RATES', 
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
 
-export const addSeveralMonoRates = async ({commit, dispatch, state}, payload) => {
+export const addSeveralPriceRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
         const priceId = state.currentPrice._id;
-        const { ratesData } = payload;
-        const updatedPrice = await Vue.http.post('/rates-manage/several-mono', { ratesData, priceId });
+        const { ratesData, prop } = payload;
+        const updatedPrice = await Vue.http.post('/rates-manage/several-rates', { ratesData, priceId, prop });
         commit('setCurrentPrice', updatedPrice.body);
     } catch(err) {
         dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});

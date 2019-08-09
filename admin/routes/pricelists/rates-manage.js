@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterAddSeveralMono } = require('../../rates');
+const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterAddSeveralRates } = require('../../rates');
 
 router.post('/combination', async (req, res) => {
     const { priceId, ...rateInfo } = req.body;
@@ -40,10 +40,10 @@ router.post('/remove-rates', async (req, res) => {
     }
 })
 
-router.post('/several-mono', async (req, res) => {
-    const { priceId, ratesData } = req.body;
+router.post('/several-rates', async (req, res) => {
+    const { priceId, ratesData, prop } = req.body;
     try {
-        const updatedPricelist = await getAfterAddSeveralMono(priceId, ratesData);
+        const updatedPricelist = await getAfterAddSeveralRates({priceId, ratesData, prop});
         res.send(updatedPricelist);
     } catch(err) {
         console.log(err);

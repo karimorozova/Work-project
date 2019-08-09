@@ -8,7 +8,7 @@
             .add-several_width-78
                 .add-several__drop-menu
                     SelectSingle(placeholder="Select" :options="pricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
-        LangsManage(v-if="isDuo"
+        LangsManage(
             title="Source languages"
             :all="source.all" 
             :chosen="source.chosen" 
@@ -19,7 +19,7 @@
             @sortBySearch="(e) => sortBySearch(e, 'source')"
             @sortLangs="(e) => sortLangs(e, 'source')")
         LangsManage(
-            :title="isDuo ? 'Target languages' : 'Languages'"
+            title="Target languages"
             :all="target.all" 
             :chosen="target.chosen" 
             @toChosen="(e) => toChosen(e, 'target')" 
@@ -54,7 +54,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         origin: {
-            type: String
+            type: String,
+            default: 'global'
         },
         who: {
             type: Object
@@ -66,10 +67,7 @@ export default {
             type: Array,
             default: () => []
         },
-        isDuo: {
-            type: Boolean,
-            default: true
-        }
+        ratesName: { type: String }
     },
     data() {
         return {
@@ -84,8 +82,6 @@ export default {
             selectedSteps: [],
             areErrors: false,
             errors: [],
-            langSearchValue: "",
-            isSourceSearch: true,
             selectedPrice: {name: ""}
         }
     },
@@ -107,61 +103,52 @@ export default {
         },
         checkErrors() {
             this.errors = [];
-            if(!this.selectedPrice._id) this.errors.push('Please, select pricelist');
-            if(!this.source.chosen.length) this.errors.push('Choose source languages');
-            if(!this.target.chosen.length) this.errors.push('Choose target languages');
-            if(!this.selectedSteps.length) this.errors.push('Please, select services');
-            if(!this.selectedInd.length) this.errors.push('Please, select industries');
-            if(this.errors.length) {
+            if(!this.selectedPrice._id) {
+                this.errors.push('Please, select pricelist');
                 return this.areErrors = true;
             } else {
-                this.addLangCombinations();
+                if(!this.source.chosen.length) this.errors.push('Please, select source languages');
+                if(!this.target.chosen.length) this.errors.push('Please, select target languages');
+                if(!this.selectedSteps.length) this.errors.push('Please, select steps');
+                if(!this.selectedInd.length) this.errors.push('Please, select industries');
+                if(this.errors.length) {
+                    return this.areErrors = true;
+                }
             }
+            this.addLangCombinations();
         },
         closeErrors() {
             this.areErrors = false;
         },
         setPrice({option}) {
             this.selectedPrice = option;
-            this.priceLangs();
+            this.setPriceLangs();
             this.sortLangArray(this.source.all);
             this.sortLangArray(this.target.all);
         },
-        priceLangs() {
-            const allCombs = this.selectedPrice.combinations.filter(item => item.source);
-            const notUniqueSource = allCombs.map(item => {
-                return item.source;
-            });
-            const notUniqueTarget = allCombs.map(item => {
-                return item.target;
-            });
+        setPriceLangs() {
+            const allCombs = this.selectedPrice[this.ratesName];
+            const notUniqueSource = allCombs.map(item => item.source);
+            const notUniqueTarget = allCombs.map(item => item.target);
             this.source.all = notUniqueSource.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);            
             this.target.all = notUniqueTarget.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
             this.source.chosen = [];            
             this.target.chosen = [];            
         },
-        collectCombinations() {
-            let combinations = [];
+        collectData() {
             const industries = this.selectedInd[0].name === 'All' ? ['All'] : this.selectedInd.map(item => item._id);
             const stepsIds = this.selectedSteps.map(item => item._id);
-            for(let source of this.source.chosen) {
-                for(let target of this.target.chosen) {
-                    if(source._id !== target._id) {
-                        combinations.push({
-                            source,
-                            target,
-                            industries,
-                            stepsIds
-                        })
-                    }
-                }
+            return {
+                copyRates: this.selectedPrice[this.ratesName],
+                sources: this.source.chosen,
+                targets: this.target.chosen,
+                industries, 
+                stepsIds
             }
-            return combinations;
         },
-        async addLangCombinations() {
-            const combinations = this.collectCombinations();
-            const priceId = this.selectedPrice._id;
-            this.$emit("checkCombinations", { priceId, combinations });
+        addLangCombinations() {
+            const ratesData = this.collectData();
+            this.$emit("addSeveralRates", { ratesData });
         },
         closeSeveral() {
             if(this.isAvailablePairs) return;
@@ -236,7 +223,12 @@ export default {
             this.selectedInd.push(industry);
         },
         setSteps({option}) {
-
+            const step = this.vuexSteps.find(item => item.title === option);
+            const position = this.selectedStepsTitles.indexOf(option);
+            if(position !== -1) {
+                 return this.selectedSteps.splice(position, 1);
+            }
+            this.selectedSteps.push(step);
         },
         async getAllPricelists() {
             try {
@@ -250,6 +242,7 @@ export default {
     computed: {
         ...mapGetters({
             vuexPricelists: "getPricelists",
+            vuexSteps: "getVuexSteps",
             currentPrice: "getCurrentPrice"
         }),
         pricelists() {
