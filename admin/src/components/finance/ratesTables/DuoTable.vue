@@ -79,6 +79,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     mixins: [crudIcons, scrollDrop, ratesTable],
     props: {
+        rateForm: { type: String },
+        defaultStepSymbol: { type: String },
         fullInfo: { type: Array, default: () => [] },
         industries: { type: Array, default: () => [] },
         selectedSteps: { type: Array, default: () => [] },
@@ -92,8 +94,7 @@ export default {
                 {label: "Industry", headerKey: "headerIndustry", key: "industry", width: 194, padding: "0"},
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
-            ],
-            defaultStepSymbol: "translation"
+            ]
         }
     },
     methods: {

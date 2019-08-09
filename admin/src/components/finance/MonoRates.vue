@@ -90,7 +90,7 @@ export default {
             storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
-            setAllMonoStepsForRates: "setAllMonoStepsForRates"
+            setAllStepsForRates: "setAllStepsForRates"
         })
     },
     computed: {

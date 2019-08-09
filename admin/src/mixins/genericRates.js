@@ -92,11 +92,7 @@ export default {
         },
         setAllSteps() {
             const stepIds = this.vuexSteps.filter(item => item.calculationUnit === this.calcUnit).map(item => item._id);
-            if(this.rateForm === "monoRates") { 
-                this.setAllMonoStepsForRates(stepIds);
-            } else {
-                this.calcUnit === 'Words' ? this.setAllDuoStepsForRates({prop: 'wordsRates', stepIds}) : this.setAllDuoStepsForRates({prop: 'hoursRates', stepIds});
-            }
+            this.setAllStepsForRates({prop: this.rateForm, stepIds});
         },
         defaultRates() {
             const packageSteps = this.vuexSteps.filter(item => item.calculationUnit === this.calcUnit);

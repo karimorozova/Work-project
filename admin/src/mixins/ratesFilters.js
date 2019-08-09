@@ -48,11 +48,7 @@ export default {
             if(this.industryFilter.length && this.industryFilter[0].name !== 'All') {
                 result = result.filter(item => this.hasIndustry(item.industries))
             }
-            if(this.rateForm === "monoRates") {
-                this.storeMonoRates(result)
-            } else {
-                this.rateForm === 'wordsRates' ? this.storeWordsRates(result) : this.storeHoursRates(result);
-            }
+            this.storePriceRates({prop: this.rateForm, value: result});
         },
         hasIndustry(industries) {
             return industries.find(item => this.industryFilterNames.indexOf(item.name) !== -1);

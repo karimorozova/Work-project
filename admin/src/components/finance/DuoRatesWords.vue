@@ -18,6 +18,8 @@
         .duo-rates__button
             Button(value="Import rates" @clicked="showImportRates")
     DuoTable(
+        :rateForm="rateForm"
+        :defaultStepSymbol="defaultStepSymbol"
         :fullInfo="fullInfo"
         :industries="industries"
         :selectedSteps="selectedSteps"
@@ -72,7 +74,7 @@ export default {
             storePriceRates: "storePriceRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
-            setAllDuoStepsForRates: "setAllDuoStepsForRates"
+            setAllStepsForRates: "setAllStepsForRates"
         })
     },
     computed: {
