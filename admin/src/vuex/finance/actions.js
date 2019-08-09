@@ -3,26 +3,12 @@ import Vue from "vue";
 export const addFinanceProperty = ({commit, rootState}, payload) => {
     rootState.a.currentProject.finance = {...rootState.a.currentProject.finance, 'Select': payload};
 };
-export const storeDuoRates = ({commit}, payload) => commit('setDuoRates', payload);
+export const storeWordsRates = ({commit}, payload) => commit('setWordsRates', payload);
+export const storeHoursRates = ({commit}, payload) => commit('setHoursRates', payload);
 export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
-export const getDuoCombinations = async ({commit, state}, payload) => {
-    commit('startRequest');
-    try {
-        const id = state.currentPrice._id;
-        const result = await Vue.http.get(`/service/parsed-rates?form=Duo&id=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
-            if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
-        })
-        commit('setDuoRates', rates);
-        commit('endRequest');
-    } catch(err) {
-        commit('endRequest');
-        throw new Error("Error on getting Duo rates");
-    }
-}
+
 export const addSeveralMonoRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
@@ -89,8 +75,9 @@ export const setAllMonoStepsForRates = ({commit, state}, payload) => {
     commit("setMonoRates", combinations);
 }
 export const setAllDuoStepsForRates = ({commit, state}, payload) => {
-    const combinations = state.duoRates.map(item => {
-        for(let id of payload) {
+    const { prop, stepIds } = payload;
+    const combinations = state[prop].map(item => {
+        for(let id of stepIds) {
             if(Object.keys(item.rates).indexOf(id) === -1) {
                 item.rates[id] = { value: 0, min: 5, active: false }
             }
@@ -98,7 +85,11 @@ export const setAllDuoStepsForRates = ({commit, state}, payload) => {
         item.isChecked = false;
         return item;
     })
-    commit("setDuoRates", combinations);
+    if(prop === 'monoRates') {
+        commit("setMonoRates", combinations);
+    } else {
+        prop === 'wordsRates' ? commit("setWordsRates", combinations): commit("setHoursRates", combinations);
+    }
 }
 export const toggleRateCheck = ({commit, state}, payload) => {
     const { prop, id, isChecked } = payload;
@@ -108,7 +99,11 @@ export const toggleRateCheck = ({commit, state}, payload) => {
         }
         return item;
     })
-    prop === 'monoRates' ? commit("setMonoRates", combinations) : commit("setDuoRates", combinations);
+    if(prop === 'monoRates') {
+        commit("setMonoRates", combinations);
+    } else {
+        prop === 'wordsRates' ? commit("setWordsRates", combinations): commit("setHoursRates", combinations);
+    }
 }
 export const toggleAllRatesCheck = ({commit, state}, payload) => {
     const { prop, isChecked } = payload;

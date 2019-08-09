@@ -35,20 +35,24 @@ export default {
             this.setFilters({mainProp: "industryFilter", option: industry, index, isIndustry: true});
         },
         fitlterRates() {
-            let result = this.rateForm === "monoRates" ? this.currentPrice.monoRates : this.currentPrice.duoRates;
-            if(this.sourceSelect.length && this.sourceSelect[0] !== 'All') {
+            let result = this.currentPrice[this.rateForm];
+            if(this.sourceSelect.length && this.sourceSelect[0] !== 'All' && this.rateForm !== "monoRates") {
                 result = result.filter(item => this.sourceSelect.indexOf(item.source.symbol) !== -1);
             }
             if(this.targetSelect.length && this.targetSelect[0] !== 'All') {
                 result = result.filter(item => this.targetSelect.indexOf(item.target.symbol) !== -1);
             }
-            if(this.packageFilter.length && this.packageFilter[0] !== 'All') {
+            if(this.packageFilter.length && this.packageFilter[0] !== 'All' && this.rateForm === "monoRates") {
                 result = result.filter(item => this.packageFilter.indexOf(item.packageSize) !== -1);
             }
             if(this.industryFilter.length && this.industryFilter[0].name !== 'All') {
                 result = result.filter(item => this.hasIndustry(item.industries))
             }
-            this.rateForm === "monoRates" ? this.storeMonoRates(result) : this.storeDuoRates(result);
+            if(this.rateForm === "monoRates") {
+                this.storeMonoRates(result)
+            } else {
+                this.rateForm === 'wordsRates' ? this.storeWordsRates(result) : this.storeHoursRates(result);
+            }
         },
         hasIndustry(industries) {
             return industries.find(item => this.industryFilterNames.indexOf(item.name) !== -1);

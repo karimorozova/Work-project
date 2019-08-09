@@ -85,7 +85,8 @@ export default {
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
             this.storeMonoRates([...this.pricelists[index].monoRates]);
-            this.storeDuoRates([...this.pricelists[index].duoRates]);
+            this.storeWordsRates([...this.pricelists[index].wordsRates]);
+            this.storeHoursRates([...this.pricelists[index].hoursRates]);
             this.$router.push("/settings/rates");
         },
         async makeAction(index, key) {
@@ -236,7 +237,8 @@ export default {
             alertToggle: "alertToggle",
             storeCurrentPrice: "storeCurrentPrice",
             storeMonoRates: "storeMonoRates",
-            storeDuoRates: "storeDuoRates",
+            storeWordsRates: "storeWordsRates",
+            storeHoursRates: "storeHoursRates",
             storePricelists: "storePricelists"
         })
     },

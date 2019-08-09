@@ -18,9 +18,9 @@
         .duo-rates__button
             Button(value="Import rates" @clicked="showImportRates")
     DuoTable(
+        :fullInfo="fullInfo"
         :industries="industries"
         :selectedSteps="selectedSteps"
-        :fullInfo="fullInfo"
         @addNewRow="addNewRow"
         @refreshRates="refreshRates"
     )
@@ -53,9 +53,9 @@ export default {
     },
     data() {
         return {
-            defaultStepSymbol: "translation",
-            rateForm: "duoRates",
-            calcUnit: "Words"
+            defaultStepSymbol: "qa",
+            rateForm: "hoursRates",
+            calcUnit: "Hours"
         }
     },
     methods: {
@@ -69,7 +69,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            storeDuoRates: "storeDuoRates",
+            storeHoursRates: "storeHoursRates",
             deletePriceRates: "deletePriceRates",
             getSteps: "getSteps",
             setAllDuoStepsForRates: "setAllDuoStepsForRates"
@@ -78,7 +78,7 @@ export default {
     computed: {
         ...mapGetters({
             vuexSteps: "getVuexSteps",
-            fullInfo: "getDuoRates",
+            fullInfo: "getHoursRates",
             currentPrice: "getCurrentPrice"
         })
     },

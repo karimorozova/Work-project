@@ -79,6 +79,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     mixins: [crudIcons, scrollDrop, ratesTable],
     props: {
+        fullInfo: { type: Array, default: () => [] },
         industries: { type: Array, default: () => [] },
         selectedSteps: { type: Array, default: () => [] },
     },
@@ -92,7 +93,7 @@ export default {
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
             ],
-            defaultStepSymbol: "translation",
+            defaultStepSymbol: "translation"
         }
     },
     methods: {
@@ -101,7 +102,7 @@ export default {
             alertToggle: "alertToggle",
             toggleRateCheck: "toggleRateCheck",
             toggleAllRatesCheck: "toggleAllRatesCheck",
-            saveMonoRates: "saveMonoRates",
+            savePricelistRates: "savePricelistRates",
             deletePriceRate: "deletePriceRate"
         }),
         async checkErrors(index) {
@@ -118,7 +119,6 @@ export default {
     computed: {
         ...mapGetters({
             steps: "getVuexSteps",
-            fullInfo: "getDuoRates",
             currentPrice: "getCurrentPrice"
         })
     },

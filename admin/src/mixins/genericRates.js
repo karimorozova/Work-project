@@ -74,7 +74,12 @@ export default {
             this.targetSelect = ["All"];
             this.packageFilter = ["All"];
             this.industryFilter = [{name: "All"}];
-            this.rateForm === 'duoRates' ? this.storeDuoRates(this.currentPrice.duoRates) : this.storeMonoRates(this.currentPrice.monoRates);
+            if(this.rateForm === 'monoRates') {
+                this.storeMonoRates(this.currentPrice.monoRates);
+            } else {
+                this.calcUnit === 'Words' ? this.storeWordsRates(this.currentPrice.duoRates) : this.storeHoursRates(this.currentPrice.duoRates);
+            }
+             
             this.setAllSteps();
         },
         async setDefaultStep() {
@@ -91,7 +96,11 @@ export default {
         },
         setAllSteps() {
             const stepIds = this.vuexSteps.filter(item => item.calculationUnit === this.calcUnit).map(item => item._id);
-            this.rateForm === "duoRates" ? this.setAllDuoStepsForRates(stepIds) : this.setAllMonoStepsForRates(stepIds);
+            if(this.rateForm === "monoRates") { 
+                this.setAllMonoStepsForRates(stepIds);
+            } else {
+                this.calcUnit === 'Words' ? this.setAllDuoStepsForRates({prop: 'wordsRates', stepIds}) : this.setAllDuoStepsForRates({prop: 'hoursRates', stepIds});
+            }
         },
         defaultRates() {
             const packageSteps = this.vuexSteps.filter(item => item.calculationUnit === this.calcUnit);

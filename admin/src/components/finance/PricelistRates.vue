@@ -19,27 +19,28 @@
                         span Wordcount
                         img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': isWordcountDrop}") 
                     .finance-rates__rates-drop(v-if="isWordcountDrop")
-                        DuoRates(@addSevLangs="addSevLangs")
+                        DuoRatesWords
             .finance-rates__block(:class="{'finance-rates_straight-angle': isHoursDrop}")
                 .finance-rates__open-rates
                     .finance-rates__select(@click="(e) => toggleRates(e, 'isHoursDrop')")
                         span Hours
                         img.finance-rates__image(src="../../assets/images/Other/open.png" :class="{'finance-rates_reverse': isHoursDrop}") 
                     .finance-rates__rates-drop(v-if="isHoursDrop")
-                        DuoRates(@addSevLangs="addSevLangs")
-        Addseverallangs(v-if="isAddSeveral"
-            origin="global"
-            :isAvailablePairs="isAvailablePairs"
-            @checkCombinations="checkCombinations"
-            @closeSeveral="closeSevLangs")
+                        DuoRatesHours
+        //- Addseverallangs(v-if="isAddSeveral"
+        //-     origin="global"
+        //-     :isAvailablePairs="isAvailablePairs"
+        //-     @checkCombinations="checkCombinations"
+        //-     @closeSeveral="closeSevLangs")
         AvailablePairs(v-if="isAvailablePairs"
-        :list="langPairs"
-        @addLangs="addCombinations"
-        @closeList="closeLangPairs")
+            :list="langPairs"
+            @addLangs="addCombinations"
+            @closeList="closeLangPairs")
 </template>
 
 <script>
-import DuoRates from "./DuoRates";
+import DuoRatesWords from "./DuoRatesWords";
+import DuoRatesHours from "./DuoRatesHours";
 import MonoRates from "./MonoRates";
 import Addseverallangs from "./Addseverallangs";
 import Button from "../Button";
@@ -105,13 +106,6 @@ export default {
         goBack() {
             this.$router.go(-1);
         },
-        async getAllServices() {
-            try {
-                if(!this.services.length) {
-                    await this.getServices();
-                }
-            } catch(err) {}
-        },
         ...mapActions({
             alertToggle: "alertToggle",
             storeDuoRates: "storeDuoRates",
@@ -129,13 +123,13 @@ export default {
     },
     components: {
         MonoRates,
-        DuoRates,
+        DuoRatesWords,
+        DuoRatesHours,
         Addseverallangs,
         Button,
         AvailablePairs
     },
     created() {
-        this.getAllServices();
         this.getSteps();
     }
 };

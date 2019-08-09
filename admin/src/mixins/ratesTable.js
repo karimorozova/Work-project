@@ -81,8 +81,7 @@ export default {
                 prev[cur] = {...this.currentInfo.rates[cur], value, min};
                 return {...prev};
             }, {})
-            this.rateForm === 'duoRates' ? await this.saveDuoRates({...this.currentInfo, rates})
-                : await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm});
+            await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm});
             this.$emit("refreshRates");
             this.cancelEdition();
         },

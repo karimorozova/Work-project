@@ -2,7 +2,6 @@ const { Languages, Services } = require("../models/");
 const { getAfterUpdate, getClient } = require("./getClients");
 const { 
     getPricelist, 
-    parseIndustries, 
     replaceRates, 
     replaceFromPrice, 
     includeAllIndustries, 
@@ -12,19 +11,19 @@ const {
     updateCombIndustries } = require("../rates");
 
 async function getClientRates({client, form}) {
-    const combinations = form === "Duo" ? client.languageCombinations.filter(item => item.source)
-    : client.languageCombinations.filter(item => !item.source);
-    try {
-        const ratesServices = await Services.find({languageForm: form});
-        const serviceIds = ratesServices.map(item => item.id);
-        let fullInfo = [];
-        for(let rate of combinations) {
-            fullInfo.push(...parseIndustries(rate, serviceIds, form));    
-        }
-        return fullInfo;
-    } catch(err) {
-        console.log("from function getClientRates " + err);   
-    }
+    // const combinations = form === "Duo" ? client.languageCombinations.filter(item => item.source)
+    // : client.languageCombinations.filter(item => !item.source);
+    // try {
+    //     const ratesServices = await Services.find({languageForm: form});
+    //     const serviceIds = ratesServices.map(item => item.id);
+    //     let fullInfo = [];
+    //     for(let rate of combinations) {
+    //         fullInfo.push(...parseIndustries(rate, serviceIds, form));    
+    //     }
+    //     return fullInfo;
+    // } catch(err) {
+    //     console.log("from function getClientRates " + err);   
+    // }
 }
 
 async function updateClientRates(ratesInfo) {

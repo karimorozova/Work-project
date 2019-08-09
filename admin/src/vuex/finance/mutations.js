@@ -1,6 +1,12 @@
 export const mutations = {
-    setDuoRates(state, payload) {
-        state.duoRates = payload.sort((a,b) => {
+    setWordsRates(state, payload) {
+        state.wordsRates = payload.sort((a,b) => {
+            if(a.target.lang > b.target.lang) return 1;
+            if(a.target.lang < b.target.lang) return -1;
+        });;
+    },
+    setHoursRates(state, payload) {
+        state.hoursRates = payload.sort((a,b) => {
             if(a.target.lang > b.target.lang) return 1;
             if(a.target.lang < b.target.lang) return -1;
         });;
