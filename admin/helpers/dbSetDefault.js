@@ -6,8 +6,6 @@ const {
   Services,
   Industries,
   Pricelist,
-  Duorate,
-  Monorate,
   Timezones,
   LeadSource,
   Group,
