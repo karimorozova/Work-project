@@ -2,6 +2,7 @@
 .mono-rates
     .filters
         RatesFilters(
+            :entity="entity"
             form="Mono"
             :targetSelect="targetSelect"
             :selectedSteps="selectedSteps"
@@ -20,6 +21,9 @@
         .mono-rates__button
             Button(value="Import rates" @clicked="showImportRates")
     MonoTable(
+        :entity="entity"
+        :isClient="isClient"
+        :isVendor="!isClient"
         :industries="industries"
         :packages="packages"
         :selectedSteps="selectedSteps"
@@ -36,21 +40,21 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
-    AddseveralMono(v-if="isImportRates" 
-        :steps="filteredSteps"
-        :packages="packages"
-        @addSeveralRates="addSeveralRates"
-        @closeSeveral="closeImportRates")
+    //- AddseveralMono(v-if="isImportRates" 
+    //-     :steps="filteredSteps"
+    //-     :packages="packages"
+    //-     @addSeveralRates="addSeveralRates"
+    //-     @closeSeveral="closeImportRates")
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
-import RatesFilters from "./RatesFilters";
-import MonoTable from "./ratesTables/MonoTable";
-import SelectSingle from "../SelectSingle";
-import ApproveModal from "../ApproveModal";
-import Button from "../Button";
-import AddseveralMono from "./AddseveralMono";
+import RatesFilters from "../RatesFilters";
+import MonoTable from "../ratesTables/MonoTable";
+import SelectSingle from "@/components/SelectSingle";
+import ApproveModal from "@/components/ApproveModal";
+import Button from "@/components/Button";
+import AddseveralMono from "../AddseveralMono";
 import { mapGetters, mapActions } from "vuex";
 import ratesFilters from "@/mixins/ratesFilters";
 import genericRates from "@/mixins/genericRates";
@@ -58,7 +62,8 @@ import genericRates from "@/mixins/genericRates";
 export default {
     mixins: [ratesFilters, genericRates],
     props: {
-        entity: {type: Object}
+        entity: {type: Object},
+        isClient: {type: Boolean, default: true}
     },
     data() {
         return {
@@ -76,11 +81,14 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
+        getLanguages() {
+
+        },
         ...mapActions([
             "alertToggle",
             "addSeveralPriceRates",
             "storePriceRates",
-            "deletePriceRates",
+            "deleteClientRates",
             "getSteps",
             "setAllStepsForRates"
         ])
@@ -89,7 +97,6 @@ export default {
         ...mapGetters({
             vuexSteps: "getVuexSteps",
             fullInfo: "getMonoRates",
-            currentPrice: "getCurrentPrice"
         })
     },
     components: {

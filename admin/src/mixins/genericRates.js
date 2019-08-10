@@ -44,7 +44,12 @@ export default {
             if(!checked.length) return;
             const checkedIds = checked.map(item => item._id);
             try {
-                await this.deletePriceRates({checkedIds, prop: this.rateForm});
+                if(!this.entity) {
+                    await this.deletePriceRates({checkedIds, prop: this.rateForm});
+                } else {
+                    this.isClient ? await this.deletClientRates({checkedIds, prop: this.rateForm})
+                        : await this.deletVendorRates({checkedIds, prop: this.rateForm})
+                }
                 this.refreshRates();
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot delete rates.', isShow: true, type: 'error'});

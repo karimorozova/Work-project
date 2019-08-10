@@ -22,14 +22,6 @@ async function updateClientRates(client, rateInfo) {
     }
 }
 
-async function updateMonoRates(client, info) {
-    
-}
-
-async function updateDuoRates(client, info) {
-    
-}
-
 async function deleteRate(deleteInfo, id) {
     // const {clientId, industries, servicesIds} = deleteInfo;
     // try {

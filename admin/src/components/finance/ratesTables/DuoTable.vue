@@ -45,6 +45,7 @@
                     template(v-if="currentActive === index")
                         .duo-table__drop-menu
                             IndustrySelect(
+                                :entity="entity"
                                 @scrollDrop="scrollDrop"
                                 :selectedInd="currentInfo.industries" 
                                 :filteredIndustries="industriesNames"
@@ -80,6 +81,9 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     mixins: [crudIcons, scrollDrop, ratesTable],
     props: {
+        entity: { type: Object },
+        isClient: { type: Boolean, default: false },
+        isVendor: { type: Boolean, default: false },
         rateForm: { type: String },
         defaultStepSymbol: { type: String },
         fullInfo: { type: Array, default: () => [] },
@@ -99,14 +103,18 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            getSteps: "getSteps",
-            alertToggle: "alertToggle",
-            toggleRateCheck: "toggleRateCheck",
-            toggleAllRatesCheck: "toggleAllRatesCheck",
-            savePricelistRates: "savePricelistRates",
-            deletePriceRate: "deletePriceRate"
-        }),
+        ...mapActions([
+            'getSteps',
+            'alertToggle',
+            'toggleRateCheck',
+            'toggleAllRatesCheck',
+            'savePricelistRates',
+            'saveClientRates',
+            'saveVendorRates',
+            'deletePriceRate',
+            'deleteClientRate',
+            'deleteVendorRate'
+        ]),
         async checkErrors() {
             this.errors = [];
             if(!this.currentInfo.source.lang) this.errors.push("Please, set the source language");

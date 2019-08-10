@@ -52,18 +52,29 @@ router.post('/rates', async (req, res) => {
     }
 })
 
-router.delete('/rate/:id', async (req, res) => {
-    const deleteInfo = {...req.body};
-    const { id } = req.params;
-    if(id === "undefined") {
-        return res.send("Deleted");
-    }
+router.post('/remove-rate', async (req, res) => {
+    const { clientId, rateId, prop } = req.body;
     try {
-        const updatedClient = await deleteRate(deleteInfo, id);
+        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+            $pull: {[prop]: {'_id': rateId}}    
+        })
         res.send(updatedClient);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting rates of Client");
+        res.status(500).send("Error on deleting rate of Client");
+    }
+})
+
+router.post('/remove-rates', async (req, res) => {
+    const { clientId, checkedIds, prop } = req.body;
+    try {
+        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+            $pull: {[prop]: {'_id': {$in: checkedIds}}}    
+        })
+        res.send(updatedClient);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rate of Client");
     }
 })
 

@@ -47,10 +47,10 @@
 import ClickOutside from "vue-click-outside";
 import RatesFilters from "./RatesFilters";
 import DuoTable from "./ratesTables/DuoTable";
-import SelectSingle from "../SelectSingle";
-import Button from "../Button";
+import SelectSingle from "@/components/SelectSingle";
+import Button from "@/components/Button";
 import Addseverallangs from "./Addseverallangs";
-import ApproveModal from "../ApproveModal";
+import ApproveModal from "@/components/ApproveModal";
 import ratesFilters from "@/mixins/ratesFilters";
 import genericRates from "@/mixins/genericRates";
 import { mapGetters, mapActions } from "vuex";
@@ -76,14 +76,14 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            storePriceRates: "storePriceRates",
-            deletePriceRates: "deletePriceRates",
-            getSteps: "getSteps",
-            setAllStepsForRates: "setAllStepsForRates",
-            addSeveralPriceRates: "addSeveralPriceRates"
-        })
+        ...mapActions([
+            "alertToggle",
+            "storePriceRates",
+            "deletePriceRates",
+            "getSteps",
+            "setAllStepsForRates",
+            "addSeveralPriceRates"
+        ])
     },
     computed: {
         ...mapGetters({

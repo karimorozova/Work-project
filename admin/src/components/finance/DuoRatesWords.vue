@@ -76,14 +76,14 @@ export default {
                 rates: {...this.defaultRates()},
             });
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            storePriceRates: "storePriceRates",
-            deletePriceRates: "deletePriceRates",
-            getSteps: "getSteps",
-            setAllStepsForRates: "setAllStepsForRates",
-            addSeveralPriceRates: "addSeveralPriceRates"
-        })
+        ...mapActions([
+            "alertToggle",
+            "storePriceRates",
+            "deletePriceRates",
+            "getSteps",
+            "setAllStepsForRates",
+            "addSeveralPriceRates"
+        ])
     },
     computed: {
         ...mapGetters({

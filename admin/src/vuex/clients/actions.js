@@ -43,27 +43,30 @@ export const saveClientRates = async ({commit, dispatch, state}, payload) => {
     }
 }
 export const deleteClientRate = async ({commit, dispatch}, payload) => {
-    commit("startRequest");
+    commit('startRequest');
     try {
-        await dispatch('deleteClientsCheckedRate', payload);
-        const { languageForm } = payload.deletedRate;
-        commit("endRequest");
+        const { id, prop } = payload;
+        const clientId = state.currentClient._id;
+        const result = await Vue.http.post('/clientsapi/remove-rate', { clientId, rateId: id, prop });
+        dispatch("storeCurrentClient", result.body);
     } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on deleting rate");
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
     }
 }
 
-export const deleteClientsCheckedRate = async ({commit, dispatch, state}, payload) => {
-    commit("startRequest");
+export const deleteClientRates = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
     try {
-        const deletedRate = { ...payload.deletedRate, clientId: state.currentClient._id};
-        const result = await Vue.http.delete(`/clientsapi/rate/${payload.id}`, {body: deletedRate});
-        dispatch('storeCurrentClient', result.body);
-        commit("endRequest");
+        const { checkedIds, prop } = payload;
+        const clientId = state.currentClient._id;
+        const result = await Vue.http.post('/clientsapi/remove-rates', { clientId, checkedIds, prop });
+        dispatch("storeCurrentClient", result.body);
     } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on deleting rate");
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
     }
 }
 

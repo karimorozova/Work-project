@@ -10,6 +10,9 @@ export const mutations = {
             state[prop] = value.sort((a,b) => {
                 if(a.source.lang > b.source.lang) return 1;
                 if(a.source.lang < b.source.lang) return -1;
+            }).sort((a,b) => {
+                if(a.target.lang > b.target.lang) return 1;
+                if(a.target.lang < b.target.lang) return -1;
             });
         }
     },

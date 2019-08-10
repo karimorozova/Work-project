@@ -84,14 +84,14 @@ export default {
         getLanguages() {
 
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            addSeveralPriceRates: "addSeveralPriceRates",
-            storePriceRates: "storePriceRates",
-            deleteClientRates: "deleteClientRates",
-            getSteps: "getSteps",
-            setAllStepsForRates: "setAllStepsForRates"
-        })
+        ...mapActions([
+            "alertToggle",
+            "addSeveralPriceRates",
+            "storePriceRates",
+            "deleteClientRates",
+            "getSteps",
+            "setAllStepsForRates"
+        ])
     },
     computed: {
         ...mapGetters({
