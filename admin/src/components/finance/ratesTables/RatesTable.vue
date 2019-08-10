@@ -4,7 +4,7 @@
         .table__thead-row
             .table__thead-cell(v-for="field of fields" :style="{width: field.width+'px'}")
                 slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 6}")
+    .table__tbody(:class="[{'tbody_visible-overflow': tableData.length < 6}, bodyClass]")
         .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width+'px', padding: field.padding}")
                 slot(:name="field.key" :row="row" :index="index")
@@ -48,6 +48,9 @@ export default {
         isApproveModal: {
             type: Boolean,
             default: false
+        },
+        bodyClass: {
+            type: String
         }
     },
     data() {

@@ -85,7 +85,7 @@
             input.button(type="button" value="Delete" @click="approveVendorDelete")
         Addseverallangs(v-if="isAddSeveral"
             origin="vendor"
-            :who="currentVendor"
+            :entity="currentVendor"
             @checkCombinations="checkCombinations"
             @closeSeveral="closeSevLangs"
         )
@@ -145,14 +145,14 @@ export default {
             this.isAvailablePairs = false;
         },
         async checkCombinations({ priceId, combinations }) {
-            this.addSeveralPriceId = priceId;
-            try {
-                const result = await this.$http.post("/prices/combinations", { priceId, combinations });
-                this.langPairs = [...result.body];
-                this.isAvailablePairs = true;
-            } catch(err) {
-                this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
-            }
+            // this.addSeveralPriceId = priceId;
+            // try {
+            //     const result = await this.$http.post("/prices/combinations", { priceId, combinations });
+            //     this.langPairs = [...result.body];
+            //     this.isAvailablePairs = true;
+            // } catch(err) {
+            //     this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
+            // }
         },
         async addCombinations() {
             this.closeLangPairs();

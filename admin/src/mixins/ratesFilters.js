@@ -35,7 +35,7 @@ export default {
             this.setFilters({mainProp: "industryFilter", option: industry, index, isIndustry: true});
         },
         fitlterRates() {
-            let result = this.currentPrice[this.rateForm];
+            let result = this.entity ? this.entity[this.rateForm] : this.currentPrice[this.rateForm];
             if(this.sourceSelect.length && this.sourceSelect[0] !== 'All' && this.rateForm !== "monoRates") {
                 result = result.filter(item => this.sourceSelect.indexOf(item.source.symbol) !== -1);
             }

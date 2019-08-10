@@ -1,4 +1,4 @@
-const { Pricelist, Industries, Services } = require("../models");
+const { Pricelist } = require("../models");
 
 async function saveNewPricelist(pricelist) {
     const { name, isActive, isClientDefault, isVendorDefault, copyName } = pricelist;

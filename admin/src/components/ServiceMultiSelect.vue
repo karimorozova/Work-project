@@ -34,7 +34,7 @@ export default {
             type: Number,
             default: 0
         },
-        who: {
+        entity: {
             type: Object
         }
     },

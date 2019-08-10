@@ -29,49 +29,17 @@ export const updateLeadContact = ({commit}, payload) => commit('setLeadContact',
 export const storeClientDuoRates = ({commit}, payload) => commit('setClientDuoRates', payload);
 export const storeClientMonoRates = ({commit}, payload) => commit('setClientMonoRates', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
-export const getClientDuoCombinations = async ({commit, dispatch, state}) => {
-    commit("startRequest");
-    try {
-        const id = state.currentClient._id;
-        const result = await Vue.http.get(`/clientsapi/rates?form=Duo&clientId=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
-            if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
-        })
-        dispatch('storeClientDuoRates', rates);
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on getting Duo rates")
-    }
-}
-export const getClientMonoCombinations = async ({commit, dispatch, state}) => {
-    commit("startRequest");
-    try {
-        const id = state.currentClient._id;
-        const result = await Vue.http.get(`/clientsapi/rates?form=Mono&clientId=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
-            if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;
-        })
-        dispatch('storeClientMonoRates', rates);
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on getting Mono rates")
-    }
-}
+
 export const saveClientRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
-        const ratesInfo = { ...payload, clientId: state.currentClient._id}
-        const result = await Vue.http.post('/clientsapi/rates', { ratesInfo });
+        const clientId = state.currentClient._id;
+        const result = await Vue.http.post('/clientsapi/rates', { clientId, ...payload });
         dispatch('storeCurrentClient', result.body);
-        ratesInfo.languageForm === "Duo" ? await dispatch('getClientDuoCombinations') : await dispatch('getClientMonoCombinations');
-        commit("endRequest");
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on saving rate");
     }
 }
 export const deleteClientRate = async ({commit, dispatch}, payload) => {
@@ -79,7 +47,6 @@ export const deleteClientRate = async ({commit, dispatch}, payload) => {
     try {
         await dispatch('deleteClientsCheckedRate', payload);
         const { languageForm } = payload.deletedRate;
-        languageForm === "Duo" ? await dispatch('getClientDuoCombinations') : await dispatch('getClientMonoCombinations');
         commit("endRequest");
     } catch(err) {
         commit("endRequest");
@@ -107,7 +74,7 @@ export const updateClientRate = async ({commit, dispatch}, payload) => {
         const updatedClient = await Vue.http.post("/clientsapi/combination", { step, rate });
         dispatch("storeClient", updatedClient.body);
     } catch(err) {
-        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
     } finally {
         commit("endRequest");
     }

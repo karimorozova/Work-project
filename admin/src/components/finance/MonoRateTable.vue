@@ -27,7 +27,7 @@
                                 img(v-if="info.industry.icon && currentActive !== index" :src="info.industry.icon")
                                 span.title-tooltip {{ info.industry.name }}
                             .inner-component(v-if="currentActive === index")
-                                IndustrySelect(:parentIndex="index" :who="entity" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
+                                IndustrySelect(:parentIndex="index" :entity="entity" :selectedInd="industrySelected" :filteredIndustries="infoIndustries" @chosenInd="changeIndustry" @scrollDrop="scrollDrop")
                         template(v-for="(service, servKey) in info.industry.rates")
                             td(v-if="servIndex(servKey) !== -1" :class="{'add-shadow': currentActive === index}")
                                 .monorates-table__rates-column

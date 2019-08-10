@@ -1,36 +1,35 @@
 <template lang="pug">
-.duo-rates
+.mono-rates
     .filters
         RatesFilters(
-            :sourceSelect="sourceSelect"
+            form="Mono"
             :targetSelect="targetSelect"
             :serviceSelect="serviceSelect"
             :industryFilter="industryFilter"
-            @setSourceFilter="setSourceFilter"
+            :packageFilter="packageFilter"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
             @setServiceFilter="setServiceFilter"
+            @setPackageFilter="setPackageFilter"
         )
-    .add-button
-        input(type="button" @click="addSevLangs" value="Add several languages")
-    .duo-rates__action(v-if="isAnyChecked")
+    .mono-rates__action(v-if="isAnyChecked")
         SelectSingle(:options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
-    DuoRateTable(
+    MonoRateTable(
         origin="client"
         :entity="client"
         :fullInfo="fullInfo"
-        :sourceSelect="sourceSelect"
         :targetSelect="targetSelect"
         :industryFilter="industryFilter"
         :filterIndustry="filterIndustry"
         :serviceSelect="serviceSelect"
+        :packageFilter="packageFilter"
         :isErrors="isAnyError"
         @showEditingError="showEditingError"
         @showValidationErrors="showValidationErrors"
         @showNotUniqueWarning="showNotUniqueWarning"
         @addNewRow="addNewRow"
     )
-    .duo-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
+    .mono-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
             text="Are you sure?"
             approveValue="Yes"
@@ -43,10 +42,10 @@
         .message
             p The combination you want to add already exists!
             .message__info-list
-                li Source: 
-                    span.info-item {{ uniqueComb.source }}
                 li Target: 
                     span.info-item {{ uniqueComb.target }}
+                li Package: 
+                    span.info-item {{ uniqueComb.package }}
             span.close(@click="closeUnique") +
     .edition-message(v-if="isEditing")
         .message
@@ -64,7 +63,7 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import RatesFilters from "../../finance/RatesFilters";
-import DuoRateTable from "../../finance/DuoRateTable";
+import MonoRateTable from "../../finance/MonoRateTable";
 import SelectSingle from "../../SelectSingle";
 import ApproveModal from "../../ApproveModal";
 import { mapGetters, mapActions } from "vuex";
@@ -74,22 +73,18 @@ export default {
         client: {
             type: Object
         },
-        sevLangs: {
-            type: Boolean,
-            default: false
-        }
     },
     data() {
         return {
             isAllChecked: false,
-            sourceSelect: ["EN-GB"],
             targetSelect: ["All"],
+            packageFilter: ["All"],
             industryFilter: [{name: "All"}],
             industrySelected: [{name: 'All'}],
             serviceSelect: [{}],
             heads: [
-                { title: "Source Language" },
-                { title: "Target Language" },
+                { title: "Language" },
+                { title: "Package" },
                 { title: "Industry" },
                 { title: "" }
             ],
@@ -97,7 +92,7 @@ export default {
             selectedAction: "",
             isNotUnique: false,
             isEditing: false,
-            uniqueComb: {source: "", target: ""},
+            uniqueComb: {source: "", package: ""},
             showValidError: false,
             validErrors: [],
         }
@@ -126,7 +121,7 @@ export default {
                         await this.deleteRate(info);
                     } 
                 }
-                await this.getDuoCombinations();
+                await this.getMonoCombinations();
                 this.alertToggle({message: 'Rates deleted.', isShow: true, type: 'success'});
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
@@ -136,16 +131,13 @@ export default {
             const deletedRate = {
                 servicesIds: this.servicesIds,
                 industries: [info.industry],
-                languageForm: "Duo"
+                languageForm: "Mono"
             }
             try {
                 await this.deleteCheckedRate({ id: info.id, deletedRate });
             } catch(err) {
                 this.alertToggle({message: 'Internal serer error. Cannot delete rates.', isShow: true, type: 'error'});
             }
-        },
-        addSevLangs() {
-            this.$emit('addSevLangs', this.fullInfo);
         },
         closeErrorMessage() {
             this.showValidError = false;
@@ -155,6 +147,12 @@ export default {
         },
         closeEditionMessage() {
             this.isEditing = false
+        },
+        changeRate(e, servKey) {
+            this.changedRate[servKey].value = +event.target.value
+        },
+        toggleActive(index, key) {
+            this.changedRate[key].active = !this.changedRate[key].active;
         },
         setServiceFilter({service}) {
             const index = this.serviceSelect.findIndex(item => item._id === service._id);
@@ -167,22 +165,6 @@ export default {
                 this.defaultService();
             }
             this.serviceSelect.sort((a, b) => {return a.sortIndex - b.sortIndex});
-        },
-        setSourceFilter({lang}) {
-            if(this.sourceSelect[0] == 'All') {
-                this.sourceSelect = [];
-                this.sourceSelect.push(lang.symbol)
-            } else {
-                let index = this.sourceSelect.indexOf(lang.symbol);
-                if(index != -1) {
-                    this.sourceSelect.splice(index, 1);
-                } else {
-                    this.sourceSelect.push(lang.symbol)
-                }
-            }
-            if(lang.lang == 'All' || !this.sourceSelect.length) {
-                this.sourceSelect = ['All'];
-            }
         },
         setTargetFilter({lang}) {
             if(this.targetSelect[0] == 'All') {
@@ -222,6 +204,18 @@ export default {
                 })
             }
         },
+        setPackageFilter({option}) {
+            const position = this.packageFilter.indexOf(option);
+            this.packageFilter = this.packageFilter.filter(item => item !== 'All');
+            if(position !== -1) {
+                this.packageFilter.splice(position, 1);
+            } else {
+                this.packageFilter.push(option);
+            }
+            if(option === 'All' || !this.packageFilter.length) {
+                return this.packageFilter = ['All']
+            }
+        },
         showEditingError() {
             this.isEditing = true;
         },
@@ -234,18 +228,17 @@ export default {
             this.isNotUnique = true;    
         },
         addNewRow() {
-            this.sourceSelect = ["All"];
             this.targetSelect = ["All"];
             this.industryFilter = [{name: "All"}];
             this.fullInfo.push({
-                sourceLanguage: "", 
-                targetLanguage: "", 
+                targetLanguage: "",
+                package: "",
                 industry: {name: "All", rates: {...this.defaultRates()}},
             });
         },
         async getAllCombinations() {
             try {
-                await this.getDuoCombinations();
+                await this.getMonoCombinations();
             } catch(err) {
                 this.alertToggle({message: 'Internal server error. Cannot get rates.', isShow: true, type: 'error'});
             }
@@ -256,14 +249,16 @@ export default {
                     await this.getServices();
                 }
             } catch(err) { }
-            let defaultServ = this.vuexServices.find(item => item.symbol === 'tr');
+            let defaultServ = this.vuexServices.find(item => {
+                return item.symbol === 'co';
+            });
             this.serviceSelect = [defaultServ];
         },
         defaultRates() {
             const duoServices = this.vuexServices.sort((a, b) => { 
                 if(a.sortIndex < b.sortIndex) return -1; 
                 if(a.sortIndex > b.sortIndex) return 1;
-            }).filter(item => item.languageForm === "Duo");
+            }).filter(item => item.languageForm === "Mono");
             return duoServices.reduce((init, cur) => {
                 const key = cur._id;
                 init[key] = {value: 0, active: false};
@@ -272,8 +267,7 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            storeClient: "storeClient",
-            storeDuoRates: "storeClientDuoRates",
+            storeMonoRates: "storeClientMonoRates",
             deleteCheckedRate: "deleteClientsCheckedRate",
             getServices: "getServices"
         })
@@ -281,10 +275,10 @@ export default {
     computed: {
         ...mapGetters({
             vuexServices: "getVuexServices",
-            fullInfo: "getClientDuoCombs"
+            fullInfo: "getClientMonoCombs"
         }),
         servicesIds() {
-            return this.serviceSelect.length ? this.serviceSelect.map(item => item._id) : [];
+            return this.serviceSelect.map(item => item._id);
         },
         infoIndustries() {
             let result = [];
@@ -332,7 +326,7 @@ export default {
     },
     components: {
         RatesFilters,
-        DuoRateTable,
+        MonoRateTable,
         SelectSingle,
         ApproveModal
     },
@@ -344,14 +338,13 @@ export default {
         this.getAllCombinations();
     },
     beforeDestroy() {
-        this.storeDuoRates([]);
+        this.storeMonoRates([]);
     }
 };
 </script>
 
 <style lang="scss" scoped>
-
-.duo-rates {
+.mono-rates {
     position: relative;
     font-family: MyriadPro;
     width: 872px;
@@ -374,6 +367,8 @@ export default {
 .filters {
     margin-bottom: 20px;
     margin-top: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #67573E;
 }
 
 .add-button {

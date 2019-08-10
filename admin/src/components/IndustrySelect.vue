@@ -30,7 +30,7 @@ export default {
             type: Number,
             default: 0
         },
-        who: {
+        entity: {
             type: Object
         },
         customClass: {
@@ -63,7 +63,7 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            if(!this.who) {
+            if(!this.entity) {
                 try {
                 const result = await this.$http.get('/api/industries');
                 this.industries = result.data;
@@ -77,7 +77,7 @@ export default {
                     this.errors.push(err)
                 }
             } else {
-                let industries = JSON.stringify(this.who.industries);
+                let industries = JSON.stringify(this.entity.industries);
                 industries = JSON.parse(industries);
                 this.industries = industries;
                 this.industries.unshift({name: "All"})

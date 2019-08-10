@@ -35,9 +35,9 @@ async function getAfterAddSeveralRates({priceId, ratesData, prop}) {
 
 /////// Mono rates managing start ///////
 
-async function manageMonoPairRates({packageSize, industries, target, rates, priceRates}) {
+async function manageMonoPairRates({packageSize, industries, target, rates, priceRates, entity}) {
     try {
-        const allIndustries = await Industries.find();
+        const allIndustries = entity ? entity.industries : await Industries.find();
         if(industries[0].name === 'All') {
             if(!priceRates.length) {
                 return [{packageSize, industries: allIndustries, target, rates}]
@@ -103,9 +103,9 @@ async function getAfterAddSeveralMono(priceId, ratesData) {
 
 /////// Duo rates managing start ///////
 
-async function manageDuoPairRates({source, target, industries, rates, priceRates}) {
+async function manageDuoPairRates({source, target, industries, rates, priceRates, entity}) {
     try {
-        const allIndustries = await Industries.find();
+        const allIndustries = entity ? entity.industries : await Industries.find();
         if(industries[0].name === 'All') {
             if(!priceRates.length) {
                 return [{source, target, industries: allIndustries, rates}]
@@ -211,4 +211,4 @@ function getRatesToCopy(pairRates, stepsIds) {
     }, {})
 }
 
-module.exports = { getAfterRatesSaved, getAfterAddSeveralRates }
+module.exports = { getAfterRatesSaved, getAfterAddSeveralRates, manageMonoPairRates, manageDuoPairRates }

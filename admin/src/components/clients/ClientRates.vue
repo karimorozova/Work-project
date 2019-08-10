@@ -6,7 +6,7 @@
                     span.client-rates__label Package
                     img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMonoRatesShow}") 
                 .client-rates__drop(v-if="isMonoRatesShow")
-                    MonoRates(:client="client")
+                    MonoRates(:entity="client" :isClient="true")
         .client-rates__block(:class="{'client-rates_straight-angle': isDuoRatesShow}")
             .client-rates__open
                 .client-rates__select(@click="duoRatesToggler")
@@ -27,6 +27,7 @@
 import DuoRates from "./rates/DuoRates";
 import MonoRates from "./rates/MonoRates";
 import FinanceMatrix from "../FinanceMatrix";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -42,6 +43,10 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            storePriceRates: "storePriceRates",
+            getSteps: "getSteps"
+        }),
         addSevLangs({serviceTitle}) {
             this.$emit('addSevLangs', {serviceTitle})
         },  
@@ -65,6 +70,14 @@ export default {
         DuoRates,
         MonoRates,
         FinanceMatrix
+    },
+    created() {
+        this.getSteps();
+    },
+    mounted() {
+        this.storePriceRates({prop: 'monoRates', value: this.client.monoRates})
+        this.storePriceRates({prop: 'wordsRates', value: this.client.wordsRates})
+        this.storePriceRates({prop: 'hoursRates', value: this.client.hoursRates})
     }
 }
 </script>
@@ -108,6 +121,7 @@ export default {
     &__drop {
         padding: 5px 2px 15px 2px;
         border-top: 1px solid rgba(103, 87, 62, 0.5);
+        max-height: 450px;
     }
 }
 

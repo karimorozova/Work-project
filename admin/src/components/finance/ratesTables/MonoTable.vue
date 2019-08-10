@@ -7,6 +7,7 @@
                 :areErrors="areErrors"
                 :errors="errors"
                 @closeErrors="closeErrors"
+                :bodyClass="ratesBodyClass"
             )
                 .mono-table__header(slot="headerCheck" slot-scope="{ field }")
                     CheckBox(:isChecked="isAllChecked" @check="(e) => toggleAllChecks(e, true)" @uncheck="(e) => toggleAllChecks(e, false)" :isWhite="true")
@@ -44,6 +45,7 @@
                     template(v-if="currentActive === index")
                         .mono-table__drop-menu
                             IndustrySelect(
+                                :entity="entity"
                                 @scrollDrop="scrollDrop"
                                 :selectedInd="currentInfo.industries" 
                                 :filteredIndustries="industriesNames"
@@ -80,6 +82,9 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     mixins: [crudIcons, scrollDrop, ratesTable],
     props: {
+        entity: { type: Object },
+        isClient: { type: Boolean, default: false },
+        isVendor: { type: Boolean, default: false },
         industries: { type: Array, default: () => [] },
         selectedSteps: { type: Array, default: () => [] },
         packages: { type: Array, default: () => [] }
@@ -95,18 +100,23 @@ export default {
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
             ],
             defaultStepSymbol: "copywriting",
-            rateForm: 'monoRates'
+            rateForm: 'monoRates',
+            ratesBodyClass: 'mono-rates-table'
         }
     },
     methods: {
-        ...mapActions({
-            getSteps: "getSteps",
-            alertToggle: "alertToggle",
-            toggleRateCheck: "toggleRateCheck",
-            toggleAllRatesCheck: "toggleAllRatesCheck",
-            savePricelistRates: "savePricelistRates",
-            deletePriceRate: "deletePriceRate"
-        }),
+        ...mapActions([
+            'getSteps',
+            'alertToggle',
+            'toggleRateCheck',
+            'toggleAllRatesCheck',
+            'savePricelistRates',
+            'saveClientRates',
+            'saveVendorRates',
+            'deletePriceRate',
+            'deleteClientRate',
+            'deleteVendorRate'
+        ]),
         async checkErrors() {
             this.errors = [];
             if(!this.currentInfo.target.lang) this.errors.push("Please, set the language");
@@ -124,7 +134,7 @@ export default {
             steps: "getVuexSteps",
             fullInfo: "getMonoRates",
             currentPrice: "getCurrentPrice"
-        }),
+        })
     },
     components: {
         LanguagesSelect,

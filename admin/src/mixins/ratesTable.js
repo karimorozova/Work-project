@@ -13,8 +13,9 @@ export default {
             return drop && this.fullInfo.length >= 4;
         },
         handleScroll() {
-            let element = document.querySelector('.table__tbody');
-            element.scrollTop = element.scrollHeight;
+            const querySelector = `.${this.ratesBodyClass}`;
+            let element = document.querySelector(querySelector);
+            element.scrollTop = 400;
         },
         toggleCheck(e, index, bool) {
             const id = this.fullInfo[index]._id;
@@ -69,7 +70,12 @@ export default {
                 return this.cancelEdition(index);
             }
             try {
-                await this.deletePriceRate({id: this.fullInfo[index]._id, prop: this.rateForm});
+                if(!this.isClient && !this.isVendor) {
+                    await this.deletePriceRate({id: this.fullInfo[index]._id, prop: this.rateForm});
+                } else {
+                    this.isClient ? await this.deleteClientRate({...this.currentInfo, rates, prop: this.rateForm})
+                        : await this.deleteVendorRate({...this.currentInfo, rates, prop: this.rateForm})    
+                }
                 this.$emit("refreshRates");
                 this.cancelEdition();
             } catch(err) { }
@@ -81,7 +87,12 @@ export default {
                 prev[cur] = {...this.currentInfo.rates[cur], value, min};
                 return {...prev};
             }, {})
-            await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm});
+            if(!this.isClient && !this.isVendor) {
+                await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm});
+            } else {
+                this.isClient ? await this.saveClientRates({...this.currentInfo, rates, prop: this.rateForm})
+                    : await this.saveVendorRates({...this.currentInfo, rates, prop: this.rateForm})
+            }
             this.$emit("refreshRates");
             this.cancelEdition();
         },

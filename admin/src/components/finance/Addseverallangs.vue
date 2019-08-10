@@ -37,7 +37,7 @@
                 .add-several__select-block
                     span.add-several__title Industries
                     .add-several__drop-menu
-                        IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="setIndustry" :who="who")
+                        IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="setIndustry" :entity="entity")
         .add-several__submit
             input.add-several__button(type="button" @click="checkErrors" value="Submit")
     ValidationErrors(v-if="areErrors" isAbsolute :errors="errors" @closeErrors="closeErrors")
@@ -57,7 +57,7 @@ export default {
             type: String,
             default: 'global'
         },
-        who: {
+        entity: {
             type: Object
         },
         isAvailablePairs: {

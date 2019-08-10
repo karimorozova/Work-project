@@ -7,6 +7,7 @@
                 :areErrors="areErrors"
                 :errors="errors"
                 @closeErrors="closeErrors"
+                :bodyClass="ratesBodyClass"
             )
                 .duo-table__header(slot="headerCheck" slot-scope="{ field }")
                     CheckBox(:isChecked="isAllChecked" @check="(e) => toggleAllChecks(e, true)" @uncheck="(e) => toggleAllChecks(e, false)" :isWhite="true")
@@ -121,7 +122,10 @@ export default {
         ...mapGetters({
             steps: "getVuexSteps",
             currentPrice: "getCurrentPrice"
-        })
+        }),
+        ratesBodyClass() {
+            return this.rateForm === 'wordsRates' ? 'words-rates-table' : 'hours-rates-table'; 
+        }
     },
     components: {
         LanguagesSelect,

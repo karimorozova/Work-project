@@ -58,7 +58,7 @@ import genericRates from "@/mixins/genericRates";
 export default {
     mixins: [ratesFilters, genericRates],
     props: {
-        
+        entity: {type: Object}
     },
     data() {
         return {

@@ -16,7 +16,7 @@
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu
-            IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
+            IndustrySelect(:entity="entity" :selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .rates-filters__item
         label.rates-filters__title Steps
         .rates-filters__drop-menu
@@ -30,6 +30,9 @@ import SelectMulti from "../SelectMulti";
 
 export default {
     props: {
+        entity: {
+            type: Object
+        },
         form: {
             type: String
         },

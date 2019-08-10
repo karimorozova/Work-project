@@ -201,37 +201,20 @@ function defaultClient(client) {
   return client.name.indexOf('default') !== -1;
 }
 
-async function clientLangs() {
-  try {
-    let clients = await Clients.find().populate('industries');
-    let duoRates = await Duorate.find().populate('industries.industry');
-    let monoRates = await Monorate.find().populate('industries.industry');
-    for(let client of clients) {
-      if(!client.languageCombinations.length && defaultClient(client)) {
-        client.languageCombinations = [];
-            for(let i = 0; i < 5; i++) {
-              const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));
-              const monoIndex = Math.floor(Math.random() * (monoRates.length - 1));
-              const duoIndustries = duoRates[i].industries.filter(item => item.industry.id === client.industries[0].id);
-              const monoIndustries = monoRates[monoIndex].industries.filter(item => item.industry.id === client.industries[0].id);
-              client.languageCombinations.push({
-                source: duoRates[duoIndex].source,
-                target: duoRates[duoIndex].target,
-                industries: duoIndustries
-              });
-              client.languageCombinations.push({
-                target: monoRates[monoIndex].target,
-                package: monoRates[monoIndex].package,
-                industries: monoIndustries
-              });
+async function fillClientsRates() {
+    try {
+        let clients = await Clients.find().populate('industries');
+        for(let client of clients) {
+            const combinations = [...client.monoRates, ...client.wordsRates, ...client.hoursRates];
+            if(!combinations.length && defaultClient(client)) {
+                const { monoRates, wordsRates, hoursRates } = await getRates(client.industries);
+                await Clients.updateOne({name: client.name}, {monoRates, wordsRates, hoursRates});
             }
-          await Clients.updateOne({name: client.name}, {languageCombinations: client.languageCombinations});
         }
+    } catch(err) {
+        console.log(err);
+        console.log("Error on filling clients language combinations");
     }
-  } catch(err) {
-    console.log(err);
-    console.log("Error on filling clients language combinations");
-  }
 }
 
 function vendors() {
@@ -266,37 +249,8 @@ function defaultVendor(vendor) {
   return vendor.firstName.indexOf('default') !== -1;
 }
 
-async function vendorLangs() {
-  try {
-    let vendors = await Vendors.find().populate('industries');
-    let duoRates = await Duorate.find().populate('industries.industry');
-    let monoRates = await Monorate.find().populate('industries.industry');
-    for(let vendor of vendors) {
-      if(!vendor.languageCombinations.length && defaultVendor(vendor)) {
-        vendor.languageCombinations = [];
-            for(let i = 0; i < 5; i++) {
-              const duoIndex = Math.floor(Math.random() * (duoRates.length - 1));
-              const monoIndex = Math.floor(Math.random() * (monoRates.length - 1));
-              const duoIndustries = duoRates[i].industries.filter(item => item.industry.id === vendor.industries[0].id);
-              const monoIndustries = monoRates[monoIndex].industries.filter(item => item.industry.id === vendor.industries[0].id);
-              vendor.languageCombinations.push({
-                source: duoRates[duoIndex].source,
-                target: duoRates[duoIndex].target,
-                industries: duoIndustries
-              });
-              vendor.languageCombinations.push({
-                target: monoRates[monoIndex].target,
-                package: monoRates[monoIndex].package,
-                industries: monoIndustries
-              });
-            }
-          await Vendors.updateOne({name: vendor.name}, {languageCombinations: vendor.languageCombinations});
-        }
-    }
-  } catch(err) {
-    console.log(err);
-    console.log("Error on filling vendors language combinations");
-  }
+async function fillVendorsRates() {
+
 }
 
 function languages() {
@@ -427,11 +381,10 @@ function services() {
     })
 }
 
-async function getRates() {
+async function getRates(industries) {
     try {
         const languages = await Languages.find().limit(10);
         const englishLang = await Languages.findOne({symbol: "EN-GB"});
-        const industries = await Industries.find();
         const wordsSteps = await Step.find({calculationUnit: "Words"});
         const hoursSteps = await Step.find({calculationUnit: "Hours"});
         const monoSteps = await Step.find({calculationUnit: "Packages"});
@@ -480,7 +433,8 @@ function getMonoCombinations({languages, industries, steps}) {
 
 async function fillPricelist() {
   try {
-    const { wordsRates, hoursRates, monoRates } = await getRates();
+    const industries = await Industries.find();
+    const { wordsRates, hoursRates, monoRates } = await getRates(industries);
     let pricelists = await Pricelist.find();
     if(!pricelists.length) {
       await Pricelist.create({
@@ -516,9 +470,9 @@ async function checkCollections() {
     await requests();
     await projects();
     await users();
-    // await clientLangs();
-    // await vendorLangs();
     await fillPricelist();
+    await fillClientsRates();
+    await fillVendorsRates();
 }
 
 module.exports = checkCollections();

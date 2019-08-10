@@ -75,7 +75,8 @@ export default {
             this.packageFilter = ["All"];
             this.industryFilter = [{name: "All"}];
             const prop = this.rateForm;
-            this.storePriceRates({prop, value: this.currentPrice[prop]});             
+            const value = this.entity ? this.entity[prop] : this.currentPrice[prop];
+            this.storePriceRates({prop, value});             
             this.setAllSteps();
         },
         async setDefaultStep() {
@@ -102,6 +103,9 @@ export default {
             }, {});
         },
         async getIndustries() {
+            if(this.entity) {
+                return this.industries = this.entity.industries.map(item => item._id).sort();
+            }
             try {
                 const result = await this.$http.get("/api/industries");
                 this.industries = result.body.map(item => item._id).sort();
@@ -115,7 +119,7 @@ export default {
                 this.packages = result.body.map(item => item.size);
                 this.packages.unshift("All");
             } catch(err) {
-
+                this.alertToggle({message: "Erorr on getting Packages", isShow: true, type: "error"});
             }
         }
     },
