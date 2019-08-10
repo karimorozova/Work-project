@@ -1,4 +1,4 @@
-const { getPricelist, getPricelists, getUpdatedPricelist } = require("./getrates");
+const { getPricelist, getPricelists, getUpdatedPricelist } = require("./getPrices");
 const { saveNewPricelist, deletePricelist } = require("./pricelists");
 const { getAfterRatesSaved, getAfterAddSeveralRates } = require("./ratesmanage");
 

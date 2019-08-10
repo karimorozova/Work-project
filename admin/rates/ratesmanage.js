@@ -1,5 +1,5 @@
 const { Industries } = require("../models");
-const { getUpdatedPricelist, getPricelist } = require("./getrates");
+const { getUpdatedPricelist, getPricelist } = require("./getPrices");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
     const { prop, packageSize, industries, source, target, rates } = rateInfo;
