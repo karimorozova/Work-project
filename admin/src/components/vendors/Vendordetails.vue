@@ -351,8 +351,8 @@ export default {
 
 .vendor-info {
     padding: 40px;
-    box-sizing: border-box;
     position: relative;
+    width: 1020px;
 }
 
 .title {
@@ -363,16 +363,15 @@ export default {
     margin: 20px 10px 40px 10px;
     padding: 20px;
     box-shadow: 0 0 15px #67573e9d;
-    width: 900px;
 }
 
 .gen-info {
     display: flex;
     justify-content: space-between;
     &__block {
-        width: 36%;
+        width: 32%;
         &:first-child {
-            width: 22%;
+            width: 20%;
             text-align: center;
         }
     }
@@ -434,8 +433,9 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-left: 10px;
-    width: 900px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    width: 1020px;
 }
 
 .button {

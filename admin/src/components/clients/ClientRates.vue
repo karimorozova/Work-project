@@ -55,21 +55,12 @@ export default {
         ...mapActions({
             storePriceRates: "storePriceRates",
             getSteps: "getSteps"
-        }),
-        addSevLangs({serviceTitle}) {
-            this.$emit('addSevLangs', {serviceTitle})
-        },  
+        }), 
         toggleRates(e, prop) {
             this[prop] = !this[prop];
         },
-        duoRatesToggler() {
-            this.isDuoRatesShow = !this.isDuoRatesShow;
-        },
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
-        },
-        ratesUpdate(data) {
-            this.$emit('ratesUpdate', data);
         },
         setMatrixData({value, key}) {
             this.$emit("setMatrixData", {value, key});

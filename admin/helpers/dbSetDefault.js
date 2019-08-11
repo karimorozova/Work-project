@@ -195,8 +195,8 @@ function clients() {
       })
 }
 
-function defaultClient(client) {
-  return client.name.indexOf('default') !== -1;
+function isDefaultValue(entity) {
+  return entity.name ? entity.name.indexOf('default') !== -1 : entity.firstName.indexOf('default') !== -1;
 }
 
 async function fillClientsRates() {
@@ -204,7 +204,7 @@ async function fillClientsRates() {
         let clients = await Clients.find().populate('industries');
         for(let client of clients) {
             const combinations = [...client.monoRates, ...client.wordsRates, ...client.hoursRates];
-            if(!combinations.length && defaultClient(client)) {
+            if(!combinations.length && isDefaultValue(client)) {
                 const { monoRates, wordsRates, hoursRates } = await getRates(client.industries);
                 await Clients.updateOne({name: client.name}, {monoRates, wordsRates, hoursRates});
             }
@@ -243,12 +243,20 @@ function vendors() {
   })
 }
 
-function defaultVendor(vendor) {
-  return vendor.firstName.indexOf('default') !== -1;
-}
-
 async function fillVendorsRates() {
-
+    try {
+        let vendors = await Vendors.find().populate('industries');
+        for(let vendor of vendors) {
+            const combinations = [...vendor.monoRates, ...vendor.wordsRates, ...vendor.hoursRates];
+            if(!combinations.length && isDefaultValue(vendor)) {
+                const { monoRates, wordsRates, hoursRates } = await getRates(vendor.industries);
+                await Vendors.updateOne({firstName: vendor.firstName}, {monoRates, wordsRates, hoursRates});
+            }
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error on filling clients language combinations");
+    }
 }
 
 function languages() {
