@@ -26,7 +26,6 @@ export const storeClientProperty = ({commit}, payload) => commit('setClientPrope
 export const storeClientContact = ({commit}, payload) => commit('addContact', payload);
 export const updateClientContact = ({commit}, payload) => commit('updateContact', payload);
 export const updateLeadContact = ({commit}, payload) => commit('setLeadContact', payload);
-export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
 
 export const saveClientRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
@@ -61,6 +60,20 @@ export const deleteClientRates = async ({commit, dispatch, state}, payload) => {
         const clientId = state.currentClient._id;
         const result = await Vue.http.post('/clientsapi/remove-rates', { clientId, checkedIds, prop });
         dispatch("storeCurrentClient", result.body);
+    } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
+
+export const importRatesToClient = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
+    try {
+        const clientId = state.currentClient._id;
+        const { ratesData, prop } = payload;
+        const result = await Vue.http.post('/clientsapi/import-rates', { ratesData, clientId, prop });
+        dispatch('storeCurrentClient', result.body);
     } catch(err) {
         dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
     } finally {

@@ -8,11 +8,11 @@ async function updateVendorRates(vendor, rateInfo) {
         let updatedRates = [];
         if(prop === 'monoRates') {
             updatedRates = await manageMonoPairRates({
-                packageSize, industries, target, rates, priceRates: vendor[prop], entity: vendor
+                packageSize, industries, target, rates, currentRates: vendor[prop], entity: vendor
             });
         } else {
             updatedRates = await manageDuoPairRates({
-                source, target, industries, rates, priceRates: vendor[prop], entity: vendor
+                source, target, industries, rates, currentRates: vendor[prop], entity: vendor
             });
         }
         return await getVendorAfterUpdate({"_id": vendor.id}, {[prop]: updatedRates});

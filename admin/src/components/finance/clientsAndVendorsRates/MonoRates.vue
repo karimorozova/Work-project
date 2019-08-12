@@ -40,11 +40,12 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
-    //- AddseveralMono(v-if="isImportRates" 
-    //-     :steps="filteredSteps"
-    //-     :packages="packages"
-    //-     @addSeveralRates="addSeveralRates"
-    //-     @closeSeveral="closeImportRates")
+    AddseveralMono(v-if="isImportRates" 
+        :entity="entity"
+        :steps="filteredSteps"
+        :packages="packages"
+        @addSeveralRates="addSeveralRates"
+        @closeSeveral="closeImportRates")
 </template>
 
 <script>
@@ -86,7 +87,8 @@ export default {
         },
         ...mapActions([
             "alertToggle",
-            "addSeveralPriceRates",
+            "importRatesToPrice",
+            "importRatesToClient",
             "storePriceRates",
             "deleteClientRates",
             "getSteps",

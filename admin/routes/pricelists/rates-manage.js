@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterAddSeveralRates } = require('../../rates');
+const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterRatesImported } = require('../../rates');
 
 router.post('/combination', async (req, res) => {
     const { priceId, ...rateInfo } = req.body;
@@ -40,14 +40,14 @@ router.post('/remove-rates', async (req, res) => {
     }
 })
 
-router.post('/several-rates', async (req, res) => {
+router.post('/import-rates', async (req, res) => {
     const { priceId, ratesData, prop } = req.body;
     try {
-        const updatedPricelist = await getAfterAddSeveralRates({priceId, ratesData, prop});
+        const updatedPricelist = await getAfterRatesImported({priceId, ratesData, prop});
         res.send(updatedPricelist);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting rate from pricelist");
+        res.status(500).send("Error on importing rates to pricelist");
     }
 })
 

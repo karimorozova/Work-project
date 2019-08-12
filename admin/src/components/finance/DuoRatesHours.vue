@@ -82,7 +82,7 @@ export default {
             "deletePriceRates",
             "getSteps",
             "setAllStepsForRates",
-            "addSeveralPriceRates"
+            "importRatesToPrice"
         ])
     },
     computed: {

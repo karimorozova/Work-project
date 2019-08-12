@@ -7,12 +7,12 @@ export const addFinanceProperty = ({commit, rootState}, payload) => {
 export const storePriceRates = ({commit}, payload) => commit('SET_PRICE_RATES', payload);
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 
-export const addSeveralPriceRates = async ({commit, dispatch, state}, payload) => {
+export const importRatesToPrice = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
         const priceId = state.currentPrice._id;
         const { ratesData, prop } = payload;
-        const updatedPrice = await Vue.http.post('/rates-manage/several-rates', { ratesData, priceId, prop });
+        const updatedPrice = await Vue.http.post('/rates-manage/import-rates', { ratesData, priceId, prop });
         commit('setCurrentPrice', updatedPrice.body);
     } catch(err) {
         dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});

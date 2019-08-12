@@ -69,7 +69,12 @@ export default {
         },
         async addSeveralRates({ratesData}) {
             try {
-                await this.addSeveralPriceRates({ratesData, prop: this.rateForm});
+                if(!this.entity) {
+                    await this.importRatesToPrice({ratesData, prop: this.rateForm});
+                } else {
+                    this.isClient ? await this.importRatesToClient({ratesData, prop: this.rateForm})
+                        : await this.importRatesToVendor({ratesData, prop: this.rateForm})
+                }
                 this.refreshRates();
                 this.isImportRates = false;
             } catch(err) { }

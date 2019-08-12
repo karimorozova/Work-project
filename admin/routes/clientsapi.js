@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload, clientMail } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
-const { getClient, getClients, updateClientRates, getClientAfterUpdate, addSeveralCombinations, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
+const { getClient, getClients, updateClientRates, getClientAfterUpdate, importRates, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -90,14 +90,14 @@ router.post('/combination', async (req, res) => {
     }
 })
 
-router.post('/several-langs', async (req, res) => {
-    const { priceId, combinations, clientId } = req.body;
+router.post('/import-rates', async (req, res) => {
+    const { clientId, ratesData, prop } = req.body;
     try {
-        const updatedClient = await addSeveralCombinations({priceId, clientId, combinations});
+        const updatedClient = await importRates({clientId, ratesData, prop});
         res.send(updatedClient);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several languages for Client");
+        res.status(500).send("Error on importing rates to Client");
     }
 })
 
