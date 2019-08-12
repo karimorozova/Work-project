@@ -1,5 +1,5 @@
 const { getClient, getClients, getClientAfterUpdate } = require('./getClients');
-const { updateClientRates, deleteRate, addSeveralCombinations, getClientAfterCombinationsUpdated } = require('./clientRates');
+const { updateClientRates, addSeveralCombinations, getClientAfterCombinationsUpdated } = require('./clientRates');
 const { updateClientInfo } = require('./info');
 const { getAfterTaskStatusUpdate } = require('./projects');
 
@@ -8,7 +8,6 @@ const clients = {
     getClients,
     updateClientRates,
     getClientAfterUpdate,
-    deleteRate,
     addSeveralCombinations,
     updateClientInfo,
     getAfterTaskStatusUpdate,

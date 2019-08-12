@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, getVendorRates, updateVendorRates, deleteRate, addSeveralCombinations, getVendorAfterCombinationsUpdated } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, updateVendorRates, addSeveralCombinations, getVendorAfterCombinationsUpdated } = require('../vendors');
 const { Vendors } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -42,22 +42,11 @@ router.post('/step-email', async (req, res) => {
     }
 })
 
-router.get('/rates', async (req, res) => {
-    const { vendorId, form } = req.query;
-    try {
-        let vendor = await getVendor({"_id": vendorId});
-        const rates = await getVendorRates({vendor, form});
-        res.send(rates);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting Vendor rates');
-    }
-})
-
 router.post('/rates', async (req, res) => {
-    const { ratesInfo } = req.body;
+    const { vendorId, ...rateInfo } = req.body;
     try {
-        const updatedVendor = await updateVendorRates(ratesInfo);
+        const vendor = await getVendor({"_id": vendorId});
+        const updatedVendor = await updateVendorRates(vendor, rateInfo);
         res.send(updatedVendor);
     } catch(err) {
         console.log(err);
@@ -65,18 +54,29 @@ router.post('/rates', async (req, res) => {
     }
 })
 
-router.delete('/rate/:id', async (req,res) => {
-    let  deleteInfo = {...req.body};
-    const { id } = req.params;
-    if(id === "undefined") {
-        return res.send("Deleted");
-    }
+router.post('/remove-rate', async (req, res) => {
+    const { vendorId, rateId, prop } = req.body;
     try {
-        const updatedVendor = await deleteRate(deleteInfo, id);
+        const updatedVendor = await getVendorAfterUpdate({"_id": vendorId}, {
+            $pull: {[prop]: {'_id': rateId}}    
+        })
         res.send(updatedVendor);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting rates of Vendor");
+        res.status(500).send("Error on deleting rate of Vendor");
+    }
+})
+
+router.post('/remove-rates', async (req, res) => {
+    const { vendorId, checkedIds, prop } = req.body;
+    try {
+        const updatedVendor = await getVendorAfterUpdate({"_id": vendorId}, {
+            $pull: {[prop]: {'_id': {$in: checkedIds}}}    
+        })
+        res.send(updatedVendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rate of Vendor");
     }
 })
 
@@ -88,7 +88,7 @@ router.post('/combination', async (req, res) => {
         res.send(updatedVendor);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding combination for Client");
+        res.status(500).send("Error on adding combination for Vendor");
     }
 })
 

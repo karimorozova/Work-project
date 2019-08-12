@@ -26,8 +26,6 @@ export const storeClientProperty = ({commit}, payload) => commit('setClientPrope
 export const storeClientContact = ({commit}, payload) => commit('addContact', payload);
 export const updateClientContact = ({commit}, payload) => commit('updateContact', payload);
 export const updateLeadContact = ({commit}, payload) => commit('setLeadContact', payload);
-export const storeClientDuoRates = ({commit}, payload) => commit('setClientDuoRates', payload);
-export const storeClientMonoRates = ({commit}, payload) => commit('setClientMonoRates', payload);
 export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
 
 export const saveClientRates = async ({commit, dispatch, state}, payload) => {
