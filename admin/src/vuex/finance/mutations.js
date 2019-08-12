@@ -8,12 +8,12 @@ export const mutations = {
             });
         } else {
             state[prop] = value.sort((a,b) => {
-                if(a.source.lang > b.source.lang) return 1;
-                if(a.source.lang < b.source.lang) return -1;
-            }).sort((a,b) => {
-                if(a.target.lang > b.target.lang) return 1;
-                if(a.target.lang < b.target.lang) return -1;
-            });
+                if(a.source.lang === b.source.lang) {
+                    return a.target.lang > b.target.lang ? 1 : -1
+                } else {
+                    return a.source.lang > b.source.lang ? 1 : -1
+                }
+            })
         }
     },
     setCurrentPrice(state, payload) {
