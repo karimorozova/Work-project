@@ -39,12 +39,13 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
-    //- Addseverallangs(v-if="isImportRates"
-    //-     :ratesName="rateForm"
-    //-     :steps="filteredSteps"
-    //-     :packages="packages"
-    //-     @addSeveralRates="addSeveralRates"
-    //-     @closeSeveral="closeImportRates")
+    Addseverallangs(v-if="isImportRates"
+        :entity="entity"
+        :ratesName="rateForm"
+        :steps="filteredSteps"
+        :packages="packages"
+        @addSeveralRates="addSeveralRates"
+        @closeSeveral="closeImportRates")
 </template>
 
 <script>
@@ -87,7 +88,8 @@ export default {
             "deleteClientRates",
             "getSteps",
             "setAllStepsForRates",
-            "importRatesToPrice"
+            "importRatesToPrice",
+            "importRatesToClient"
         ])
     },
     computed: {
