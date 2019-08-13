@@ -2,16 +2,16 @@ const { Industries } = require("../models");
 const { getUpdatedPricelist, getPricelist } = require("./getPrices");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
-    const { prop, packageSize, industries, source, target, rates } = rateInfo;
+    const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
     try {
         let updatedRates = [];
         if(prop === 'monoRates') {
             updatedRates = await manageMonoPairRates({
-                packageSize, industries, target, rates, currentRates: pricelist[prop]
+                stepsIds, packageSize, industries, target, rates, currentRates: pricelist[prop]
             });
         } else {
             updatedRates = await manageDuoPairRates({
-                source, target, industries, rates, currentRates: pricelist[prop]
+                stepsIds, source, target, industries, rates, currentRates: pricelist[prop]
             });
         }
         return await getUpdatedPricelist({"_id": pricelist.id}, {[prop]: updatedRates});
@@ -35,7 +35,7 @@ async function getAfterRatesImported({priceId, ratesData, prop}) {
 
 /////// Mono rates managing start ///////
 
-async function manageMonoPairRates({packageSize, industries, target, rates, currentRates, entity}) {
+async function manageMonoPairRates({stepsIds, packageSize, industries, target, rates, currentRates, entity}) {
     try {
         const allIndustries = entity ? entity.industries : await Industries.find();
         if(industries[0].name === 'All') {
@@ -46,13 +46,13 @@ async function manageMonoPairRates({packageSize, industries, target, rates, curr
                 if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
                 return true;
             });
-            updatedRates.push({target, packageSize, industries: allIndustries, rates});
+            updatedRates.push(...manageMonoAllIndustriesRates({stepsIds, target, packageSize, allIndustries, rates, currentRates}));
             return updatedRates;
         } else {
             if(!currentRates.length) {
                 return [{packageSize, industries, target, rates}]
             }
-            return manageMonoNotAllIndustriesRate({packageSize, industries, target, rates, currentRates})
+            return manageMonoNotAllIndustriesRate({stepsIds, packageSize, industries, target, rates, currentRates})
         }
     } catch(err) {
         console.log(err);
@@ -60,15 +60,25 @@ async function manageMonoPairRates({packageSize, industries, target, rates, curr
     }
 }
 
-function manageMonoNotAllIndustriesRate({packageSize, industries, target, rates, currentRates}) {
-    const industriesIds = industries.map(item => item._id);
+function manageMonoAllIndustriesRates({stepsIds, target, packageSize, allIndustries, rates, currentRates}) {
+    let samePairs = currentRates.filter(item => item.target.lang === target.lang && item.packageSize === packageSize);
+    if(!samePairs.length) {
+        return [...currentRates, {target, packageSize, industries: allIndustries, rates}]
+    }
+    let industries = allIndustries.map(item => {
+        return {...item._doc, _id: item.id}
+    })
+    return manageSamePairs({samePairs, rates, stepsIds, industries});
+}
+
+function manageMonoNotAllIndustriesRate({stepsIds, packageSize, industries, target, rates, currentRates}) {
     let updatedRates = currentRates.filter(item => {
         if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
         return true;
     });
     let samePairs = currentRates.filter(item => item.packageSize === packageSize && target.lang === item.target.lang);
     if(samePairs.length) {
-        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds, form: 'mono'}));
+        updatedRates.push(...manageSamePairs({stepsIds, samePairs, rates, industries}));
     } else {
         updatedRates.push({target, packageSize, industries, rates});  
     }
@@ -89,7 +99,7 @@ async function getAfterImportMono(priceId, ratesData) {
             let copiedRates = getRatesToCopy(pair.rates, stepsIds);
             const { packageSize, target } = pair;
             monoRates = await manageMonoPairRates({
-                packageSize, industries, target, rates: copiedRates, currentRates: monoRates
+                stepsIds, packageSize, industries, target, rates: copiedRates, currentRates: monoRates
             });
         }
         return await getUpdatedPricelist({"_id": priceId}, { monoRates });
@@ -103,7 +113,7 @@ async function getAfterImportMono(priceId, ratesData) {
 
 /////// Duo rates managing start ///////
 
-async function manageDuoPairRates({source, target, industries, rates, currentRates, entity}) {
+async function manageDuoPairRates({stepsIds, source, target, industries, rates, currentRates, entity}) {
     try {
         const allIndustries = entity ? entity.industries : await Industries.find();
         if(industries[0].name === 'All') {
@@ -114,13 +124,13 @@ async function manageDuoPairRates({source, target, industries, rates, currentRat
                 if(item.source.lang === source.lang && item.target.lang === target.lang) return false;
                 return true;
             });
-            updatedRates.push({source, target, industries: allIndustries, rates});
+            updatedRates.push(...manageDuoAllIndustriesRates({stepsIds, target, source, allIndustries, rates, currentRates}));
             return updatedRates;
         } else {
             if(!currentRates.length) {
                 return [{source, target, industries, rates}]
             }
-            return manageDuoNotAllIndustriesRate({source, target, industries, rates, currentRates})
+            return manageDuoNotAllIndustriesRate({stepsIds, source, target, industries, rates, currentRates})
         }
     } catch(err) {
         console.log(err);
@@ -128,15 +138,25 @@ async function manageDuoPairRates({source, target, industries, rates, currentRat
     }
 }
 
-function manageDuoNotAllIndustriesRate({source, target, industries, rates, currentRates}) {
-    const industriesIds = industries.map(item => item._id);
+function manageDuoAllIndustriesRates({stepsIds, target, source, allIndustries, rates, currentRates}) {
+    let samePairs = currentRates.filter(item => item.target.lang === target.lang && item.source.lang === source.lang);
+    if(!samePairs.length) {
+        return [...currentRates, {target, source, industries: allIndustries, rates}]
+    }
+    let industries = allIndustries.map(item => {
+        return {...item._doc, _id: item.id}
+    })
+    return manageSamePairs({samePairs, rates, stepsIds, industries});
+}
+
+function manageDuoNotAllIndustriesRate({stepsIds, source, target, industries, rates, currentRates}) {
     let updatedRates = currentRates.filter(item => {
         if(item.source.lang === source.lang && item.target.lang === target.lang) return false;
         return true;
     });
     let samePairs = currentRates.filter(item => item.source.lang === source.lang && target.lang === item.target.lang);
     if(samePairs.length) {
-        updatedRates.push(...manageSamePairs({samePairs, rates, industriesIds, form: 'duo'}));
+        updatedRates.push(...manageSamePairs({stepsIds, samePairs, rates, industries}));
     } else {
         updatedRates.push({source, target, industries, rates});  
     }
@@ -158,7 +178,7 @@ async function getAfterImportDuo({priceId, ratesData, prop}) {
             let copiedRates = getRatesToCopy(pair.rates, stepsIds);
             const { source, target } = pair;
             updatedRates = await manageDuoPairRates({
-                source, industries, target, rates: copiedRates, currentRates: updatedRates
+                stepsIds, source, industries, target, rates: copiedRates, currentRates: updatedRates
             });
         }
         return await getUpdatedPricelist({"_id": priceId}, { [prop]: updatedRates });
@@ -170,25 +190,72 @@ async function getAfterImportDuo({priceId, ratesData, prop}) {
 
 /////// Duo rates manage end ///////
 
-function manageSamePairs({samePairs, rates, industriesIds, form}) {
-    let sameRateIndex = samePairs.findIndex(item => areEqual(item.rates, rates));
-    let managedRates = samePairs.map((item, index) => {
-        let industries = [];
-        if(sameRateIndex === index) {
-            industries = item.industries.map(industry => industry.id);
-            industries.push(industriesIds);
-            industries = industries.filter((value, index, self) => self.indexOf(value) === index);    
+function updateCurrentRates({currentRates, newRates, stepsIds}) {
+    return Object.keys(currentRates).reduce((acc, cur) => {
+        if(stepsIds.indexOf(cur) !== -1) {
+            acc[cur] = newRates[cur];
         } else {
-            industries = item.industries.filter(industry => industriesIds.indexOf(industry.id) === -1);
+            acc[cur] = currentRates[cur];
         }
-        item.industries = industries;
-        return item;
-    })
-    if(sameRateIndex === -1) {
-        form === 'mono' ? managedRates.push({target: samePairs[0].target, packageSize: samePairs[0].packageSize, industries: industriesIds, rates})
-            : managedRates.push({source: samePairs[0].source, target: samePairs[0].target, industries: industriesIds, rates})
+        return {...acc}
+    }, {})
+}
+
+function manageSamePairs({stepsIds, samePairs, rates, industries}) {
+    let industriesIds = industries.map(item => item._id);
+    let updatedRates = [];
+    for(let i = 0; i < samePairs.length; i++) {
+        let pairIndustries = samePairs[i].industries.map(item => item.id);
+        let changingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) !== -1);
+        let remainingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) === -1);
+        let newRates = getNewRates(samePairs[i].rates, rates, stepsIds);
+        industriesIds = industriesIds.filter(item => pairIndustries.indexOf(item) === -1);
+        updatedRates.push({...samePairs[i]._doc, industries: remainingPairIndustries});
+        updatedRates.push({...samePairs[i]._doc, rates: newRates, industries: changingPairIndustries});
     }
-    return managedRates;
+    if(industriesIds.length) {
+        updatedRates.push({...samePairs[0]._doc, rates, industries: industries.map(item => item._id)})
+    }
+    updatedRates = updatedRates.filter(item => item.industries.length);
+    updatedRates = joinSameRatesIndustries(updatedRates);
+    return updatedRates;
+}
+
+function joinSameRatesIndustries(pairs) {
+    let joinedPairs = [...pairs];
+    for(let i = joinedPairs.length - 1; i >= 0; i--) {
+        const remainPairs = joinedPairs.slice(0, i);
+        if(remainPairs.length) {
+            for(let j = 0; j < remainPairs.length; j++) {
+                if(areEqual(remainPairs[j].rates, joinedPairs[i].rates)) {
+                    const industries = getUniqueIndustries([...joinedPairs[i].industries, ...remainPairs[j].industries]);
+                    joinedPairs[i].industries = industries;
+                    if(j < i) {
+                        joinedPairs.splice(j, 1);
+                        i--;
+                    } else {
+                        joinedPairs.splice(j-1, 1);
+                    }
+                }
+            }
+        }
+    }
+    return joinedPairs;
+}
+
+function getUniqueIndustries(industries) {
+    return industries.filter((val, index, self) => self.indexOf(val) === index)
+}
+
+function getNewRates(oldRates, newRates, stepsIds) {
+    return Object.keys(newRates).reduce((acc, cur) => {
+        if(stepsIds.indexOf(cur) !== -1) {
+            acc[cur] = newRates[cur];
+        } else {
+            acc[cur] = oldRates[cur];
+        }
+        return {...acc}
+    }, {})
 }
 
 function areEqual(itemRates, rates) {
@@ -201,13 +268,13 @@ function areEqual(itemRates, rates) {
 }
 
 function getRatesToCopy(pairRates, stepsIds) {
-    return Object.keys(pairRates).reduce((prev, cur) => {
+    return Object.keys(pairRates).reduce((acc, cur) => {
         if(stepsIds.indexOf(cur) !== -1) {
-            prev[cur] = pairRates[cur]
+            acc[cur] = pairRates[cur]
         } else {
-            prev[cur] = {value: 0, min: 5, active: false}
+            acc[cur] = {value: 0, min: 5, active: false}
         }
-        return {...prev}
+        return {...acc}
     }, {})
 }
 

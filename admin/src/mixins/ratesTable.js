@@ -88,10 +88,10 @@ export default {
                 return {...prev};
             }, {})
             if(!this.isClient && !this.isVendor) {
-                await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm});
+                await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm, stepsIds: this.stepsIds});
             } else {
-                this.isClient ? await this.saveClientRates({...this.currentInfo, rates, prop: this.rateForm})
-                    : await this.saveVendorRates({...this.currentInfo, rates, prop: this.rateForm})
+                this.isClient ? await this.saveClientRates({...this.currentInfo, rates, prop: this.rateForm, stepsIds: this.stepsIds})
+                    : await this.saveVendorRates({...this.currentInfo, rates, prop: this.rateForm, stepsIds: this.stepsIds})
             }
             this.$emit("refreshRates");
             this.cancelEdition();
@@ -135,6 +135,9 @@ export default {
         isAllIndusties(rateIndustries) {
             const rateIndustriesIds = rateIndustries.map(item => item._id).sort();
             return JSON.stringify(rateIndustriesIds) === JSON.stringify(this.industries);
+        },
+        isTogglerActive(rowRates, stepId, index) {
+            return this.currentActive === index ? this.currentInfo.rates[stepId].active : rowRates[stepId].active;
         },
         closeErrors() {
             this.areErrors = false;

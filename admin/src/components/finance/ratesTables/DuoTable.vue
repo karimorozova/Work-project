@@ -94,8 +94,8 @@ export default {
         return {
             fields: [
                 {label: "", headerKey: "headerCheck", key: "check", width: 28, padding: "0"},
-                {label: "Source Language", headerKey: "headerSource", key: "source", width: 212, padding: "0"},
-                {label: "Target Language", headerKey: "headerTarget", key: "target", width: 159, padding: "0"},
+                {label: "Source Language", headerKey: "headerSource", key: "source", width: 186, padding: "0"},
+                {label: "Target Language", headerKey: "headerTarget", key: "target", width: 185, padding: "0"},
                 {label: "Industry", headerKey: "headerIndustry", key: "industry", width: 194, padding: "0"},
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},

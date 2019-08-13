@@ -1,7 +1,7 @@
 <template lang="pug">
 .toggler(:class="customClass")
     label.switch
-        input(type="checkbox" :checked="isActive" :disabled="isDisabled" @change="toggle")
+        input.toggler__input(type="checkbox" :checked="isActive" :disabled="isDisabled" @change="toggle")
         span.slider
 </template>
 
@@ -37,7 +37,7 @@ export default {
   margin-bottom: 0
 }
 
-.switch input { 
+.switch .toggler__input { 
   opacity: 0;
   width: 0;
   height: 0;
@@ -67,15 +67,15 @@ export default {
   transition: .4s;
 }
 
-input:checked + .slider {
+input.toggler__input:checked + .slider {
   background-color: #4BA5A5;
 }
 
-input:focus + .slider {
+input.toggler__input:focus + .slider {
   box-shadow: 0 0 1px #4BA5A5;
 }
 
-input:checked + .slider:before {
+input.toggler__input:checked + .slider:before {
   transform: translateX(16px);
 }
 

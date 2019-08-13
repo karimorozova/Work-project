@@ -2,16 +2,16 @@ const { getClientAfterUpdate, getClient } = require("./getClients");
 const { manageMonoPairRates, manageDuoPairRates, getRatesToCopy } = require("../rates/ratesmanage");
 
 async function updateClientRates(client, rateInfo) {
-    const { prop, packageSize, industries, source, target, rates } = rateInfo;
+    const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
     try {
         let updatedRates = [];
         if(prop === 'monoRates') {
             updatedRates = await manageMonoPairRates({
-                packageSize, industries, target, rates, currentRates: client[prop], entity: client
+                stepsIds, packageSize, industries, target, rates, currentRates: client[prop], entity: client
             });
         } else {
             updatedRates = await manageDuoPairRates({
-                source, target, industries, rates, currentRates: client[prop], entity: client
+                stepsIds, source, target, industries, rates, currentRates: client[prop], entity: client
             });
         }
         return await getClientAfterUpdate({"_id": client.id}, {[prop]: updatedRates});

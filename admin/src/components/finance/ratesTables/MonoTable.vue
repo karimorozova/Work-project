@@ -59,7 +59,7 @@
                             span.mono-table__text min -&nbsp
                             span.mono-table__text(v-if="currentActive !== index") {{ row.rates[step._id].min }}
                             input.mono-table__input.mono-table_width-50(v-else v-model="currentInfo.rates[step._id].min")
-                        Toggler(:isActive="row.rates[step._id].active" :isDisabled="currentActive !== index" :customClass="{'toggler_opacity-07': currentActive !== index}" @toggle="toggleActive(step._id)")
+                        Toggler(:isActive="isTogglerActive(row.rates, step._id, index)" :isDisabled="currentActive !== index" :customClass="{'toggler_opacity-07': currentActive !== index}" @toggle="toggleActive(step._id)")
                 .mono-table__icons(slot="icons" slot-scope="{ row, index }")
                     img.mono-table__icon(v-for="(icon, key) in icons" :src="icon.icon" :class="{'mono-table_opacity': isActive(key, index)}" @click="makeAction(key, index)")
         .mono-table__add

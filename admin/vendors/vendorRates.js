@@ -3,16 +3,16 @@ const { getPricelist } = require("../rates");
 const { manageMonoPairRates, manageDuoPairRates } = require("../rates/ratesmanage");
 
 async function updateVendorRates(vendor, rateInfo) {
-    const { prop, packageSize, industries, source, target, rates } = rateInfo;
+    const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
     try {
         let updatedRates = [];
         if(prop === 'monoRates') {
             updatedRates = await manageMonoPairRates({
-                packageSize, industries, target, rates, currentRates: vendor[prop], entity: vendor
+                stepsIds, packageSize, industries, target, rates, currentRates: vendor[prop], entity: vendor
             });
         } else {
             updatedRates = await manageDuoPairRates({
-                source, target, industries, rates, currentRates: vendor[prop], entity: vendor
+                stepsIds, source, target, industries, rates, currentRates: vendor[prop], entity: vendor
             });
         }
         return await getVendorAfterUpdate({"_id": vendor.id}, {[prop]: updatedRates});
