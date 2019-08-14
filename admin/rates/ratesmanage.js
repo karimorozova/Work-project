@@ -63,7 +63,7 @@ async function manageMonoPairRates({stepsIds, packageSize, industries, target, r
 function manageMonoAllIndustriesRates({stepsIds, target, packageSize, allIndustries, rates, currentRates}) {
     let samePairs = currentRates.filter(item => item.target.lang === target.lang && item.packageSize === packageSize);
     if(!samePairs.length) {
-        return [...currentRates, {target, packageSize, industries: allIndustries, rates}]
+        return [{target, packageSize, industries: allIndustries, rates}]
     }
     let industries = allIndustries.map(item => {
         return {...item._doc, _id: item.id}
@@ -87,26 +87,48 @@ function manageMonoNotAllIndustriesRate({stepsIds, packageSize, industries, targ
 
 async function getAfterImportMono(priceId, ratesData) {
     let { copyRates, industries, stepsIds, packages, targets } = ratesData;
-    if(industries[0] === 'All') {
-        industries = [{name: 'All'}]
-    }
-    const targetsIds = targets.map(item => item._id);
-    const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    const isAllIndustries = industries[0] === 'All'
     try {
+        if(isAllIndustries) {
+            industries = await Industries.find();
+        }
+        const targetsIds = targets.map(item => item._id);
+        const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
         const price = await getPricelist({"_id": priceId});
         let monoRates = price.monoRates.length ? [...price.monoRates] : [];
-        for(let pair of allAvailablePairs) {
-            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
-            const { packageSize, target } = pair;
-            monoRates = await manageMonoPairRates({
-                stepsIds, packageSize, industries, target, rates: copiedRates, currentRates: monoRates
-            });
+        if(!monoRates.length) {
+            monoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
+        } else {
+            monoRates = fillNonEmptyMonoRates({allAvailablePairs, stepsIds, industries, monoRates, isAllIndustries});
         }
         return await getUpdatedPricelist({"_id": priceId}, { monoRates });
     } catch(err) {
         console.log(err);
         console.log("Error in getAfterImportMono");
     }
+}
+
+function fillNonEmptyMonoRates({allAvailablePairs, stepsIds, industries, monoRates, isAllIndustries}) {
+    let currentRates = [...monoRates];
+    let filledRates = [];
+    for(let pair of allAvailablePairs) {
+        let copiedRates = getRatesToCopy(pair.rates, stepsIds);
+        const { packageSize, target } = pair;
+        filledRates = [];
+        if(isAllIndustries) {
+            filledRates = currentRates.filter(item => {
+                if(item.target.lang === target.lang && item.packageSize === packageSize) return false;
+                return true;
+            });
+            filledRates.push(...manageMonoAllIndustriesRates({stepsIds, target, packageSize, allIndustries: industries, rates: copiedRates, currentRates}));
+        } else {
+            filledRates = manageMonoNotAllIndustriesRate({
+                stepsIds, packageSize, industries, target, rates: copiedRates, currentRates
+            })
+        }
+        currentRates = [...filledRates];
+    }
+    return currentRates;
 }
 
 /////// Mono rates managing end ///////
@@ -141,7 +163,7 @@ async function manageDuoPairRates({stepsIds, source, target, industries, rates, 
 function manageDuoAllIndustriesRates({stepsIds, target, source, allIndustries, rates, currentRates}) {
     let samePairs = currentRates.filter(item => item.target.lang === target.lang && item.source.lang === source.lang);
     if(!samePairs.length) {
-        return [...currentRates, {target, source, industries: allIndustries, rates}]
+        return [{target, source, industries: allIndustries, rates}]
     }
     let industries = allIndustries.map(item => {
         return {...item._doc, _id: item.id}
@@ -165,44 +187,57 @@ function manageDuoNotAllIndustriesRate({stepsIds, source, target, industries, ra
 
 async function getAfterImportDuo({priceId, ratesData, prop}) {
     let { copyRates, industries, stepsIds, sources, targets } = ratesData;
-    if(industries[0] === 'All') {
-        industries = [{name: 'All'}]
-    }
-    const sourcesIds = sources.map(item => item._id);
-    const targetsIds = targets.map(item => item._id);
-    const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    const isAllIndustries = industries[0] === 'All'
     try {
-        const price = await getPricelist({"_id": priceId});
-        let updatedRates = price[prop].length ? [...price[prop]] : [];
-        for(let pair of allAvailablePairs) {
-            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
-            const { source, target } = pair;
-            updatedRates = await manageDuoPairRates({
-                stepsIds, source, industries, target, rates: copiedRates, currentRates: updatedRates
-            });
+        if(isAllIndustries) {
+            industries = await Industries.find();
         }
-        return await getUpdatedPricelist({"_id": priceId}, { [prop]: updatedRates });
+        const sourcesIds = sources.map(item => item._id);
+        const targetsIds = targets.map(item => item._id);
+        const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+        const price = await getPricelist({"_id": priceId});
+        let duoRates = price[prop].length ? [...price[prop]] : [];
+        if(!duoRates.length) {
+            duoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
+        } else {
+            duoRates = fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates, isAllIndustries});
+        }
+        return await getUpdatedPricelist({"_id": priceId}, { [prop]: duoRates });
     } catch(err) {
         console.log(err);
         console.log("Error in getAfterImportDuo");
     }
 }
 
-/////// Duo rates manage end ///////
-
-function updateCurrentRates({currentRates, newRates, stepsIds}) {
-    return Object.keys(currentRates).reduce((acc, cur) => {
-        if(stepsIds.indexOf(cur) !== -1) {
-            acc[cur] = newRates[cur];
+function fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates, isAllIndustries}) {
+    let currentRates = [...duoRates];
+    let filledRates = [];
+    for(let pair of allAvailablePairs) {
+        let copiedRates = getRatesToCopy(pair.rates, stepsIds);
+        const { source, target } = pair;
+        filledRates = [];
+        if(isAllIndustries) {
+            filledRates = currentRates.filter(item => {
+                if(item.target.lang === target.lang && item.source.lang === source.lang) return false;
+                return true;
+            });
+            filledRates.push(...manageDuoAllIndustriesRates({stepsIds, target, source, allIndustries: industries, rates: copiedRates, currentRates}));
         } else {
-            acc[cur] = currentRates[cur];
+            filledRates = manageDuoNotAllIndustriesRate({
+                stepsIds, source, industries, target, rates: copiedRates, currentRates
+            })
         }
-        return {...acc}
-    }, {})
+        currentRates = [...filledRates];
+    }
+    return currentRates;
 }
 
+/////// Duo rates manage end ///////
+
 function manageSamePairs({stepsIds, samePairs, rates, industries}) {
-    let industriesIds = industries.map(item => item._id);
+    let industriesIds = industries.map(item => {
+        return item._id ? item._id : item
+    });
     let updatedRates = [];
     for(let i = 0; i < samePairs.length; i++) {
         let pairIndustries = samePairs[i].industries.map(item => item.id);
@@ -210,11 +245,13 @@ function manageSamePairs({stepsIds, samePairs, rates, industries}) {
         let remainingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) === -1);
         let newRates = getNewRates(samePairs[i].rates, rates, stepsIds);
         industriesIds = industriesIds.filter(item => pairIndustries.indexOf(item) === -1);
-        updatedRates.push({...samePairs[i]._doc, industries: remainingPairIndustries});
-        updatedRates.push({...samePairs[i]._doc, rates: newRates, industries: changingPairIndustries});
+        const { _id, ...pair } = samePairs[i]._doc;
+        updatedRates.push({...pair, industries: remainingPairIndustries});
+        updatedRates.push({...pair, rates: newRates, industries: changingPairIndustries});
     }
     if(industriesIds.length) {
-        updatedRates.push({...samePairs[0]._doc, rates, industries: industries.map(item => item._id)})
+        const { _id, ...firstPair } = samePairs[0]._doc;
+        updatedRates.push({...firstPair, rates, industries: industriesIds});
     }
     updatedRates = updatedRates.filter(item => item.industries.length);
     updatedRates = joinSameRatesIndustries(updatedRates);
@@ -241,6 +278,16 @@ function joinSameRatesIndustries(pairs) {
         }
     }
     return joinedPairs;
+}
+
+function fillEmptyRates({allAvailablePairs, stepsIds, industries}) {
+    let filledRates = [];
+    for(let pair of allAvailablePairs) {
+        const rates = getRatesToCopy(pair.rates, stepsIds);
+        const {_id, ...newPair } = pair; 
+        filledRates.push({...newPair, rates, industries})
+    }
+    return filledRates;
 }
 
 function getUniqueIndustries(industries) {

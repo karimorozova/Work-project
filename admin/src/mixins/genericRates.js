@@ -86,7 +86,8 @@ export default {
             this.industryFilter = [{name: "All"}];
             const prop = this.rateForm;
             const value = this.entity ? this.entity[prop] : this.currentPrice[prop];
-            this.storePriceRates({prop, value});             
+            this.storePriceRates({prop, value});
+            this.sortRates(prop);            
             this.setAllSteps();
         },
         async setDefaultStep() {

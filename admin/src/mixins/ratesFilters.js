@@ -49,6 +49,7 @@ export default {
                 result = result.filter(item => this.hasIndustry(item.industries))
             }
             this.storePriceRates({prop: this.rateForm, value: result});
+            this.sortRates(this.rateForm);
         },
         hasIndustry(industries) {
             return industries.find(item => this.industryFilterNames.indexOf(item.name) !== -1);

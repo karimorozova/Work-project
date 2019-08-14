@@ -52,12 +52,13 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            storePriceRates: "storePriceRates",
-            getSteps: "getSteps",
-            alertToggle: "alertToggle",
-            setVendorsMatrixData: "setVendorsMatrixData",
-        }), 
+        ...mapActions([
+            "storePriceRates",
+            "sortRates",
+            "getSteps",
+            "alertToggle",
+            "setVendorsMatrixData",
+        ]), 
         toggleRates(e, prop) {
             this[prop] = !this[prop];
         },
@@ -86,6 +87,9 @@ export default {
         this.storePriceRates({prop: 'monoRates', value: this.vendor.monoRates})
         this.storePriceRates({prop: 'wordsRates', value: this.vendor.wordsRates})
         this.storePriceRates({prop: 'hoursRates', value: this.vendor.hoursRates})
+        this.sortRates('monoRates')
+        this.sortRates('wordsRates')
+        this.sortRates('hoursRates')
     }
 }
 

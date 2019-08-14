@@ -79,6 +79,7 @@ export default {
         ...mapActions([
             "alertToggle",
             "storePriceRates",
+            "sortRates",
             "deletePriceRates",
             "getSteps",
             "setAllStepsForRates",

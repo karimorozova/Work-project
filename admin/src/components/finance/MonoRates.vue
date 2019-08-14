@@ -80,6 +80,7 @@ export default {
             "alertToggle",
             "importRatesToPrice",
             "storePriceRates",
+            "sortRates",
             "deletePriceRates",
             "getSteps",
             "setAllStepsForRates"

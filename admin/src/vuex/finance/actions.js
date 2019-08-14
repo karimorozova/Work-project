@@ -5,6 +5,7 @@ export const addFinanceProperty = ({commit, rootState}, payload) => {
 };
 
 export const storePriceRates = ({commit}, payload) => commit('SET_PRICE_RATES', payload);
+export const sortRates = ({commit}, payload) => commit('SORT_RATES', payload);
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
 
 export const importRatesToPrice = async ({commit, dispatch, state}, payload) => {

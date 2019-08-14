@@ -52,10 +52,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            storePriceRates: "storePriceRates",
-            getSteps: "getSteps"
-        }), 
+        ...mapActions([
+            "storePriceRates",
+            "sortRates",
+            "getSteps"
+        ]), 
         toggleRates(e, prop) {
             this[prop] = !this[prop];
         },
@@ -79,6 +80,9 @@ export default {
         this.storePriceRates({prop: 'monoRates', value: this.client.monoRates})
         this.storePriceRates({prop: 'wordsRates', value: this.client.wordsRates})
         this.storePriceRates({prop: 'hoursRates', value: this.client.hoursRates})
+        this.sortRates('monoRates')
+        this.sortRates('wordsRates')
+        this.sortRates('hoursRates')
     }
 }
 </script>

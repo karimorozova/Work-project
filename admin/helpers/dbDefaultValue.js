@@ -7,7 +7,7 @@ const languagesDefault = [
     {"lang":"Arabic (Saudi Arabia)", "icon":"/static/flags31x21pix/Arabic[AR-SA].png", "symbol":"AR-SA", "xtm": "ar_SA", "iso1":"ar-SA", "iso2":"ara-SA", "direction":"in", "crud": false, "check": false, "active": true, parent: "AR"},
     {"lang":"Azerbaijani (Latin)", "icon":"/static/flags31x21pix/Azerbaijani[AZ-LN].png", "symbol":"AZ-LN", "xtm": "az_AZ_Latn", "iso1":"az-AZ-Latin", "iso2":"aze", "direction":"in", "crud": false, "active": true, "check": false,},
     {"lang":"Bulgarian", "icon":"/static/flags31x21pix/Bulgarian[BG].png", "symbol":"BG", "xtm": "bg_BG", "iso1":"bg-BG", "iso2":"bul", "direction":"both", "crud": false, "active": true, "check": false},
-    {"lang":"Bengali (Indida)", "icon":"/static/flags31x21pix/Bengali[BN-IN].png", "symbol":"BN-IN", "xtm": "bn_IN", "iso1":"bn_IN", "iso2":"ben_IN", "direction":"in", "crud": false, "active": true, "check": false,},
+    {"lang":"Bengali (India)", "icon":"/static/flags31x21pix/Bengali[BN-IN].png", "symbol":"BN-IN", "xtm": "bn_IN", "iso1":"bn_IN", "iso2":"ben_IN", "direction":"in", "crud": false, "active": true, "check": false,},
     {"lang":"Bosnian (Cyrillic)", "icon":"/static/flags31x21pix/Bosnian[BS].png", "symbol":"BS", "xtm": "bs_BA_Cyrl", "iso1":"bs", "iso2":"bos", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Bosnian (Latin)", "icon":"/static/flags31x21pix/Bosnian[BS].png", "symbol":"BS-LAT", "xtm": "bs_BA_Latn", "iso1":"bs-lat", "iso2":"bos-lat", "direction":"in", "crud": false, "active": true, "check": false},
     {"lang":"Czech", "icon":"/static/flags31x21pix/Czech[CS].png", "symbol":"CS", "xtm": "cs_CZ", "iso1":"cz-CZ", "iso2":"cze", "direction":"in", "crud": false, "active": true, "check": false},
