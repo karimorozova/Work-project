@@ -73,8 +73,8 @@ export default {
                 if(!this.isClient && !this.isVendor) {
                     await this.deletePriceRate({id: this.fullInfo[index]._id, prop: this.rateForm});
                 } else {
-                    this.isClient ? await this.deleteClientRate({...this.currentInfo, rates, prop: this.rateForm})
-                        : await this.deleteVendorRate({...this.currentInfo, rates, prop: this.rateForm})    
+                    this.isClient ? await this.deleteClientRate({id: this.fullInfo[index]._id, prop: this.rateForm})
+                        : await this.deleteVendorRate({id: this.fullInfo[index]._id, prop: this.rateForm})    
                 }
                 this.$emit("refreshRates");
                 this.cancelEdition();

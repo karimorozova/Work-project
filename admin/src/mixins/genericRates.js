@@ -47,8 +47,8 @@ export default {
                 if(!this.entity) {
                     await this.deletePriceRates({checkedIds, prop: this.rateForm});
                 } else {
-                    this.isClient ? await this.deletClientRates({checkedIds, prop: this.rateForm})
-                        : await this.deletVendorRates({checkedIds, prop: this.rateForm})
+                    this.isClient ? await this.deleteClientRates({checkedIds, prop: this.rateForm})
+                        : await this.deleteVendorRates({checkedIds, prop: this.rateForm})
                 }
                 this.refreshRates();
             } catch(err) {

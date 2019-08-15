@@ -39,7 +39,7 @@ export const saveClientRates = async ({commit, dispatch, state}, payload) => {
         commit("endRequest");
     }
 }
-export const deleteClientRate = async ({commit, dispatch}, payload) => {
+export const deleteClientRate = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
         const { id, prop } = payload;

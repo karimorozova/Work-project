@@ -87,11 +87,14 @@ export default {
         },
         ...mapActions([
             "alertToggle",
-            "importRatesToPrice",
             "importRatesToClient",
+            "importRatesToVendor",
             "storePriceRates",
             "sortRates",
             "deleteClientRates",
+            "deleteClientRate",
+            "deleteVendorRates",
+            "deleteVendorRate",
             "getSteps",
             "setAllStepsForRates"
         ])

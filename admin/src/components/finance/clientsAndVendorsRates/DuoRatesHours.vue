@@ -87,10 +87,13 @@ export default {
             "storePriceRates",
             "sortRates",
             "deleteClientRates",
+            "deleteClientRate",
+            "deleteVendorRates",
+            "deleteVendorRate",
             "getSteps",
             "setAllStepsForRates",
-            "importRatesToPrice",
-            "importRatesToClient"
+            "importRatesToClient",
+            "importRatesToVendor",
         ])
     },
     computed: {
