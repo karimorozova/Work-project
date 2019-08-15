@@ -1,5 +1,5 @@
 const { getClientAfterUpdate, getClient } = require("./getClients");
-const { manageMonoPairRates, manageDuoPairRates, getRatesToCopy } = require("../rates/ratesmanage");
+const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates } = require("../rates/ratesmanage");
 
 async function updateClientRates(client, rateInfo) {
     const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
@@ -37,20 +37,19 @@ async function importRates({clientId, ratesData, prop}) {
 
 async function getAfterImportMono(clientId, ratesData) {
     let { copyRates, industries, stepsIds, packages, targets } = ratesData;
-    if(industries[0] === 'All') {
-        industries = [{name: 'All'}]
-    }
-    const targetsIds = targets.map(item => item._id);
-    const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    const isAllIndustries = industries[0] === 'All'
     try {
         const client = await getClient({"_id": clientId});
+        if(isAllIndustries) {
+            industries = client.industries;
+        }
+        const targetsIds = targets.map(item => item._id);
+        const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
         let monoRates = client.monoRates.length ? [...client.monoRates] : [];
-        for(let pair of allAvailablePairs) {
-            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
-            const { packageSize, target } = pair;
-            monoRates = await manageMonoPairRates({
-                packageSize, industries, target, rates: copiedRates, currentRates: monoRates, entity: client
-            });
+        if(!monoRates.length) {
+            monoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
+        } else {
+            monoRates = fillNonEmptyMonoRates({allAvailablePairs, stepsIds, industries, monoRates, isAllIndustries});
         }
         return await getClientAfterUpdate({"_id": clientId}, { monoRates });
     } catch(err) {
@@ -65,23 +64,22 @@ async function getAfterImportMono(clientId, ratesData) {
 
 async function getAfterImportDuo({clientId, ratesData, prop}) {
     let { copyRates, industries, stepsIds, sources, targets } = ratesData;
-    if(industries[0] === 'All') {
-        industries = [{name: 'All'}]
-    }
-    const sourcesIds = sources.map(item => item._id);
-    const targetsIds = targets.map(item => item._id);
-    const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+    const isAllIndustries = industries[0] === 'All'
     try {
         const client = await getClient({"_id": clientId});
-        let updatedRates = client[prop].length ? [...client[prop]] : [];
-        for(let pair of allAvailablePairs) {
-            let copiedRates = getRatesToCopy(pair.rates, stepsIds);
-            const { source, target } = pair;
-            updatedRates = await manageDuoPairRates({
-                source, industries, target, rates: copiedRates, currentRates: updatedRates, entity: client
-            });
+        if(isAllIndustries) {
+            industries = client.industries;
         }
-        return await getClientAfterUpdate({"_id": clientId}, { [prop]: updatedRates });
+        const sourcesIds = sources.map(item => item._id);
+        const targetsIds = targets.map(item => item._id);
+        const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
+        let duoRates = client[prop].length ? [...client[prop]] : [];
+        if(!duoRates.length) {
+            duoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
+        } else {
+            duoRates = fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates, isAllIndustries});
+        }
+        return await getClientAfterUpdate({"_id": clientId}, { [prop]: duoRates });
     } catch(err) {
         console.log(err);
         console.log("Error in getAfterImportDuo");
