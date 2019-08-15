@@ -12,11 +12,5 @@ export const mutations = {
         } else {
             state.currentVendor.industries.push(payload);
         }
-    },
-    setVendorDuoRates(state, payload) {
-        state.vendorDuoRates = payload;
-    },
-    setVendorMonoRates(state, payload) {
-        state.vendorMonoRates = payload;
     }
 }

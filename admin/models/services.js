@@ -35,10 +35,6 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         default: 'Mono'
     },
-    calculationUnit: {
-        type: String,
-        default: 'Words'
-    },
     steps: [{
         stage: {
             type: String,

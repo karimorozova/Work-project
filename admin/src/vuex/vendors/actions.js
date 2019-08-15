@@ -3,99 +3,63 @@ import Vue from "vue";
 export const storeCurrentVendor = ({ commit }, payload) => commit('setCurrentVendor', payload);
 export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
-export const storeVendorDuoRates = ({commit}, payload) => commit('setVendorDuoRates', payload);
-export const storeVendorMonoRates = ({commit}, payload) => commit('setVendorMonoRates', payload);
 export const storeVendor = ({commit, rootState}, payload) => {
     const index = rootState.a.vendors.findIndex(item => item._id === payload._id);
     rootState.a.vendors.splice(index, 1, payload);
 }
 
-export const getVendorDuoCombinations = async ({commit, dispatch, state}) => {
-    commit("startRequest");
-    try {
-        const id = state.currentVendor._id;
-        const result = await Vue.http.get(`/vendorsapi/rates?form=Duo&vendorId=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
-            if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
-        })
-        dispatch('storeVendorDuoRates', rates);
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on getting Duo rates")
-    }
-}
-export const getVendorMonoCombinations = async ({commit, dispatch, state}) => {
-    commit("startRequest");
-    try {
-        const id = state.currentVendor._id;
-        const result = await Vue.http.get(`/vendorsapi/rates?form=Mono&vendorId=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
-            if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;
-        })
-        dispatch('storeVendorMonoRates', rates);
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on getting Mono rates")
-    }
-}
-
 export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
-        const ratesInfo = { ...payload, vendorId: state.currentVendor._id};
-        const result = await Vue.http.post('/vendorsapi/rates', { ratesInfo });
+        const vendorId = state.currentVendor._id;
+        const result = await Vue.http.post('/vendorsapi/rates', { vendorId, ...payload });
         dispatch('storeCurrentVendor', result.body);
-        ratesInfo.languageForm === "Duo" ? await dispatch('getVendorDuoCombinations') : await dispatch('getVendorMonoCombinations');
-        commit("endRequest");
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on saving rate");
     }
 }
 
-export const addSeveralVendorRates = async ({commit, dispatch, rootState}, payload) => {
-    commit("startRequest");
+export const importRatesToVendor = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
     try {
-        const { combinations, vendorId } = payload;
-        const updatedVendor = await Vue.http.post('/vendorsapi/several-langs', {combinations, vendorId});
-        const index = rootState.a.vendors.findIndex(item => item._id === vendorId);
-        rootState.a.vendors.splice(index, 1, updatedVendor.body);
-        dispatch('storeCurrentVendor', updatedVendor.body);
-        await dispatch('getVendorDuoCombinations');
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on adding sveral langs for Vendor")
-    }
-}
-
-export const deleteVendorRate = async ({commit, dispatch}, payload) => {
-    commit("startRequest");
-    try {
-        await dispatch('deleteVendorsCheckedRate', payload);
-        const { languageForm } = payload.deletedRate;
-        languageForm === "Duo" ? await dispatch('getVendorDuoCombinations') : await dispatch('getVendorMonoCombinations');
-        commit("endRequest");
-    } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on deleting rate");
-    }
-}
-
-export const deleteVendorsCheckedRate = async ({commit, dispatch, state}, payload) => {
-    commit("startRequest");
-    try {
-        const deletedRate = { ...payload.deletedRate, vendorId: state.currentVendor._id};
-        const result = await Vue.http.delete(`/vendorsapi/rate/${payload.id}`, {body: deletedRate});
+        const vendorId = state.currentVendor._id;
+        const { ratesData, prop } = payload;
+        const result = await Vue.http.post('/vendorsapi/import-rates', { ratesData, vendorId, prop });
         dispatch('storeCurrentVendor', result.body);
-        commit("endRequest");
     } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on deleting rate");
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
+
+export const deleteVendorRate = async ({commit, dispatch, state}, payload) => {
+    commit("startRequest");
+    try {
+        const { id, prop } = payload;
+        const vendorId = state.currentVendor._id;
+        const result = await Vue.http.post('/vendorsapi/remove-rate', { vendorId, rateId: id, prop });
+        dispatch("storeCurrentVendor", result.body);
+    } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
+
+export const deleteVendorRates = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
+    try {
+        const { checkedIds, prop } = payload;
+        const vendorId = state.currentVendor._id;
+        const result = await Vue.http.post('/vendorsapi/remove-rates', { vendorId, checkedIds, prop });
+        dispatch("storeCurrentVendor", result.body);
+    } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
     }
 }
 

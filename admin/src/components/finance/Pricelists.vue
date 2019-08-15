@@ -84,6 +84,12 @@ export default {
     methods: {
         showRates(index) {
             this.storeCurrentPrice(this.pricelists[index]);
+            this.storePriceRates({prop: 'monoRates', value: [...this.pricelists[index].monoRates]});
+            this.storePriceRates({prop: 'wordsRates', value: [...this.pricelists[index].wordsRates]});
+            this.storePriceRates({prop: 'hoursRates', value: [...this.pricelists[index].hoursRates]});
+            this.sortRates('monoRates');
+            this.sortRates('wordsRates');
+            this.sortRates('hoursRates');
             this.$router.push("/settings/rates");
         },
         async makeAction(index, key) {
@@ -230,11 +236,13 @@ export default {
                 this.alertToggle({message: "Error on getting pricelists.", isShow: true, type: "error"});
             }
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            storeCurrentPrice: "storeCurrentPrice",
-            storePricelists: "storePricelists"
-        })
+        ...mapActions([
+            "alertToggle",
+            "storeCurrentPrice",
+            "storePriceRates",
+            "storePricelists",
+            "sortRates"
+        ])
     },
     computed: {
         ...mapGetters({

@@ -1,19 +1,26 @@
 <template lang="pug">
     .client-rates
-        .client-rates__block(:class="{'client-rates_straight-angle': isMonoRatesShow}")
+        .client-rates__block(:class="{'client-rates_straight-angle': isMonoRates}")
             .client-rates__open 
-                .client-rates__select(@click="monoRatesToggler")
+                .client-rates__select(@click="(e) => toggleRates(e, 'isMonoRates')")
                     span.client-rates__label Package
-                    img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMonoRatesShow}") 
-                .client-rates__drop(v-if="isMonoRatesShow")
-                    MonoRates(:client="client")
-        .client-rates__block(:class="{'client-rates_straight-angle': isDuoRatesShow}")
+                    img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isMonoRates}") 
+                .client-rates__drop(v-if="isMonoRates")
+                    MonoRates(:entity="client" :isClient="true")
+        .client-rates__block(:class="{'client-rates_straight-angle': isWordsRates}")
             .client-rates__open
-                .client-rates__select(@click="duoRatesToggler")
+                .client-rates__select(@click="(e) => toggleRates(e, 'isWordsRates')")
                     span.client-rates__label Wordcount
-                    img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isDuoRatesShow}") 
-                .client-rates__drop(v-if="isDuoRatesShow")
-                    DuoRates(:client="client" @addSevLangs="addSevLangs")
+                    img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isWordsRates}") 
+                .client-rates__drop(v-if="isWordsRates")
+                    DuoRatesWords(:entity="client" :isClient="true")
+        .client-rates__block(:class="{'client-rates_straight-angle': isHoursRates}")
+            .client-rates__open
+                .client-rates__select(@click="(e) => toggleRates(e, 'isHoursRates')")
+                    span.client-rates__label Hours
+                    img.client-rates__icon(src="../../assets/images/Other/open.png" :class="{'client-rates_reverse': isHoursRates}") 
+                .client-rates__drop(v-if="isHoursRates")
+                    DuoRatesHours(:entity="client" :isClient="true")
         .client-rates__block(:class="{'client-rates_straight-angle': isMatrixShow}")
             .client-rates__open
                 .client-rates__select(@click="matrixToggler")
@@ -24,9 +31,11 @@
 </template>
 
 <script>
-import DuoRates from "./rates/DuoRates";
-import MonoRates from "./rates/MonoRates";
+import MonoRates from "../finance/clientsAndVendorsRates/MonoRates";
+import DuoRatesWords from "../finance/clientsAndVendorsRates/DuoRatesWords";
+import DuoRatesHours from "../finance/clientsAndVendorsRates/DuoRatesHours";
 import FinanceMatrix from "../FinanceMatrix";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -36,35 +45,44 @@ export default {
     },
     data() {
         return {
-            isMonoRatesShow: false,
-            isDuoRatesShow: false,
+            isMonoRates: false,
+            isWordsRates: false,
+            isHoursRates: false,
             isMatrixShow: false
         }
     },
     methods: {
-        addSevLangs({serviceTitle}) {
-            this.$emit('addSevLangs', {serviceTitle})
-        },  
-        monoRatesToggler() {
-            this.isMonoRatesShow = !this.isMonoRatesShow;
-        },
-        duoRatesToggler() {
-            this.isDuoRatesShow = !this.isDuoRatesShow;
+        ...mapActions([
+            "storePriceRates",
+            "sortRates",
+            "getSteps"
+        ]), 
+        toggleRates(e, prop) {
+            this[prop] = !this[prop];
         },
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
-        },
-        ratesUpdate(data) {
-            this.$emit('ratesUpdate', data);
         },
         setMatrixData({value, key}) {
             this.$emit("setMatrixData", {value, key});
         }
     },
     components: {
-        DuoRates,
+        DuoRatesWords,
+        DuoRatesHours,
         MonoRates,
         FinanceMatrix
+    },
+    created() {
+        this.getSteps();
+    },
+    mounted() {
+        this.storePriceRates({prop: 'monoRates', value: this.client.monoRates})
+        this.storePriceRates({prop: 'wordsRates', value: this.client.wordsRates})
+        this.storePriceRates({prop: 'hoursRates', value: this.client.hoursRates})
+        this.sortRates('monoRates')
+        this.sortRates('wordsRates')
+        this.sortRates('hoursRates')
     }
 }
 </script>
@@ -108,6 +126,7 @@ export default {
     &__drop {
         padding: 5px 2px 15px 2px;
         border-top: 1px solid rgba(103, 87, 62, 0.5);
+        max-height: 450px;
     }
 }
 

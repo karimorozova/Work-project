@@ -4,7 +4,8 @@ import { mutations } from './mutations';
 
 const state = {
     counter: 0,
-    duoRates: [],
+    wordsRates: [],
+    hoursRates: [],
     monoRates: [],
     serviceWhenAddSeveral: "",
     pricelists: [],

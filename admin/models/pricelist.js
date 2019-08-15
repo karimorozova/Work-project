@@ -15,26 +15,51 @@ const PricelistSchema = new mongoose.Schema({
     isActive: {
         type: Boolean
     },
-    combinations: [{ 
+    wordsRates: [{ 
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
         },
         target: {
             type: Schema.Types.ObjectId, ref: 'Language'
         },
-        package: {
+        industries: [{
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        }],
+        rates: {
+            type: Object,
+            default: {}
+        }
+    }],
+    hoursRates: [{ 
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language',
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        industries: [{
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        }],
+        rates: {
+            type: Object,
+            default: {}
+        }
+    }],
+    monoRates: [{ 
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        packageSize: {
             type: String,
             trim: true
         },
-        industries: [{
-            industry: {
-                type: Schema.Types.ObjectId, ref: 'Industries'
-            },
-            rates: {
-                type: Object,
-                default: {}
-            }
-        }]
+        industries: [{    
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        }],
+        rates: {
+            type: Object,
+            default: {}
+        }
     }]
 },{ minimize: false });
 

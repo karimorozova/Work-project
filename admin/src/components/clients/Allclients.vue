@@ -67,11 +67,11 @@ export default {
         clientCancel() {
             this.$emit('clientCancel');
         },
-        async showClientDetails({id}) {
+        showClientDetails({id}) {
             const client = this.allClients.find(item => item._id === id);
             let str = JSON.stringify(client);
             const currentClient = JSON.parse(str);
-            await this.storeCurrentClient(currentClient);
+            this.storeCurrentClient(currentClient);
             this.$router.push(`/clients/details/${id}`);
         },
         addClient() {

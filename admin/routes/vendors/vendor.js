@@ -3,7 +3,7 @@ const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
-const { getVendor, getVendorRates, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldPhoto, getJobs, updateStepProp } = require('../../vendors');
+const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldPhoto, getJobs, updateStepProp } = require('../../vendors');
 const { upload } = require('../../utils');
 
 router.post("/login", async (req, res, next) => {
@@ -61,18 +61,6 @@ router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on saving data. Try later.");
-    }
-})
-
-router.get("/rates", checkVendor, async (req, res) => {
-    const { id, form } = req.query;
-    try {
-        const vendor = await getVendor({"_id": id});
-        const rates = await getVendorRates({vendor, form});
-        res.send(rates);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting rates.");
     }
 })
 

@@ -3,76 +3,93 @@ import Vue from "vue";
 export const addFinanceProperty = ({commit, rootState}, payload) => {
     rootState.a.currentProject.finance = {...rootState.a.currentProject.finance, 'Select': payload};
 };
-export const storeDuoRates = ({commit}, payload) => commit('setDuoRates', payload);
-export const storeMonoRates = ({commit}, payload) => commit('setMonoRates', payload);
+
+export const storePriceRates = ({commit}, payload) => commit('SET_PRICE_RATES', payload);
+export const sortRates = ({commit}, payload) => commit('SORT_RATES', payload);
 export const storePricelists = ({commit}, payload) => commit('setPricelists', payload);
-export const storeServiceWhenAddSeveral = ({commit}, payload) => commit('setServiceWhenAddSeveral', payload);
-export const getDuoCombinations = async ({commit, state}, payload) => {
-    commit('startRequest');
-    try {
-        const id = state.currentPrice._id;
-        const result = await Vue.http.get(`/service/parsed-rates?form=Duo&id=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.sourceLanguage.lang < b.sourceLanguage.lang) return -1;
-            if(a.sourceLanguage.lang > b.sourceLanguage.lang) return 1;
-        })
-        commit('setDuoRates', rates);
-        commit('endRequest');
-    } catch(err) {
-        commit('endRequest');
-        throw new Error("Error on getting Duo rates");
-    }
-}
-export const getMonoCombinations = async ({commit, state}, payload) => {
-    commit('startRequest');
-    try {
-        const id = state.currentPrice._id;
-        const result = await Vue.http.get(`/service/parsed-rates?form=Mono&id=${id}`);
-        const rates = result.body.sort((a, b) => {
-            if(a.targetLanguage.lang < b.targetLanguage.lang) return -1;
-            if(a.targetLanguage.lang > b.targetLanguage.lang) return 1;
-        })
-        commit('setMonoRates', rates);
-        commit('endRequest');
-    } catch(err) {
-        commit('endRequest');
-        throw new Error("Error on getting Mono rates");
-    }
-}
-export const saveGlobalRates = async ({commit, dispatch, state}, payload) => {
+
+export const importRatesToPrice = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
         const priceId = state.currentPrice._id;
-        await Vue.http.post('/service/rates', {info: payload, priceId});
-        payload.languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
-        commit('endRequest');
+        const { ratesData, prop } = payload;
+        const updatedPrice = await Vue.http.post('/rates-manage/import-rates', { ratesData, priceId, prop });
+        commit('setCurrentPrice', updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on saving rate");
     }
 }
-export const deleteServiceRate = async ({commit, dispatch, state}, payload) => {
+
+export const savePricelistRates = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
+    const priceId = state.currentPrice._id;
+    try {
+        const result = await Vue.http.post('/rates-manage/combination', { priceId, ...payload });
+        commit("setCurrentPrice", result.body);
+    } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
+export const deletePriceRate = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
+        const { id, prop } = payload;
         const priceId = state.currentPrice._id;
-        await dispatch('deleteCheckedRate', {...payload, priceId});
-        const { languageForm } = payload.deletedRate;
-        languageForm === "Duo" ? await dispatch('getDuoCombinations') : await dispatch('getMonoCombinations');
-        commit('endRequest');
+        const updatedPrice = await Vue.http.post('/rates-manage/remove-rate', { priceId, rateId: id, prop });
+        commit("setCurrentPrice", updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on deleting rate");
     }
 }
-export const deleteCheckedRate = async ({commit}, payload) => {
+export const deletePriceRates = async ({commit, dispatch, state}, payload) => {
     commit('startRequest');
     try {
-        await Vue.http.delete(`/service/rate/${payload.priceId}`, {body: {...payload.deletedRate, id: payload.id}});
-        commit('endRequest');
+        const { checkedIds, prop } = payload;
+        const priceId = state.currentPrice._id;
+        const updatedPrice = await Vue.http.post('/rates-manage/remove-rates', { priceId, checkedIds, prop });
+        commit("setCurrentPrice", updatedPrice.body);
     } catch(err) {
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error("Error on deleting rate");
     }
-    commit('endRequest');
 }
 export const storeCurrentPrice = ({commit}, payload) => commit('setCurrentPrice', payload);
+export const setAllStepsForRates = ({commit, state}, payload) => {
+    const { prop, stepIds } = payload;
+    const combinations = state[prop].map(item => {
+        for(let id of stepIds) {
+            if(Object.keys(item.rates).indexOf(id) === -1) {
+                item.rates[id] = { value: 0, min: 5, active: false }
+            }
+        }
+        item.isChecked = false;
+        return item;
+    })
+    commit('SET_PRICE_RATES', {prop, value: combinations});
+}
+
+export const toggleRateCheck = ({commit, state}, payload) => {
+    const { prop, id, isChecked } = payload;
+    const combinations = state[prop].map(item => {
+        if(item._id === id) {
+            item.isChecked = isChecked;
+        }
+        return item;
+    })
+    commit('SET_PRICE_RATES', {prop, value: combinations});
+}
+export const toggleAllRatesCheck = ({commit, state}, payload) => {
+    const { prop, isChecked } = payload;
+    const combinations = state[prop].map(item => {
+        item.isChecked = isChecked;
+        return item;
+    })
+    commit('SET_PRICE_RATES', {prop, value: combinations});
+}

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload, clientMail } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
-const { getClient, getClients, getClientRates, updateClientRates, getAfterUpdate, deleteRate, addSeveralCombinations, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
+const { getClient, getClients, updateClientRates, getClientAfterUpdate, importRates, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -40,22 +40,11 @@ router.post('/mailtoclient', async (req, res) => {
     }
 })
 
-router.get('/rates', async (req, res) => {
-    const { clientId, form } = req.query;
-    try {
-        let client = await getClient({"_id": clientId});
-        const rates = await getClientRates({client, form});
-        res.send(rates);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting Client rates');
-    }
-})
-
 router.post('/rates', async (req, res) => {
-    const { ratesInfo } = req.body;
+    const { clientId, ...rateInfo } = req.body;
     try {
-        const updatedClient = await updateClientRates(ratesInfo);
+        const client = await getClient({"_id": clientId});
+        const updatedClient = await updateClientRates(client, rateInfo);
         res.send(updatedClient);
     } catch(err) {
         console.log(err);
@@ -63,18 +52,29 @@ router.post('/rates', async (req, res) => {
     }
 })
 
-router.delete('/rate/:id', async (req, res) => {
-    const deleteInfo = {...req.body};
-    const { id } = req.params;
-    if(id === "undefined") {
-        return res.send("Deleted");
-    }
+router.post('/remove-rate', async (req, res) => {
+    const { clientId, rateId, prop } = req.body;
     try {
-        const updatedClient = await deleteRate(deleteInfo, id);
+        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+            $pull: {[prop]: {'_id': rateId}}    
+        })
         res.send(updatedClient);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on deleting rates of Client");
+        res.status(500).send("Error on deleting rate of Client");
+    }
+})
+
+router.post('/remove-rates', async (req, res) => {
+    const { clientId, checkedIds, prop } = req.body;
+    try {
+        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+            $pull: {[prop]: {'_id': {$in: checkedIds}}}    
+        })
+        res.send(updatedClient);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on deleting rate of Client");
     }
 })
 
@@ -90,14 +90,14 @@ router.post('/combination', async (req, res) => {
     }
 })
 
-router.post('/several-langs', async (req, res) => {
-    const { priceId, combinations, clientId } = req.body;
+router.post('/import-rates', async (req, res) => {
+    const { clientId, ratesData, prop } = req.body;
     try {
-        const updatedClient = await addSeveralCombinations({priceId, clientId, combinations});
+        const updatedClient = await importRates({clientId, ratesData, prop});
         res.send(updatedClient);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several languages for Client");
+        res.status(500).send("Error on importing rates to Client");
     }
 })
 
@@ -160,7 +160,7 @@ router.delete('/deleteclient/:id', async (req, res) => {
 router.post('/deleteContact', async (req, res) => {
     const { id, contacts } = req.body;
     try {
-        const result = await getAfterUpdate({"_id": id}, {contacts: contacts})
+        const result = await getClientAfterUpdate({"_id": id}, {contacts: contacts})
         res.send({updatedClient: result})
     } catch(err) {
         console.log(err);
@@ -171,7 +171,7 @@ router.post('/deleteContact', async (req, res) => {
 router.post('/update-matrix', async (req, res) => {
     const { id, matrix } = req.body;
     try {
-        const result = await getAfterUpdate({"_id": id}, {matrix: matrix});
+        const result = await getClientAfterUpdate({"_id": id}, {matrix: matrix});
         res.send({updatedClient: result});
     } catch(err) {
         res.status(500).send("Error on updating matrix");

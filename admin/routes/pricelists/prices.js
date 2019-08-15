@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Pricelist } = require('../../models');
-const { saveNewPricelist, deletePricelist, getPricelists, checkPriceForPairs, addSeveralLangs } = require('../../rates');
+const { saveNewPricelist, deletePricelist, getPricelists } = require('../../rates');
 
 router.get('/pricelists', async (req, res) => {
     try {
@@ -67,29 +67,6 @@ router.post('/activeness', async (req, res) => {
         console.log(err);
         res.status(500).send("Error on setting active/inactive pricelist");
     }
-})
-
-router.post('/combinations', async (req, res) => {
-  const { priceId, combinations } = req.body;
-  try {
-    const availablePairs = await checkPriceForPairs(priceId, combinations);
-    res.send(availablePairs);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on checking combinations");
-  }
-})
-
-router.post('/several-langs', async (req, res) => {
-  const { currentPriceId, sourcePriceId, combinations } = req.body;
-  try {
-    const updatedCombinations = await addSeveralLangs({ currentPriceId, sourcePriceId, combinations });
-    await Pricelist.updateOne({"_id": currentPriceId}, {combinations: updatedCombinations});
-    res.send('Several languages added');
-  } catch(err) {
-    console.log(err)
-    res.status(500).send('Error on adding several language combinations');
-  }
 })
 
 module.exports = router;

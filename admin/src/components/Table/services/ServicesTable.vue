@@ -6,19 +6,13 @@
                 :tableData="services"
                 :errors="errors"
                 :areErrors="areErrors"
-                :isApproveModal="isDeleting"
                 @closeErrors="closeErrors"
-                @approve="deleteService"
-                @notApprove="cancel"
-                @closeModal="cancel"
             )
                 template(slot="headerIcon" slot-scope="{ field }")
                     .services__header {{ field.label }}
                 template(slot="headerTitle" slot-scope="{ field }")
                     .services__header {{ field.label }}
                 template(slot="headerLangForm" slot-scope="{ field }")
-                    .services__header {{ field.label }}
-                template(slot="headerUnit" slot-scope="{ field }")
                     .services__header {{ field.label }}
                 template(slot="headerStep1" slot-scope="{ field }")
                     .services__header {{ field.label }}
@@ -45,15 +39,6 @@
                             :selectedOption="currentLangForm"
                             :options="langForms"
                             @chooseOption="setLangForm"
-                            @scrollDrop="scrollDrop"
-                        )
-                template(slot="calculationUnit" slot-scope="{ row, index }")
-                    .services__data(v-if="currentActive !== index") {{ row.calculationUnit }}
-                    .services__drop-menu(v-else)
-                        SelectSingle(
-                            :selectedOption="currentUnit"
-                            :options="units"
-                            @chooseOption="setUnit"
                             @scrollDrop="scrollDrop"
                         )
                 template(slot="step1" slot-scope="{ row, index }")
@@ -103,22 +88,19 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Icon", headerKey: "headerIcon", key: "icon", width: Math.floor(950*0.10), padding: "0"},
-                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(950*0.18), padding: "0"},
-                {label: "Language Form", headerKey: "headerLangForm", key: "languageForm", width: Math.floor(950*0.14), padding: "0"},
-                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(950*0.14), padding: "0"},
-                {label: "Step 1", headerKey: "headerStep1", key: "step1", width: Math.floor(950*0.12), padding: "0"},
-                {label: "Step 2", headerKey: "headerStep2", key: "step2", width: Math.floor(950*0.12), padding: "0"},
-                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(950*0.08), padding: "0"},
+                {label: "Icon", headerKey: "headerIcon", key: "icon", width: Math.floor(900*0.10), padding: "0"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(900*0.18), padding: "0"},
+                {label: "Language Form", headerKey: "headerLangForm", key: "languageForm", width: Math.floor(900*0.18), padding: "0"},
+                {label: "Step 1", headerKey: "headerStep1", key: "step1", width: Math.floor(900*0.16), padding: "0"},
+                {label: "Step 2", headerKey: "headerStep2", key: "step2", width: Math.floor(900*0.16), padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(900*0.10), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
             services: [],
             langForms: ["Mono", "Duo"],
-            units: ["Words", "Hours", "Packages"],
             currentActive: -1,
             currentTitle: "",
             currentLangForm: "",
-            currentUnit: "",
             currentStep1: "",
             currentStep2: "",
             iconFile: [],
@@ -126,9 +108,7 @@ export default {
             steps: [],
             areErrors: false,
             errors: [],
-            isDeleting: false,
-            deleteIndex: -1,
-            tableWidth: 950
+            tableWidth: 900
         }
     },
     methods: {
@@ -172,19 +152,10 @@ export default {
                 this.cancel();
                 await this.getServices();
             }
-            if(key === "delete") {
-                if(!this.services[index]._id) {
-                    this.services.splice(index, 1);
-                    return this.cancel();
-                }
-                this.deleteIndex = index;
-                this.isDeleting = true;
-            }
         },
         async checkErrors(index) {
             this.errors = [];
             if(!this.currentTitle || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
-            if(!this.currentUnit) this.errors.push("Please, select calculation unit.");
             if(!this.currentLangForm) this.errors.push("Please, select language form.");
             if(this.errors.length) {
                 this.areErrors = true;
@@ -242,7 +213,6 @@ export default {
             newData.append("active", this.services[index].active);
             newData.append("icon", this.iconFile[0]);
             newData.append("languageForm", this.currentLangForm);
-            newData.append("calculationUnit", this.currentUnit);
             newData.append("steps", JSON.stringify(steps));
             newData.append("symbol", symbol);
             newData.append("projectType", this.services[index].projectType);
@@ -257,28 +227,10 @@ export default {
             if(stage2) steps.push({stage: 'stage2', step: stage2._id});
             return steps;
         },
-        async deleteService() {
-            const index = this.deleteIndex;
-            const id = this.services[index]._id;
-            if(!id) {
-                this.services.splice(index, 1);
-                return this.cancel();
-            }
-            const { icon } = this.services[index];
-            try {
-                await this.$http.delete(`/service/service/${id}`, {body: { icon }});
-                this.services.splice(index, 1);
-                this.alertToggle({message: "Service removed", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Erorr on removing Service", isShow: true, type: "error"});
-            }
-            this.cancel();
-        }, 
         setEditionData(index) {
             this.currentActive = index;
             this.currentTitle= this.services[index].title;
             this.currentLangForm = this.services[index].languageForm;
-            this.currentUnit = this.services[index].calculationUnit;
             this.setCurrentEditableSteps(index);
         },
         setCurrentEditableSteps(index) {
@@ -297,16 +249,11 @@ export default {
             this.currentActive = -1;
             this.currentTitle = "";
             this.currentLangForm = "",
-            this.currentUnit = "",
             this.imageData = "";
             this.iconFile = [];
-            this.isDeleting = false;
         },
         setLangForm({option}) {
             this.currentLangForm = option;
-        },
-        setUnit({option}) {
-            this.currentUnit = option;
         },
         setStep({option}, prop) {
             this[prop] = option;
@@ -319,7 +266,6 @@ export default {
                 icon: "",
                 title: "",
                 languageForm: "",
-                calculationUnit: "",
                 active: false,
                 sortIndex: this.services.length + 1,
                 symbol: "",
@@ -370,7 +316,7 @@ export default {
 @import "../../../assets/styles/settingsTable";
 
 .services {
-    width: 950px;
+    width: 900;
     &__data {
         @extend %table-data;
     }

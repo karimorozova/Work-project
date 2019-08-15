@@ -45,6 +45,10 @@ export default {
         },
         customClass: {
             type: String
+        },
+        externalLanguages: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
@@ -57,8 +61,9 @@ export default {
     methods: {
         showLangs(event) {
             let elementsObj = event.composedPath();
+            const classNames = ["table__tbody-row", "table__body-row"];
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr") {
+                if(item.localName === "tr" || classNames.indexOf(item.className) !== -1) {
                     return item;
                 }
             });
@@ -69,10 +74,13 @@ export default {
                 height = tr.offsetHeight;
             }
             this.droppedLang = !this.droppedLang;
-            this.$emit('scrollDrop', {drop: this.droppedLang, index: this.parentIndex, offsetTop: top, offsetHeight: height});
+            this.$emit('scrollDrop', {drop: this.droppedLang, offsetTop: top, offsetHeight: height});
             this.searchLang = "";
         },
         async getLanguages() {
+            if(this.externalLanguages.length) {
+                return this.languages = this.externalLanguages;
+            }
             try {
                 const result = await this.$http.get('/api/languages');
                 let sortedArray = result.body;
@@ -322,4 +330,19 @@ export default {
         height: 28px;
     }
 }
+
+.table-drop {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    .drop {
+        border: 1px solid #BFB09D;
+        max-height: 118px;
+    }
+    .select {
+        height: 100%;
+        box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
+    }
+}
+
 </style>

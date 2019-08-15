@@ -16,21 +16,23 @@
     .rates-filters__item
         label.rates-filters__title Industry
         .rates-filters__drop-menu
-            IndustrySelect(:selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
+            IndustrySelect(:entity="entity" :selectedInd="industryFilter" :filteredIndustries="filterIndustry" @chosenInd="setIndustryFilter")
     .rates-filters__item
-        label.rates-filters__title Service
+        label.rates-filters__title Steps
         .rates-filters__drop-menu
-            ServiceMultiSelect(:form="form" :selectedServ="serviceSelect" :filteredServices="filteredServices" @chosenServ="setServiceFilter")
+            SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setStepsFilter")
 </template>
 
 <script>
 import LanguagesSelect from "../LanguagesSelect";
 import IndustrySelect from "../IndustrySelect";
-import ServiceMultiSelect from "../ServiceMultiSelect";
 import SelectMulti from "../SelectMulti";
 
 export default {
     props: {
+        entity: {
+            type: Object
+        },
         form: {
             type: String
         },
@@ -43,16 +45,17 @@ export default {
         industryFilter: {
             type: Array
         },
-        serviceSelect: {
+        selectedSteps: {
             type: Array
         },
         packageFilter: {
             type: Array
-        }
-    },
-    data() {
-        return {
-            packages: []
+        },
+        steps: {
+            type: Array
+        },
+        packages: {
+            type: Array
         }
     },
     methods: {
@@ -65,25 +68,16 @@ export default {
         setIndustryFilter({industry}) {
             this.$emit('setIndustryFilter', {industry});
         },
-        setServiceFilter({service}) {
-            this.$emit('setServiceFilter', {service});
+        setStepsFilter({option}) {
+            this.$emit('setStepsFilter', {option});
         },
         setPackageFilter({option}) {
             this.$emit('setPackageFilter', {option});
-        },
-        async getPackages() {
-            try {
-                const result = await this.$http.get("/api/packages");
-                this.packages = result.body.map(item => item.size);
-                this.packages.unshift("All");
-            } catch(err) {
-
-            }
-        },
+        }
     },
     computed: {
-        filteredServices() {
-            return this.serviceSelect.length ? this.serviceSelect.map(item => item.title) : [];
+        selectedStepsTitles() {
+            return this.selectedSteps.length ? this.selectedSteps.map(item => item.title) : [];
         },
         filterIndustry() {
             let result = [];
@@ -98,11 +92,7 @@ export default {
     components: {
         LanguagesSelect,
         IndustrySelect,
-        ServiceMultiSelect,
         SelectMulti
-    },
-    created() {
-        this.getPackages();
     }
 }
 </script>
@@ -125,6 +115,7 @@ export default {
     &__drop-menu {
         position: relative;
         width: 100%;
+        z-index: 10;
     }
 }
 </style>

@@ -1,6 +1,6 @@
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
-const { getAfterUpdate } = require('./getClients');
+const { getClientAfterUpdate } = require('./getClients');
 
 async function updateClientInfo({clientId, client, files}) {
         const { contacts } = client;
@@ -17,7 +17,7 @@ async function updateClientInfo({clientId, client, files}) {
             })
             updatingClient.contract = contract;
             updatingClient.nda = nda;
-            return await getAfterUpdate({"_id": clientId}, updatingClient);
+            return await getClientAfterUpdate({"_id": clientId}, updatingClient);
         } catch(err) {
             console.log(err);
             console.log("Error in updateClientInfo");

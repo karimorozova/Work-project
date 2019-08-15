@@ -1,19 +1,17 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outClick")
+    .drop-select(v-click-outside="outClick" :class="customClass")
         .select
-            template(v-if="selectedInd.length && selectedInd[0].name !== 'All'")
-                .selected
+            .selected(v-if="selectedInd.length")
+                template(v-if="selectedInd[0].name !== 'All'")
                     img(v-for="name in selectedInd" :src="name.icon") 
-            template(v-if="selectedInd.length && selectedInd[0].name === 'All'") 
-                span.selected All
-            template(v-if="!selectedInd.length") 
-                span.selected.no-choice Select
+                template(v-if="selectedInd[0].name === 'All'") All
+            .selected.select_opacity-05(v-if="!selectedInd.length") Select
             .arrow-button(@click="showInds")
                 img(src="../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
         .drop(v-if="droppedInd")
             .drop__item(v-for="(industry, index) in industries" @click="changeInd(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) != -1}")
+                    .checkbox__check(:class="{checked: filteredIndustries.indexOf(industry.name) !== -1}")
                 span.drop__name {{ industry.name }}
 </template>
 
@@ -32,8 +30,11 @@ export default {
             type: Number,
             default: 0
         },
-        who: {
+        entity: {
             type: Object
+        },
+        customClass: {
+            type: String
         }
     },
     data() {
@@ -46,8 +47,9 @@ export default {
     methods: {
         showInds(event) {
             let elementsObj = event.composedPath();
+            const classNames = ["table__tbody-row", "table__body-row"];
             let tr = elementsObj.find(item => {
-                if(item.localName == "tr") {
+                if(item.localName == "tr"|| classNames.indexOf(item.className) !== -1) {
                     return item;
                 }
             });
@@ -61,20 +63,21 @@ export default {
             this.$emit('scrollDrop', {drop: this.droppedInd, index: this.parentIndex, offsetTop: top, offsetHeight: height})
         },
         async getIndustries() {
-            if(!this.who) {
+            if(!this.entity) {
                 try {
                 const result = await this.$http.get('/api/industries');
-                this.industries = result.data.filter(item => {
-                    if (item.name !== 'More' && item.name !== 'Other') {
-                        return item
-                    }
-                });
+                this.industries = result.data;
+                // this.industries = result.data.filter(item => {
+                //     if (item.name !== 'More' && item.name !== 'Other') {
+                //         return item
+                //     }
+                // });
                 this.industries.unshift({name: "All"})
                 } catch(err) {
                     this.errors.push(err)
                 }
             } else {
-                let industries = JSON.stringify(this.who.industries);
+                let industries = JSON.stringify(this.entity.industries);
                 industries = JSON.parse(industries);
                 this.industries = industries;
                 this.industries.unshift({name: "All"})
@@ -90,7 +93,7 @@ export default {
     directives: {
         ClickOutside
     },
-    mounted () {
+    created () {
         this.getIndustries()
     }
 }
@@ -148,8 +151,8 @@ export default {
         box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
         height: 100%;
     }
-    .no-choice {
-        opacity: 0.6;
+    &_opacity-05 {
+        opacity: 0.5;
     }
 }
 .drop-select {
@@ -230,4 +233,22 @@ export default {
         }
     }
 }
+
+.table-drop {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    .drop {
+        border: 1px solid #BFB09D;
+        max-height: 118px;
+    }
+    .select {
+        box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
+        height: 100%;
+        .selected {
+            height: 100%;
+        }
+    }
+}
+
 </style>

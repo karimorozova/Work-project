@@ -1,33 +1,32 @@
 <template lang="pug">
-.mono-rates
+.duo-rates
     .filters
         RatesFilters(
-            form="Mono"
+            :sourceSelect="sourceSelect"
             :targetSelect="targetSelect"
             :selectedSteps="selectedSteps"
             :industryFilter="industryFilter"
-            :packageFilter="packageFilter"
             :steps="filteredSteps"
-            :packages="packages"
+            @setSourceFilter="setSourceFilter"
             @setTargetFilter="setTargetFilter"
             @setIndustryFilter="setIndustryFilter"
-            @setPackageFilter="setPackageFilter"
             @setStepsFilter="setStepsFilter"
         )
-    .mono-rates__action
-        .mono-rates__drop-menu
+    .duo-rates__action
+        .duo-rates__drop-menu
             SelectSingle(v-if="isAnyChecked" :options="actions" :selectedOption="selectedAction" placeholder="Select action" @chooseOption="setAction")
-        .mono-rates__button
+        .duo-rates__button
             Button(value="Import rates" @clicked="showImportRates")
-    MonoTable(
-        :industries="industries"
-        :packages="packages"
-        :selectedSteps="selectedSteps"
+    DuoTable(
+        :rateForm="rateForm"
+        :defaultStepSymbol="defaultStepSymbol"
         :fullInfo="fullInfo"
+        :industries="industries"
+        :selectedSteps="selectedSteps"
         @addNewRow="addNewRow"
         @refreshRates="refreshRates"
-        )
-    .mono-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
+    )
+    .duo-rates__approve-action(v-if="selectedAction" v-click-outside="closeModal")
         ApproveModal(
             text="Are you sure?"
             approveValue="Yes"
@@ -36,7 +35,8 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
-    AddseveralMono(v-if="isImportRates" 
+    Addseverallangs(v-if="isImportRates"
+        :ratesName="rateForm"
         :steps="filteredSteps"
         :packages="packages"
         @addSeveralRates="addSeveralRates"
@@ -46,72 +46,69 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import RatesFilters from "./RatesFilters";
-import MonoTable from "./ratesTables/MonoTable";
+import DuoTable from "./ratesTables/DuoTable";
 import SelectSingle from "../SelectSingle";
-import ApproveModal from "../ApproveModal";
 import Button from "../Button";
-import AddseveralMono from "./AddseveralMono";
-import { mapGetters, mapActions } from "vuex";
+import Addseverallangs from "./Addseverallangs";
+import ApproveModal from "../ApproveModal";
 import ratesFilters from "@/mixins/ratesFilters";
 import genericRates from "@/mixins/genericRates";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     mixins: [ratesFilters, genericRates],
     props: {
-        entity: {type: Object}
+        
     },
     data() {
         return {
-            defaultStepSymbol: "copywriting",
-            rateForm: "monoRates",
-            calcUnit: "Packages"
+            defaultStepSymbol: "translation",
+            rateForm: "wordsRates",
+            calcUnit: "Words"
         }
     },
     methods: {
         addNewRow() {
             this.fullInfo.push({
-                target: {},
-                packageSize: "",
+                source: {}, 
+                target: {}, 
                 industries: [{name: "All"}],
                 rates: {...this.defaultRates()},
             });
         },
         ...mapActions([
             "alertToggle",
-            "importRatesToPrice",
             "storePriceRates",
             "sortRates",
             "deletePriceRates",
             "getSteps",
-            "setAllStepsForRates"
+            "setAllStepsForRates",
+            "importRatesToPrice"
         ])
     },
     computed: {
         ...mapGetters({
             vuexSteps: "getVuexSteps",
-            fullInfo: "getMonoRates",
+            fullInfo: "getWordsRates",
             currentPrice: "getCurrentPrice"
         })
     },
     components: {
         RatesFilters,
-        MonoTable,
+        DuoTable,
         SelectSingle,
         ApproveModal,
         Button,
-        AddseveralMono
+        Addseverallangs
     },
     directives: {
         ClickOutside
-    },
-    created() {
-        this.getPackages();
     }
 };
 </script>
 
 <style lang="scss" scoped>
-.mono-rates {
+.duo-rates {
     position: relative;
     font-family: MyriadPro;
     width: 972px;
@@ -141,8 +138,6 @@ export default {
 .filters {
     margin-bottom: 20px;
     margin-top: 10px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #67573E;
 }
 
 .add-button {

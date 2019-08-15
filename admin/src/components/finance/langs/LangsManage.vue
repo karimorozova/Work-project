@@ -119,6 +119,10 @@ export default {
     justify-content: space-between;
     margin-bottom: 30px;
     position: relative;
+    &__title {
+        width: 20%;
+        text-align: center;
+    }
     &__languages {
         width: 78%;
         display: flex;

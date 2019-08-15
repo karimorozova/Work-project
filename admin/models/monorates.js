@@ -5,18 +5,18 @@ const MonorateSchema = new mongoose.Schema({
   target: {
     type: Schema.Types.ObjectId, ref: 'Language'
   },
-  package: {
+  packageSize: {
     type: String
   },
   industries: [{
     industry: {
       type: Schema.Types.ObjectId, ref: 'Industries'
-    },
-    rates: {
-      type: Object,
-      default: {}
     }
-  }]
+  }],
+  rates: {
+    type: Object,
+    default: {}
+  }
 },{ minimize: false });
 
 const Monorate = mongoose.model('Monorate', MonorateSchema);

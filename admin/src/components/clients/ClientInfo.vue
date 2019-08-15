@@ -80,7 +80,7 @@
         input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
         input.button(type="button" value="Delete" @click="approveClientDelete")
     Addseverallangs(v-if="isAddSeveral"
-        :who="currentClient"
+        :entity="currentClient"
         origin="client"
         @checkCombinations="checkCombinations"
         @closeSeveral="closeSevLangs")
@@ -166,14 +166,14 @@ export default {
             this.isAvailablePairs = false;
         },
         async checkCombinations({ priceId, combinations }) {
-            this.addSeveralPriceId = priceId;
-            try {
-                const result = await this.$http.post("/prices/combinations", { priceId, combinations });
-                this.langPairs = [...result.body];
-                this.isAvailablePairs = true;
-            } catch(err) {
-                this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
-            }
+            // this.addSeveralPriceId = priceId;
+            // try {
+            //     const result = await this.$http.post("/prices/combinations", { priceId, combinations });
+            //     this.langPairs = [...result.body];
+            //     this.isAvailablePairs = true;
+            // } catch(err) {
+            //     this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
+            // }
         },
         async addCombinations() {
             this.closeLangPairs();
@@ -366,7 +366,6 @@ export default {
             updateClientContact: "updateClientContact",
             updateLeadContact: "updateLeadContact",
             deleteClientContact: "deleteClientContact",
-            getDuoCombinations: "getClientDuoCombinations"
         })
     },
     computed: {
@@ -412,12 +411,13 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .client-info {
+    padding: 40px;
+    width: 1020px;
     position: relative;
     &__gen-info, &__contacts-info, &__rates, &__sales, &__billing {
         margin: 20px 10px 40px 10px;
         padding: 40px;
         box-shadow: 0 0 15px #67573e9d;
-        width: 900px;
         box-sizing: border-box;
     }
     &__rates {
@@ -427,17 +427,12 @@ export default {
         display: flex;
         justify-content: space-between;
         .gen-info__block {
-            width: 40%;
+            width: 35%;
         }
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
     }
-}
-
-.client-info {
-    padding: 40px;
-    width: 52%;
 }
 
 .title {
@@ -519,8 +514,7 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-left: 10px;
-    width: 900px;
+    margin-right: 10px;
 }
 
 .button {

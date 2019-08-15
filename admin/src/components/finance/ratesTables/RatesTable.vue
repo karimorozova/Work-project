@@ -2,11 +2,11 @@
 .table
     .table__thead
         .table__thead-row
-            .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
+            .table__thead-cell(v-for="field of fields" :style="{width: field.width+'px'}")
                 slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 6}")
+    .table__tbody(:class="[{'tbody_visible-overflow': tableData.length < 6}, bodyClass]")
         .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
-            .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
+            .table__tbody-cell(v-for="field of fields" :style="{width: field.width+'px', padding: field.padding}")
                 slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
         :errors="errors"
@@ -48,6 +48,9 @@ export default {
         isApproveModal: {
             type: Boolean,
             default: false
+        },
+        bodyClass: {
+            type: String
         }
     },
     data() {
@@ -57,7 +60,7 @@ export default {
     },
     methods: {
         onClick(index) {
-            this.$emit("onRowClicked", {index: index})
+            this.$emit("onRowClicked", {index})
         },
         closeErrors() {
             this.$emit("closeErrors");
@@ -83,12 +86,14 @@ export default {
 @import '../../../assets/scss/colors.scss';
 
 .table {
-    width: 100%;
+    width: fit-content;
     &__thead {
         .table__thead-row {
             background-color: $thead-background;
             color: $white;
         }
+        border-right: 0.5px solid $cell-border;
+        border-left: 0.5px solid $cell-border;
     }
     &__tbody {
         height: 180px;
@@ -127,9 +132,6 @@ export default {
     }
     &__thead-row, &__tbody-row {
         display: flex;
-    }
-    &_scroll-padding {
-        padding-right: 15px;
     }
     &_bottom-bordered {
         border-bottom: 0.5px solid $cell-border;

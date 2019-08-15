@@ -1,21 +1,26 @@
 <template lang="pug">
 .vendor-rates
-    .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMonoRatesShow}")
+    .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMonoRates}")
         .vendor-rates__open 
-            .vendor-rates__select(@click="monoRatesToggler")
+            .vendor-rates__select(@click="(e) => toggleRates(e, 'isMonoRates')")
                 span.vendor-rates__label Package
-                img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMonoRatesShow}") 
-            .vendor-rates__drop(v-if="isMonoRatesShow")
-                MonoRates(:vendor="vendor")
-    .vendor-rates__block(:class="{'vendor-rates_straight-angle': isDuoRatesShow}")
+                img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isMonoRates}") 
+            .vendor-rates__drop(v-if="isMonoRates")
+                MonoRates(:entity="vendor" :isClient="false")
+    .vendor-rates__block(:class="{'vendor-rates_straight-angle': isWordsRates}")
         .vendor-rates__open
-            .vendor-rates__select(@click="duoRatesToggler")
+            .vendor-rates__select(@click="(e) => toggleRates(e, 'isWordsRates')")
                 span.vendor-rates__label Wordcount
-                img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isDuoRatesShow}") 
-            .vendor-rates__drop(v-if="isDuoRatesShow")
-                DuoRates(:vendor="vendor" 
-                    @addSevLangs="addSevLangs"
-                    @updateVendor="updateVendor")
+                img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isWordsRates}") 
+            .vendor-rates__drop(v-if="isWordsRates")
+                DuoRatesWords(:entity="vendor" :isClient="false")
+    .vendor-rates__block(:class="{'vendor-rates_straight-angle': isHoursRates}")
+        .vendor-rates__open
+            .vendor-rates__select(@click="(e) => toggleRates(e, 'isHoursRates')")
+                span.vendor-rates__label Hours
+                img.vendor-rates__icon(src="../../assets/images/Other/open.png" :class="{'vendor-rates_reverse': isHoursRates}") 
+            .vendor-rates__drop(v-if="isHoursRates")
+                DuoRatesHours(:entity="vendor" :isClient="false")
     .vendor-rates__block(:class="{'vendor-rates_straight-angle': isMatrixShow}")
             .vendor-rates____open
                 .vendor-rates__select(@click="matrixToggler")
@@ -26,10 +31,11 @@
 </template>
 
 <script>
-import DuoRates from "./rates/DuoRates";
-import MonoRates from "./rates/MonoRates";
+import MonoRates from "../finance/clientsAndVendorsRates/MonoRates";
+import DuoRatesWords from "../finance/clientsAndVendorsRates/DuoRatesWords";
+import DuoRatesHours from "../finance/clientsAndVendorsRates/DuoRatesHours";
 import FinanceMatrix from "../FinanceMatrix";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -39,20 +45,22 @@ export default {
     },
     data() {
         return {
-            isMonoRatesShow: false,
-            isDuoRatesShow: false,
+            isMonoRates: false,
+            isWordsRates: false,
+            isHoursRates: false,
             isMatrixShow: false
         }
     },
     methods: {
-        addSevLangs(data) {
-            this.$emit('addSevLangs')
-        },
-        monoRatesToggler() {
-            this.isMonoRatesShow = !this.isMonoRatesShow;
-        },
-        duoRatesToggler() {
-            this.isDuoRatesShow = !this.isDuoRatesShow;
+        ...mapActions([
+            "storePriceRates",
+            "sortRates",
+            "getSteps",
+            "alertToggle",
+            "setVendorsMatrixData",
+        ]), 
+        toggleRates(e, prop) {
+            this[prop] = !this[prop];
         },
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
@@ -64,35 +72,24 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error on setting matrix data", isShow: true, type: "error"})
             }
-        },
-        async getAllServices() {
-            try {
-                if(!this.vuexServices.length) {
-                    await this.getServices();
-                }
-            } catch(err) { }
-        },
-        updateVendor() {
-            this.$emit("updateVendor");
-        },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            setVendorsMatrixData: "setVendorsMatrixData",
-            getServices: "getServices"
-        })
-    },
-    computed: {
-        ...mapGetters({
-            vuexServices: "getVuexServices",
-        })
+        }
     },
     components: {
-        DuoRates,
+        DuoRatesWords,
+        DuoRatesHours,
         MonoRates,
         FinanceMatrix
     },
     created() {
-        this.getAllServices();
+        this.getSteps();
+    },
+    mounted() {
+        this.storePriceRates({prop: 'monoRates', value: this.vendor.monoRates})
+        this.storePriceRates({prop: 'wordsRates', value: this.vendor.wordsRates})
+        this.storePriceRates({prop: 'hoursRates', value: this.vendor.hoursRates})
+        this.sortRates('monoRates')
+        this.sortRates('wordsRates')
+        this.sortRates('hoursRates')
     }
 }
 

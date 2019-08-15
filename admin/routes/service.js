@@ -1,10 +1,8 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { Services, Pricelist } = require('../models');
-const { updatePricelistRate, deleteRate, updateLangCombs } = require('../services/');
+const { Services } = require('../models');
 const { getProject, getProjectWithUpdatedFinance } = require('../projects/');
 const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../calculations');
-const { getAllRates } = require('../services/getRates'); 
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
@@ -63,56 +61,6 @@ router.post('/step-payables', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on getting step payables');
-  }
-})
-
-router.post('/rates', async (req, res) => {
-    try {
-        const { info, priceId } = req.body;
-        const result = await updatePricelistRate(info, priceId);
-        res.send(result);
-    } catch(err) {
-        console.log(err)
-        res.status(500).send('Error on adding/updating the rate');
-    }
-})
-
-router.post('/several-langs', async (req, res) => {
-  let { combinations } = req.body;
-  try {
-      await updateLangCombs(combinations);
-    res.send('Several langs added..');
-  } catch(err) {
-    console.log(err)
-    res.status(500).send('Error on adding several language combinations');
-  }
-})
-
-router.delete('/rate/:priceId', async (req, res) => {
-  const { industries, servicesIds, id } = req.body;
-  const { priceId } = req.params;
-  try {
-    await deleteRate({
-      priceId,
-      rateId: id, 
-      industries, 
-      services: servicesIds
-    });
-    res.send("deleted");
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Error on deleting the rate');
-  }
-})
-
-router.get("/parsed-rates",  async (req, res) => {
-  const { id, form } = req.query;
-  try {
-    const rates = await getAllRates(form, id);
-    res.send(rates); 
-  } catch(err) {
-    console.log(err);
-    res.send("error");
   }
 })
 

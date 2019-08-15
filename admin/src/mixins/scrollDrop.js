@@ -6,7 +6,11 @@ export default {
     },
     methods: {
         scrollDrop({drop, offsetTop, offsetHeight}) {
-            let tbody = document.querySelector(this.bodyClass);
+            let querySelector = this.bodyClass;
+            if(this.ratesBodyClass) {
+                querySelector = `.${this.ratesBodyClass}`
+            }
+            let tbody = document.querySelector(querySelector);
             if(this.isScrollDrop(drop, tbody)) {
                 setTimeout(() => {
                     const offsetBottom = offsetTop + offsetHeight*2;

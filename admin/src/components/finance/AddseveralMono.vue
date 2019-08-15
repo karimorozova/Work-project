@@ -9,25 +9,20 @@
                 .add-several__drop-menu
                     SelectSingle(placeholder="Select" :options="pricelists" :selectedOption="selectedPrice.name" @chooseOption="setPrice")
         LangsManage(
-            title="Source languages"
-            :all="source.all" 
-            :chosen="source.chosen" 
-            @toChosen="(e) => toChosen(e, 'source')" 
-            @toAll="(e) => toAll(e, 'source')"
-            @forceMoveTo="(e) => forceMoveTo(e, 'source')"
-            @forceMoveBack="(e) => forceMoveBack(e, 'source')"
-            @sortBySearch="(e) => sortBySearch(e, 'source')"
-            @sortLangs="(e) => sortLangs(e, 'source')")
-        LangsManage(
-            title="Target languages"
+            title="Languages"
             :all="target.all" 
             :chosen="target.chosen" 
-            @toChosen="(e) => toChosen(e, 'target')" 
-            @toAll="(e) => toAll(e, 'target')"
-            @forceMoveTo="(e) => forceMoveTo(e, 'target')"
-            @forceMoveBack="(e) => forceMoveBack(e, 'target')"
-            @sortBySearch="(e) => sortBySearch(e, 'target')"
-            @sortLangs="(e) => sortLangs(e, 'target')")
+            @toChosen="toChosen" 
+            @toAll="toAll"
+            @forceMoveTo="forceMoveTo"
+            @forceMoveBack="forceMoveBack"
+            @sortBySearch="sortBySearch"
+            @sortLangs="sortLangs")
+        .add-several__prices
+            span.add-several__title.add-several_width-22 Packages
+            .add-several_width-78
+                .add-several__drop-menu
+                    SelectMulti(placeholder="Select" :options="packages" :selectedOptions="selectedPackages" @chooseOptions="setPackage")
         .add-several__service-industry
             span.add-several__title.add-several_width-22 Steps
             .add-several_width-78
@@ -40,7 +35,7 @@
                         IndustrySelect(:selectedInd="selectedInd" :filteredIndustries="checkedIndustries" @chosenInd="setIndustry" :entity="entity")
         .add-several__submit
             input.add-several__button(type="button" @click="checkErrors" value="Submit")
-    ValidationErrors(v-if="areErrors" isAbsolute :errors="errors" @closeErrors="closeErrors")
+    ValidationErrors(v-if="areErrors" :isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 </template>
 
 <script>
@@ -63,14 +58,14 @@ export default {
             type: Array,
             default: () => []
         },
-        ratesName: { type: String }
+        packages: {
+            type: Array,
+            default: () => []
+        }
     },
     data() {
         return {
             languages: [],
-            source: {
-                all: [], chosen: []
-            },
             target: {
                 all: [], chosen: []
             },
@@ -78,7 +73,8 @@ export default {
             selectedSteps: [],
             areErrors: false,
             errors: [],
-            selectedPrice: {name: ""}
+            selectedPrice: {name: ""},
+            selectedPackages: []
         }
     },
     methods: {
@@ -86,14 +82,13 @@ export default {
             alertToggle: "alertToggle",
             storePricelists: "storePricelists"
         }),
-        sortBySearch({value, prop }, mainProp) {
-            if(!value) return this.sortLangArray(this[mainProp][prop]);
+        sortBySearch({value, prop }) {
+            if(!value) return this.sortLangArray(this.target[prop]);
             const val = value.toLowerCase();
-            for(let index in this[mainProp][prop]) {
-                const n = val.length;
-                if(this[mainProp][prop][index].lang.toLowerCase().slice(0, n) === val) {
-                    let replaceLang = this[mainProp][prop].splice(index, 1);
-                    this[mainProp][prop].unshift(replaceLang[0]);
+            for(let index in this.target[prop]) {
+                if(this.target[prop][index].lang.toLowerCase().slice(0, val.length) === val) {
+                    let replaceLang = this.target[prop].splice(index, 1);
+                    this.target[prop].unshift(replaceLang[0]);
                 }
             }
         },
@@ -103,8 +98,8 @@ export default {
                 this.errors.push('Please, select pricelist');
                 return this.areErrors = true;
             } else {
-                if(!this.source.chosen.length) this.errors.push('Please, select source languages');
                 if(!this.target.chosen.length) this.errors.push('Please, select target languages');
+                if(!this.selectedPackages.length) this.errors.push('Please, select packages');
                 if(!this.selectedSteps.length) this.errors.push('Please, select steps');
                 if(!this.selectedInd.length) this.errors.push('Please, select industries');
                 if(this.errors.length) {
@@ -119,28 +114,24 @@ export default {
         setPrice({option}) {
             this.selectedPrice = option;
             this.setPriceLangs();
-            this.sortLangArray(this.source.all);
             this.sortLangArray(this.target.all);
         },
         setPriceLangs() {
-            const allCombs = this.selectedPrice[this.ratesName];
-            const notUniqueSource = allCombs.map(item => item.source);
-            const notUniqueTarget = allCombs.map(item => item.target);
-            this.source.all = notUniqueSource.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);            
-            this.target.all = notUniqueTarget.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
-            this.source.chosen = [];            
+            const notUniqueTargets =  this.selectedPrice.monoRates.map(item => item.target);
+            this.target.all = notUniqueTargets.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
             this.target.chosen = [];            
         },
         collectData() {
             const industries = this.selectedInd[0].name === 'All' ? ['All'] : this.selectedInd.map(item => item._id);
+            const packages = this.selectedPackages[0] === 'All' ? this.packages.filter(item => item !== 'All') : this.selectedPackages;
             const stepsIds = this.selectedSteps.map(item => item._id);
             return {
-                copyRates: this.selectedPrice[this.ratesName],
-                sources: this.source.chosen,
-                targets: this.target.chosen,
+                copyRates: this.selectedPrice.monoRates,
                 industries, 
-                stepsIds
-            }
+                stepsIds, 
+                packages,                  
+                targets: this.target.chosen
+            };
         },
         addLangCombinations() {
             const ratesData = this.collectData();
@@ -152,8 +143,8 @@ export default {
             this.selectedSteps = [];
             this.$emit('closeSeveral')
         },
-        sortLangs({ prop }, mainProp) {
-            this.sortLangArray(this[mainProp][prop]);
+        sortLangs({ prop }) {
+            this.sortLangArray(this.target[prop]);
         },
         sortLangArray(arr) {
             arr.sort((a, b) => {
@@ -161,62 +152,65 @@ export default {
                 if(a.lang > b.lang) return 1;
             })
         },
-        forceMoveTo({ index }, prop) {
-            const language = this[prop].all.splice(index, 1);
-            this[prop].chosen.push(language[0]);
-            this[prop].chosen.forEach(item => {
+        forceMoveTo({ index }) {
+            const language = this.target.all.splice(index, 1);
+            this.target.chosen.push(language[0]);
+            this.target.chosen.forEach(item => {
                 item.check = false
             })
-            this.sortLangArray(this[prop].chosen);
+            this.sortLangArray(this.target.chosen);
         },
-        forceMoveBack({ index }, prop) {
-            const language = this[prop].chosen.splice(index, 1);
-            this[prop].all.push(language[0]);
-            this[prop].all.forEach(item => {
+        forceMoveBack({ index }) {
+            const language = this.target.chosen.splice(index, 1);
+            this.target.all.push(language[0]);
+            this.target.all.forEach(item => {
                 item.check = false
             })
             this.sortLangArray(this[prop].all);
         },
-        toChosen(e, mainProp) {
-            for(let lang of this[mainProp].all) {
+        toChosen() {
+            for(let lang of this.target.all) {
                 if(lang.check) {
-                    this[mainProp].chosen.push(lang)
+                    this.target.chosen.push(lang)
                 }
             }
-            this[mainProp].all = this[mainProp].all.filter(item => {
+            this.target.all = this.target.all.filter(item => {
                 return !item.check;
             })
-            this[mainProp].chosen.forEach(item => {
+            this.target.chosen.forEach(item => {
                 item.check = false
             })
-            this.sortLangArray(this[mainProp].chosen);
+            this.sortLangArray(this.target.chosen);
         },
-        toAll(e, mainProp) {
-            for(let lang of this[mainProp].chosen) {
+        toAll() {
+            for(let lang of this.target.chosen) {
                 if(lang.check) {
-                    this[mainProp].all.push(lang)
+                    this.target.all.push(lang)
                 }
             }
-            this[mainProp].chosen = this[mainProp].chosen.filter(item => {
+            this.target.chosen = this.target.chosen.filter(item => {
                 return !item.check;
             })
-            this[mainProp].all.forEach(item => {
+            this.target.all.forEach(item => {
                 item.check = false
             })
-            this.sortLangArray(this[mainProp].all);
+            this.sortLangArray(this.target.all);
+        },
+        setElements({position, mainProp, prop, option}) {
+            if(position !== -1) {
+                 return this[mainProp].splice(position, 1);
+            }
+            if(this[mainProp].length && (this[mainProp][0]  === "All" || this[mainProp][0][prop] === "All")) {
+                this[mainProp] = []
+            }
+            this[mainProp].push(option);
         },
         setIndustry({industry}) {
             if(industry.name === "All") {
                 return this.selectedInd = [{name: 'All'}];
             }
             const position = this.selectedInd.findIndex(item => item.name === industry.name);
-            if(position !== -1) {
-                 return this.selectedInd.splice(position, 1);
-            }
-            if(this.selectedInd.length && this.selectedInd[0].name === "All") {
-                this.selectedInd = []
-            };
-            this.selectedInd.push(industry);
+            this.setElements({position, mainProp: 'selectedInd', prop: 'name', option: industry});
         },
         setSteps({option}) {
             const step = this.vuexSteps.find(item => item.title === option);
@@ -225,6 +219,13 @@ export default {
                  return this.selectedSteps.splice(position, 1);
             }
             this.selectedSteps.push(step);
+        },
+        setPackage({option}) {
+            if(option === 'All') {
+                return this.selectedPackages = ['All'];
+            }
+            const position = this.selectedPackages.indexOf(option);
+            this.setElements({position, mainProp: 'selectedPackages', option});
         },
         async getAllPricelists() {
             try {
@@ -246,13 +247,7 @@ export default {
                 : this.vuexPricelists.filter(item => item._id !== this.currentPrice._id);
         },
         checkedIndustries() {
-            let result = [];
-            if(this.selectedInd.length) {
-                for(let elem of this.selectedInd) {
-                    result.push(elem.name);
-                }
-            }
-            return result;
+            return this.selectedInd.length ? this.selectedInd.map(item => item.name) : [];
         },
         selectedStepsTitles() {
             return this.selectedSteps.length ? this.selectedSteps.map(item => item.title) : [];

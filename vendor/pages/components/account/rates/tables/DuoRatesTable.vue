@@ -68,8 +68,8 @@ export default {
         }),
         async getRates() {
             try {
-                const result = await this.$axios.get(`/vendor/rates?form=Duo&id=${this.vendor._id}`);
-                this.rates = result.data;
+                // const result = await this.$axios.get(`/vendor/rates?form=Duo&id=${this.vendor._id}`);
+                // this.rates = result.data;
             } catch(err) {
                 this.alertToggle({message: err.response.data, isShow: true, type: "error"});
             }
