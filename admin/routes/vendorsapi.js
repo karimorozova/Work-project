@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, updateVendorRates, addSeveralCombinations, getVendorAfterCombinationsUpdated } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, updateVendorRates, importRates, getVendorAfterCombinationsUpdated } = require('../vendors');
 const { Vendors } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -92,14 +92,14 @@ router.post('/combination', async (req, res) => {
     }
 })
 
-router.post('/several-langs', async (req, res) => {
-    const { priceId, combinations, vendorId } = req.body;
+router.post('/import-rates', async (req, res) => {
+    const { vendorId, ratesData, prop } = req.body;
     try {
-        const updatedVendor = await addSeveralCombinations({priceId, vendorId, combinations});
+        const updatedVendor = await importRates({vendorId, ratesData, prop});
         res.send(updatedVendor);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on adding several languages for Vendor");
+        res.status(500).send("Error on importing rates to Vendor");
     }
 })
 

@@ -21,23 +21,21 @@ export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
     }
 }
 
-export const addSeveralVendorRates = async ({commit, dispatch, rootState}, payload) => {
-    commit("startRequest");
+export const importRatesToVendor = async ({commit, dispatch, state}, payload) => {
+    commit('startRequest');
     try {
-        const { combinations, vendorId } = payload;
-        const updatedVendor = await Vue.http.post('/vendorsapi/several-langs', {combinations, vendorId});
-        const index = rootState.a.vendors.findIndex(item => item._id === vendorId);
-        rootState.a.vendors.splice(index, 1, updatedVendor.body);
-        dispatch('storeCurrentVendor', updatedVendor.body);
-        await dispatch('getVendorDuoCombinations');
-        commit("endRequest");
+        const vendorId = state.currentVendor._id;
+        const { ratesData, prop } = payload;
+        const result = await Vue.http.post('/vendorsapi/import-rates', { ratesData, vendorId, prop });
+        dispatch('storeCurrentVendor', result.body);
     } catch(err) {
-        commit("endRequest");
-        throw new Error("Error on adding sveral langs for Vendor")
+        dispatch("alertToggle", {message: err.response.data, isShow:true, type: "error"});
+    } finally {
+        commit('endRequest');
     }
 }
 
-export const deleteVendorRate = async ({commit, dispatch}, payload) => {
+export const deleteVendorRate = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
         const { id, prop } = payload;

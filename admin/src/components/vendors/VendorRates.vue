@@ -35,7 +35,7 @@ import MonoRates from "../finance/clientsAndVendorsRates/MonoRates";
 import DuoRatesWords from "../finance/clientsAndVendorsRates/DuoRatesWords";
 import DuoRatesHours from "../finance/clientsAndVendorsRates/DuoRatesHours";
 import FinanceMatrix from "../FinanceMatrix";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     props: {
