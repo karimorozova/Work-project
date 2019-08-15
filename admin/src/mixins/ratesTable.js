@@ -10,7 +10,7 @@ export default {
     },
     methods: {
         isScrollDrop(drop, elem) {
-            return drop && this.fullInfo.length >= 4;
+            return drop && this.fullInfo.length >= 3;
         },
         handleScroll() {
             const querySelector = `.${this.ratesBodyClass}`;
