@@ -1,5 +1,5 @@
 <template lang="pug">
-.action-button
+.action-button(:class="customClass")
     input.action-button__button(type="button" :value="value" @click="clicked")    
 </template>
 
@@ -7,6 +7,9 @@
 export default {
     props: {
         value: {
+            type: String
+        },
+        customClass: {
             type: String
         }
     },
@@ -19,18 +22,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/colors.scss";
 
 .action-button {
     &__button {
         width: 138px;
         height: 33px;
-        color: #FFF;
+        color: $white;
         font-size: 14px;
         font-weight: 700;
         border-radius: 10px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #D15F45;
-        border: 1px solid #D15F45;
+        background-color: $orange;
+        border: 1px solid $orange;
         cursor: pointer;
         outline: none;
         &:hover {
@@ -44,6 +48,19 @@ export default {
         margin: 7px;
         @media (max-width: 450px) {
             margin: 5px;
+        }
+    }
+}
+
+.main-nav_button {
+    .action-button__button {
+        width: 168px;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.7);
+        &:hover {
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);     
+        }
+        &:active {
+            transform: scale(0.98);
         }
     }
 }

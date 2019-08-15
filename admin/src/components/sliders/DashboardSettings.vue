@@ -1,36 +1,24 @@
 <template lang="pug">
-  .dashboard
-    Activities
+    .dashboard
+        Activities
 </template>
 
 <script>
 import Activities from "../reports/Activities"
 
 export default {
-  data() {
-    return {
-      
+    components: {
+        Activities
     }
-  },
-  methods: {
-
-  },
-  computed: {
-    
-  },
-  components: {
-    Activities
-  }
 };
 </script>
 
 <style lang="scss" scoped>
 
 .dashboard {
-  min-height: 94vh;
-  width: 100%;
-  padding-left: 40px;
-  box-sizing: border-box;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 40px;
 }
 
 </style>

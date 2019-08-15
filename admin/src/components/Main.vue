@@ -5,14 +5,7 @@
                 h2.adminPortal ADMIN PORTAL
             .admin-top__search-block
                 .new-request
-                    .sel_project_block(v-click-outside="hideAdditional")
-                        .sel_project_block__proj
-                            span New Project
-                            .additional(v-if="dropdownVisible")
-                                .additional__listItem(target="_newtab" v-for='(proj, projIndex) in newProject' @click='gotoRequestPage(projIndex)') {{ proj.title }}
-                        .sel_project_block__img-wrapper(@click="showDropdown")
-                            .sel_project_block__image
-                                img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
+                    Button(value="Add New Project" @clicked="gotoRequestPage" customClass="main-nav_button")
                 .account-menu(v-click-outside="hideAccountMenu")
                     .woman-wrapper
                         img.woman-wrapper__photo(v-if="!user.photo" src="../assets/images/client-icon_image.png")
@@ -57,6 +50,7 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import { mapGetters, mapActions } from "vuex";
+import Button from "./Button";
 
 export default {
     data() {
@@ -143,11 +137,8 @@ export default {
             this.$store.dispatch('allLanguages', allLangs);
         },
         gotoRequestPage(index) {
-            if (index === 0) {
-                this.$router.push({name: 'create-project'});
-                this.checkForSpecifiedSideBar('project', 'PROJECTS');
-            }
-            this.hideAdditional();
+            this.$router.push({name: 'create-project'});
+            this.checkForSpecifiedSideBar('project', 'PROJECTS');
         },
         mainPageRender() {
             this.toggleSideBar(true);
@@ -259,6 +250,9 @@ export default {
             user: "getUser",
             userGroup: "getUserGroup"
         })
+    },
+    components: {
+        Button
     },
     beforeRouteUpdate(to, from, next) {
         if (localStorage.getItem('token')) {
@@ -595,53 +589,6 @@ export default {
     margin-right: 83px;
     z-index: 3;
     position: relative;
-
-    .sel_project_block {
-        margin-right: 150px;
-        width: 239px;
-        width: 33%;
-        background-color: #D15F45;
-        border-radius: 14px;
-        width: 100%;
-        height: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-
-        &__proj {
-            border-right: 1px solid #fff;
-            line-height: 100%;
-            color: #fff;
-            width: 80%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            position: relative;
-
-            span {
-                padding-left: 14px;
-            }
-        }
-
-        &__img-wrapper {
-            display: flex;
-            height: 100%;
-            width: 20%;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-
-            .rotate {
-                transform: rotate(180deg);
-            }
-        }
-
-        &__image {
-            padding: 5px;
-            cursor: pointer;
-        }
-    }
 }
 
 .additional {

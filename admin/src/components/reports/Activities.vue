@@ -258,7 +258,8 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .activities {
-    margin-top: 40px;
+    padding-top: 40px;
+    box-sizing: border-box;
     &__title {
         font-size: 21px;
         font-weight: 700;
