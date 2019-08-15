@@ -90,6 +90,7 @@ export default {
             "importRatesToPrice",
             "importRatesToClient",
             "storePriceRates",
+            "sortRates",
             "deleteClientRates",
             "getSteps",
             "setAllStepsForRates"
