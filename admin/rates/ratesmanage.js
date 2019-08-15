@@ -240,18 +240,20 @@ function manageSamePairs({stepsIds, samePairs, rates, industries}) {
     });
     let updatedRates = [];
     for(let i = 0; i < samePairs.length; i++) {
-        let pairIndustries = samePairs[i].industries.map(item => item.id);
-        let changingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) !== -1);
-        let remainingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) === -1);
-        let newRates = getNewRates(samePairs[i].rates, rates, stepsIds);
+        const pairIndustries = samePairs[i].industries.map(item => item.id);
+        const changingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) !== -1);
+        const remainingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) === -1);
+        const newRates = getNewRates(samePairs[i].rates, rates, stepsIds);
         industriesIds = industriesIds.filter(item => pairIndustries.indexOf(item) === -1);
-        const { _id, ...pair } = samePairs[i]._doc;
-        updatedRates.push({...pair, industries: remainingPairIndustries});
-        updatedRates.push({...pair, rates: newRates, industries: changingPairIndustries});
+        const { source, target, packageSize } = samePairs[i];
+        const ratePair = source ? {source, target} : {target, packageSize};
+        updatedRates.push({...ratePair, industries: remainingPairIndustries});
+        updatedRates.push({...ratePair, packageSize, rates: newRates, industries: changingPairIndustries});
     }
     if(industriesIds.length) {
-        const { _id, ...firstPair } = samePairs[0]._doc;
-        updatedRates.push({...firstPair, rates, industries: industriesIds});
+        const { source, target, packageSize } = samePairs[0];
+        const ratePair = source ? {source, target} : {target, packageSize};
+        updatedRates.push({...ratePair, rates, industries: industriesIds});
     }
     updatedRates = updatedRates.filter(item => item.industries.length);
     updatedRates = joinSameRatesIndustries(updatedRates);
@@ -325,4 +327,4 @@ function getRatesToCopy(pairRates, stepsIds) {
     }, {})
 }
 
-module.exports = { getAfterRatesSaved, getAfterRatesImported, manageMonoPairRates, manageDuoPairRates, getRatesToCopy }
+module.exports = { getAfterRatesSaved, getAfterRatesImported, manageMonoPairRates, manageDuoPairRates, getRatesToCopy, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates }
