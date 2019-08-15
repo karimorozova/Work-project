@@ -48,10 +48,6 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        origin: {
-            type: String,
-            default: 'global'
-        },
         entity: {
             type: Object
         },
@@ -247,7 +243,7 @@ export default {
             currentPrice: "getCurrentPrice"
         }),
         pricelists() {
-            return this.origin !== "global" ? this.vuexPricelists 
+            return this.entity ? this.vuexPricelists 
                 : this.vuexPricelists.filter(item => item._id !== this.currentPrice._id);
         },
         checkedIndustries() {
