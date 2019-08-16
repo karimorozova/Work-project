@@ -245,9 +245,9 @@ function manageSamePairs({stepsIds, samePairs, rates, industries}) {
         const remainingPairIndustries = pairIndustries.filter(item => industriesIds.indexOf(item) === -1);
         const newRates = getNewRates(samePairs[i].rates, rates, stepsIds);
         industriesIds = industriesIds.filter(item => pairIndustries.indexOf(item) === -1);
-        const { source, target, packageSize } = samePairs[i];
+        const { source, target, packageSize, rates: oldRates } = samePairs[i];
         const ratePair = source ? {source, target} : {target, packageSize};
-        updatedRates.push({...ratePair, industries: remainingPairIndustries});
+        updatedRates.push({...ratePair, rates: oldRates, industries: remainingPairIndustries});
         updatedRates.push({...ratePair, packageSize, rates: newRates, industries: changingPairIndustries});
     }
     if(industriesIds.length) {
