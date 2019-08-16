@@ -1,60 +1,17 @@
 <template lang="pug">
 .client-info
     .buttons
-        input.button(type="button" value="Save" @click="checkForErrors")
-        input.button(type="button" value="Cancel" @click="cancel")
-        input.button(type="button" value="Delete" @click="deleteClient")
+        .button
+            Button(value="Save" @clicked="checkForErrors")
+        .button
+            Button(value="Cancel" @clicked="cancel")
+        .button
+            Button(value="Delete" @clicked="deleteClient")
     .title General Information
     .client-info__gen-info
-        .gen-info__block
-            .block-item
-                label.block-item__label.block-item_relative Company Name:
-                    Asterisk(:customStyle="asteriskStyle")
-                input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'client-info_error-shadow': !currentClient.name && isSaveClicked}")
-            .block-item
-                label.block-item__label Website:
-                input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
-            .block-item
-                label.block-item__label.block-item_relative Industry:
-                    Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
-                    MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-            .block-item
-                label.block-item__label.block-item_relative Status:
-                    Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.status}")
-                    ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
-        .gen-info__block
-            .block-item
-                label.block-item__label Contract:
-                .contract
-                    .contract__upload
-                        input.upload(type="file" @change="contractLoad")
-                    .contract__download
-                        a(v-if="currentClient.contract" :href="currentClient.contract")
-                            img(src="../../assets/images/Other/Download-icon.png")
-                label.block-item__label NDA:
-                .nda
-                    .nda__upload
-                        input.upload(type="file" @change="ndaLoad")
-                    .nda__download
-                        a(v-if="currentClient.nda" :href="currentClient.nda")
-                            img(v-if="currentClient.nda" src="../../assets/images/Other/Download-icon.png")
-            .block-item
-                label.block-item__label.block-item_relative Account Manager:
-                    Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
-                    AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
-            .block-item
-                label.block-item__label.block-item_relative Sales Manager:
-                    Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.salesManager}")
-                    AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
-            .block-item
-                label.block-item__label.block-item_relative Project Manager:
-                    Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.projectManager}")
-                    AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
+        General(
+            :isSaveClicked="isSaveClicked"
+            @loadFile="loadFile")
     .title Contact Details
     .client-info__contacts-info
         ContactsInfo(
@@ -67,7 +24,6 @@
     .title(v-if="currentClient._id") Rates    
     .client-info__rates(v-if="currentClient._id")
         ClientRates(:client="currentClient"
-            @addSevLangs="addSevLangs"
             @setMatrixData="setMatrixData")
     .title Sales Information
     .client-info__sales
@@ -79,15 +35,6 @@
         p Are you sure you want to delete?
         input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
         input.button(type="button" value="Delete" @click="approveClientDelete")
-    Addseverallangs(v-if="isAddSeveral"
-        :entity="currentClient"
-        origin="client"
-        @checkCombinations="checkCombinations"
-        @closeSeveral="closeSevLangs")
-    AvailablePairs(v-if="isAvailablePairs"
-        :list="langPairs"
-        @addLangs="addCombinations"
-        @closeList="closeLangPairs")
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrorsBlock"
@@ -95,17 +42,13 @@
 </template>
 
 <script>
-import Asterisk from "../Asterisk";
+import General from "./clientInfo/General";
+import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
-import MultiClientIndustrySelect from './MultiClientIndustrySelect';
-import ClientStatusSelect from './ClientStatusSelect';
-import AMSelect from './AMSelect';
 import ContactsInfo from './ContactsInfo';
 import ClientRates from './ClientRates';
 import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
-import Addseverallangs from "../finance/Addseverallangs";
-import AvailablePairs from "../finance/pricelists/AvailablePairs";
 import { mapGetters, mapActions} from "vuex";
 
 export default {
@@ -135,60 +78,12 @@ export default {
             errors: [],
             billErrors: [],
             isLeadEmpty: "",
-            isSaveClicked: false,
-            isAddSeveral: false,
-            addSeveralServiceTitle: "",
-            asteriskStyle: {"top": "-4px"},
-            isAvailablePairs: false,
-            langPairs: [],
-            addSeveralPriceId: ""
+            isSaveClicked: false
         }
     },
     methods: {
-        contractLoad(e) {
-            if(e.target.files && e.target.files[0]) {
-                this.$emit('loadFile', {files: e.target.files, prop: 'contractFiles'})
-            };
-        },
-        ndaLoad(e) {
-            if(e.target.files && e.target.files[0]) {
-                this.$emit('loadFile', {files: e.target.files, prop: 'ndaFiles'})
-            }
-        },
-        addSevLangs({serviceTitle}) {
-            this.isAddSeveral = true;
-            this.addSeveralServiceTitle = serviceTitle;
-        },
-        closeSevLangs() {
-            this.isAddSeveral = false;
-        },
-        closeLangPairs() {
-            this.isAvailablePairs = false;
-        },
-        async checkCombinations({ priceId, combinations }) {
-            // this.addSeveralPriceId = priceId;
-            // try {
-            //     const result = await this.$http.post("/prices/combinations", { priceId, combinations });
-            //     this.langPairs = [...result.body];
-            //     this.isAvailablePairs = true;
-            // } catch(err) {
-            //     this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
-            // }
-        },
-        async addCombinations() {
-            this.closeLangPairs();
-            try {
-                const id = this.currentClient._id;
-                const clientResult = await this.$http.post('/clientsapi/several-langs', {priceId: this.addSeveralPriceId, combinations: this.langPairs, clientId: id});
-                const updatedClient = {...clientResult.body};
-                await this.storeCurrentClient(updatedClient);
-                await this.storeClient(updatedClient);
-                await this.getDuoCombinations();
-                this.closeSevLangs();
-                this.alertToggle({message: "Saved", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});
-            }
+        loadFile({files, prop}) {
+            this.$emit('loadFile', {files, prop});
         },
         async setMatrixData({value, key}) {
             let matrix = {...this.currentClient.matrix};
@@ -246,30 +141,11 @@ export default {
         cancelApprove() {
             this.isApproveModal = false;
         },
-        chosenInd({industry}) {
-            let industries = [...this.currentClient.industries];
-            const position = industries.findIndex(item => item._id === industry._id);
-            if(position !== -1) {
-                industries.splice(position, 1);
-            } else {
-                industries.push(industry);
-            }
-            this.storeClientProperty({prop: 'industries', value: industries});
-        },
-        setStatus({status}) {
-            this.storeClientProperty({prop: 'status', value: status})
-        },
         setLeadSource({leadSource}) {
             this.storeClientProperty({prop: 'leadSource', value: leadSource});
         },
-        changeProperty(e, prop) {
-            this.storeClientProperty({prop, value: e.target.value});
-        },
         changeBillingProp({prop, value}) {
             this.storeClientProperty({prop, value});
-        },
-        setManager({manager}, prop) {
-            this.storeClientProperty({prop, value: manager});
         },
         contactDetails({contactIndex}) {
             this.$router.push({name: "contact", params: {index: contactIndex}});
@@ -372,29 +248,16 @@ export default {
         ...mapGetters({
             allClients: "getClients",
             currentClient: "getCurrentClient"
-        }),
-        selectedIndNames() {
-            let result = [];
-            if(this.currentClient.industries && this.currentClient.industries.length) {
-                for(let ind of this.currentClient.industries) {
-                    result.push(ind.name);
-                }
-            }
-            return result;
-        },
+        })
     },
     components: {
-        Asterisk,
+        General,
+        Button,
         ValidationErrors,
-        MultiClientIndustrySelect,
-        ClientStatusSelect,
-        AMSelect,
         ContactsInfo,
         ClientRates,
         ClientSalesInfo,
-        ClientBillInfo,
-        Addseverallangs,
-        AvailablePairs
+        ClientBillInfo
     },
     created() {
         this.getClientInfo();
@@ -423,13 +286,6 @@ export default {
     &__rates {
         padding: 10px;
     }
-    &__gen-info {
-        display: flex;
-        justify-content: space-between;
-        .gen-info__block {
-            width: 35%;
-        }
-    }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
     }
@@ -437,77 +293,6 @@ export default {
 
 .title {
     font-size: 22px;
-}
-
-.block-item {
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    &__label {
-        margin-bottom: 0;
-    }
-    &_relative {
-        position: relative;
-    }
-    &__drop {
-        position: relative;
-        width: 191px;
-        height: 28px;
-    }
-    &_high-index {
-        z-index: 10;
-    }
-    &_medium-index {
-        z-index: 8;
-    }
-    input {
-        font-size: 14px;
-        color: #67573e;
-        border: 1px solid #67573e;
-        border-radius: 5px;
-        box-sizing: border-box;
-        padding: 0 5px;
-        outline: none;
-        width: 191px;
-        height: 30px;
-    }
-    ::-webkit-input-placeholder {
-        opacity: 0.5;
-    }
-}
-.contract, .nda {
-    display: flex;
-    align-items: center;
-    width: 22%;
-    justify-content: space-between;
-    &__upload {
-        position: relative;
-        background: url("../../assets/images/Other/upload-icon.png");
-        background-repeat: no-repeat;
-        width: 40%;
-        height: 22px;
-        overflow: hidden;
-        .upload {
-            padding-left: 0;
-            padding-right: 0;
-            width: 33px;
-            height: 22px;
-            border: none;
-            outline: none;
-            margin-top: -3px;
-            margin-right: 2px;
-            opacity: 0;
-            z-index: 2;
-            position: absolute;
-            left: -10px;
-        }
-    }
-    &__download {
-        width: 40%;
-        cursor: pointer;
-    }
 }
 
 .buttons {

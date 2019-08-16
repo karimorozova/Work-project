@@ -43,7 +43,6 @@ export default {
                 industries: [],
                 contacts: []
             },
-            asteriskStyle: {"top": "-4px"},
             isNewClient: true
         }
     },

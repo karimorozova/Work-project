@@ -77,22 +77,11 @@
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
-                @addSevLangs="addSevLangs"
                 @updateVendor="updateVendor")
         .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
-        Addseverallangs(v-if="isAddSeveral"
-            origin="vendor"
-            :entity="currentVendor"
-            @checkCombinations="checkCombinations"
-            @closeSeveral="closeSevLangs"
-        )
-        AvailablePairs(v-if="isAvailablePairs"
-            :list="langPairs"
-            @addLangs="addCombinations"
-            @closeList="closeLangPairs")
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
@@ -125,48 +114,16 @@ export default {
             isApproveModal: false,
             asteriskStyle: {"top": "-4px"},
             photoFile: [],
-            isAddSeveral: false,
             genders: ["Male", "Female"],
             errors: [],
-            isAvailablePairs: false,
             langPairs: [],
             addSeveralPriceId: "",
             oldEmail: ""
         }
     },
     methods: {
-        addSevLangs() {
-            this.isAddSeveral = true;
-        },
-        closeSevLangs() {
-            this.isAddSeveral = false;
-        },
         closeLangPairs() {
             this.isAvailablePairs = false;
-        },
-        async checkCombinations({ priceId, combinations }) {
-            // this.addSeveralPriceId = priceId;
-            // try {
-            //     const result = await this.$http.post("/prices/combinations", { priceId, combinations });
-            //     this.langPairs = [...result.body];
-            //     this.isAvailablePairs = true;
-            // } catch(err) {
-            //     this.alertToggle({message: "Can't check combinations.", isShow: "true", type: "error"});
-            // }
-        },
-        async addCombinations() {
-            this.closeLangPairs();
-            try {
-                const id = this.currentVendor._id;
-                const vendorResult = await this.$http.post('/vendorsapi/several-langs', {priceId: this.addSeveralPriceId, combinations: this.langPairs, vendorId: id});
-                const updatedVendor = {...vendorResult.body};
-                await this.storeCurrentVendor(updatedVendor);
-                await this.getDuoCombinations();
-                this.closeSevLangs();
-                this.alertToggle({message: "Saved", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Error on adding several languages", isShow: true, type: "error"});
-            }
         },
         deleteVendor() {
             this.isApproveModal = true;

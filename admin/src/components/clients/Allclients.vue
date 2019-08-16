@@ -53,10 +53,8 @@ export default {
     methods: {
         async getCustomers() {
             try {
-                if(!this.allClients.length) {
-                    let result = await this.$http.get('/all-clients');
-                    this.customersGetting(result.body);
-                }
+                let result = await this.$http.get('/all-clients');
+                this.customersGetting(result.body);
             } catch(err) {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
             }

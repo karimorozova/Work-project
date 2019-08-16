@@ -20,7 +20,7 @@ export default {
         return {
             fromRoute: "/clients",
             contactsPhotos: [],
-            contactsPhotos: [],
+            contractFiles: [],
             ndaFiles: []
         }
     },
@@ -64,7 +64,7 @@ export default {
             this.$router.go(-1);
         },
         loadFile({files, prop}) {
-            this[prop] = files;
+            this[prop] = [...files];
         },
         ...mapActions({
             alertToggle: "alertToggle",

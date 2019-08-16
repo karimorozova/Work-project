@@ -1,57 +1,17 @@
 <template lang="pug">
     .new-client-info(v-if="clientShow")
         .buttons
-            input.button(type="button" value="Save" @click="checkForErrors")
-            input.button(type="button" value="Cancel" @click="cancel")
+            .button
+                Button(value="Save" @clicked="checkForErrors")
+            .button
+                Button(value="Cancel" @clicked="cancel")
         .title General Information
         .new-client-info__gen-info
-            .gen-info__block
-                .block-item
-                    label.block-item__label.block-item_relative Company Name:
-                        Asterisk(:customStyle="asteriskStyle")
-                    input(type="text" placeholder="Company Name" v-model="client.name" :class="{'new-client-info_error-shadow': !client.name && isSaveClicked}")
-                .block-item
-                    label.block-item__label Website:
-                    input(type="text" placeholder="Website" v-model="client.website")
-                .block-item
-                    label.block-item__label.block-item_relative Industry:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop.block-item_high-index(:class="{'new-client-info_error-shadow': !client.industries.length && isSaveClicked}")
-                        MultiClientIndustrySelect(:selectedInd="client.industries" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-                .block-item
-                    label.block-item__label.block-item_relative Status:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'new-client-info_error-shadow': !client.status && isSaveClicked}")
-                        ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="setStatus")
-            .gen-info__block
-                .block-item
-                    label.block-item__label Contract:
-                    .contract
-                        .contract__upload
-                            input.upload(type="file" @change="contractLoad")
-                        .contract__download
-                            img(v-if="client.contract" src="../../assets/images/Other/Download-icon.png")
-                    label.block-item__label NDA:
-                    .nda
-                        .nda__upload
-                            input.upload(type="file" @change="ndaLoad")
-                        .nda__download
-                            img(v-if="client.nda" src="../../assets/images/Other/Download-icon.png")
-                .block-item
-                    label.block-item__label.block-item_relative Account Manager:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop.block-item_high-index(:class="{'new-client-info_error-shadow': !client.accountManager && isSaveClicked}")
-                        AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
-                .block-item
-                    label.block-item__label.block-item_relative Sales Manager:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop.block-item_medium-index(:class="{'new-client-info_error-shadow': !client.salesManager && isSaveClicked}")
-                        AMSelect(:selectedManager="client.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
-                .block-item
-                    label.block-item__label.block-item_relative Project Manager:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop(:class="{'new-client-info_error-shadow': !client.projectManager && isSaveClicked}")
-                        AMSelect(:selectedManager="client.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
+            NewGeneral(
+                :client="client"
+                :isSaveClicked="isSaveClicked"
+                @loadFile="loadFile"
+            )
         .title Contact Details
         .new-client-info__contacts-info(:class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
             ContactsInfo(
@@ -74,11 +34,9 @@
 </template>
 
 <script>
-import Asterisk from "../Asterisk";
+import NewGeneral from "./clientInfo/NewGeneral";
+import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
-import MultiClientIndustrySelect from './MultiClientIndustrySelect';
-import ClientStatusSelect from './ClientStatusSelect';
-import AMSelect from './AMSelect';
 import ContactsInfo from './ContactsInfo';
 import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
@@ -114,19 +72,11 @@ export default {
             contactInd: 0,
             contractFile: [],
             ndaFile: [],
-            asteriskStyle: {"top": "-4px"}
         }
     },
     methods: {
-        contractLoad(e) {
-            if(e.target.files && e.target.files[0]) {
-                this.$emit('loadFile', {files: e.target.files, prop: 'contractFiles'})
-            };
-        },
-        ndaLoad(e) {
-            if(e.target.files && e.target.files[0]) {
-                this.$emit('loadFile', {files: e.target.files, prop: 'ndaFiles'})
-            }
+        loadFile({files, prop}) {
+            this.$emit("loadFile", {files, prop});
         },
         cancel() {
             this.$router.push("/clients");
@@ -140,27 +90,11 @@ export default {
                 if(!lead) this.setLeadContact({index: 0});
             }
         },
-        chosenInd({industry}) {
-            if(!this.client.industries.length) {
-                return this.client.industries.push(industry);
-            }
-            const position = this.client.industries.findIndex(item => item._id === industry._id);
-            if(position !== -1) {
-                return this.client.industries.splice(position, 1);
-            }
-            this.client.industries.push(industry);
-        },
         setLeadSource({leadSource}) {
             this.client.leadSource = leadSource;
         },
-        setStatus({status}) {
-            this.client.status = status;
-        },
         setBillInfo({prop, value}) {
             this.client[prop] = value;
-        },
-        setManager({manager}, prop) {
-            this.client[prop] = manager;
         },
         contactDetails({contactIndex}) {
             this.$router.push({name: "_contact", params: {index: contactIndex}});
@@ -255,15 +189,13 @@ export default {
         },
     },
     components: {
-    Asterisk,
-    ValidationErrors,
-    MultiClientIndustrySelect,
-    ClientStatusSelect,
-    AMSelect,
-    ContactsInfo,
-    ClientSalesInfo,
-    ClientBillInfo
-  }
+        NewGeneral,
+        Button,
+        ValidationErrors,
+        ContactsInfo,
+        ClientSalesInfo,
+        ClientBillInfo
+    }
 }
 </script>
 
@@ -273,20 +205,12 @@ export default {
 .new-client-info {
     position: relative;
     padding: 40px;
-    width: 52%;
+    width: 1020px;
     &__gen-info, &__contacts-info, &__sales, &__billing {
         margin: 20px 10px 40px 10px;
         padding: 40px;
         box-shadow: 0 0 15px #67573e9d;
-        width: 900px;
         box-sizing: border-box;
-    }
-    &__gen-info {
-        display: flex;
-        justify-content: space-between;
-        .gen-info__block {
-            width: 40%;
-        }
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
@@ -297,84 +221,8 @@ export default {
     font-size: 22px;
 }
 
-.block-item {
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    &__drop {
-        border-radius: 5px;
-    }
-    &__label {
-        margin-bottom: 0;
-    }
-    &_relative {
-        position: relative;
-    }
-    &__drop {
-        position: relative;
-        width: 191px;
-        height: 28px;
-    }
-    &_high-index {
-        z-index: 10;
-    }
-    &_medium-index {
-        z-index: 8;
-    }
-    input {
-        font-size: 14px;
-        color: #67573e;
-        border: 1px solid #67573e;
-        border-radius: 5px;
-        padding: 0 5px;
-        outline: none;
-        width: 191px;
-        height: 30px;
-        box-sizing: border-box;
-    }
-    ::-webkit-input-placeholder {
-        opacity: 0.5;
-    }
-}
-.contract, .nda {
-    display: flex;
-    align-items: center;
-    width: 22%;
-    justify-content: space-between;
-    &__upload {
-        position: relative;
-        background: url("../../assets/images/Other/upload-icon.png");
-        background-repeat: no-repeat;
-        width: 40%;
-        height: 22px;
-        overflow: hidden;
-        .upload {
-        padding-left: 0;
-        padding-right: 0;
-        width: 33px;
-        height: 22px;
-        border: none;
-        outline: none;
-        margin-top: -3px;
-        margin-right: 2px;
-        opacity: 0;
-        z-index: 2;
-        position: absolute;
-        cursor: pointer;
-        left: -10px;
-        }
-    }
-    &__download {
-        width: 40%;
-        cursor: pointer;
-    }
-}
-
 .buttons {
-  width: 900px;
-  margin-left: 10px;
+  margin-right: 10px;
   display: flex;
   justify-content: flex-end;
   align-items: center;

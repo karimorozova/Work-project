@@ -9,14 +9,16 @@ export const mutations = {
         state.currentClient.contacts.push(payload);
     },
     updateContact(state, payload) {
-        state.currentClient.contacts[payload.index] = payload.contact;
+        const { index, contact } = payload;
+        state.currentClient.contacts[index] = contact;
         const lead = state.currentClient.contacts.find(item => item.leadContact);
-        if(payload.contact.leadContact) {
-            for(let index in state.currentClient.contacts) {
-                state.currentClient.contacts[index].leadContact = false;
-            }
-            state.currentClient.contacts[payload.index].leadContact = true;    
-        } else if(!payload.contact.leadContact && !lead) {
+        if(contact.leadContact) {
+            const updatedContacts = state.currentClient.contacts.map((item,ind) => {
+                item.leadContact = ind === index;
+                return item;
+            })
+            state.currentClient.contacts = updatedContacts;    
+        } else if(!contact.leadContact && !lead) {
             state.currentClient.contacts[0].leadContact = true;
         }
     },

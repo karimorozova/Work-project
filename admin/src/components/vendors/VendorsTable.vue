@@ -276,9 +276,11 @@ export default {
             this.industrySelected.push(industry);
         },
         async getVendors() {
-            if(!this.vuexVendors.length) {
+            try {
                 const result = await this.$http.get('/all-vendors');
                 this.storeVendors(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Error on getting vendors", isShow: true, type: "error"});
             }
         },
         onRowClicked({index}) {
