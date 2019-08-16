@@ -6,9 +6,9 @@
             .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}")
                 span(v-for="lang in selectedLangs") {{ lang }}; &nbsp;
             .arrow-button(@click="showLangs")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': droppedLang}")
-        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")
-        .drop(v-if="droppedLang")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': isOpened}")
+        input.search(v-if="isOpened" v-model="searchLang" placeholder="Search")
+        .drop(v-if="isOpened")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: selectedLangs.indexOf(language.symbol) != -1}")
@@ -54,7 +54,7 @@ export default {
     data() {
         return {
             languages: [],
-            droppedLang: false,
+            isOpened: false,
             searchLang: ''
         }
     },
@@ -73,9 +73,18 @@ export default {
                 top = tr.offsetTop;
                 height = tr.offsetHeight;
             }
-            this.droppedLang = !this.droppedLang;
-            this.$emit('scrollDrop', {drop: this.droppedLang, offsetTop: top, offsetHeight: height});
+            this.isOpened = !this.isOpened;
+            this.$emit('scrollDrop', {drop: this.isOpened, offsetTop: top, offsetHeight: height});
             this.searchLang = "";
+            if(this.isOpened) {
+                setTimeout(() => {
+                    this.setTheFocusOnSearch();
+                }, 0);
+            }
+        },
+        setTheFocusOnSearch() {
+            document.querySelector(".search").focus();
+            document.querySelector(".search").select();
         },
         async getLanguages() {
             if(this.externalLanguages.length) {
@@ -99,13 +108,13 @@ export default {
             }
         },
         outClick() {
-            this.droppedLang = false;
+            this.isOpened = false;
             this.searchLang = "";
         },
         changeLang(index) {
             this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex});
             if(this.single) {
-                this.droppedLang = false;
+                this.isOpened = false;
                 this.searchLang = "";
             }
         }
