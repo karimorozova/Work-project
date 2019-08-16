@@ -53,12 +53,12 @@
                                 @chosenInd="setIndustry")
                 template(v-for="step in selectedSteps" :slot="step.symbol" slot-scope="{ row, index }")
                     .duo-table__data.duo-table_space-between
-                        span.duo-table__text(v-if="currentActive !== index") {{ row.rates[step._id].value }}
-                        input.duo-table__input(v-else v-model="currentInfo.rates[step._id].value")
-                        span.duo-table__minimum
+                        span.duo-table__text.duo-table_width-33(v-if="currentActive !== index") {{ row.rates[step._id].value }}
+                        input.duo-table__input(v-else v-model="currentInfo.rates[step._id].value" maxlength="6")
+                        span.duo-table__minimum.duo-table_width-33
                             span.duo-table__text min -&nbsp
                             span.duo-table__text(v-if="currentActive !== index") {{ row.rates[step._id].min }}
-                            input.duo-table__input.duo-table_width-50(v-else v-model="currentInfo.rates[step._id].min")
+                            input.duo-table__input.duo-table_width-40(v-else v-model="currentInfo.rates[step._id].min" maxlength="5")
                         Toggler(:isActive="row.rates[step._id].active" :isDisabled="currentActive !== index" :customClass="{'toggler_opacity-07': currentActive !== index}" @toggle="toggleActive(step._id)")
                 .duo-table__icons(slot="icons" slot-scope="{ row, index }")
                     img.duo-table__icon(v-for="(icon, key) in icons" :src="icon.icon" :class="{'duo-table_opacity': isActive(key, index)}" @click="makeAction(key, index)")
@@ -180,12 +180,13 @@ export default {
         width: fit-content;
         max-width: 35%;
         display: flex;
+        align-items: center;
         box-sizing: border-box;
     }
     &__input {
         box-sizing: border-box;
-        width: 25%;
-        border: none;
+        width: 50px;
+        border: 1px solid $light-brown;
         outline: none;
         color: $main-color;
         background: transparent;
@@ -201,8 +202,11 @@ export default {
         height: 18px;
         margin-right: 5px;
     }
-    &_width-50 {
-        width: 50%
+    &_width-40 {
+        width: 40px;
+    }
+    &_width-33 {
+        width: 33%;
     }
     &_space-between {
         justify-content: space-between;
