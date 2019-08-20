@@ -21,7 +21,11 @@
                 :selectedOption="selectedPackage"
                 @chooseOption="setPackage"
             )
-            
+    .tasks-langs__item
+        .tasks-langs__title Quantity:
+            Asterisk(:customStyle="asteriskStyle")
+        .tasks-langs__input
+            input.tasks-langs__quantity(type="number" min="1" max="1000" @change="setQuantity" @input="setLimit")
 </template>
 
 <script>
@@ -46,15 +50,26 @@ export default {
     },
     methods: {
         ...mapActions({
-            storeProject: "storeProject"
+            storeProject: "storeProject",
+            setDataValue: "setTasksDataValue"
         }),
         setLanguage({lang}) {
             this.selectedLang = lang;
-            this.selectedPackage = "";
+            this.setDataValue({prop: "target", value: lang});
+            this.setPackage({option: ""});
             this.setPossiblePairPackages(lang.symbol);
         },
         setPackage({option}) {
             this.selectedPackage = option;
+            this.setDataValue({prop: "packageSize", value: option});
+        },
+        setQuantity(e) {
+            this.setDataValue({prop: "qantity", value: e.target.value});
+        },
+        setLimit(e) {
+            if(e.target.value.length > 4) {
+                e.target.value = e.target.value.slice(0,4);
+            }
         },
         async getAvailableLanguages() {
             try {
@@ -69,9 +84,10 @@ export default {
                 return self.map(elem => elem.target.lang + elem.packageSize).indexOf(item.target.lang + item.packageSize) === index;
             });
             const englishPair = this.languagePairs.find(item => item.target.symbol === 'EN-GB');
-            const symbol = englishPair ? englishPair.source.symbol : "";
             this.targets = this.languagePairs.map(item => item.target);
-            this.$emit('setMonoLanguage', { symbol });
+            if(this.targets.length === 1) {
+                this.setLanguage({lang: this.targets[0]});
+            }
             this.setDefaultPackages(englishPair);
         },
         setDefaultPackages(eng) {
@@ -80,7 +96,7 @@ export default {
                     return self.indexOf(item) === index;
                 });
                 if(this.packages.length === 1) {
-                    this.selectedPackage = this.packages[0];
+                    this.setPackage({option: this.packages[0]});
                 }
             } else {
                 this.setPossiblePairPackages(eng.symbol);
@@ -89,7 +105,7 @@ export default {
         setPossiblePairPackages(symbol) {
             this.packages = this.languagePairs.filter(item => item.target.symbol === symbol).map(pair => pair.packageSize);
             if(this.packages.length === 1) {
-                this.selectedPackage = this.packages[0];
+                this.setPackage({option: this.packages[0]});
             }
         }
     },
@@ -110,6 +126,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
 
 .tasks-langs {
     margin-bottom: 20px;
@@ -128,6 +145,23 @@ export default {
         position: relative;
         width: 191px;
         height: 28px;
+    }
+    &__input {
+        width: 191px;
+    }
+    &__quantity {
+        height: 28px;
+        box-sizing: border-box;
+        padding: 0 5px;
+        outline: none;
+        color: $main-color;
+        border: 1px solid $main-color;
+        border-radius: 5px; 
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none; 
+            margin: 0;
+        }
     }
 }
 
