@@ -87,9 +87,6 @@ export default {
             document.querySelector(".search").select();
         },
         async getLanguages() {
-            if(this.externalLanguages.length) {
-                return this.languages = this.externalLanguages;
-            }
             try {
                 const result = await this.$http.get('/api/languages');
                 let sortedArray = result.body;
@@ -121,11 +118,14 @@ export default {
     },
     computed: {
         filteredLangs() {
-            let result = this.languages.filter(item => {
-                if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
-                    return item
-                }
-            })
+            let result = this.externalLanguages.length ? this.externalLanguages : this.languages;
+            if(result.length) {
+                result = result.filter(item => {
+                    if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+                        return item
+                    }
+                })
+            }
             return result;
         }
     },
@@ -308,7 +308,6 @@ export default {
     cursor: pointer;
     .selected {
       width: 80%;
-      border-right: none;
     }
     .arrow-button {
       width: 20%;
