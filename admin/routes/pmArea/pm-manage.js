@@ -35,8 +35,8 @@ router.get("/language-pairs", async (req, res) => {
     const { customerId } = req.query;
     try {
         const customer = await getClient({"_id": customerId});
-        const { languageCombinations } = customer;
-        res.send(languageCombinations);
+        const { monoRates, wordsRates, hoursRates } = customer;
+        res.send({ monoRates, wordsRates, hoursRates });
     } catch(err) {
         console.log(err);
         console.log("Error on getting Project");
