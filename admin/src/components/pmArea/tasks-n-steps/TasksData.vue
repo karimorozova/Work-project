@@ -1,12 +1,13 @@
 <template lang="pug">
 .tasks-data
-    .new-wrapper
+    .tasks-data__main
         .tasks-data__item
                 ServiceAndWorkflow
         .tasks-data__item
             .tasks-data__item-title File Preparation
             .tasks-data__langs
-                TasksLangsModified(
+                TasksLangs(v-if="isMonoService")
+                TasksLangsDuo(v-if="!isMonoService"
                     :sourceLanguages="sourceLanguages"
                     @setSourceLanguage="setSourceLang"
                     @setTargets="setTargets"
@@ -40,7 +41,8 @@
 </template>
 
 <script>
-import TasksLangsModified from "./TasksLangsModified";
+import TasksLangs from "./TasksLangs";
+import TasksLangsDuo from "./TasksLangsDuo";
 import TasksFilesModified from "./TasksFilesModified";
 import TasksFilesRequested from "./TasksFilesRequested";
 import SelectSingle from "../../SelectSingle";
@@ -111,7 +113,6 @@ export default {
             try {
                 await this.addTasks();
             } catch (err) {
-                console.log(err);
                 this.alertToggle({message: "Error on adding tasks",isShow: true,type: "error"});
             }
         },
@@ -180,12 +181,16 @@ export default {
         selectedTemplate() {
             return this.tasksData.template ? this.tasksData.template.name : "";
         },
+        isMonoService() {
+            return this.tasksData.service ? this.tasksData.service.languageForm === "Mono" : false;
+        },
         isProject() {
             return this.currentProject.status && this.currentProject.status !== "Requested";
         }
     },
     components: {
-        TasksLangsModified,
+        TasksLangs,
+        TasksLangsDuo,
         TasksFilesModified,
         TasksFilesRequested,
         SelectSingle,
@@ -230,7 +235,7 @@ export default {
         margin-right: 15px;
     }
 
-    .new-wrapper {
+    &__main {
         display: flex;
         justify-content: space-between;
     }

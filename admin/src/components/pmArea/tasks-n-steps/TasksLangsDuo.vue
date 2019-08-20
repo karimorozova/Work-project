@@ -223,7 +223,6 @@ export default {
     @extend %flex-column;
     &__drop-menu {
         position: relative;
-        /*width: 191px;*/
         width: 100%;
         height: 28px;
     }
