@@ -14,7 +14,7 @@
                     :isRequest="isRequest"
                 )
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
-                TasksFilesModified
+                TasksFiles(:service="tasksData.service")
             .tasks-data__files(v-else)
                 TasksFilesRequested
             .tasks-data__join-files-wrapper
@@ -43,7 +43,7 @@
 <script>
 import TasksLangs from "./TasksLangs";
 import TasksLangsDuo from "./TasksLangsDuo";
-import TasksFilesModified from "./TasksFilesModified";
+import TasksFiles from "./TasksFiles";
 import TasksFilesRequested from "./TasksFilesRequested";
 import SelectSingle from "../../SelectSingle";
 import ServiceAndWorkflow from "./ServiceAndWorkflow";
@@ -191,7 +191,7 @@ export default {
     components: {
         TasksLangs,
         TasksLangsDuo,
-        TasksFilesModified,
+        TasksFiles,
         TasksFilesRequested,
         SelectSingle,
         Button,

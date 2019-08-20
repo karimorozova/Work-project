@@ -1,24 +1,24 @@
 <template lang="pug">
-    .tasks-files
-      .tasks-files__upload-wrapper
-        .tasks-files__text-button-wrapper
-          span Source file:
-          .tasks-files__upload-file
-              FilesUpload(
-                  buttonValue="Source Files *"
-                  inputClass="files-upload__source-file"
-                  :files="sourceFiles"
-                  @uploadFiles="uploadSourceFiles"
-                  @deleteFile="(e) => deleteFile(e, 'sourceFiles')")
-        .tasks-files__text-button-wrapper
-          span Reference file:
-          .tasks-files__upload-file
-              FilesUpload(
-                  buttonValue="Reference Files"
-                  inputClass="files-upload__ref-file"
-                  :files="refFiles"
-                  @uploadFiles="uploadRefFiles"
-                  @deleteFile="(e) => deleteFile(e, 'refFiles')")
+.tasks-files
+        .tasks-files__main
+            .tasks-files__item(v-if="service.calculationUnit === 'Words'")
+                span.tasks-files__label Source file:
+                .tasks-files__upload-file
+                    FilesUpload(
+                        buttonValue="Source Files *"
+                        inputClass="files-upload__source-file"
+                        :files="sourceFiles"
+                        @uploadFiles="uploadSourceFiles"
+                        @deleteFile="(e) => deleteFile(e, 'sourceFiles')")
+            .tasks-files__item
+                span.tasks-files__label Reference file:
+                .tasks-files__upload-file
+                    FilesUpload(
+                        buttonValue="Reference Files"
+                        inputClass="files-upload__ref-file"
+                        :files="refFiles"
+                        @uploadFiles="uploadRefFiles"
+                        @deleteFile="(e) => deleteFile(e, 'refFiles')")
 </template>
 
 <script>
@@ -26,6 +26,11 @@ import FilesUpload from "./tasksFiles/FilesUpload";
 import { mapActions } from "vuex";
 
 export default {
+    props: {
+        service: {
+            type: Object
+        }
+    },
     data() {
         return {
             sourceFiles: [],
@@ -38,7 +43,7 @@ export default {
         ...mapActions({
             setDataValue: "setTasksDataValue"
         }),
-        uploadSourceFiles({files}) {
+        uploadSourceFiles({ files }) {
             if (files.length) {
                 for (let file of files) {
                     const isExist = this.sourceFiles.find(item => item.name === file.name);
@@ -56,7 +61,7 @@ export default {
             }
             this.setDataValue({prop: "refFiles", value: this.refFiles});
         },
-        deleteFile({ index }, prop ) {
+        deleteFile({ index }, prop) {
             this[prop].splice(index, 1);
             this.setDataValue({prop, value: this[prop]});
             if (!this[prop].length) {
@@ -90,31 +95,24 @@ export default {
 <style lang="scss" scoped>
 
 .tasks-files {
-    &__text-button-wrapper {
-      display: flex;
-      align-items: center;
-      span {
-        margin-right: 15px;
-      }
-    }
-    &__upload-wrapper {
-      display:flex;
-      align-items: center;
-      margin-bottom: 40px;
-      justify-content: space-between;
-    }
-    &__upload-file {
-        position: relative;
-    }
-    &__join {
-        width: 191px;
+    &__item {
         display: flex;
-        justify-content: center;
         align-items: center;
     }
-    &__toggler-title {
-        font-size: 14px;
+
+    &__label {
         margin-right: 15px;
+    }
+
+    &__main {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        justify-content: space-between;
+    }
+
+    &__upload-file {
+        position: relative;
     }
 }
 
