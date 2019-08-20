@@ -67,8 +67,11 @@ export default {
             }
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
         },
-        setService() {
-
+        setService({option}) {
+            this.service = option;
+            const value = this.services.find(item => item.title === option);
+            this.setDataValue({prop: "service", value});
+            value.languageForm === 'Mono' ? this.setWorkflow({option: '1 Step'}) : this.setWorkflow({option: '2 Steps'});
         },
         setWorkflow({option}) {
             const value = this.workflowSteps.find(item => item.name === option);
@@ -101,7 +104,11 @@ export default {
             return this.tasksData.workflow ? this.tasksData.workflow : {name: ""};
         },
         workflowStepsNames() {
-            return this.workflowSteps.map(item => item.name)
+            let result = this.workflowSteps.map(item => item.name);
+            if(this.tasksData.service && this.tasksData.service.steps.length < 2) {
+                result.pop();
+            }
+            return result;
         },
         allServices() {
             if (this.services.length) {
