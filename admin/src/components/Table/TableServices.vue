@@ -7,6 +7,7 @@
             :allSteps="steps"
             :firstStageSteps="firstStageSteps"
             :secondStageSteps="secondStageSteps"
+            @setUnitFilter="setUnitFilter"
         )
     .table(v-if="isSteps")
         StepsTable(
@@ -28,7 +29,8 @@ export default {
             isSteps: false,
             tabs: ["Services", "Steps"],
             selectedTab: "Services",
-            steps: []
+            steps: [],
+            unitFilter: ""
         }
     },
     methods: {
@@ -40,6 +42,9 @@ export default {
             this.isServices = index === 0;
             this.isSteps = !this.isServices;
             this.selectedTab = this.tabs[index];
+        },
+        setUnitFilter({unit}) {
+            this.unitFilter = unit;
         },
         setStepsWithId() {
             this.steps = this.steps.filter(item => item._id);
@@ -54,22 +59,24 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error on getting Steps from DB", isShow: true, type: "error"})
             }
+        },
+        getFilteredStageSteps(stageProp) {
+            if(this.steps.length) {
+                return this.steps.filter(item => {
+                    return this.unitFilter ? item[stageProp] && item.calculationUnit === this.unitFilter : item[stageProp];
+                })
+            }
+            return [];
         }
     },
     computed: {
         firstStageSteps() {
-            let result = [];
-            if(this.steps.length) {
-                result = this.steps.filter(item => item.isStage1).map(item => item.title);
-            }
-            return result;
+            const result = this.getFilteredStageSteps('isStage1');
+            return result.length ? result.map(item => item.title) : [];
         },
         secondStageSteps() {
-            let result = [];
-            if(this.steps.length) {
-                result = this.steps.filter(item => item.isStage2).map(item => item.title);
-            }
-            return result;
+            const result = this.getFilteredStageSteps('isStage2');
+            return result.length ? result.map(item => item.title) : [];
         }
     },
     components: {
