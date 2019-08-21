@@ -119,6 +119,9 @@ export default {
     computed: {
         filteredLangs() {
             let result = this.externalLanguages.length ? this.externalLanguages : this.languages;
+            if(this.langFilter.length) {
+                result = result.filter(item => this.langFilter.indexOf(item._id) !== -1);
+            }
             if(result.length) {
                 result = result.filter(item => {
                     if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
