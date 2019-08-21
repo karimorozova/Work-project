@@ -35,9 +35,6 @@ import SelectSingle from "@/components/SelectSingle";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    props: {
-
-    },
     data() {
         return {
             targets: [],
@@ -51,7 +48,8 @@ export default {
     methods: {
         ...mapActions({
             storeProject: "storeProject",
-            setDataValue: "setTasksDataValue"
+            setDataValue: "setTasksDataValue",
+            alertToggle: "alertToggle"
         }),
         setLanguage({lang}) {
             this.selectedLang = lang;
@@ -76,7 +74,7 @@ export default {
                 const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);;
                 this.setLanguages(langPairs.data.monoRates);
             } catch(err) {
-
+                this.alertToggle({message: "Error on getting customer language pairs", isShow: true, type: "error"});
             }
         },
         setLanguages(langPairs) {
@@ -111,7 +109,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: "getCurrentProject"
+            currentProject: "getCurrentProject",
+            tasksData: "getTasksData"
         })
     },
     created() {

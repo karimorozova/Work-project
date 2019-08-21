@@ -1,7 +1,7 @@
 <template lang="pug">
 .tasks-files
         .tasks-files__main
-            .tasks-files__item(v-if="service.calculationUnit === 'Words'")
+            .tasks-files__item(v-if="isWords")
                 span.tasks-files__label Source file:
                 .tasks-files__upload-file
                     FilesUpload(
@@ -88,6 +88,11 @@ export default {
     },
     components: {
         FilesUpload,
+    },
+    computed: {
+        isWords() {
+            return this.service ? this.service.calculationUnit === 'Words' : false;
+        }
     }
 }
 </script>

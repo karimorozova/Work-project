@@ -51,10 +51,13 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         sourceLanguages: {type: Array},
-        isRequest: {type: Boolean}
+        isRequest: {type: Boolean},
+        calculationUnit: {type: String, default: "Words"}
     },
     data() {
         return {
+            wordsRates: [],
+            hoursRates: [],
             targetAll: [],
             targetChosen: [],
             languagePairs: [],
@@ -145,23 +148,24 @@ export default {
                     this.setRequestLanguages();
                 }
                 const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
-                this.setLanguages(langPairs.data);
+                this.wordsRates = [...langPairs.data.wordsRates];
+                this.hoursRates = [...langPairs.data.hoursRates];
+                this.setLanguages();
             } catch(err) {
 
             }
         },
-        setLanguages(langPairs) {
-            this.languagePairs = langPairs;
-            const pairsWithSource = langPairs.filter(item => item.source);
+        setLanguages() {
+            this.languagePairs = this.calculationUnit === 'Words' ? [...this.wordsRates] : [...this.hoursRates];
             const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
-            const sourcePair =  pairsWithSource.find(item => item.source.symbol === pairSymbol);
+            const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);
             const symbol = sourcePair ? sourcePair.source.symbol : "";
             this.$emit('setSourceLanguage', { symbol });
-            this.setDefaultTargets(pairsWithSource, sourcePair);
+            this.setDefaultTargets(sourcePair);
         },
-        setDefaultTargets(pairs, sourcePair) {
+        setDefaultTargets(sourcePair) {
             if(!sourcePair) {
-                this.targetAll = pairs.map(pair => pair.target);
+                this.targetAll = this.languagePairs.map(pair => pair.target);
             } else {
                 this.setPossibleTargets(sourcePair.source.symbol);
             }
@@ -181,7 +185,9 @@ export default {
             currentProject: "getCurrentProject"
         }),
         sourceFilter() {
-            return this.languagePairs.filter(item => item.source).map(item => item.source._id);
+            return this.languagePairs.map(item => item.source._id).filter((id, index, self) => {
+                return self.indexOf(id) === index;
+            });
         }
     },
     created() {
@@ -192,6 +198,14 @@ export default {
         Languages,
         Arrows,
         Asterisk
+    },
+    watch: {
+        calculationUnit: function(val) {
+            if(val) {
+                this.setLanguages();
+                console.log("newVal: ", val);
+            }
+        }
     }
 }
 </script>

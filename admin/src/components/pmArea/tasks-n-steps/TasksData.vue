@@ -8,6 +8,7 @@
             .tasks-data__langs
                 TasksLangs(v-if="isMonoService")
                 TasksLangsDuo(v-if="!isMonoService"
+                    :calculationUnit="currentUnit"
                     :sourceLanguages="sourceLanguages"
                     @setSourceLanguage="setSourceLang"
                     @setTargets="setTargets"
@@ -17,7 +18,7 @@
                 TasksFiles(:service="tasksData.service")
             .tasks-data__files(v-else)
                 TasksFilesRequested
-            .tasks-data__join-files-wrapper
+            .tasks-data__join-files-wrapper(v-if="currentUnit === 'Words'")
                 .tasks-data__join
                     span.tasks-data__toggler-title  Join Files
                     .tasks-data__toggler
@@ -186,6 +187,9 @@ export default {
         },
         isProject() {
             return this.currentProject.status && this.currentProject.status !== "Requested";
+        },
+        currentUnit() {
+            return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
         }
     },
     components: {
