@@ -78,15 +78,17 @@ export default {
             }
         },
         setLanguages(langPairs) {
-            this.languagePairs = langPairs.filter((item, index, self) => {
-                return self.map(elem => elem.target.lang + elem.packageSize).indexOf(item.target.lang + item.packageSize) === index;
-            });
-            const englishPair = this.languagePairs.find(item => item.target.symbol === 'EN-GB');
-            this.targets = this.languagePairs.map(item => item.target);
-            if(this.targets.length === 1) {
-                this.setLanguage({lang: this.targets[0]});
+            if(langPairs.length) {
+                this.languagePairs = langPairs.filter((item, index, self) => {
+                    return self.map(elem => elem.target.lang + elem.packageSize).indexOf(item.target.lang + item.packageSize) === index;
+                });
+                const englishPair = this.languagePairs.find(item => item.target.symbol === 'EN-GB');
+                this.targets = this.languagePairs.map(item => item.target);
+                if(this.targets.length === 1) {
+                    this.setLanguage({lang: this.targets[0]});
+                }
+                this.setDefaultPackages(englishPair);
             }
-            this.setDefaultPackages(englishPair);
         },
         setDefaultPackages(eng) {
             if(!eng) {

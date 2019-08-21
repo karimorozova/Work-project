@@ -157,11 +157,13 @@ export default {
         },
         setLanguages() {
             this.languagePairs = this.calculationUnit === 'Words' ? [...this.wordsRates] : [...this.hoursRates];
-            const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
-            const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);
-            const symbol = sourcePair ? sourcePair.source.symbol : "";
-            this.$emit('setSourceLanguage', { symbol });
-            this.setDefaultTargets(sourcePair);
+            if(this.languagePairs.length) {
+                const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
+                const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);
+                const symbol = sourcePair ? sourcePair.source.symbol : "";
+                this.$emit('setSourceLanguage', { symbol });
+                this.setDefaultTargets(sourcePair);
+            }
         },
         setDefaultTargets(sourcePair) {
             if(!sourcePair) {
@@ -203,7 +205,6 @@ export default {
         calculationUnit: function(val) {
             if(val) {
                 this.setLanguages();
-                console.log("newVal: ", val);
             }
         }
     }
