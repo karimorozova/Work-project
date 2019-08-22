@@ -102,19 +102,31 @@ export default {
             }
             return false;
         },
+        isValidQuantity(quantity) {
+            if(!quantity) {
+                return false;
+            }
+            return /^[1-9]{1,}(\d{1,})?/.test(quantity);
+        },
         async checkForErrors() {
             let errors = [];
-            const { targets, sourceFiles } = this.tasksData;
+            const { source, targets, sourceFiles, refFiles, quantity } = this.tasksData;
+            if(!this.isMonoService && !source) errors.push("Please, select Source language.");
             if (!targets || !targets.length) errors.push("Please, select Target language(s).");
-            if (!sourceFiles || !sourceFiles.length) errors.push("Please, upload Source file(s).");
-            if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
+            if(this.currentUnit === 'Words') {
+                if (!sourceFiles || !sourceFiles.length) errors.push("Please, upload Source file(s).");
+                if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
+            } else {
+                if(!refFiles || !refFiles.length) errors.push("Please, upload Reference file(s).");
+            }
+            if(this.isMonoService && !this.isValidQuantity(quantity)) errors.push("Please, enter the valid Quantity."); 
             if (errors.length) {
                 return this.$emit("showErrors", { errors });
             }
             try {
                 await this.addTasks();
             } catch (err) {
-                this.alertToggle({message: "Error on adding tasks",isShow: true,type: "error"});
+                this.alertToggle({message: "Error on adding tasks", isShow: true, type: "error"});
             }
         },
         async getCustomersFromXtm() {
@@ -150,7 +162,9 @@ export default {
                 source,
                 targets: this.tasksData.targets,
                 service: this.tasksData.service,
-                workflow: this.tasksData.workflow.id
+                workflow: this.tasksData.workflow.id,
+                packageSize: this.tasksData.packageSize,
+                quantity: this.tasksData.quantity
             });
             this.clearInputFiles(".tasks-data__source-file");
             this.clearInputFiles(".tasks-data__ref-file");
@@ -166,16 +180,9 @@ export default {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             languages: "getAllLanguages",
-            services: "getVuexServices",
             xtmCustomers: "getXtmCustomers",
             tasksData: "getTasksData"
         }),
-        allServices() {
-            if (this.services.length) {
-                return this.services.map(item => item.title);
-            }
-            return [];
-        },
         allTemplates() {
             return this.templates.map(item => item.name);
         },
