@@ -152,8 +152,9 @@ export default {
         async addTasks() {
             const { xtmId } = await this.getXtmId();
             const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
+            const isJoinFiles = this.tasksData.isJoinFiles || false;
             this.$emit("addTasks", {
-                isJoinfiles: this.tasksData.isJoinFiles,
+                isJoinfiles: isJoinFiles,
                 sourceFiles: this.tasksData.sourceFiles,
                 refFiles: this.tasksData.refFiles || [],
                 stepsDates: this.tasksData.stepsDates,

@@ -81,7 +81,7 @@ export default {
         },
         getDataForTasks(dataForTasks) {
             let tasksData = new FormData();
-            const source = dataForTasks.source ? JSON.stringify(dataForTasks) : "";
+            const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
             tasksData.append('customerId', dataForTasks.xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', dataForTasks.template.id);
