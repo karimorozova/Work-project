@@ -13,8 +13,11 @@ const { xtmToken, xtmBaseUrl } = require('../configs/');
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     try {
         let tasksInfo = {...req.body};
-        tasksInfo.source = JSON.parse(tasksInfo.source);
+        if(tasksInfo.source) {
+            tasksInfo.source = JSON.parse(tasksInfo.source);
+        }
         tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        tasksInfo.service = JSON.parse(tasksInfo.service);
         const { sourceFiles, refFiles } = req.files;
         const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
         res.send(updatedProject);

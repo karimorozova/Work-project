@@ -25,7 +25,7 @@
         .tasks-langs__title Quantity:
             Asterisk(:customStyle="asteriskStyle")
         .tasks-langs__input
-            input.tasks-langs__quantity(type="number" min="1" max="1000" @change="setQuantity" @input="setLimit")
+            input.tasks-langs__quantity(type="number" min="1" max="1000" @change="setQuantity" @input="setLimit" @keydown="removeNonDigit")
 </template>
 
 <script>
@@ -53,7 +53,7 @@ export default {
         }),
         setLanguage({lang}) {
             this.selectedLang = lang;
-            this.setDataValue({prop: "target", value: lang});
+            this.setDataValue({prop: "targets", value: [lang]});
             this.setPackage({option: ""});
             this.setPossiblePairPackages(lang.symbol);
         },
@@ -62,11 +62,17 @@ export default {
             this.setDataValue({prop: "packageSize", value: option});
         },
         setQuantity(e) {
-            this.setDataValue({prop: "qantity", value: e.target.value});
+            this.setDataValue({prop: "quantity", value: e.target.value});
         },
         setLimit(e) {
             if(e.target.value.length > 4) {
                 e.target.value = e.target.value.slice(0,4);
+            }
+        },
+        removeNonDigit(e) {
+            const forbiddenKeys = [107, 109, 69];
+            if(forbiddenKeys.indexOf(e.which) !== -1) {
+                e.preventDefault();
             }
         },
         async getAvailableLanguages() {

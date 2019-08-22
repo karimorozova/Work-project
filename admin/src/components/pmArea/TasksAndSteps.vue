@@ -79,29 +79,33 @@ export default {
         setDate({date, prop, index}) {
             this.$emit("setDate", {date, prop, index});
         },
-        getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow}) {
+        getDataForTasks(dataForTasks) {
             let tasksData = new FormData();
-            tasksData.append('customerId', xtmId);
+            const source = dataForTasks.source ? JSON.stringify(dataForTasks) : "";
+            tasksData.append('customerId', dataForTasks.xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
-            tasksData.append('template', template.id);
-            tasksData.append('workflow', workflow);
-            tasksData.append('stepsDates', JSON.stringify(stepsDates));
-            tasksData.append('service', service._id);
-            tasksData.append('source', JSON.stringify(source));
-            tasksData.append('targets', JSON.stringify(targets));
+            tasksData.append('template', dataForTasks.template.id);
+            tasksData.append('workflow', dataForTasks.workflow);
+            tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
+            tasksData.append('service', JSON.stringify(dataForTasks.service));
+            tasksData.append('source', source);
+            tasksData.append('targets', JSON.stringify(dataForTasks.targets));
             tasksData.append('projectId', this.currentProject._id);
             tasksData.append('projectName', this.currentProject.projectName);
-            tasksData.append('join', isJoinfiles);
+            tasksData.append('join', dataForTasks.isJoinfiles);
+            tasksData.append('packageSize', dataForTasks.packageSize);
+            tasksData.append('quantity', dataForTasks.quantity);
             return tasksData;
         },
-        async addTasks({sourceFiles, refFiles, isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow}) {
-            let tasksData = this.getDataForTasks({isJoinfiles, stepsDates, xtmId, template, source, targets, service, workflow});
-            if(sourceFiles.length) {
+        async addTasks(dataForTasks) {
+            let tasksData = this.getDataForTasks(dataForTasks);
+            const { sourceFiles, refFiles } = dataForTasks;
+            if(sourceFiles && sourceFiles.length) {
                 for(let file of sourceFiles) {
                     tasksData.append('sourceFiles', file)
                 }
             }
-            if(refFiles.length) {
+            if(refFiles && refFiles.length) {
                 for(let file of refFiles) {
                     tasksData.append('refFiles', file)
                 }
