@@ -23,6 +23,22 @@ async function createProject(project) {
 }
 
 async function createTasks({tasksInfo, sourceFiles, refFiles}) {
+    const { calculationUnit } = tasksInfo.service;
+    try {
+        if(calculationUnit === 'Words') {
+            return await createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles});
+        } else if(calculationUnit === 'Hours') {
+            return await createTasksWithHoursUnit({tasksInfo, sourceFiles, refFiles});
+        } else {
+            return await createTasksWithPackagesUnit({tasksInfo, sourceFiles, refFiles});
+        }        
+    } catch(err) {
+        console.log(err);
+        console.log("Error in createTasks");
+    }
+}
+
+async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
     let newTasksInfo = {...tasksInfo};
     newTasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
     newTasksInfo.template = tasksInfo.template || '247336FD';
@@ -36,7 +52,7 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
         return await getProject({"_id": newTasksInfo.projectId});
     } catch(err) {
         console.log(err);
-        console.log("Error in createTasks");
+        console.log("Error in createTasksWithWordsUnit");
     }
 }
 
@@ -81,6 +97,14 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
         console.log(err);
         console.log("Error in updateProjectTasks");
     }
+}
+
+async function createTasksWithHoursUnit({tasksInfo, refFiles}) {
+
+}
+
+async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
+    
 }
 
 module.exports = { createProject, createTasks }
