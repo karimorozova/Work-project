@@ -45,16 +45,19 @@ function getTaskSteps({steps, progress, task}) {
     let counter = 1;
     for(const key in progress) {
         const existedTask = updatedSteps.find(item => {
-            return item.taskId === task.taskId && item.name === key
+            return item.taskId === task.taskId && item.catName === key
         })
         if(!existedTask) {
             const {startDate, deadline} = getStepsDates({task, key});
             let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+            const serviceStep = getCorrectServiceStep(key, task.service.steps);
             if(key !== "jobsMetrics") {
                 updatedSteps.push({
                     stepId: `${task.taskId} ${stepsIdCounter}`,
                     taskId: task.taskId,
-                    name: key,
+                    serviceStep,
+                    name: serviceStep.title,
+                    catName: key,
                     source: task.sourceLanguage,
                     target: task.targetLanguage,
                     vendor: null,
@@ -80,12 +83,18 @@ function getTaskSteps({steps, progress, task}) {
         } else {
             for(let step of updatedSteps) {
                 if(step.taskId === task.taskId) {
-                    step.progress = progress[step.name];
+                    step.progress = progress[step.catName];
                 }
             }
         }
     }
     return updatedSteps;
+}
+
+function getCorrectServiceStep(key, serviceSteps) {
+    const stage1 = serviceSteps.find(item => item.stage === "stage1");
+    const stage2 = serviceSteps.find(item => item.stage === "stage2");
+    return key === "translate1" ? stage1.step : stage2.step; 
 }
 
 function calculateWords(metrics) {
