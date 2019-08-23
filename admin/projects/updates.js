@@ -150,7 +150,7 @@ function updateStepsStatuses({steps, status, stepIdentify}) {
     return steps.map(item => {
         if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
             let newStatus = status;
-            if(status === "Ready to Start" && item.name !== "translate1") {
+            if(status === "Ready to Start" && item.catName !== "translate1") {
                 newStatus = "Waiting to Start";
             }
             item.status = newStatus;
@@ -230,7 +230,7 @@ function updateWithApprovedTasks({taskIds, project}) {
     })
     const steps = project.steps.map(step => {
         if(step.status === 'Accepted' && taskIds.indexOf(step.taskId) !== -1) {
-            step.status = step.name === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
+            step.status = step.catName === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
         }
         return step;
     })
@@ -279,10 +279,10 @@ function updateStepsProgress({steps, task, progress}) {
 
 function setStepsProgress(step, progress) {
     const { jobsMetrics } = progress;
-    let stepProgress = progress[step.name];
+    let stepProgress = progress[step.catName];
     for(let metrics of jobsMetrics) {
         const { jobId, metricsProgress } = metrics;
-        const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[step.name];
+        const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[step.catName];
         stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
     }
     return stepProgress;
