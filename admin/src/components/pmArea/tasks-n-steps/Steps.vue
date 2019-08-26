@@ -134,10 +134,11 @@ const Datepicker = () => import("../../Datepicker");
 import moment from "moment";
 import ClickOutside from "vue-click-outside";
 import scrollDrop from "@/mixins/scrollDrop";
+import stepVendor from "@/mixins/stepVendor";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-    mixins: [scrollDrop],
+    mixins: [scrollDrop, stepVendor],
     props: {
         allSteps: {
             type: Array
@@ -329,33 +330,12 @@ export default {
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
-        async checkForLanguages(vendor, index) {
-            const step = this.allSteps[index];
-            const service = this.services.find(item => {
-                return step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
-            });
-            const matchedVendor = vendor.languageCombinations.find(item => {
-                if(item.source && item.source.symbol === step.source && 
-                    item.target.symbol === step.target) {
-                        return this.hasRateValue({
-                                service: service._id, 
-                                vendorIndustries: item.industries, 
-                                stepIndustry: this.currentProject.industry._id
-                            });
-                }
-            })
-            return matchedVendor;
-        },
-        hasRateValue({service, vendorIndustries, stepIndustry}) {
-            const industry = vendorIndustries.find(item => item.industry._id === stepIndustry);
-            return industry ? industry.rates[service].value : false;
-        },
         extendedVendors(index) {
             let result = [];
             if(this.isAllShow) {
                 return this.vendors.filter(item => item.status === 'Active');
             }
-            result = this.vendors.filter(item => item.status === 'Active' && this.checkForLanguages(item, index));
+            result = this.vendors.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
             return result;
         },
         ...mapActions({
@@ -371,7 +351,6 @@ export default {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             vendors: "getVendors",
-            services: "getVuexServices"
         }),
         stepActions() {
             let result = this.actions;

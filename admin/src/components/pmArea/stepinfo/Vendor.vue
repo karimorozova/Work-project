@@ -36,8 +36,10 @@ import PersonSelect from "../PersonSelect";
 import SelectSingle from "../../SelectSingle";
 import CustomRadio from "../../CustomRadio";
 import { mapGetters, mapActions } from 'vuex';
+import stepVendor from "@/mixins/stepVendor";
 
 export default {
+    mixins: [stepVendor],
     props: {
         vendor: {
             type: [Object, String]
@@ -72,25 +74,6 @@ export default {
         toggleRadio(e, key) {
             this[key] = !this[key];
         },
-        checkForLanguages(vendor) {
-            const service = this.services.find(item => {
-                return this.step.name === "translate1" ? item.symbol === "tr" : item.symbol === "pr";
-            });
-            return vendor.languageCombinations.find(item => {
-                if(item.source && item.source.symbol === this.step.source &&
-                    item.target.symbol === this.step.target) {
-                        return this.hasRateValue({
-                                service: service._id,
-                                vendorIndustries: item.industries,
-                                stepIndustry: this.currentProject.industry._id
-                            });
-                }
-            })
-        },
-        hasRateValue({service, vendorIndustries, stepIndustry}) {
-            const industry = vendorIndustries.find(item => item.industry._id === stepIndustry);
-            return industry ? industry.rates[service].value : false;
-        },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
         },
@@ -112,13 +95,12 @@ export default {
         ...mapGetters({
             vendors: "getVendors",
             currentProject: "getCurrentProject",
-            services: "getVuexServices"
         }),
         filteredVendors() {
             if(this.isAllShow) {
                 return this.vendors.filter(item => item.status === 'Active');
             }
-            const result = this.vendors.filter(item => this.checkForLanguages(item));
+            const result = this.vendors.filter(item => this.checkForLanguagePair(item));
             return result;
         },
         isTimeDouble() {
