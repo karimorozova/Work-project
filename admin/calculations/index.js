@@ -187,7 +187,7 @@ async function setDefaultStepVendors(project) {
         for(let i = 0; i < steps.length; i++) {
             let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
             let activeVendors = vendors.filter(item => item.status === "Active");
-            let matchedVendors = await getMatchedVendors({activeVendors, step: steps[i], project})
+            let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project})
             if(matchedVendors.length === 1 && !steps[i].vendor) {
                 steps[i].vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
                 tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
@@ -202,20 +202,25 @@ async function setDefaultStepVendors(project) {
     }
 }
 
-async function getMatchedVendors({activeVendors, step, project}) {
-    let matchedVendors = [];
-    try {
-        for(let vendor of activeVendors) {
-            const isMatching = checkForLanguages({vendor, step, project});
-            if(isMatching) {
-                matchedVendors.push(vendor);
+function getMatchedVendors({activeVendors, steps, index, project}) {
+    const step = steps[index];
+    let availableVendors = [...activeVendors];
+    if(index > 0 && step.taskId === steps[index-1].taskId) {
+        availableVendors = availableVendors.filter(item => {
+            if(steps[index-1].vendor) {
+                return item.id !== steps[index-1].vendor.id;
             }
-        }
-        return matchedVendors;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getMatchedVendors");
+            return item;
+        })
     }
+    let matchedVendors = [];
+    for(let vendor of availableVendors) {
+        const isMatching = checkForLanguages({vendor, step, project});
+        if(isMatching) {
+            matchedVendors.push(vendor);
+        }
+    }
+    return matchedVendors;
 }
 
 function checkForLanguages({vendor, step, project}) {
