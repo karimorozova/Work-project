@@ -330,14 +330,6 @@ export default {
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
-        extendedVendors(index) {
-            let result = [];
-            if(this.isAllShow) {
-                return this.vendors.filter(item => item.status === 'Active');
-            }
-            result = this.vendors.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
-            return result;
-        },
         ...mapActions({
             alertToggle: "alertToggle",
             setProjectProp: "setProjectProp",
@@ -351,6 +343,7 @@ export default {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             vendors: "getVendors",
+            userGroup: "getUserGroup"
         }),
         stepActions() {
             let result = this.actions;

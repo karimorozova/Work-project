@@ -5,7 +5,7 @@
         .step-vendor__drop-menu(v-if="isVendorSelect")
             PersonSelect(
                 :selectedPerson="currentVendorName(vendor)"
-                :persons="filteredVendors"
+                :persons="extendedVendors(-1)"
                 :isExtended="isAllShow"
                 :isAdditionalShow="isAdditionalShow"
                 @setPerson="setVendor"
@@ -95,14 +95,8 @@ export default {
         ...mapGetters({
             vendors: "getVendors",
             currentProject: "getCurrentProject",
+            userGroup: "getUserGroup"
         }),
-        filteredVendors() {
-            if(this.isAllShow) {
-                return this.vendors.filter(item => item.status === 'Active');
-            }
-            const result = this.vendors.filter(item => this.checkForLanguagePair(item));
-            return result;
-        },
         isTimeDouble() {
             return this.nextSendTime.length === 2;
         },
