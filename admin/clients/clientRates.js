@@ -1,5 +1,6 @@
 const { getClientAfterUpdate, getClient } = require("./getClients");
-const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates } = require("../rates/ratesmanage");
+const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates, getDefaultRates } = require("../rates/ratesmanage");
+const { Languages } = require("../models");
 
 async function updateClientRates(client, rateInfo) {
     const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
@@ -89,35 +90,55 @@ async function getAfterImportDuo({clientId, ratesData, prop}) {
 /// Duo rates manage end ///
 
 async function getClientAfterCombinationsUpdated({project, step, rate}) {
-    const stepTask = project.tasks.find(item => item.taskId === step.taskId);
-    const rateService = stepTask.service;
-    const rateIndustry = project.industry.id;
+    const stepId = step.serviceStep._id;
+    const prop = getCorrectRateProp(step.serviceStep);
+    const industries = [{...project.industry._doc, _id: project.industry.id}];
     try {
+        const defaultRates = await getDefaultRates(step.serviceStep.calculationUnit);
+        const rates = getRatesForUpdate({defaultRates, rate, stepId});
+        const {source, target} = await getPairInfoForUpdate({prop, step});
         const client = await getClient({"_id": project.customer.id});
-        let { languageCombinations } = client;
-        const existingCombIndex = languageCombinations.findIndex(item => item.source && item.source.symbol === step.source && item.target.symbol === step.target);
-        if(existingCombIndex !== -1) {
-            languageCombinations[existingCombIndex].industries = getUpdateIndustriesForComb({
-                industries: languageCombinations[existingCombIndex].industries,
-                rateService, rateIndustry, rate
-            })
-            return await getClientAfterUpdate({"_id": client.id},{ languageCombinations })
-        }
-        return addNewCombination({id: client.id, languageCombinations, rateService, rateIndustry, rate});
+        const rateInfo = {source, target, prop, rates, industries, stepsIds: [stepId]};
+        return await updateClientRates(client, rateInfo);
     } catch(err) {
         console.log(err);
         console.log("Error in getClientAfterCombinationsUpdated");
     }
 }
 
-function getUpdateIndustriesForComb({industries, rateIndustry, rateService, rate}) {
-    return industries.map(item => {
-        if(item.industry.id === rateIndustry) {
-            item.rates[rateService].value = rate;
-            item.rates[rateService].active = true;
+async function getPairInfoForUpdate({prop, step}) {
+    let source = "";
+    try {
+        const target = await Languages.findOne({symbol: step.target});
+        if(prop !== 'monoRates') {
+            source = await Languages.findOne({symbol: step.source});
         }
-        return item;
-    })
+        return {source, target}
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getPairInfoForUpdate");
+    }
+}
+
+function getCorrectRateProp(serviceStep) {
+    if(serviceStep.calculationUnit === 'Words') {
+        return 'wordsRates';
+    }
+    if(serviceStep.calculationUnit === 'Hours') {
+        return 'hoursRates'
+    }
+    return 'monoRates';
+}
+
+function getRatesForUpdate({defaultRates, rate, stepId}) {
+    return Object.keys(defaultRates).reduce((acc, cur) => {
+        if(cur === stepId) {
+            acc[cur] = {...rate, active: true};
+        } else {
+            acc[cur] = defaultRates[cur];
+        }
+        return {...acc};
+    }, {})
 }
 
 module.exports= { updateClientRates, importRates, getClientAfterCombinationsUpdated };

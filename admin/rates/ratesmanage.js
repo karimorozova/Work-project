@@ -1,4 +1,4 @@
-const { Industries } = require("../models");
+const { Industries, Step } = require("../models");
 const { getUpdatedPricelist, getPricelist } = require("./getPrices");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
@@ -321,10 +321,33 @@ function getRatesToCopy(pairRates, stepsIds) {
         if(stepsIds.indexOf(cur) !== -1) {
             acc[cur] = pairRates[cur]
         } else {
-            acc[cur] = {value: 0, min: 5, active: false}
+            acc[cur] = {value: 0, min: 0, active: false}
         }
         return {...acc}
     }, {})
 }
 
-module.exports = { getAfterRatesSaved, getAfterRatesImported, manageMonoPairRates, manageDuoPairRates, getRatesToCopy, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates }
+async function getDefaultRates(calculationUnit) {
+    try {
+        const steps = await Step.find({calculationUnit});
+        return steps.reduce((acc, cur) => {
+            acc[cur.id] = {value: 0, min: 0, active: false};
+            return {...acc};
+        }, {})
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getDefaultRates");
+    }
+}
+
+module.exports = { 
+    getDefaultRates,
+    getAfterRatesSaved, 
+    getAfterRatesImported, 
+    manageMonoPairRates, 
+    manageDuoPairRates, 
+    getRatesToCopy, 
+    fillEmptyRates, 
+    fillNonEmptyMonoRates, 
+    fillNonEmptyDuoRates 
+}

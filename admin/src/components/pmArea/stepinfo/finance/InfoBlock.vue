@@ -66,7 +66,7 @@ export default {
         },
         async approveAction() {
             await this.save();
-            const {rateValue, mminimum} = this.changedData;
+            const {rateValue, minimum} = this.changedData;
             if(this.selectedTab === 'Receivables') {
                 return await this.updateClientRate({step: this.step, rate: {...this.step.clientRate, value: +rateValue, min: +minimum}});
             }

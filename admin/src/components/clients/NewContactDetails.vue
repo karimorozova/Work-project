@@ -77,6 +77,7 @@ import SelectSingle from "../SelectSingle";
 import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
+import { mapGetters } from 'vuex';
 
 export default {
     data() {
@@ -181,6 +182,9 @@ export default {
         },
     },
     computed: {
+        ...mapGetters({
+            currentClient: "getCurrentClient"
+        }),
         isEmailValid() {
             if(this.isSaveClicked) {
                 let regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -203,6 +207,11 @@ export default {
         next(vm => {
             vm.fromRoute = from.path;
         })
+    },
+    created() {
+        if(!this.currentClient._id && this.$route.params.id) {
+            this.$router.push(`/clients/details/${this.$route.params.id}`);
+        }
     }
 }
 </script>

@@ -86,7 +86,7 @@ export const updateClientRate = async ({commit, dispatch}, payload) => {
     try {
         const { step, rate } = payload;
         const updatedClient = await Vue.http.post("/clientsapi/combination", { step, rate });
-        dispatch("storeClient", updatedClient.body);
+        dispatch('storeCurrentClient', updatedClient.body);
     } catch(err) {
         dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
     } finally {
