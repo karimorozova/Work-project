@@ -4,7 +4,8 @@
         :fields="fields"
         :tableData="filteredClients"
         @onRowClicked="onRowClicked"
-        :bodyClass="['clients__table', {'tbody_visible-overflow': filteredClients.length < 36}]"
+        :bodyClass="['clients__table', {'tbody_visible-overflow': filteredClients.length < 30}]"
+        :tableheadRowClass="filteredClients.length < 30 ? 'tbody_visible-overflow' : ''"
     )
         template(slot="headerName" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}

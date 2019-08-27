@@ -172,7 +172,7 @@ export default {
         box-sizing: border-box;
         width: 100%;
         max-height: 150px;
-        overflow-y: overlay;
+        overflow-y: auto;
         overflow-x: hidden;
         flex-direction: column;
         background-color: white;

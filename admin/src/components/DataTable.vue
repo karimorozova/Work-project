@@ -8,9 +8,6 @@
       .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
           slot(:name="field.key" :row="row" :index="index")
-        transition(name="slide-fade")
-          .table__row-expanded(v-if="isExpand && activeIndex === index")
-            slot(name="expanded" :row="row" :index="index")
 </template>
 
 <script>
@@ -21,13 +18,6 @@
       },
       tableData: {
         type: Array
-      },
-      hasScroll: {
-        type: Boolean
-      },
-      isExpand: {
-        type: Boolean,
-        default: false
       },
       activeIndex: {
         type: Number
@@ -74,7 +64,7 @@
     }
     &__tbody {
       max-height: 180px;
-      overflow-y: overlay;
+      overflow-y: scroll;
       margin-bottom: 20px;
       border: 0.5px solid $cell-border;
       border-bottom: 1px solid $cell-border;
@@ -127,27 +117,8 @@
       display: flex;
       flex-wrap: wrap;
     }
-    &__row-expanded {
-      width: 100%;
-      background-color: $white;
-      .table__body-row {
-        cursor: default;
-        &:nth-of-type(even) {
-          .table__tbody-cell {
-            background-color: $white;
-          }
-        }
-        &:nth-of-type(odd) {
-          .table__tbody-cell {
-            background-color: $table-row-zebra-background;
-          }
-        }
-        &:hover {
-          .table__tbody-cell {
-            background-color: $cell-background;
-          }
-        }
-      }
+    &__head-row {
+        overflow-y: scroll;
     }
   }
 
@@ -195,19 +166,6 @@
 
   .tbody_visible-overflow {
     overflow: visible;
-  }
-
-  .slide-fade-enter-active {
-    transition: all .3s ease;
-  }
-
-  .slide-fade-leave-active {
-    transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-  }
-
-  .slide-fade-enter, .slide-fade-leave-to {
-    transform: translateY(-10px);
-    opacity: 0;
   }
 
   .table_no-bottom-margin {

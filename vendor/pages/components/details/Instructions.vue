@@ -23,7 +23,7 @@ export default {
         border: 2px solid $light-brown;
         border-radius: 5px;
         max-height: 125px;
-        overflow-y: overlay;
+        overflow-y: auto;
     }
     &__text {
         margin: 10px 0;

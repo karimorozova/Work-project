@@ -138,7 +138,7 @@ export default {
     box-sizing: border-box;
     .drop {
         max-height: 100px;
-        overflow-y: overlay;
+        overflow-y: auto;
         overflow-x: hidden;
         background-color: #FFF;
         border-top: 1px solid #67573E;

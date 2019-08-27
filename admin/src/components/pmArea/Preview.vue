@@ -75,7 +75,7 @@ export default {
     &__details {
         width: 100%;
         box-sizing: border-box;
-        overflow-y: overlay;
+        overflow-y: auto;
     }
     &__title {
         font-size: 20px;

@@ -46,7 +46,7 @@ export default {
         color: #FFF;
     }
     &__tbody {
-    overflow-y: overlay;
+    overflow-y: auto;
     height: 97px;
     }
     &__thead-cell {

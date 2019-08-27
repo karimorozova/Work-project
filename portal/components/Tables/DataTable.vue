@@ -5,7 +5,7 @@
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
     .table__tbody.scroll(:class="[{'tbody_visible-overflow': isBodyOverflow}, bodyClass]")
-      .table__tbody-row(:class="rowClass" v-for="(row, index) of tableData" @click="onClick(index)")
+      .table__tbody-row(:class="[{'tbody_visible-overflow': isBodyOverflow}, rowClass]" v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
@@ -102,7 +102,7 @@
 
   &__tbody {
     max-height: 600px;
-    overflow-y: overlay;
+    overflow-y: scroll;
     margin-bottom: 20px;
     border: 0.5px solid $light-brown;
     border-bottom: 1px solid $light-brown;
@@ -143,7 +143,9 @@
   &__thead-row, &__tbody-row {
     display: flex;
   }
-
+  &__thead-row {
+    overflow-y: scroll;
+  }
   &__tbody-row {
     cursor: pointer;
     &:nth-of-type(even) {

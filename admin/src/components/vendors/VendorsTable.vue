@@ -3,7 +3,8 @@
     DataTable(
         :fields="fields"
         :tableData="filteredVendors"
-        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': filteredVendors.length < 36}]"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': filteredVendors.length < 30}]"
+        :tableheadRowClass="filteredVendors.length < 30 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="vendors-table_height-28"
         @onRowClicked="onRowClicked"
     )
@@ -338,7 +339,7 @@ export default {
         display: flex;
         align-items: center;
         height: 30px;
-        overflow-y: overlay;
+        overflow-y: auto;
         box-sizing: border-box;
     }
     &__icons {

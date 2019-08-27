@@ -3,8 +3,8 @@
     DataTable(
         :fields="fields"
         :tableData="allProjects"
-        :hasScroll="hasScroll"
-        bodyClass="all-projects"
+        :bodyClass="['all-projects', {'tbody_visible-overflow': allProjects.length < 12}]"
+        :tableheadRowClass="allProjects.length < 12 ? 'tbody_visible-overflow' : ''"
         @onRowClicked="onRowClicked"
     )
         template(slot="headerProjectId" slot-scope="{ field }")
@@ -112,11 +112,6 @@ export default {
         },
         edit() {
             console.log("edit");
-        }
-    },
-    computed: {
-        hasScroll() {
-            return document.body.offsetWidth > 1024 && this.allProjects.length > 5;
         }
     },
     components: {

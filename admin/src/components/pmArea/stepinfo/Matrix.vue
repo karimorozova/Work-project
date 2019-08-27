@@ -10,7 +10,8 @@
         DataTable(
             :fields="fields"
             :tableData="matrixData"
-            bodyClass="matrix-table"
+            :bodyClass="['matrix-table', 'tbody_visible-overflow']"
+            tableheadRowClass='tbody_visible-overflow'
         )
             template(slot="headerTitle" slot-scope="{ field }")
                 span.step-matrix__label {{ field.label }}

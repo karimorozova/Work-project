@@ -1,7 +1,7 @@
 <template lang="pug">
 .table
     .table__thead
-        .table__thead-row
+        .table__thead-row(:class="{'tbody_visible-overflow': tableData.length < 20}")
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
                 slot(:name="field.headerKey" :field="field")
     .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 20}")
@@ -85,6 +85,8 @@ export default {
 .table {
     width: 100%;
     &__thead {
+        border: .5px solid $thead-background;
+        border-bottom: none;
         .table__thead-row {
             background-color: $thead-background;
             color: $white;
@@ -92,7 +94,7 @@ export default {
     }
     &__tbody {
         max-height: 600px;
-        overflow-y: overlay;
+        overflow-y: scroll;
         margin-bottom: 20px;
         border: 0.5px solid $cell-border;
         border-bottom: 1px solid $cell-border;
@@ -127,6 +129,9 @@ export default {
     }
     &__thead-row, &__tbody-row {
         display: flex;
+    }
+    &__thead-row {
+        overflow-y: scroll;
     }
     &_scroll-padding {
         padding-right: 15px;

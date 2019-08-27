@@ -167,7 +167,7 @@ export default {
         font-size: 14px;
         width: 100%;
         max-height: 150px;
-        overflow-y: overlay;
+        overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
         z-index: 6;

@@ -201,7 +201,7 @@ export default {
     &_break-word {
         word-break: break-word;
         align-items: baseline;
-        overflow-y: overlay;
+        overflow-y: auto;
     }
     &_flex-centered {
         display: flex;

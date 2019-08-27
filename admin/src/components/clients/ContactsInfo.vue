@@ -6,6 +6,8 @@
             DataTable(
                 :fields="fields"
                 :tableData="client.contacts"
+                :bodyClass="contactsLength < 5 ? 'tbody_visible-overflow' : ''"
+                :tableheadRowClass="contactsLength < 5 ? 'tbody_visible-overflow' : ''"
                 @onRowClicked="showContactDetails"
             )
                 template(slot="headerName" slot-scope="{ field }")
@@ -211,6 +213,11 @@ export default {
         },
         setLeadContact(index) {
             this.$emit("setLeadContact", { index });
+        }
+    },
+    computed: {
+        contactsLength() {
+            return this.client.contacts ? this.client.contacts.length : 0;
         }
     },
     components: {

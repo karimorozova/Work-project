@@ -97,7 +97,7 @@ export default {
                 {label: "Package", headerKey: "headerPackage", key: "package", width: 159, padding: "0"},
                 {label: "Industry", headerKey: "headerIndustry", key: "industry", width: 194, padding: "0"},
                 {label: "", headerKey: "headerStep1", key: "copywriting", width: 233, padding: "0", isStepTitle: true},
-                {label: "", headerKey: "headerIcons", key: "icons", width: 145, padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: 129, padding: "0"},
             ],
             defaultStepSymbol: "copywriting",
             rateForm: 'monoRates',
@@ -157,11 +157,11 @@ export default {
     width: 100%;
     &__table {
         max-width: 972px;
-        overflow-x: overlay;
+        overflow-x: auto;
         position: relative;
     }
     &__add {
-        margin: 5px 0 10px 0;
+        margin: 15px 0 10px 0;
     }
     &__drop-menu {
         position: relative;
@@ -171,7 +171,7 @@ export default {
         @extend %table-data;
         height: 34px;
         flex-wrap: wrap;
-        overflow-y: overlay;
+        overflow-y: auto;
     }
     &__editing-data {
         @extend %table-data;

@@ -126,7 +126,7 @@ export default {
     }
     &_break-word {
         word-break: break-all;
-        overflow-y: overlay;
+        overflow-y: auto;
         align-items: baseline;
     }
 }

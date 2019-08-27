@@ -20,6 +20,8 @@
             :fields="fields"
             :tableData="allTasks"
             bodyRowClass="steps-table-row"
+            :bodyClass="['steps-table-body', {'tbody_visible-overflow': allTasks.length < 10}]"
+            :tableheadRowClass="allTasks.length < 10 ? 'tbody_visible-overflow' : ''"
             @onRowClicked="onRowClicked"
         )
             template(slot="headerCheck" slot-scope="{ field }")

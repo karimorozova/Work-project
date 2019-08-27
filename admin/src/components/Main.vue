@@ -520,8 +520,9 @@ export default {
             padding: 0;
             width: 177px;
             height: 77vh;
+            overflow-y: scroll;
             margin-bottom: 0;
-            overflow-y: overlay;
+            margin-left: 16px;
 
             &_item {
                 padding-bottom: 10px;

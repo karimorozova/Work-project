@@ -16,7 +16,7 @@
             @addRow="addFinanceData"
             @refreshFinance="refreshFinance"
         )
-    .step-info__block(v-if="step.name === 'translate1'")
+    .step-info__block(v-if="step.serviceStep.symbol === 'translation'")
         Matrix(
             :matrixData="matrixData"
             :step="step"
@@ -66,7 +66,7 @@ export default {
             return
         },
         getMatrixData(rateProp, prop) {
-            if(this.step.name !== "translate1") {
+            if(this.step.serviceStep.symbol !== "translation") {
                 return
             }
             this.matrixData = [];

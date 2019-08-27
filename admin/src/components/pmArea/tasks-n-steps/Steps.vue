@@ -21,6 +21,7 @@
             :tableData="allSteps"
             :activeIndex="activeIndex"
             :bodyClass="['steps-table-body', {'tbody_visible-overflow': allSteps.length < 10}]"
+            :tableheadRowClass="allSteps.length < 10 ? 'tbody_visible-overflow' : ''"
             bodyCellClass="steps-table-cell"
             bodyRowClass="steps-table-row"
         )

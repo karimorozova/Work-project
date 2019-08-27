@@ -78,7 +78,7 @@ export default {
     components: {
         ValidationErrors,
         ApproveModal
-    }
+    },
 }
 </script>
 
@@ -97,8 +97,7 @@ export default {
     }
     &__tbody {
         height: 180px;
-        overflow-y: overlay;
-        margin-bottom: 20px;
+        overflow-y: scroll;
         border: 0.5px solid $cell-border;
         border-bottom: 1px solid $cell-border;
         border-top: none;
@@ -132,6 +131,9 @@ export default {
     }
     &__thead-row, &__tbody-row {
         display: flex;
+    }
+    &__thead-row {
+        overflow-y: scroll;
     }
     &_bottom-bordered {
         border-bottom: 0.5px solid $cell-border;
