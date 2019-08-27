@@ -6,8 +6,8 @@
             .details__col
                 .details__item
                     LabelVal(text="Rate:" customClass="finance-details")
-                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.rate }} &euro;
-                        input.details__input(v-else type="text" size="6" v-model="currentData.rate" @blur="(e) => recalcSubtotal(e, 'quantityRelative')")
+                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.rateValue }} &euro;
+                        input.details__input(v-else type="text" size="6" v-model="currentData.rateValue" @blur="(e) => recalcSubtotal(e, 'quantityRelative')")
                 .details__item
                     LabelVal(text="Quantity[Relative]:" customClass="finance-details")
                         span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.quantityRelative }}
@@ -84,7 +84,7 @@ export default {
         },
         checkForErrors() {
             this.errors = [];
-            if(!this.currentData.rate || !this.floatRegex.test(this.currentData.rate)) this.errors.push("Set valid Rate value (integer/float)");
+            if(!this.currentData.rateValue || !this.floatRegex.test(this.currentData.rateValue)) this.errors.push("Set valid Rate value (integer/float)");
             if(this.currentData.minimum && !this.floatRegex.test(this.currentData.minimum)) this.errors.push("Set valid Minimum Charge value (integer/float)");
             if(!this.currentData.subtotal || !this.floatRegex.test(this.currentData.subtotal)) this.errors.push("Set valid Subtotal value (integer/float)");
             if(!this.currentData.quantityRelative || !this.integerRegex.test(this.currentData.quantityRelative)) this.errors.push("Set valid Quantity[Relative] value(integer)");

@@ -7,6 +7,8 @@
             :fields="fields"
             :tableData="financeData"
             bodyRowClass="steps-table-row"
+            bodyClass="tbody_visible-overflow"
+            tableheadRowClass="tbody_visible-overflow"
         )
             template(slot="headerTitle" slot-scope="{ field }")
             template(slot="headerReceivables" slot-scope="{ field }")

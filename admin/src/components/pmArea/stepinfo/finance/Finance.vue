@@ -6,9 +6,10 @@
                 .step-finance__table
                     DataTable(
                     :fields="fields"
-                        :tableData="financeData_PlusRate"
+                        :tableData="tableData"
                         :tableheadClass="'table__header'"
-                        :tableheadRowClass="'table__header-row'"
+                        bodyClass="tbody_visible-overflow"
+                        :tableheadRowClass="'table__header-row tbody_visible-overflow'"
                         :bodyRowClass="'table__body-row-custom'"
                     )
                         template(slot="headerTitle" slot-scope="{ field }")
@@ -25,10 +26,7 @@
                             span.step-finance__value {{ row.payables }}
                             span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
                 Results(:financeData="financeData")
-            InfoBlock(
-                :step="step"
-                :financeDataRate="financeDataRate"
-                )
+            InfoBlock(:step="step")
 </template>
 
 <script>
@@ -42,12 +40,7 @@ import InfoBlock from "./InfoBlock";
 export default {
     props: {
         step: { type: Object },
-        financeData: {
-            type: Array
-        },
-        financeDataRate: {
-            type: Object
-        }
+        financeData: { type: Array, default: () => [] },
     },
     data() {
         return {
@@ -75,14 +68,21 @@ export default {
         Results,
         InfoBlock
     },
-    mounted() {
-        this.financeData_PlusRate = [...this.financeData];
-        this.financeData_PlusRate.splice(this.financeData_PlusRate.length - 1, 0, {
-            title: 'Rate',
-            receivables: this.financeDataRate.clientRate,
-            payables: this.financeDataRate.vendorRate
-        });
-    },
+    computed: {
+        tableData() {
+            let result = [];
+            const dataLength = this.financeData.length;
+            if(dataLength) {
+                result = this.financeData;
+                result.splice(dataLength-1, 0, {
+                    title: 'Rate',
+                    receivables: this.step.clientRate ? this.step.clientRate.value : 0,
+                    payables: this.step.vendorRate ? this.step.vendorRate.value : 0
+                })
+            }
+            return result;
+        }
+    }
 }
 </script>
 

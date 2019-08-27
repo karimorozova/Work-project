@@ -66,11 +66,12 @@ export default {
         },
         async approveAction() {
             await this.save();
+            const {rateValue, mminimum} = this.changedData;
             if(this.selectedTab === 'Receivables') {
-                return await this.updateClientRate({step: this.step, rate: +this.changedData.rate});
+                return await this.updateClientRate({step: this.step, rate: {...this.step.clientRate, value: +rateValue, min: +minimum}});
             }
             if(this.step.vendor) {
-                return await this.updateVendorRate({step: this.step, rate: +this.changedData.rate});
+                return await this.updateVendorRate({step: this.step, rate: {...this.step.vendorRate, value: +rateValue, min: +minimum}});
             }
         },
         async save() {
@@ -80,14 +81,14 @@ export default {
                 const changedStep = {
                     ...this.step,
                     finance: { Price, Wordcount },
-                    [rateProp]: +this.changedData.rate
+                    [rateProp]: {value: +this.changedData.rateValue, min: +this.changedData.minimum}
                 }
                 this.isModal = false;
                 await this.updateStepFinance(changedStep);
             } catch(err) { }
         },
         collectData(data) {
-            const { rate, subtotal, quantityTotal, quantityRelative } = data;
+            const { rateValue, minimum, subtotal, quantityTotal, quantityRelative } = data;
             const Wordcount = {receivables: +quantityTotal, payables: +quantityRelative};
             let Price = Object.keys(this.step.finance.Price).reduce((prev, cur) => {
                 prev[cur] = this.step.finance.Price[cur];
@@ -99,14 +100,16 @@ export default {
     },
     computed: {
         financeData() {
-            const rate = this.selectedTab === "Receivables" ? +this.step.clientRate : +this.step.vendorRate;
+            const stepRate = this.selectedTab === "Receivables" ? this.step.clientRate : this.step.vendorRate;
+            const rateValue = stepRate ? stepRate.value : 0;
+            const rateMin = stepRate ? stepRate.min : 0;
             const subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.receivables : +this.step.finance.Price.payables;
             return {
-                rate,
+                rateValue,
                 quantityRelative: +this.step.finance.Wordcount.payables,
                 quantityTotal: +this.step.finance.Wordcount.receivables,
                 subtotal,
-                minimum: 0,
+                minimum: rateMin,
                 discount: 0
             }
         },

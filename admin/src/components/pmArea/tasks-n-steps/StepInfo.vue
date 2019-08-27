@@ -12,7 +12,6 @@
         Finance(
             :step="step"
             :financeData="financeData"
-            :financeDataRate="financeDataRate"
             @addRow="addFinanceData"
             @refreshFinance="refreshFinance"
         )
@@ -169,10 +168,6 @@ export default {
                     }
                 ]
             },[])
-        },
-        financeDataRate() {
-            const { clientRate, vendorRate } = this.step;
-            return { clientRate, vendorRate };
         },
         stepFiles() {
             let result = [];

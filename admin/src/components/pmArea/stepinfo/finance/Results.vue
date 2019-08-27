@@ -3,25 +3,35 @@
     .step-finance__summary
       .step-finance__summary-value
         span Profit:
-        span.step-finance__money {{ (this.financeData[1].receivables- this.financeData[1].payables).toFixed(2) }} &euro;
+        span.step-finance__money {{ profitAndMargin.profit.toFixed(2) }} &euro;
     .step-finance__summary
       .step-finance__summary-value
         span Margin:
-        span.step-finance__money + {{ ((this.financeData[1].receivables- this.financeData[1].payables)/this.financeData[1].receivables).toFixed(2) }} %
+        span.step-finance__money + {{ profitAndMargin.margin.toFixed(2) }} %
     .step-finance__summary
       .step-finance__summary-value
         span ROI:
-        span.step-finance__money + {{ 0 }} %
+        span.step-finance__money + 0 %
 </template>
 
 <script>
     export default {
-      props: {
-        financeData: {
-          type: Array
+        props: {
+            financeData: {
+                type: Array
+            },
         },
-
-      },
+        computed: {
+            profitAndMargin() {
+                let result = {profit: 0, margin: 0};
+                if(this.financeData.length) {
+                    const price = this.financeData.find(item => item.title === 'Price');
+                    result.profit = price.receivables - price.payables;
+                    result.margin = result.profit/price.receivables;
+                }
+                return result;
+            }
+        }
     }
 </script>
 
