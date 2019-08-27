@@ -59,8 +59,8 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/metrics', async (req, res) => {
     const { projectId } = req.query;
     try {
-        const updatedProject = await updateProjectMetrics({projectId});
-        res.send("ok");
+        await updateProjectMetrics({projectId});
+        res.send("metrics received");
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting metrics ");

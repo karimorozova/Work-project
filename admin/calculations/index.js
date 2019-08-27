@@ -1,7 +1,6 @@
-const { Services, Vendors } = require('../models');
+const { Vendors } = require('../models');
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
-const { getOneService } = require('../services/getServices');
 const { updateProject } = require('../projects/getProjects');
 const { emptyMetrics } = require('../helpers/dbDefaultValue');
 
@@ -110,7 +109,8 @@ async function payablesCalc({task, project, step}) {
 
 function getStepPayables({rate, metrics, step}) {
     let { finance } = step;
-    const payables = step.name !== "translate1" ? +(metrics.totalWords*rate)
+    const rateValue = rate ? rate.value : 0; 
+    const payables = step.serviceStep.symbol !== "translation" ? +(metrics.totalWords*rateValue)
     : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
     return {...step, finance, vendorRate: rate};
@@ -120,8 +120,7 @@ function getRate({step, project, vendor}) {
     try {
         const comb = getCombination({combs: vendor.wordsRates, step, industryId: project.industry.id});
         const rate = comb ? comb.rates[step.serviceStep._id] : "";
-        const basicRate = vendor.basicRate ? +vendor.basicRate : 0;
-        return rate && rate.value ? +rate.value : +basicRate;
+        return rate || "";
     } catch(err) {
         console.log(err);
         console.log("Error in getRate");
@@ -131,13 +130,17 @@ function getRate({step, project, vendor}) {
 function calcCost(metrics, field, rate) {
     let cost = 0;
     let wordsSum = 0;
+    const rateValue = rate ? rate.value : 0;
     for(let key in metrics) {
         if(key !== 'totalWords' && key !== "nonTranslatable") {
-            cost+= metrics[key].value*metrics[key][field]*rate;
+            cost+= metrics[key].value*metrics[key][field]*rateValue;
             wordsSum += metrics[key].value;
         }
     }
-    cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rate;
+    cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rateValue;
+    if(rate && cost < rate.min) {
+        cost = rate.min;
+    }
     return cost;
 }
 
@@ -146,7 +149,7 @@ async function getCustomerRate({step, industryId, customerId}) {
         const customer = await getClient({"_id": customerId});
         const comb = getCombination({combs: customer.wordsRates, step, industryId});
         const rate = comb ? comb.rates[step.serviceStep._id] : "";
-        const customerRate = rate ? rate.value : "";
+        const customerRate = rate || "";
         return customerRate;
     } catch(err) {
         console.log(err);
@@ -172,7 +175,11 @@ function getCombination({combs, step, industryId}) {
 async function calcProofingStep({step, task, project, words}) {
     try {
         const rate = await getCustomerRate({task, step, industryId: project.industry.id, customerId: project.customer.id});
-        const cost = +(words*rate).toFixed(2);
+        let cost = 0;
+        if(rate) {
+            const value = +(words*rate.value).toFixed(2);
+            cost = rate.min && value < rate.min ? rate.min : value;
+        }
         return { cost, rate }
     } catch(err) {
         console.log(err);
