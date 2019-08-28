@@ -1,6 +1,5 @@
 const { getClientAfterUpdate, getClient } = require("./getClients");
-const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates, getDefaultRates } = require("../rates/ratesmanage");
-const { Languages } = require("../models");
+const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates, getRateInfoFromStepFinance } = require("../rates/ratesmanage");
 
 async function updateClientRates(client, rateInfo) {
     const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
@@ -90,55 +89,14 @@ async function getAfterImportDuo({clientId, ratesData, prop}) {
 /// Duo rates manage end ///
 
 async function getClientAfterCombinationsUpdated({project, step, rate}) {
-    const stepId = step.serviceStep._id;
-    const prop = getCorrectRateProp(step.serviceStep);
-    const industries = [{...project.industry._doc, _id: project.industry.id}];
     try {
-        const defaultRates = await getDefaultRates(step.serviceStep.calculationUnit);
-        const rates = getRatesForUpdate({defaultRates, rate, stepId});
-        const {source, target} = await getPairInfoForUpdate({prop, step});
+        const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
         const client = await getClient({"_id": project.customer.id});
-        const rateInfo = {source, target, prop, rates, industries, stepsIds: [stepId]};
         return await updateClientRates(client, rateInfo);
     } catch(err) {
         console.log(err);
         console.log("Error in getClientAfterCombinationsUpdated");
     }
-}
-
-async function getPairInfoForUpdate({prop, step}) {
-    let source = "";
-    try {
-        const target = await Languages.findOne({symbol: step.target});
-        if(prop !== 'monoRates') {
-            source = await Languages.findOne({symbol: step.source});
-        }
-        return {source, target}
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getPairInfoForUpdate");
-    }
-}
-
-function getCorrectRateProp(serviceStep) {
-    if(serviceStep.calculationUnit === 'Words') {
-        return 'wordsRates';
-    }
-    if(serviceStep.calculationUnit === 'Hours') {
-        return 'hoursRates'
-    }
-    return 'monoRates';
-}
-
-function getRatesForUpdate({defaultRates, rate, stepId}) {
-    return Object.keys(defaultRates).reduce((acc, cur) => {
-        if(cur === stepId) {
-            acc[cur] = {...rate, active: true};
-        } else {
-            acc[cur] = defaultRates[cur];
-        }
-        return {...acc};
-    }, {})
 }
 
 module.exports= { updateClientRates, importRates, getClientAfterCombinationsUpdated };

@@ -1,4 +1,4 @@
-const { Industries, Step } = require("../models");
+const { Industries, Step, Languages } = require("../models");
 const { getUpdatedPricelist, getPricelist } = require("./getPrices");
 
 async function getAfterRatesSaved(rateInfo, pricelist) {
@@ -234,6 +234,60 @@ function fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates
 
 /////// Duo rates manage end ///////
 
+/////// Clients and Vendors rates additional functions start //////
+
+async function getRateInfoFromStepFinance({project, step, rate}) {
+    const stepId = step.serviceStep._id;
+    const prop = getCorrectRateProp(step.serviceStep);
+    const industries = [{...project.industry._doc, _id: project.industry.id}];
+    try {
+        const defaultRates = await getDefaultRates(step.serviceStep.calculationUnit);
+        const rates = getRatesForUpdate({defaultRates, rate, stepId});
+        const {source, target} = await getPairInfoForUpdate({prop, step});
+        return {source, target, prop, rates, industries, stepsIds: [stepId]};
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getRateInfoFromStepFinance");
+    }
+}
+
+async function getPairInfoForUpdate({prop, step}) {
+    let source = "";
+    try {
+        const target = await Languages.findOne({symbol: step.target});
+        if(prop !== 'monoRates') {
+            source = await Languages.findOne({symbol: step.source});
+        }
+        return {source, target}
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getPairInfoForUpdate");
+    }
+}
+
+function getCorrectRateProp(serviceStep) {
+    if(serviceStep.calculationUnit === 'Words') {
+        return 'wordsRates';
+    }
+    if(serviceStep.calculationUnit === 'Hours') {
+        return 'hoursRates'
+    }
+    return 'monoRates';
+}
+
+function getRatesForUpdate({defaultRates, rate, stepId}) {
+    return Object.keys(defaultRates).reduce((acc, cur) => {
+        if(cur === stepId) {
+            acc[cur] = {...rate, active: true};
+        } else {
+            acc[cur] = defaultRates[cur];
+        }
+        return {...acc};
+    }, {})
+}
+
+/////// Clients and Vendors rates additional functions end //////
+
 function manageSamePairs({stepsIds, samePairs, rates, industries}) {
     let industriesIds = industries.map(item => {
         return item._id ? item._id : item
@@ -349,5 +403,6 @@ module.exports = {
     getRatesToCopy, 
     fillEmptyRates, 
     fillNonEmptyMonoRates, 
-    fillNonEmptyDuoRates 
+    fillNonEmptyDuoRates,
+    getRateInfoFromStepFinance
 }

@@ -1,5 +1,5 @@
 const { getVendor, getVendorAfterUpdate } = require("./getVendors");
-const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates } = require("../rates/ratesmanage");
+const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates, getRateInfoFromStepFinance } = require("../rates/ratesmanage");
 
 async function updateVendorRates(vendor, rateInfo) {
     const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
@@ -88,20 +88,14 @@ async function getAfterImportDuo({vendorId, ratesData, prop}) {
 
 /// Duo rates manage end ///
 async function getVendorAfterCombinationsUpdated({project, step, rate}) {
-    const stepTask = project.tasks.find(item => item.taskId === step.taskId);
-    const rateService = stepTask.service;
-    const rateIndustry = project.industry.id;
     try {
+        const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
         const vendor = await getVendor({"_id": step.vendor._id});
-        return await getWihtUpdatedCombs({vendor, step, rate, rateService, rateIndustry});
+        return await updateVendorRates(vendor, rateInfo);
     } catch(err) {
         console.log(err);
         console.log("Error in getVendorAfterCombinationsUpdated");
     }
-}
-
-async function getWihtUpdatedCombs({vendor, step, rate, rateService, rateIndustry}) {
-    
 }
 
 module.exports= { updateVendorRates, importRates, getVendorAfterCombinationsUpdated };
