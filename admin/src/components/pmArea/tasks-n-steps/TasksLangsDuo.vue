@@ -78,6 +78,10 @@ export default {
                 if(a.lang > b.lang) return 1;
             });
         },
+        getDistinctLangs(langs) {
+            if(!langs.length) return [];
+            return langs.filter((obj, index, self) => self.map(item => item.lang).indexOf(obj.lang) === index);
+        },
         setSource({lang}) {
             this.$emit("setSourceLanguage", {symbol: lang.symbol});
             this.setPossibleTargets(lang.symbol);
@@ -168,10 +172,11 @@ export default {
         setDefaultTargets(sourcePair) {
             if(!sourcePair) {
                 this.targetAll = this.languagePairs.map(pair => pair.target);
+                this.sortLangs('targetAll');
             } else {
                 this.setPossibleTargets(sourcePair.source.symbol);
             }
-            this.sortLangs('targetAll');
+            this.targetAll = this.getDistinctLangs(this.targetAll);
         },
         setRequestLanguages() {
             const { symbol } = this.currentProject.sourceLanguage;
