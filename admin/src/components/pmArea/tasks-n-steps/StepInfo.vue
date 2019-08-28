@@ -69,6 +69,7 @@ export default {
                 return
             }
             this.matrixData = [];
+            const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
             for(let key of Object.keys(this.task.metrics)) {
                 if(this.excludeKeys.indexOf(key) === -1) {
                     this.matrixData.push({
@@ -77,8 +78,8 @@ export default {
                         title: this.task.metrics[key].text,
                         value: this.task.metrics[key][prop]*100,
                         wordcount: this.task.metrics[key].value,
-                        rate: +this.step[rateProp]*this.task.metrics[key][prop],
-                        total: this.step[rateProp]*this.task.metrics[key][prop]*this.task.metrics[key].value
+                        rate: rateValue*this.task.metrics[key][prop],
+                        total: rateValue*this.task.metrics[key][prop]*this.task.metrics[key].value
                     });
                 }
             }
@@ -89,13 +90,14 @@ export default {
                 return init + cur.wordcount;
             }, 0);
             const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
-            const total = wordcount*this.step[rateProp];
+            const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
+            const total = wordcount*rateValue;
             this.matrixData.push({
                 active: false,
                 title: "No match",
                 value: "100",
                 wordcount: wordcount,
-                rate: +this.step[rateProp],
+                rate: rateValue,
                 total: total
             })
         },
