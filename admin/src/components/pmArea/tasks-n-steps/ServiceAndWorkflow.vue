@@ -29,7 +29,10 @@
                 :start="stepsDates[count-1].start"
                 :deadline="stepsDates[count-1].deadline"
                 @setDate="(e) => setDate(e, count)"
-            )    
+            )
+        transition(name="fade")
+            .workflow__error(v-if="isError")
+                p.workflow__error-message The Service has no Steps! Please, check the Settings.
 </template>
 
 <script>
@@ -49,13 +52,20 @@ export default {
             stepsCounter: 2,
             stepsDates: [{ start: new Date(), deadline: "" }, { start: "", deadline: new Date() }],
             asteriskStyle: {"top": "-2px"},
-            positionStyle: {"margin-top": "3px"}
+            positionStyle: {"margin-top": "3px"},
+            isError: false
         }
     },
     methods: {
         ...mapActions({
             setDataValue: "setTasksDataValue"
         }),
+        showError() {
+            this.isError = true;
+            setTimeout(() => {
+                this.isError = false;
+            }, 4000)
+        },
         setDate({ date, prop }, count) {
             this.stepsDates[count - 1][prop] = date;
             if (this.stepsDates[count] && prop === "deadline") {
@@ -68,10 +78,17 @@ export default {
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
         },
         setService({option}) {
-            this.service = option;
             const value = this.services.find(item => item.title === option);
+            if(!value.steps.length) {
+                return this.showError();
+            }
+            this.service = option;
             this.setDataValue({prop: "service", value});
-            value.languageForm === 'Mono' ? this.setWorkflow({option: '1 Step'}) : this.setWorkflow({option: '2 Steps'});
+            if(value.languageForm === 'Mono' || value.steps.length === 1) {
+                this.setWorkflow({option: '1 Step'});
+            } else {
+                this.setWorkflow({option: '2 Steps'});
+            }
         },
         setWorkflow({option}) {
             const value = this.workflowSteps.find(item => item.name === option);
@@ -130,8 +147,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
 
 .workflow {
+    position: relative;
     &__title {
         font-size: 21px;
         margin-bottom: 20px;
@@ -153,9 +172,30 @@ export default {
     &__default-dates {
         margin: 30px 0;
     }
+    &__error {
+        position: absolute;
+        top: 0;
+        left: 60px;
+        box-shadow: 0 0 5px $orange;
+        z-index: 10;
+        background-color: $white;
+        padding: 0 5px;
+        border-radius: 10px;
+    }
+    &__error-message {
+        color: $orange;
+        font-weight: 600;
+    }
     &_relative {
         position: relative;
     }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .4s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>
