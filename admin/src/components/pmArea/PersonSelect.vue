@@ -1,5 +1,5 @@
 <template lang="pug">
-.drop-select(v-click-outside="outClick")
+.drop-select(v-click-outside="outClick" :class="customClass")
     .select
         template(v-if="selectedPerson")
             span.selected {{ selectedPerson }}
@@ -33,6 +33,9 @@ export default {
         },
         index: {
             type: Number
+        },
+        customClass: {
+            type: String
         }
     },
     data() {
@@ -146,6 +149,7 @@ export default {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     .drop {
         font-size: 14px;
         width: 100%;
@@ -185,6 +189,20 @@ export default {
     .project-details__drop-menu &, .step-vendor & {
         border: 1px solid $brown-border;
         border-radius: 5px;
+    }
+}
+
+.bordered {
+    border: 1px solid $brown-border;
+    border-radius: 5px;
+}
+
+.arrow-20 {
+    .arrow-button {
+        width: 20%;
+    }
+    .selected {
+        width: 80%;
     }
 }
 
