@@ -51,4 +51,13 @@ export default {
 .new-chart-label {
     font-size: 14px;
 }
+
+.column {
+    flex-direction: column;
+    align-items: flex-start;
+    .pair__value {
+        display: flex;
+        align-items: center;
+    }
+}
 </style>

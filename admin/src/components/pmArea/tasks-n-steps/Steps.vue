@@ -113,6 +113,8 @@
                     :task="getTask(infoIndex)"
                     @closeStepInfo="closeStepInfo"
                 )
+    .steps__reassignment(v-if="isReassignment")
+        Reassignment(@close="closeReassignment")
     .steps__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
@@ -130,6 +132,7 @@ import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
 import ApproveModal from "../../ApproveModal";
 const StepInfo = () => import("./StepInfo");
+const Reassignment = () => import("../stepinfo/Reassignment");
 import SelectSingle from "../../SelectSingle";
 const Datepicker = () => import("../../Datepicker");
 import moment from "moment";
@@ -181,6 +184,7 @@ export default {
             chosenStep: {},
             infoIndex: -1,
             isStepInfo: false,
+            isReassignment: false
         }
     },
     methods: {
@@ -236,6 +240,9 @@ export default {
             this.isStepInfo = false;
             this.infoIndex = -1;
         },
+        closeReassignment() {
+            this.isReassignment = false;
+        },
         setVendor({person}, index) {
             this.$emit("setVendor", {vendor: { _id: person._id }, index});
         },
@@ -281,6 +288,9 @@ export default {
                     case "ReOpen":
                         const steps = checkedSteps.filter(item => item.status === "Completed");
                         await this.reopenSteps(steps);
+                        break;
+                    case "Reassign":
+                        this.isReassignment = true;
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
@@ -366,11 +376,15 @@ export default {
             let result = this.actions;
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
             const completedStep = this.allSteps.find(item => item.status === "Completed");
+            const startedStep = this.allSteps.find(item => item.status === "Started");
             if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
                 result= [];
             }
             if(completedStep && result.indexOf("ReOpen") === -1) {
                 result.push("ReOpen");
+            }
+            if(startedStep && result.indexOf("Reassign") === -1) {
+                result.push("Reassign");
             }
             if(!result.length) {
                 result = ["No action available"];
@@ -385,6 +399,7 @@ export default {
         SelectSingle,
         Datepicker,
         StepInfo,
+        Reassignment,
         ApproveModal,
         Tabs
     },
@@ -451,6 +466,14 @@ export default {
         position: relative;
         width: 100%;
         height: 29px;
+    }
+    &__reassignment {
+        position: absolute;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
     }
     &__approve-action {
         position: absolute;
