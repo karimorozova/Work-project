@@ -77,18 +77,20 @@ export default {
         async save() {
             const { Price, Wordcount } = this.collectData(this.changedData);
             const rateProp = this.selectedTab === 'Receivables' ? 'clientRate' : 'vendorRate';
+            const discountProp = this.selectedTab === 'Receivables' ? 'clientDiscount' : 'vendorDiscount';
             try {
                 const changedStep = {
                     ...this.step,
                     finance: { Price, Wordcount },
-                    [rateProp]: {value: +this.changedData.rateValue, min: +this.changedData.minimum}
+                    [rateProp]: {value: +this.changedData.rateValue, min: +this.changedData.minimum},
+                    [discountProp]: +this.changedData.discount
                 }
                 this.isModal = false;
                 await this.updateStepFinance(changedStep);
             } catch(err) { }
         },
         collectData(data) {
-            const { rateValue, minimum, subtotal, quantityTotal, quantityRelative } = data;
+            const { subtotal, quantityTotal, quantityRelative } = data;
             const Wordcount = {receivables: +quantityTotal, payables: +quantityRelative};
             let Price = Object.keys(this.step.finance.Price).reduce((prev, cur) => {
                 prev[cur] = this.step.finance.Price[cur];
@@ -103,6 +105,7 @@ export default {
             const stepRate = this.selectedTab === "Receivables" ? this.step.clientRate : this.step.vendorRate;
             const rateValue = stepRate ? stepRate.value : 0;
             const rateMin = stepRate ? stepRate.min : 0;
+            const stepDiscount = this.selectedTab === "Receivables" ? this.step.clientDiscount : this.step.vendorDiscount;
             const subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.receivables : +this.step.finance.Price.payables;
             return {
                 rateValue,
@@ -110,7 +113,7 @@ export default {
                 quantityTotal: +this.step.finance.Wordcount.receivables,
                 subtotal,
                 minimum: rateMin,
-                discount: 0
+                discount: stepDiscount || 0
             }
         },
         rateOwner() {

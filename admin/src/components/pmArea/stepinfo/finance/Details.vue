@@ -11,7 +11,7 @@
                 .details__item
                     LabelVal(text="Quantity[Relative]:" customClass="finance-details")
                         span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.quantityRelative }}
-                        input.details__input(v-else type="text" size="6" v-model="currentData.quantityRelative" @blur="(e) => recalcSubtotal(e, 'rate')")
+                        input.details__input(v-else type="text" size="6" v-model="currentData.quantityRelative" @blur="(e) => recalcSubtotal(e, 'rateValue')")
                 .details__item
                     LabelVal(text="Subtotal:" customClass="finance-details")
                         span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.subtotal }} &euro;
@@ -27,7 +27,7 @@
                         input.details__input(v-else type="text" size="6" v-model="currentData.quantityTotal")
                 .details__item
                     LabelVal(text="Discounts/Surcharges:" customClass="finance-details")
-                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.discount }} &euro;
+                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.discount }} %
                         input.details__input(v-else type="text" size="6" v-model="currentData.discount")
         .details__row.details_border-top
             .details__col.details_margin-top
@@ -77,7 +77,7 @@ export default {
         },
         recalcSubtotal(e, propMultiply) {
             const { value } = e.target;
-            const regex = propMultiply === 'rate' ? this.integerRegex : this.floatRegex;
+            const regex = propMultiply === 'rateValue' ? this.integerRegex : this.floatRegex;
             if(regex.test(value)) {
                 this.currentData.subtotal = (+value*this.currentData[propMultiply]).toFixed(2);
             }
@@ -86,12 +86,14 @@ export default {
             this.errors = [];
             if(!this.currentData.rateValue || !this.floatRegex.test(this.currentData.rateValue)) this.errors.push("Set valid Rate value (integer/float)");
             if(this.currentData.minimum && !this.floatRegex.test(this.currentData.minimum)) this.errors.push("Set valid Minimum Charge value (integer/float)");
+            if(this.currentData.discount && !this.floatRegex.test(this.currentData.discount)) this.errors.push("Set valid Discount value (integer/float)");
             if(!this.currentData.subtotal || !this.floatRegex.test(this.currentData.subtotal)) this.errors.push("Set valid Subtotal value (integer/float)");
             if(!this.currentData.quantityRelative || !this.integerRegex.test(this.currentData.quantityRelative)) this.errors.push("Set valid Quantity[Relative] value(integer)");
             if(!this.currentData.quantityTotal || !this.integerRegex.test(this.currentData.quantityTotal)) this.errors.push("Set valid Quantity[Total] value(integer)");
             if (this.errors.length) {
                 return this.areErrorsExist = true;
-            } 
+            }
+            this.currentData.subtotal = this.currentData.subtotal < this.currentData.minimum ? this.currentData.mininmum : this.currentData.subtotal;
             this.$emit("save", this.currentData);
             this.cancel();
         },
@@ -106,9 +108,9 @@ export default {
     },
     computed: {
         total() {
-            let result = +this.financeData.subtotal + +this.financeData.discount;
+            let result = (+this.financeData.subtotal - +(this.financeData.subtotal*this.financeData.discount/100)).toFixed(2);
             if(this.isEditing) {
-                result = +this.currentData.subtotal + +this.currentData.discount;
+                result = (+this.currentData.subtotal - +(this.currentData.subtotal*this.currentData.discount/100)).toFixed(2);
             }
             return result;
         }

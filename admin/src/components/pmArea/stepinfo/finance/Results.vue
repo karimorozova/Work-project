@@ -7,11 +7,11 @@
     .step-finance__summary
       .step-finance__summary-value
         span Margin:
-        span.step-finance__money + {{ profitAndMargin.margin.toFixed(2) }} %
+        span.step-finance__money {{ profitAndMargin.margin.toFixed(2) }} %
     .step-finance__summary
       .step-finance__summary-value
         span ROI:
-        span.step-finance__money + 0 %
+        span.step-finance__money 0 %
 </template>
 
 <script>
