@@ -25,21 +25,21 @@
             .reassignment__row
                 LabelVal(text="Should new Vendor start from the beggining?" customClass="column")
                     .reassignment__check
-                        CheckBox
+                        CheckBox(@check="(e)=>toggle(e, 'isStart', 'yes')" @uncheck="(e)=>toggle(e, 'isStart', 'yes')" :isChecked="isStart.yes")
                         .reassignment__check-label Yes
                     .reassignment__check
-                        CheckBox
+                        CheckBox(@check="(e)=>toggle(e, 'isStart', 'no')" @uncheck="(e)=>toggle(e, 'isStart', 'no')" :isChecked="isStart.no")
                         .reassignment__check-label No
             .reassignment__row
                 LabelVal(text="Should old Vendor be paid for this part?" customClass="column")
                     .reassignment__check
-                        CheckBox
+                        CheckBox(@check="(e)=>toggle(e, 'isPay', 'yes')" @uncheck="(e)=>toggle(e, 'isPay', 'yes')" :isChecked="isPay.yes")
                         .reassignment__check-label Yes
                     .reassignment__check
-                        CheckBox
+                        CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
                         .reassignment__check-label No
                     .reassignment__work
-                        input.reassignment__percent(type="text")
+                        input.reassignment__percent(type="text" :value="getProgress()" @change="setProgress")
                         span.reassignment__text %  is done
         .reassignment__buttons
             .reassignment__button
@@ -56,6 +56,7 @@ import SelectSingle from "@/components/SelectSingle";
 import CheckBox from "@/components/CheckBox";
 import stepVendor from "@/mixins/stepVendor";
 import { mapGetters, mapActions } from "vuex";
+import { program } from 'babel-types';
 
 export default {
     mixins: [stepVendor],
@@ -67,18 +68,36 @@ export default {
             reasons: [],
             isAllShow: false,
             newVendor: null,
-            reason: ""
+            reason: "",
+            isStart: {yes: false, no: true},
+            isPay: {yes: true, no: false},
+            enteredProgress: ""
         }
     },
     methods: {
         ...mapActions([
             "alertToggle"
         ]),
+        setProgress(e) {
+            this.enteredProgress = e.target.value;
+        },
+        getProgress() {
+            if(this.enteredProgress) return this.enteredProgress;
+            const { progress } = this.step;
+            return Math.floor(progress.wordsDone/progress.wordsTotal*100);
+        },
         currentVendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
         },
         toggleVendors({isAll}) {
             this.isAllShow = isAll;
+        },
+        toggle(e, prop, key) {
+            if(this[prop][key]) return;
+            this[prop] = Object.keys(this[prop]).reduce((acc, prev) => {
+                prev === key ? acc[prev] = true : acc[prev] = false;
+                return {...acc};
+            }, {})
         },
         setReason({option}) {
             this.reason = option;
