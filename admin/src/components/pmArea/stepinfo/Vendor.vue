@@ -7,7 +7,7 @@
                 :selectedPerson="currentVendorName(vendor)"
                 :persons="extendedVendors(-1)"
                 :isExtended="isAllShow"
-                :isAdditionalShow="isAdditionalShow"
+                :isAdditionalShow="true"
                 @setPerson="setVendor"
                 @togglePersonsData="toggleVendors"
             )
@@ -53,8 +53,7 @@ export default {
             isAfterRejectCheck: false,
             isAfterTimeCheck: false,
             nextSendTime: 1,
-            isAllShow: false,
-            isAdditionalShow: true
+            isAllShow: false
         }
     },
     methods: {

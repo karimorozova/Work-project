@@ -67,6 +67,9 @@
                         @scrollDrop="scrollDrop"
                     )
                 span.steps__step-vendor(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
+                    .steps__vendor-replace(v-if="row.vendor")
+                        img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
+                        .steps__tooltip Reassign Vendor
                     span.steps__step-no-select(v-if="!row.vendor") No Vendor
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
@@ -114,7 +117,7 @@
                     @closeStepInfo="closeStepInfo"
                 )
     .steps__reassignment(v-if="isReassignment")
-        Reassignment(@close="closeReassignment")
+        Reassignment(@close="closeReassignment" :step="reassignStep")
     .steps__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
@@ -184,7 +187,8 @@ export default {
             chosenStep: {},
             infoIndex: -1,
             isStepInfo: false,
-            isReassignment: false
+            isReassignment: false,
+            reassignStep: {}
         }
     },
     methods: {
@@ -235,6 +239,10 @@ export default {
         showStepDetails(index) {
             this.infoIndex = index;
             this.isStepInfo = true;
+        },
+        showReassignment(index) {
+            this.reassignStep = {...this.allSteps[index]};
+            this.isReassignment = true;
         },
         closeStepInfo() {
             this.isStepInfo = false;
@@ -288,9 +296,6 @@ export default {
                     case "ReOpen":
                         const steps = checkedSteps.filter(item => item.status === "Completed");
                         await this.reopenSteps(steps);
-                        break;
-                    case "Reassign":
-                        this.isReassignment = true;
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
@@ -376,15 +381,11 @@ export default {
             let result = this.actions;
             const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created");
             const completedStep = this.allSteps.find(item => item.status === "Completed");
-            const startedStep = this.allSteps.find(item => item.status === "Started");
             if(!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
                 result= [];
             }
             if(completedStep && result.indexOf("ReOpen") === -1) {
                 result.push("ReOpen");
-            }
-            if(startedStep && result.indexOf("Reassign") === -1) {
-                result.push("Reassign");
             }
             if(!result.length) {
                 result = ["No action available"];
@@ -455,6 +456,39 @@ export default {
     }
     &__step-vendor {
         padding: 7px 5px 5px 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+    &__vendor-replace {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        box-sizing: border-box;
+        &:hover {
+            .steps__tooltip {
+                display: block;
+                z-index: 50;
+            }
+        }
+    }
+    &__replace-icon {
+        max-width: 20px;
+        cursor: pointer;
+    }
+    &__tooltip {
+        text-align: center;
+        width: 110px;
+        position: absolute;
+        right: 25px;
+        top: 0;
+        display: none;
+        background-color: $white;
+        color: $orange;
+        box-sizing: border-box;
+        padding: 3px;
+        border-radius: 8px;
     }
     &__step-no-select {
         opacity: 0.7;

@@ -6,11 +6,22 @@
             .reassignment__row
                 LabelVal(text="Reason to reassign")
                     .reassignment__drop
-                        PersonSelect(customClass="bordered arrow-20")
+                        SelectSingle(
+                            placeholder="Select"
+                            :options="cnacelReasons"
+                            @chooseOption="setReason"
+                            :selectedOption="reason")
             .reassignment__row
                 LabelVal(text="New Vendor")
                     .reassignment__drop
-                        SelectSingle
+                        PersonSelect(
+                            customClass="bordered arrow-20"
+                            :persons="extendedVendors(-1)"
+                            :selectedPerson="currentVendorName(newVendor)"
+                            :isExtended="isAllShow"
+                            :isAdditionalShow="true"
+                            @setPerson="setVendor"
+                            @togglePersonsData="toggleVendors")
             .reassignment__row
                 LabelVal(text="Should new Vendor start from the beggining?" customClass="column")
                     .reassignment__check
@@ -43,14 +54,62 @@ import PersonSelect from "../PersonSelect";
 import Button from "@/components/Button";
 import SelectSingle from "@/components/SelectSingle";
 import CheckBox from "@/components/CheckBox";
+import stepVendor from "@/mixins/stepVendor";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [stepVendor],
     props: {
-        step: {type: Object}
+        step: {type: Object},
+    },
+    data() {
+        return {
+            reasons: [],
+            isAllShow: false,
+            newVendor: null,
+            reason: ""
+        }
     },
     methods: {
+        ...mapActions([
+            "alertToggle"
+        ]),
+        currentVendorName(vendor) {
+            return vendor ? vendor.firstName + ' ' + vendor.surname : "";
+        },
+        toggleVendors({isAll}) {
+            this.isAllShow = isAll;
+        },
+        setReason({option}) {
+            this.reason = option;
+        },
+        setVendor({person}) {
+            if(this.step.vendor && person._id === this.step.vendor._id) return;
+            this.newVendor = person
+        },
         close() {
             this.$emit('close');
+        },
+        async getReasons() {
+            try {
+                const result = await this.$http.get("/api/reasons");
+                this.reasons = result.body;
+            } catch(err) {
+                this.alertToggle({message: "Error on getting Reasons.", isShow: true, type: "error"});
+            }
+        }
+    },
+    computed: {
+        ...mapGetters({
+            allVendors: "getVendors",
+            currentProject: "getCurrentProject",
+            userGroup: "getUserGroup"
+        }),
+        cnacelReasons() {
+            return this.reasons ? this.reasons.map(item => item.reason) : [];
+        },
+        vendors() {
+            return this.allVendors.filter(item => item._id !== this.step.vendor._id);
         }
     },
     components: {
@@ -59,6 +118,9 @@ export default {
         PersonSelect,
         CheckBox,
         Button
+    },
+    created() {
+        this.getReasons();
     }
 }
 </script>
