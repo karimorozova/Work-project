@@ -67,7 +67,7 @@
                         @scrollDrop="scrollDrop"
                     )
                 span.steps__step-vendor(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
-                    .steps__vendor-replace(v-if="row.vendor")
+                    .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
                         img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
                         .steps__tooltip Reassign Vendor
                     span.steps__step-no-select(v-if="!row.vendor") No Vendor
