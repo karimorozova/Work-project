@@ -269,8 +269,8 @@ function setStepsStatus({steps, status, project}) {
 function updateStepsProgress({steps, task, progress}) {
     const updatedSteps = steps.map(item => {
         if(task.taskId === item.taskId) {
-            item.progress = setStepsProgress(item, progress);
-            return item
+            item.progress = item.status === 'Started' ? setStepsProgress(item, progress) : item.progress;
+            return item;
         }
         return item;
     });
