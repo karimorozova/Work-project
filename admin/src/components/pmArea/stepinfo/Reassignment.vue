@@ -43,7 +43,7 @@
                         span.reassignment__text %  is done
         .reassignment__buttons
             .reassignment__button
-                Button(value="Save")
+                Button(value="Save" @clicked="save")
             .reassignment__button
                 Button(value="Cancel" @clicked="close")
 </template>
@@ -76,7 +76,8 @@ export default {
     },
     methods: {
         ...mapActions([
-            "alertToggle"
+            "alertToggle",
+            "reassignVendor"
         ]),
         setProgress(e) {
             this.enteredProgress = e.target.value;
@@ -108,6 +109,20 @@ export default {
         },
         close() {
             this.$emit('close');
+        },
+        async save() {
+            const reassignData = {
+                step: this.step,
+                progress: this.getProgress(),
+                isStart: this.isStart.yes,
+                isPay: this.isPay.yes,
+                reason: this.reason,
+                vendor: this.newVendor
+            }
+            try {
+                await this.reassignVendor(reassignData);
+                this.close();
+            } catch(err) { }
         },
         async getReasons() {
             try {

@@ -5,7 +5,7 @@ const { getProject, createProject, updateProject, changeProjectProp, getProjectA
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
-const  { getStepsWithFinanceUpdated } = require("../../projectSteps");
+const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles } = require("../../clientRequests");
 
@@ -170,6 +170,21 @@ router.post("/vendor-assignment", async (req, res) => {
         }
         await stepVendorsRequestSending(project, [step]);
         res.send('messages sent');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on sending emails to vendors");
+    }
+})
+
+router.post("/reassign-vendor", async (req, res) => {
+    const reassignData = {...req.body};
+    try {
+        const project = await getProject({"steps._id": reassignData.step._id});
+        await stepReassignedNotification(project, reassignData.step);
+        const { steps, tasks } = await reassignVendor(project, reassignData);
+        const updatedProject = await getProjectAfterFinanceUpdated({project, steps, tasks});
+        // await stepVendorsRequestSending(project, [step]);
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending emails to vendors");
