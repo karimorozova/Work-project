@@ -14,6 +14,8 @@
                     @setTargets="setTargets"
                     :isRequest="isRequest"
                 )
+            .tasks-data__service-steps(v-if="currentUnit === 'Hours'")
+                HoursServiceSteps(:steps="tasksData.service.steps")
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
                 TasksFiles(:service="tasksData.service")
             .tasks-data__files(v-else)
@@ -46,6 +48,7 @@ import TasksLangs from "./TasksLangs";
 import TasksLangsDuo from "./TasksLangsDuo";
 import TasksFiles from "./TasksFiles";
 import TasksFilesRequested from "./TasksFilesRequested";
+import HoursServiceSteps from "./HoursServiceSteps";
 import SelectSingle from "../../SelectSingle";
 import ServiceAndWorkflow from "./ServiceAndWorkflow";
 import Button from "../../Button";
@@ -205,6 +208,7 @@ export default {
         TasksLangsDuo,
         TasksFiles,
         TasksFilesRequested,
+        HoursServiceSteps,
         SelectSingle,
         Button,
         ServiceAndWorkflow,

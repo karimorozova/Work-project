@@ -41,7 +41,7 @@
                   @invalidDate="invalidDateWarn"
               )
           img.steps-date__image(src="../../../assets/images/calendar.png" @click="showDeadlineCalendar")
-  .steps-date__title Step {{ stepCounter }}:
+  .steps-date__title Step {{ stepCounter }}
 
 </template>
 
