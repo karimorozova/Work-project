@@ -1,6 +1,9 @@
 <template lang="pug">
 .project-info(v-if="currentProject._id")
-    .project-info__title Project Details : {{currentProject.projectId}}
+    .project-info__title Project Id: 
+        span.project-info_bold {{currentProject.projectId}}
+    .project-info__title Project Status: 
+        span.project-info_bold {{ currentProject.status }}
     .project-info__all-info
         Project(:project="currentProject")
         //- ProjectShortDetails(:project="currentProject" @toggleCheck="toggleProjectOption")
@@ -274,6 +277,9 @@ export default {
         bottom: 0;
         right: 0;
         z-index: 100
+    }
+    &_bold {
+        font-weight: bold;
     }
 }
 </style>
