@@ -6,6 +6,19 @@ export const setTasksDataValue = ({commit}, payload) => commit('SET_TASKS_DATA_V
 
 export const clearTasksData = ({commit}) => commit('CLEAR_DATA');
 
+export const addProjectTasks = async ({ commit, dispatch }, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.post('/xtm/add-tasks', payload);
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Tasks were added", isShow: true, type: "success"})
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter');
+    }
+}
+
 export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {

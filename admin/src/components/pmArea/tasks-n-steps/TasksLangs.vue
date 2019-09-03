@@ -33,8 +33,10 @@ import LanguagesSelect from "@/components/LanguagesSelect";
 import Asterisk from "@/components/Asterisk";
 import SelectSingle from "@/components/SelectSingle";
 import { mapGetters, mapActions } from "vuex";
+import taskData from "@/mixins/taskData";
 
 export default {
+    mixins: [taskData],
     data() {
         return {
             targets: [],
@@ -63,17 +65,6 @@ export default {
         },
         setQuantity(e) {
             this.setDataValue({prop: "quantity", value: e.target.value});
-        },
-        setLimit(e) {
-            if(e.target.value.length > 4) {
-                e.target.value = e.target.value.slice(0,4);
-            }
-        },
-        removeNonDigit(e) {
-            const forbiddenKeys = [107, 109, 69];
-            if(forbiddenKeys.indexOf(e.which) !== -1) {
-                e.preventDefault();
-            }
         },
         async getAvailableLanguages() {
             try {

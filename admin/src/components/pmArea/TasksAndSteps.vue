@@ -85,7 +85,7 @@ export default {
             tasksData.append('customerId', dataForTasks.xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', dataForTasks.template.id);
-            tasksData.append('workflow', dataForTasks.workflow);
+            tasksData.append('workflow', dataForTasks.workflow.id);
             tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
             tasksData.append('service', JSON.stringify(dataForTasks.service));
             tasksData.append('source', source);
@@ -99,6 +99,14 @@ export default {
         },
         async addTasks(dataForTasks) {
             let tasksData = this.getDataForTasks(dataForTasks);
+            if(dataForTasks.service.calculationUnit === 'Hours') {
+                const steps = [...dataForTasks.service.steps];
+                const length = +dataForTasks.workflow.name.split(" ")[0];
+                for(let i = 0; i < length; i++) {
+                    tasksData.append(`${steps[i].step.symbol}-hours`, dataForTasks[`${steps[i].step.symbol}-hours`])
+                    tasksData.append(`${steps[i].step.symbol}-quantity`, dataForTasks[`${steps[i].step.symbol}-quantity`])
+                }
+            }
             const { sourceFiles, refFiles } = dataForTasks;
             if(sourceFiles && sourceFiles.length) {
                 for(let file of sourceFiles) {
@@ -112,12 +120,21 @@ export default {
             }
             try {
                 await this.addProjectTasks(tasksData);
-                this.alertToggle({message: "Tasks are added.", isShow: true, type: "success"});
                 this.isTaskData = false;
                 this.clearTasksData();
-            } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot add tasks.", isShow: true, type: "error"})
-            }
+            } catch(err) { }
+        },
+        appendHoursStepsInfo(dataForTasks) {
+                const steps = [...dataForTasks.service.steps];
+                const length = +dataForTasks.workflow.name.split(" ")[0];
+                for(let i = 0; i < length; i++) {
+
+                    if(!dataForTasks[`${steps[i].step.symbol}-quantity`] 
+                     || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
+                        this.errors.push("Please, set Hours and Quantity for all service steps.");
+                        return;
+                    }
+                }
         },
         getMetrics() {
             this.$emit("getMetrics");

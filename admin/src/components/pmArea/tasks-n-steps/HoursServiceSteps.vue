@@ -6,18 +6,31 @@
                 .hours-steps__main
                     .hours-steps__item
                         LabelVal(text="Hours")
-                            input.hours-steps__input(type="text")
+                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setHours(e, step)" @input="setLimit" @keydown="removeNonDigit")
                     .hours-steps__item
                         LabelVal(text="Quantity")
-                            input.hours-steps__input(type="number")
+                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setQuantity(e, step)" @input="setLimit" @keydown="removeNonDigit")
                 .hours-steps__stage Step {{ index+1 }}
 </template>
 
 <script>
 import LabelVal from "@/components/LabelVal";
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
+import taskData from "@/mixins/taskData";
 
 export default {
+    mixins: [taskData],
+    methods: {
+        ...mapActions({
+            setDataValue: "setTasksDataValue"
+        }),
+        setQuantity(e, step) {
+            this.setDataValue({prop: `${step.symbol}-quantity`, value: +e.target.value});
+        },
+        setHours(e, step) {
+            this.setDataValue({prop: `${step.symbol}-hours`, value: +e.target.value});
+        }
+    },
     computed: {
         ...mapGetters({
             tasksData: "getTasksData"
@@ -63,15 +76,22 @@ export default {
         margin: 5px 0;
     }
     &__input {
+        color: $main-color;
         width: 70px;
         margin-left: 10px;
         outline: none;
         border: 1px solid $main-color;
+        border-radius: 5px;
         box-sizing: border-box;
         padding-left: 5px;
         transition: all 0.2s;
         &:focus {
             box-shadow: 0 0 10px $deep-brown;
+        }
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none; 
+            margin: 0;
         }
     }
     &__stage {

@@ -85,17 +85,7 @@ export const updateCurrentProject = async ({ commit, state }, payload) => {
     commit('alertingMessage', {message: err.message, isShow: true, type: "error"});
   }
 }
-export const addProjectTasks = async ({ commit }, payload) => {
-  commit('startRequest');
-  try {
-    const updatedProject = await Vue.http.post('/xtm/add-tasks', payload);
-    await commit('storeCurrentProject', updatedProject.data);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
-}
+
 export const updateMatrix = async ({ commit }, payload) => {
   commit('startRequest')
   commit('updateMatrixData', payload);

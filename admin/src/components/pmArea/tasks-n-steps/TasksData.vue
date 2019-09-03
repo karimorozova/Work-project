@@ -69,6 +69,7 @@ export default {
             sourceLanguages: [],
             targetLanguages: [],
             isJoinFiles: false,
+            errors: []
         }
     },
     methods: {
@@ -112,24 +113,41 @@ export default {
             return /^[1-9]{1,}(\d{1,})?/.test(quantity);
         },
         async checkForErrors() {
-            let errors = [];
+            this.errors = [];
             const { source, targets, sourceFiles, refFiles, quantity } = this.tasksData;
-            if(!this.isMonoService && !source) errors.push("Please, select Source language.");
-            if (!targets || !targets.length) errors.push("Please, select Target language(s).");
-            if(this.currentUnit === 'Words') {
-                if (!sourceFiles || !sourceFiles.length) errors.push("Please, upload Source file(s).");
-                if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) errors.push("Reference file cannot be the same as Source!");
-            } else {
-                if(!refFiles || !refFiles.length) errors.push("Please, upload Reference file(s).");
-            }
-            if(this.isMonoService && !this.isValidQuantity(quantity)) errors.push("Please, enter the valid Quantity."); 
-            if (errors.length) {
-                return this.$emit("showErrors", { errors });
+            if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
+            if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
+            this.checkFiles(sourceFiles, refFiles);
+            this.checkHoursSteps();
+            if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity."); 
+            if (this.errors.length) {
+                return this.$emit("showErrors", { errors: this.errors });
             }
             try {
                 await this.addTasks();
             } catch (err) {
                 this.alertToggle({message: "Error on adding tasks", isShow: true, type: "error"});
+            }
+        },
+        checkFiles(sourceFiles, refFiles) {
+            if(this.currentUnit === 'Words') {
+                if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
+                if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) this.errors.push("Reference file cannot be the same as Source!");
+            } else {
+                if(!refFiles || !refFiles.length) this.errors.push("Please, upload Reference file(s).");
+            }
+        },
+        checkHoursSteps() {
+            if(this.currentUnit === 'Hours') {
+                const steps = [...this.tasksData.service.steps];
+                const length = +this.tasksData.workflow.name.split(" ")[0];
+                for(let i = 0; i < length; i++) {
+                    if(!this.tasksData[`${steps[i].step.symbol}-quantity`] 
+                     || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
+                        this.errors.push("Please, set Hours and Quantity for all service steps.");
+                        return;
+                    }
+                }
             }
         },
         async getCustomersFromXtm() {
@@ -153,22 +171,15 @@ export default {
             return { xtmId };
         },
         async addTasks() {
-            const { xtmId } = await this.getXtmId();
+            // const { xtmId } = await this.getXtmId();
             const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
             const isJoinFiles = this.tasksData.isJoinFiles || false;
             this.$emit("addTasks", {
+                ...this.tasksData,
                 isJoinfiles: isJoinFiles,
-                sourceFiles: this.tasksData.sourceFiles,
                 refFiles: this.tasksData.refFiles || [],
-                stepsDates: this.tasksData.stepsDates,
-                xtmId,
-                template: this.tasksData.template,
-                source,
-                targets: this.tasksData.targets,
-                service: this.tasksData.service,
-                workflow: this.tasksData.workflow.id,
-                packageSize: this.tasksData.packageSize,
-                quantity: this.tasksData.quantity
+                xtmId: 1,
+                source
             });
             this.clearInputFiles(".tasks-data__source-file");
             this.clearInputFiles(".tasks-data__ref-file");
