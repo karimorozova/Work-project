@@ -10,6 +10,7 @@ async function reassignVendor(project, reassignData) {
         const stepIndex = steps.findIndex(item => item.stepId === step.stepId);
         steps.splice(stepIndex, 1, updatedStep, newStep);
         tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
+        tasks[taskIndex].status = "Created";
         return { steps, tasks };
     } catch(err) {
         console.log(err);
