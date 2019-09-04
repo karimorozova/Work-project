@@ -22,14 +22,14 @@ function updateCurrentStep({step, isPay, progress}) {
     let updatedStep = JSON.stringify(step);
     updatedStep = JSON.parse(updatedStep);
     const { payables, receivables } = updatedStep.finance.Price; 
+    updatedStep.finance.Price.receivables = 0;
     if(+progress) {
         updatedStep.status = "Cancelled Halfway";
-        updatedStep.finance.Price.halfPayables = isPay ? payables*progress/100 : 0;
-        updatedStep.finance.Price.halfReceivables = receivables*progress/100;
+        updatedStep.finance.Price.halfPayables = isPay ? +(payables*progress/100).toFixed(2) : 0;
+        updatedStep.finance.Price.halfReceivables = 0;
     } else {
         updatedStep.status = "Cancelled";
-        updatedStep.finance.Price.payables = isPay ? payables*progress/100 : 0;
-        updatedStep.finance.Price.receivables = 0;
+        updatedStep.finance.Price.payables = isPay ? +(payables*progress/100).toFixed(2) : 0;
     }
     return updatedStep;
 }

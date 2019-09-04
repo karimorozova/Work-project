@@ -219,10 +219,10 @@ export default {
             return date.split('T')[0].split('-').reverse().join('-');
         },
         marginCalc(finance) {
-            if(!finance.halfReceivables) {
-                return (finance.receivables - finance.payables).toFixed(2);
+            if(finance.halfReceivables >= 0) {
+                return (finance.halfReceivables - finance.halfPayables).toFixed(2);
             }
-            return (finance.halfReceivables - finance.halfPayables).toFixed(2);
+            return (finance.receivables - finance.payables).toFixed(2);
         },
         progress(task) {
             const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);

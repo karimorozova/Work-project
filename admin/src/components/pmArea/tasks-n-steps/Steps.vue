@@ -224,8 +224,9 @@ export default {
             : this.$emit('showTab', { tab: this.tabs[index] });
         },
         marginCalc(step) {
-            if(step.finance.halfReceivables) {
-                return (step.finance.halfReceivables - step.finance.halfPayables).toFixed(2);
+            const { Price } = step.finance;
+            if(Price.halfReceivables >= 0) {
+                return (Price.halfReceivables - Price.halfPayables).toFixed(2);
             }
             const receivables = this.getTotalReceivables(step);
             const payables = this.getTotalPayables(step);
