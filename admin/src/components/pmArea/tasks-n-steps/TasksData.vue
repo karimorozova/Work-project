@@ -171,14 +171,14 @@ export default {
             return { xtmId };
         },
         async addTasks() {
-            // const { xtmId } = await this.getXtmId();
+            const { xtmId } = await this.getXtmId();
             const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
             const isJoinFiles = this.tasksData.isJoinFiles || false;
             this.$emit("addTasks", {
                 ...this.tasksData,
                 isJoinfiles: isJoinFiles,
                 refFiles: this.tasksData.refFiles || [],
-                xtmId: 1,
+                xtmId,
                 source
             });
             this.clearInputFiles(".tasks-data__source-file");
