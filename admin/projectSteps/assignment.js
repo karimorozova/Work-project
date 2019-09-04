@@ -21,10 +21,11 @@ async function reassignVendor(project, reassignData) {
 function updateCurrentStep({step, isPay, progress}) {
     let updatedStep = JSON.stringify(step);
     updatedStep = JSON.parse(updatedStep);
-    const { payables, receivables } = updatedStep.finance.Price; 
+    const { payables } = updatedStep.finance.Price; 
     updatedStep.finance.Price.receivables = 0;
     if(+progress) {
         updatedStep.status = "Cancelled Halfway";
+        updatedStep.progress = getUpdatedProgress(step.progress, progress);
         updatedStep.finance.Price.halfPayables = isPay ? +(payables*progress/100).toFixed(2) : 0;
         updatedStep.finance.Price.halfReceivables = 0;
     } else {
@@ -32,6 +33,16 @@ function updateCurrentStep({step, isPay, progress}) {
         updatedStep.finance.Price.payables = isPay ? +(payables*progress/100).toFixed(2) : 0;
     }
     return updatedStep;
+}
+
+function getUpdatedProgress(stepProgress, progress) {
+    const { wordsTotal } = stepProgress;
+    let wordsDone = Math.round(wordsTotal*progress/100);
+    return {
+        ...stepProgress,
+        wordsDone,
+        wordsToBeDone: wordsTotal - wordsDone
+    }
 }
 
 async function getNewStep({step, vendor, isStart, progress, project, task}) {
