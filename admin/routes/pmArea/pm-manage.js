@@ -180,10 +180,8 @@ router.post("/reassign-vendor", async (req, res) => {
     const reassignData = {...req.body};
     try {
         const project = await getProject({"steps._id": reassignData.step._id});
-        await stepReassignedNotification(project, reassignData.step);
         const { steps, tasks } = await reassignVendor(project, reassignData);
         const updatedProject = await getProjectAfterFinanceUpdated({project, steps, tasks});
-        // await stepVendorsRequestSending(project, [step]);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

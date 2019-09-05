@@ -107,7 +107,7 @@ export default {
             const rateMin = stepRate ? stepRate.min : 0;
             const stepDiscount = this.selectedTab === "Receivables" ? this.step.clientDiscount : this.step.vendorDiscount;
             let subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.receivables : +this.step.finance.Price.payables;
-            if(this.step.finance.Price.receivables >= 0) {
+            if(this.step.finance.Price.halfReceivables >= 0) {
                 subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.halfReceivables : +this.step.finance.Price.halfPayables;
             }
             return {

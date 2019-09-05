@@ -1,16 +1,19 @@
 const { payablesCalc } = require('../calculations');
+const { stepVendorsRequestSending, stepReassignedNotification } = require('../utils');
 
 async function reassignVendor(project, reassignData) {
     try {
         const { step, vendor, isStart, isPay, reason, progress } = reassignData;
         let { steps, tasks } = project;
         let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-        const newStep = await getNewStep({step, vendor, project, task: tasks[taskIndex]});
-        const updatedStep = updateCurrentStep({step, isPay, progress});
+        const newStep = await getNewStep({isStart, progress, step, vendor, project, task: tasks[taskIndex]});
+        const updatedStep = updateCurrentStep({step, isStart, isPay, progress});
         const stepIndex = steps.findIndex(item => item.stepId === step.stepId);
         steps.splice(stepIndex, 1, updatedStep, newStep);
         tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
         tasks[taskIndex].status = "Created";
+        await stepReassignedNotification(project, updatedStep, reason);
+        await stepVendorsRequestSending(project, [newStep]);
         return { steps, tasks };
     } catch(err) {
         console.log(err);
@@ -18,16 +21,14 @@ async function reassignVendor(project, reassignData) {
     }
 }
 
-function updateCurrentStep({step, isPay, progress}) {
-    let updatedStep = JSON.stringify(step);
-    updatedStep = JSON.parse(updatedStep);
-    const { payables } = updatedStep.finance.Price; 
+function updateCurrentStep({step, isStart, isPay, progress}) {
+    let updatedStep = JSON.parse(JSON.stringify(step));
+    const { payables, receivables } = updatedStep.finance.Price; 
     updatedStep.finance.Price.receivables = 0;
     if(+progress) {
         updatedStep.status = "Cancelled Halfway";
-        updatedStep.progress = getUpdatedProgress(step.progress, progress);
         updatedStep.finance.Price.halfPayables = isPay ? +(payables*progress/100).toFixed(2) : 0;
-        updatedStep.finance.Price.halfReceivables = 0;
+        updatedStep.finance.Price.halfReceivables = isPay && !isStart ? +(receivables*progress/100).toFixed(2) : 0;
     } else {
         updatedStep.status = "Cancelled";
         updatedStep.finance.Price.payables = isPay ? +(payables*progress/100).toFixed(2) : 0;
@@ -35,30 +36,40 @@ function updateCurrentStep({step, isPay, progress}) {
     return updatedStep;
 }
 
-function getUpdatedProgress(stepProgress, progress) {
-    const { wordsTotal } = stepProgress;
-    let wordsDone = Math.round(wordsTotal*progress/100);
-    return {
-        ...stepProgress,
-        wordsDone,
-        wordsToBeDone: wordsTotal - wordsDone
-    }
-}
-
 async function getNewStep({step, vendor, isStart, progress, project, task}) {
     const { _id, ...stepInfo } = {...step};
+    const stepId = step.stepId+'-R'
     try {
         let newStep = {
             ...stepInfo,
+            stepId,
             status: 'Request Sent',
             vendor,
             vendorsClickedOffer: [],
             isVendorRead: false,
         };
-        return await payablesCalc({task, project, step: newStep});
+        const stepWithPaybles = await payablesCalc({task, project, step: newStep});
+        if(!isStart && progress > 0) {
+            return updateFinanceForNewStep(stepWithPaybles, progress);
+        }
+        return stepWithPaybles;
     } catch(err) {
         console.log(err);
         console.log("Error in getNewStep");
+    }
+}
+
+function updateFinanceForNewStep(step, progress) {
+    let { finance } = step;
+    let { receivables, payables } = finance.Price;
+    payables -= +(payables*progress/100).toFixed(2);
+    receivables -= +(receivables*progress/100).toFixed(2);
+    return {
+        ...step,
+        finance: {
+            ...finance,
+            Price: {receivables, payables}
+        }
     }
 }
 
