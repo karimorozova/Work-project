@@ -12,7 +12,6 @@
         Finance(
             :step="step"
             :financeData="financeData"
-            @addRow="addFinanceData"
             @refreshFinance="refreshFinance"
         )
     .step-info__block(v-if="step.serviceStep.symbol === 'translation'")
@@ -61,9 +60,6 @@ export default {
         }
     },
     methods: {
-        addFinanceData() {
-            return
-        },
         getMatrixData(rateProp, prop) {
             if(this.step.serviceStep.symbol !== "translation") {
                 return
@@ -159,12 +155,18 @@ export default {
         }),
         financeData() {
             return Object.keys(this.step.finance).reduce((prev, cur) => {
-                const margin = this.step.finance[cur].receivables - this.step.finance[cur].payables;
+                let receivables = +this.step.finance[cur].receivables;
+                let payables = +this.step.finance[cur].payables;
+                if(this.step.finance[cur].halfReceivables >= 0) {
+                    receivables = +this.step.finance[cur].halfReceivables;
+                    payables = +this.step.finance[cur].halfPayables;
+                }
+                const margin = (receivables - payables).toFixed(2);
                 return [...prev, {
                     title: cur,
-                    receivables: +this.step.finance[cur].receivables,
-                    payables: +this.step.finance[cur].payables,
-                    margin: +margin.toFixed(2),
+                    receivables,
+                    payables,
+                    margin,
                     clientRate: this.step.clientRate,
                     vendorRate: this.step.vendorRate
                     }
