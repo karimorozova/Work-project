@@ -39,17 +39,20 @@
                         CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
                         .reassignment__check-label No
                     .reassignment__work
-                        input.reassignment__percent(type="text" :value="getProgress()" @change="setProgress")
+                        input.reassignment__percent(type="text" :value="progress" @change="setProgress")
                         span.reassignment__text %  is done
         .reassignment__buttons
             .reassignment__button
-                Button(value="Save" @clicked="save")
+                Button(value="Save" @clicked="checkErrors")
             .reassignment__button
                 Button(value="Cancel" @clicked="close")
+        .reassignment__errors(v-if="areErrors")
+            ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 </template>
 
 <script>
 import LabelVal from "@/components/LabelVal";
+import ValidationErrors from "@/components/ValidationErrors";
 import PersonSelect from "../PersonSelect";
 import Button from "@/components/Button";
 import SelectSingle from "@/components/SelectSingle";
@@ -71,7 +74,9 @@ export default {
             reason: "",
             isStart: {yes: false, no: true},
             isPay: {yes: true, no: false},
-            enteredProgress: ""
+            enteredProgress: "",
+            errors: [],
+            areErrors: false
         }
     },
     methods: {
@@ -82,8 +87,7 @@ export default {
         setProgress(e) {
             this.enteredProgress = e.target.value;
         },
-        getProgress() {
-            if(this.enteredProgress) return this.enteredProgress;
+        getCurrentProgress() {
             const { progress } = this.step;
             return Math.floor(progress.wordsDone/progress.wordsTotal*100);
         },
@@ -110,10 +114,24 @@ export default {
         close() {
             this.$emit('close');
         },
+        closeErrors() {
+            this.areErrors = false;
+        },
+        async checkErrors() {
+            this.errors = [];
+            if(!this.reason) this.errors.push("Please, set the Reason.");
+            if(!this.newVendor) this.errors.push("Please, set the Vendor.");
+            const currentProgress = this.getCurrentProgress();
+            if(this.enteredProgress > currentProgress) this.errors.push("Entered progress cannot be higher than current progress.");
+            if(this.errors.length) {
+                return this.areErrors = true;
+            }
+            await this.save();
+        },
         async save() {
             const reassignData = {
                 step: this.step,
-                progress: this.getProgress(),
+                progress: this.progress,
                 isStart: this.isStart.yes,
                 isPay: this.isPay.yes,
                 reason: this.reason,
@@ -144,10 +162,14 @@ export default {
         },
         vendors() {
             return this.allVendors.filter(item => item._id !== this.step.vendor._id);
+        },
+        progress() {
+            return this.enteredProgress || this.getCurrentProgress();
         }
     },
     components: {
         LabelVal,
+        ValidationErrors,
         SelectSingle,
         PersonSelect,
         CheckBox,
