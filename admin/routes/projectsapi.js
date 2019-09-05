@@ -62,7 +62,7 @@ router.get('/declinequote', async (req, res) => {
 })
 
 router.get('/step-decision', getProjectManageToken, async (req, res) => {
-    const { decision, vendorId, projectId, taskId, stepName, to } = req.query;
+    const { decision, vendorId, projectId, stepId, to } = req.query;
     const date = Date.now();
     try {
         if((date - +to) > 900000) {
@@ -71,7 +71,7 @@ router.get('/step-decision', getProjectManageToken, async (req, res) => {
         } else {
             const project = await Projects.findOne({"_id": projectId});
             const steps = [...project.steps];
-            let index = steps.findIndex(item => item.name === stepName && item.taskId === taskId);
+            let index = steps.findIndex(item => item.stepId === stepId);
             if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)

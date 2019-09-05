@@ -43,8 +43,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     }
 }
 
-async function stepReassignedNotification(project, step) {
-    const message = vendorReassignmentMessage(step);
+async function stepReassignedNotification(project, step, reason) {
+    const message = vendorReassignmentMessage(step, reason);
     try {
         await sendEmail({to: step.vendor.email, subject: `Step has been reassigned (ID V001.1, ${project.projectId})`}, message);
     } catch(err) {
@@ -55,10 +55,10 @@ async function stepReassignedNotification(project, step) {
 
 async function stepVendorsRequestSending(project, checkedSteps) {
     let steps = [...project.steps];
-    const assignedStepsCheck = checkedSteps.map(item => item.taskId + item.name);
+    const assignedStepsCheck = checkedSteps.map(item => item.stepId);
     try {
         for(let step of steps) {
-            if(step.vendor && assignedStepsCheck.indexOf(step.taskId + step.name) !== -1) {
+            if(step.vendor && assignedStepsCheck.indexOf(step.stepId) !== -1) {
                 await sendRequestToVendor(project, step);
                 step.status = "Request Sent"
             }

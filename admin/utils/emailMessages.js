@@ -188,9 +188,9 @@ function requestMessageForVendor(obj) {
     const expiryDate = new Date(date + 900000);
     const langPair = obj.source + " >> " + obj.target + ";"
     const token = jwt.sign({vendorId: obj.vendor.id}, secretKey, { expiresIn: '2h'});
-    const taskId = obj.taskId.replace(/ /g, '%20');
-    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&taskId=${taskId}&stepName=${obj.name}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
-    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=decline&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&taskId=${taskId}&stepName=${obj.name}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const stepId = obj.stepId.replace(/ /g, '%20');
+    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=decline&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
     const start = obj.start.split('T')[0].split('-').reverse().join('-');
     const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
 
@@ -404,13 +404,15 @@ function vendorNotificationMessage(obj) {
             </div>`;
 }
 
-function vendorReassignmentMessage(obj) {
+function vendorReassignmentMessage(obj, reason) {
+    const reassignReason = `<p><h3>Reason</h3><span>${reason}</span></p>` || '';
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
                 <div class="all-info" style="padding: 0 15px 0 30px;">
                     <p class="description" style="font-size: 18px;">
                         Please pay attention to the fact that there is a step that has been reassigned to a new Vendor. 
                     </p>
+                    ${reassignReason}
                     <h3 class="detailsTitle">Step Details</h3>
                     <table class="details">
                         <tr>
