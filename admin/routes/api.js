@@ -6,7 +6,7 @@ const fs = require('fs');
 const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
-const { getManyServices } = require('../services/');
+const { getServices } = require('../services/');
 const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
@@ -97,7 +97,7 @@ router.get('/languages', async (req, res) => {
 
 router.get('/services', async (req, res) => {
   try {
-    const services = await getManyServices();
+    const services = await getServices();
     res.send(services);
   } catch(err) {
       console.log(err);

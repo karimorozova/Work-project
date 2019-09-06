@@ -2,7 +2,7 @@ const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mai
 const { vendorNotificationMessage, emailMessageForContact, messageForClient, managerTaskCompleteNotificationMessage, 
     taskReadyMessage, deliverablesDownloadedMessage, tasksQuoteMessage } = require("../utils/emailMessages");
 const { getProject } = require("./getProjects");
-const { getOneService } = require("../services/getServices");
+const { getService } = require("../services/getServices");
 const { User } = require("../models");
 
 async function stepCancelNotifyVendor(steps, projectId) {
@@ -30,7 +30,7 @@ async function getMessage(projectId, messageTarget) {
 
 async function getQuoteInfo(projectId) {
     const project = await getProject({"_id": projectId});
-    const service = await getOneService({"_id": project.tasks[0].service});
+    const service = await getService({"_id": project.tasks[0].service});
     let quote = {...project._doc, id: project.id};
     quote.service = service.title;
     const { contacts } = project.customer;
@@ -53,7 +53,7 @@ async function taskCompleteNotifyPM(project, task) {
 
 async function getPMnotificationMessage(project, task) {
     try {
-        const service = await getOneService({"_id": task.service});
+        const service = await getService({"_id": task.service});
         return message = managerTaskCompleteNotificationMessage({
             ...project._doc,
             service: service.title,
@@ -112,7 +112,7 @@ async function sendTasksQuote(tasks) {
         const project = await getProject({"tasks.taskId": tasks[0].taskId});
         const contact = project.customer.contacts.find(item => item.leadContact);
         for(let task of tasks) {
-            const service = await getOneService({"_id": task.service});
+            const service = await getService({"_id": task.service});
             const quoteInfo = {...project._doc, task, contact, service: service.title};
             const message = tasksQuoteMessage(quoteInfo);
             await clientQuoteEmail({contact, subject: `Quote(s) (ID C001.1, ${project.projectId})`}, message);
