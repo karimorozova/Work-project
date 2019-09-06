@@ -163,11 +163,7 @@
       dataForRequest(ind) {
         this.serviceType = this.newProject[ind].title;
         this.navbarList.forEach((item, i) => {
-          if (i === 0) {
-            item.active = true;
-          } else {
-            item.active = false;
-          }
+            item.active = i === 0;
         });
         this.$router.push(`/client-request${this.newProject[ind].path}`);
         this.dropdownVisible = false;

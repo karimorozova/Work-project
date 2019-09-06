@@ -4,7 +4,8 @@ const https = require('https');
 const jwt = require("jsonwebtoken");
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
-const { getProject, getProjects, createProject, updateProjectStatus, getDeliverablesLink, storeFiles } = require("../projects/");
+const { getService } = require('../services');
+const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
 const { createRequest, storeRequestFiles, getClientRequests } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients } = require('../models');
@@ -79,13 +80,24 @@ router.get('/language-combinations', checkClientContact, async (req, res) => {
     }
 });
 
+router.get('/request-service', checkClientContact, async (req, res) => {
+    const { symbol } = req.query;
+    try {
+        const service = await getService({symbol});
+        res.send(service);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on getting request service');
+    }
+})
+
 router.get('/default-source', checkClientContact, async (req, res) => {
     const tokenHeader = req.headers['token-header'];
+    const { ratesProp } = req.query;
     try {
         const verificationResult = jwt.verify(tokenHeader, secretKey);
         const client = await getClient({"_id": verificationResult.clientId});
-        const english = client.languageCombinations.filter(item => item.source)
-            .find(item => item.source.symbol === 'EN-GB');
+        const english = client[ratesProp].find(item => item.source.symbol === 'EN-GB');
         const source = english ? english.source : "";
         res.send({source});
     } catch(err) {

@@ -53,16 +53,17 @@ export default {
     },
     data() {
         return {
-            selectedIndustry: ""
+            selectedIndustry: "",
+            service: {title: "Select"}
         }
     },
     methods: {
-        ...mapActions({
-            setOrderDetails: "setOrderDetails",
-            setOrderDetail: "setOrderDetail",
-            submitForm: "submitForm",
-            setDefaultSource: "setDefaultSource"
-        }),
+        ...mapActions([
+            "setOrderDetails",
+            "setOrderDetail",
+            "setDefaultSource",
+            "alertToggle"
+        ]),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
         },
@@ -78,6 +79,17 @@ export default {
             if(this.clientIndustries.length === 1) {
                 this.setOrderDetail({prop: 'industry', value: this.clientIndustries[0]._id})
             }
+        },
+        async setDefaultRequestSource() {
+            try {
+                const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
+                this.service = serv.data;
+                const unit = this.service.calculationUnit ? this.service.calculationUnit.toLowerCase() : "";
+                const ratesProp = unit ? `${unit}Rates` : 'wordsRates'
+                await this.setDefaultSource({ratesProp});
+            } catch(err) { 
+                this.alertToggle({message: "Error on getting service and default source", isShow: true, type: "error"})
+            }
         }
     },
     computed: {
@@ -88,9 +100,6 @@ export default {
         }),
         industries() {
             return this.clientIndustries ? this.clientIndustries.map(item => item.name) : [];
-        },
-        service() {
-            return this.services.length ? this.services.find(item => item.symbol === this.requestService) : {title: 'Select'};
         },
         formattedDeadline() {
             let result = "";
@@ -127,7 +136,7 @@ export default {
     mounted() {
         this.setOrderDetails({});
         this.setOrderDetail({prop: 'quoteDecision', value: 'Send'});
-        this.setDefaultSource();
+        this.setDefaultRequestSource();
     }
 }
 </script>

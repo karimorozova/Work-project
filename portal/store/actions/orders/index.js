@@ -31,9 +31,13 @@ export const setOrderDetail = ({commit}, payload) => {
 }
 
 export const setDefaultSource = async function ({commit}, payload) {
-    const english = await this.$axios.get('/portal/default-source');
-    const source = english.data.source || {lang: 'Select'};
-    commit('SET_DETAIL', {prop: 'source', value: source});
+    try {
+        const english = await this.$axios.get(`/portal/default-source?ratesProp=${payload.ratesProp}`);
+        const source = english.data.source || {lang: 'Select'};
+        commit('SET_DETAIL', {prop: 'source', value: source});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
+    }
 }
 
 export const removeFile = ({commit}, payload) => {

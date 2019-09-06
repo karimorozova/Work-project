@@ -48,20 +48,26 @@ export default {
             orderDetails: "getOrderDetails"
         }),
         sourceLangs() {
-            return this.clientLanguages.map(item => item.source)
-                .filter((item, index, arr) => {
-                    return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
-                });
+            if(this.clientLanguages.wordsRates) {
+                return this.clientLanguages.wordsRates.map(item => item.source)
+                    .filter((item, index, arr) => {
+                        return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
+                    });
+            }
+            return [];
         },
         targetLangs() {
-            let result = this.clientLanguages.map(item => item.target)
-                .filter((item, index, arr) => {
-                    return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
-                });
-            if(this.selectedSource && this.selectedSource.lang !== "Select") {
-                result = result.filter(item => item.symbol !== this.selectedSource.symbol);
+            if(this.clientLanguages.wordsRates) {
+                let result = this.clientLanguages.wordsRates.map(item => item.target)
+                    .filter((item, index, arr) => {
+                        return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
+                    });
+                if(this.selectedSource && this.selectedSource.lang !== "Select") {
+                    result = result.filter(item => item.symbol !== this.selectedSource.symbol);
+                }
+                return result;
             }
-            return result;
+            return [];
         },
         targets() {
             let result = [];
