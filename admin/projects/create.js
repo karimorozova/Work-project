@@ -28,9 +28,9 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
         if(calculationUnit === 'Words') {
             return await createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles});
         } else if(calculationUnit === 'Hours') {
-            return await createTasksWithHoursUnit({tasksInfo, sourceFiles, refFiles});
+            return await createTasksWithHoursUnit({tasksInfo, refFiles});
         } else {
-            return await createTasksWithPackagesUnit({tasksInfo, sourceFiles, refFiles});
+            return await createTasksWithPackagesUnit({tasksInfo, refFiles});
         }        
     } catch(err) {
         console.log(err);
