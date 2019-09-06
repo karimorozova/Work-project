@@ -36,15 +36,15 @@ export const getProjectsAndRequests = async function({ commit, dispatch, state})
       commit('SET_CLIENT', client);
       dispatch('setLangCombinations', client);
   } catch(err) {
+      console.log(err);
       dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
   }
 }
 
 export const setLangCombinations = ({ commit }, payload) => {
-  const combinations = payload.languageCombinations.filter(item => item.source).map(item => {
-      return {source: item.source, target: item.target}
-  });
-  commit('SET_COMBINATIONS', combinations);
+  commit('SET_DUO_COMBINATIONS', {combs: payload.wordsRates, prop: 'wordsRates'});
+  commit('SET_DUO_COMBINATIONS', {combs: payload.hoursRates, prop: 'hoursRates'});
+  commit('SET_MONO_COMBINATIONS', payload.monoRates);
 }
 
 export const setProjects = ({commit}, payload) => {

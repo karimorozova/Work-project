@@ -1,5 +1,5 @@
 const state = {
-  clientLanguages: [],
+  clientLanguages: {},
   clientInfo: {},
   user: {},
   services: [],
