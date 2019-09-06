@@ -38,7 +38,7 @@ export default {
             projectNameFilter: '',
             deadlineFilter: {
                 from: new Date(new Date().getFullYear(), 0, 1), 
-                to: new Date()
+                to: new Date(new Date().getFullYear(), new Date().getMonth() + 4, 1)
             },
             projectIdFilter: '',
             sourceFilter: '',

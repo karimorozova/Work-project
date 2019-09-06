@@ -30,70 +30,70 @@ import Button from "../buttons/Button";
 import moment from "moment";
 
 export default {
-  props: {
-    datesFilter: {
-      type: Object,
-      default: () => {
-        return {
-            from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
-            to: new Date()
-          }
-      }
-    }
-  },
-  data() {
-    return {
-      state: {
-        highlighted: {
-          days: [6, 0]
-        },
-        disabled: {
-          to: moment().add(-1, 'day').endOf('day').toDate()
+    props: {
+        datesFilter: {
+            type: Object,
+            default: () => {
+                return {
+                    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), 
+                    to: new Date()
+                }
+            }
         }
-      },
-      currentTo: ''
+    },
+    data() {
+        return {
+            state: {
+                highlighted: {
+                    days: [6, 0]
+                },
+                disabled: {
+                    to: moment().add(-1, 'day').endOf('day').toDate()
+                }
+            },
+            currentTo: ''
+        }
+    },
+    methods: {
+        close() {
+            this.$emit('close')
+        },
+        setDate(date, prop) {
+            this.$emit('setDate', { prop , date })
+        },
+        fromAny() {
+            let from = new Date(1970, 1, 1);
+            if(this.checked.from) {
+                from = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+            }
+            this.$emit('fromAny', { from });
+        },
+        toAny() {
+            this.$emit('toAny', {to: new Date()});
+        }
+    },
+    computed: {
+        dateFrom() {
+            return moment(this.datesFilter.from).format('MMMM Do YYYY')
+        },
+        dateTo() {
+            return moment(this.datesFilter.to).format('MMMM Do YYYY')      
+        },
+        checked() {
+            let result = {from: false, to: false}
+            if(this.datesFilter.from <= new Date(1970, 1, 1)) {
+                result.from = true;
+            }
+            if(this.datesFilter.to >= moment(new Date()).hours(2)) {
+                result.to = true
+            }
+            return result;
+        }
+    },
+    components: {
+            datepicker: DatePicker,
+            Button
     }
-  },
-  methods: {
-    close() {
-      this.$emit('close')
-    },
-    setDate(date, prop) {
-      this.$emit('setDate', { prop , date })
-    },
-    fromAny() {
-      let from = new Date(1970, 1, 1);
-      if(this.checked.from) {
-        from = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      }
-      this.$emit('fromAny', { from });
-    },
-    toAny() {
-      this.$emit('toAny', {to: new Date()});
-    }
-  },
-  computed: {
-    dateFrom() {
-      return moment(this.datesFilter.from).format('MMMM Do YYYY')
-    },
-    dateTo() {
-      return moment(this.datesFilter.to).format('MMMM Do YYYY')      
-    },
-    checked() {
-      let result = {from: false, to: false}
-      if(this.datesFilter.from <= new Date(1970, 1, 1)) {
-        result.from = true;
-      }
-      if(this.datesFilter.to >= moment(new Date()).hours(2)) {
-        result.to = true
-      }
-      return result;
-    }
-  },
-  components: {
-    datepicker: DatePicker,
-    Button
-  }
 };
 </script>
 
