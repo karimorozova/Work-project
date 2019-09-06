@@ -9,7 +9,7 @@
             .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
-            .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
+            .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePair(row) }}
             .tasks-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
             .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
@@ -23,9 +23,10 @@
 import DataTable from "~/components/Tables/DataTable";
 import { mapGetters, mapActions } from "vuex";
 import tableFields from "~/mixins/tableFields";
+import taskPair from "~/mixins/taskPair";
 
 export default {
-    mixins: [tableFields],
+    mixins: [tableFields, taskPair],
     data() {
         return {
             fields: [
@@ -39,16 +40,6 @@ export default {
         }
     },
     methods: {
-        getLanguagePairs(task) {
-            let pair = "";
-            for(let langPair of this.clientLanguages) {
-                if(langPair.source.symbol === task.sourceLanguage && 
-                    langPair.target.symbol === task.targetLanguage) {
-                        pair = `${langPair.source.lang} => ${langPair.target.lang}`
-                }
-            }
-            return pair;
-        },
         isDownload(task) {
             return task.status === 'Ready for Delivery'
         },

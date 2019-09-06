@@ -10,7 +10,7 @@
             .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
-            .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
+            .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePair(row) }}
             .tasks-table__status(slot="status" slot-scope="{ row }") {{ row.status }}
                 .tasks-table__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
                     img.tasks-table__time-icon(src="../../../../assets/images/time_icon.png")
@@ -36,9 +36,10 @@ import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 import tableFields from "~/mixins/tableFields";
+import taskPair from "~/mixins/taskPair";
 
 export default {
-    mixins: [tableFields],
+    mixins: [tableFields, taskPair],
     data() {
         return {
             fields: [
@@ -67,16 +68,6 @@ export default {
         },
         getDeliveredTime(date) {
             return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
-        },
-        getLanguagePairs(task) {
-            let pair = "";
-            for(let langPair of this.clientLanguages) {
-                if(langPair.source.symbol === task.sourceLanguage && 
-                    langPair.target.symbol === task.targetLanguage) {
-                        pair = `${langPair.source.lang} => ${langPair.target.lang}`
-                }
-            }
-            return pair;
         },
         isApproveReject(task) {
             return task.status === 'Created'
