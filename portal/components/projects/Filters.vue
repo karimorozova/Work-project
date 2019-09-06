@@ -63,7 +63,8 @@ export default {
             this.$emit('setFilter', { filter, value: e.target.value.toLowerCase() });
         },
         setLangFilter({option}, prop) {
-            const lang = this.combinations.find(item => item[prop].lang === option);
+            const duoCombinatins = [...this.combinations.wordsRates, ...this.combinations.hoursRates];
+            const lang = duoCombinatins.find(item => item[prop].lang === option);
             const filter = prop === 'source' ? 'sourceFilter' : 'targetFilter';
             this.$emit("setLangFilter", {value: lang[prop].symbol, filter})
         },
@@ -93,14 +94,20 @@ export default {
             combinations: "getCombinations"
         }),
         sourceLangs() {
-            return this.combinations.map(item => item.source.lang).filter((item, index,arr) => {
-                return arr.indexOf(item) === index
-            })
+            const { wordsRates, hoursRates } = this.combinations;
+            if(wordsRates && wordsRates) {
+                const result = [...wordsRates, ...hoursRates];
+                return result.map(item => item.source.lang).filter((item, index,arr) => {
+                    return arr.indexOf(item) === index
+                })
+            }
+            return []
         },
         targetLangs() {
-            return this.combinations.map(item => item.target.lang).filter((item, index,arr) => {
+            const { monoRates } = this.combinations;
+            return monoRates ? monoRates.map(item => item.target.lang).filter((item, index,arr) => {
                 return arr.indexOf(item) === index
-            })
+            }) : [];
         }
     },
     components: {
