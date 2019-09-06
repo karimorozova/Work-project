@@ -107,35 +107,6 @@ export default {
     messageClose() {
       this.showErrors = false;
     },
-    companySelect(data) {
-      this.company = data;
-      this.personSelected = { name: "Options" };
-      if (this.company.id) {
-        let homeApi = axios.create({
-          baseURL: "https://pangea.s.xtrf.eu/home-api/",
-          headers: {
-            "X-AUTH-ACCESS-TOKEN": "U0mLa6os4DIBAsXErcSUvxU0cj"
-          }
-        });
-        return new Promise(resolve => {
-          homeApi
-            .get(`customers/${this.company.id}?embed=persons`)
-            .then(response => {
-              resolve(response.data);
-              this.persons = response.data.persons;
-            })
-            .catch(error => {
-              resolve(error);
-            });
-        });
-      }
-    },
-    showPersons() {
-      this.droppedPersons = !this.droppedPersons;
-    },
-    changePerson(ind) {
-      this.personSelected = this.persons[ind];
-    },
     // 
     async projectAction(index, iconIndex) {
       if (iconIndex == 2) {

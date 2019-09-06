@@ -161,35 +161,6 @@
       messageClose() {
         this.showErrors = false;
       },
-      companySelect(data) {
-        this.company = data;
-        this.personSelected = { name: "Options" };
-        if (this.company.id) {
-          let homeApi = axios.create({
-            baseURL: "https://pangea.s.xtrf.eu/home-api/",
-            headers: {
-              "X-AUTH-ACCESS-TOKEN": "U0mLa6os4DIBAsXErcSUvxU0cj"
-            }
-          });
-          return new Promise(resolve => {
-            homeApi
-              .get(`customers/${this.company.id}?embed=persons`)
-              .then(response => {
-                resolve(response.data);
-                this.persons = response.data.persons;
-              })
-              .catch(error => {
-                resolve(error);
-              });
-          });
-        }
-      },
-      showPersons() {
-        this.droppedPersons = !this.droppedPersons;
-      },
-      changePerson(ind) {
-        this.personSelected = this.persons[ind];
-      },
       projectsChanges(data) {
         if(this.projects.length == 1) {
           this.projects.splice(data.index, 1,
@@ -721,7 +692,7 @@
       box-shadow: 0 0 5px rgba(102, 86, 61, 0.6);
       width: 250px;
       position: absolute;
-      bottom: -10px;
+      top: 0;
       left: 230px;
     }
     .vdp-datepicker__calendar .cell {
