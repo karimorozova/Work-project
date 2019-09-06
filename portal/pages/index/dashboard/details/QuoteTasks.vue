@@ -3,6 +3,8 @@
         DataTable(
             :fields="tableFields"
             :tableData="tableData"
+            :bodyClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
+            :tableHeadRowClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}

@@ -3,6 +3,8 @@
         DataTable(
             :fields="tableFields"
             :tableData="project.tasks"
+            :bodyClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
+            :tableHeadRowClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}

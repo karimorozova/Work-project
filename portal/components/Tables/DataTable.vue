@@ -1,11 +1,11 @@
 <template lang="pug">
   .table
     .table__thead
-      .table__thead-row
+      .table__thead-row(:class="tableHeadRowClass")
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody.scroll(:class="[{'tbody_visible-overflow': isBodyOverflow}, bodyClass]")
-      .table__tbody-row(:class="[{'tbody_visible-overflow': isBodyOverflow}, rowClass]" v-for="(row, index) of tableData" @click="onClick(index)")
+    .table__tbody.scroll(:class="bodyClass")
+      .table__tbody-row(:class="rowClass" v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
@@ -49,11 +49,11 @@
         type: Boolean,
         default: false
       },
-      isBodyOverflow: {
-        type: Boolean
-      },
       bodyClass: {
         type: String
+      },
+      tableHeadRowClass: {
+          type: String
       },
       rowClass: {
         type: String
