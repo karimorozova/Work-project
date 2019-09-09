@@ -90,7 +90,13 @@ export default {
         setPossibleTargets(symbol) {
             const pairsWithPossibleTargets = this.languagePairs.filter(item => item.source && item.source.symbol === symbol);
             this.targetAll = !pairsWithPossibleTargets.length ? [] : pairsWithPossibleTargets.map(pair => pair.target);
-            this.sortLangs('targetAll');
+            if(this.targetAll.length) {
+                this.setUniqueLangs('targetAll');
+                this.sortLangs('targetAll');
+            }
+        },
+        setUniqueLangs(arrProp) {
+            this[arrProp] = this[arrProp].reduce((acc, cur) => acc.findIndex(el => el._id === cur._id) < 0 ? [...acc, cur]: acc, []);
         },
         emitTargets() {
             this.$emit("setTargets", {targets: this.targetChosen});

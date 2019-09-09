@@ -58,7 +58,8 @@ export default {
         },
         targetLangs() {
             if(this.clientLanguages.wordsRates) {
-                let result = this.clientLanguages.wordsRates.map(item => item.target)
+                let result = this.clientLanguages.wordsRates.filter(item => this.selectedSource.lang !== 'Select' && item.source.lang === this.selectedSource.lang);
+                result = result.map(item => item.target)
                     .filter((item, index, arr) => {
                         return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
                     });
