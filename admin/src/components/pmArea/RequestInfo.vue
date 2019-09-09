@@ -1,5 +1,5 @@
 <template lang="pug">
-.request-info
+.request-info(v-if="currentProject._id")
     .request-info__title Request Details : {{currentProject.requestId}}
     .request-info__all-info
         Request(:request="currentProject")

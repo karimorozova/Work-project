@@ -6,6 +6,7 @@
                 :tableData="allFiles"
                 :hasScroll="hasScroll"
                 :bodyClass="['request-files_table', {'tbody_visible-overflow': allFiles.length < 4}]"
+                :tableheadRowClass="allFiles.length < 4 ? 'tbody_visible-overflow' : ''"
                 )
                 template(slot="headerFile" slot-scope="{ field }")
                     .files-table__checkbox
