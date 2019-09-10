@@ -1,4 +1,4 @@
-const { payablesCalc } = require('../calculations');
+const { payablesCalc } = require('../сalculations/wordcount');
 const { stepVendorsRequestSending, stepReassignedNotification } = require('../utils');
 
 async function reassignVendor(project, reassignData) {

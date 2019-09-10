@@ -51,7 +51,7 @@
             template(slot="taskId" slot-scope="{ row }")
                 span.tasks__task-data {{ row.taskId }}
             template(slot="language" slot-scope="{ row }")
-                span.tasks__task-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
+                span.tasks__task-data {{ getPair(row) }}
             template(slot="start" slot-scope="{ row }")
                 span.tasks__task-data {{ formatDate(row.start) }}
             template(slot="deadline" slot-scope="{ row }")
@@ -129,6 +129,12 @@ export default {
         }
     },
     methods: {
+        getPair(task) {
+            if(task.packageSize) {
+                return `${task.targetLanguage} / ${task.packageSize}`;
+            }
+            return `${task.sourceLanguage} >> ${task.targetLanguage}`;
+        },
         getDeliveredTime(date) {
             return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
         },

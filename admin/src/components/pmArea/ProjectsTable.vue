@@ -99,9 +99,10 @@ export default {
         },
         projectLangs(row) {
             if(row.tasks) {
-                return row.tasks.reduce((prev, cur) => {
-                    return prev + cur.sourceLanguage + ' >> ' + cur.targetLanguage + '; '
-                }, "")
+                const pairs = row.tasks.map(item => {
+                    return item.packageSize ? `${item.targetLanguage} / ${item.packageSize}` : `${item.sourceLanguage} >> ${item.targetLanguage}`;
+                }).filter((elem, index, self) => self.indexOf(elem) === index);
+                return pairs.reduce((prev, cur) => prev + cur + '; ', "");
             }
             return this.getRequestLangs(row);
         },

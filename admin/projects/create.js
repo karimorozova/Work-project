@@ -1,7 +1,8 @@
 const { Projects } = require("../models");
-const { getProject } = require("./getProjects");
+const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
 const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi");
+const { getFinanceDataForPackages } = require("../сalculations/packages");
 const moment = require("moment");
 
 async function createProject(project) {
@@ -89,9 +90,8 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
             {$set: {sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, isMetricsExist: false}, 
             $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: newTasksInfo.service, projectId: xtmProject.projectId, 
                 start: project.createdAt, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
-                status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, receivables: "", 
-                payables: "", check: false, finance: {'Wordcount': {receivables: 0, payables: 0}, 
-                'Price': {receivables: 0, payables: 0}}}}}
+                status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, check: false, 
+                finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );
     } catch(err) {
         console.log(err);
@@ -104,7 +104,53 @@ async function createTasksWithHoursUnit({tasksInfo, refFiles}) {
 }
 
 async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
-    
+    const { projectId, service, targets, packageSize, quantity } = tasksInfo;
+    const stepsDates = JSON.parse(tasksInfo.stepsDates);
+    try {
+        const project = await getProject({"_id": projectId});
+        const taskRefFiles = await storeFiles(refFiles, projectId);
+        const { vendor, payables, receivables } = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
+        const finance = {Wordcount: {receivables: 1, payables: 1}, Price: {receivables, payables}};
+        const tasks = getTasksForPackages({
+            ...tasksInfo, stepsDates, taskRefFiles, projectId: project.projectId, finance
+        });
+        const projectFinance = getProjectFinanceForPackages(tasks);
+        return updateProject({"_id": projectId}, { tasks, finance: projectFinance });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in createTasksWithPackagesUnit");
+    }
+}
+
+function getProjectFinanceForPackages(tasks) {
+    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0);
+    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0);
+    return {
+        Price: {receivables, payables},
+        Wordcount: {receivables: tasks.length, payables: tasks.length}
+    }
+}
+
+function getTasksForPackages(tasksInfo) {
+    const { projectId, service, targets, packageSize, quantity, stepsDates, taskRefFiles, finance } = tasksInfo;
+    let tasks = [];
+    for(let i = 0; i < quantity; i++) {
+        const idNumber = i+1 < 10 ? `T0${i+1}` : `T${i+1}`; 
+        const taskId = projectId + ` ${idNumber}`;
+        tasks.push({
+            taskId,
+            targetLanguage: targets[0].symbol,
+            packageSize,
+            refFiels: taskRefFiles,
+            service,
+            projectId,
+            start: stepsDates[0].start,
+            deadline: stepsDates[0].deadline,
+            finance,
+            status: 'Created'
+        })
+    }
+    return tasks;
 }
 
 module.exports = { createProject, createTasks }

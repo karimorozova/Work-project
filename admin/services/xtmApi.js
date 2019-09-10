@@ -1,7 +1,7 @@
 const unirest = require('unirest');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
-const { taskMetricsCalc, metricsCalc } = require('../calculations');
+const { taskMetricsCalc, metricsCalc } = require('../сalculations/wordcount');
 const { Clients } = require('../models');
 
 function getXtmCustomers() {

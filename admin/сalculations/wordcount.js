@@ -3,6 +3,7 @@ const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { emptyMetrics } = require('../helpers/dbDefaultValue');
+const { hasActiveRateValue } = require('./general');
 
 async function metricsCalc(metrics) {
     if(!metrics) {
@@ -234,21 +235,13 @@ function checkForLanguages({vendor, step, project}) {
     return vendor.wordsRates.find(item => {
         if(item.source && item.source.symbol === step.source && 
             item.target.symbol === step.target) {
-                return hasRateValue({
+                return hasActiveRateValue({
                         step, 
                         pair: item, 
                         stepIndustry: project.industry.id
                     });
         }
     })
-}
-
-function hasRateValue({step, pair, stepIndustry}) {
-    const index = pair.industries.findIndex(item => item.id === stepIndustry);
-    if(index === -1) {
-        return false;
-    }
-    return pair.rates[step.serviceStep._id];
 }
 
 async function updateProjectCosts(project) {

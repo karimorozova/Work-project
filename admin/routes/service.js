@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services } = require('../models');
 const { getProject, getProjectWithUpdatedFinance } = require('../projects/');
-const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../calculations');
+const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../сalculations/wordcount');
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {

@@ -1,5 +1,5 @@
 const { getProject, updateProject } = require('./getProjects');
-const { receivablesCalc } = require('../calculations');
+const { receivablesCalc } = require('../сalculations/wordcount');
 const { getMetrics } = require('../services');
 
 async function updateProjectMetrics({projectId}) {
