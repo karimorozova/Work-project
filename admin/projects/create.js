@@ -116,7 +116,7 @@ async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
         });
         const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
         const projectFinance = getProjectFinanceForPackages(tasks);
-        return updateProject({"_id": projectId}, { tasks, finance: projectFinance });
+        return updateProject({"_id": projectId}, { tasks, steps, finance: projectFinance });
     } catch(err) {
         console.log(err);
         console.log("Error in createTasksWithPackagesUnit");
@@ -142,7 +142,7 @@ function getTasksForPackages(tasksInfo) {
             taskId,
             targetLanguage: targets[0].symbol,
             packageSize,
-            refFiels: taskRefFiles,
+            refFiles: taskRefFiles,
             service,
             projectId,
             start: stepsDates[0].start,
@@ -154,31 +154,25 @@ function getTasksForPackages(tasksInfo) {
     return tasks;
 }
 
-// function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
-//     let counter = 1;
-//     return tasks.reduce((acc, cur) => {
-//         const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
-//         acc.push({
-//             stepId: `${cur.taskId} ${stepsIdCounter}`,
-//             taskId: cur.taskId,
-//             serviceStep: cur.service.steps[0].step,
-//             name: cur.service.steps[0].step.title,
-//             target: cur.targetLanguage,
-//             packageSize: cur.packageSize,
-//             vendor,
-//             start: cur.start,
-//             deadline: cur.deadline,
-//             progress: 0,
-//             status: "Created",
-//             clientRate,
-//             finance: cur.finance,
-//             vendorRate,
-//             check: false,
-//             vendorsClickedOffer: [],
-//             isVendorRead: false
-//         })
-//         return acc;
-//     }, [])
-// }
+function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
+    let counter = 1;
+    return tasks.reduce((acc, cur) => {
+        const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+        acc.push({
+            ...cur,
+            stepId: `${cur.taskId} ${stepsIdCounter}`,
+            serviceStep: cur.service.steps[0].step,
+            name: cur.service.steps[0].step.title,
+            vendor,
+            progress: 0,
+            clientRate,
+            vendorRate,
+            check: false,
+            vendorsClickedOffer: [],
+            isVendorRead: false
+        })
+        return [...acc];
+    }, [])
+}
 
 module.exports = { createProject, createTasks }

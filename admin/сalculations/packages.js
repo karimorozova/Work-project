@@ -40,7 +40,7 @@ async function getVendorWithPayables({packageSize, target, step, industryId}) {
         const matchedVendors = vendors.filter(item => isVendorMatches({
             rates: item.monoRates, packageSize, target, step, industryId
         }))
-        // if(matchedVendors.length === 1) {
+        if(matchedVendors.length === 1) {
             const ratePair = matchedVendors[0].monoRates.find(item => {
                 return item.target.symbol === target.symbol && item.packageSize === packageSize 
                 && hasActiveRateValue({step, pair: item, stepIndustry: industryId})
@@ -48,7 +48,7 @@ async function getVendorWithPayables({packageSize, target, step, industryId}) {
             const { min, value } = ratePair.rates[step._id];
             const payables = value > min ? value : min;            
             return {vendor: matchedVendors[0].id, vendorRate: ratePair.rates[step._id], payables};
-        // }
+        }
         return {vendor: null, vendorRate: "", payables: 0};
     } catch(err) {
         console.log(err);
