@@ -17,9 +17,11 @@ async function updateProjectProgress(project) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
-            const { progress } = await getTaskProgress(task);
-            steps = updateStepsProgress({task, steps, progress});
-            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
+            if(task.service.calculationUnit === 'Words') {
+                const { progress } = await getTaskProgress(task);
+                steps = updateStepsProgress({task, steps, progress});
+                task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
+            }
         }
         return await updateProject({"_id": project.id}, { steps, tasks });
     } catch(err) {

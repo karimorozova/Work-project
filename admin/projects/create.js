@@ -104,7 +104,7 @@ async function createTasksWithHoursUnit({tasksInfo, refFiles}) {
 }
 
 async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
-    const { projectId, service, targets, packageSize, quantity } = tasksInfo;
+    const { projectId, service, targets, packageSize } = tasksInfo;
     const stepsDates = JSON.parse(tasksInfo.stepsDates);
     try {
         const project = await getProject({"_id": projectId});
@@ -116,7 +116,7 @@ async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
         });
         const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
         const projectFinance = getProjectFinanceForPackages(tasks);
-        return updateProject({"_id": projectId}, { tasks, steps, finance: projectFinance });
+        return updateProject({"_id": projectId}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
     } catch(err) {
         console.log(err);
         console.log("Error in createTasksWithPackagesUnit");

@@ -7,10 +7,12 @@ async function updateProjectMetrics({projectId}) {
         const project = await getProject({"_id": projectId});
         let { steps, tasks } = project;
         for(let task of tasks) {
-            const { taskMetrics, progress } = await getMetrics({projectId: task.projectId, customerId: project.customer.id});
-            task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
-            task.finance.Wordcount = calculateWords(task.metrics);
-            steps = getTaskSteps({steps, progress, task});
+            if(task.service.calculationUnit === 'Words') {
+                const { taskMetrics, progress } = await getMetrics({projectId: task.projectId, customerId: project.customer.id});
+                task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
+                task.finance.Wordcount = calculateWords(task.metrics);
+                steps = getTaskSteps({steps, progress, task});
+            }
         }
         await updateProject({"_id": projectId}, {tasks, steps, isMetricsExist: true});
     } catch(err) {
@@ -58,8 +60,8 @@ function getTaskSteps({steps, progress, task}) {
                     serviceStep,
                     name: serviceStep.title,
                     catName: key,
-                    source: task.sourceLanguage,
-                    target: task.targetLanguage,
+                    sourceLanguage: task.sourceLanguage,
+                    targetLanguage: task.targetLanguage,
                     vendor: null,
                     start: startDate,
                     deadline: deadline,

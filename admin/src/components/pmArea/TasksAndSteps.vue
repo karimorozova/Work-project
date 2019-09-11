@@ -23,7 +23,7 @@
             @setDate="setDate"
             @showTab="showTab"
         )
-        Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics")
+        Button(v-if="isMetricsButton" :value="metricsButton" @clicked="getMetrics")
 </template>
 
 <script>
@@ -150,6 +150,13 @@ export default {
         metricsButton() {
             return this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
         },
+        isMetricsButton() {
+            if(this.currentProject.tasks) {
+                const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words');
+                return this.currentProject.tasks.length && wordsUnit;
+            }
+            return false;
+        }
     },
     components: {
         TasksData,
