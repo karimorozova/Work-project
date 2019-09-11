@@ -6,9 +6,9 @@ async function getFinanceDataForPackages({project, service, packageSize, target}
     const { step } = service.steps[0];
     const industryId = project.industry.id;
     try {
-        const { vendor, payables } = await getVendorWithPayables({packageSize, target, step, industryId});
-        const receivables = await getReceivables({project, packageSize, target, step, industryId});
-        return  { vendor, payables, receivables };
+        const { vendor, vendorRate, payables } = await getVendorWithPayables({packageSize, target, step, industryId});
+        const { receivables, clientRate } = await getReceivables({project, packageSize, target, step, industryId});
+        return  { vendor, vendorRate, clientRate, payables, receivables };
     } catch(err) {
         console.log(err);
         console.log("Error in getFinanceForPackages");
@@ -24,9 +24,10 @@ async function getReceivables({project, packageSize, target, step, industryId}) 
         })
         if(ratePair) {
             const { min, value } = ratePair.rates[step._id];
-            return value > min ? value : min;
+            const receivables = value > min ? value : min;
+            return {receivables, clientRate: ratePair.rates[step._id]};
         }
-        return 0;
+        return {receivables: 0, clientRate: ""};
     } catch(err) {
         console.log(err);
         console.log("Error in getReceivables");
@@ -46,9 +47,9 @@ async function getVendorWithPayables({packageSize, target, step, industryId}) {
             })
             const { min, value } = ratePair.rates[step._id];
             const payables = value > min ? value : min;            
-            return {vendor: matchedVendors[0].id, payables };
+            return {vendor: matchedVendors[0].id, vendorRate: ratePair.rates[step._id], payables};
         // }
-        return {vendor: null, payables: 0};
+        return {vendor: null, vendorRate: "", payables: 0};
     } catch(err) {
         console.log(err);
         console.log("Error in getVendorWithPayables");

@@ -109,11 +109,12 @@ async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
     try {
         const project = await getProject({"_id": projectId});
         const taskRefFiles = await storeFiles(refFiles, projectId);
-        const { vendor, payables, receivables } = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
+        const {vendor, vendorRate, clientRate, payables, receivables} = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
         const finance = {Wordcount: {receivables: 1, payables: 1}, Price: {receivables, payables}};
         const tasks = getTasksForPackages({
             ...tasksInfo, stepsDates, taskRefFiles, projectId: project.projectId, finance
         });
+        const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
         const projectFinance = getProjectFinanceForPackages(tasks);
         return updateProject({"_id": projectId}, { tasks, finance: projectFinance });
     } catch(err) {
