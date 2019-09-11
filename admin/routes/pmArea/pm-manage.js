@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
-const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, 
+const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
+const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
@@ -186,6 +187,31 @@ router.post("/reassign-vendor", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on sending emails to vendors");
+    }
+})
+
+router.get('/costs', async (req, res) => {
+    const { projectId } = req.query;
+    try {
+      let project = await getProject({"_id": projectId});
+      let projectToUpdate = await getProjectWithUpdatedFinance(project);
+      const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
+      const updatedProject = await updateProjectCosts({...projectToUpdate, steps, tasks});
+      res.send(updatedProject);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send('Error on getting costs');
+    }
+})
+
+router.post('/step-payables', async (req, res) => {
+    let { projectId, step, index } = req.body;
+    try {
+      const updatedProject = await getAfterPayablesUpdated({ projectId, step, index});
+      res.send(updatedProject);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send('Error on getting step payables');
     }
 })
 

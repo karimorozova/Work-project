@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { Services } = require('../models');
-const { getProject, getProjectWithUpdatedFinance } = require('../projects/');
-const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require('../сalculations/wordcount');
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
@@ -38,30 +36,5 @@ router.delete("/service/:id", async (req, res) => {
       res.status(500).send('Error / Cannot remove Service')
     }
 });
-
-router.get('/costs', async (req, res) => {
-  const { projectId } = req.query;
-  try {
-    let project = await getProject({"_id": projectId});
-    let projectToUpdate = await getProjectWithUpdatedFinance(project);
-    const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
-    const updatedProject = await updateProjectCosts({...projectToUpdate, steps, tasks});
-    res.send(updatedProject);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Error on getting costs');
-  }
-})
-
-router.post('/step-payables', async (req, res) => {
-  let { projectId, step, index } = req.body;
-  try {
-    const updatedProject = await getAfterPayablesUpdated({ projectId, step, index});
-    res.send(updatedProject);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Error on getting step payables');
-  }
-})
 
 module.exports = router;
