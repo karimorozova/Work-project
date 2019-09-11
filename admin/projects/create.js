@@ -110,12 +110,12 @@ async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
         const project = await getProject({"_id": projectId});
         const taskRefFiles = await storeFiles(refFiles, projectId);
         const {vendor, vendorRate, clientRate, payables, receivables} = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
-        const finance = {Wordcount: {receivables: 1, payables: 1}, Price: {receivables, payables}};
+        const finance = {Wordcount: {receivables: "", payables: ""}, Price: {receivables, payables}};
         const tasks = getTasksForPackages({
             ...tasksInfo, stepsDates, taskRefFiles, projectId: project.projectId, finance
         });
         const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
-        const projectFinance = getProjectFinanceForPackages(tasks);
+        const projectFinance = getProjectFinanceForPackages(tasks, project.finance);
         return updateProject({"_id": projectId}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
     } catch(err) {
         console.log(err);
@@ -123,12 +123,14 @@ async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
     }
 }
 
-function getProjectFinanceForPackages(tasks) {
-    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0);
-    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0);
+function getProjectFinanceForPackages(tasks, projectFinance) {
+    const currentReceivables = projectFinance.Price.receivables || 0;
+    const currentPayables = projectFinance.Price.payables || 0;
+    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0) + currentReceivables;
+    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0) + currentPayables;
     return {
         Price: {receivables, payables},
-        Wordcount: {receivables: tasks.length, payables: tasks.length}
+        Wordcount: {...projectFinance.Wordcount}
     }
 }
 

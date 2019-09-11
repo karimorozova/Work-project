@@ -129,7 +129,7 @@ export default {
                     return await this.updateProgress();
                 }
                 await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
-                const updatedProject = await this.$http.get(`/service/costs?projectId=${this.currentProject._id}`);
+                const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
                 await this.storeProject(updatedProject.body);
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
