@@ -34,14 +34,13 @@ const ProjectsSchema = new mongoose.Schema({
     serviceStep: {},
     name: "",
     catName: "",
-    source: "",
-    target: "",
+    sourceLanguage: "",
+    targetLanguage: "",
+    packageSize: "",
     start: {},
     deadline: {},
     progress: "",
     status: "",
-    receivables: "",
-    payables: "",
     clientRate: "",
     clientDiscount: "",
     finance: {
@@ -60,7 +59,6 @@ const ProjectsSchema = new mongoose.Schema({
     },
     vendorRate: "",
     vendorDiscount: "",
-    margin: "",
     check: Boolean,
     vendorsClickedOffer: Array,
     isVendorRead: {type: Boolean, default: false}
@@ -100,14 +98,6 @@ const ProjectsSchema = new mongoose.Schema({
     type: Array,
     default: [],
     trim: true
-  },
-  receivables: {
-    type: String,
-    default: ''
-  },
-  payables: {
-    type: String,
-    default: ''
   },
   roi: {
     type: String,
