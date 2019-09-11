@@ -54,7 +54,7 @@
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
-                span.steps__step-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
+                span.steps__step-data {{ getStepPair(row) }}
             template(slot="vendor" slot-scope="{ row, index }")
                 .steps__vendor-menu(v-if="isVendorSelect(row.status)")
                     PersonSelect(
@@ -192,6 +192,12 @@ export default {
         }
     },
     methods: {
+        getStepPair(step) {
+            if(step.packageSize) {
+                return `${step.targetLanguage} / ${step.packageSize}`;
+            }
+            return `${step.sourceLanguage} >> ${step.targetLanguage}`;
+        },
         getTotalReceivables(step) {
             const { finance, clientDiscount } = step;
             if(clientDiscount) {

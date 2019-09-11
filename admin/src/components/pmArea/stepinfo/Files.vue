@@ -5,6 +5,8 @@
         DataTable(
             :fields="fields"
             :tableData="stepFiles"
+            :bodyClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
+            :tableheadRowClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
         )
             template(slot="headerCheck" slot-scope="{ field }")
                 input.step-files__check(type="checkbox" v-model="isAllChecked")
@@ -45,7 +47,7 @@ export default {
             type: Object
         },
         projectId: {
-            type: Number
+            type: [Number, String]
         },
         xtmJobs: {
             type: Array
