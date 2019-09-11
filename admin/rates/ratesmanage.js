@@ -254,9 +254,9 @@ async function getRateInfoFromStepFinance({project, step, rate}) {
 async function getPairInfoForUpdate({prop, step}) {
     let source = "";
     try {
-        const target = await Languages.findOne({symbol: step.target});
+        const target = await Languages.findOne({symbol: step.targetLanguage});
         if(prop !== 'monoRates') {
-            source = await Languages.findOne({symbol: step.source});
+            source = await Languages.findOne({symbol: step.sourceLanguage});
         }
         return {source, target}
     } catch(err) {

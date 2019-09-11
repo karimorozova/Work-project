@@ -154,4 +154,31 @@ function getTasksForPackages(tasksInfo) {
     return tasks;
 }
 
+// function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
+//     let counter = 1;
+//     return tasks.reduce((acc, cur) => {
+//         const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+//         acc.push({
+//             stepId: `${cur.taskId} ${stepsIdCounter}`,
+//             taskId: cur.taskId,
+//             serviceStep: cur.service.steps[0].step,
+//             name: cur.service.steps[0].step.title,
+//             target: cur.targetLanguage,
+//             packageSize: cur.packageSize,
+//             vendor,
+//             start: cur.start,
+//             deadline: cur.deadline,
+//             progress: 0,
+//             status: "Created",
+//             clientRate,
+//             finance: cur.finance,
+//             vendorRate,
+//             check: false,
+//             vendorsClickedOffer: [],
+//             isVendorRead: false
+//         })
+//         return acc;
+//     }, [])
+// }
+
 module.exports = { createProject, createTasks }

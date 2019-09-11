@@ -26,8 +26,8 @@ export default {
         },
         isVendorMatchesForDuoRate({ratesProp, step, vendor}) {
             return vendor[ratesProp].find(item => {
-                if(item.source.symbol === step.source && 
-                    item.target.symbol === step.target) {
+                if(item.source.symbol === step.sourceLanguage && 
+                    item.target.symbol === step.targetLanguage) {
                     return this.hasRateValue({
                         stepId: step.serviceStep._id, 
                         pair: item, 
@@ -39,7 +39,7 @@ export default {
         isVendorMatchesForMonoRate({ratesProp, step, vendor}) {
             return vendor[ratesProp].find(item => {
                 if(item.packageSize === step.packageSize && 
-                    item.target.symbol === step.target) {
+                    item.target.symbol === step.targetLanguage) {
                     return this.hasRateValue({
                         stepId: step.serviceStep._id, 
                         pair: item, 

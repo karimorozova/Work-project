@@ -161,10 +161,10 @@ async function getCustomerRate({step, industryId, customerId}) {
 function getCombination({combs, step, industryId}) {
     const filtered = combs.filter(item => {
         if(step.serviceStep.calcualtionUnit !== 'Packages') {
-        return item.source.symbol === step.source &&
-                    item.target.symbol === step.target
+        return item.source.symbol === step.sourceLanguage &&
+                    item.target.symbol === step.targetLanguage
         }
-        return item.target.symbol === step.target &&
+        return item.target.symbol === step.targetLanguage &&
         item.packageSize === step.packageSize
     })
     return filtered.find(item => {
@@ -233,8 +233,8 @@ function getMatchedVendors({activeVendors, steps, index, project}) {
 
 function checkForLanguages({vendor, step, project}) {
     return vendor.wordsRates.find(item => {
-        if(item.source && item.source.symbol === step.source && 
-            item.target.symbol === step.target) {
+        if(item.source && item.source.symbol === step.sourceLanguage && 
+            item.target.symbol === step.targetLanguage) {
                 return hasActiveRateValue({
                         step, 
                         pair: item, 

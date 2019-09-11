@@ -54,7 +54,7 @@
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data {{ row.name }}
             template(slot="language" slot-scope="{ row }")
-                span.steps__step-data {{ row.source }} >> {{ row.target }}
+                span.steps__step-data {{ row.sourceLanguage }} >> {{ row.targetLanguage }}
             template(slot="vendor" slot-scope="{ row, index }")
                 .steps__vendor-menu(v-if="isVendorSelect(row.status)")
                     PersonSelect(
