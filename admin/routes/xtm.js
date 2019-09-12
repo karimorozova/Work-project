@@ -79,10 +79,6 @@ router.get('/update-progress', async (req, res) => {
     }
 })
 
-router.post('/request', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
-    res.send("ok");
-})
-
 router.get('/xtm-customers', async (req, res) => {
     try {
         const xtmCustomers = await getXtmCustomers();
@@ -102,57 +98,6 @@ router.post('/update-project', async (req, res) => {
         console.log(err);
         res.status(500).send('Error on updating project');
     }
-})
-
-router.get('/xtmwords', async (req, res) => {
-    let id = req.query.projectId;
-    let str = '<?xml version="1.0" encoding="UTF-8"?>' +
-    '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
-    '<soapenv:Header/>' +
-    '<soapenv:Body>' +
-      '<pm:obtainProjectMetrics>' +
-         '<loginAPI>' +
-            '<client>Pangea</client>' +
-            '<password>pm</password>' +
-            '<userId>3150</userId>' +
-         '</loginAPI>' +
-         '<project>' +
-            `<id>${id}</id>` +
-         '</project>' +
-      '</pm:obtainProjectMetrics>' +
-    '</soapenv:Body>' +
-    '</soapenv:Envelope>';
-
-    function createCORSRequest(method, url) {
-        let xhr = new XMLHttpRequest();
-        if ("withCredentials" in xhr) {
-            xhr.open(method, url, false);
-        } else if (typeof XDomainRequest != "undefined") {
-            alert
-            xhr = new XDomainRequest();
-            xhr.open(method, url);
-        } else {
-            console.log("CORS not supported");
-            alert("CORS not supported");
-            xhr = null;
-        }
-        return xhr;
-    }
-    let xhr = createCORSRequest("POST", `${xtmBaseUrl}/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl`);
-    if(!xhr){
-    console.log("XHR issue");
-    return;
-    }
-
-    xhr.onload = function (){
-    let results = '<?xml version="1.0" encoding="UTF-8"?><projectMetrics>' + xhr.responseText.split('<projectMetrics>')[1].split('</projectMetrics>')[0] + '</projectMetrics>';
-    let object = JSON.parse(parser.toJson(results));
-    let wordsTotal = object.projectMetrics.coreMetrics.totalWords;
-    res.send(wordsTotal);
-    }
-
-    xhr.setRequestHeader('Content-Type', 'text/xml');
-    xhr.send(str);
 })
 
 router.get('/editor', async (req, res) => {
