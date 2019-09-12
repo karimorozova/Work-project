@@ -19,9 +19,11 @@ async function updateProjectProgress(project) {
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words') {
                 const { progress } = await getTaskProgress(task);
-                steps = updateStepsProgress({task, steps, progress});
-                task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
+                steps = updateWordcountStepsProgress({task, steps, progress});
+            } else {
+                steps = updateStepsProgress(task, steps);
             }
+            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
         }
         return await updateProject({"_id": project.id}, { steps, tasks });
     } catch(err) {
@@ -268,15 +270,22 @@ function setStepsStatus({steps, status, project}) {
     return updateStepsStatuses({steps: projectSteps, status, stepIdentify})
 }
 
-function updateStepsProgress({steps, task, progress}) {
-    const updatedSteps = steps.map(item => {
+function updateStepsProgress(task, steps) {
+    return steps.map(item => {
+        if(task.taskId === item.taskId) {
+            item.progress = item.status  === 'Started' && item.targetFile ? 100 : item.progress;
+        }
+        return item;
+    })
+}
+
+function updateWordcountStepsProgress({steps, task, progress}) {
+    return steps.map(item => {
         if(task.taskId === item.taskId) {
             item.progress = item.status === 'Started' ? setStepsProgress(item, progress) : item.progress;
-            return item;
         }
         return item;
     });
-    return updatedSteps;
 }
 
 function setStepsProgress(step, progress) {
@@ -401,6 +410,5 @@ function getProjectFinancePrice(tasks) {
     return { receivables, payables };
 }
 
-module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateStepsProgress, 
-    areAllStepsCompleted, updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets,
-    getAfterReopenSteps, getProjectAfterFinanceUpdated };
+module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, 
+    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps, getProjectAfterFinanceUpdated };

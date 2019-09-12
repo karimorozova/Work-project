@@ -43,6 +43,7 @@ const ProjectsSchema = new mongoose.Schema({
     status: "",
     clientRate: "",
     clientDiscount: "",
+    targetFile: "",
     finance: {
       'Wordcount': {
         receivables: "", 
