@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
-const { getAfterPayablesUpdated, setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
+const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
+const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
@@ -207,11 +208,11 @@ router.get('/costs', async (req, res) => {
 router.post('/step-payables', async (req, res) => {
     let { projectId, step, index } = req.body;
     try {
-      const updatedProject = await getAfterPayablesUpdated({ projectId, step, index});
-      res.send(updatedProject);
+        const updatedProject = await getAfterPayablesUpdated({ projectId, step, index});
+        res.send(updatedProject);
     } catch(err) {
-      console.log(err);
-      res.status(500).send('Error on getting step payables');
+        console.log(err);
+        res.status(500).send('Error on getting step payables');
     }
 })
 

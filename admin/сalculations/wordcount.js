@@ -78,10 +78,8 @@ async function receivablesCalc({task, project, step}) {
     }
 }
 
-async function getAfterPayablesUpdated({projectId, step, index}) {
+async function getAfterWordcountPayablesUpdated({project, step}) {
     try {
-        const queryStr = `steps.${index}`;
-        let project = await updateProject({"_id": projectId}, {$set: {[queryStr]: step}});
         let { tasks, steps } = project;
         const taskIndex = tasks.findIndex(item => item.taskId == step.taskId);
         const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.name === step.name);
@@ -89,10 +87,10 @@ async function getAfterPayablesUpdated({projectId, step, index}) {
         steps[stepIndex] = await payablesCalc({task: tasks[taskIndex], project, step});
         tasks[taskIndex].finance.Price.payables = +(steps.filter(item => item.taskId === tasks[taskIndex].taskId)
         .reduce((prev, cur) => prev + +cur.finance.Price.payables, 0).toFixed(2));
-        return await updateProjectCosts({...project._doc, id: projectId, tasks, steps});
+        return await updateProjectCosts({...project._doc, id: project.id, tasks, steps});
       } catch(err) {
         console.log(err);
-        console.log('Error in getAfterPayablesUpdated');
+        console.log('Error in getAfterWordcountPayablesUpdated');
       }
 }
 
@@ -293,4 +291,4 @@ function  wordsCalculation(task) {
 }
 
 module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, 
-    updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc, getAfterPayablesUpdated };
+    updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc, getAfterWordcountPayablesUpdated };
