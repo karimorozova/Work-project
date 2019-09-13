@@ -3,14 +3,14 @@
         .select
             template(v-if="selectedManager")
                 .selected
-                    span {{ selectedManager.username }}
+                    span {{ getFullName(selectedManager) }}
             template(v-if="!selectedManager") 
                 span.selected.no-manager Options
             .arrow-button(@click="showManagers")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{chosen: manager._id == selectedManager._id}")
-                span {{ manager.username }}
+            .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{'chosen': manager._id == selectedManager._id}")
+                span {{ getFullName(manager) }}
 </template>
 
 <script>
@@ -20,6 +20,9 @@ export default {
     props: {
         selectedManager: {
             type: [Object, String]
+        },
+        group: {
+            type: String
         }
     },
     data() {
@@ -43,10 +46,20 @@ export default {
         async getManagers() {
             try {
                 const result = await this.$http.get('/users')
-                this.managers = result.data;
+                this.managers = result.data.filter(item => {
+                    if(this.group) {
+                        return item.group.name === this.group;
+                    }
+                    return item;
+                });
             } catch(err) {
                 console.log(err);
             }  
+        },
+        getFullName(manager) {
+            const firstName = manager.firstName || "";
+            const lastName = manager.lastName || "";
+            return `${firstName} ${lastName}`;
         }
     },
     directives: {

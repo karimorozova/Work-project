@@ -38,17 +38,17 @@
                 label.block-item__label.block-item_relative Account Manager:
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
-                    AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
+                    AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Accounting")
             .block-item
                 label.block-item__label.block-item_relative Sales Manager:
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.salesManager}")
-                    AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
+                    AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
             .block-item
                 label.block-item__label.block-item_relative Project Manager:
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.projectManager}")
-                    AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
+                    AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
 </template>
 
 <script>
