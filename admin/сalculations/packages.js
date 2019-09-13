@@ -1,6 +1,7 @@
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { hasActiveRateValue } = require('./general');
+const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 
 async function getFinanceDataForPackages({project, service, packageSize, target}) {
     const { step } = service.steps[0];
@@ -82,8 +83,7 @@ async function getAfterPackagesPayablesUpdated({project, step}) {
         });
         const updatedSteps = getUpdatesSteps({steps, payables, vendorRate, step});
         const updatedTasks = getUpdatesTasks({tasks, payables, step});
-        // return await getUpdatedProjectAfterFinanceRecalculated({project, tasks: updatedTasks, steps: updatedSteps});
-        return { updatedTasks, updatedSteps }
+        return await getProjectAfterFinanceUpdated({project, tasks: updatedTasks, steps: updatedSteps})
     } catch(err) {
         console.log(err);
         console.log('Error in getAfterPackagesPayablesUpdated');

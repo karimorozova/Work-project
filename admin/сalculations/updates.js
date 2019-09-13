@@ -1,7 +1,6 @@
 const { getAfterWordcountPayablesUpdated } = require("./wordcount");
 const { getAfterPackagesPayablesUpdated } = require("./packages");
 const { updateProject } = require("../projects");
-const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 
 async function getAfterPayablesUpdated({projectId, step, index}) {
     try {
@@ -11,8 +10,7 @@ async function getAfterPayablesUpdated({projectId, step, index}) {
             return await getAfterWordcountPayablesUpdated({project, step});
         }
         if(step.serviceStep.calculationUnit === 'Packages') {
-            const {updatedTasks,updatedSteps} = await getAfterPackagesPayablesUpdated({project, step});
-            return await getProjectAfterFinanceUpdated({project, tasks: updatedTasks, steps: updatedSteps});
+            return await getAfterPackagesPayablesUpdated({project, step});
         }
     } catch(err) {
         console.log(err);
