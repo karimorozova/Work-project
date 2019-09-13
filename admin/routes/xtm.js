@@ -8,7 +8,7 @@ const fs = require('fs');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const parser = require('xml2json');
 const https = require('https');
-const { xtmToken, xtmBaseUrl } = require('../configs/');
+const { xtmBaseUrl } = require('../configs/');
 
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     try {

@@ -28,11 +28,13 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
     try {
         if(calculationUnit === 'Words') {
             return await createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles});
-        } else if(calculationUnit === 'Hours') {
-            return await createTasksWithHoursUnit({tasksInfo, refFiles});
         } else {
-            return await createTasksWithPackagesUnit({tasksInfo, refFiles});
-        }        
+            const stepsDates = JSON.parse(tasksInfo.stepsDates);
+            const project = await getProject({"_id": tasksInfo.projectId});
+            const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
+            const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
+            return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
+        }
     } catch(err) {
         console.log(err);
         console.log("Error in createTasks");
@@ -106,25 +108,20 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
 
 /// Creating tasks for hours unit services start ///
 
-async function createTasksWithHoursUnit({tasksInfo, refFiles}) {
-
+async function createTasksWithHoursUnit(allInfo) {
+    
 }
 
 /// Creating tasks for wordcount unit services end ///
 
 /// Creating tasks for packages unit services start ///
 
-async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
-    const { projectId, service, targets, packageSize } = tasksInfo;
-    const stepsDates = JSON.parse(tasksInfo.stepsDates);
+async function createTasksWithPackagesUnit(allInfo) {
+    const { projectId, project, service, targets, packageSize } = allInfo;
     try {
-        const project = await getProject({"_id": projectId});
-        const taskRefFiles = await storeFiles(refFiles, projectId);
         const {vendor, vendorRate, clientRate, payables, receivables} = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
         const finance = {Wordcount: {receivables: "", payables: ""}, Price: {receivables, payables}};
-        const tasks = getTasksForPackages({
-            ...tasksInfo, stepsDates, taskRefFiles, projectId: project.projectId, finance
-        });
+        const tasks = getTasksForPackages({...allInfo, projectId: project.projectId, finance});
         const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
         const projectFinance = getProjectFinanceForPackages(tasks, project.finance);
         return updateProject({"_id": projectId}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
