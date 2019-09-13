@@ -162,7 +162,7 @@ export default {
         },
         async getXtmId() {
             try {
-                if (!this.xtmCustomers.length) {
+                if (!this.xtmCustomers.length && this.tasksData.service.calculationUnit === 'Words') {
                     await this.getCustomersFromXtm();
                 }
             } catch (err) {}
