@@ -39,6 +39,9 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
     }
 }
 
+
+/// Creating tasks for wordcount unit services start ///
+
 async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
     let newTasksInfo = {...tasksInfo};
     newTasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
@@ -99,9 +102,17 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
     }
 }
 
+/// Creating tasks for wordcount unit services end ///
+
+/// Creating tasks for hours unit services start ///
+
 async function createTasksWithHoursUnit({tasksInfo, refFiles}) {
 
 }
+
+/// Creating tasks for wordcount unit services end ///
+
+/// Creating tasks for packages unit services start ///
 
 async function createTasksWithPackagesUnit({tasksInfo, refFiles}) {
     const { projectId, service, targets, packageSize } = tasksInfo;
@@ -176,5 +187,7 @@ function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
         return [...acc];
     }, [])
 }
+
+/// Creating tasks for packages unit services end ///
 
 module.exports = { createProject, createTasks }
