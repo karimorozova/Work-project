@@ -49,6 +49,7 @@ router.post("/new-project", async (req, res) => {
     let project = {...req.body};
     const client = await Clients.findOne({"_id": project.customer});
     project.projectManager = client.projectManager._id;
+    project.accountManager = client.accountManager._id;
     try {
         const result = await createProject(project);
         res.send(result);
