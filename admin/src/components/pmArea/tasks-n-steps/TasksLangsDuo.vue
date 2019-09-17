@@ -167,6 +167,7 @@ export default {
         },
         setLanguages() {
             this.languagePairs = this.calculationUnit === 'Words' ? [...this.wordsRates] : [...this.hoursRates];
+            this.targetChosen = [];
             if(this.languagePairs.length) {
                 const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
                 const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);

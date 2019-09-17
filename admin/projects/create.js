@@ -3,6 +3,7 @@ const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
 const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
+const { getHoursStepFinanceData } = require("../сalculations/hours"); 
 const moment = require("moment");
 
 async function createProject(project) {
@@ -109,7 +110,108 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
 /// Creating tasks for hours unit services start ///
 
 async function createTasksWithHoursUnit(allInfo) {
-    
+    const { project } = allInfo;
+    try {
+        let tasksWithoutFinance = getTasksForHours({...allInfo, projectId: project.projectId});
+        const steps = await getStepsForHours({...allInfo, tasks: tasksWithoutFinance});
+        const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
+        const projectFinance = getProjectFinance(tasks, project.finance); 
+        return updateProject({"_id": project.id}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in createTasksWithHoursUnit");
+    }
+}
+
+function getHoursTaskWithFinance(task, steps) {
+    const taskSteps = steps.filter(item => item.taskId === task.taskId);
+    const receivables = +taskSteps.reduce((acc, cur) => {
+        acc += +cur.finance.Price.receivables;
+        return acc;
+    }, 0).toFixed(2)
+    const payables = +taskSteps.reduce((acc, cur) => {
+        acc += +cur.finance.Price.payables;
+        return acc;
+    }, 0).toFixed(2)
+    return {...task, 
+        finance: {Price: {receivables, payables}, Wordcount: {receivables: "", payables: ""}}
+    }
+}
+
+function getTasksForHours(tasksInfo) {
+    const { projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
+    let tasks = [];
+    for(let i = 0; i < targets.length; i++) {
+        const idNumber = i+1 < 10 ? `T0${i+1}` : `T${i+1}`; 
+        const taskId = projectId + ` ${idNumber}`;
+        tasks.push({
+            taskId,
+            targetLanguage: targets[i].symbol,
+            sourceLanguage: source.symbol,
+            refFiles: taskRefFiles,
+            service,
+            projectId,
+            start: stepsDates[0].start,
+            deadline: stepsDates[stepsDates.length-1].deadline,
+            status: 'Created'
+        })
+    }
+    return tasks;
+}
+
+async function getStepsForHours(stepsInfo) {
+    const { tasks } = stepsInfo;
+    try {
+        const steps = await Promise.all(tasks.map(item => {
+            return getHoursTaskSteps(item, stepsInfo);
+        }))
+        return steps.reduce((acc, cur) => {
+            acc.push(...cur);
+            return acc;
+        }, [])
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getStepsForHours");
+    }
+}
+
+async function getHoursTaskSteps(task, stepsInfo) {
+    let steps = [];
+    try {
+        for(let i = 0; i < stepsInfo.stepsDates.length; i++) {
+            const stepsIdCounter = i+1 < 10 ? `S0${i+1}` : `S${i+1}`;
+            const serviceStep = task.service.steps[i].step;
+            const hours = +stepsInfo[`${serviceStep.symbol}-hours`];
+            const quantity = +stepsInfo[`${serviceStep.symbol}-quantity`];
+            const financeData = await getHoursStepFinanceData({
+                task, serviceStep, project: stepsInfo.project, multiplier: hours*quantity
+            });
+            steps.push({
+                ...task,
+                stepId: `${task.taskId} ${stepsIdCounter}`,
+                serviceStep,
+                name: task.service.steps[i].step.title,
+                start: stepsInfo.stepsDates[i].start,
+                deadline: stepsInfo.stepsDates[i].deadline,
+                hours,
+                quantity,
+                vendor: financeData.vendor,
+                vendorRate: financeData.vendorRate,
+                clientRate: financeData.clientRate,
+                finance: {
+                    Price: {receivables: financeData.receivables, payables: financeData.payables},
+                    Wordcount: {receivables: "", payables: ""}},
+                progress: 0,
+                check: false,
+                vendorsClickedOffer: [],
+                isVendorRead: false
+            })
+        }
+        return steps;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getHoursTaskSteps");
+    }
 }
 
 /// Creating tasks for wordcount unit services end ///
@@ -117,28 +219,17 @@ async function createTasksWithHoursUnit(allInfo) {
 /// Creating tasks for packages unit services start ///
 
 async function createTasksWithPackagesUnit(allInfo) {
-    const { projectId, project, service, targets, packageSize } = allInfo;
+    const { project, service, targets, packageSize } = allInfo;
     try {
         const {vendor, vendorRate, clientRate, payables, receivables} = await getFinanceDataForPackages({project, service, packageSize, target: targets[0]});
         const finance = {Wordcount: {receivables: "", payables: ""}, Price: {receivables, payables}};
         const tasks = getTasksForPackages({...allInfo, projectId: project.projectId, finance});
         const steps = getStepsForPackages({tasks, vendor, vendorRate, clientRate});
-        const projectFinance = getProjectFinanceForPackages(tasks, project.finance);
-        return updateProject({"_id": projectId}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
+        const projectFinance = getProjectFinance(tasks, project.finance);
+        return updateProject({"_id": project.id}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
     } catch(err) {
         console.log(err);
         console.log("Error in createTasksWithPackagesUnit");
-    }
-}
-
-function getProjectFinanceForPackages(tasks, projectFinance) {
-    const currentReceivables = projectFinance.Price.receivables || 0;
-    const currentPayables = projectFinance.Price.payables || 0;
-    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0) + currentReceivables;
-    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0) + currentPayables;
-    return {
-        Price: {receivables, payables},
-        Wordcount: {...projectFinance.Wordcount}
     }
 }
 
@@ -186,5 +277,17 @@ function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
 }
 
 /// Creating tasks for packages unit services end ///
+
+
+function getProjectFinance(tasks, projectFinance) {
+    const currentReceivables = projectFinance.Price.receivables || 0;
+    const currentPayables = projectFinance.Price.payables || 0;
+    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0) + currentReceivables;
+    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0) + currentPayables;
+    return {
+        Price: {receivables, payables},
+        Wordcount: {...projectFinance.Wordcount}
+    }
+}
 
 module.exports = { createProject, createTasks }

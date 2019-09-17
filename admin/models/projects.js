@@ -37,6 +37,8 @@ const ProjectsSchema = new mongoose.Schema({
     sourceLanguage: "",
     targetLanguage: "",
     packageSize: "",
+    hours: "",
+    quantity: "",
     start: {},
     deadline: {},
     progress: "",
