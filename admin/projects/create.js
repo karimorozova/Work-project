@@ -283,8 +283,8 @@ function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
 function getProjectFinance(tasks, projectFinance) {
     const currentReceivables = projectFinance.Price.receivables || 0;
     const currentPayables = projectFinance.Price.payables || 0;
-    const receivables = tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0) + currentReceivables;
-    const payables = tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0) + currentPayables;
+    const receivables = +(tasks.reduce((acc,cur) => acc + cur.finance.Price.receivables, 0) + currentReceivables).toFixed(2);
+    const payables = +(tasks.reduce((acc,cur) => acc + cur.finance.Price.payables, 0) + currentPayables).toFixed(2);
     return {
         Price: {receivables, payables},
         Wordcount: {...projectFinance.Wordcount}
