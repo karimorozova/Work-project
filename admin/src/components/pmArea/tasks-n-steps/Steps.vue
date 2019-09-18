@@ -52,7 +52,7 @@
                 .steps__info-icon(@click="showStepDetails(index)")
                     i.fa.fa-info-circle
             template(slot="name" slot-scope="{ row }")
-                span.steps__step-data {{ row.name }}
+                span.steps__step-data.steps_no-padding {{ row.name }}
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ getStepPair(row) }}
             template(slot="vendor" slot-scope="{ row, index }")
@@ -66,7 +66,7 @@
                         @togglePersonsData="toggleVendors"
                         @scrollDrop="scrollDrop"
                     )
-                span.steps__step-vendor(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
+                span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
                     .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
                         img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
                         .steps__tooltip Reassign Vendor
@@ -165,7 +165,7 @@ export default {
             tabs: ['Tasks', 'Steps'],
             fields: [
                 {label: "Check", headerKey: "headerCheck", key: "check", width: "4%"},
-                {label: "Step", headerKey: "headerName", key: "name", width: "9%"},
+                {label: "Step", headerKey: "headerName", key: "name", width: "9%", padding: 0},
                 {label: "Language", headerKey: "headerLanguage", key: "language", width: "12%"},
                 {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "14%", padding: 0},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
@@ -461,17 +461,10 @@ export default {
             }
         }
     }
-    &__step-vendor {
-        padding: 7px 5px 5px 6px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
     &__vendor-replace {
         position: relative;
         width: 20px;
-        height: 20px;
+        margin-right: 5px;
         box-sizing: border-box;
         &:hover {
             .steps__tooltip {
@@ -526,6 +519,18 @@ export default {
         padding-left: 5px;
         max-height: 32px;
         overflow-y: auto;
+    }
+    &_no-padding {
+        height: 100%;
+        width: 100%;
+        max-height: 30px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 5px;
+        overflow-y: auto;
+        overflow-y: hidden;
     }
 }
 
