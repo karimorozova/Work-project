@@ -14,7 +14,7 @@
         .step-vendor__current-vendor(v-else) {{ currentVendorName(vendor) }}
             span.step-vendor__no-vendor(v-if="!vendor") No Vendor
         .step-vendor__contacts
-            .step-vendor__icon
+            .step-vendor__icon(@click="gotToVendorInfo")
                 i.fa.fa-info-circle
             .step-vendor__icon(@click="sendEmail")
                 i.fa.fa-envelope
@@ -84,6 +84,9 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error"});
             }
+        },
+        gotToVendorInfo() {
+            this.$router.push(`/vendors/details/${this.vendor._id}`);
         },
         ...mapActions({
             alertToggle: "alertToggle",
