@@ -1,4 +1,6 @@
 const unirest = require('unirest');
+const fs = require('fs');
+const request = require('request');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
 const { taskMetricsCalc, metricsCalc } = require('../сalculations/wordcount');
@@ -38,6 +40,25 @@ function saveTasks(object) {
 }
 
 function saveTemplateTasks(object) {
+    const formData = getDataForRequest(object);
+    return new Promise((resolve, reject) => {
+        request.post({
+            url: `${xtmBaseUrl}/rest-api/projects`,
+            headers: {
+                "Authorization": xtmToken,
+                "Content-Type": "multipart/form-data"
+            },
+            formData }, function(err, httpResponse, body) {
+                if(err) {
+                    reject(err);
+                }
+                resolve(body);
+            }
+        )
+    })    
+}
+
+function getDataForRequest(object) {
     const withJoinObject = object.join && object.join !== "false" ? {
         'workflowId': object.workflowId,
         'fileProcessType': 'JOIN'
@@ -45,32 +66,23 @@ function saveTemplateTasks(object) {
     const filesObj = {};
     if(object.sourceFiles.length) {
         for(let index in object.sourceFiles) {
-            filesObj[`translationFiles[${index}].file`] = object.sourceFiles[index];
+            filesObj[`translationFiles[${index}].file`] = fs.createReadStream(object.sourceFiles[index]);
         }
     }
     if(object.refFiles && object.refFiles.length) {
         for(let index in refFiles) {
-            filesObj[`referenceFiles[${index}].file`] = object.refFiles[index];
+            filesObj[`referenceFiles[${index}].file`] = fs.createReadStream(object.refFiles[index]);
         }
     }
-    return new Promise((resolve, reject) => {
-        unirest.post(`${xtmBaseUrl}/rest-api/projects`)
-        .headers({"Authorization": xtmToken,
-        'Content-Type': 'multipart/form-data'})  
-        .field('customerId', object.customerId)
-        .field('name', object.name)
-        .field('sourceLanguage', object.source)
-        .field('targetLanguages', object.target)
-        .field('analysisTemplateId', object.templateId)
-        .field(withJoinObject)
-        .attach(filesObj)
-        .end(response => {
-            if(response.error) {
-                return reject(response.error)
-            }
-            resolve(response.body)
-        })
-    })    
+    return {
+        customerId: object.customerId,
+        name: object.name,
+        sourceLanguage: object.source,
+        targetLanguages: object.target,
+        analysisTemplateId: object.templateId,
+        ...withJoinObject,
+        ...filesObj
+    }
 }
 
 function getMetrics({projectId, customerId}) {

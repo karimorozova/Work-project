@@ -79,6 +79,7 @@ async function addTasksToXtm({newTasksInfo, project}) {
                 workflowId: newTasksInfo.workflow,
                 join: newTasksInfo.join
             });
+            xtmProject = JSON.parse(xtmProject);
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
             let taskId = project.projectId + ` ${idNumber}`;
             await updateProjectTasks({newTasksInfo, project, xtmProject, taskId, target})

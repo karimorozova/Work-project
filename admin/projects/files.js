@@ -1,5 +1,5 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
-const { moveFile } = require('../utils/movingFile');
+const { moveProjectFile } = require('../utils/movingFile');
 const { getRequestOptions } = require('../services/xtmApi');
 const { getProject } = require('./getProjects');
 const fs = require('fs');
@@ -13,7 +13,7 @@ async function storeFiles(filesArr, projectId) {
         if(filesArr.length) {
             for(let file of filesArr) {
                 const newPath = `./dist/projectFiles/${projectId}/${tasks.length+1}-${file.filename.replace(/\s+/g, '_')}`;
-                await moveFile(file, newPath);
+                await moveProjectFile(file, newPath);
                 storedFiles.push(newPath);
             }
         }
