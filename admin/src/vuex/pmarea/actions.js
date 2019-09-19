@@ -19,6 +19,19 @@ export const addProjectTasks = async ({ commit, dispatch }, payload) => {
     }
 }
 
+export const updateProgress = async ({ commit, dispatch }, payload) => {
+    dispatch('incrementRequestCounter')
+    const { projectId, isCatTool } = payload;
+    try {
+        const updatedProject = await Vue.http.post('/xtm/update-progress', { projectId, isCatTool });
+        await dispatch('setCurrentProject', updatedProject.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter');
+    }
+}
+
 export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {

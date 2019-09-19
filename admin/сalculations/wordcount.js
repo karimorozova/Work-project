@@ -191,14 +191,16 @@ async function setDefaultStepVendors(project) {
         let { steps, tasks } = project;
         const vendors = await getVendors();
         for(let i = 0; i < steps.length; i++) {
-            let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
-            let activeVendors = vendors.filter(item => item.status === "Active");
-            let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project})
-            if(matchedVendors.length === 1 && !steps[i].vendor) {
-                steps[i].vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
-                tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
-                steps[i] = await payablesCalc({task: tasks[taskIndex], project, step: steps[i]._doc});
-                tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+steps[i].finance.Price.payables).toFixed(2);
+            if(steps[i].serviceStep.calcualtionUnit === 'Words') {
+                let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
+                let activeVendors = vendors.filter(item => item.status === "Active");
+                let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project})
+                if(matchedVendors.length === 1 && !steps[i].vendor) {
+                    steps[i].vendor = {...matchedVendors[0], _id: matchedVendors[0].id};
+                    tasks[taskIndex].metrics = await updateTaskMetrics(tasks[taskIndex].metrics, matchedVendors[0].id);            
+                    steps[i] = await payablesCalc({task: tasks[taskIndex], project, step: steps[i]._doc});
+                    tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+steps[i].finance.Price.payables).toFixed(2);
+                }
             }
         }
         return { steps, tasks };

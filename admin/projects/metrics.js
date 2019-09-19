@@ -26,7 +26,7 @@ async function getProjectWithUpdatedFinance(project) {
     let { tasks, steps } = projectToUpdate;
     try {
         for(let step of steps) {
-            if(!step.finance.Price.receivables) {
+            if(!step.finance.Price.receivables && step.serviceStep.calculationUnit === 'Words') {
                 let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
                 const receivables = step.finance.Price.receivables ? {rate: step.clientRate, cost: +step.finance.Price.receivables}
                 : await receivablesCalc({task: tasks[taskIndex], project: projectToUpdate, step});

@@ -56,23 +56,24 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            setProjectProp: "setProjectProp",
-            setProjectStatus: "setProjectStatus",
-            storeProject: "setCurrentProject",
-            vendorsSetting: "vendorsSetting",
-            alertToggle: 'alertToggle',
-            removeStepVendor: 'removeStepVendor',
-            setStepVendor: 'setStepVendor',
-            setStepDate: 'setStepDate',
-            updateCurrentProject: "updateCurrentProject",
-            sendClientQuote: "sendClientQuote",
-            sendProjectDetails: "sendProjectDetails"
-        }),
+        ...mapActions([
+            "setProjectProp",
+            "setProjectStatus",
+            "setCurrentProject",
+            "vendorsSetting",
+            "alertToggle",
+            "removeStepVendor",
+            "setStepVendor",
+            "setStepDate",
+            "updateProgress",
+            "updateCurrentProject",
+            "sendClientQuote",
+            "sendProjectDetails"
+        ]),
         async toggleProjectOption({key}) {
             try {
                 const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
-                await this.storeProject(result.body);
+                await this.setCurrentProject(result.body);
             } catch(err) {
                 this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
             }
@@ -114,23 +115,28 @@ export default {
             const payables = receivables - repetitions;
             return { receivables, payables };
         },
-        async updateProgress() {
+        async updateProjectProgress() {
+            const projectId = this.currentProject._id;
+            const nonWordcountTasks = this.currentProject.tasks.filter(item => item.service.calculationUnit !== 'Words');
+            const wordcountTasks = this.currentProject.tasks.filter(item => item.service.calculationUnit === 'Words');
             try {
-                const updatedData = await this.$http.get(`/xtm/update-progress?projectId=${this.currentProject._id}`);
-                await this.storeProject(updatedData.body);
+                if(nonWordcountTasks.length) {
+                    await this.updateProgress({projectId, isCatTool: false});
+                }
+                if(wordcountTasks.length) {
+                    await this.updateProgress({projectId, isCatTool: true});
+                }
                 this.alertToggle({message: "Metrics are updated.", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Internal server error. Cannot update metrics.", isShow: true, type: "error"})
-            }
+            } catch(err) { }
         },
         async getMetrics() {
             try {
                 if(this.currentProject.isMetricsExist) {
-                    return await this.updateProgress();
+                    return await this.updateProjectProgress();
                 }
                 await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
                 const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
-                await this.storeProject(updatedProject.body);
+                await this.setCurrentProject(updatedProject.body);
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
@@ -204,7 +210,7 @@ export default {
             try {
                 if(!this.currentProject._id) {
                     const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
-                    await this.storeProject(curProject.body);
+                    await this.setCurrentProject(curProject.body);
                 }
             } catch(err) {
 

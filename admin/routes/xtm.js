@@ -67,11 +67,11 @@ router.get('/metrics', async (req, res) => {
     }
 })
 
-router.get('/update-progress', async (req, res) => {
-    const { projectId } = req.query;
+router.post('/update-progress', async (req, res) => {
+    const { projectId, isCatTool } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        const result = await updateProjectProgress(project);
+        const result = await updateProjectProgress(project, isCatTool);
         res.send(result);
     } catch(err) {
         console.log(err);

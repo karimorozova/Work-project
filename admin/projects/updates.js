@@ -14,14 +14,14 @@ async function changeProjectProp(projectId, property) {
     return await updateProject({"_id": projectId}, {...changedProject});
 }
 
-async function updateProjectProgress(project) {
+async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
-            if(task.service.calculationUnit === 'Words') {
+            if(task.service.calculationUnit === 'Words' && isCatTool) {
                 const { progress } = await getTaskProgress(task);
                 steps = updateWordcountStepsProgress({task, steps, progress});
-            } else {
+            } else if(!isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
             task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
