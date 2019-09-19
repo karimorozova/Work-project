@@ -1,4 +1,5 @@
 const { payablesCalc } = require('../сalculations/wordcount');
+const { getVendorRate } = require('../сalculations/general');
 const { stepVendorsRequestSending, stepReassignedNotification } = require('../utils');
 
 async function reassignVendor(project, reassignData) {
@@ -48,7 +49,7 @@ async function getNewStep({step, vendor, isStart, progress, project, task}) {
             vendorsClickedOffer: [],
             isVendorRead: false,
         };
-        const stepWithPaybles = await payablesCalc({task, project, step: newStep});
+        const stepWithPaybles = await getStepPayables({task, step: newStep, project})
         if(!isStart && progress > 0) {
             return updateFinanceForNewStep(stepWithPaybles, progress);
         }
@@ -56,6 +57,29 @@ async function getNewStep({step, vendor, isStart, progress, project, task}) {
     } catch(err) {
         console.log(err);
         console.log("Error in getNewStep");
+    }
+}
+
+async function getStepPayables({task, step, project}) {
+    const unit = step.serviceStep.calculationUnit;
+    try {
+        if(unit === 'Words') {
+            return await payablesCalc({task, project, step: newStep});
+        } else {
+            const ratesProp = unit === 'Packages' ? 'monoRates' : 'hoursRates';
+            const { payables, vendorRate } = getVendorRate({
+                ...step, ratesProp, industryId: project.industry.id, step: step.serviceStep
+            })
+            const Price = { ...step.finance.Price, payables };
+            return {
+                ...step, 
+                finance: {...step.finance, Price}, 
+                vendorRate
+            }
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getStepPayables");
     }
 }
 

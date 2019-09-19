@@ -25,7 +25,7 @@ function isAnotherPartEqual(packageSize, source, item) {
 
 function getVendorRate({vendor, ratesProp, packageSize, source, target, industryId, step, multiplier}) {
     const ratePair = vendor[ratesProp].find(item => {
-        return item.target.symbol === target.symbol && item.source.symbol === source.symbol
+        return item.target.symbol === target.symbol && isAnotherPartEqual(packageSize, source, item)
         && hasActiveRateValue({step, pair: item, stepIndustry: industryId})
     })
     let { min, value } = ratePair ? ratePair.rates[step._id] : {min: 0, value: 0};
@@ -34,4 +34,23 @@ function getVendorRate({vendor, ratesProp, packageSize, source, target, industry
     return {vendor, vendorRate: ratePair ? ratePair.rates[step._id] : "", payables};
 }
 
-module.exports = { hasActiveRateValue, isVendorMatches, getVendorRate }
+function getUpdatedSteps({steps, payables, vendorRate, step}) {
+    return steps.map(item => {
+        if(item.stepId === step.stepId) {
+            item.finance.Price.payables = payables;
+            item.vendorRate = vendorRate;
+        }
+        return item;
+    })
+}
+
+function getUpdatedTasks({tasks, payables, step}) {
+    return tasks.map(item => {
+        if(item.taskId === step.taskId) {
+            item.finance.Price.payables = payables;
+        }
+        return item;
+    })
+}
+
+module.exports = { hasActiveRateValue, isVendorMatches, getVendorRate, getUpdatedSteps, getUpdatedTasks }

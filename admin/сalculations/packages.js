@@ -1,6 +1,6 @@
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
-const { hasActiveRateValue, getVendorRate, isVendorMatches } = require('./general');
+const { hasActiveRateValue, getVendorRate, isVendorMatches, getUpdatedSteps, getUpdatedTasks } = require('./general');
 const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 
 async function getFinanceDataForPackages({project, service, packageSize, target}) {
@@ -58,34 +58,20 @@ async function getAfterPackagesPayablesUpdated({project, step}) {
     try {
         const vendor = await getVendor({"_id": step.vendor._id});
         const { vendorRate, payables } = getVendorRate({
-            vendor, packageSize: step.packageSize, ratesProp: 'monoRates', target: {symbol: step.target}, industryId: project.industry.id, step
+            vendor, 
+            packageSize: step.packageSize, 
+            ratesProp: 'monoRates', 
+            target: {symbol: step.targetLanguage}, 
+            industryId: project.industry.id, 
+            step: step.serviceStep
         });
-        const updatedSteps = getUpdatesSteps({steps, payables, vendorRate, step});
-        const updatedTasks = getUpdatesTasks({tasks, payables, step});
+        const updatedSteps = getUpdatedSteps({steps, payables, vendorRate, step});
+        const updatedTasks = getUpdatedTasks({tasks, payables, step});
         return await getProjectAfterFinanceUpdated({project, tasks: updatedTasks, steps: updatedSteps})
     } catch(err) {
         console.log(err);
         console.log('Error in getAfterPackagesPayablesUpdated');
     }
-}
-
-function getUpdatesSteps({steps, payables, vendorRate, step}) {
-    return steps.map(item => {
-        if(item.stepId === step.stepId) {
-            item.finance.Price.payables = payables;
-            item.vendorRate = vendorRate;
-        }
-        return item;
-    })
-}
-
-function getUpdatesTasks({tasks, payables, step}) {
-    return tasks.map(item => {
-        if(item.taskId === step.taskId) {
-            item.finance.Price.payables = payables;
-        }
-        return item;
-    })
 }
 
 module.exports = { getFinanceDataForPackages, getAfterPackagesPayablesUpdated }

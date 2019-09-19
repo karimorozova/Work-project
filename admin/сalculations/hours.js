@@ -1,6 +1,7 @@
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
-const { hasActiveRateValue, isVendorMatches, getVendorRate } = require('./general');
+const { hasActiveRateValue, isVendorMatches, getVendorRate, getUpdatedSteps, getUpdatedTasks } = require('./general');
+const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 
 async function getHoursStepFinanceData({task, serviceStep, project, multiplier}) {
     const industryId = project.industry.id;
@@ -17,6 +18,27 @@ async function getHoursStepFinanceData({task, serviceStep, project, multiplier})
     } catch(err) {
         console.log(err);
         console.log("Error in getHoursStepFinanceData");
+    }
+}
+
+async function getAfterHoursPayablesUpdated({project, step}) {
+    let {tasks, steps} = project;
+    try {
+        const vendor = await getVendor({"_id": step.vendor._id});
+        const { vendorRate, payables } = getVendorRate({
+            vendor, 
+            source: {symbol: step.sourceLanguage}, 
+            ratesProp: 'hoursRates', 
+            target: {symbol: step.targetLanguage}, 
+            industryId: project.industry.id, 
+            step: step.serviceStep
+        });
+        const updatedSteps = getUpdatedSteps({steps, payables, vendorRate, step});
+        const updatedTasks = getUpdatedTasks({tasks, payables, step});
+        return await getProjectAfterFinanceUpdated({project, tasks: updatedTasks, steps: updatedSteps})
+    } catch(err) {
+        console.log(err);
+        console.log('Error in getAfterPackagesPayablesUpdated');
     }
 }
 
@@ -57,4 +79,4 @@ async function getVendorWithPayables({source, target, step, industryId, multipli
     }
 }
 
-module.exports = { getHoursStepFinanceData }
+module.exports = { getHoursStepFinanceData, getAfterHoursPayablesUpdated }
