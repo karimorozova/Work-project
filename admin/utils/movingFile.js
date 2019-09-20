@@ -19,8 +19,8 @@ const moveProjectFile = (oldFile, newPath) => {
               console.log("Error from Move File: " + err);
               reject(err);
             }
-          });
-        resolve(newPath);
+            resolve(newPath);
+        });
     })
 } 
 

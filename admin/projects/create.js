@@ -5,6 +5,7 @@ const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi"
 const { getFinanceDataForPackages } = require("../сalculations/packages");
 const { getHoursStepFinanceData } = require("../сalculations/hours"); 
 const moment = require("moment");
+const fs = require("fs");
 
 async function createProject(project) {
     let todayStart = new Date();
@@ -17,6 +18,7 @@ async function createProject(project) {
         project.status = project.status || "Draft";
         project.projectId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
         const createdProject = await Projects.create(project);
+        await createProjectFolder(createdProject.id);
         return await getProject({"_id": createdProject.id});
     } catch(err) {
         console.log(err);
@@ -142,8 +144,9 @@ function getHoursTaskWithFinance(task, steps) {
 function getTasksForHours(tasksInfo) {
     const { projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
     let tasks = [];
+    let tasksLength = tasksInfo.project.tasks.length + 1;
     for(let i = 0; i < targets.length; i++) {
-        const idNumber = i+1 < 10 ? `T0${i+1}` : `T${i+1}`; 
+        const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
         const taskId = projectId + ` ${idNumber}`;
         tasks.push({
             taskId,
@@ -156,6 +159,7 @@ function getTasksForHours(tasksInfo) {
             deadline: stepsDates[stepsDates.length-1].deadline,
             status: 'Created'
         })
+        tasksLength++;
     }
     return tasks;
 }
@@ -237,8 +241,9 @@ async function createTasksWithPackagesUnit(allInfo) {
 function getTasksForPackages(tasksInfo) {
     const { projectId, service, targets, packageSize, quantity, stepsDates, taskRefFiles, finance } = tasksInfo;
     let tasks = [];
+    let tasksLength = tasksInfo.project.tasks.length + 1;
     for(let i = 0; i < quantity; i++) {
-        const idNumber = i+1 < 10 ? `T0${i+1}` : `T${i+1}`; 
+        const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
         const taskId = projectId + ` ${idNumber}`;
         tasks.push({
             taskId,
@@ -252,6 +257,7 @@ function getTasksForPackages(tasksInfo) {
             finance,
             status: 'Created'
         })
+        tasksLength++;
     }
     return tasks;
 }
@@ -279,6 +285,14 @@ function getStepsForPackages({tasks, vendor, vendorRate, clientRate}) {
 
 /// Creating tasks for packages unit services end ///
 
+function createProjectFolder(projectId) {
+    return new Promise((resolve, reject) => {
+        fs.mkdir(`./dist/projectFiles/${projectId}`, (err) => {
+            if(err) reject(err);
+            resolve('ok');
+        })
+    })
+}
 
 function getProjectFinance(tasks, projectFinance) {
     const currentReceivables = projectFinance.Price.receivables || 0;
