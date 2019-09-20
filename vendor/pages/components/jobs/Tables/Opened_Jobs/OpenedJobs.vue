@@ -6,7 +6,8 @@
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
-      bodyClass="tbody_height-200"
+      :bodyClass="jobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
+      :tableHeadRowClass="jobs.length < 7 ? 'tbody_visible-overflow' : ''"
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )
@@ -31,8 +32,7 @@
       template(slot="projectName" slot-scope="{ row, index }")
         .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
-        .jobs__data(v-if="row.name === 'translate1'") Translation
-        .jobs__data(v-else) Proofing
+        .jobs__data {{ row.name }}
       template(slot="status" slot-scope="{ row, index }")
         .jobs__data {{ row.status }}
       template(slot="progress" slot-scope="{ row, index }")
@@ -117,7 +117,7 @@
         return this.progress(row.progress) >= 100 && row.status === "Started";
       },
       progress(prog) {
-        return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
+        return prog.wordsTotal ? ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2) : prog;
       },
       showModal(index) {
         this.$emit("showModal", { index });

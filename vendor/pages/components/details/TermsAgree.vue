@@ -29,9 +29,8 @@ export default {
         isReadonly() {
             const statuses = ["Started", "Approved", "In progress"];
             if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed") return true;
-            if(this.job.serviceStep.symbol !== "translation" && this.job.status !== "Started") {
-                const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
-                return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
+            if(this.job.prevStep && this.job.status !== "Started") {
+                return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
             }
             if(this.job.status !== "Started") {
                 return this.job.status !== "Accepted" && this.job.status !== "Ready to Start";

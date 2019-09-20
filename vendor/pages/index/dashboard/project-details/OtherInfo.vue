@@ -7,7 +7,7 @@
             .other__info__item
                 LabelValue(title="Project Manager" :value="fullManagerName" customClass="pair_column-flex")
         .other-info__item
-            LabelValue(title="Job Type" :value="jobType" customClass="pair_column-flex")
+            LabelValue(title="Job Type" :value="job.name" customClass="pair_column-flex")
         .other-info__item
             LabelValue(v-if="job.industry" title="Industry" :value="job.industry.name" customClass="pair_column-flex")
         .other-info__item

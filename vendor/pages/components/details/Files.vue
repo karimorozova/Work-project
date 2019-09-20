@@ -4,7 +4,8 @@
         DataTable(
             :fields="fields"
             :tableData="jobFiles"
-            bodyClass="table_no-body-bottom-margin"
+            :bodyClass="jobFiles.length < 7 ? 'table_no-body-bottom-margin tbody_visible-overflow' : 'table_no-body-bottom-margin'"
+            :tableHeadRowClass="jobFiles.length < 7 ? 'tbody_visible-overflow' : ''"
         )
             template(slot="headerFileName" slot-scope="{ field }")
                 span.job-files__label {{ field.label }}

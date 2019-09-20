@@ -38,12 +38,12 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            getJobs: "getJobs",
-            selectJob: "selectJob",
-            alertToggle: "alertToggle",
-            setJobStatus: "setJobStatus"
-        }),
+        ...mapActions([
+            "getJobs",
+            "selectJob",
+            "alertToggle",
+            "setJobStatus"
+        ]),
         closeModal() {
             this.isApproveModal = false;            
         },
@@ -69,7 +69,8 @@ export default {
                     await this.getJobInfo();
                 }
                 if(this.job.status !== "Started") return;
-                await this.$axios.get(`/xtm/update-progress?projectId=${this.job.project_Id}`);
+                const isCatTool = this.job.serviceStep.calculationUnit === 'Words';
+                await this.$axios.post('/xtm/update-progress', {projectId: this.job.project_Id, isCatTool});
                 await this.getJobs();
                 this.setCurrentJob();
                 this.alertToggle({message: "Progress updated", isShow: true, type: "success"});
@@ -100,11 +101,10 @@ export default {
             return "Start"
         },
         isForbidden() {
-            if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.name !== "translate1") {
-                const prevStepProgress = this.job.prevStepProgress.wordsDone / this.job.prevStepProgress.wordsTotal * 100;
-                return prevStepProgress < 100 || this.job.prevStepStatus !== "Completed";
+            if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.prevStep) {
+                return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
             }
-            if(this.job.name === "translate1" && this.statuses.indexOf(this.job.projectStatus) !== -1) {
+            if(!this.job.prevStep && this.statuses.indexOf(this.job.projectStatus) !== -1) {
                 return true;
             } 
             return false;

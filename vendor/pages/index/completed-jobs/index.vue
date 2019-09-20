@@ -20,7 +20,8 @@
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
-            bodyClass="tbody_height-200"
+            :bodyClass="completedJobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
+            :tableHeadRowClass="completedJobs.length < 7 ? 'tbody_visible-overflow' : ''"
             @closeErrors="closeErrors"
             @onRowClicked="chooseJob"
           )

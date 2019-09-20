@@ -6,7 +6,8 @@
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
-      bodyClass="tbody_height-200"
+      :bodyClass="jobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
+      :tableHeadRowClass="jobs.length < 7 ? 'tbody_visible-overflow' : ''"
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )

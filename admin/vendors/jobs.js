@@ -17,13 +17,14 @@ async function getJobs(id) {
 }
 
 function getSteps(project, id) {
+    try {
     const { steps, tasks } = project;
     let assignedSteps = [];
     let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id);
     for(let step of filteredSteps) {
         if(step.name !== 'invalid') {
             const stepTask = tasks.find(item => item.taskId === step.taskId);
-            const prevStep = step.name !== 'translate1' ? steps.find(item => item.name === "translate1" && item.taskId === step.taskId) : "";
+            const prevStep = getPrevStepData(stepTask, steps, step);
             assignedSteps.push({...step._doc,
                 project_Id: project._id,
                 projectId: project.projectId, 
@@ -35,12 +36,29 @@ function getSteps(project, id) {
                 xtmJobIds: stepTask.xtmJobs,
                 sourceFiles: stepTask.sourceFiles,
                 refFiles: stepTask.refFiles,
-                prevStepProgress: prevStep ? prevStep.progress : "",
-                prevStepStatus: prevStep ? prevStep.status : ""
+                prevStep
             });
         }
     }
     return assignedSteps;
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+function getPrevStepData(stepTask, steps, step) {
+    const sameSteps = steps.filter(item => item.taskId === stepTask.taskId && item.stepId !== step.stepId);
+    const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1');
+    if(!sameSteps.length || stage1.step.title === step.serviceStep.title) {
+        return false;
+    }
+    const prevStep = sameSteps.find(item => item.serviceStep.title === stage1.step.title);
+    const i = 0;
+    const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone/prevStep.progress.wordsTotal*100).toFixed(2) : prevStep.progress;
+    return {
+        status: prevStep.status,
+        progress: prevProgress
+    }
 }
 
 async function updateStepProp({jobId, prop, value}) {
