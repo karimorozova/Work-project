@@ -235,11 +235,20 @@ function updateWithApprovedTasks({taskIds, project}) {
     })
     const steps = project.steps.map(step => {
         if(step.status === 'Accepted' && taskIds.indexOf(step.taskId) !== -1) {
-            step.status = step.catName === 'translate1' ? 'Ready to Start' : 'Waiting to Start';
+            const stepTask = tasks.find(item => item.taskId === step.taskId);
+            step.status = getApprovedStepStatus(stepTask, step);
         }
         return step;
     })
     return { tasks, steps }
+}
+
+function getApprovedStepStatus(stepTask, step) {
+    const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1');
+    if(stage1.step.title === step.serviceStep.title) {
+        return 'Ready to Start';
+    }
+    return 'Waiting to Start';
 }
 
 function getProjectNewStatus(changedTasks, status) {
