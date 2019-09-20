@@ -1,13 +1,5 @@
 <template lang="pug">
 .project
-    //- .project__project-template(v-if="!project.projectId")
-    //-     SelectSingle(
-    //-         :selectedOption="project.template"
-    //-         :options="templates"
-    //-         placeholder="Project Template"
-    //-         refersTo="template"
-    //-         @chooseOption="setValue"
-    //-     )
     .project__all-info
         .project__info-row
             input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
@@ -36,7 +28,8 @@
                         )
             .project__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
-                    .project__drop-menu
+                    .project__selected-industry(v-if="project.tasks && project.tasks.length") {{ project.industry.name }}
+                    .project__drop-menu(v-else)
                         SelectSingle(
                             :selectedOption="selectedIndustry.name || project.industry.name"
                             :options="industriesList"
@@ -81,11 +74,6 @@ export default {
     },
     data() {
         return {
-            templates: [
-                "template 1",
-                "template 2",
-                "template 3",
-            ],
             selectedIndustry: "",
             industries: [],
             disabled: {
