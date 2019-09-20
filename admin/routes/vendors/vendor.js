@@ -5,6 +5,7 @@ const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldPhoto, getJobs, updateStepProp } = require('../../vendors');
 const { upload } = require('../../utils');
+const { setVendorNewPassword } = require('../../users');
 
 router.post("/login", async (req, res, next) => {
     if (req.body.logemail) {
@@ -28,6 +29,21 @@ router.post("/login", async (req, res, next) => {
         let err = new Error('All fields required.');
         err.status = 400;
         res.status(400).send("All fields required.");
+    }
+})
+
+router.post("/reset-pass", async (req, res) => {
+    const { email } = req.body;
+    try {
+        const vendor = await Vendors.findOne({"email": email});
+        if(!vendor) {
+            return res.status(400).send("No such user"); 
+        }
+        await setVendorNewPassword(vendor, email);
+        res.send("new password sent");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Server error. Try again later.");
     }
 })
 

@@ -1,5 +1,4 @@
 const { getMessageWithRandomPassword, sendEmail } = require('../utils');
-const { Clients } = require('../models');
 const passwordGen = require('generate-password');
 const bcrypt = require('bcryptjs');
 
@@ -35,4 +34,16 @@ async function setClientsContactNewPassword(client, email) {
     }
 }
 
-module.exports = { setNewPassword, setClientsContactNewPassword }
+async function setVendorNewPassword(vendor, email) {
+    const { password, message } = getMessageWithNewPassword();
+    try {
+        vendor.password = password;
+        await vendor.save();
+        await sendEmail({to: email, subject: "New password for user"}, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setVendorNewPassword");
+    }
+}
+
+module.exports = { setNewPassword, setClientsContactNewPassword, setVendorNewPassword }

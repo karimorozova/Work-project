@@ -46,7 +46,7 @@ router.post("/reset-pass", async (req, res) => {
             return res.status(400).send("No such user"); 
         }
         await setClientsContactNewPassword(client, email);
-        return res.send("new password sent");
+        res.send("new password sent");
     } catch(err) {
         console.log(err);
         res.status(500).send("Server error. Try again later.");
