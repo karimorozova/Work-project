@@ -13,7 +13,7 @@
                 slot
     .tasks-steps__tables
         Tasks(v-if="currentProject.tasks.length && isTasksShow"
-            :allTasks="currentProject.tasks"
+            :allTasks="this.currentProject.tasks"
             @showTab="showTab"
         )
         Steps(v-if="currentProject.steps.length && isStepsShow"

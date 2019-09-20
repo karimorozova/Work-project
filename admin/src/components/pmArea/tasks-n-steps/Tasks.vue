@@ -25,7 +25,7 @@
             @onRowClicked="onRowClicked"
         )
             template(slot="headerCheck" slot-scope="{ field }")
-                input.tasks__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
+                CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
             template(slot="headerTaskid" slot-scope="{ field }")
                 span.tasks__label {{ field.label }}
             template(slot="headerLanguage" slot-scope="{ field }")
@@ -46,8 +46,8 @@
                 span.tasks__label {{ field.label }}
             template(slot="headerDelivery" slot-scope="{ field }")
                 span.tasks__label {{ field.label }}
-            template(slot="check" slot-scope="{ row }")
-                input.tasks__task-data(type="checkbox" v-model="row.check")
+            template(slot="check" slot-scope="{ row, index }")
+                CheckBox(:isChecked="row.isChecked" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
             template(slot="taskId" slot-scope="{ row }")
                 span.tasks__task-data {{ row.taskId }}
             template(slot="language" slot-scope="{ row }")
@@ -93,6 +93,7 @@ import DataTable from "../../DataTable";
 import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
 import SelectSingle from "../../SelectSingle";
+import CheckBox from "@/components/CheckBox";
 const ApproveModal = () => import("../../ApproveModal");
 const DeliveryReview = () => import("./DeliveryReview");
 import moment from "moment";
@@ -107,8 +108,8 @@ export default {
     data() {
         return {
             fields: [
-                {label: "check", headerKey: "headerCheck", key: "check", width: "4%"},
-                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "13%"},
+                {label: "check", headerKey: "headerCheck", key: "check", width: "3%"},
+                {label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "14%"},
                 {label: "Language", headerKey: "headerLanguage", key: "language", width: "12%"},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
@@ -121,7 +122,6 @@ export default {
             ],
             selectedAction: "",
             tabs: ['Tasks', 'Steps'],
-            isAllSelected: false,
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             isDeliveryReview: false,
@@ -151,17 +151,17 @@ export default {
         },
         deliveryReviewAction() {
             const validStatuses = ["Pending Approval", "Cancelled Halfway"];
-            const checkedTasks = this.allTasks.filter(item => item.check && validStatuses.indexOf(item.status) !== -1);
+            const checkedTasks = this.allTasks.filter(item => item.isChecked && validStatuses.indexOf(item.status) !== -1);
             if(checkedTasks.length) {
                 this.reviewTasks = checkedTasks;
                 this.isDeliveryReview = true;
             }
             this.selectedAction = "";
-            this.unCheckAllTAsks();
+            this.unCheckAllTasks();
         },
-        unCheckAllTAsks() {
+        unCheckAllTasks() {
             const unchecked = this.allTasks.map(item => {
-                item.check = false;
+                item.isChecked = false;
                 return item;
             })
             this.storeProject({...this.currentProject, tasks: unchecked});
@@ -170,7 +170,7 @@ export default {
             this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
         },
         async approveAction() {
-            const checkedTasks = this.allTasks.filter(item => item.check);
+            const checkedTasks = this.allTasks.filter(item => item.isChecked);
             if(!checkedTasks.length) {
                 return this.closeApproveModal();
             }
@@ -193,12 +193,12 @@ export default {
                 this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
             } finally {
                 this.closeApproveModal();
-                this.unCheckAllTAsks();
+                this.unCheckAllTasks();
             }
         },
         notApproveAction() {
             this.closeApproveModal();
-            this.unCheckAllTAsks();
+            this.unCheckAllTasks();
         },
         async cancelTasks(tasks) {
             const validStatuses = ["Created", "Started", "Approved"];
@@ -241,12 +241,16 @@ export default {
                     return init + cur.progress/taskSteps.length;
                 }, 0))
         },
-        async selectAll() {
-            let tasks = [];
-            for(const task of this.allTasks) {
-                tasks.push({...task, check: this.isAllSelected})
-            }
-            await this.setProjectProp({value: tasks, prop: 'tasks'});
+        toggleCheck(e, index, val) {
+            this.allTasks[index].isChecked = val;
+            this.setProjectProp({value: this.allTasks, prop: 'tasks'});
+        },
+        toggleAll(e, val) {
+            const tasks = this.allTasks.reduce((acc, cur) => {
+                acc.push({...cur, isChecked: val});
+                return acc;
+            }, []);
+            this.setProjectProp({value: tasks, prop: 'tasks'});
         },
         closeApproveModal() {
             this.isApproveActionShow = false;
@@ -302,16 +306,21 @@ export default {
                 }
             }
             return result;
+        },
+        isAllSelected() {
+            const unchecked = this.currentProject.tasks.find(item => !item.isChecked);
+            return !unchecked;
         }
     },
     components: {
         DataTable,
         ProgressLine,
+        CheckBox,
         SelectSingle,
         ApproveModal,
         DeliveryReview,
         Tabs
-    }    
+    }
 }
 </script>
 

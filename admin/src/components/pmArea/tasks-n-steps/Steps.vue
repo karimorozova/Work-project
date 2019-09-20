@@ -26,7 +26,7 @@
             bodyRowClass="steps-table-row"
         )
             template(slot="headerCheck" slot-scope="{ field }")
-                input.steps__check(type="checkbox" v-model="isAllSelected" @change="selectAll")
+                CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
             template(slot="headerName" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="headerLanguage" slot-scope="{ field }")
@@ -48,7 +48,7 @@
             template(slot="headerMargin" slot-scope="{ field }")
                 span.steps__label {{ field.label }}
             template(slot="check" slot-scope="{ row, index }")
-                input.steps__step-data(type="checkbox" v-model="row.check")
+                CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
                 .steps__info-icon(@click="showStepDetails(index)")
                     i.fa.fa-info-circle
             template(slot="name" slot-scope="{ row }")
@@ -131,6 +131,7 @@
 <script>
 import DataTable from "../../DataTable";
 import ProgressLine from "../../ProgressLine";
+import CheckBox from "@/components/CheckBox";
 import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
 import ApproveModal from "../../ApproveModal";
@@ -177,7 +178,6 @@ export default {
                 {label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%"},
             ],
             selectedVendors: [],
-            isAllSelected: false,
             actions: ["Mark as accept/reject" ,"Request confirmation"],
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
@@ -346,20 +346,24 @@ export default {
             if(!filteredSteps.length) return;
             try {
                 const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
-                await this.storeProject(result.body);
+                await this.setCurrentProject(result.body);
                 this.alertToggle({message: "Requests has been sent.", isShow: true, type: 'success'})
             } catch(err) {
                 this.alertToggle({message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error'});
             }
         },
         progress(prog) {
-            return ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2);
+            return prog.wordsTotal ? ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2) : prog;
         },
-        selectAll() {
-            const steps = this.allSteps.map(item => {
-                item.check = this.isAllSelected;
-                return item;
-            }) 
+        toggleCheck(e, index, val) {
+            this.allSteps[index].check = val;
+            this.setProjectProp({value: this.allSteps, prop: 'steps'});
+        },
+        toggleAll(e, val) {
+            const steps = this.allSteps.reduce((acc, cur) => {
+                acc.push({...cur, check: val});
+                return acc;
+            }, []);
             this.setProjectProp({value: steps, prop: 'steps'});
         },
         vendorName(vendor) {
@@ -369,14 +373,14 @@ export default {
         changeDate(e, prop, index) {
             this.$emit('setDate', {date: new Date(e), prop, index});
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            setProjectProp: "setProjectProp",
-            storeProject: "setCurrentProject",
-            setStepsStatus: "setStepsStatus",
-            setProjectStatus: "setProjectStatus",
-            reopenSteps: "reopenSteps"
-        })
+        ...mapActions([
+            "alertToggle",
+            "setProjectProp",
+            "setCurrentProject",
+            "setStepsStatus",
+            "setProjectStatus",
+            "reopenSteps"
+        ])
     },
     computed: {
         ...mapGetters({
@@ -398,6 +402,10 @@ export default {
                 result = ["No action available"];
             }
             return result;
+        },
+        isAllSelected() {
+            const unchecked = this.currentProject.steps.find(item => !item.check);
+            return !unchecked;
         }
     },
     components: {
@@ -405,6 +413,7 @@ export default {
         ProgressLine,
         PersonSelect,
         SelectSingle,
+        CheckBox,
         Datepicker,
         StepInfo,
         Reassignment,

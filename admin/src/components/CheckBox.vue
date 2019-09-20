@@ -43,4 +43,12 @@ export default {
     }
 }
 
+.tasks-n-steps {
+    text-align: center;
+    height: 14px;
+    .checkbox__image {
+        width: 14px;
+    }
+}
+
 </style>

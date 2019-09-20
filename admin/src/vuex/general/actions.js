@@ -22,10 +22,10 @@ export const getServices = async ({ commit, dispatch }) => {
     const allServices = result.body;
     allServices.sort((a, b) => {return a.sortIndex - b.sortIndex});
     dispatch('servicesGetting', allServices);
-    commit('endRequest');
   } catch(err) {
-      commit('endRequest');
       dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+  } finally {
+    commit('endRequest');
   }
 }
 export const setProjectStatus = async ({commit, state}, payload) => {
@@ -35,11 +35,11 @@ export const setProjectStatus = async ({commit, state}, payload) => {
     const id = state.currentProject._id;
     const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status });
     await commit('storeCurrentProject', updatedProject.body);
-    commit('endRequest');
   } catch(err) {
-    commit('endRequest');
-    throw new Error(err.body);
-  }
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+  } finally {
+        commit('endRequest');
+  } 
 }
 export const setStepsStatus = async ({ commit, state }, payload) => {
   commit('startRequest')
@@ -51,149 +51,149 @@ export const setStepsStatus = async ({ commit, state }, payload) => {
       const updatedProject = await Vue.http.post('/pm-manage/step-status', { id, status, steps: filteredSteps });
       await commit('storeCurrentProject', updatedProject.body);
     }
-    commit('endRequest');
   } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+  } finally {
+        commit('endRequest');
   }
 }
 export const setStepVendor = async ({ commit, state }, payload) => {
-  commit('startRequest')
-  try {
-    const { vendor, index } = payload;
-    let step = state.currentProject.steps[index];
-    const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor}, index});
-    await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
-    await commit('storeCurrentProject', updatedProject.body);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
-};
+    commit('startRequest')
+    try {
+        const { vendor, index } = payload;
+        let step = state.currentProject.steps[index];
+        const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor}, index});
+        await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
+        await commit('storeCurrentProject', updatedProject.body);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
 
 export const updateCurrentProject = async ({ commit, state }, payload) => {
-  commit('startRequest')
-  try {
-    const updatedProject = await Vue.http.post('/xtm/update-project', {...payload});
-    const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
-    state.projects[index] = updatedProject.data;
-    await commit('storeCurrentProject', updatedProject.data);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    commit('alertingMessage', {message: err.message, isShow: true, type: "error"});
-  }
+    commit('startRequest')
+    try {
+        const updatedProject = await Vue.http.post('/xtm/update-project', {...payload});
+        const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
+        state.projects[index] = updatedProject.data;
+        await commit('storeCurrentProject', updatedProject.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
 
 export const updateMatrix = async ({ commit }, payload) => {
-  commit('startRequest')
-  commit('updateMatrixData', payload);
-  try {
-    const updatedProject = await Vue.http.post('/xtm/update-matrix', {...payload});
-    await commit('storeCurrentProject', updatedProject.data);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
+    commit('startRequest')
+    commit('updateMatrixData', payload);
+    try {
+        const updatedProject = await Vue.http.post('/xtm/update-matrix', {...payload});
+        await commit('storeCurrentProject', updatedProject.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
 
 export const updateReport = async ({ commit }, payload) => {
-  commit('startRequest');
-  try {
-    const { id, notes, isWorkingDay } = payload;
-    await Vue.http.post('/zoho/report', { id, notes, isWorkingDay });
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
+    commit('startRequest');
+    try {
+        const { id, notes, isWorkingDay } = payload;
+        await Vue.http.post('/zoho/report', { id, notes, isWorkingDay });
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
 
 export const sendClientQuote = async ({commit, state}, payload) => {
-  commit('startRequest');
-  try { 
-    const { message } = payload;
-    const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message});
-    await commit('storeCurrentProject', updatedProject.data);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
+    commit('startRequest');
+    try { 
+        const { message } = payload;
+        const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message});
+        await commit('storeCurrentProject', updatedProject.data);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
 
 export const sendProjectDetails = async ({commit, state}, payload) => {
-  commit('startRequest');
-  try { 
-    const { message } = payload;
-    await Vue.http.post('/pm-manage/project-details', {id: state.currentProject._id, message});
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.message);
-  }
+    commit('startRequest');
+    try { 
+        const { message } = payload;
+        await Vue.http.post('/pm-manage/project-details', {id: state.currentProject._id, message});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 } 
 
 export const saveUser = async ({ commit }, payload) => {
-  commit('startRequest');
-  try {
-    await Vue.http.post('/user', payload);
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.body);
-  }
+    commit('startRequest');
+    try {
+        await Vue.http.post('/user', payload);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
 
 export const removeUser = async ({ commit, dispatch }, payload) => {
-  commit('startRequest');
-  try {
-    const result = await Vue.http.delete(`/user/${payload}`, {body: {token: localStorage.getItem("token")}});
-    if(result.body === "logout") {
-      dispatch("logout");
+    commit('startRequest');
+    try {
+        const result = await Vue.http.delete(`/user/${payload}`, {body: {token: localStorage.getItem("token")}});
+        if(result.body === "logout") {
+            dispatch("logout");
+        }
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
     }
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err.body);
-  }
 }
 
 export const alertToggle = ({ commit }, payload) => {
-  commit('alertingMessage', payload);
-  setTimeout(() => {
-    commit('alertingMessage', {message: "", isShow: false, type: "success"});
-  }, 5000)
+    commit('alertingMessage', payload);
+    setTimeout(() => {
+        commit('alertingMessage', {message: "", isShow: false, type: "success"});
+    }, 5000)
 }
 
 export const sendNewPassword = async ({ commit }, payload ) => {
     commit('startRequest');
     try {
         await Vue.http.post('/reset-pass', {email: payload});
-        commit('endRequest');
     } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
         commit('endRequest');
-        throw new Error(err.body);
     }
 }
 
 export const login = ({ commit, state }, payload) => {
-  commit('startRequest')
-  return new Promise(resolve => {
-    const {token, group, firstName, lastName, photo} = payload;
-    state.userGroup = group;
-    state.user = {firstName, lastName, photo}; 
-    setTimeout(() => {
-      let currentDate = Date.now();
-      let expiryTime = currentDate + 60000*120;
-      let object = {value: token, timestamp: expiryTime}
-      localStorage.setItem("token", JSON.stringify(object));
-      commit('endRequest');
-      resolve();
-    }, 1000);
-  });
+    commit('startRequest')
+    return new Promise(resolve => {
+        const {token, group, firstName, lastName, photo} = payload;
+        state.userGroup = group;
+        state.user = {firstName, lastName, photo}; 
+        setTimeout(() => {
+            let currentDate = Date.now();
+            let expiryTime = currentDate + 60000*120;
+            let object = {value: token, timestamp: expiryTime}
+            localStorage.setItem("token", JSON.stringify(object));
+            commit('endRequest');
+            resolve();
+        }, 1000);
+    });
 };
 
 export const logout = ({ commit }) => {
@@ -201,15 +201,15 @@ export const logout = ({ commit }) => {
 }
 
 export const setUser = async ({commit, state}) => {
-  commit('startRequest')
-  try {
-    const key = JSON.parse(localStorage.getItem("token"));
-    const result = await Vue.http.get(`/user?key=${key.value}`);
-    state.user = result.data;
-    state.userGroup = result.data.group;
-    commit('endRequest');
-  } catch(err) {
-    commit('endRequest');
-    throw new Error(err)
-  }
+    commit('startRequest')
+    try {
+        const key = JSON.parse(localStorage.getItem("token"));
+        const result = await Vue.http.get(`/user?key=${key.value}`);
+        state.user = result.data;
+        state.userGroup = result.data.group;
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
 }
