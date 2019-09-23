@@ -113,7 +113,7 @@ function calculateWords(metrics) {
 
 function setStepsProgress(name, progress) {
     if(!progress.jobsMetrics.length) {
-        return { wordsDone: 0, wordsToBeDone: 0, totalWordCount: 0 }
+        return { wordsDone: 0, wordsToBeDone: 0, totalWordCount: 1 }
     }
     const { jobsMetrics } = progress;
     let stepProgress = progress[name];
