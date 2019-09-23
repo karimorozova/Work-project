@@ -22,7 +22,7 @@ export default {
         box-sizing: border-box;
         border: 2px solid $light-brown;
         border-radius: 5px;
-        max-height: 125px;
+        height: 125px;
         overflow-y: auto;
     }
     &__text {

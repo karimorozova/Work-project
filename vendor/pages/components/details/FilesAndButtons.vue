@@ -30,11 +30,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            setJobStatus: "setJobStatus",
-            selectJob: "selectJob",
-            alertToggle: "alertToggle"
-        }),
+        ...mapActions([
+            "setJobStatus",
+            "selectJob",
+            "alertToggle"
+        ]),
         async startJob() {
             if(!this.job.isVendorRead) return;
             try {
