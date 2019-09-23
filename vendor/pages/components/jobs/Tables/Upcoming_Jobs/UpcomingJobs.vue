@@ -30,8 +30,7 @@
       template(slot="projectName" slot-scope="{ row, index }")
         .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
-        .jobs__data(v-if="row.name === 'translate1'") Translation
-        .jobs__data(v-else) Proofing
+        .jobs__data {{ row.name }}
       template(slot="status" slot-scope="{ row, index }")
         .jobs__data {{ row.status }}
       template(slot="deadLine" slot-scope="{ row, index }")

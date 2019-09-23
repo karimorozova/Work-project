@@ -8,7 +8,7 @@
           :deadFilter="deadFilter"
           :invoiceDateFilter="invoiceDateFilter"
           :jobTypeFilter="jobTypeFilter"
-          @setJobTypeFilter="(option) => setFilter(option, 'jobTypeFilter')"
+          @setJobTypeFilter="setJobTypeFIlter"
           @setInvoiceDateFilter="(option) => setFilter(option, 'invoiceDateFilter')"
           @requestOnFilterStartDate="requestOnFilterStartDate"
           @requestOnFilterDeadline="requestOnFilterDeadline"
@@ -42,8 +42,7 @@
             template(slot="projectName" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.projectName }}
             template(slot="type" slot-scope="{ row, index }")
-              .jobs__data(v-if="row.name === 'translate1'") Translation
-              .jobs__data(v-else) Proofing
+              .jobs__data {{ row.name }}
             template(slot="deadline" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
@@ -125,17 +124,17 @@
         this[prop] = option;
         this.filterJobs();
       },
+      setJobTypeFIlter({step}) {
+        this.jobTypeFilter = step.title || step;
+        if(step !== 'All') {
+            this.filterJobs = this.completedJobs.filter(item => item.serviceStep.symbol === step.symbol);
+        } else {
+            this.filteredJobs = this.completedJobs;    
+        }
+      },
 
       filterJobs() {
         this.filteredJobs = this.completedJobs;
-
-        if (this.jobTypeFilter && this.jobTypeFilter !== 'All' && this.jobTypeFilter !== 'QA') {
-          if (this.jobTypeFilter === 'Translation') {
-            this.filteredJobs = this.filteredJobs.filter(item => item.name === 'translate1')
-          } else if (this.jobTypeFilter === 'Proofing') {
-            this.filteredJobs = this.filteredJobs.filter(item => item.name === 'correct1')
-          }
-        }
 
         if (this.invoiceDateFilter && this.invoiceDateFilter !== 'All') {
           this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter)
@@ -177,7 +176,7 @@
       completedJobs() {
         let result = [];
         if(this.jobs.length) {
-          result = this.jobs.filter(job => job.status === "Completed" || job.status === "Cancelled Halfway");
+          result = this.jobs.filter(job => job.status === "Completed" || job.status === "Cancelled" ||job.status === "Cancelled Halfway");
         }
         return result;
       }

@@ -34,7 +34,7 @@ export default {
     computed: {
         progress() {
             if(this.job.progress) {
-                return +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2);
+                return this.job.progress.wordsTotal ? +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2): this.job.progress;
             }
         },
     },
