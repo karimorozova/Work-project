@@ -7,7 +7,7 @@
             .other__info__item
                 LabelValue(title="Project Manager" :value="fullManagerName" customClass="pair_column-flex")
         .other-info__item
-            LabelValue(title="Services" :value="getServices()" customClass="pair_column-flex")
+            LabelValue(title="Services" :value="getServices()" customClass="pair_column-flex align-centered")
         .other-info__item
             LabelValue(v-if="project.industry" title="Industry" :value="project.industry.name" customClass="pair_column-flex")
         .other-info__item
@@ -40,7 +40,7 @@ export default {
         getProjectServices() {
             let projectServices = "";
             const { tasks } = this.project;
-            const tasksServices = tasks.map(item => item.service).filter((item, index, arr) => {
+            const tasksServices = tasks.map(item => item.service._id).filter((item, index, arr) => {
                 return arr.indexOf(item) === index;
             });
             projectServices = this.allServices.reduce((init, cur) => {

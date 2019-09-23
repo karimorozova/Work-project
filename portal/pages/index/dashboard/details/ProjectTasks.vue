@@ -103,9 +103,8 @@ export default {
             let total = 0;
             const taskSteps = steps.filter(item => task.taskId === item.taskId);
             for(let step of taskSteps) {
-                if(task.taskId === step.taskId) {
-                    total+= +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2);
-                }
+                const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2) : step.progress;
+                total+= progress;
             }
             return (total/taskSteps.length).toFixed(2);
         }

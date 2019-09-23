@@ -4,7 +4,7 @@ export default {
             const unit = task.service.calculationUnit.toLowerCase();
             let ratesProp = unit === 'packages' ? 'monoRates' : `${unit}Rates`;
             const taskPair = this.getTaskPair(task, ratesProp, unit);
-            const pair = unit === 'packages' ? `${taskPair.target.lang} => ${taskPair.packageSize}` :
+            const pair = unit === 'packages' ? `${taskPair.target.lang} / ${taskPair.packageSize}` :
                 `${taskPair.source.lang} => ${taskPair.target.lang}`
             return pair;
         },

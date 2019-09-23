@@ -76,4 +76,8 @@ export default {
     }
 }
 
+.align-centered {
+    text-align: center;
+}
+
 </style>

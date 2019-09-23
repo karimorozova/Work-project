@@ -80,7 +80,8 @@ export default {
             let total = 0;
             const { steps } = this.project;
             for(let step of steps) {
-                total+= +(step.progress.wordsDone/step.progress.wordsTotal*100);
+                const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2) : step.progress;
+                total+= progress;
             }
             return +(total/steps.length).toFixed(2);
         },
