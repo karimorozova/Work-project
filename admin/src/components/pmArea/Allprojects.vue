@@ -64,7 +64,8 @@ export default {
         },
         selectProject({project}) {
             this.storeProject(project);
-            if(project.status === 'Requested') {
+            const request = this.allRequests.find(item => item._id === project._id);
+            if(request) {
                 return this.$router.push(`/request-details/${project._id}`); 
             }
             this.$router.push(`/project-details/${project._id}`);
@@ -84,7 +85,7 @@ export default {
             let result = this.projectsType !== 'requests' ? this.allProjects : this.allRequests;
             if(this.statusFilter && this.statusFilter !== 'All') {
                 result = result.filter(item => {
-                    return item.status === this.statusFilter;
+                    return this.projectsType !== 'requests' ? item.status === this.statusFilter : item;
                 })
             }
             if(this.managerFilter) {

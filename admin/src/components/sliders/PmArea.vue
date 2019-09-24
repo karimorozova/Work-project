@@ -54,7 +54,7 @@ export default {
             requests: "getAllRequests",
         }),
         sidebarLinks() {
-            const requestsCounter = this.requests.length;
+            const requestsCounter = this.requests.filter(item => item.status !== 'Cancelled').length;
             return this.links.map(item => {
                 if(item.routeName === 'requests') {
                     item.counter = requestsCounter;

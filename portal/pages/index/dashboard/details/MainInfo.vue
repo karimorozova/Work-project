@@ -79,11 +79,14 @@ export default {
         getTotalProgress() {
             let total = 0;
             const { steps } = this.project;
-            for(let step of steps) {
-                const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2) : step.progress;
-                total+= progress;
+            if(steps && steps.length) {
+                for(let step of steps) {
+                    const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2) : step.progress;
+                    total+= progress;
+                }
+                return +(total/steps.length).toFixed(2);
             }
-            return +(total/steps.length).toFixed(2);
+            return 0;
         },
         showModal() {
             this.isApproveModal = true;
@@ -94,7 +97,8 @@ export default {
         async cancelQuote() {
             this.isApproveModal = false;
             try {
-                await this.cancelCurrentQuote({id: this.project._id});
+                await this.cancelCurrentQuote({id: this.project._id, status: this.project.status});
+                this.$router.push('/dashboard');
             } catch(err) { }
         }
     },

@@ -19,7 +19,7 @@ import {
   SET_DUO_COMBINATIONS
 } from "./services";
 import { SET_ORDER_DETAILS, SET_DETAIL, REMOVE_FILE, SET_XTM_CUSTOMERS, SET_CLIENTS_XTM } from "./orders";
-import { SET_REQUEST_DETAIL } from "./requestQuote";
+import { SET_REQUEST_DETAIL, REMOVE_QUOTE } from "./requestQuote";
 
 export {
     SET_REQUEST_DETAIL,
@@ -41,6 +41,7 @@ export {
     INCREASE_REQUEST,
     DECREASE_REQUEST,
     REPLACE_QUOTE,
+    REMOVE_QUOTE,
     SET_PROJECT,
     SET_ORDER_DETAILS,
     SET_DETAIL,

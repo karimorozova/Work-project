@@ -6,7 +6,7 @@ const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
-const { createRequest, storeRequestFiles, getClientRequests } = require("../clientRequests");
+const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients } = require('../models');
 const { secretKey } = require('../configs');
@@ -59,7 +59,7 @@ router.get('/projects', checkClientContact, async (req, res) => {
         const verificationResult = jwt.verify(token, secretKey);
         const client = await getClient({"_id": verificationResult.clientId})
         const projects = await getProjects({"customer": verificationResult.clientId});
-        const requests = await getClientRequests({"customer": verificationResult.clientId});
+        const requests = await getClientRequests({"customer": verificationResult.clientId, status: {$ne: "Cancelled"}});
         const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
         res.send({client, user, projects, requests});
     } catch(err) {
@@ -268,7 +268,18 @@ router.post('/task-status', checkClientContact, async (req, res) => {
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on Project status update");
+        res.status(500).send("Error on task status update");
+    }
+})
+
+router.post('/cancel-quote', checkClientContact, async (req, res) => {
+    const { id } = req.body;
+    try {
+        const request = await updateClientRequest({"_id": id},{ status: "Cancelled" });
+        res.send(request);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on request quote status update");
     }
 })
 

@@ -33,9 +33,9 @@
                         placeholder="Template"
                         @chooseOption="setTemplate"
                     )
-    .tasks-data__add-tasks(v-if="isProject")
+    .tasks-data__add-tasks(v-if="isProject && isButton")
         Button(value="Add tasks" @clicked="checkForErrors")
-    .tasks-data__buttons(v-else)
+    .tasks-data__buttons(v-if="isRequest && isButton")
         .tasks-data__button
             Button(value="Assign to PM")
         .tasks-data__button
@@ -209,6 +209,10 @@ export default {
         },
         isProject() {
             return this.currentProject.status && this.currentProject.status !== "Requested";
+        },
+        isButton() {
+            const forbiddenStatuses = ['Cancelled', 'Cancelled Halfway', 'Closed'];
+            return forbiddenStatuses.indexOf(this.currentProject.status) === -1;
         },
         currentUnit() {
             return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
