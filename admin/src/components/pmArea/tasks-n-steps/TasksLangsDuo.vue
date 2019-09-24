@@ -154,13 +154,13 @@ export default {
                     const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
                     await this.storeProject(curProject.body);
                 }
-                if(this.isRequest) {
-                    this.setRequestLanguages();
-                }
                 const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
                 this.wordsRates = [...langPairs.data.wordsRates];
                 this.hoursRates = [...langPairs.data.hoursRates];
                 this.setLanguages();
+                if(this.isRequest) {
+                    this.setRequestLanguages();
+                }
             } catch(err) {
 
             }

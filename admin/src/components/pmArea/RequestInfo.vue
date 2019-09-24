@@ -9,7 +9,7 @@
         RequestTasksData(
             @setDate="setDate"
             @showErrors="showErrors"
-            :isRequest="isRequest")
+            )
             ValidationErrors(v-if="areErrorsExist"
                 :errors="errors"
                 :isAbsolute="isBlockAbsoulte"
@@ -34,7 +34,6 @@ export default {
             isEditAndSend: false,
             message: "",
             mailSubject: "",
-            isRequest: true
         }
     },
     methods: {

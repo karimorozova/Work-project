@@ -13,7 +13,7 @@
             @setSourceLang="setSource"
             @setTargets="setTargets"
             @showErrors="showErrors"
-            :isRequest="isRequest"
+            :isRequest="true"
         )
             template(slot="errors")
                 slot
@@ -24,9 +24,6 @@ import TasksData from "./tasks-n-steps/TasksData";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-    props: {
-        isRequest: {type: Boolean}
-    },
     data() {
         return {
             selectedWorkflow: {name:"2 Steps", id: 2917},
