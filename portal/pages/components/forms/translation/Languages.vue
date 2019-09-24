@@ -17,7 +17,6 @@ import TitleInput from "../TitleInput";
 import SingleLangsMenu from "../SingleLangsMenu";
 import MultiLangsMenu from "../MultiLangsMenu";
 import { mapGetters, mapActions } from "vuex";
-import { lang } from 'moment';
 
 export default {
     data() {

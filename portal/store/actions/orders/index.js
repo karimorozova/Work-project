@@ -55,13 +55,11 @@ export const submitForm = async function ({commit, dispatch, state}, payload) {
         service: payload.service._id
     }
     try {
-        await dispatch('setClientsXtmId');
-        const xtmCutomer = state.xtmCustomers.find(item => item.name === state.clientInfo.name);
-        orderDetails.xtmCustomerId = xtmCutomer.id;
         const details = appendData(orderDetails);
         const newProject = await this.$axios.post('/portal/request', details);
         const projects = [...state.projects, newProject.data];
         commit('SET_PROJECTS', projects);
+        dispatch('setOrderDetails', {});
     } catch(err) {
         dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
     }

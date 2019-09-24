@@ -231,7 +231,7 @@ router.get('/reject', checkClientContact, async (req, res) => {
 });
 
 router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-    let {source, targets, quoteDecision, xtmCustomerId, ...request } = req.body;
+    let {source, targets, quoteDecision, ...request } = req.body;
     try {
         const sourceLanguage = JSON.parse(source);
         const targetLanguages = JSON.parse(targets);
