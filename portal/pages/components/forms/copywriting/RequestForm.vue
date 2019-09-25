@@ -2,19 +2,27 @@
     .copywriting-form
         form.form
             .form__block
-                .form__name
+                .form__item.name
                     ProjectName
-                .form__deadline
+                .form__item.deadline
                     Deadline
             .form__block
-                .form__language
+                .form__item
                     Language
+            .form__block
+                .form__item
+                    Package
+            .form__block
+                .form__item
+                    Type
 </template>
 
 <script>
 import ProjectName from "../ProjectName";
 import Deadline from "../Deadline";
 import Language from "./Language";
+import Package from "./Package";
+import Type from "./Type";
 
 export default {
     data() {
@@ -25,7 +33,9 @@ export default {
     components: {
         ProjectName,
         Deadline,
-        Language
+        Language,
+        Package,
+        Type
     }
 }
 </script>
@@ -43,14 +53,15 @@ export default {
             margin-bottom: 20px;
         }
     }
-    &__name {
+    &__item {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .name {
         width: 247px;
     }
-    &__deadline {
-        width: fit-content;
-    }
-    &__language {
-        width: 100%;
+    .deadline {
+        width: 42%;
     }
     &_centered {
         justify-content: center;

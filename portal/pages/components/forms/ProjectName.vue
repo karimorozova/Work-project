@@ -1,7 +1,7 @@
 <template lang="pug">
     .project-name
         TitleInput(title="PROJECT NAME:" :isAsterisk="true")
-            input.project-name__input(type="text" placeholder="Project Name" :value="orderDetails.projectName" @input="setProjectName")
+            input.project-name__input(type="text" placeholder="50 characters maximum" :value="orderDetails.projectName" @input="setProjectName")
 </template>
 
 <script>
