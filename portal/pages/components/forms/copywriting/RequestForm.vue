@@ -15,6 +15,9 @@
             .form__block
                 .form__item
                     Type
+            .form__block
+                .form__item
+                    GeneralBrief
 </template>
 
 <script>
@@ -23,6 +26,7 @@ import Deadline from "../Deadline";
 import Language from "./Language";
 import Package from "./Package";
 import Type from "./Type";
+import GeneralBrief from "./GeneralBrief";
 
 export default {
     data() {
@@ -35,7 +39,8 @@ export default {
         Deadline,
         Language,
         Package,
-        Type
+        Type,
+        GeneralBrief
     }
 }
 </script>

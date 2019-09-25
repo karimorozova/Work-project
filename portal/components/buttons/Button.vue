@@ -72,4 +72,10 @@ export default {
     }
 }
 
+.white-back {
+    background-color: $white;
+    color: $main-color;
+    border: 1px solid $main-color;
+}
+
 </style>
