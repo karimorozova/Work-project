@@ -27,7 +27,7 @@ export default {
     },
     methods: {
         autoGrow() {
-            let element = document.querySelector(`.${growClass}`);
+            let element = document.querySelector(`.${this.growClass}`);
             let row = element.getAttribute("rows");
             if (element.clientHeight < element.scrollHeight) {
                 element.style.height = element.scrollHeight * 2 - element.clientHeight + "px";

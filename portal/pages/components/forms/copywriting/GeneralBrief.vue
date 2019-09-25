@@ -3,7 +3,7 @@
         TitleInput(title="GENERAL BRIEF:")
             .main
                 .main__block
-                    TextInput(label="Description" :isArea="true" :isInfo="true" @setInputVal="setDescription" :isAsterisk="true"
+                    TextInput(label="Description" :isArea="true" :isInfo="true" @setInputVal="setDescription" :isAsterisk="true" growClass="breif-area"
                         tip="Please give a brief description of the project in as match detail as possible.")
                 .main__block
                     TextInput(label="Targeted Audience" :isInfo="true" 
