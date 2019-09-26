@@ -13,6 +13,7 @@
 import FormWrapper from "@/pages/components/forms/FormWrapper";
 import OrderInfo from "@/pages/components/forms/OrderInfo";
 import RequestForm from "@/pages/components/forms/copywriting/RequestForm";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -22,7 +23,10 @@ export default {
         }
     },
     methods: {
-        async setDefaulDetails() {
+        ...mapActions([
+            "setOrderDetails"
+        ]),
+        async setService() {
             try {
                 const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
                 this.service = serv.data;
@@ -37,7 +41,9 @@ export default {
         RequestForm
     },
     created() {
-        this.setDefaulDetails();
+        this.setOrderDetails({});
+        this.setOrderDetails({prop: 'quoteDecision', value: 'Send'});
+        this.setService();
     }
 }
 </script>
