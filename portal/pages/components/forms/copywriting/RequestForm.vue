@@ -27,6 +27,9 @@
             .form__block
                 .form__item
                     ToneOfVoice
+            .form__block
+                .form__item
+                    Design
 </template>
 
 <script>
@@ -39,6 +42,7 @@ import GeneralBrief from "./GeneralBrief";
 import Structure from "./Structure";
 import Style from "./Style";
 import ToneOfVoice from "./ToneOfVoice";
+import Design from "./Design";
 
 export default {
     data() {
@@ -55,7 +59,8 @@ export default {
         GeneralBrief,
         Structure,
         Style,
-        ToneOfVoice
+        ToneOfVoice,
+        Design
     }
 }
 </script>
