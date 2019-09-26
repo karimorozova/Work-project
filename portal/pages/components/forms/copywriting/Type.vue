@@ -9,6 +9,7 @@
 
 <script>
 import TitleInput from "../TitleInput";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -21,15 +22,25 @@ export default {
         }
     },
     methods: {
+        ...mapActions([
+            "setOrderDetail"
+        ]),
         setType(index) {
             this.types = this.types.map((item, ind) => {
                 item.isChecked = ind === index;
                 return item;
             })
+            this.setOrderDetail({prop: 'type', value: this.types[index].name});
+        },
+        setDefaultType() {
+            this.setOrderDetail({prop: 'type', value: this.types[0].name});
         }
     },
     components: {
         TitleInput
+    },
+    created() {
+        this.setDefaultType();
     }
 }
 </script>

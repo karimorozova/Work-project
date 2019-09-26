@@ -21,8 +21,12 @@ export default {
         }
     },
     methods: {
+        ...mapActions([
+            "setOrderDetail"
+        ]),
         selectLanguage({language}) {
             this.selectedTarget = language;
+            this.setOrderDetail({prop: 'targets',value: [language]});
         }
     },
     computed: {

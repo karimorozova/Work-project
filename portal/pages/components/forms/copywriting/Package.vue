@@ -13,6 +13,7 @@
 <script>
 import TitleInput from "../TitleInput";
 import CustomRadio from "@/components/CustomRadio";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -21,11 +22,15 @@ export default {
         }
     },
     methods: {
+        ...mapActions([
+            "setOrderDetail"
+        ]),
         setSize(index) {
             this.packageSizes = this.packageSizes.map((item, ind) => {
                 item.isChecked = ind === index;
                 return item;
             })
+            this.setOrderDetail({prop: "packageSize", value: this.packageSizes[index]});
         },
         async getPackages() {
             try {
@@ -35,6 +40,7 @@ export default {
                     return item;
                 });
                 this.packageSizes[0].isChecked = true;
+                this.setOrderDetail({prop: "packageSize", value: this.packageSizes[0]})
             } catch(err) {
 
             }

@@ -70,7 +70,7 @@ export default {
             return this.industry || 'Select';
         },
         selectedPackage() {
-            return this.orderDetails.package || "Select";
+            return this.orderDetails.packageSize ? this.orderDetails.packageSize.name : "Select";
         },
         selectedType() {
             return this.orderDetails.type || "Select"; 
