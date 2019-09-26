@@ -54,6 +54,7 @@ export default {
         margin-bottom: 5px;
         border: 1px solid $main-color;
         border-radius: 10px;
+        outline: none;
     }
     &__text {
         font-size: 12px;

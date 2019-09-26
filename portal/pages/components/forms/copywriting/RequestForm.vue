@@ -18,6 +18,9 @@
             .form__block
                 .form__item
                     GeneralBrief
+            .form__block
+                .form__item
+                    Structure
 </template>
 
 <script>
@@ -27,6 +30,7 @@ import Language from "./Language";
 import Package from "./Package";
 import Type from "./Type";
 import GeneralBrief from "./GeneralBrief";
+import Structure from "./Structure";
 
 export default {
     data() {
@@ -40,7 +44,8 @@ export default {
         Language,
         Package,
         Type,
-        GeneralBrief
+        GeneralBrief,
+        Structure
     }
 }
 </script>
