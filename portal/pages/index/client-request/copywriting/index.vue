@@ -2,7 +2,11 @@
     .copywriting    
         FormWrapper
             RequestForm
-        OrderInfo
+        OrderInfo(
+            :service="service.title"
+            :isDuo="false"
+            :isCoptwriting="true"
+        )
 </template>
 
 <script>
@@ -11,11 +15,30 @@ import OrderInfo from "@/pages/components/forms/OrderInfo";
 import RequestForm from "@/pages/components/forms/copywriting/RequestForm";
 
 export default {
+    data() {
+        return {
+            requestService: "co",
+            service: {title: "Select"}
+        }
+    },
+    methods: {
+        async setDefaulDetails() {
+            try {
+                const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
+                this.service = serv.data;
+            } catch(err) {
+
+            }
+        }
+    },
     components: {
         FormWrapper,
         OrderInfo,
         RequestForm
-    }    
+    },
+    created() {
+        this.setDefaulDetails();
+    }
 }
 </script>
 

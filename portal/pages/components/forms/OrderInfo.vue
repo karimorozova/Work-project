@@ -10,7 +10,7 @@
             .info-block
                 .info-block__title LANGUAGE(S):
                     span.info-block__num 2
-                .info-block__item
+                .info-block__item(v-if="isDuo")
                     span.info-block__label Source:
                     span.info-block__text {{ source.lang }}
                 .info-block__item
@@ -19,9 +19,17 @@
             .info-block
                 .info-block__item
                     span.info-block__num 3
-                .info-block__title INDUSTRY:
-                .info-block__item
+                .info-block__title(v-if="isDuo") INDUSTRY:
+                .info-block__title(v-else) PACKAGE:
+                .info-block__item(v-if="isDuo")
                     span.info-block__text {{ selectedIndustry }}
+                .info-block__item(v-if="!isDuo")
+                    span.info-block__text {{ selectedPackage }}
+            .info-block(v-if="isCoptwriting")
+                .info-block__title TYPE:
+                    span.info-block__num 4
+                .info-block__item 
+                    span.info-block__text {{ selectedType }}
             .info-block
                 .info-block__title SUGGESTED DEADLINE
                 .info-block__item
@@ -34,6 +42,8 @@ import moment from "moment";
 
 export default {
     props: {
+        isDuo: {type: Boolean, default: true},
+        isCoptwriting: {type: Boolean},
         service: {type: String},
         industry: {type: String}
     },
@@ -58,6 +68,12 @@ export default {
         },
         selectedIndustry() {
             return this.industry || 'Select';
+        },
+        selectedPackage() {
+            return this.orderDetails.package || "Select";
+        },
+        selectedType() {
+            return this.orderDetails.type || "Select"; 
         }
     }
     
@@ -91,6 +107,10 @@ export default {
 .info-block {
     position: relative;
     margin-bottom: 15px;
+    &__title {
+        font-weight: bold;
+        font-size: 18px;
+    }
     &__num {
         position: absolute;
         left: -20px;

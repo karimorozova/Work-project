@@ -58,7 +58,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-            langs: [{lang: 'dfsdfs', symbol: 'sdfsdf'}]
+            
         }
     },
     methods: {
@@ -70,6 +70,9 @@ export default {
         ]),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
+        },
+        checkErrors() {
+
         }
     },
     computed: {
