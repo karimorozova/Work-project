@@ -49,6 +49,7 @@ export default {
 }
 
 .option {
+    color: $main-color;
     display: flex;
     flex-direction: column;
     align-items: center;
