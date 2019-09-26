@@ -33,6 +33,10 @@
             .form__block
                 .form__item
                     Seo
+            .form__block
+                QuoteDecision(:quoteDecision="quoteDecision" @setQuoteDecision="setQuoteDecision")
+            .form__submit
+                Button(value="Submit" @makeAction="checkErrors")
 </template>
 
 <script>
@@ -47,11 +51,34 @@ import Style from "./Style";
 import ToneOfVoice from "./ToneOfVoice";
 import Design from "./Design";
 import Seo from "./Seo";
+import QuoteDecision from "../QuoteDecision";
+import Button from "@/components/buttons/Button";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
             langs: [{lang: 'dfsdfs', symbol: 'sdfsdf'}]
+        }
+    },
+    methods: {
+        ...mapActions([
+            "setOrderDetails",
+            "setOrderDetail",
+            "setDefaultSource",
+            "alertToggle"
+        ]),
+        setQuoteDecision({value}) {
+            this.setOrderDetail({prop: 'quoteDecision', value});
+        }
+    },
+    computed: {
+        ...mapGetters({
+            services: "getAllServices",
+            orderDetails: "getOrderDetails"
+        }),
+        quoteDecision() {
+            return this.orderDetails.quoteDecision || "Send";
         }
     },
     components: {
@@ -65,7 +92,9 @@ export default {
         Style,
         ToneOfVoice,
         Design,
-        Seo
+        Seo,
+        QuoteDecision,
+        Button
     }
 }
 </script>
@@ -95,6 +124,9 @@ export default {
     }
     &_centered {
         justify-content: center;
+    }
+    &__submit {
+        text-align: center;
     }
 }
 

@@ -1,6 +1,6 @@
 <template lang="pug">
     .submit-button(:class="customClass")
-        button.submit-button__button(type="submit" ) {{ value}}
+        button.submit-button__button(type="submit" ) {{ value }}
 </template>
 
 <script>
