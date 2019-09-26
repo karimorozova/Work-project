@@ -104,4 +104,14 @@ export default {
     }
 }
 
+.row-flexed {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    .text-input__input {
+        width: 77%;
+    }
+}
+
 </style>

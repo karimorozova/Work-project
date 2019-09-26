@@ -59,6 +59,7 @@ export default {
     align-items: center;
     &__title {
         margin-right: 20px;
+        width: 70px;
     }
 }
 

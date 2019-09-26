@@ -30,6 +30,9 @@
             .form__block
                 .form__item
                     Design
+            .form__block
+                .form__item
+                    Seo
 </template>
 
 <script>
@@ -43,6 +46,7 @@ import Structure from "./Structure";
 import Style from "./Style";
 import ToneOfVoice from "./ToneOfVoice";
 import Design from "./Design";
+import Seo from "./Seo";
 
 export default {
     data() {
@@ -60,7 +64,8 @@ export default {
         Structure,
         Style,
         ToneOfVoice,
-        Design
+        Design,
+        Seo
     }
 }
 </script>
