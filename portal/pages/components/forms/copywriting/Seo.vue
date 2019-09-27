@@ -18,6 +18,7 @@ import TitleInput from "../TitleInput";
 import CheckBox from "@/components/CheckBox";
 import BigToggler from "@/components/BigToggler";
 import TextInput from "./brief/TextInput";
+import { mapActions } from "vuex";
 
 export default {
     data() {
@@ -32,14 +33,19 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["setOrderDetail"]),
         toggle() {
             this.isSeo = !this.isSeo;
+            this.setOrderDetail({prop: "isSeo", value: this.isSeo});
+            this.setOrderDetail({prop: "isMeta", value: this.isSeo});            
         },
         toggleOption(e, val) {
             this.isMeta = val;
+            this.setOrderDetail({prop: "isMeta", value: this.isMeta});            
         },
         setInputVal({ value }, key) {
-            this.seo[key] = value; 
+            this.seo[key] = value;
+            this.setOrderDetail({prop: `seo-${key}`, value});            
         }
     },
     components: {

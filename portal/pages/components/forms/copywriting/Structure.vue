@@ -12,6 +12,7 @@
 <script>
 import TitleInput from "../TitleInput";
 import CustomRadio from "@/components/CustomRadio";
+import { mapActions } from "vuex";
 
 export default {
     data() {
@@ -25,15 +26,17 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["setOrderDetail"]),
         toggleStructure(index) {
             this.structures = this.structures.map((item, ind) => {
                 item.isChecked = ind === index;
                 return item;
             })
+            this.setOrderDetail({prop: "structure", value: this.structures[index].name});
         },
         setOtherStructures(e) {
             const { value } = e.target;
-            console.log(value);
+            this.setOrderDetail({prop: "structure", value});
         },
         setOthers() {
             this.toggleStructure(this.structures.length-1);
@@ -42,6 +45,9 @@ export default {
     components: {
         TitleInput,
         CustomRadio
+    },
+    mounted() {
+        this.setOrderDetail({prop: "structure", value: this.structures[0].name});
     }
 }
 </script>

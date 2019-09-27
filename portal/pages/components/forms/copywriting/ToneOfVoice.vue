@@ -5,12 +5,13 @@
             .option(v-for="(tone, index) in tones")
                 CheckBox(:isChecked="tone.isChecked" @check="(e) => toggle(e, index, true)" @uncheck="(e) => toggle(e, index, false)")
                 .option__name {{ tone.name }}
-                    textarea.option__text(v-if="tone.name === 'Other'" @click="(e) => toggle(e, index, true)" @input="setOther")
+                    textarea.option__text(v-if="tone.name === 'Other'" @click="(e) => toggle(e, index, true)" @blur="setOther")
 </template>
 
 <script>
 import TitleInput from "../TitleInput";
 import CheckBox from "@/components/CheckBox";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -29,13 +30,30 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["setOrderDetail"]),
         toggle(e, index, val) {
-            this.tones[index].isChecked = val; 
+            this.tones[index].isChecked = val;
+            let currentTones = this.orderDetails.tones || [];
+            const position = currentTones.indexOf(this.tones[index].name);
+            if(val && position === -1) {
+                currentTones.push(this.tones[index].name);
+            } else {
+                currentTones.splice(position, 1);
+            }
+            this.setOrderDetail({prop: "tones", value: currentTones});
         },
         setOther(e) {
             const { value } = e.target;
-            console.log(value);
+            let currentTones = this.orderDetails.tones || [];
+            currentTones = currentTones.filter(item => item.indexOf('Other') === -1);
+            currentTones.push(`Other: ${value}`);
+            this.setOrderDetail({prop: "tones", value: currentTones});
         }
+    },
+    computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        })
     },
     components: {
         TitleInput,

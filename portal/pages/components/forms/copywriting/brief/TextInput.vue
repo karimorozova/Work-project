@@ -34,6 +34,7 @@ export default {
             }
         },
         setInputVal(e) {
+            console.log("sdfsdf");
             const { value } = e.target;
             this.$emit('setInputVal', { value });
         },

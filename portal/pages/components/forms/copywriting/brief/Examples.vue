@@ -3,7 +3,7 @@
         .title Examples
         .main
             .block
-                input.block__input(typ="text" placeholder="www.example.com")
+                input.block__input(typ="text" placeholder="www.example.com" @input="setExamples")
                 .block__text URL
             .block
                 UploadFileButton(comment="" @uploadedFile="setFiles")
@@ -12,11 +12,17 @@
 
 <script>
 import UploadFileButton from "@/components/buttons/UploadFileButton";
+import { mapActions } from "vuex";
 
 export default {
     methods: {
+        ...mapActions(["setOrderNestedDetail"]),
+        setExamples(e) {
+            const { value } = e.target;
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Exapmles', value});
+        },
         setFiles({files}) {
-            console.log(files);
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Files', value: files});
         }
     },
     components: {

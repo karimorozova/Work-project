@@ -25,7 +25,7 @@
                     span.info-block__text {{ selectedIndustry }}
                 .info-block__item(v-if="!isDuo")
                     span.info-block__text {{ selectedPackage }}
-            .info-block(v-if="isCoptwriting")
+            .info-block(v-if="isCopywriting")
                 .info-block__title TYPE:
                     span.info-block__num 4
                 .info-block__item 
@@ -43,7 +43,7 @@ import moment from "moment";
 export default {
     props: {
         isDuo: {type: Boolean, default: true},
-        isCoptwriting: {type: Boolean},
+        isCopywriting: {type: Boolean},
         service: {type: String},
         industry: {type: String}
     },

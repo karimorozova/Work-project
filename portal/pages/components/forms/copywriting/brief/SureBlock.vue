@@ -3,6 +3,7 @@
         .top
             .top__item
                 TextInput(label="Topics to mention or not mention" :isInfo="true" :isAsterisk="true" customClass="long-tip" :isDisabled="isNotSure"
+                    @setInputVal="setTopics"
                     tip="What main topics should or should not be discussed in the article? Please be as detailed as possible.")
             .top__item or
             .top__item 
@@ -25,6 +26,7 @@
 import TextInput from "./TextInput";
 import Button from "@/components/buttons/Button";
 import CustomRadio from "@/components/CustomRadio";
+import { mapActions } from "vuex";
 
 export default {
     data() {
@@ -35,12 +37,22 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["setOrderNestedDetail"]),
+        setTopics({value}) {
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Topics', value});
+        },
         toggleOption() {
             this.isNotSure = !this.isNotSure;
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isNotSure', value: this.isNotSure});
+            if(this.isNotSure) {
+                this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isFreedom', value: this.isFreedom});
+            }
         },
         toggleFreedom(trueProp, falseProp) {
             this[trueProp] = true;
             this[falseProp] = false;
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isFreedom', value: this.isFreedom});
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isOutline', value: this.isOutline});
         }
     },
     components: {

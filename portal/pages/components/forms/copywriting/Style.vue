@@ -11,6 +11,7 @@
 <script>
 import TitleInput from "../TitleInput";
 import CustomRadio from "@/components/CustomRadio";
+import { mapActions } from "vuex";
 
 export default {
     data() {
@@ -22,16 +23,21 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["setOrderDetail"]),
         toggle(index) {
             this.options = this.options.map((item,ind) => {
                 item.isChecked = ind === index;
                 return item;
             })
+            this.setOrderDetail({prop: "style", value: this.options[index].name});
         }
     },
     components: {
         TitleInput,
         CustomRadio
+    },
+    mounted() {
+        this.setOrderDetail({prop: "style", value: this.options[0].name});
     }
 }
 </script>

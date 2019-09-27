@@ -30,6 +30,10 @@ export const setOrderDetail = ({commit}, payload) => {
     commit('SET_DETAIL', payload);
 }
 
+export const setOrderNestedDetail = ({commit}, payload) => {
+    commit('SET_NESTED_DETAIL', payload);
+}
+
 export const setDefaultSource = async function ({commit}, payload) {
     try {
         const english = await this.$axios.get(`/portal/default-source?ratesProp=${payload.ratesProp}`);

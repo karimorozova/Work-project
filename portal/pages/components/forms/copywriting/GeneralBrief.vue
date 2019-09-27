@@ -3,13 +3,13 @@
         TitleInput(title="GENERAL BRIEF:")
             .main
                 .main__block
-                    TextInput(label="Description" :isArea="true" :isInfo="true" @setInputVal="setDescription" :isAsterisk="true" growClass="breif-area"
+                    TextInput(label="Description" :isArea="true" :isInfo="true" @setTextareaVal="(e) => setValue(e, 'Description')" :isAsterisk="true" growClass="breif-area"
                         tip="Please give a brief description of the project in as match detail as possible.")
                 .main__block
-                    TextInput(label="Targeted Audience" :isInfo="true" 
+                    TextInput(label="Targeted Audience" :isInfo="true" @setInputVal="(e) => setValue(e, 'Targeted Audience')"
                         tip="What kind of audience will read this article?")
                 .main__block
-                    TextInput(label="Suggested title")
+                    TextInput(label="Suggested title" @setInputVal="(e) => setValue(e, 'Suggested title')")
                 .main__block
                     SureBlock
                 .main__block
@@ -21,11 +21,13 @@ import TitleInput from "../TitleInput";
 import TextInput from "./brief/TextInput";
 import SureBlock from "./brief/SureBlock";
 import Examples from "./brief/Examples";
+import { mapActions } from "vuex";
 
 export default {
     methods: {
-        setDescription({value}) {
-            console.log(value);
+        ...mapActions(["setOrderNestedDetail"]),
+        setValue({value}, prop) {
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop, value});
         }
     },
     components: {

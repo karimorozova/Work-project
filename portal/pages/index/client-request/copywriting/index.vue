@@ -5,7 +5,7 @@
         OrderInfo(
             :service="service.title"
             :isDuo="false"
-            :isCoptwriting="true"
+            :isCopywriting="true"
         )
 </template>
 
@@ -24,7 +24,8 @@ export default {
     },
     methods: {
         ...mapActions([
-            "setOrderDetails"
+            "setOrderDetails",
+            "setOrderDetail"
         ]),
         async setService() {
             try {
@@ -42,7 +43,8 @@ export default {
     },
     created() {
         this.setOrderDetails({});
-        this.setOrderDetails({prop: 'quoteDecision', value: 'Send'});
+        this.setOrderDetail({prop: 'quoteDecision', value: 'Send'});
+        this.setOrderDetail({prop: 'genbrief', value: {}});
         this.setService();
     }
 }
