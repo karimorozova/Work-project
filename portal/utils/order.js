@@ -4,8 +4,10 @@ export const appendData = (orderDetails) => {
         if(key !== 'detailFiles' && key !== 'refFiles')
         details.append(key, orderDetails[key])
     }
-    for(let file of orderDetails.detailFiles) {
+    if(orderDetails.detailFiles && orderDetails.detailFiles.length) {
+        for(let file of orderDetails.detailFiles) {
         details.append('detailFiles', file);
+        }
     }
     if(orderDetails.refFiles && orderDetails.refFiles.length) {
         for(let file of orderDetails.refFiles) {

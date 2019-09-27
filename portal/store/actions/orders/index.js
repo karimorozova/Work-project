@@ -50,8 +50,12 @@ export const removeFile = ({commit}, payload) => {
 
 export const submitForm = async function ({commit, dispatch, state}, payload) {
     let orderDetails = {...state.orderDetails,
-        source: JSON.stringify(state.orderDetails.source),
+        source: JSON.stringify(state.orderDetails.source) || "",
+        packageSize: JSON.stringify(state.orderDetails.packageSize) || "",
         targets: JSON.stringify(state.orderDetails.targets),
+        genbrief: JSON.stringify(state.orderDetails.genbrief) || "",
+        tones: JSON.stringify(state.orderDetails.tones) || "",
+        designs: JSON.stringify(state.orderDetails.designs) || "",
         createdAt: new Date(),
         customer: state.clientInfo._id,
         projectManager: state.clientInfo.projectManager._id,

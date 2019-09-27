@@ -16,13 +16,16 @@ import { mapActions } from "vuex";
 
 export default {
     methods: {
-        ...mapActions(["setOrderNestedDetail"]),
+        ...mapActions([
+            "setOrderNestedDetail", 
+            "setOrderDetail"
+        ]),
         setExamples(e) {
             const { value } = e.target;
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Exapmles', value});
+            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Examples', value});
         },
         setFiles({files}) {
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Files', value: files});
+            this.setOrderDetail({prop: 'refFiles', value: files});
         }
     },
     components: {

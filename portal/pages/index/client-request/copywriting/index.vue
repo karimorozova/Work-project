@@ -1,25 +1,29 @@
 <template lang="pug">
     .copywriting    
         FormWrapper
-            RequestForm
+            RequestForm(:service="service" @showErrors="showErrors")
         OrderInfo(
             :service="service.title"
             :isDuo="false"
             :isCopywriting="true"
         )
+        ValidationErrors(v-if="areErrors" :errors="errors" @closeErrors="closeErrors" customClass="client-request-form")
 </template>
 
 <script>
 import FormWrapper from "@/pages/components/forms/FormWrapper";
 import OrderInfo from "@/pages/components/forms/OrderInfo";
 import RequestForm from "@/pages/components/forms/copywriting/RequestForm";
+import ValidationErrors from "@/components/ValidationErrors";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
         return {
             requestService: "co",
-            service: {title: "Select"}
+            service: {title: "Select"},
+            areErrors: false,
+            errors: []
         }
     },
     methods: {
@@ -27,6 +31,13 @@ export default {
             "setOrderDetails",
             "setOrderDetail"
         ]),
+        showErrors({errors}) {
+            this.errors = errors;
+            this.areErrors = true;
+        },
+        closeErrors() {
+            this.areErrors = false;
+        },
         async setService() {
             try {
                 const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
@@ -39,7 +50,8 @@ export default {
     components: {
         FormWrapper,
         OrderInfo,
-        RequestForm
+        RequestForm,
+        ValidationErrors
     },
     created() {
         this.setOrderDetails({});

@@ -56,23 +56,33 @@ import Button from "@/components/buttons/Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    data() {
-        return {
-            
-        }
+    props: {
+        service: {type: Object}
     },
     methods: {
         ...mapActions([
             "setOrderDetails",
             "setOrderDetail",
-            "setDefaultSource",
-            "alertToggle"
+            "alertToggle",
+            "submitForm"
         ]),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
         },
-        checkErrors() {
-
+        async checkErrors() {
+            let errors = [];
+            if(!this.orderDetails.projectName) errors.push('Enter Project name');
+            if(!this.orderDetails.deadline) errors.push('Set Suggested deadline');
+            if(!this.orderDetails.targets || !this.orderDetails.targets.length) errors.push('Select Target language(s)');
+            if(!this.orderDetails.genbrief.Description) errors.push('Fill the Description field');
+            if(!this.orderDetails.genbrief.isNotSure && !this.orderDetails.genbrief.Topics) errors.push('Enter Topics');
+            if(!this.orderDetails.tones || !this.orderDetails.tones.length) errors.push('Select Tone of Voice');
+            if(errors.length) {
+                return this.$emit('showErrors', { errors });
+            }
+            try {
+                await this.submitForm({service: this.service});
+            } catch(err) { }
         }
     },
     computed: {

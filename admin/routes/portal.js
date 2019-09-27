@@ -233,8 +233,12 @@ router.get('/reject', checkClientContact, async (req, res) => {
 router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
     let {source, targets, quoteDecision, ...request } = req.body;
     try {
-        const sourceLanguage = JSON.parse(source);
+        const sourceLanguage = source ? JSON.parse(source) : "";
         const targetLanguages = JSON.parse(targets);
+        request.packageSize = request.packageSize ? JSON.parse(request.packageSize) : "";
+        request.genbrief = request.genbrief ? JSON.parse(request.genbrief) : "";
+        request.tones = request.tones ? JSON.parse(request.tones) : "";
+        request.designs = request.designs ? JSON.parse(request.designs) : "";
         let createdRequest = await createRequest({...request, sourceLanguage, targetLanguages});
         const { detailFiles: sourceFiles, refFiles } = req.files;
         createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);

@@ -49,6 +49,7 @@ export default {
         z-index: 50;
     }
     &__errors-title {
+        color: $main-color;
         font-size: 18px;
         text-align: center;
         margin-bottom: 10px;
@@ -62,6 +63,7 @@ export default {
         font-weight: 600;
     }
     &__close {
+        color: $main-color;
         transform: rotate(45deg);
         position: absolute;
         top: -12px;
@@ -119,6 +121,18 @@ export default {
             left: 30px;
             width: 300px;
         }
+    }
+}
+
+.client-request-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    .validation__errors {
+        margin-left: -200px;
     }
 }
 
