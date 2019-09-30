@@ -62,10 +62,10 @@ export default {
                     .filter((item, index, arr) => {
                         return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
                     });
-                if(this.selectedSource && this.selectedSource.lang !== "Select") {
-                    result = result.filter(item => item.symbol !== this.selectedSource.symbol);
-                }
-                return result;
+                return result.sort((a, b) => {
+                    if(a.lang > b.lang) return 1;
+                    if(a.lang < b.lang) return -1;
+                });
             }
             return [];
         },
