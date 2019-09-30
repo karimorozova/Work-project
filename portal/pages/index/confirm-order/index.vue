@@ -2,9 +2,9 @@
   .confirms
     p.confirms__header THANK YOU FOR YOUR ORDER!
     p.confirms__summary-text SUMMARY BELOW:
-    Translationconfirm(v-if="serviceType == 'Translation' || serviceType == 'Localization'")
+    Translationconfirm(v-if="serviceType === 'Translation' || serviceType === 'Localization'")
     //- Proofingconfirm(v-if="serviceType == 'Proofing'")
-    //- Copywritingconfirm(v-if="serviceType == 'Copywriting'")
+    Copywritingconfirm(v-if="serviceType === 'Copywriting'")
     //- Marketingconfirm(v-if="serviceType == 'Marketing'")
 </template>
 
@@ -16,33 +16,25 @@
   import { mapGetters } from "vuex";
 
   export default {
-    data() {
-      return {
-        serviceType: "Translation",
-      }
-    },
-    methods: {
-      serviceDetect() {
-        if(this.orderDetails.service) {
-          let service = this.services.find(item => this.orderDetails.service === item._id);
-          this.serviceType = service.title;
-        }
-      }
-    },
     computed: {
       ...mapGetters({
         orderDetails: "getOrderDetails",
         services: 'getAllServices'
-      })
+      }),
+      serviceType() {
+        let result = "";
+        if(this.orderDetails.service) {
+            let service = this.services.find(item => this.orderDetails.service === item._id);
+            result = service.title;
+        }
+        return result;
+      }
     },
     components: {
       Translationconfirm,
       Copywritingconfirm,
       Proofingconfirm,
       Marketingconfirm
-    },
-    mounted() {
-      this.serviceDetect()
     }
   }
 </script>
