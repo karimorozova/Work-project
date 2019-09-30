@@ -40,10 +40,10 @@ import SelectSingle from "../../SelectSingle";
 import Asterisk from "../../Asterisk";
 import StepsDefaultDateModified from "./StepsDefaultDateModified";
 import { mapGetters, mapActions } from 'vuex';
-import setDefaultTranslationService from "@/mixins/setDefaultTranslationService";
+import setDefaultTasksService from "@/mixins/setDefaultTasksService";
 
 export default {
-    mixins: [setDefaultTranslationService],
+    mixins: [setDefaultTasksService],
     data() {
         return {
             isNeedToStoreService: true,

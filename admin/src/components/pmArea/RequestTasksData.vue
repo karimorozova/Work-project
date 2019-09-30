@@ -8,7 +8,6 @@
             :template="template"
             :sourceLanguages="sourceLanguages"
             :targetLanguages="targetLangs"
-            :service="service"
             @setValue="setValue"
             @setSourceLang="setSource"
             @setTargets="setTargets"
@@ -30,7 +29,6 @@ export default {
             template: "Standard processing",
             sourceLanguages: [],
             targetLanguages: [],
-            service: "",
             isTaskData: true,
         }
     },
@@ -38,25 +36,11 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle",
             addProjectTasks: "addProjectTasks",
-            getServices: "getServices"
         }),
         toggleTaskData() {
             if(this.currentProject.status !== 'Delivered') {
                 this.isTaskData = !this.isTaskData;
             }
-        },
-        async defaultService() {
-            try {
-                if(!this.services.length) {
-                    await this.getServices();
-                }
-            } catch(err) {
-                this.alertToggle({message: "Error on getting services from DB", isShow: true, type: "error"});
-            }
-            const service = this.services.find(item => {
-                return item.symbol === 'tr'
-            });
-            this.service = service.title;
         },
         setValue({option, refersTo}) {
             this[refersTo] = option;
@@ -76,8 +60,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject',
-            services: "getVuexServices",
+            currentProject: 'getCurrentProject'
         }),
         targetLangs() {
             return this.targetLanguages.map(item => {
@@ -87,9 +70,6 @@ export default {
     },
     components: {
         TasksData
-    },
-    mounted() {
-        this.defaultService();
     }
 }
 </script>

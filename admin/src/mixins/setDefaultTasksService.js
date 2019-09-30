@@ -15,13 +15,12 @@ export default {
                 this.alertToggle({message: "Error on getting services from DB", isShow: true, type: "error"});
             }
             const service = this.services.find(item => {
-                return item.symbol === 'tr'
+                const serviceSymbol = this.currentProject.service ? this.currentProject.service.symbol : 'tr';
+                return item.symbol === serviceSymbol;
             });
             this.service = service.title;
-            if(this.isNeedToStoreService) {
-                this.storeDefaultService(service);
-            }
-        }
+            this.storeDefaultService(service);
+        },
     },
     created() {
         this.setDefaultService()
