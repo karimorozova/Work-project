@@ -68,7 +68,7 @@ export default {
         },
         async getAvailableLanguages() {
             try {
-                const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);;
+                const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
                 this.setLanguages(langPairs.data.monoRates);
             } catch(err) {
                 this.alertToggle({message: "Error on getting customer language pairs", isShow: true, type: "error"});
@@ -81,18 +81,22 @@ export default {
                 });
                 const englishPair = this.languagePairs.find(item => item.target.symbol === 'EN-GB');
                 this.targets = this.languagePairs.map(item => item.target);
-                if(this.targets.length === 1) {
+                if(this.currentProject.status === 'Requested') {
+                    this.setLanguage({lang: this.currentProject.targetLanguages[0]});
+                } else if(this.targets.length === 1) {
                     this.setLanguage({lang: this.targets[0]});
-                }
+                }                
                 this.setDefaultPackages(englishPair);
             }
         },
         setDefaultPackages(eng) {
-            if(!eng) {
+            if(!eng || this.currentProject.status === 'Requested') {
                 this.packages = this.languagePairs.map(pair => pair.packageSize).filter((item, index, self) => {
                     return self.indexOf(item) === index;
                 });
-                if(this.packages.length === 1) {
+                if(this.currentProject.status === 'Requested') {
+                    this.setPackage({option: this.currentProject.packageSize.size});
+                } else if(this.packages.length === 1) {
                     this.setPackage({option: this.packages[0]});
                 }
             } else {

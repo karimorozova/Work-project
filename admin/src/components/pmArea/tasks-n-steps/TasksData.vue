@@ -190,6 +190,9 @@ export default {
                 elem.value = "";
             }
         },
+        setServiceForm() {
+            this.isMonoService = this.tasksData.service.languageForm === "Mono";
+        }
     },
     computed: {
         ...mapGetters({
@@ -205,6 +208,9 @@ export default {
             return this.tasksData.template ? this.tasksData.template.name : "";
         },
         isMonoService() {
+            if(this.currentProject.status === 'Requested') {
+                return this.currentProject.service.languageForm === "Mono";
+            }
             return this.tasksData.service ? this.tasksData.service.languageForm === "Mono" : false;
         },
         isProject() {
