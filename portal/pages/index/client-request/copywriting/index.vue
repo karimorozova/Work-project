@@ -45,6 +45,7 @@ export default {
             }
             try {
                 await this.createPackagesRequest({service: this.service});
+                this.$router.push("/confirm-order");
             } catch(err) { }
         },
         closeErrors() {
@@ -54,6 +55,7 @@ export default {
             try {
                 const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
                 this.service = serv.data;
+                this.setOrderDetail({prop: 'service', value: this.service._id});
             } catch(err) {
 
             }
