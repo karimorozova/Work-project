@@ -48,26 +48,48 @@ export const removeFile = ({commit}, payload) => {
     commit('REMOVE_FILE', payload);
 }
 
-export const submitForm = async function ({commit, dispatch, state}, payload) {
+export const createWordsRequest = async function ({commit, dispatch, state}, payload) {
     let orderDetails = {...state.orderDetails,
-        source: JSON.stringify(state.orderDetails.source) || "",
-        packageSize: JSON.stringify(state.orderDetails.packageSize) || "",
+        source: JSON.stringify(state.orderDetails.source),
         targets: JSON.stringify(state.orderDetails.targets),
-        genbrief: JSON.stringify(state.orderDetails.genbrief) || "",
-        tones: JSON.stringify(state.orderDetails.tones) || "",
-        designs: JSON.stringify(state.orderDetails.designs) || "",
         createdAt: new Date(),
         customer: state.clientInfo._id,
         projectManager: state.clientInfo.projectManager._id,
+        accountManager: state.clientInfo.accountManager._id,
         status: 'Requested',
-        service: payload.service._id
+        service: payload.service._id,
+        unit: payload.service.calculationUnit
     }
     try {
         const details = appendData(orderDetails);
-        const newProject = await this.$axios.post('/portal/request', details);
-        const projects = [...state.projects, newProject.data];
-        commit('SET_PROJECTS', projects);
-        dispatch('setOrderDetails', {});
+        const newRequest = await this.$axios.post('/portal/request', details);
+        const requests = [...state.requests, newRequest.data];
+        commit('SET_REQUESTS', requests);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
+    }
+}
+
+export const createPackagesRequest = async function ({commit, dispatch, state}, payload) {
+    let orderDetails = {...state.orderDetails,
+        packageSize: JSON.stringify(state.orderDetails.packageSize),
+        targets: JSON.stringify(state.orderDetails.targets),
+        genbrief: JSON.stringify(state.orderDetails.genbrief),
+        tones: JSON.stringify(state.orderDetails.tones),
+        designs: JSON.stringify(state.orderDetails.designs),
+        createdAt: new Date(),
+        customer: state.clientInfo._id,
+        projectManager: state.clientInfo.projectManager._id,
+        accountManager: state.clientInfo.accountManager._id,
+        status: 'Requested',
+        service: payload.service._id,
+        unit: payload.service.calculationUnit
+    }
+    try {
+        const details = appendData(orderDetails);
+        const newRequest = await this.$axios.post('/portal/request', details);
+        const requests = [...state.requests, newRequest.data];
+        commit('SET_REQUESTS', requests);
     } catch(err) {
         dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
     }
