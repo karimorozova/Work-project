@@ -49,11 +49,11 @@ export default {
             if(task.service.calculationUnit !== 'Packages') {
                 ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
             }
-            return ratesProp === 'monoRates' ? getMonoPair(task) : getDuoPair(task, ratesProp);
+            return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
         },
         getMonoPair(task) {
             const targets = this.clientLanguages.monoRates.map(item => item.target);
-            const pairLang = targets.find(item => item.symbol === task.targeLanguage);
+            const pairLang = targets.find(item => item.symbol === task.targetLanguage);
             return `${pairLang.lang} / ${task.packageSize}`;
         },
         getDuoPair(task, ratesProp) {
