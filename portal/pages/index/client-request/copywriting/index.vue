@@ -1,7 +1,7 @@
 <template lang="pug">
     .copywriting    
         FormWrapper
-            RequestForm(:service="service" @showErrors="showErrors")
+            RequestForm(:service="service" @checkErrors="checkErrors")
         OrderInfo(
             :service="service.title"
             :isDuo="false"
@@ -29,11 +29,23 @@ export default {
     methods: {
         ...mapActions([
             "setOrderDetails",
-            "setOrderDetail"
+            "setOrderDetail",
+            "createPackagesRequest"
         ]),
-        showErrors({errors}) {
-            this.errors = errors;
-            this.areErrors = true;
+        async checkErrors() {
+            this.errors = [];
+            if(!this.orderDetails.projectName) this.errors.push('Enter Project name');
+            if(!this.orderDetails.deadline) this.errors.push('Set Suggested deadline');
+            if(!this.orderDetails.targets || !this.orderDetails.targets.length) this.errors.push('Select Target language(s)');
+            if(!this.orderDetails.genbrief.Description) this.errors.push('Fill the Description field');
+            if(!this.orderDetails.genbrief.isNotSure && !this.orderDetails.genbrief.Topics) this.errors.push('Enter Topics');
+            if(!this.orderDetails.tones || !this.orderDetails.tones.length) this.errors.push('Select Tone of Voice');
+            if(this.errors.length) {
+                return this.areErrors = true;
+            }
+            try {
+                await this.createPackagesRequest({service: this.service});
+            } catch(err) { }
         },
         closeErrors() {
             this.areErrors = false;
@@ -46,6 +58,11 @@ export default {
 
             }
         }
+    },
+    computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        })
     },
     components: {
         FormWrapper,
