@@ -51,17 +51,20 @@ const ClientRequestSchema = new mongoose.Schema({
     },
     sourceLanguage: {
         type: Object,
-        default: null,
-        trim: true
+        default: null
     },
     targetLanguages: {
         type: Array,
-        default: [],
-        trim: true
+        default: []
+    },
+    packageSize: {
+        type: Object,
+        default: null
     },
     brief: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     isBriefApproved: {
         type: Boolean,
@@ -69,21 +72,42 @@ const ClientRequestSchema = new mongoose.Schema({
     },
     notes: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
+    },
+    tones: {
+        type: Array,
+        default: []
     },
     sourceFiles: {
         type: Array,
-        default: [],
-        trim: true
+        default: []
     },
     refFiles: {
         type: Array,
-        default: [],
-        trim: true
+        default: []
     },
     genBrief: {
+        type: Object,
+        default: null
+    },
+    structure: {
         type: String,
-        default: ""
+        default: '',
+        trim: true
+    },
+    style: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    designs: {
+        type: Array,
+        default: []
+    },
+    seo: {
+        type: Array,
+        default: []
     }
 });
 
