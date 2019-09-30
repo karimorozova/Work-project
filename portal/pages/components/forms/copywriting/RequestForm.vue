@@ -37,6 +37,7 @@
                 QuoteDecision(:quoteDecision="quoteDecision" @setQuoteDecision="setQuoteDecision")
             .form__submit
                 Button(value="Submit" @makeAction="checkErrors")
+                p.form__note Please note that all copywriting jobs come with one free round of edits. Rewriting requests come at separate cost.
 </template>
 
 <script>
@@ -64,7 +65,7 @@ export default {
             "setOrderDetails",
             "setOrderDetail",
             "alertToggle",
-            "submitForm"
+            "createPackagesRequest"
         ]),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});
@@ -81,7 +82,7 @@ export default {
                 return this.$emit('showErrors', { errors });
             }
             try {
-                await this.submitForm({service: this.service});
+                await this.createPackagesRequest({service: this.service});
             } catch(err) { }
         }
     },
@@ -140,6 +141,16 @@ export default {
     }
     &__submit {
         text-align: center;
+        position: relative;
+    }
+    &__note {
+        position: absolute;
+        color: $main-color;
+        font-size: 12px;
+        width: 120%;
+        left: -10%;
+        bottom: 100%;
+        opacity: 0.8;
     }
 }
 

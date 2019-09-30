@@ -18,7 +18,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            submitForm: "submitForm",
+            submitForm: "createWordsRequest",
         }),
         closeErrors() {
             this.areErrors = false;
