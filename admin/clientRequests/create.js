@@ -10,14 +10,64 @@ async function createRequest(request) {
     try {
         const todaysRequests = await ClientRequest.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
         const nextNumber = (todaysRequests.length < 10) ? '[0' + (todaysRequests.length + 1) + ']': '[' + (todaysRequests.length + 1) + ']';
-        request.status = "Requested";
-        request.requestId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
-        const createdRequest = await ClientRequest.create(request);
-        return await getClientRequest({"_id": createdRequest.id});
+        const requestId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
+        const requestData = {...request, requestId};
+        if(request.unit === 'Words') {
+            return await createWordsRequest({...requestData})
+        }
+        if(request.unit === 'Packages') {
+            return await createPackagesRequest({...requestData});
+        }
     } catch(err) {
         console.log(err);
         console.log('Error in createRequest');
     }
+}
+
+async function createWordsRequest(request) {
+    try {
+        const sourceLanguage = JSON.parse(request.source);
+        const targetLanguages = JSON.parse(request.targets);
+        const newRequest = await ClientRequest.create({...request, sourceLanguage, targetLanguages});
+        return await getClientRequest({"_id": newRequest.id});
+    } catch(err) {
+        console.log(err);
+        console.log('Error in createWordsRequest');
+    }
+}
+
+async function createPackagesRequest(request) {
+    try {
+        const targetLanguages = JSON.parse(request.targets);
+        const packageSize = request.packageSize ? JSON.parse(request.packageSize) : "";
+        const genbrief = request.genbrief ? JSON.parse(request.genbrief) : "";
+        const tones = request.tones ? JSON.parse(request.tones) : "";
+        const designs = request.designs ? JSON.parse(request.designs) : "";
+        const seo = getSeo(request);
+        const newRequest = await ClientRequest.create({...request, 
+            packageSize, targetLanguages, genbrief, tones, designs, seo
+        });
+        return await getClientRequest({"_id": newRequest.id});
+    } catch(err) {
+        console.log(err);
+        console.log('Error in createWordsRequest');
+    }
+}
+
+function getSeo(request) {
+    let seoData = [];
+    if(request.isSeo === 'true') {
+        const isMetaTags = request.isMeta === 'true';
+        let seoInfo = Object.keys(request).filter(item => item.indexOf('seo') !== -1);
+        if(seoInfo.length) {
+            seoInfo = seoInfo.map(item => {
+                const newItem = item.split('-')[1];
+                return newItem;
+            })
+        }
+        seoData.push(...seoInfo, isMetaTags);
+    }
+    return seoData;
 }
 
 module.exports = { createRequest };
