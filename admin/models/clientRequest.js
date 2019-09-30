@@ -87,7 +87,7 @@ const ClientRequestSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    genBrief: {
+    genbrief: {
         type: Object,
         default: null
     },

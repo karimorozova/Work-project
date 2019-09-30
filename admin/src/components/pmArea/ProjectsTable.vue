@@ -108,7 +108,10 @@ export default {
         },
         getRequestLangs(row) {
             return row.targetLanguages.reduce((prev, cur) => {
-                return prev + `${row.sourceLanguage.symbol} >> ${cur.symbol}; `;
+                if(row.sourceLanguage) {
+                    return prev + `${row.sourceLanguage.symbol} >> ${cur.symbol}; `;
+                }
+                return prev + `${cur.symbol} / ${row.packageSize}; `;
             }, "")
         },
         edit() {
