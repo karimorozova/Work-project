@@ -40,19 +40,25 @@ export default {
     methods: {
         getLanguagePairs(row) {
             if(this.project.status === "Requested") {
-                return `${this.project.sourceLanguage.lang} => ${row.lang}`
+                return this.project.packageSize ? `${row.lang} / ${this.project.packageSize.size}` : `${this.project.sourceLanguage.lang} => ${row.lang}`;
             }
             return this.getQuotePairs(row);
         },
         getQuotePairs(task) {
-            let pair = "";
-            for(let langPair of this.clientLanguages) {
-                if(langPair.source.symbol === task.sourceLanguage && 
-                    langPair.target.symbol === task.targetLanguage) {
-                        pair = `${langPair.source.lang} => ${langPair.target.lang}`
-                }
+            let ratesProp = 'monoRates';
+            if(task.service.calculationUnit !== 'Packages') {
+                ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
             }
-            return pair;
+            return ratesProp === 'monoRates' ? getMonoPair(task) : getDuoPair(task, ratesProp);
+        },
+        getMonoPair(task) {
+            const targets = this.clientLanguages.monoRates.map(item => item.target);
+            const pairLang = targets.find(item => item.symbol === task.targeLanguage);
+            return `${pairLang.lang} / ${task.packageSize}`;
+        },
+        getDuoPair(task, ratesProp) {
+            const pair = this.clientLanguages[ratesProp].find(item => item.source.symbol === task.sourceLanguage && item.target.symbol === task.targetLanguage);
+            return `${pair.source.lang} => ${pair.target.lang}`;
         }
     },
     computed: {
