@@ -111,7 +111,7 @@ export default {
                 if(row.sourceLanguage) {
                     return prev + `${row.sourceLanguage.symbol} >> ${cur.symbol}; `;
                 }
-                return prev + `${cur.symbol} / ${row.packageSize}; `;
+                return prev + `${cur.symbol} / ${row.packageSize.size}; `;
             }, "")
         },
         edit() {
