@@ -12,13 +12,13 @@
             .form__block
                 .form__item
                     Package
-            .form__block
+            .form__block(v-if="!isMarketing")
                 .form__item
                     Type
             .form__block
                 .form__item
-                    GeneralBrief
-            .form__block
+                    GeneralBrief(:isMarketing="isMarketing")
+            .form__block(v-if="!isMarketing")
                 .form__item
                     Structure
             .form__block
@@ -27,10 +27,10 @@
             .form__block
                 .form__item
                     ToneOfVoice
-            .form__block
+            .form__block(v-if="!isMarketing")
                 .form__item
                     Design
-            .form__block
+            .form__block(v-if="!isMarketing")
                 .form__item
                     Seo
             .form__block
@@ -58,7 +58,8 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        service: {type: Object}
+        service: {type: Object},
+        isMarketing: {type: Boolean}
     },
     methods: {
         ...mapActions([

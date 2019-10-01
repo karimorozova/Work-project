@@ -9,9 +9,10 @@
             .top__item 
                 Button(value="I am not sure" @makeAction="toggleOption" :buttonClass="isNotSure ? 'white-back': ''")
         .bottom(v-if="isNotSure")
-            .bottom__title If you are unsure of what points the article should cover, please select one of the following:
+            .bottom__title(v-if="!isMarketing") If you are unsure of what points the article should cover, please select one of the following:
+            .bottom__title(v-else) If you are unsure of what points the mailer should cover, you agree to the following:
                 span.bottom__asterisk *
-            .bottom__options
+            .bottom__options(v-if="!isMarketing")
                 .bottom__option(:class="{'bottom_shadow': isFreedom}"  @click="toggleFreedom('isFreedom', 'isOutline')")
                     .bottom__radio
                         CustomRadio(:isChecked="isFreedom" @toggleRadio="toggleFreedom('isFreedom', 'isOutline')")
@@ -20,6 +21,9 @@
                     .bottom__radio
                         CustomRadio(:isChecked="isOutline" @toggleRadio="toggleFreedom('isOutline', 'isFreedom')")
                     .bottom__text Request an outline from the copywriter
+            .bottom__agreement-list(v-else)
+                li.bottom__agreement-item You give the copywriter freedom to write the mailer as they please.
+                li.bottom__agreement-item You will only receive one round of edits if you think the mailer needs improvement. Rewriting requests come at a separate cost.
 </template>
 
 <script>
@@ -29,6 +33,9 @@ import CustomRadio from "@/components/CustomRadio";
 import { mapActions } from "vuex";
 
 export default {
+    props: {
+        isMarketing: {type: Boolean}
+    },
     data() {
         return {
             isNotSure: false,
@@ -44,7 +51,7 @@ export default {
         toggleOption() {
             this.isNotSure = !this.isNotSure;
             this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isNotSure', value: this.isNotSure});
-            if(this.isNotSure) {
+            if(this.isNotSure && !this.isMarketing) {
                 this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isFreedom', value: this.isFreedom});
             }
         },
@@ -115,6 +122,12 @@ export default {
     &__text {
         text-align: center;
         margin-top: 20px;
+    }
+    &__agreement-list {
+        line-height: 1.4em;
+    }
+    &__agreement-item {
+        font-size: 14px;
     }
     &_shadow {
         box-shadow: 0 0 10px $brown-shadow;
