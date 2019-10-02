@@ -1,12 +1,14 @@
 <template lang="pug">
     .files-buttons
         Files
+        .files-buttons__upload
+            UploadDeliverable(@setDeliverables="setDeliverables")
         .files-buttons__terms(v-if="job.status !== 'Completed'")
             TermsAgree(:job="job")
-        .files-buttons__buttons(v-if="isButton && job.status !== 'Completed'" :class="{'files-buttons_opacity05': !job.isVendorRead}")
+        .files-buttons__buttons(v-if="deliverables.length || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
             .files-buttons__button(v-if="isStartButton")
                 Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
-            .files-buttons__button(v-if="progress >= 100" )
+            .files-buttons__button(v-if="progress >= 100 || deliverables.length")
                 Button(value="Complete" @makeAction="showModal")
         .files-buttons__icons(v-if="areIcons && job.status !== 'Completed'")
             .files-buttons__icon(v-for="(icon, key) in icons")
@@ -17,6 +19,7 @@
 <script>
 import Files from "../../../components/details/Files";
 const TermsAgree = () => import("../../../components/details/TermsAgree");
+const UploadDeliverable = () => import("../../../components/details/UploadDeliverable");
 const Button = () => import("~/components/buttons/Button");
 import { mapGetters, mapActions } from "vuex";
 
@@ -27,6 +30,7 @@ export default {
                 Approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 Reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
             },
+            deliverables: []
         }
     },
     methods: {
@@ -35,6 +39,10 @@ export default {
             selectJob: "selectJob",
             alertToggle: "alertToggle"
         }),
+        setDeliverables({files}) {
+            console.log(files);
+            this.deliverables = files;
+        },
         async startJob() {
             if(!this.job.isVendorRead) return;
             try {
@@ -85,6 +93,7 @@ export default {
     components: {
         Files,
         TermsAgree,
+        UploadDeliverable,
         Button
     }
 }
@@ -97,6 +106,10 @@ export default {
     padding-bottom: 20px;
     display: flex;
     flex-direction: column;
+    &__upload {
+        padding: 5px;
+        box-sizing: border-box;
+    }
     &__terms {
         margin-top: 10px;
     }
