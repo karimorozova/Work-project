@@ -31,11 +31,11 @@
                     a.job-files__link(:href='row.source')
                         img.job-files__image(src="../../../assets/images/download.png")
             template(slot="target" slot-scope="{ row, index }")
-                .job-files_flex-centered(v-if="row.category === 'Source file'")
+                .job-files_flex-centered
                     .job-files__link(v-if="isTargetLink(row)")
                         img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
             template(slot="editor" slot-scope="{ row, index }")
-                .job-files__editor(v-if="job.status === 'Started' && row.category === 'Source file'")
+                .job-files__editor(v-if="isEditor && row.category === 'Source file'")
                     img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToXtmEditor(row)")                   
 </template>
 
@@ -68,7 +68,7 @@ export default {
             return this.getProgress(file) === 100 || this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
         },
         getFilesJobId(file) {
-            const xtmJob = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+            const xtmJob = this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
             return xtmJob ? xtmJob.jobId : "";
         },
         getProgress(file) {
@@ -114,6 +114,9 @@ export default {
             }
         },
         async downloadTarget(file) {
+            if(this.job.serviceStep.calculationUnit !== 'Words') {
+                return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
+            }
             const jobId = this.getFilesJobId(file);
             const existingTarget = this.getExistingTargetPath(jobId);
             if(this.job.status === "Completed") {
@@ -150,7 +153,11 @@ export default {
     computed: {
         ...mapGetters({
             job: "getSelectedJob"
-        })
+        }),
+        isEditor() {
+            if(!this.job.serviceStep.isEditor) return false;
+            return this.job.status === 'Started';
+        }
     },
     components: {
         DataTable,
