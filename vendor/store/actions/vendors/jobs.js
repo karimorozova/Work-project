@@ -11,9 +11,15 @@ export const getJobs = async function({ commit, dispatch, state}) {
 
 export const setJobStatus = async function({commit, dispatch, state}, payload) {
     try {
-        const { jobId, status } = payload;
-        await this.$axios.post('/vendor/job', { jobId, status });
-        if(status === "Completed") {
+        const { jobId, status, targetFile } = payload;
+        await this.$axios.post('/vendor/job', { jobId, status, targetFile });
+        if(targetFile) {
+            let fileData = new FormData();
+            fileData.append('jobId', jobId);
+            fileData.append('targetFile', targetFile);
+            await this.$axios.post('/xtm/step-target', fileData);
+        }
+        if(status === "Completed" && !targetFile) {
             await downloadJobTargets(this, state.selectedJob);
         }
         await dispatch("getJobs");

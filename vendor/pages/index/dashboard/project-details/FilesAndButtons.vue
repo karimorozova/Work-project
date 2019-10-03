@@ -1,7 +1,7 @@
 <template lang="pug">
     .files-buttons
         Files
-        .files-buttons__upload
+        .files-buttons__upload(v-if="job.status === 'Started'")
             UploadDeliverable(@setDeliverables="setDeliverables")
         .files-buttons__terms(v-if="job.status !== 'Completed'")
             TermsAgree(:job="job")
@@ -24,13 +24,15 @@ const Button = () => import("~/components/buttons/Button");
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    props: {
+        deliverables: {type: Array, default: () => []}
+    },
     data() {
         return {
             icons: {
                 Approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 Reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
-            },
-            deliverables: []
+            }
         }
     },
     methods: {
@@ -40,8 +42,7 @@ export default {
             alertToggle: "alertToggle"
         }),
         setDeliverables({files}) {
-            console.log(files);
-            this.deliverables = files;
+            this.$emit('setDeliverables', {files});
         },
         async startJob() {
             if(!this.job.isVendorRead) return;

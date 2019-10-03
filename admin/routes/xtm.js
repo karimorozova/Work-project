@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, generateTargetFile, getXtmCustomers} = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles} = require('../projects/');
+const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles, storeFiles} = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../сalculations/wordcount');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
@@ -175,15 +175,13 @@ router.get('/editor', async (req, res) => {
     }
 })
 
-router.post('/step-target', async (req, res) => {
-    const { step, projectId } = req.body;
+router.post('/step-target', upload.fields([{name: 'targetFile'}]), async (req, res) => {
+    const { jobId } = req.body;
     try {
-        const project = await getProject({"_id": projectId});
-        let stepIndex = project.steps.findIndex(item => {
-            return item.taskId === step.taskId && item.name === step.name
-        });
-        project.steps[stepIndex].targetFiles = step.targetFiles;
-        const updatedProject = await updateProject({"_id": projectId}, {steps: project.steps});
+        const project = await getProject({"steps._id": jobId});
+        const { targetFile } = req.files;
+        const paths = await storeFiles(targetFile, project.id);
+        const updatedProject = await updateProject({"steps._id": jobId}, {"steps.$.targetFile": paths[0], "steps.$.progress": 100});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

@@ -93,7 +93,7 @@ router.get("/jobs", checkVendor, async (req, res) => {
 })
 
 router.post("/job", checkVendor, async (req, res) => {
-    const { jobId, status } = req.body;
+    const { jobId, status, targetFile } = req.body;
     try {
         await updateStepProp({jobId, prop: 'status', value: status});
         res.send("Status updated");

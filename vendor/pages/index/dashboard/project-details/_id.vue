@@ -9,7 +9,7 @@
                 .details__describe
                     OtherInfo
             .details__files
-                FilesAndButtons(@showModal="showModal")
+                FilesAndButtons(:deliverables="targetFiles" @showModal="showModal" @setDeliverables="setDeliverables")
             .details__modal(v-if="isApproveModal")
                  ApproveModal(
                     :isCentered="isApproveModal"
@@ -34,7 +34,8 @@ export default {
     data() {
         return {
             isApproveModal: false,
-            statuses: ["Quote sent", "Draft", "Requested"]
+            statuses: ["Quote sent", "Draft", "Requested"],
+            targetFiles: []
         }
     },
     methods: {
@@ -54,14 +55,16 @@ export default {
             const currentJob = this.allJobs.find(item => item._id === this.job._id);
             this.selectJob(currentJob);
         },
+        setDeliverables({files}) {
+            this.targetFiles = files;
+        },
         async completeJob() {
             this.closeModal();
             try {
-                await this.setJobStatus({jobId: this.job._id, status: "Completed"});
+                await this.setJobStatus({jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0]});
                 this.setCurrentJob();
-            } catch(err) {
-                this.alertToggle({message: "Error in jobs action", isShow: true, type: "error"});
-            }
+                this.targetFiles = [];
+            } catch(err) { }
         },
         async refreshProgress() {
             try {

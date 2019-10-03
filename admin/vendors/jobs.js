@@ -110,13 +110,9 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
             return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
-        if(step.name === "translate1") {
-            const updatedSteps = steps.map(item => {
-                if(item.taskId === step.taskId && item.name !== "translate1") {
-                    item.status = "Ready to Start";
-                }
-                return item;
-            })
+        const stage1step = task.service.steps.find(item => item.stage === 'stage1');
+        if(step.serviceStep._id === stage1step.step._id) {
+            const updatedSteps = getWithReadyToStartSteps({task, steps});
             return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
         }
         return await Projects.updateOne({"steps._id": jobId},{ steps })
@@ -124,6 +120,16 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
         console.log(err);
         console.log("Error in manageCompletedStatus");
     }
+}
+
+function getWithReadyToStartSteps({task, steps}) {
+    const stage2step = task.service.steps.find(item => item.stage === 'stage2');
+    return steps.map(item => {
+        if(stage2step && item.serviceStep._id === stage2step.step._id && item.taskId === task.taskId) {
+            item.status = 'Ready to Start';
+        }
+        return item;
+    })
 }
 
 function setAcceptedStepStatus({project, steps, jobId}) {
