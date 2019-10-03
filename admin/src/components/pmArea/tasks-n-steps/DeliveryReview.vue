@@ -68,15 +68,15 @@ export default {
         },
         getStepsFiles() {
             for(let task of this.tasks) {
-                const { xtmJobs } = task;
-                const files = xtmJobs.reduce((prev, cur) => {
-                    const fileName = cur.targetFile.split("/").pop();
+                const taskFiles = task.xtmJobs || task.targetFiles;
+                const files = taskFiles.reduce((prev, cur) => {
+                    const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
                     prev.push({
                         fileName,
                         pair: `${task.sourceLanguage} >> ${task.targetLanguage}`,
                         taskId: task.taskId,
                         jobId: cur.jobId,
-                        path: cur.targetFile,
+                        path: cur.targetFile || cur.path.split("./dist").pop(),
                         isFileApproved: cur.isFileApproved
                     })
                     return [...prev];

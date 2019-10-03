@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, generateTargetFile, getXtmCustomers} = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles, storeFiles} = require('../projects/');
+const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, storeFiles} = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../сalculations/wordcount');
 const { updateProjectMetrics } = require('../projects/metrics');
 const fs = require('fs');
@@ -181,7 +181,7 @@ router.post('/step-target', upload.fields([{name: 'targetFile'}]), async (req, r
         const project = await getProject({"steps._id": jobId});
         const { targetFile } = req.files;
         const paths = await storeFiles(targetFile, project.id);
-        const updatedProject = await updateProject({"steps._id": jobId}, {"steps.$.targetFile": paths[0], "steps.$.progress": 100});
+        const updatedProject = await updateNonWordsTaskTargetFiles({project, path: paths[0], jobId, fileName: targetFile[0].filename});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

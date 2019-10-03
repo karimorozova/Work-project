@@ -323,6 +323,32 @@ function getTasksWithTargets({tasks, step, jobId, path}) {
     })
 }
 
+async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
+    const steps = project.steps.map(item => {
+        if(item.id === jobId) {
+            item.status = 'Completed';
+            item.progress = 100;
+            item.targetFile = path;
+        }
+        return item;
+    })
+    const taskStep = steps.find(item => item.id === jobId);
+    const tasks = project.tasks.map(item => {
+        let targetFiles = item.targetFiles || [];
+        if(taskStep.taskId === item.taskId) {
+            targetFiles.push({fileName, path, isFileApproved: false});
+            item.targetFiles = targetFiles;
+        }
+        return item;
+    })
+    try {
+        return await updateProject({"_id": project.id}, { steps, tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateNonWordsTaskTargetFiles");
+    }
+}
+
 function getAfterPathUpdate({xtmJobs, jobId, path, name}) {
     return xtmJobs.map(item => {
         if(item.jobId === jobId) {
@@ -382,4 +408,4 @@ function getTasksAfterReopen({steps, tasks}) {
 }
 
 module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, 
-    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps };
+    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
