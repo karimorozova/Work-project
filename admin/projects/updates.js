@@ -364,7 +364,11 @@ async function getAfterApproveFile({taskId, jobId, isFileApproved}) {
         const project = await getProject({"tasks.taskId": taskId});
         const tasks = project.tasks.map(task => {
             if(task.taskId === taskId) {
-                task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
+                if(task.xtmJobs) {
+                    task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
+                } else {
+                    task.targetFiles = getAfterApproveUpdate({jobs: task.targetFiles, jobId, isFileApproved});
+                }
             }
             return task;
         });
