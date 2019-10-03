@@ -29,7 +29,7 @@
                 a.step-files__link(:href='row.source')
                     img.step-files__image(src="../../../assets/images/download-big-b.png")
             template(slot="target" slot-scope="{ row, index }")
-                .step-files__link(v-if="row.category !== 'Reference file' && isCompleted")
+                .step-files__link(v-if="isDownloadIcon(row)")
                     img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile(index)")                            
 </template>
 
@@ -74,7 +74,16 @@ export default {
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
         },
+        isDownloadIcon(file) {
+            if(this.step.serviceStep.calculationUnit === 'Words') {
+                return file.category !== 'Reference file' && this.isCompleted;
+            }
+            return this.isCompleted && file.target;
+        },
         async downloadTargetFile(index) {
+            if(this.step.serviceStep.calculationUnit !== 'Words') {
+                return this.createLinkAndDownolad(this.stepFiles[index].target.split("./dist")[1]);
+            }
             const xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
             try {
                 if(xtmJob[`${this.step.name}-targetFile`]) {
@@ -103,8 +112,11 @@ export default {
         }),
         isCompleted() {
             const { progress } = this.step;
+            if(this.step.serviceStep.calculationUnit === 'Words') {
             return (progress.wordsDone / progress.wordsTotal * 100 >= 100 && this.step.status === 'Completed') 
                 || this.step.status === 'Cancelled Halfway';
+            }
+            return progress === 100;
         }
     },
     components: {
