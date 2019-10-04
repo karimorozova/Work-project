@@ -67,9 +67,9 @@ export default {
         toggleProp(e, prop) {
             this[prop] = !this[prop];
         },
-        isNameUnique() {
+        isNotUnique() {
             const duplicateName = this.pricelists.find(item => {
-                return (item.name === this.pricelistName);
+                return (item.name.toLowerCase() === this.pricelistName.toLowerCase().trim());
             })
             return duplicateName;
         },
@@ -78,7 +78,7 @@ export default {
         },
         async checkForErrors() {
             this.errors = [];
-            if(!this.pricelistName || this.isNameUnique()) this.errors.push("The name should be unique and not empty.");
+            if(!this.pricelistName || this.isNotUnique()) this.errors.push("The name should be unique and not empty.");
             if(this.errors.length) {
                 return this.isErrorExist = true;
             }
