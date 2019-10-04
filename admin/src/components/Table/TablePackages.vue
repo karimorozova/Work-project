@@ -82,6 +82,7 @@ export default {
             }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             const sizeRegEx = /^[1-9][0-9]*$/;
             if(!this.currentName || !this.isTitleUnique(index)) this.errors.push("Name should not be empty and be unique!");
@@ -105,7 +106,6 @@ export default {
             this.areErrors = false;
         },
         async savePackage(index) {
-            if(this.currentActive === -1) return;
             this.packages[index].name = this.currentName;
             this.packages[index].size = this.currentSize;
             try {

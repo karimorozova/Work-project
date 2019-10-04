@@ -73,6 +73,7 @@ export default {
             }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentSourceName || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
             if(this.errors.length) {
@@ -105,7 +106,6 @@ export default {
             this.isDeleting = false;
         },
         async saveSource(index) {
-            if(this.currentActive === -1) return;
             this.sources[index].source = this.currentSourceName;
             try {
                 await this.$http.post("/api/leadsource", {leadSource: this.sources[index]});

@@ -77,6 +77,7 @@ export default {
             }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentGroupName || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
             if(this.errors.length) {
@@ -109,7 +110,6 @@ export default {
             this.isDeleting = false;
         },
         async saveGroup(index) {
-            if(this.currentActive === -1) return;
             this.groups[index].name = this.currentGroupName;
             try {
                 await this.$http.post("/api/group", {group: this.groups[index]});

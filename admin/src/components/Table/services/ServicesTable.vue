@@ -168,6 +168,7 @@ export default {
             }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentTitle || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
             if(!this.currentLangForm) this.errors.push("Please, select language form.");

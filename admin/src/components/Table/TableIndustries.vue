@@ -132,6 +132,7 @@ export default {
             this.currentName= this.industries[index].name;
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentName || !this.isNameUnique(index)) this.errors.push("Name should not be empty and be unique!");
             if(this.errors.length) {
@@ -153,7 +154,6 @@ export default {
             this.areErrors = false;
         },
         async saveChanges(index) {
-            if(this.currentActive === -1) return;
             const id = this.industries[index]._id;
             const newData = this.collectData(index);
             try {

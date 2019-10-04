@@ -117,6 +117,7 @@ export default {
             }
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             const sameType = this.alliInstructions.find(item => {
                 return item.type === this.currentInstruction.type && item._id !== this.currentInstruction._id
                 })
