@@ -33,7 +33,7 @@ import { mapActions } from "vuex";
 export default {
     mixins: [crudIcons],
     props: {
-        alliInstructions: {
+        allInstructions: {
             type: Array,
             default: () => []
         },
@@ -116,13 +116,15 @@ export default {
                 this.alertToggle({message: "Error on deleting instruction", isShow: true, type: "error"});
             }
         },
+        isNotUniqueType() {
+            return this.allInstructions.find(item => {
+                return item.type.toLowerCase() === this.currentInstruction.type.toLowerCase().trim() && item._id !== this.currentInstruction._id
+            })
+        },
         async checkErrors(index) {
             if(this.currentActive === -1) return;
-            const sameType = this.alliInstructions.find(item => {
-                return item.type === this.currentInstruction.type && item._id !== this.currentInstruction._id
-                })
             this.errors = [];
-            if(!this.currentInstruction.type || sameType) this.errors.push("Type title should be unique and not empty");
+            if(!this.currentInstruction.type || this.isNotUniqueType()) this.errors.push("Type title should be unique and not empty");
             if(!this.currentInstruction.content) this.errors.push("Type content should not be empty");
             if(this.errors.length) {
                 return this.areErrors = true;
