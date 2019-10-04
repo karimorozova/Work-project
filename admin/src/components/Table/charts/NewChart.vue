@@ -70,7 +70,7 @@ export default {
             await this.saveChart();
         },
         isNotUniqueName() {
-            const sameNameChart = this.charts.find(item => item.name === this.chartName);
+            const sameNameChart = this.charts.find(item => item.name.toLowerCase() === this.chartName.toLowerCase().trim());
             return sameNameChart;
         },
         async saveChart() {
