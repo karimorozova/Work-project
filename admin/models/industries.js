@@ -4,15 +4,18 @@ const Schema = mongoose.Schema;
 const IndustriesSchema = new mongoose.Schema({
     icon: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     name: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     generic: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     active: {
         type: Boolean,

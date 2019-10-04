@@ -143,7 +143,7 @@ export default {
         },
         isNameUnique(index) {
             const duplicateIndex = this.industries.findIndex((item, ind) => {
-                if(index !== ind && item.name === this.industries[index].name) {
+                if(index !== ind && item.name.toLowerCase() === this.currentName.toLowerCase().trim()) {
                     return item;
                 }
             })
@@ -218,7 +218,7 @@ export default {
                 icon: "",
                 name: "",
                 generic: "",
-                active: false
+                active: true
             });
             this.setEditionData(this.industries.length - 1);
         },
