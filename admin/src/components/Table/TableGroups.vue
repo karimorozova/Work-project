@@ -89,7 +89,7 @@ export default {
         },
         isTitleUnique(index) {
             const duplicateIndex = this.groups.findIndex((item, ind) => {
-                if(index !== ind && item.name === this.groups[index].name) {
+                if(index !== ind && item.name.toLowerCase() === this.currentGroupName.toLowerCase().trim()) {
                     return item;
                 }
             })
