@@ -83,8 +83,9 @@ export default {
         },
         async checkErrors(index) {
             this.errors = [];
+            const sizeRegEx = /^[1-9][0-9]*$/;
             if(!this.currentName || !this.isTitleUnique(index)) this.errors.push("Name should not be empty and be unique!");
-            if(!this.currentSize) this.errors.push("Please, set the size of the package.");
+            if(!this.currentSize || !sizeRegEx.test(this.currentSize)) this.errors.push("Please, set the valid size of the package.");
             if(this.errors.length) {
                 this.areErrors = true;
                 return
@@ -94,7 +95,7 @@ export default {
         },
         isTitleUnique(index) {
             const duplicateIndex = this.packages.findIndex((item, ind) => {
-                if(index !== ind && item.name === this.packages[index].name) {
+                if(index !== ind && item.name.toLowerCase() === this.currentName.toLowerCase().trim()) {
                     return item;
                 }
             })
