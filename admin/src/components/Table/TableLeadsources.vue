@@ -84,7 +84,7 @@ export default {
         },
         isTitleUnique(index) {
             const duplicateIndex = this.sources.findIndex((item, ind) => {
-                if(index !== ind && item.source === this.sources[index].source) {
+                if(index !== ind && item.source.toLowerCase() === this.currentSourceName.toLowerCase().trim()) {
                     return item;
                 }
             })
