@@ -164,7 +164,7 @@ export default {
             if(key === "cancel") {
                 if(this.currentActive === -1) return;
                 this.cancel();
-                await this.getServices();
+                await this.getAllServices();
             }
         },
         async checkErrors(index) {
@@ -172,6 +172,7 @@ export default {
             if(!this.currentTitle || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
             if(!this.currentLangForm) this.errors.push("Please, select language form.");
             if(!this.currentUnit) this.errors.push("Please, select calculation unit.");
+            if(!this.currentStep1) this.errors.push("Please, select Step 1.");
             if(this.errors.length) {
                 this.areErrors = true;
                 return
@@ -267,7 +268,9 @@ export default {
             this.currentActive = -1;
             this.currentTitle = "";
             this.currentLangForm = "",
-            this.currentUnit = "",
+            this.currentUnit = "";
+            this.currentStep1 = "";
+            this.currentStep2 = "";
             this.imageData = "";
             this.iconFile = [];
             this.$emit("setUnitFilter", {unit: ""});
@@ -315,11 +318,7 @@ export default {
         activeClasses(index) {
             return this.currentActive === index ? 'services_active services_flex' : "";
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            getServices: "getServices",
-            servicesGetting: "servicesGetting"
-        }),
+        ...mapActions(["alertToggle", "servicesGetting"]),
     },
     computed: {
         manageIcons() {
