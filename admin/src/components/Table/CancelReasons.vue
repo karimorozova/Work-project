@@ -75,6 +75,7 @@ export default {
             this.isDeleting = true;
         },
         async checkErrors(index) {
+            if(this.currentActive === -1) return;
             this.errors = [];
             if(!this.currentReason || !this.isReasonUnique(index)) this.errors.push("Reason should not be empty and be unique!");
             if(this.errors.length) {
@@ -86,7 +87,7 @@ export default {
         },
         isReasonUnique(index) {
             const duplicateIndex = this.reasons.findIndex((item, ind) => {
-                if(index !== ind && item.reason.trim() === this.reasons[index].reason.trim()) {
+                if(index !== ind && item.reason.toLowerCase() === this.currentReason.toLowerCase().trim()) {
                     return item;
                 }
             })
@@ -107,7 +108,6 @@ export default {
             this.isDeleting = false;
         },
         async saveReason(index) {
-            if(this.currentActive === -1) return;
             this.reasons[index].reason = this.currentReason;
             try {
                 await this.$http.post("/api/reason", {reason: this.reasons[index]});
