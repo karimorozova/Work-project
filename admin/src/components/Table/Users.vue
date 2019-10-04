@@ -124,7 +124,7 @@ export default {
             this.errors = [];
             if(!this.currentFirstName) this.errors.push("Please, enter user's first name");
             if(!this.currentLastName) this.errors.push("Please, enter user's last name");
-            if(!this.currentEmail || !this.isEmailValid() || !this.isEmailUnique(index)) this.errors.push("Email should be unique and not empty");
+            if(!this.currentEmail || !this.isEmailValid() || this.isEmailUnique(index)) this.errors.push("Enter a valid and unique email");
             if(!this.currentPosition) this.errors.push("Please, enter user's position");
             if(!this.currentGroup || !this.currentGroup.name) this.errors.push("Please, select user's group");
             if(this.errors.length) {
@@ -158,10 +158,9 @@ export default {
             return regex.test(this.currentEmail);
         },
         isEmailUnique(index) {
-            const emails = this.users.map((item, i) => {
-                if(i !== index) return item.email
-            } );
-            return emails.indexOf(this.currentEmail.trim()) === -1;
+            return this.users.filter((item, i) => {
+                return i !== index && item.email.toLowerCase() === this.currentEmail.toLowerCase().trim()
+            }).length;
         },
         setEditingData(index) {
             this.currentActive = index;
