@@ -8,7 +8,8 @@ const StepSchema = new mongoose.Schema({
     },
     calculationUnit: {
         type: String,
-        default: 'Words'
+        default: 'Words',
+        trim : true
     },
     isStage1: {
         type: Boolean

@@ -13,15 +13,18 @@ const ServicesSchema = new mongoose.Schema({
     },
     symbol: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     formType: {
         type: String,
-        default: '' 
+        default: '',
+        trim: true 
     },
     icon: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     active: {
         type: Boolean,
@@ -33,11 +36,13 @@ const ServicesSchema = new mongoose.Schema({
     },
     calculationUnit: {
         type: String,
-        default: 'Words'
+        default: 'Words',
+        trim: true
     },
     languageForm: {
         type: String,
-        default: 'Duo'
+        default: 'Duo',
+        trim: true
     },
     steps: [{
         stage: {
@@ -57,10 +62,12 @@ const ServicesSchema = new mongoose.Schema({
     xtrf: {
         type: String,
         default: '',
+        trim: true
     },
     projectType: {
         type: String,
         default: "regular",
+        trim: true
     },
     createdAt: {
         type: Date,

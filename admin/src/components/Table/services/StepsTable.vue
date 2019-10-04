@@ -103,7 +103,7 @@ export default {
                 isStage1: false,
                 isStage2: false,
                 isEditor: false,
-                isActive: false,
+                isActive: true,
                 symbol: ""
             }
             this.steps.push(this.currentStep);
@@ -143,6 +143,7 @@ export default {
             const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title.trim());
             if(!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty");
             if(!this.currentStep.calculationUnit) this.errors.push("Please, select calculation unit.");
+            if(!this.currentStep.isStage1 && !this.currentStep.isStage2) this.errors.push("Please, set at least one stage.");
             if(this.errors.length) {
                 return this.areErrors = true;
             }
