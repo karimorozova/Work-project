@@ -440,6 +440,9 @@ export default {
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .photo-image {
         max-width: 100%;
         max-height: 100%;

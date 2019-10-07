@@ -3,7 +3,10 @@
         .photo__wrap(v-if="!accountInfo.photo")
             input.photo__file(type="file" @change="previewPhoto")
             .photo__text(v-if="!isImageExist")
-                p.photo__message upload your photo                          
+                p.photo__message(v-if="!isFileError") upload your photo
+                    span.photo__extensions *.jpg/jpeg/png
+                    span.photo__size <= 2MB
+                p.photo__error-message(v-else) Incorrect file type or size                       
             img.photo__image(v-if="isImageExist")
         .photo__wrap(v-if="accountInfo.photo")
             input.photo__file(type="file" @change="previewPhoto")                       
@@ -18,7 +21,8 @@ export default {
         return {
             photoFile: [],
             isImageExist: false,
-            domain: ""
+            domain: "",
+            isFileError: false
         }
     },
     methods: {
@@ -27,7 +31,7 @@ export default {
         }),
         previewPhoto() {
             let input = document.getElementsByClassName('photo__file')[0];
-            if(input.files && input.files[0]) {
+            if(this.checkFile(input.files)) {
                 this.setAccountProp({prop: "photoFile", value: input.files});
                 this.isImageExist = true;
                 let reader = new FileReader();
@@ -35,8 +39,24 @@ export default {
                     document.getElementsByClassName('photo__image')[0].src = e.target.result;
                 }
                 reader.readAsDataURL(input.files[0]);
+            } else {
+                this.showFileError();
             }
         },
+        showFileError() {
+            this.isFileError = true;
+            setTimeout(() => {
+                this.isFileError = false;
+            }, 5000)
+        },
+        checkFile(files) {
+            if(files &&  files[0]) {
+                const types = ['jpg', 'jpeg', 'png'];
+                const type = files[0].name.split('.').pop();
+                return types.indexOf(type) !== -1 && files[0].size <= 2000000;
+            }
+            return false;
+        }
     },
     computed: {
         ...mapGetters({
@@ -63,6 +83,7 @@ export default {
         margin-bottom: 20px;
         display: flex;
         justify-content: center;
+        align-items: center;
     }
     &__image {
         max-width: 100%;
@@ -84,6 +105,14 @@ export default {
         align-items: center;
         width: 100%;
         height: 100%;
+    }
+    &__extensions, &__size {
+        display: block;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+    &__error-message {
+        color: $orange;
     }
     &__message {
         font-size: 18px;
