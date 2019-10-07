@@ -14,8 +14,8 @@
                         p.photo-text__message(v-if="!isFileError") upload your photo
                             span.photo-extensions *.jpg/jpeg/png
                             span.photo-size <= 2MB
-                        p.photo-text__error-message(v-else) Incorrect file type or size
                     img.photo-image(v-if="imageExist")
+                    p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
                 .photo-wrap(v-if="currentVendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
                     img.photo-image(:src="currentVendor.photo")
@@ -105,8 +105,10 @@ import VendorRates from "./VendorRates";
 import Addseverallangs from "../finance/Addseverallangs";
 import AvailablePairs from "../finance/pricelists/AvailablePairs";
 import { mapGetters, mapActions } from "vuex";
+import photoPreview from '@/mixins/photoPreview';
 
 export default {
+    mixins: [photoPreview],
     data() {
         return {
             areErrorsExist: false,
@@ -134,34 +136,6 @@ export default {
         },
         cancelApprove() {
             this.isApproveModal = false;
-        },
-        previewPhoto() {
-            let input = document.getElementsByClassName('photo-file')[0];
-            if(this.checkFile(input.files)) {
-                this.photoFile = input.files;
-                this.imageExist = true;
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementsByClassName('photo-image')[0].src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                this.showFileError();
-            }
-        },
-        showFileError() {
-            this.isFileError = true;
-            setTimeout(() => {
-                this.isFileError = false;
-            }, 5000)
-        },
-        checkFile(files) {
-            if(files &&  files[0]) {
-                const types = ['jpg', 'jpeg', 'png'];
-                const type = files[0].name.split('.').pop();
-                return types.indexOf(type) !== -1 && files[0].size <= 2000000;
-            }
-            return false;
         },
         closeErrors() {
             this.areErrorsExist = false;
@@ -473,6 +447,12 @@ export default {
         text-align: center;
     }
     &__error-message {
+        position: absolute;
+        bottom: 30%;
+        z-index: 10;
+        background-color: $white;
+        padding: 3px;
+        box-sizing: border-box;
         color: $orange;
     }
 }

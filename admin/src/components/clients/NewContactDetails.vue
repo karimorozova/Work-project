@@ -10,8 +10,11 @@
                 .photo-wrap(v-if="!contact.photo")
                     input.photo-file(type="file" @change="previewPhoto")
                     .photo-text(v-if="!imageExist")
-                        p upload your photo                          
+                        p.photo-text__message(v-if="!isFileError") upload your photo
+                            span.photo-extensions *.jpg/jpeg/png
+                            span.photo-size <= 2MB                   
                     img.photo-image(v-if="imageExist")
+                    p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
                 .photo-wrap(v-if="contact.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
                     img.photo-image(:src="contact.photo")    
@@ -78,8 +81,10 @@ import ClickOutside from "vue-click-outside";
 import CountriesSelect from './CountriesSelect';
 import TimezoneSelect from './TimezoneSelect';
 import { mapGetters } from 'vuex';
+import photoPreview from '@/mixins/photoPreview';
 
 export default {
+    mixins: [photoPreview],
     data() {
         return {
             contact: {
@@ -105,23 +110,11 @@ export default {
             errors: [],
             isSaveClicked: false,
             genders: ["Male", "Female"],
-            fromRoute: ""
+            fromRoute: "",
+            isFileError: false
         }
     },
     methods: {
-        previewPhoto() {
-            let input = document.getElementsByClassName('photo-file')[0];
-            if(input.files && input.files[0]) {
-                this.contact.file = input.files[0].name;
-                this.photoFile = input.files;
-                this.imageExist = true;
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementsByClassName('photo-image')[0].src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        },
         openGenders() {
             this.genderDropped = !this.genderDropped;
         },
@@ -283,6 +276,9 @@ export default {
             overflow: hidden;
             display: flex;
             justify-content: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             .photo-image {
                 max-height: 100%;
                 max-width: 100%;
@@ -319,12 +315,27 @@ export default {
     align-items: center;
     width: 100%;
     height: 100%;
-    p {
+    &__message {
         font-size: 18px;
         opacity: 0.5;
         width: 50%;
         text-align: center;
     }
+    &__error-message {
+        position: absolute;
+        bottom: 30%;
+        z-index: 10;
+        background-color: $white;
+        padding: 3px;
+        box-sizing: border-box;
+        color: $orange;
+    }
+}
+
+.photo-extensions, .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
 }
 
 .names-gender {

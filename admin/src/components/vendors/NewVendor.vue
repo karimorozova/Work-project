@@ -10,8 +10,11 @@
                 .photo-wrap(v-if="!vendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")
                     .photo-text(v-if="!imageExist")
-                        p upload your photo                          
+                        p.photo-text__message(v-if="!isFileError") upload your photo
+                            span.photo-extensions *.jpg/jpeg/png
+                            span.photo-size <= 2MB
                     img.photo-image(v-if="imageExist")
+                    p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
                 .photo-wrap(v-if="vendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
                     img.photo-image(:src="vendor.photo")
@@ -95,11 +98,10 @@ import SelectSingle from "../SelectSingle";
 import Asterisk from "../Asterisk";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import { mapGetters, mapActions } from "vuex";
+import photoPreview from '@/mixins/photoPreview';
 
 export default {
-    props: {
-        
-    },
+    mixins: [photoPreview],
     data() {
         return {
             areErrorsExist: false,
@@ -134,22 +136,11 @@ export default {
                 industries: [],
                 test: false,
                 position: []
-            }
+            },
+            isFileError: false
         }
     },
     methods: {
-        previewPhoto() {
-            let input = document.getElementsByClassName('photo-file')[0];
-            if(input.files && input.files[0]) {
-                this.photoFile = input.files;
-                this.imageExist = true;
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementsByClassName('photo-image')[0].src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        },
         closeErrors() {
             this.areErrorsExist = false;
         },
@@ -247,6 +238,7 @@ export default {
 
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss"; 
 
 .vendor-wrap {
     position: relative;
@@ -368,6 +360,9 @@ export default {
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .photo-image {
         max-width: 100%;
         max-height: 100%;
@@ -391,12 +386,27 @@ export default {
     align-items: center;
     width: 100%;
     height: 100%;
-    p {
+    &__message {
         font-size: 18px;
         opacity: 0.5;
         width: 50%;
         text-align: center;
     }
+    &__error-message {
+        position: absolute;
+        bottom: 30%;
+        z-index: 10;
+        background-color: $white;
+        padding: 3px;
+        box-sizing: border-box;
+        color: $orange;
+    }
+}
+
+.photo-extensions, .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
 }
 
 .delete-approve {

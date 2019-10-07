@@ -6,8 +6,8 @@
                 p.photo__message(v-if="!isFileError") upload your photo
                     span.photo__extensions *.jpg/jpeg/png
                     span.photo__size <= 2MB
-                p.photo__error-message(v-else) Incorrect file type or size                       
             img.photo__image(v-if="isImageExist")
+            p.photo__error-message(v-if="isFileError") Incorrect file type or size
         .photo__wrap(v-if="accountInfo.photo")
             input.photo__file(type="file" @change="previewPhoto")                       
             img.photo__image(:src="domain+accountInfo.photo")
@@ -41,6 +41,7 @@ export default {
                 reader.readAsDataURL(input.files[0]);
             } else {
                 this.showFileError();
+                input.value = "";
             }
         },
         showFileError() {
@@ -53,7 +54,7 @@ export default {
             if(files &&  files[0]) {
                 const types = ['jpg', 'jpeg', 'png'];
                 const type = files[0].name.split('.').pop();
-                return types.indexOf(type) !== -1 && files[0].size <= 2000000;
+                return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 2000000;
             }
             return false;
         }
@@ -112,6 +113,12 @@ export default {
         margin-top: 10px;
     }
     &__error-message {
+        position: absolute;
+        bottom: 30%;
+        z-index: 10;
+        background-color: $white;
+        padding: 3px;
+        box-sizing: border-box;
         color: $orange;
     }
     &__message {
