@@ -11,7 +11,10 @@
                 .photo-wrap(v-if="!currentVendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")
                     .photo-text(v-if="!imageExist")
-                        p upload your photo                          
+                        p.photo-text__message(v-if="!isFileError") upload your photo
+                            span.photo-extensions *.jpg/jpeg/png
+                            span.photo-size <= 2MB
+                        p.photo-text__error-message(v-else) Incorrect file type or size
                     img.photo-image(v-if="imageExist")
                 .photo-wrap(v-if="currentVendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
@@ -118,7 +121,8 @@ export default {
             errors: [],
             langPairs: [],
             addSeveralPriceId: "",
-            oldEmail: ""
+            oldEmail: "",
+            isFileError: false
         }
     },
     methods: {
@@ -133,7 +137,7 @@ export default {
         },
         previewPhoto() {
             let input = document.getElementsByClassName('photo-file')[0];
-            if(input.files && input.files[0]) {
+            if(this.checkFile(input.files)) {
                 this.photoFile = input.files;
                 this.imageExist = true;
                 let reader = new FileReader();
@@ -141,7 +145,23 @@ export default {
                     document.getElementsByClassName('photo-image')[0].src = e.target.result;
                 }
                 reader.readAsDataURL(input.files[0]);
+            } else {
+                this.showFileError();
             }
+        },
+        showFileError() {
+            this.isFileError = true;
+            setTimeout(() => {
+                this.isFileError = false;
+            }, 5000)
+        },
+        checkFile(files) {
+            if(files &&  files[0]) {
+                const types = ['jpg', 'jpeg', 'png'];
+                const type = files[0].name.split('.').pop();
+                return types.indexOf(type) !== -1 && files[0].size <= 2000000;
+            }
+            return false;
         },
         closeErrors() {
             this.areErrorsExist = false;
@@ -157,7 +177,6 @@ export default {
             if(this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
                 try {
                     const result = await this.$http.get(`/vendors/application/unique-email?email=${this.currentVendor.email}`);
-                    console.log(result.data);
                     const isUnique = !result.data;
                     isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
                 } catch(err) {
@@ -299,6 +318,7 @@ export default {
 
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .vendor-wrap {
     position: relative;
@@ -443,12 +463,21 @@ export default {
     align-items: center;
     width: 100%;
     height: 100%;
-    p {
+    &__message {
         font-size: 18px;
         opacity: 0.5;
         width: 50%;
         text-align: center;
     }
+    &__error-message {
+        color: $orange;
+    }
+}
+
+.photo-extensions, .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
 }
 
 .delete-approve {
