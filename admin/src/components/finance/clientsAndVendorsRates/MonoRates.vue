@@ -1,5 +1,5 @@
 <template lang="pug">
-.mono-rates
+.mono-rates(v-click-outside="closeImportRates")
     .filters
         RatesFilters(
             :entity="entity"

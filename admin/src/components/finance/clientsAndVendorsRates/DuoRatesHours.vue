@@ -1,5 +1,5 @@
 <template lang="pug">
-.duo-rates
+.duo-rates(v-click-outside="closeImportRates")
     .filters
         RatesFilters(
             :entity="entity"
