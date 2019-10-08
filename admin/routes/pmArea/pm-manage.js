@@ -60,9 +60,11 @@ router.post("/new-project", async (req, res) => {
 })
 
 router.get("/all-managers", async (req, res) => {
+    const { groupFilter } = req.query;
     try {
-        const users = await User.find({}, {firstName: 1, lastName: 1});
-        res.send(users);
+        const users = await User.find({}, {firstName: 1, lastName: 1}).populate("group");
+        const filteredUsers = groupFilter ? users.filter(item => item.group.name === groupFilter) : users;
+        res.send(filteredUsers);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting managers ");
