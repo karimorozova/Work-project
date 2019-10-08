@@ -38,7 +38,7 @@ async function getFilesInfo(obj) {
         if(iconFile) {
             const newIconPath = `./dist/services/${formattedDate}-${iconFile[0].filename}`;
             await moveFile(iconFile[0], newIconPath);
-            icon = `/static/${formattedDate}-${iconFile[0].filename}`;
+            icon = `/services/${formattedDate}-${iconFile[0].filename}`;
         }
         return icon;
     } catch(err) {
