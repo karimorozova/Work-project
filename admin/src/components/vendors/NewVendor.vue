@@ -150,7 +150,7 @@ export default {
         },
         async checkForErrors() {
             this.errors = [];
-            if(!this.vendor.firstName) this.errors.push('Company name cannot be empty.');
+            if(!this.vendor.firstName) this.errors.push('First name cannot be empty.');
             if(!this.vendor.industries.length) this.errors.push('Please, choose at least one industry.');
             if(!this.vendor.status) this.errors.push('Please, choose status.');
             if(this.checkEmail()) {
