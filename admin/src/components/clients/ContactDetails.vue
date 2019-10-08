@@ -322,12 +322,13 @@ export default {
 .photo-file {
     position: absolute;
     top: -25px;
-    left: -100px;
+    left: -65px;
     height: 180px;
     background-color: transparent;
     outline: none;
     border: none;
     z-index: 5;
+    cursor: pointer;
 }
 
 .photo-text {

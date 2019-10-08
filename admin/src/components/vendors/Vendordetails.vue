@@ -432,6 +432,7 @@ export default {
     outline: none;
     border: none;
     z-index: 5;
+    cursor: pointer;
 }
 
 .photo-text {

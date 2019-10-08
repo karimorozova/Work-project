@@ -199,6 +199,8 @@ export default {
             z-index: 2;
             position: absolute;
             left: -10px;
+            cursor: pointer;
+            font-size: 0;
         }
     }
     &__download {

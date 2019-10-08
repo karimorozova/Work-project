@@ -120,6 +120,8 @@ export default {
         z-index: 2;
         position: absolute;
         left: -5px;
+        cursor: pointer;
+        font-size: 0;
     }
     &_green {
         color: $green-approve;

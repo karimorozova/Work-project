@@ -272,6 +272,8 @@ export default {
             opacity: 0;
             z-index: 2;
             position: absolute;
+            cursor: pointer;
+            font-size: 0;
         }
     }
     &_red-shadow {

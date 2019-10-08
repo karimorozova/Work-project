@@ -415,6 +415,7 @@ export default {
         position: absolute;
         left: 6px;
         cursor: pointer;
+        font-size: 0;
     }
     &__no-file {
         opacity: 0.5;

@@ -349,6 +349,7 @@ export default {
         position: absolute;
         left: 15px;
         cursor: pointer;
+        font-size: 0;
     }
     &_no-back {
         background: none;
