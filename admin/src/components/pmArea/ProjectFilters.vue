@@ -126,9 +126,10 @@ export default {
             })
         },
         managersNames() {
-            return this.managers.map(item => {
+            const fullNames = this.managers.map(item => {
                 return item.firstName + " " + item.lastName;
             })
+            return ['All', ...fullNames];
         }
     },
     mounted() {

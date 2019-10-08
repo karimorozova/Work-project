@@ -39,7 +39,7 @@ export default {
             sourceFilter: [],
             targetFilter: [],
             statusFilter: "All",
-            managerFilter: "",
+            managerFilter: "All",
             startFilter: "",
             deadlineFilter: "",
             managers: [],
@@ -71,7 +71,7 @@ export default {
             this.$router.push(`/project-details/${project._id}`);
         },
         async getManagers() {
-            const managers = await this.$http.get("/pm-manage/all-managers");
+            const managers = await this.$http.get("/pm-manage/all-managers?groupFilter=Project%20Managers");
             this.managers = managers.body;
         },
     },
@@ -88,7 +88,7 @@ export default {
                     return this.projectsType !== 'requests' ? item.status === this.statusFilter : item;
                 })
             }
-            if(this.managerFilter) {
+            if(this.managerFilter  && this.managerFilter !== 'All') {
                 result = result.filter(item => {
                     return item.projectManager.firstName + ' ' + item.projectManager.lastName === this.managerFilter
                 })
