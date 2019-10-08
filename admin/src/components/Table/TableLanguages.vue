@@ -127,7 +127,11 @@ export default {
         },
         toggleActive(index) {
             if(this.currentActive !== index) return;
-            this.languages[index].active = !this.languages[index].active;
+            const curLang = this.langPaging[this.currentPage-1][index];
+            this.languages = this.languages.map(item => {
+                item.active = item._id === curLang._id ? !curLang.active : item.active;
+                return item;
+            })
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
@@ -151,11 +155,11 @@ export default {
         },
         async saveChanges(index) {
             if(this.currentActive === -1) return;
-            const id = this.languages[this.currentActive]._id;
+            const id = this.langPaging[this.currentPage-1][this.currentActive]._id;
             let newData = new FormData();
-            const isActive = this.languages[this.currentActive].active ? 1 : "";
+            const isActive = this.langPaging[this.currentPage-1][this.currentActive].active ? 1 : "";
             newData.append("flag", this.file[0]);
-            newData.append("icon", this.languages[this.currentActive].icon);
+            newData.append("icon", this.langPaging[this.currentPage-1][this.currentActive].icon);
             newData.append("active", isActive);
             try {
                 await this.$http.put(`/api/languages/${id}`, newData);
