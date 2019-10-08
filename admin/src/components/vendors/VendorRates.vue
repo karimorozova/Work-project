@@ -101,6 +101,7 @@ export default {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    position: relative;
     &__block {
         box-sizing: border-box;
         width: 100%;

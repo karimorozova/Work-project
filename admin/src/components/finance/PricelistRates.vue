@@ -37,9 +37,6 @@ import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    props: {
-    
-    },
     data() {
         return {
             isMonoDrop: false,
@@ -80,6 +77,7 @@ export default {
 .finance-rates {
     margin: 20px;
     margin-left: 0;
+    position: relative;
     &__price-info {
         display: flex;
         justify-content: space-between;

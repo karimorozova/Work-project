@@ -1,5 +1,5 @@
 <template lang="pug">
-.mono-rates(v-click-outside="closeImportRates")
+.mono-rates
     .filters
         RatesFilters(
             :entity="entity"
@@ -124,7 +124,6 @@ export default {
 
 <style lang="scss" scoped>
 .mono-rates {
-    position: relative;
     font-family: MyriadPro;
     width: 972px;
     &__action {

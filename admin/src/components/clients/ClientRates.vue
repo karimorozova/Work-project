@@ -93,6 +93,7 @@ export default {
 .client-rates {
     display: flex;
     flex-direction: column;
+    position: relative;
     &__block {
         width: 100%;
         max-height: 500px;

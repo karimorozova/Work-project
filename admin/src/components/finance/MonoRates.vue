@@ -112,7 +112,6 @@ export default {
 
 <style lang="scss" scoped>
 .mono-rates {
-    position: relative;
     font-family: MyriadPro;
     width: 972px;
     &__action {

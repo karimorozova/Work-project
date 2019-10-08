@@ -57,9 +57,6 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     mixins: [ratesFilters, genericRates],
-    props: {
-        
-    },
     data() {
         return {
             defaultStepSymbol: "translation",
@@ -109,7 +106,6 @@ export default {
 
 <style lang="scss" scoped>
 .duo-rates {
-    position: relative;
     font-family: MyriadPro;
     width: 972px;
     &__action {

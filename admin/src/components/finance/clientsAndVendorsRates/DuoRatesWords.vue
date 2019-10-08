@@ -1,5 +1,5 @@
 <template lang="pug">
-.duo-rates(v-click-outside="closeImportRates")
+.duo-rates
     .filters
         RatesFilters(
             :entity="entity"
@@ -118,7 +118,6 @@ export default {
 
 <style lang="scss" scoped>
 .duo-rates {
-    position: relative;
     font-family: MyriadPro;
     width: 972px;
     &__action {
