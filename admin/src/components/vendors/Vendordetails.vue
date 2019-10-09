@@ -161,7 +161,7 @@ export default {
         async checkForErrors() {
             try {
                 this.errors = [];
-                if(!this.currentVendor.firstName) this.errors.push('Company name cannot be empty.');
+                if(!this.currentVendor.firstName) this.errors.push('First name cannot be empty.');
                 if(!this.currentVendor.industries.length) this.errors.push('Please, choose at least one industry.');
                 if(!this.currentVendor.status) this.errors.push('Please, choose status.');
                 await this.checkEmail();
