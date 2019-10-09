@@ -95,7 +95,7 @@ export default {
             }
             if(this.clientFilter) {
                 result = result.filter(item => {
-                    return item.customer.name.toLowerCase().indexOf(this.clientFilter) !=-1
+                    return item.customer.name.toLowerCase().indexOf(this.clientFilter.toLowerCase().trim()) !=-1
                 })
             }
             if(this.startFilter) {
