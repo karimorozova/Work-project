@@ -4,7 +4,7 @@
         .new-price__row
             .new-price__col
                 .new-price__item
-                    LabelVal(text="Name" customClass="new-chart-label")
+                    LabelVal(text="Name" customClass="new-chart-label" :isRequired="true")
                         input.new-price__text(type="text" v-model="pricelistName")
                 .new-price__item
                     LabelVal(text="Copy from" customClass="new-chart-label")
