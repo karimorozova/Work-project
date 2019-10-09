@@ -30,7 +30,7 @@
                 .block-item
                     label.block-item__label.block-item_relative Email:
                         Asterisk(:customStyle="asteriskStyle")
-                    input.block-item__input-field(:class="{'block-item_error-shadow': checkEmail && isSaveClicked}" type="text" placeholder="Email" :value="vendor.email" @change="(e) => updateProp(e,'email')")
+                    input.block-item__input-field(:class="{'block-item_error-shadow': checkEmail() && isSaveClicked}" type="text" placeholder="Email" :value="vendor.email" @change="(e) => updateProp(e,'email')")
                 .block-item
                     label Phone:
                     input.block-item__input-field(type="text" placeholder="Phone" :value="vendor.phone" @change="(e) => updateProp(e,'phone')")
