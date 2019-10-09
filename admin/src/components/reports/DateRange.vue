@@ -1,10 +1,10 @@
 <template lang="pug">
-    .date-range
+    .date-range(v-click-outside="closePickers")
         .date-range__title Date Range:
         .date-range__dates
             input.date-range__input(type="text" readonly :value="dateRange")
             img.date-range__icon(src="../../assets/images/calendar.png" @click="togglePickers")
-            .date-range__datepickers(v-if="isDatepickers" v-click-outside="closePickers")
+            .date-range__datepickers(v-if="isDatepickers")
                 .date-range__pickers
                     DatePickers(
                         title="From"
