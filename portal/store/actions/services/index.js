@@ -50,3 +50,19 @@ export const setLangCombinations = ({ commit }, payload) => {
 export const setProjects = ({commit}, payload) => {
   commit('SET_PROJECTS', payload)
 };
+
+export const saveAccountDetails = async function({ commit, dispatch, state }, payload) {
+    let formData = new FormData();
+    for(let key in payload) {
+        formData.append(key, payload[key])
+    }
+    formData.append('token', state.token);
+    try {
+        const result = await this.$axios.post('/portal/account-details', formData);
+        const { user } = result.data; 
+        commit('SET_USER', user);
+    } catch(err) {
+        console.log(err);
+        dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+    }
+}

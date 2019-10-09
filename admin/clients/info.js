@@ -35,7 +35,7 @@ async function attachPhotos({photoFiles, contacts, clientId}) {
                             console.log(err)
                         })
                     }
-                    const newPath = `/clientsDocs/${clientId}/contacts/${contact.firstName}-${contact.surname}${photo.filename}`;
+                    const newPath = `/clientsDocs/${clientId}/contacts/${contact.firstName}-${contact.surname}-${photo.filename}`;
                     await moveFile(photo, `./dist${newPath}`);
                     contact.photo = newPath;
                     contact.file = null;

@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const fs = require('fs');
-const https = require('https');
 const jwt = require("jsonwebtoken");
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
@@ -11,7 +10,7 @@ const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients } = require('../models');
 const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
-const { setClientsContactNewPassword } = require('../users');
+const { setClientsContactNewPassword, updateAccountDetails } = require('../users');
 
 router.post("/auth", async (req, res, next) => {
   if (req.body.logemail && req.body.logpassword) {
@@ -37,6 +36,25 @@ router.post("/auth", async (req, res, next) => {
     res.status(400).send("All fields required.");
   }
 });
+
+router.post("/account-details", checkClientContact,  upload.fields([{ name: 'photo' }]), async (req, res) => {
+    const accountData = req.body;
+    try {
+        const verificationResult = jwt.verify(accountData.token, secretKey);
+        let client = await getClient({"_id": verificationResult.clientId});
+        const userIndex = client.contacts.findIndex(item => item.email === verificationResult.contactEmail);
+        const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
+        const updatedUser = await updateAccountDetails({
+            user: client.contacts[userIndex], clientId: client.id, accountData, photoFile
+        });
+        client.contacts[userIndex] = updatedUser;
+        client.save();
+        res.send({user: updatedUser});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving account info");
+    }
+})
 
 router.post("/reset-pass", async (req, res) => {
     const { email } = req.body;
@@ -128,34 +146,10 @@ router.get('/clientinfo', checkClientContact, async (req, res) => {
     }
 });
 
-router.get('/projectFiles', checkClientContact, async (request, res) => {
-    let options = {
-        hostname: 'pangea.s.xtrf.eu',
-        path: `/customer-api/projects/${request.query.projectId}/files/outputFilesAsZip`,
-        method: 'GET',
-        headers: {
-            'Cookie': `JSESSIONID=${request.cookies.ses}`,
-        }
-    };
-    try {
-        let wstream = fs.createWriteStream(`./dist/project${request.query.projectId}.zip`);
-        let req = await https.request(options, (resp) => {
-
-            resp.pipe(wstream);
-        });
-        req.end();
-        wstream.on('finish', () => {
-            res.send('File created!')
-        })
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting project files');
-    }
+router.get('/projectFiles', checkClientContact, async (req, res) => {
+    res.send('ok');
 });
 
-router.get('/downloadProject', checkClientContact, (req, res) => {
-    res.send(`https://admin.pangea.global/project${req.query.projectId}.zip`);
-});
 
 router.get('/deleteZip', (req, res) => {
     let fileName = 'project';
@@ -173,35 +167,6 @@ router.get('/deleteZip', (req, res) => {
         console.log(err);
         res.status(500).send('Error on deleting file');
     }
-});
-
-router.get('/taskFiles', checkClientContact, async (request, res) => {
-    let options = {
-        hostname: 'pangea.s.xtrf.eu',
-        path: `/customer-api/projects/tasks/${request.query.taskId}/files/outputFilesAsZip`,
-        method: 'GET',
-        headers: {
-            'Cookie': `JSESSIONID=${request.cookies.ses}`,
-        }
-    };
-    try {
-        let wstream = fs.createWriteStream(`./dist/task${request.query.taskId}.zip`);
-        let req = await https.request(options, (resp) => {
-            resp.pipe(wstream);
-        });
-
-        req.end();
-        wstream.on('finish', () => {
-            res.send('File created!')
-        })
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on getting task files');
-    }
-});
-
-router.get('/downloadTask', checkClientContact, (req, res) => {
-    res.send(`https://admin.pangea.global/task${req.query.taskId}.zip`);
 });
 
 router.post('/approve-reject', checkClientContact, async (req, res) => {
@@ -222,7 +187,7 @@ router.post('/approve-reject', checkClientContact, async (req, res) => {
 router.get('/reject', checkClientContact, async (req, res) => {
     const id = req.query.quoteId;
     try {
-        const result = await customer.quoteReject(id);
+        await customer.quoteReject(id);
         res.send("rejected");
     } catch(err) {
         console.log(err);
