@@ -6,7 +6,20 @@ export const setTasksDataValue = ({commit}, payload) => commit('SET_TASKS_DATA_V
 
 export const clearTasksData = ({commit}) => commit('CLEAR_DATA');
 
-export const addProjectTasks = async ({ commit, dispatch }, payload) => {
+export const setProjectDate = async ({dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.put('/pm-manage/project-date', payload);
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Updated", isShow: true, type: "success"})
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data.message, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter');
+    }
+}
+
+export const addProjectTasks = async ({ dispatch }, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedProject = await Vue.http.post('/xtm/add-tasks', payload);
@@ -19,7 +32,7 @@ export const addProjectTasks = async ({ commit, dispatch }, payload) => {
     }
 }
 
-export const updateProgress = async ({ commit, dispatch }, payload) => {
+export const updateProgress = async ({ dispatch }, payload) => {
     dispatch('incrementRequestCounter')
     const { projectId, isCatTool } = payload;
     try {
@@ -32,7 +45,7 @@ export const updateProgress = async ({ commit, dispatch }, payload) => {
     }
 }
 
-export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
+export const approveDeliveryFile = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const {taskId, jobId, isFileApproved} = payload
@@ -46,7 +59,7 @@ export const approveDeliveryFile = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const uploadTarget = async ({commit, dispatch}, payload) => {
+export const uploadTarget = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         await Vue.http.post("/pm-manage/target", payload);
@@ -58,7 +71,7 @@ export const uploadTarget = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const approveWithOption = async ({commit, dispatch}, payload) => {
+export const approveWithOption = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const { taskIds, isDeliver } = payload;
@@ -72,7 +85,7 @@ export const approveWithOption = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const approveDeliverable = async ({commit, dispatch}, payload) => {
+export const approveDeliverable = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedProject = await Vue.http.post("/pm-manage/tasks-approve", { taskIds: payload });
@@ -85,7 +98,7 @@ export const approveDeliverable = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const deliverTasks = async ({commit, dispatch}, payload) => {
+export const deliverTasks = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const tasks = payload.filter(item => item.status === "Ready for Delivery");
@@ -101,7 +114,7 @@ export const deliverTasks = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const sendTasksDetails = async ({commit, dispatch}, payload) => {
+export const sendTasksDetails = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const tasks = payload.filter(task => task.status === "Created");
@@ -116,7 +129,7 @@ export const sendTasksDetails = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const reopenSteps = async ({commit, dispatch}, payload) => {
+export const reopenSteps = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         if(payload.length) {
@@ -131,7 +144,7 @@ export const reopenSteps = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const updateStepFinance = async ({commit, dispatch}, payload) => {
+export const updateStepFinance = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedProject = await Vue.http.post("/pm-manage/step-finance", { step: payload });
@@ -144,7 +157,7 @@ export const updateStepFinance = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const addFileToRequest = async ({commit, dispatch}, payload) => {
+export const addFileToRequest = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/request-file", payload);
@@ -156,7 +169,7 @@ export const addFileToRequest = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const removeRequestFile = async ({commit, dispatch}, payload) => {
+export const removeRequestFile = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/remove-request-file", payload);
@@ -168,7 +181,7 @@ export const removeRequestFile = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const toggleRequestFileApprovement = async ({commit, dispatch}, payload) => {
+export const toggleRequestFileApprovement = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/file-approvement", payload);
@@ -180,7 +193,7 @@ export const toggleRequestFileApprovement = async ({commit, dispatch}, payload) 
     }
 }
 
-export const approveRequestFiles = async ({commit, dispatch}, payload) => {
+export const approveRequestFiles = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter');
     let { id, sourceFiles, refFiles } = payload;
     sourceFiles = sourceFiles.map(item => {
@@ -201,7 +214,7 @@ export const approveRequestFiles = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const approveRequestProp = async ({commit, dispatch}, payload) => {
+export const approveRequestProp = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/prop-approvement", payload);
@@ -213,7 +226,7 @@ export const approveRequestProp = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const setRequestValue = async ({commit, dispatch}, payload) => {
+export const setRequestValue = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/request-value", payload);
@@ -225,7 +238,7 @@ export const setRequestValue = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const setProjectValue = async ({commit, dispatch}, payload) => {
+export const setProjectValue = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedProject = await Vue.http.post("/pm-manage/project-value", payload);
@@ -249,7 +262,7 @@ export const deleteRequestFiles = async ({commit, dispatch}, payload) => {
     }
 }
 
-export const reassignVendor = async ({commit, dispatch}, payload) => {
+export const reassignVendor = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
         const updatedRequest = await Vue.http.post("/pm-manage/reassign-vendor", payload);

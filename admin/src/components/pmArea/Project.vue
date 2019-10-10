@@ -6,11 +6,11 @@
             input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
             .project__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="project.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
+                    Datepicker(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .project__date
                 LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="project.deadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                    Datepicker(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__info-row
             .project__client
@@ -82,7 +82,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            createdAt: new Date(),
+            startDate: new Date(),
             deadline: "",
             isSearchClient: true,
             isRequiredField: true,
@@ -91,12 +91,23 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle",
-            customersGetting: "customersGetting"
-        }),
+        ...mapActions([
+            "alertToggle",
+            "customersGetting",
+            "setProjectDate"
+        ]),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
+        },
+        async updateProjectDate(e, prop) {
+            if(this.project._id) {
+                const date = {[prop]: e};
+                await this.setDate(prop, date);
+            }
+        },
+        async setDate(prop, date) {
+            if(prop === 'startDate' && this.project.tasks.length) return;
+            await this.setProjectDate({date, projectId: this.project._id});
         },
         setValue({option, refersTo}) {
             this.$emit('setValue', {option: option, refersTo: refersTo});
@@ -117,7 +128,7 @@ export default {
         async checkForErrors() {
             this.errors = [];
             if(!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.");
-            if(!this.project.createdAt) this.errors.push("Please, set the start date.");
+            if(!this.project.startDate) this.errors.push("Please, set the start date.");
             if(!this.project.deadline) this.errors.push("Please, set the deadline date.");
             if(!this.project.customer.name) this.errors.push("Please, select a Client.");
             if(!this.selectedIndustry) this.errors.push("Please, choose an industry.");
@@ -132,7 +143,7 @@ export default {
             }
         },
         async createProject() {
-            this.project.dateFormatted = moment(this.project.createdAt).format('YYYY MM DD');
+            this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD');
             this.project.industry = this.selectedIndustry._id;
             const customer = {...this.project.customer};
             this.project.customer = customer._id;
@@ -185,6 +196,9 @@ export default {
         },
         nameOfProject() {
             return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;
+        },
+        disabledPicker() {
+            return !!(this.project._id && this.project.tasks.length);
         }
     },
     components: {
