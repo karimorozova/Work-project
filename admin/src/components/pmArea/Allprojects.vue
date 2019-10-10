@@ -100,7 +100,7 @@ export default {
             }
             if(this.startFilter) {
                 result = result.filter(item => {
-                    return new Date(item.createdAt) >= this.startFilter
+                    return new Date(item.startDate) >= this.startFilter
                 })
             }
             if(this.deadlineFilter) {

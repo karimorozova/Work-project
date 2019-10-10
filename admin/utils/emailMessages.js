@@ -276,7 +276,7 @@ function managerAssignmentNotifyingMessage(obj) {
                     </tr>
                     <tr>
                         <td>Start date: </td>
-                        <td>${obj.createdAt}</td>
+                        <td>${obj.startDate}</td>
                     </tr>
                     <tr>
                         <td>Deadline: </td>
@@ -322,7 +322,7 @@ function emailMessageForContact(obj) {
                     </tr>
                     <tr>
                         <td>Start date: </td>
-                        <td>${obj.createdAt}</td>
+                        <td>${obj.startDate}</td>
                     </tr>
                     <tr>
                         <td>Deadline: </td>

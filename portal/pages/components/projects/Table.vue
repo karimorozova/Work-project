@@ -14,7 +14,7 @@
             .data-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
-            .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
+            .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.startDate) }}
             .data-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId || row.requestId }}
             .data-table__data(slot="projectName" slot-scope="{ row, index }" :class="{'data-table_break-word': row.projectName.length > 30}") {{ row.projectName }}
             .data-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}

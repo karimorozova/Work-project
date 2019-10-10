@@ -105,7 +105,7 @@ export default {
         },
         setDefaultStepDates() {
             this.stepsDates = [
-                { start: this.currentProject.createdAt, deadline: "" },
+                { start: this.currentProject.startDate, deadline: "" },
                 { start: "", deadline: this.currentProject.deadline }
             ]
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});

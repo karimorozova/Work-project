@@ -3,7 +3,7 @@ const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
+const { getProject, createProject, updateProject, toggleProjectProp, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
@@ -74,7 +74,7 @@ router.get("/all-managers", async (req, res) => {
 router.put("/project-option", async (req, res) => {
     const { projectId, property } = req.body;
     try {
-        const result = await changeProjectProp(projectId, property);
+        const result = await toggleProjectProp(projectId, property);
         res.send(result);
     } catch(err) {
         console.log(err);
@@ -90,6 +90,17 @@ router.put("/project-status", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Internal server error / Cannot change Project's status");
+    }
+})
+
+router.put("/project-date", async (req, res) => {
+    const { projectId, date } = req.body;
+    try {
+        const result = await updateProject({"_id": projectId}, date);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Internal server error / Cannot change Project's deadline");
     }
 })
 

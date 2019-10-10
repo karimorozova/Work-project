@@ -77,7 +77,7 @@ export default {
         filteredProjects() {
             let statuses = ['Quote sent', 'Requested'];
             let result = this.allProjects.filter(item => {
-                return moment(item.createdAt) >= this.requestFilter.from && moment(item.createdAt) <= this.requestFilter.to
+                return moment(item.startDate) >= this.requestFilter.from && moment(item.startDate) <= this.requestFilter.to
                     && moment(item.deadline) >= this.deadlineFilter.from && moment(item.deadline) <= this.deadlineFilter.to
                     && statuses.indexOf(item.status) === -1
             });

@@ -23,7 +23,7 @@
             span.projects-table__label {{ field.label }}
         template(slot="headerRoi" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="headerCreatedAt" slot-scope="{ field }") 
+        template(slot="headerStartDate" slot-scope="{ field }") 
             span.projects-table__label {{ field.label }}
         template(slot="headerDeadline" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
@@ -49,8 +49,8 @@
                 span {{ row.finance.Price.payables }}
         template(slot="roi" slot-scope="{ row }")
             span {{ row.roi }}
-        template(slot="createdAt" slot-scope="{ row }") 
-            span {{ row.createdAt.split('T')[0].split('-').reverse().join('-') }}
+        template(slot="startDate" slot-scope="{ row }") 
+            span {{ row.startDate.split('T')[0].split('-').reverse().join('-') }}
         template(slot="deadline" slot-scope="{ row }")
             span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
         template(slot="projectManager" slot-scope="{ row }")
@@ -80,7 +80,7 @@ export default {
                 {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "7%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%"},
                 {label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%"},
-                {label: "Start date", headerKey: "headerCreatedAt", key: "createdAt", width: "7%"},
+                {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
                 {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
                 {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},

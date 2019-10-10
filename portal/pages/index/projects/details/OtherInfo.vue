@@ -29,7 +29,7 @@ export default {
     },
     methods: {
         getFormattedDate(date) {
-            return moment(this.project.createdAt).format("DD-MM-YYYY")
+            return moment(this.project.startDate).format("DD-MM-YYYY")
         },
         getServices() {
             let projectServices = "";

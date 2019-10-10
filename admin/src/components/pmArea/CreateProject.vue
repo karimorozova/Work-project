@@ -22,7 +22,7 @@ export default {
                 brief: "",
                 notes: "",
                 industry: "",
-                createdAt: new Date(),
+                startDate: new Date(),
                 deadline: "",
             }
         }

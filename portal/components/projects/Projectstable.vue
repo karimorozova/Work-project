@@ -16,7 +16,7 @@
                 .projects-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
                 .projects-table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
-                .projects-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.createdAt) }}
+                .projects-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.startDate) }}
                 .projects-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId }}
                 .projects-table__data(slot="projectName" slot-scope="{ row, index }") {{ row.projectName }}
                 .projects-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}

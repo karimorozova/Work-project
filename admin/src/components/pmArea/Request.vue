@@ -5,7 +5,7 @@
             input.request__name(type="text" v-model="request.projectName" placeholder="Project Name")
             .request__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="request.createdAt" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
+                    Datepicker(v-model="request.startDate" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
                 img.request__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .request__date
                 LabelValue(label="Requested Deadline" :isRequired="isRequiredField" customClass="project_margin")
@@ -78,7 +78,7 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            createdAt: new Date(),
+            startDate: new Date(),
             deadline: "",
             isSearchClient: true,
             isRequiredField: true,

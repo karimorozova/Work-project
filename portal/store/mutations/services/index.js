@@ -44,8 +44,8 @@ export const SET_PROJECTS = (state, payload) => {
     let projects = [];
     if(payload.length) {
         projects = payload.sort((a, b) => {
-            if (a.createdAt > b.createdAt) return -1
-            if (a.createdAt < b.createdAt) return 1;
+            if (a.startDate > b.startDate) return -1
+            if (a.startDate < b.startDate) return 1;
         });
     }
     state.projects = projects;
@@ -55,8 +55,8 @@ export const SET_REQUESTS = (state, payload) => {
     let requests = [];
     if(payload.length) {
         requests = payload.sort((a, b) => {
-            if (a.createdAt > b.createdAt) return -1
-            if (a.createdAt < b.createdAt) return 1;
+            if (a.startDate > b.startDate) return -1
+            if (a.startDate < b.startDate) return 1;
         });
     }
     state.requests = requests;

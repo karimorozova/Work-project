@@ -65,13 +65,13 @@ export default {
     filteredProjects() {
       let statuses = ['Started', 'Approved', 'In progress', 'Ready for Delivery'];
       const result = this.filterByStatus(statuses);
-      return result.sort((a, b) => a.createdAt < b.createdAt ? 1 : -1);
+      return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1);
     },
     filteredQuotes() {
       let statuses = ['Quote sent', 'Requested'];
       const projects = this.filterByStatus(statuses);
       const result = [...this.requests, ...projects];
-      return result.sort((a, b) => a.createdAt < b.createdAt ? 1 : -1); 
+      return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1); 
     }
   },
   components: {

@@ -13,7 +13,7 @@ async function createProject(project) {
     let todayEnd = new Date(todayStart);
     todayEnd.setUTCHours(23,59,59,0);
     try {
-        const todaysProjects = await Projects.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
+        const todaysProjects = await Projects.find({"startDate" : { $gte : todayStart, $lt: todayEnd }});
         const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
         project.status = project.status || "Draft";
         project.projectId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
@@ -98,7 +98,7 @@ async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, ta
         await Projects.updateOne({"_id": project._id}, 
             {$set: {sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, isMetricsExist: false}, 
             $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: newTasksInfo.service, projectId: xtmProject.projectId, 
-                start: project.createdAt, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
+                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
                 status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, check: false, 
                 finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );

@@ -13,7 +13,7 @@
     .descriptors__request-date
         LabelValue(
             label="Requested On"
-            :value="project.createdAt.split('T')[0].split('-').reverse().join('-')"
+            :value="project.startDate.split('T')[0].split('-').reverse().join('-')"
         )
     .descriptors__deadline
         LabelValue(

@@ -7,7 +7,7 @@ const { generateTargetFile } = require('../services/xtmApi');
 const { storeTargetFile } = require('./files');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
 
-async function changeProjectProp(projectId, property) {
+async function toggleProjectProp(projectId, property) {
     const project = await getProject({"_id": projectId});
     let changedProject = {...project._doc};
     changedProject[property] = !changedProject[property]; 
@@ -411,5 +411,5 @@ function getTasksAfterReopen({steps, tasks}) {
     return updatedTasks;
 }
 
-module.exports = { changeProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, 
+module.exports = { toggleProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, 
     getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
