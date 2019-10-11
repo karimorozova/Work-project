@@ -2,6 +2,9 @@ export const mutations = {
     setCurrentVendor(state, payload) {
         state.currentVendor = {...payload};
     },
+    SET_FILTERED_VENDORS(state, payload) {
+        state.filteredVendors = [...payload];
+    },
     setVendorProp(state, payload) {
         state.currentVendor[payload.prop] = payload.value;
     },

@@ -31,6 +31,7 @@
 <script>
 import VendorsTable from "./VendorsTable";
 import VendorFilters from "./VendorFilters";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -44,38 +45,68 @@ export default {
             sourceLangs: ["All"],
             targetLangs: ["All"],
             stepFilter: {title: "All"},
-            nameFilter: ""
+            nameFilter: "",
+            // filteredVendors: []
         }
     },
     methods: {
+        ...mapActions(["setFiltereVendors"]),
         addVendor() {
             this.$router.push("/vendors/new-vendor");
         },
-        setFilter({option}, prop) {
+        async setFilter({option}, prop) {
             this[prop] = option;
+            await this.getVendors();
         },
-        setStepFilter({step}) {
+        async setStepFilter({step}) {
             this.stepFilter = step;
+            await this.getVendors();
         },
-        setAllLangs({prop}) {
+        async setAllLangs({prop}) {
             this[prop] = ["All"];
+            await this.getVendors();
         },
-        removeLangFilter({prop, position}) {
+        async removeLangFilter({prop, position}) {
             this[prop].splice(position, 1);
             if(this[prop].length === 0) {
                 this[prop] = ["All"];
             }
+            await this.getVendors();
         },
-        addLangFilter({prop, lang}) {
+        async addLangFilter({prop, lang}) {
             if(this[prop].indexOf('All') !== -1) {
                 this[prop] = [];
             }
             this[prop].push(lang.symbol);
+            await this.getVendors();
         },
+        async getVendors() {
+            try {
+                const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
+                this.setFiltereVendors(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Error on getting vendors", isShow: true, type: "error"});
+            }
+        },
+    },
+    computed: {
+        filters() {
+            return {
+                nameFilter: this.nameFilter,
+                stepFilter: this.stepFilter,
+                statusFilter: this.statusFilter,
+                sourceFilter: this.sourceLangs,
+                targetFilter: this.targetLangs,
+                industryFilter: this.industryFilter
+            }
+        }
     },
     components: {
         VendorsTable,
         VendorFilters
+    },
+    created() {
+        this.getVendors();
     }
 }
 </script>

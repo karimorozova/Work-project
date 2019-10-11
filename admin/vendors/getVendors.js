@@ -1,7 +1,8 @@
 const { Vendors } = require("../models");
+const { filterVendors } = require("./filter");
 
-async function getVendor(obj) {
-    const vendor = await Vendors.findOne(obj)
+async function getVendor(query) {
+    const vendor = await Vendors.findOne(query)
             .populate('native')
             .populate('industries')
             .populate("wordsRates.source")
@@ -17,8 +18,8 @@ async function getVendor(obj) {
     return vendor;
 }
 
-async function getVendors(obj) {
-    const vendors = await Vendors.find(obj)
+async function getVendors(query) {
+    const vendors = await Vendors.find(query)
             .populate('native')
             .populate('industries')
             .populate("wordsRates.source")
@@ -50,4 +51,14 @@ async function getVendorAfterUpdate(query, update) {
             .populate('languagePairs.target')
 }
 
-module.exports = { getVendor, getVendors, getVendorAfterUpdate }
+async function getFilteredVendors(filters) {
+    try {
+        const vendors = await getVendors({});
+        return filterVendors(vendors, filters);
+    } catch(err) {
+        console.log(err);
+        console.log("Error on filtering vendors");
+    }
+}
+
+module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors }

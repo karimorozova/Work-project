@@ -2,9 +2,9 @@
 .vendors-table
     DataTable(
         :fields="fields"
-        :tableData="filteredVendors"
-        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': filteredVendors.length < 30}]"
-        :tableheadRowClass="filteredVendors.length < 30 ? 'tbody_visible-overflow' : ''"
+        :tableData="vendors"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 30}]"
+        :tableheadRowClass="vendors.length < 30 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="vendors-table_height-28"
         @onRowClicked="onRowClicked"
     )
@@ -159,8 +159,7 @@ export default {
             updateCurrentVendor: "updateCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry",
-            deleteCurrentVendor: "deleteCurrentVendor",
-            getServices: "getServices"
+            deleteCurrentVendor: "deleteCurrentVendor"
         }),
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 600;
@@ -189,11 +188,11 @@ export default {
         },
         setCurrentEditionValues(index) {
             this.currentEditingIndex = index;
-            this.currentBasicRate = this.filteredVendors[index].basicRate;
-            this.currentTqi = this.filteredVendors[index].tqi;
-            this.industrySelected = this.filteredVendors[index].industries;
-            this.selectedStatus = this.filteredVendors[index].status;
-            this.selectedNative = this.filteredVendors[index].native;
+            this.currentBasicRate = this.vendors[index].basicRate;
+            this.currentTqi = this.vendors[index].tqi;
+            this.industrySelected = this.vendors[index].industries;
+            this.selectedStatus = this.vendors[index].status;
+            this.selectedNative = this.vendors[index].native;
         },
         setCurrentDefaults() {
             this.currentEditingIndex = -1;
@@ -208,7 +207,7 @@ export default {
         async updateVendor(index) {
             let sendData = new FormData();
             const updatingVendor = {
-                ...this.filteredVendors[index],
+                ...this.vendors[index],
                 basicRate: this.currentBasicRate,
                 tqi: this.currentTqi,
                 industries: this.industrySelected,
@@ -245,7 +244,7 @@ export default {
         async approveDelete() {
             this.isDeleteMessageShow = false;
             this.currentEditingIndex = -1;
-            const vendor = this.filteredVendors[this.deletingVendorIndex];
+            const vendor = this.vendors[this.deletingVendorIndex];
             try {
                 const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${vendor._id}`);
                 if(isAssigned.body) {
@@ -276,27 +275,18 @@ export default {
             }
             this.industrySelected.push(industry);
         },
-        async getVendors() {
-            try {
-                const result = await this.$http.get('/all-vendors');
-                this.storeVendors(result.body);
-            } catch(err) {
-                this.alertToggle({message: "Error on getting vendors", isShow: true, type: "error"});
-            }
-        },
         onRowClicked({index}) {
             if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
-            const vendor = this.filteredVendors[index];
+            const vendor = this.vendors[index];
             this.storeCurrentVendor(vendor);
             this.$router.push(`/vendors/details/${vendor._id}`);
         }
     },
     computed: {
         ...mapGetters({
-            vuexVendors: "getVendors",
-            services: "getVuexServices"
+            vendors: "getFilteredVendors"
         }),
         selectedIndNames() {
             let result = [];
@@ -313,9 +303,6 @@ export default {
         MultiVendorIndustrySelect,
         NativeLanguageSelect,
         Button
-    },
-    created() {
-        this.getVendors();
     }
 }
 </script>

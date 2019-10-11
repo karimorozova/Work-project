@@ -3,7 +3,7 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, updateVendorRates, importRates, getVendorAfterCombinationsUpdated } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, importRates, getVendorAfterCombinationsUpdated } = require('../vendors');
 const { Vendors } = require('../models');
 
 function moveFile(oldFile, vendorId) {
@@ -18,6 +18,17 @@ mv(oldFile.path, newFile, {
 return oldFile.filename;
 }
 
+router.post('/filtered-vendors', async (req, res) => {
+    const { filters } = req.body;
+    try {
+        const filteredVendors = await getFilteredVendors(filters);
+        res.send(filteredVendors);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting filtered Vendors");
+    }
+})
+
 router.get('/vendor', async (req, res) => {
     const id = req.query.id;
     try {
@@ -25,7 +36,7 @@ router.get('/vendor', async (req, res) => {
         res.send(vendor)
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on getting Vendors");
+        res.status(500).send("Error on getting Vendor");
     }
 })
 

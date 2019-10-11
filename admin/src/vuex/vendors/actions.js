@@ -1,11 +1,12 @@
 import Vue from "vue";
 
 export const storeCurrentVendor = ({ commit }, payload) => commit('setCurrentVendor', payload);
+export const setFiltereVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
 export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
-export const storeVendor = ({commit, rootState}, payload) => {
-    const index = rootState.a.vendors.findIndex(item => item._id === payload._id);
-    rootState.a.vendors.splice(index, 1, payload);
+export const storeVendor = ({commit, state}, payload) => {
+    const index = state.filteredVendors.findIndex(item => item._id === payload._id);
+    state.filteredVendors.splice(index, 1, payload);
 }
 
 export const saveVendorRates = async ({commit, dispatch, state}, payload) => {
@@ -63,63 +64,63 @@ export const deleteVendorRates = async ({commit, dispatch, state}, payload) => {
     }
 }
 
-export const deleteCurrentVendor = async ({commit, rootState}, payload) => {
+export const deleteCurrentVendor = async ({commit, state}, payload) => {
     commit("startRequest");
     try {
         const  { id } = payload;
         await Vue.http.delete(`/vendorsapi/deletevendor/${id}`);
-        const index = rootState.a.vendors.findIndex(item => item._id === id);
-        rootState.a.vendors.splice(index, 1);
-        commit("endRequest");
+        const index = state.filteredVendors.findIndex(item => item._id === id);
+        state.filteredVendors.splice(index, 1);
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on deleting Vendor");
     }
 }
 
-export const saveNewVendor = async ({commit, rootState}, payload) => {
+export const saveNewVendor = async ({commit, state}, payload) => {
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/new-vendor", payload);
         const newVendor = result.body;
-        rootState.a.vendors.push(newVendor);
+        state.filteredVendors.push(newVendor);
         commit('setCurrentVendor', newVendor);
-        commit("endRequest");
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on saving Vendor");
     }
 }
 
-export const updateCurrentVendor = async ({commit, rootState}, payload) => {
+export const updateCurrentVendor = async ({commit, state}, payload) => {
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/update-vendor", payload);
         const updatedVendor = result.body;
-        const index = rootState.a.vendors.findIndex(item => item._id === updatedVendor._id);
-        rootState.a.vendors.splice(index, 1, updatedVendor);
+        const index = state.filteredVendors.findIndex(item => item._id === updatedVendor._id);
+        state.filteredVendors.splice(index, 1, updatedVendor);
         commit('setCurrentVendor', updatedVendor);
-        commit("endRequest");
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on updating Vendor information");
     }
 }
 
-export const setVendorsMatrixData = async ({commit, dispatch, rootState, state}, payload) => {
+export const setVendorsMatrixData = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
     try {
         const { _id, matrix } = state.currentVendor;
         matrix[payload.key].rate = payload.value;
         const updatedVendor = await Vue.http.post('/vendorsapi/update-matrix', {_id, matrix});
-        rootState.a.vendors.forEach(item => { 
+        state.filteredVendors.forEach(item => { 
             if(item._id === _id) item.matrix = matrix
         });
         dispatch("storeCurrentVendor", updatedVendor.body)
-        commit("endRequest");
     } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
         commit("endRequest");
-        throw new Error("Error on updating matrix data");
     }
 }
 
