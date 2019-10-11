@@ -15,7 +15,8 @@
               .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .account-menu(v-click-outside="hideAccountMenu")
           .womanWrapper
-            img.womanWrapper__photo(src="../assets/images/client-icon_image.png")
+            img.womanWrapper__photo(v-if="user.photo" :src="domain+user.photo")
+            img.womanWrapper__photo(v-else src="../assets/images/client-icon_image.png")
             .accountMenuWrapper(v-if="accountMenuVisible")
               .accountBlock
                 .accountBlock__info
@@ -109,7 +110,8 @@
         serviceType: "",
         thanksService: "",
         breadCrumb1: "",
-        breadCrumb2: ""
+        breadCrumb2: "",
+        domain: ""
       };
     },
     methods: {
@@ -199,6 +201,7 @@
       }
     },
     mounted() {
+        this.domain = process.env.domain;
       this.mainPageRender();
       this.setToken();
       this.getServices();
