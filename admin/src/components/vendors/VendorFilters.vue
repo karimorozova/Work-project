@@ -3,7 +3,7 @@
     .v-filters__col.v-filters_width-21
         .v-filters__item.v-filters_margin-bottom-20
             label.v-filters__filter-title Name
-            input.v-filters__input-field(type="text" placeholder="Vendor Name" v-model="nameFilter" @input="filterByName")
+            input.v-filters__input-field(type="text" placeholder="Vendor Name" v-model="nameFilter" @keyup="filterByName")
         .v-filters__item
             label.v-filters__filter-title Step
             .v-filters__drop-menu
@@ -59,7 +59,9 @@ export default {
         return {
             nameFilter: "",
             isAllForIndustryExist: true,
-            steps: []
+            steps: [],
+            typingTimer: "",
+            doneTypingInterval: 800
         }
     },
     methods: {
@@ -98,7 +100,16 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error on getting steps", isShow: true, type: "error"});
             }
-        }
+        },
+        filterByName(e) {
+            const { value } = e.target;
+            clearTimeout(this.typingTimer);
+            this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval);
+            const vm = this;
+            function doneTyping () {
+                vm.$emit("setNameFilter", { option: value })
+            }
+        },
     },
     computed: {
         stepNames() {

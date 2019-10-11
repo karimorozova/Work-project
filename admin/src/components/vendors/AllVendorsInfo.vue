@@ -46,7 +46,6 @@ export default {
             targetLangs: ["All"],
             stepFilter: {title: "All"},
             nameFilter: "",
-            // filteredVendors: []
         }
     },
     methods: {
