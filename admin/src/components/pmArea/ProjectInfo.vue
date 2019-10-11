@@ -95,7 +95,7 @@ export default {
                 await this.setStepDate({value: date, prop, index});
                 await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
                 await this.getMetrics();
-            } catch(err) {console.log(err)}
+            } catch(err) { }
         },
         async setStatus({option}) {
             try {

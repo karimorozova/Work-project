@@ -2,7 +2,7 @@
     .files-upload
         UploadFileButton(:text="buttonValue")
             input.files-upload__file-input(type="file" @change='uploadFiles' multiple :class="inputClass")
-        .files-upload__files-list
+        .files-upload__files-list(:class="{'files-upload_bordered': isFilesShow && files.length}")
             .files-upload__files-expander(v-if="files.length")
                 .files-upload__list-title(@click="toggleList") Files list
                     img.files-upload__list-icon(src="../../../../assets/images/arrow_open.png" :class="{'files-upload_reversed-icon': isFilesShow}")
@@ -88,6 +88,9 @@ export default {
     }
     &__list-title {
         cursor: pointer;
+    }
+    &_bordered {
+        border: 1px solid $main-color;
     }
 }
 
