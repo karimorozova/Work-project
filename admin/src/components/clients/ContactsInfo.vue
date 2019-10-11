@@ -245,6 +245,7 @@ export default {
     }
     &__data-cell {
         padding: 5px 0 5px 3px;
+        overflow-x: hidden;
     }
     &__radio {
         display: flex;
