@@ -23,6 +23,7 @@
                     .mono-table__data(v-if="currentActive !== index") {{ row.target.lang }}
                     .mono-table__drop-menu(v-else)
                         LanguagesSelect(
+                            :isSingle="true"
                             @scrollDrop="scrollDrop" 
                             :selectedLangs="[currentInfo.target.symbol]" 
                             :addAll="false"

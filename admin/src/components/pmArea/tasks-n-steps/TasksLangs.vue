@@ -7,7 +7,7 @@
             LanguagesSelect(
                 placeholder="Language"
                 :externalLanguages="targets"
-                :single='true'
+                :isSingle='true'
                 :selectedLangs="selectedLang ? [selectedLang.symbol] : []"
                 @chosenLang="setLanguage"
             )

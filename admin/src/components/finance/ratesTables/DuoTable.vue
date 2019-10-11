@@ -23,6 +23,7 @@
                     .duo-table__data(v-if="currentActive !== index") {{ row.source.lang }}
                     .duo-table__drop-menu(v-else)
                         LanguagesSelect(
+                            :isSingle="true"
                             @scrollDrop="scrollDrop" 
                             :selectedLangs="[currentInfo.source.symbol]" 
                             :addAll="false"
@@ -32,6 +33,7 @@
                     .duo-table__data(v-if="currentActive !== index") {{ row.target.lang }}
                     .duo-table__drop-menu(v-else)
                         LanguagesSelect(
+                            :isSingle="true"
                             @scrollDrop="scrollDrop" 
                             :selectedLangs="[currentInfo.target.symbol]" 
                             :addAll="false"

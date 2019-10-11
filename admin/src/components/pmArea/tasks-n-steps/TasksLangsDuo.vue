@@ -7,7 +7,7 @@
             LanguagesSelect(
                 placeholder="Source Languages"
                 :langFilter="sourceFilter"
-                :single='true'
+                :isSingle='true'
                 :selectedLangs="sourceLanguages"
                 customClass="tasks-data__langs-mod"
                 @chosenLang="setSource"

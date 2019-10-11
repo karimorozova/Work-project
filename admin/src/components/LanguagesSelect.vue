@@ -35,7 +35,7 @@ export default {
             type: String,
             default: 'Select'
         },
-        single: {
+        isSingle: {
             type: Boolean,
             default: false
         },
@@ -110,7 +110,7 @@ export default {
         },
         changeLang(index) {
             this.$emit("chosenLang", {lang: this.filteredLangs[index], index: this.parentIndex});
-            if(this.single) {
+            if(this.isSingle) {
                 this.isOpened = false;
                 this.searchLang = "";
             }
