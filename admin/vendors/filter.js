@@ -36,7 +36,7 @@ function getFilters(filters) {
     const sourceFilter = filters.sourceFilter[0] ? {$in: filters.sourceFilter}: "";
     const targetFilter = filters.targetFilter[0] ? {$in: filters.targetFilter}: "";
     const stepFilter = filters.stepFilter.title !== 'All' ? filters.stepFilter._id : "";
-    const nameFilter = filters.nameFilter.trim() ? filters.nameFilter.split(" ") : "";
+    const nameFilter = filters.nameFilter;
     return {
         status,
         industries,
