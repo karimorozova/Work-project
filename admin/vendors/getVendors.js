@@ -54,20 +54,24 @@ async function getVendorAfterUpdate(query, update) {
 async function getFilteredVendors(filters) {
     try {
         const query = getFilteringQuery(filters);
-        const vendors = await Vendors.find(query).sort({_id: 1}).limit(25)
-            .populate("native")
-            .populate("industries")
-            .populate("wordsRates.source")
-            .populate("wordsRates.target")
-            .populate("wordsRates.industries")
-            .populate("hoursRates.source")
-            .populate("hoursRates.target")
-            .populate("hoursRates.industries")
-            .populate("monoRates.target")
-            .populate("monoRates.industries")
-            .populate("languagePairs.source")
-            .populate("languagePairs.target")
-        return vendors;
+        const vendors = await Vendors.aggregate([
+            {$addFields: {"name" : {$concat : [ "$firstName", " ", "$surname" ]}}},
+            {$match: query},
+        ]).sort({_id: 1}).limit(25)
+        
+        return Vendors.populate(vendors, [
+            "native",
+            "industries",
+            "wordsRates.source",
+            "wordsRates.target",
+            "wordsRates.industries",
+            "hoursRates.source",
+            "hoursRates.target",
+            "hoursRates.industries",
+            "monoRates.target",
+            "languagePairs.source",
+            "languagePairs.target"
+        ]);
     } catch(err) {
         console.log(err);
         console.log("Error on filtering vendors");

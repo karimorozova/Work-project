@@ -17,47 +17,17 @@ function getFilteringQuery(filters) {
     if(targetFilter) {
         query["wordsRates.target"] = targetFilter;
     }
-    if(nameFilter || stepFilter) {
-        query["$and"] = getCombinedFilters({nameFilter, stepFilter, query});
-    }
-    return query;
-}
-
-function getCombinedFilters({nameFilter, stepFilter}) {
-    const nameFilterQuery = getNameFilterQuery(nameFilter);
-    const stepFiltersQuery = getStepFiltersQuery(stepFilter);
-    return [
-        {"$or": nameFilterQuery},
-        {"$or": stepFiltersQuery}
-    ]
-}
-
-function getNameFilterQuery(nameFilter) {
     if(nameFilter) {
-        return [
-            {"firstName": {$in: nameFilter.map(item => new RegExp(`${item}`, 'i'))}},
-            {"surname": {$in: nameFilter.map(item => new RegExp(`${item}`, 'i'))}}
-        ]
-    } else {
-        return [
-            {"firstName": {$exists: true}},
-            {"surname": {$exists: true}}
-        ]
+        query["name"] = {"$regex": new RegExp(`${nameFilter}`, 'i')};
     }
-}
-
-function getStepFiltersQuery(stepFilter) {
     if(stepFilter) {
-        return [
+        query["$or"] = [
             {[`wordsRates.rates.${stepFilter}.active`]: true},
             {[`hoursRates.rates.${stepFilter}.active`]: true},
             {[`monoRates.rates.${stepFilter}.active`]: true},
         ]
-    } else {
-        return [
-            {"_id": {$exists: true}}
-        ]
     }
+    return query;
 }
 
 function getFilters(filters) {
