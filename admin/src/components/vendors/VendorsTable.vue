@@ -175,9 +175,9 @@ export default {
             return vendor.firstName + " " + vendor.surname;
         },
         getLanguageCombs(vendor) {
-            // return vendor.languagePairs.map(item => {
-            //     return item.source.symbol + " >> " + item.target.symbol + "; "
-            // }).reduce((init, cur) => init + cur, "")
+            return vendor.languagePairs.map(item => {
+                return item.source.symbol + " >> " + item.target.symbol + "; "
+            }).reduce((init, cur) => init + cur, "")
         },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
