@@ -1,69 +1,80 @@
-function filterVendors(vendors, filters) {
-    let result = [...vendors];
-    if(filters.nameFilter) {
-        result = result.filter(item => {
-            const name = item.firstName + " " + item.surname;
-            return name.toLowerCase().indexOf(filters.nameFilter.toLowerCase()) != -1;
-        })
+const ObjectId = require('mongodb').ObjectID;
+
+function getFilteringQuery(filters) {
+    const { status, industries, sourceFilter, targetFilter, stepFilter, nameFilter } = getFilters(filters);
+    let query = {
+        status
     }
-    if(filters.statusFilter && filters.statusFilter !== 'All') {
-        result = result.filter(item => {
-            return item.status == filters.statusFilter;
-        })
+    if(filters.lastId) {
+        query["_id"] = {$gt: ObjectId(filters.lastId)}
     }
-    if(filters.industryFilter && filters.industryFilter.name !== 'All') {
-        result = result.filter(item => {
-            const industryIds = item.industries.map(indus => indus.id);
-            return industryIds.indexOf(filters.industryFilter._id) !== -1;
-        })
+    if(industries) {
+        query.industries = industries;
     }
-    if(filters.sourceFilter && filters.sourceFilter.length && filters.sourceFilter[0] !== 'All') {
-        result = result.filter(item => {
-            const combs = [...item.wordsRates, ...item.hoursRates];
-            if(combs.length) {
-                const comb = combs.find(item => item.source && filters.sourceFilter.indexOf(item.source.symbol) !== -1);
-                return comb;
-            }
-        })
+    if(sourceFilter) {
+        query["wordsRates.source"] = sourceFilter;
     }
-    if(filters.targetFilter && filters.targetFilter.length && filters.targetFilter[0] !== 'All') {
-        result = result.filter(item => {
-            const combs = [...item.wordsRates, ...item.hoursRates, ...item.monoRates];;
-            if(combs.length) {
-                const comb = combs.find(item => filters.targetFilter.indexOf(item.target.symbol) !== -1);
-                return comb;
-            }
-        })
+    if(targetFilter) {
+        query["wordsRates.target"] = targetFilter;
     }
-    if(filters.stepFilter && filters.stepFilter.title !== "All") {
-        result = filterByStep(result, filters.stepFilter);
+    if(nameFilter || stepFilter) {
+        query["$and"] = getCombinedFilters({nameFilter, stepFilter, query});
     }
-    return result;
+    return query;
 }
 
-function filterByStep(vendors, stepFilter) {
-    return vendors.filter(vendor => {
-        const combs = [...vendor.wordsRates, ...vendor.hoursRates, ...vendor.monoRates];
-        return isActiveStep(combs, stepFilter);
-    })
+function getCombinedFilters({nameFilter, stepFilter}) {
+    const nameFilterQuery = getNameFilterQuery(nameFilter);
+    const stepFiltersQuery = getStepFiltersQuery(stepFilter);
+    return [
+        {"$or": nameFilterQuery},
+        {"$or": stepFiltersQuery}
+    ]
 }
 
-function isActiveStep(combs, stepFilter) {
-    for(let comb of combs) {
-        const { rates } = comb;
-        const activeStep = checkServiceSteps(rates, stepFilter);
-        if(activeStep) {
-            return true;
-        }
+function getNameFilterQuery(nameFilter) {
+    if(nameFilter) {
+        return [
+            {"firstName": {$in: nameFilter.map(item => new RegExp(`${item}`, 'i'))}},
+            {"surname": {$in: nameFilter.map(item => new RegExp(`${item}`, 'i'))}}
+        ]
+    } else {
+        return [
+            {"firstName": {$exists: true}},
+            {"surname": {$exists: true}}
+        ]
     }
 }
 
-function checkServiceSteps(rates, stepFilter) {
-    return Object.keys(rates).find(item => {
-        if(item === stepFilter._id) {
-            return rates[item].active && +rates[item].value > 0;
-        }
-    })             
+function getStepFiltersQuery(stepFilter) {
+    if(stepFilter) {
+        return [
+            {[`wordsRates.rates.${stepFilter}.active`]: true},
+            {[`hoursRates.rates.${stepFilter}.active`]: true},
+            {[`monoRates.rates.${stepFilter}.active`]: true},
+        ]
+    } else {
+        return [
+            {"_id": {$exists: true}}
+        ]
+    }
 }
 
-module.exports = { filterVendors }
+function getFilters(filters) {
+    const status = filters.statusFilter !== 'All' ? filters.statusFilter : {$ne: ""};
+    const industries = filters.industryFilter.name !== 'All' ? filters.industryFilter._id : "";
+    const sourceFilter = filters.sourceFilter[0] ? {$in: filters.sourceFilter}: "";
+    const targetFilter = filters.targetFilter[0] ? {$in: filters.targetFilter}: "";
+    const stepFilter = filters.stepFilter.title !== 'All' ? filters.stepFilter._id : "";
+    const nameFilter = filters.nameFilter.trim() ? filters.nameFilter.split(" ") : "";
+    return {
+        status,
+        industries,
+        sourceFilter,
+        targetFilter,
+        stepFilter,
+        nameFilter
+    }
+}
+
+module.exports = { getFilteringQuery }

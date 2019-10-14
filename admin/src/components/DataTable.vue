@@ -4,7 +4,7 @@
       .table__head-row(:class="tableheadRowClass")
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}" :class="headCellClass")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="bodyClass")
+    .table__tbody(:class="bodyClass" @scroll="handleBodyScroll")
       .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
           slot(:name="field.key" :row="row" :index="index")
@@ -44,6 +44,12 @@
     methods: {
       onClick(index) {
         this.$emit("onRowClicked", {index})
+      },
+      handleBodyScroll(e) {
+        const element = e.target;
+        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+            this.$emit('bottomScrolled');
+        }
       }
     }
   }

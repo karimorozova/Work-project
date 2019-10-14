@@ -4,8 +4,8 @@
         VendorFilters(
             :industryFilter="industryFilter"
             :leadFilter="leadFilter"
-            :sourceLangs="sourceLangs"
-            :targetLangs="targetLangs"
+            :sourceLangs="sourceFilter"
+            :targetLangs="targetFilter"
             :step="stepFilter.title"
             @setNameFilter="(option) => setFilter(option, 'nameFilter')"
             @setStatusFilter="(option) => setFilter(option, 'statusFilter')"
@@ -21,17 +21,18 @@
         VendorsTable(
             :nameFilter="nameFilter"
             :industryFilter="industryFilter"
-            :sourceFilter="sourceLangs"
-            :targetFilter="targetLangs"
+            :sourceFilter="sourceFilter"
+            :targetFilter="targetFilter"
             :statusFilter="statusFilter"
             :stepFilter="stepFilter"
+            @bottomScrolled="bottomScrolled"
         )
 </template>
 
 <script>
 import VendorsTable from "./VendorsTable";
 import VendorFilters from "./VendorFilters";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     props: {
@@ -42,14 +43,28 @@ export default {
     data() {
         return {
             industryFilter: {name: "All"},
-            sourceLangs: ["All"],
-            targetLangs: ["All"],
+            sourceLangs: [{symbol: "All"}],
+            targetLangs: [{symbol: "All"}],
             stepFilter: {title: "All"},
             nameFilter: "",
+            isDataRemain: true,
+            lastId: ""
         }
     },
     methods: {
-        ...mapActions(["setFiltereVendors"]),
+        ...mapActions(["setFiltereVendors", "alertToggle"]),
+        scrollBodyToTop() {
+            let tbody = document.querySelector(".vendors-table__body");
+            tbody.scrollTop = 0;
+        },
+        async bottomScrolled() {
+            if(this.isDataRemain) {
+                const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
+                this.setFiltereVendors([...this.vendors, ...result.body]);
+                this.isDataRemain = result.body.length === 25;
+                this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
+            }
+        },
         addVendor() {
             this.$router.push("/vendors/new-vendor");
         },
@@ -62,42 +77,57 @@ export default {
             await this.getVendors();
         },
         async setAllLangs({prop}) {
-            this[prop] = ["All"];
+            this[prop] = [{symbol: "All"}];
             await this.getVendors();
         },
         async removeLangFilter({prop, position}) {
             this[prop].splice(position, 1);
             if(this[prop].length === 0) {
-                this[prop] = ["All"];
+                this[prop] = [{symbol: "All"}];
             }
             await this.getVendors();
         },
         async addLangFilter({prop, lang}) {
-            if(this[prop].indexOf('All') !== -1) {
+            const currentProp = prop === 'sourceLangs' ? 'sourceFilter' : 'targetFilter'
+            if(this[currentProp].indexOf('All') !== -1) {
                 this[prop] = [];
             }
-            this[prop].push(lang.symbol);
+            this[prop].push(lang);
             await this.getVendors();
         },
         async getVendors() {
+            this.lastId = "";
+            this.isDataRemain = true;
             try {
                 const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
                 this.setFiltereVendors(result.body);
+                this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
+                this.scrollBodyToTop();
             } catch(err) {
                 this.alertToggle({message: "Error on getting vendors", isShow: true, type: "error"});
             }
         },
     },
     computed: {
+        ...mapGetters({
+            vendors: "getFilteredVendors"
+        }),
         filters() {
             return {
                 nameFilter: this.nameFilter,
                 stepFilter: this.stepFilter,
                 statusFilter: this.statusFilter,
-                sourceFilter: this.sourceLangs,
-                targetFilter: this.targetLangs,
-                industryFilter: this.industryFilter
+                sourceFilter: this.sourceLangs.map(item => item._id),
+                targetFilter: this.targetLangs.map(item => item._id),
+                industryFilter: this.industryFilter,
+                lastId: this.lastId
             }
+        },
+        sourceFilter() {
+            return this.sourceLangs.map(item => item.symbol);
+        },
+        targetFilter() {
+            return this.targetLangs.map(item => item.symbol);
         }
     },
     components: {

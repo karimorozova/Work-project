@@ -1,10 +1,10 @@
 const { Vendors } = require("../models");
-const { filterVendors } = require("./filter");
+const { getFilteringQuery } = require("./filter");
 
 async function getVendor(query) {
     const vendor = await Vendors.findOne(query)
-            .populate('native')
-            .populate('industries')
+            .populate("native")
+            .populate("industries")
             .populate("wordsRates.source")
             .populate("wordsRates.target")
             .populate("wordsRates.industries")
@@ -13,15 +13,15 @@ async function getVendor(query) {
             .populate("hoursRates.industries")
             .populate("monoRates.target")
             .populate("monoRates.industries")
-            .populate('languagePairs.source')
-            .populate('languagePairs.target')
+            .populate("languagePairs.source")
+            .populate("languagePairs.target")
     return vendor;
 }
 
 async function getVendors(query) {
     const vendors = await Vendors.find(query)
-            .populate('native')
-            .populate('industries')
+            .populate("native")
+            .populate("industries")
             .populate("wordsRates.source")
             .populate("wordsRates.target")
             .populate("wordsRates.industries")
@@ -30,15 +30,15 @@ async function getVendors(query) {
             .populate("hoursRates.industries")
             .populate("monoRates.target")
             .populate("monoRates.industries")
-            .populate('languagePairs.source')
-            .populate('languagePairs.target')
+            .populate("languagePairs.source")
+            .populate("languagePairs.target")
     return vendors;
 }
 
 async function getVendorAfterUpdate(query, update) {
     return await Vendors.findOneAndUpdate(query, update, {new: true})
-            .populate('native')
-            .populate('industries')
+            .populate("native")
+            .populate("industries")
             .populate("wordsRates.source")
             .populate("wordsRates.target")
             .populate("wordsRates.industries")
@@ -47,14 +47,27 @@ async function getVendorAfterUpdate(query, update) {
             .populate("hoursRates.industries")
             .populate("monoRates.target")
             .populate("monoRates.industries")
-            .populate('languagePairs.source')
-            .populate('languagePairs.target')
+            .populate("languagePairs.source")
+            .populate("languagePairs.target")
 }
 
 async function getFilteredVendors(filters) {
     try {
-        const vendors = await getVendors({});
-        return filterVendors(vendors, filters);
+        const query = getFilteringQuery(filters);
+        const vendors = await Vendors.find(query).sort({_id: 1}).limit(25)
+            .populate("native")
+            .populate("industries")
+            .populate("wordsRates.source")
+            .populate("wordsRates.target")
+            .populate("wordsRates.industries")
+            .populate("hoursRates.source")
+            .populate("hoursRates.target")
+            .populate("hoursRates.industries")
+            .populate("monoRates.target")
+            .populate("monoRates.industries")
+            .populate("languagePairs.source")
+            .populate("languagePairs.target")
+        return vendors;
     } catch(err) {
         console.log(err);
         console.log("Error on filtering vendors");

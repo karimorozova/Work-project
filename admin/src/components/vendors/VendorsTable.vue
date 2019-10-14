@@ -3,10 +3,11 @@
     DataTable(
         :fields="fields"
         :tableData="vendors"
-        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 30}]"
-        :tableheadRowClass="vendors.length < 30 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 20}]"
+        :tableheadRowClass="vendors.length < 20 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="vendors-table_height-28"
         @onRowClicked="onRowClicked"
+        @bottomScrolled="bottomScrolled"
     )
         template(slot="headerVendorName" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
@@ -161,6 +162,9 @@ export default {
             updateIndustry: "updateIndustry",
             deleteCurrentVendor: "deleteCurrentVendor"
         }),
+        bottomScrolled() {
+            this.$emit("bottomScrolled");
+        },
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 600;
         },
@@ -171,9 +175,9 @@ export default {
             return vendor.firstName + " " + vendor.surname;
         },
         getLanguageCombs(vendor) {
-            return vendor.languagePairs.map(item => {
-                return item.source.symbol + " >> " + item.target.symbol + "; "
-            }).reduce((init, cur) => init + cur, "")
+            // return vendor.languagePairs.map(item => {
+            //     return item.source.symbol + " >> " + item.target.symbol + "; "
+            // }).reduce((init, cur) => init + cur, "")
         },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
