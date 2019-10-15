@@ -32,17 +32,15 @@
             @projectSave='projectSaving'
             @errorsEmpty='errorsExist'
         )
-        .addLine
-          .addLine__button(@click="addProject")
-            span.plus +
+        Add(@makeAction="addProject")
       .errorsMessage(v-if="showErrors")
         .message
           .message__close(@click="messageClose")
             i.fas.fa-times
-          h3 Error(s)!
+          h3.message__title Error(s)!
           li(v-for='error in errors') {{ error.error }}
       .startProject
-        input.createButton(@click="newProject" type="button" value="Create Project" :disabled="createDisable")
+        Button(value="Create Project" @makeAction="newProject" )
     .summaryInfo
       .orderInfo
         .orderInfo__title
@@ -65,10 +63,12 @@
 
 <script>
   import axios from "axios";
-  import Datepicker from "~/components/Datepicker.vue";
+  import Datepicker from "~/components/Datepicker";
+  import Add from "~/components/buttons/Add";
+  import Button from "~/components/buttons/Button";
   import moment from "moment";
   import Multiselect from "vue-multiselect";
-  import NewProject from "~/components/NewProject.vue";
+  import NewProject from "~/components/NewProject";
 
   export default {
     name: "project",
@@ -93,7 +93,7 @@
           }
         ],
         format: "dd/MM/yyyy",
-        createDisable: true,
+        createDisable: false,
         fileTypeSelect: "",
         contactPerson: "",
         state: {
@@ -300,6 +300,8 @@
     mounted() {},
     components: {
       Datepicker,
+      Add,
+      Button,
       Multiselect,
       "newproject": NewProject
     }
@@ -315,6 +317,7 @@
     align-items: flex-start;
     margin-bottom: 30px;
     .table-block {
+        position: relative;
       margin-top: 40px;
       padding: 0 20px;
     }
@@ -523,20 +526,15 @@
               }
             }
             .drop {
-              position: absolute;
               background-color: #FFF;
               border: 1px solid #BFB09D;
-              padding-top: 5px;
               max-height: 200px;
               position: absolute;
               z-index: 5;
               overflow-y: auto;
               width: 100%;
-              display: flex;
-              flex-direction: column;
               font-size: 14px;
               top: 26px;
-              left: -2px;
               &_item {
                 color: #67573E;
                 transition: all 0.3s;
@@ -584,13 +582,6 @@
       .lang {
         width: 17%;
       }
-      .lang-options {
-        .select {
-          .drop {
-            padding-top: 30px;
-          }
-        }
-      }
     }
     .addLine {
       &__button {
@@ -612,15 +603,12 @@
   }
 
   .search {
-    width: 98%;
-    position: absolute;
-    top: 28px;
-    left: -2px;
-    z-index: 10;
-    border-left: 1px solid black;
-    border-top: none;
-    box-shadow: 0 2px 5px rgba(102, 86, 61, 0.6);
+    width: 100%;
+    border: none;
+    outline: none;
+    box-shadow: inset 0 0px 3px rgba(102, 86, 61, 0.6);
     padding: 3px 0 2px 2px;
+    box-sizing: border-box;
   }
 
   .disabled{
@@ -636,32 +624,35 @@
   }
 
   .errorsMessage {
-    width: 300px;
-    max-height: 250px;
     position: absolute;
     top: 0;
-    bottom: 0;
     left: 0;
+    bottom: 0;
     right: 0;
-    margin: auto;
-    background-color: white;
-    color: red;
     z-index: 20;
-    border: 1px solid red;
-    box-shadow: 0 0 15px red;
-    text-align: center;
-    padding-bottom: 15px;
-    padding-top: 0;
-    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .message {
-      position: relative;
+        width: 300px;
+        position: relative;
+        background-color: white;
+        color: red;
+        border: 1px solid red;
+        box-shadow: 0 0 15px red;
+        text-align: center;
+        font-size: 18px;
+        padding-bottom: 10px;
+      &__title {
+        margin-bottom: 5px;
+      }
       li {
         list-style: none;
         padding: 5px;
       }
       &__close {
         position: absolute;
-        top: -15px;
+        top: 5px;
         right: 7px;
         cursor: pointer;
       }
