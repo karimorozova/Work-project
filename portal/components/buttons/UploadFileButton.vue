@@ -90,7 +90,9 @@ export default {
         cursor: pointer;
         opacity: 0;
         filter: alpha(opacity=0);
-        font-size: 30px;
+        font-size: 0;
+        width: 195px;
+        height: 38px;
         font-family: MyriadPro;
         @media (max-width: 550px) {
             width: 140px;
