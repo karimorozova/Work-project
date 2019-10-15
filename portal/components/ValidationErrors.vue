@@ -42,7 +42,7 @@ export default {
         left: 50%;
         margin-left: -300px;
         width: 320px;
-        padding: 15px;
+        padding: 20px;
         box-shadow: 0 0 10px $brown-shadow;
         background-color: $white;
         box-sizing: border-box;
@@ -92,7 +92,7 @@ export default {
         z-index: 50;
     }
     .validation__messages {
-        box-shadow: 0 0 5px $red;
+        box-shadow: 0 0 5px $brown-shadow;
         background-color: white;
         padding: 20px;
     }
