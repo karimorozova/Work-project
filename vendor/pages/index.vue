@@ -317,7 +317,6 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
     transition: all 0.5s;
     z-index: 2;
@@ -328,9 +327,10 @@ export default {
     font-size: 15px;
     font-weight: bold;
     padding: 0;
-    width: 177px;
+    width: 167px;
     height: 77vh;
     margin-bottom: 0;
+    overflow-y: scroll;
   }
   &__nav-item {
     padding-bottom: 10px;
