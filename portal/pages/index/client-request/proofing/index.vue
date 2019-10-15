@@ -562,6 +562,7 @@
         }
         input.infoInput {
           width: 100%;
+          box-sizing: border-box;
           border: none;
           outline: none;
         }
