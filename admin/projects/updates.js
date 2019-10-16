@@ -151,17 +151,24 @@ function getTaskStatusAfterCancel(steps, taskId) {
     }
 }
 
-function updateStepsStatuses({steps, status, stepIdentify}) {
-    return steps.map(item => {
-        if(stepIdentify.indexOf(item.taskId + item.name) !== -1) {
+function updateStepsStatuses({projectSteps, tasks, status, stepIdentify}) {
+    return projectSteps.map(item => {
+        if(stepIdentify.indexOf(item.id) !== -1) {
             let newStatus = status;
-            if(status === "Ready to Start" && item.catName !== "translate1") {
+            if(status === "Ready to Start" && isPrevStep({tasks, projectSteps, step: item})) {
                 newStatus = "Waiting to Start";
             }
             item.status = newStatus;
         }
         return item;
     })
+}
+
+function isPrevStep({tasks, projectSteps, step}) {
+    const stepTask = tasks.find(item => item.taskId === step.taskId);
+    const sameSteps = projectSteps.filter(item => item.taskId === stepTask.taskId && item.stepId !== step.stepId);
+    const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1');
+    return sameSteps.length && stage1.step.title !== step.serviceStep.title;
 }
 
 function getStepNewFinance(step) {
@@ -261,11 +268,9 @@ function getProjectNewStatus(changedTasks, status) {
 }
 
 function setStepsStatus({steps, status, project}) {
-    const projectSteps = [...project.steps];
-    const stepIdentify = steps.map(item => {
-        return item.taskId + item.name;
-    })
-    return updateStepsStatuses({steps: projectSteps, status, stepIdentify})
+    const {steps: projectSteps, tasks } = project;
+    const stepIdentify = steps.map(item => item._id);
+    return updateStepsStatuses({projectSteps, tasks, status, stepIdentify})
 }
 
 function updateStepsProgress(task, steps) {
