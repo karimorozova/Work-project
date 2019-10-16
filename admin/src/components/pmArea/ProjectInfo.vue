@@ -142,16 +142,6 @@ export default {
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})
             }
         },
-        setStepsProgress(name, progress) {
-            const { jobsMetrics } = progress;
-            let stepProgress = progress[name];
-            for(let metrics of jobsMetrics) {
-                const { jobId, metricsProgress } = metrics;
-                const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[name];
-                stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
-            }
-            return stepProgress;
-        },
         getStepsDates({task, key}) {
             let startDate = task.start;
             let deadline = task.deadline;
