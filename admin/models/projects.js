@@ -62,7 +62,7 @@ const ProjectsSchema = new mongoose.Schema({
     },
     vendorRate: "",
     vendorDiscount: "",
-    check: Boolean,
+    check: false,
     vendorsClickedOffer: Array,
     isVendorRead: {type: Boolean, default: false}
   }],

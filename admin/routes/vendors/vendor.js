@@ -70,7 +70,7 @@ router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req
         if(photoFile) {
             let oldPath = info.photo;
             info.photo = await getPhotoLink(id, photoFile);
-            removeOldPhoto(oldPath, info.photo);
+            await removeOldPhoto(oldPath, info.photo);
         }
         vendor = await getVendorAfterUpdate({"_id": id}, { ...info })
         res.send(vendor);

@@ -29,15 +29,17 @@ async function getPhotoLink(id, file) {
 }
 
 function removeOldPhoto(oldPath, newPath) {
-    if(oldPath === newPath) return;
-    try {
-        fs.unlink(`./dist/${oldPath}`, (err) => {
-            if (err) throw err;
+    if(oldPath === newPath || !oldPath) return;
+    return new Promise((resolve, reject) => {
+        fs.unlink(`./dist${oldPath}`, (err) => {
+            if (err) {
+                console.log(err);
+                console.log("Error in removeOldPhoto");
+                reject(err);
+            }
         });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in removeOldPhoto");
-    }
+        resolve("removed");
+    })
 }
 
 module.exports = { saveHashedPassword, getPhotoLink, removeOldPhoto }
