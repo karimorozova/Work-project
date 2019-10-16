@@ -3,13 +3,13 @@
         TitleInput(title="PROJECT DETAILS" :isAsterisk="true")
             .project-details__files
                 .project-details__item
-                    UploadFileButton(label="Files" buttonTitle="Upload File(s)" @uploadedFile="setDetailFiles")
+                    UploadFileButton(label="Files" buttonTitle="Upload File(s)" @uploadedFile="setDetailFiles" inputName="detailFiles")
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in detailFiles")
                             span.project-details__remove(@click="(e) => deleteFile(e, index, 'detailFiles')") +
                             span.project-details__file {{ file.name }}
                 .project-details__item
-                    UploadFileButton(label="Upload Reference File" @uploadedFile="setRefFiles")
+                    UploadFileButton(label="Upload Reference File" @uploadedFile="setRefFiles" inputName="refFiles")
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in refFiles")
                             span.project-details__remove(@click="(e) => deleteFile(e, index, 'refFiles')") +
@@ -42,11 +42,18 @@ export default {
                     }
                 }
                 return this.setOrderDetail({prop: 'detailFiles', value: [...existingFiles]});
+                this.clearFileInput('detailFiles');
             }
             this.setOrderDetail({prop: 'detailFiles', value: [...files]});
+            this.clearFileInput('detailFiles');
         },
         setRefFiles({ files }) {
-            this.setOrderDetail({prop: 'refFiles', value: [...files]});            
+            this.setOrderDetail({prop: 'refFiles', value: [...files]});
+            this.clearFileInput('refFiles');
+        },
+        clearFileInput(name) {
+            const fileInput = document.querySelector(`input[name=${name}]`);
+            fileInput.value = "";
         },
         deleteFile(e, index, arr) {
             this.removeFile({prop: arr, index})

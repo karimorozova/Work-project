@@ -8,25 +8,41 @@
             .block
                 UploadFileButton(comment="" @uploadedFile="setFiles")
                 .block__text Upload Reference File
+        .files-list(v-if="orderDetails.refFiles")
+            .files-list__item(v-for="(file, index) in orderDetails.refFiles")
+                span.files-list__remove(@click="(e) => deleteFile(e, index)") +
+                span.file-list__name {{ file.name }}
+
 </template>
 
 <script>
 import UploadFileButton from "@/components/buttons/UploadFileButton";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     methods: {
         ...mapActions([
             "setOrderNestedDetail", 
-            "setOrderDetail"
+            "setOrderDetail",
+            "removeFile"
         ]),
         setExamples(e) {
             const { value } = e.target;
             this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Examples', value});
         },
         setFiles({files}) {
-            this.setOrderDetail({prop: 'refFiles', value: files});
+            this.setOrderDetail({prop: 'refFiles', value: Array.from(files)});
+            const fileInput = document.querySelector(".upload-file__input");
+            fileInput.value = "";
+        },
+        deleteFile(e, index) {
+            this.removeFile({prop: 'refFiles', index});
         }
+    },
+    computed: {
+        ...mapGetters({
+            orderDetails: "getOrderDetails"
+        })
     },
     components: {
         UploadFileButton
@@ -72,6 +88,23 @@ export default {
     }
     ::-webkit-input-placeholder {
         text-align: center;
+    }
+}
+
+.files-list {
+    margin-top: 10px;
+    &__item {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 12px;
+    }
+    &__remove {
+        font-size: 18px;
+        font-weight: 700;
+        transform: rotate(45deg);
+        cursor: pointer;
+        margin-right: 5px;
     }
 }
 
