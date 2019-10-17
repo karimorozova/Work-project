@@ -68,6 +68,7 @@ async function getFilteredVendors(filters) {
             "hoursRates.source",
             "hoursRates.target",
             "hoursRates.industries",
+            "monoRates.industries",
             "monoRates.target",
             "languagePairs.source",
             "languagePairs.target"
