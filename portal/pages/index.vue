@@ -101,9 +101,9 @@
         newProject: [
           {title: "Translation", path: "/translation"},
           {title: "Copywriting", path: "/copywriting"},
-          {title: "Marketing", path: "/marketing"},
-          {title: "Proofing/QA", path: "/proofing"},
-          {title: "Graphic Localization", path: "/graphic-localization"}
+          {title: "Marketing", path: "/marketing"}
+        //   {title: "Proofing/QA", path: "/proofing"},
+        //   {title: "Graphic Localization", path: "/graphic-localization"}
         ],
         dropdownVisible: false,
         clientRequestShow: false,
