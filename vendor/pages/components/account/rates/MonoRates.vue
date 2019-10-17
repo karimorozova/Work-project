@@ -134,6 +134,8 @@ export default {
 <style lang="scss" scoped>
 
 .mono-rates {
+    width: 100%;
+    overflow-x: auto;
     &__filters {
         padding-bottom: 20px;
         margin-top: 10px;
