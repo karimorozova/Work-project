@@ -1,9 +1,10 @@
 <template lang="pug">
     .duo-table 
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="filteredRates"
             bodyClass="tbody_height-150"
+            :isRateTable="true"
         )
             template(slot="headSource" slot-scope="{ field }")
                 .duo-table__header {{ field.label }}
@@ -11,23 +12,24 @@
                 .duo-table__header {{ field.label }}
             template(slot="headIndustry" slot-scope="{ field }")
                 .duo-table__header {{ field.label }}
-            template(slot="headService" slot-scope="{ field }")
-                .duo-table__header.duo-table_flex
-                    span.duo-table__services-header(v-for="service in field.label") {{ service }}
+            template(v-for="(step, stepIndex) in ratesSteps" :slot="'headStep'+(stepIndex+1)" slot-scope="{ field }")
+                .duo-table__header {{ field.label }}
             template(slot="sourceLanguage" slot-scope="{ row, index }")
-                .duo-table__data {{ row.sourceLanguage.lang }}
+                .duo-table__data {{ row.source.lang }}
             template(slot="targetLanguage" slot-scope="{ row, index }")
-                .duo-table__data {{ row.targetLanguage.lang }}
+                .duo-table__data {{ row.target.lang }}
             template(slot="industry" slot-scope="{ row, index }")
                 .duo-table__data
-                    .duo-table__industry-data
-                        img.duo-table__image(:src="domain+row.industry.icon")
-                        span.duo-table__tooltip {{ row.industry.name }}
-            template(slot="services" slot-scope="{ row, index }")
-                .duo-table__data
-                    span.duo-table__services-rates(v-for="rate of existedRates(row.industry.rates)") 
-                        span.duo-table__value(v-if="rate.value") {{ rate.value }} &euro;
-                        span.duo-table__value(v-else) - 
+                    .duo-table__industry-data(v-if="isAllIndusties(row.industries)") All
+                    .duo-table__industry-data(v-else)
+                        img.duo-table__image(v-for="elem of row.industries" :src="domain+elem.icon")
+            template(v-for="step in ratesSteps" :slot="step.symbol" slot-scope="{ row, index }")
+                .duo-table__data.duo-table_spaced
+                    span.duo-table__rate(v-if="row.rates[step._id].value") {{ row.rates[step._id].value }} &euro;
+                    span.duo-table__rate(v-else) - 
+                    span.duo-table__rate min - {{ row.rates[step._id].min }} &euro;
+                    span.duo-table__rate.duo-table_green(v-if="row.rates[step._id].active") active
+                    span.duo-table__rate.duo-table_orange(v-else) inactive
 </template>
 
 <script>
@@ -47,77 +49,82 @@ export default {
         targetFilter: {
             type: Array,
             default: () => []
+        },
+        rates: {
+            type: Array,
+            default: () => []
+        },
+        unit: {
+            type: String,
+            default: "Words"
         }
     },
     data() {
         return {
             fields: [
-                {label: "Source Language", headerKey: "headSource", key: "sourceLanguage", width: "21%", padding: "0"},
-                {label: "Target Language", headerKey: "headTarget", key: "targetLanguage", width: "21%", padding: "0"},
-                {label: "Industry", headerKey: "headIndustry", key: "industry", width: "13%", padding: "0"},
-                {label: ["Translation", "Proofing", "QA and Testing"], headerKey: "headService", key: "services", width: "45%", padding: "0"},
+                {label: "Source Language", headerKey: "headSource", key: "sourceLanguage", width: "188px", padding: "0"},
+                {label: "Target Language", headerKey: "headTarget", key: "targetLanguage", width: "188px", padding: "0"},
+                {label: "Industry", headerKey: "headIndustry", key: "industry", width: "163px", padding: "0"},
+                {label: "", headerKey: "headStep1", key: "", width: "229px", padding: "0", isStepTitle: true}
             ],
-            rates: [],
-            domain: "",
-            serviceFilter: ["tr", "pr", "qt"]
+            domain: ""
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle"
-        }),
-        async getRates() {
-            try {
-                // const result = await this.$axios.get(`/vendor/rates?form=Duo&id=${this.vendor._id}`);
-                // this.rates = result.data;
-            } catch(err) {
-                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-            }
-        },
-        existedRates(rates) {
-            let serviceRates = Object.keys(rates).reduce((init, cur) => {
-                let service = this.services.find(item => item._id === cur);
-                const key = service.symbol;
-                if(this.serviceFilter.indexOf(key) !== -1) {
-                    init[key] = rates[cur];
-                }
-                return {...init};
-            },{})
-            return serviceRates;
-        },
-        setDefaultServices() {
-            let lastIndex = this.fields.length - 1;
-            const duoServices = this.services.filter(item => {
-                return item.languageForm === "Duo" && this.serviceFilter.indexOf(item.symbol) !== -1
-            });
-            this.fields[lastIndex].label = duoServices.map(item => item.title);
+        ...mapActions(["alertToggle"]),
+        isAllIndusties(rateIndustries) {
+            const rateIndustriesIds = rateIndustries.map(item => item._id).sort();
+            const accountIndustriesIds = this.vendor.industries.map(item => item._id).sort();
+            return JSON.stringify(rateIndustriesIds) === JSON.stringify(accountIndustriesIds);
         }
     },
     computed: {
         ...mapGetters({
             vendor: "getVendor",
-            services: "getServices"
+            steps: "getSteps"
         }),
         filteredRates() {
             let result = this.rates;
             if(this.sourceFilter.length && this.sourceFilter[0] !== "All") {
-                result = result.filter(item => this.sourceFilter.indexOf(item.sourceLanguage.lang) !== -1);
+                result = result.filter(item => this.sourceFilter.indexOf(item.source.lang) !== -1);
             }
             if(this.targetFilter.length && this.targetFilter[0] !== "All") {
-                result = result.filter(item => this.targetFilter.indexOf(item.targetLanguage.lang) !== -1);
+                result = result.filter(item => this.targetFilter.indexOf(item.target.lang) !== -1);
             }
             if(this.industriesFilter.length && this.industriesFilter[0] !== "All") {
-                result = result.filter(item => this.industriesFilter.indexOf(item.industry.name) !== -1);
+                result = result.filter(item => {
+                    const industry = item.industries.find(indus => this.industriesFilter.indexOf(indus.name) !== -1);
+                    return !!industry;
+                });
             }
             return result;
-        }
+        },
+        ratesSteps() {
+            return this.steps.filter(item => item.calculationUnit === this.unit);
+        },
+        stepsIds() {
+            return this.steps.filter(item => item.calculationUnit === this.unit).map(item => item._id);
+        },
+        tableFields() {
+            let fields = this.fields.map(item => item);
+            fields = fields.filter(item => !item.isStepTitle);
+            for(let i = 0; i < this.ratesSteps.length; i++) {
+                fields.push({
+                    label: this.ratesSteps[i].title, 
+                    headerKey: `headStep${i+1}`, 
+                    key: this.ratesSteps[i].symbol, 
+                    width: "229px", 
+                    padding: "0", 
+                    isStepTitle: true
+                })
+            }
+            return fields;
+        },
     },
     components: {
         DataTable
     },
     mounted() {
-        this.getRates();
-        this.setDefaultServices();
         this.domain = process.env.domain;
     }
 }
@@ -131,21 +138,6 @@ export default {
         display: flex;
         justify-content: space-around;
     }
-    &__services-header, &__services-rates {
-        width: 33%;
-        display: flex;
-        justify-content: center;
-        border-right: 1px solid $white;
-        &:last-child {
-            border-right: none;
-        }
-    }
-    &__services-rates  {
-        border-right: 1px solid $cell-border;
-        height: 100%;
-        align-items: center;
-        padding: 0 5px;
-    }
     &__data {
         height: 28px;
         padding: 0 5px; 
@@ -157,24 +149,27 @@ export default {
         display: flex;
         align-items: center;
         position: relative;
-        &:hover {
-            .duo-table__tooltip {
-                z-index: 1;
-                opacity: 1;
-            }
-        }
     }
     &__image {
         max-width: 20px;
+        margin-right: 3px
     }
-    &__tooltip {
-        position: absolute;
-        font-size: 10px;
-        left: 20px;
+    &__rate {
+        width: 30%;
+        text-align: right;
+        &:first-child {
+            width: 25%;
+            text-align: left;
+        }
+    }
+    &_orange {
         color: $orange;
-        z-index: -1;
-        opacity: 0;
-        transition: all 0.3s;
+    }
+    &_green {
+        color: $green;
+    }
+    &_spaced {
+        justify-content: space-between;
     }
 }
 

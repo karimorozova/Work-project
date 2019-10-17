@@ -1,5 +1,5 @@
 <template lang="pug">
-  .table
+  .table(:class="{'table_fit': isRateTable}")
     .table__thead
       .table__thead-row(:class="tableHeadRowClass")
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
@@ -62,6 +62,10 @@
         type: [String, Object],
         default: ""
       },
+      isRateTable: {
+        type: Boolean,
+        default: false
+      }
     },
     data() {
       return {
@@ -204,6 +208,10 @@
 
 .tbody_visible-overflow {
   overflow: visible;
+}
+
+.table_fit {
+    width: fit-content;
 }
 
 </style>

@@ -4,6 +4,7 @@
             :fields="tableFields"
             :tableData="filteredRates"
             bodyClass="tbody_height-150"
+            :isRateTable="true"
         )
             template(slot="headLanguage" slot-scope="{ field }")
                 .mono-table__header {{ field.label }}
@@ -60,7 +61,7 @@ export default {
                 {label: "Language", headerKey: "headLanguage", key: "language", width: "188px", padding: "0"},
                 {label: "Package", headerKey: "headPackage", key: "package", width: "200px", padding: "0"},
                 {label: "Industry", headerKey: "headIndustry", key: "industry", width: "151px", padding: "0"},
-                {label: "", headerKey: "headStep1", key: "copywriting", width: "229px", padding: "0", isStepTitle: true},
+                {label: "", headerKey: "headStep1", key: "copywriting", width: "229px", padding: "0", isStepTitle: true}
             ],
             domain: ""
         }

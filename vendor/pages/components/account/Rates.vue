@@ -7,13 +7,20 @@
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMonoRatesShow}") 
             .rates__drop(v-if="isMonoRatesShow")
                 MonoRates
-    .rates__block(:class="{'rates_straight-angle': isDuoRatesShow}")
+    .rates__block(:class="{'rates_straight-angle': isWordsRates}")
         .rates__open
-            .rates__select(@click="duoRatesToggler")
+            .rates__select(@click="(e) => duoRatesToggler(e, 'isWordsRates')")
                 span.rates__label Wordcount
-                img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isDuoRatesShow}") 
-            .rates__drop(v-if="isDuoRatesShow")
-                DuoRates
+                img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isWordsRates}") 
+            .rates__drop(v-if="isWordsRates")
+                WordsRates
+    .rates__block(:class="{'rates_straight-angle': isHoursRates}")
+        .rates__open
+            .rates__select(@click="(e) => duoRatesToggler(e, 'isHoursRates')")
+                span.rates__label Hours
+                img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isHoursRates}") 
+            .rates__drop(v-if="isHoursRates")
+                HoursRates
     .rates__block(:class="{'rates_straight-angle': isMatrixShow}")
             .rates____open
                 .rates__select(@click="matrixToggler")
@@ -24,7 +31,8 @@
 </template>
 
 <script>
-import DuoRates from "./rates/DuoRates";
+import WordsRates from "./rates/WordsRates";
+import HoursRates from "./rates/HoursRates";
 import MonoRates from "./rates/MonoRates";
 import FinanceMatrix from "./rates/FinanceMatrix";
 import { mapActions, mapGetters } from "vuex";
@@ -33,7 +41,8 @@ export default {
     data() {
         return {
             isMonoRatesShow: false,
-            isDuoRatesShow: false,
+            isWordsRates: false,
+            isHoursRates: false,
             isMatrixShow: false,
         }
     },
@@ -41,8 +50,8 @@ export default {
         monoRatesToggler() {
             this.isMonoRatesShow = !this.isMonoRatesShow;
         },
-        duoRatesToggler() {
-            this.isDuoRatesShow = !this.isDuoRatesShow;
+        duoRatesToggler(e, prop) {
+            this[prop] = !this[prop];
         },
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
@@ -68,7 +77,8 @@ export default {
         ...mapActions(["alertToggle", "setSteps", "setPackages"])
     },
     components: {
-        DuoRates,
+        WordsRates,
+        HoursRates,
         MonoRates,
         FinanceMatrix
     },

@@ -5,7 +5,8 @@
                 :fields="fields"
                 :tableData="tableData"
                 bodyRowClass="rates-matrix-row"
-                bodyClass="rates-matrix-body"
+                bodyClass="rates-matrix-body tbody_visible-overflow"
+                tableHeadRowClass="tbody_visible-overflow"
             )
                 template(slot="headerText" slot-scope="{ field }")
                     span.finance-matrix__text {{ field.label }}

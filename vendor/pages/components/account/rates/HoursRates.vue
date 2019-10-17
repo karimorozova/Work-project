@@ -7,17 +7,17 @@
                 :industryFilter="industriesNames"
                 :targetLanguages="targetLanguages"
                 :sourceLanguages="sourceLanguages"
-                :services="servicesNames"
+                :steps="stepsNames"
                 :targetSelect="targetSelect"
                 :sourceSelect="sourceSelect"
-                :serviceSelect="serviceSelect"
+                :selectedSteps="selectedSteps"
                 @setSourceFilter="(e) => setLangFilter(e, 'sourceSelect')"
                 @setTargetFilter="(e) => setLangFilter(e, 'targetSelect')"
                 @setIndustryFilter="setIndustryFilter"
                 @setServiceFilter="setServiceFilter"
             )
         .duo-rates__rates
-            DuoRatesTable(:sourceFilter="sourceSelect" :targetFilter="targetSelect" :industriesFilter="industriesNames")
+            DuoRatesTable(:rates="sortedRates" unit="Hours" :sourceFilter="sourceSelect" :targetFilter="targetSelect" :industriesFilter="industriesNames")
 </template>
 
 <script>
@@ -31,8 +31,7 @@ export default {
             targetSelect: ["All"],
             sourceSelect: ["All"],
             industriesSelect: [{name: "All"}],
-            serviceSelect: ["Translation"],
-            duoServicesFilter: ["tr", "pr", "qt"]
+            selectedSteps: ["Graphic Design"]
         }
     },
     methods: {
@@ -59,18 +58,18 @@ export default {
             if(!this.industriesSelect.length) return this.industriesSelect = [{name: "All"}];
         },
         setServiceFilter({option}) {
-            const position = this.serviceSelect.indexOf(option);
+            const position = this.selectedSteps.indexOf(option);
             if(position !== -1) {
-                this.serviceSelect.splice(position, 1);
+                this.selectedSteps.splice(position, 1);
             } else {
-                this.serviceSelect = this.serviceSelect.filter(item => item !== "All");
-                this.serviceSelect.push(option);
+                this.selectedSteps = this.selectedSteps.filter(item => item !== "All");
+                this.selectedSteps.push(option);
             }
-            if(!this.serviceSelect.length) return this.serviceSelect = ["Translation"];
+            if(!this.selectedSteps.length) return this.selectedSteps = ["Graphic Design"];
         },
-        setDefaultService() {
-            const defaultService = this.services.find(item => item.symbol === 'tr');
-            this.serviceSelect = [defaultService.title];
+        setDefaultStep() {
+            const defaultStep = this.steps.find(item => item.symbol === 'graphic_design');
+            this.selectedSteps = [defaultStep.title];
         }
     },
     components: {
@@ -80,32 +79,26 @@ export default {
     computed: {
         ...mapGetters({
             accountInfo: "getAccountInfo",
-            services: "getServices"
+            steps: "getSteps"
         }),
         sourceLanguages() {
             let result = [];
-            const { languageCombinations } = this.accountInfo;
-            if(languageCombinations.length) {
-                result = languageCombinations.filter(item => item.source).map(item => item.source.lang);
+            const { hoursRates } = this.accountInfo;
+            if(hoursRates.length) {
+                result = hoursRates.filter(item => item.source).map(item => item.source.lang);
                 result = result.filter((item, i, arr) => arr.indexOf(item) === i);
-                result.sort((a, b) => {
-                    if(a < b) return -1;
-                    if(a > b) return 1;
-                })
+                result.sort((a, b) => a > b ? 1 : -1);
                 result.unshift("All");
             }
             return result;
         },
         targetLanguages() {
             let result = [];
-            const { languageCombinations } = this.accountInfo;
-            if(languageCombinations.length) {
-                result = languageCombinations.map(item => item.target.lang);
+            const { hoursRates } = this.accountInfo;
+            if(hoursRates.length) {
+                result = hoursRates.map(item => item.target.lang);
                 result = result.filter((item, i, arr) => arr.indexOf(item) === i);
-                result.sort((a, b) => {
-                    if(a < b) return -1;
-                    if(a > b) return 1;
-                })
+                result.sort((a, b) => a > b ? 1 : -1);
                 result.unshift("All");
             }
             return result;
@@ -118,17 +111,24 @@ export default {
         industriesNames() {
             return this.industriesSelect.map(item => item.name);
         },
-        servicesNames() {
+        stepsNames() {
             let result = [];
-            if(this.services.length) {
-                result = this.services.filter(item => item.languageForm === "Duo" && this.duoServicesFilter.indexOf(item.symbol) !== -1)
+            if(this.steps.length) {
+                result = this.steps.filter(item => item.calculationunit === "Hours")
                 .map(item => item.title);
+            }
+            return result;
+        },
+        sortedRates() {
+            let result = [...this.accountInfo.hoursRates];
+            if(result.length) {
+                result.sort((a,b) => a.target.lang > b.target.lang ? 1 : -1);
             }
             return result;
         }
     },
     mounted() {
-        this.setDefaultService();
+        this.setDefaultStep();
     }
 }
 </script>
@@ -136,6 +136,8 @@ export default {
 <style lang="scss" scoped>
 
 .duo-rates {
+    width: 100%;
+    overflow-x: auto;
     &__filters {
         padding-bottom: 20px;
         margin-top: 10px;
