@@ -4,7 +4,6 @@ export default async function ({ commit, dispatch, state }) {
         commit("SET_VENDOR", result.data);
         commit("SET_ACCOUNT_INFO");
     } catch(err) {
-        console.log(err);
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
 }

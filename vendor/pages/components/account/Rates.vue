@@ -3,21 +3,21 @@
     .rates__block(:class="{'rates_straight-angle': isMonoRatesShow}")
         .rates__open 
             .rates__select(@click="monoRatesToggler")
-                span.rates__label Mono
+                span.rates__label Package
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMonoRatesShow}") 
             .rates__drop(v-if="isMonoRatesShow")
                 MonoRates
     .rates__block(:class="{'rates_straight-angle': isDuoRatesShow}")
         .rates__open
             .rates__select(@click="duoRatesToggler")
-                span.rates__label Duo
+                span.rates__label Wordcount
                 img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isDuoRatesShow}") 
             .rates__drop(v-if="isDuoRatesShow")
                 DuoRates
     .rates__block(:class="{'rates_straight-angle': isMatrixShow}")
             .rates____open
                 .rates__select(@click="matrixToggler")
-                    span.rates__label Matrix
+                    span.rates__label Discount Chart
                     img.rates__icon(src="../../../assets/images/Other/open.png" :class="{'rates_reverse': isMatrixShow}") 
                 .rates__drop(v-if="isMatrixShow")
                     FinanceMatrix
@@ -47,11 +47,11 @@ export default {
         matrixToggler() {
             this.isMatrixShow = !this.isMatrixShow;
         },
-        async getServices() {
+        async getSteps() {
             try {
-                const result = await this.$axios.get("/api/services");
-                let services = result.data.sort((a, b) => a.sortIndex - b.sortIndex);
-                this.setServices(services);
+                const result = await this.$axios.get("/api/steps");
+                const steps = result.data.sort((a, b) => a.title < b.title ? -1 : 1);
+                this.setSteps(steps);
             } catch(err) {
 
             }
@@ -65,11 +65,7 @@ export default {
 
             }
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            setServices: "setServices",
-            setPackages: "setPackages"
-        })
+        ...mapActions(["alertToggle", "setSteps", "setPackages"])
     },
     components: {
         DuoRates,
@@ -77,7 +73,7 @@ export default {
         FinanceMatrix
     },
     mounted() {
-        this.getServices();
+        this.getSteps();
         this.getPackages();
     }
 }
@@ -91,7 +87,7 @@ export default {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    width: 900px;
+    width: 1040px;
     position: relative;
     margin: 20px 0  0 10px;
     padding: 10px;

@@ -1,7 +1,7 @@
 <template lang="pug">
     .mono-table 
         DataTable(
-            :fields="fields"
+            :fields="tableFields"
             :tableData="filteredRates"
             bodyClass="tbody_height-150"
         )
@@ -11,23 +11,24 @@
                 .mono-table__header {{ field.label }}
             template(slot="headIndustry" slot-scope="{ field }")
                 .mono-table__header {{ field.label }}
-            template(slot="headService" slot-scope="{ field }")
-                .mono-table__header.mono-table_flex
-                    span.mono-table__services-header(v-for="service in field.label") {{ service }}
+            template(v-for="(step, stepIndex) in packagesSteps" :slot="'headStep'+(stepIndex+1)" slot-scope="{ field }")
+                .mono-table__header {{ field.label }}
             template(slot="language" slot-scope="{ row, index }")
-                .mono-table__data {{ row.targetLanguage.lang }}
+                .mono-table__data {{ row.target.lang }}
             template(slot="package" slot-scope="{ row, index }")
-                .mono-table__data {{ row.package }}
+                .mono-table__data {{ row.packageSize }}
             template(slot="industry" slot-scope="{ row, index }")
                 .mono-table__data
-                    .mono-table__industry-data
-                        img.mono-table__image(:src="domain+row.industry.icon")
-                        span.mono-table__tooltip {{ row.industry.name }}
-            template(slot="services" slot-scope="{ row, index }")
-                .mono-table__data
-                    span.mono-table__services-rates(v-for="rate of row.industry.rates") 
-                        span.mono-table__value(v-if="rate.value") {{ rate.value }} &euro;
-                        span.mono-table__value(v-else) - 
+                    .mono-table__industry-data(v-if="isAllIndusties(row.industries)") All
+                    .mono-table__industry-data(v-else)
+                        img.mono-table__image(v-for="elem of row.industries" :src="domain+elem.icon")
+            template(v-for="step in packagesSteps" :slot="step.symbol" slot-scope="{ row, index }")
+                .mono-table__data.mono-table_spaced
+                    span.mono-table__rate(v-if="row.rates[step._id].value") {{ row.rates[step._id].value }} &euro;
+                    span.mono-table__rate(v-else) - 
+                    span.mono-table__rate min - {{ row.rates[step._id].min }} &euro;
+                    span.mono-table__rate.mono-table_green(v-if="row.rates[step._id].active") active
+                    span.mono-table__rate.mono-table_orange(v-else) inactive
 </template>
 
 <script>
@@ -47,63 +48,78 @@ export default {
         packagesFilter: {
             type: Array,
             default: () => []
+        },
+        rates: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
         return {
             fields: [
-                {label: "Language", headerKey: "headLanguage", key: "language", width: "21%", padding: "0"},
-                {label: "Package", headerKey: "headPackage", key: "package", width: "21%", padding: "0"},
-                {label: "Industry", headerKey: "headIndustry", key: "industry", width: "13%", padding: "0"},
-                {label: ["Copywriting", "Blogging", "Seo Writing"], headerKey: "headService", key: "services", width: "45%", padding: "0"},
+                {label: "Language", headerKey: "headLanguage", key: "language", width: "188px", padding: "0"},
+                {label: "Package", headerKey: "headPackage", key: "package", width: "200px", padding: "0"},
+                {label: "Industry", headerKey: "headIndustry", key: "industry", width: "151px", padding: "0"},
+                {label: "", headerKey: "headStep1", key: "copywriting", width: "229px", padding: "0", isStepTitle: true},
             ],
-            rates: [],
             domain: ""
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle"
-        }),
-        async getRates() {
-            try {
-                // const result = await this.$axios.get(`/vendor/rates?form=Mono&id=${this.vendor._id}`);
-                // this.rates = result.data;
-            } catch(err) {
-                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-            }
+        ...mapActions(["alertToggle"]),
+        isAllIndusties(rateIndustries) {
+            const rateIndustriesIds = rateIndustries.map(item => item._id).sort();
+            const accountIndustriesIds = this.vendor.industries.map(item => item._id).sort();
+            return JSON.stringify(rateIndustriesIds) === JSON.stringify(accountIndustriesIds);
         },
-        setDefaultServices() {
-            let lastIndex = this.fields.length - 1;
-            const monoServices = this.services.filter(item => item.languageForm === "Mono");
-            this.fields[lastIndex].label = monoServices.map(item => item.title);
-        }
     },
     computed: {
         ...mapGetters({
             vendor: "getVendor",
-            services: "getServices"
+            steps: "getSteps"
         }),
         filteredRates() {
             let result = this.rates;
             if(this.langFilter.length && this.langFilter[0] !== "All") {
-                result = result.filter(item => this.langFilter.indexOf(item.targetLanguage.lang) !== -1);
+                result = result.filter(item => this.langFilter.indexOf(item.target.lang) !== -1);
             }
             if(this.industriesFilter.length && this.industriesFilter[0] !== "All") {
-                result = result.filter(item => this.industriesFilter.indexOf(item.industry.name) !== -1);
+                result = result.filter(item => {
+                    const industry = item.industries.find(indus => this.industriesFilter.indexOf(indus.name) !== -1);
+                    return !!industry;
+                });
             }
             if(this.packagesFilter.length && this.packagesFilter[0] !== "All") {
-                result = result.filter(item => this.packagesFilter.indexOf(item.package) !== -1);
+                result = result.filter(item => this.packagesFilter.indexOf(item.packageSize) !== -1);
             }
             return result;
+        },
+        tableFields() {
+            let fields = this.fields.map(item => item);
+            fields = fields.filter(item => !item.isStepTitle);
+            for(let i = 0; i < this.packagesSteps.length; i++) {
+                fields.push({
+                    label: this.packagesSteps[i].title, 
+                    headerKey: `headStep${i+1}`, 
+                    key: this.packagesSteps[i].symbol, 
+                    width: "229px", 
+                    padding: "0", 
+                    isStepTitle: true
+                })
+            }
+            return fields;
+        },
+        stepsIds() {
+            return this.steps.filter(item => item.calculationUnit === "Packages").map(item => item._id);
+        },
+        packagesSteps() {
+            return this.steps.filter(item => item.calculationUnit === "Packages");
         }
     },
     components: {
         DataTable
     },
     mounted() {
-        this.getRates();
-        this.setDefaultServices();
         this.domain = process.env.domain;
     }
 }
@@ -117,21 +133,6 @@ export default {
         display: flex;
         justify-content: space-around;
     }
-    &__services-header, &__services-rates {
-        width: 33%;
-        display: flex;
-        justify-content: center;
-        border-right: 1px solid $white;
-        &:last-child {
-            border-right: none;
-        }
-    }
-    &__services-rates  {
-        border-right: 1px solid $cell-border;
-        height: 100%;
-        align-items: center;
-        padding: 0 5px;
-    }
     &__data {
         height: 28px;
         padding: 0 5px; 
@@ -143,24 +144,27 @@ export default {
         display: flex;
         align-items: center;
         position: relative;
-        &:hover {
-            .mono-table__tooltip {
-                z-index: 1;
-                opacity: 1;
-            }
-        }
     }
     &__image {
         max-width: 20px;
+        margin-right: 3px;
     }
-    &__tooltip {
-        position: absolute;
-        font-size: 10px;
-        left: 20px;
+    &__rate {
+        width: 30%;
+        text-align: right;
+        &:first-child {
+            width: 25%;
+            text-align: left;
+        }
+    }
+    &_orange {
         color: $orange;
-        z-index: -1;
-        opacity: 0;
-        transition: all 0.3s;
+    }
+    &_green {
+        color: $green;
+    }
+    &_spaced {
+        justify-content: space-between;
     }
 }
 

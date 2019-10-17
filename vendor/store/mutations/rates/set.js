@@ -1,5 +1,5 @@
-export const SET_SERVICES = (state, payload) => {
-    state.services = payload;
+export const SET_STEPS = (state, payload) => {
+    state.steps = payload;
 }
 
 export const SET_PACKAGES = (state, payload) => {

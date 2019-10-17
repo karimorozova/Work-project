@@ -48,7 +48,7 @@ export default {
 .password {
     display: flex;
     justify-content: space-around;
-    width: 900px;
+    width: 1040px;
     box-shadow: 0 0 15px $brown-shadow;
     margin: 0 0 40px 10px;
     padding: 40px 20px;

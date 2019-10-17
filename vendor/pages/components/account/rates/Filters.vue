@@ -20,7 +20,7 @@
     .rates-filters__item.rates-filters_no-display
         label.rates-filters__title Service
         .rates-filters__drop-menu
-            SelectMulti(:selectedOptions="serviceSelect" :options="services" @chooseOptions="setServiceFilter" customClass="filters")
+            SelectMulti(:selectedOptions="selectedSteps" :options="steps" @chooseOptions="setStepsFilter" customClass="filters")
 </template>
 
 <script>
@@ -61,11 +61,11 @@ export default {
             type: Array,
             default: () => []
         },
-        serviceSelect: {
+        selectedSteps: {
             type: Array,
             default: () => []
         },
-        services: {
+        steps: {
             type: Array,
             default: () => []
         },
@@ -93,17 +93,14 @@ export default {
         setIndustryFilter({industry}) {
             this.$emit("setIndustryFilter", { industry} );           
         },
-        setServiceFilter({option}) {
-            this.$emit("setServiceFilter", { option });
+        setStepsFilter({option}) {
+            this.$emit("setStepsFilter", { option });
         },
         setPackageFilter({option}) {
             this.$emit("setPackageFilter", { option });
         }
     },
     computed: {
-        filteredServices() {
-            return this.serviceSelect.map(item => item.title);
-        },
         filterIndustry() {
             let result = [];
             if(this.industryFilter.length) {

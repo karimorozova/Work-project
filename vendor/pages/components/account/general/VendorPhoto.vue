@@ -92,13 +92,15 @@ export default {
     }
     &__file {
         position: absolute;
-        top: -25px;
-        left: -100px;
-        height: 180px;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
         background-color: transparent;
         outline: none;
         border: none;
         z-index: 5;
+        font-size: 0;
+        cursor: pointer;
     }
     &__text {
         display: flex;

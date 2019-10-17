@@ -34,11 +34,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            setAccountInfo: "setAccountInfo",
-            saveVendorInfo: "saveVendorInfo",
-            alertToggle: "alertToggle"
-        }),
+        ...mapActions(["setAccountInfo", "saveVendorInfo", "alertToggle"]),
         closeErrors() {
             this.areErorrs = false;
         },
@@ -93,18 +89,15 @@ export default {
     box-sizing: border-box;
     padding: 20px;
     color: $main-color;
+    position: relative;
     &__buttons {
         display: flex;
         justify-content: flex-end;
-        width: 900px;
+        width: 1040px;
         margin-left: 10px;
     }
     &__title {
         font-size: 22px;
-    }
-    &__errors {
-        width: 900px;
-        position: relative;
     }
 }
 </style>

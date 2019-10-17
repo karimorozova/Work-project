@@ -30,11 +30,11 @@ export default {
     margin: 20px 10px 40px 10px;
     padding: 20px;
     box-shadow: 0 0 15px $brown-shadow;
-    width: 900px;
+    width: 1040px;
     display: flex;
     justify-content: space-between;
     &__block {
-        width: 36%;
+        width: 30%;
         &:first-child {
             max-width: 180px;
         }

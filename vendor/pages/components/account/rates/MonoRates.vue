@@ -6,18 +6,18 @@
                 :industriesSelect="industriesSelect"
                 :industryFilter="industriesNames"
                 :targetLanguages="targetLanguages"
-                :services="servicesNames"
+                :steps="stepsNames"
                 :packages="allPackages"
                 :targetSelect="targetSelect"
-                :serviceSelect="serviceSelect"
+                :selectedSteps="selectedSteps"
                 :packageSelect="packageSelect"
                 @setPackageFilter="(e) => setFilter(e, 'packageSelect')"
                 @setTargetFilter="(e) => setFilter(e, 'targetSelect')"
                 @setIndustryFilter="setIndustryFilter"
-                @setServiceFilter="setServiceFilter"
+                @setStepsFilter="setStepsFilter"
             )
         .mono-rates__rates    
-            MonoRatesTable(:langFilter="targetSelect" :industriesFilter="industriesNames" :packagesFilter="packageSelect")
+            MonoRatesTable(:rates="sortedRates" :langFilter="targetSelect" :industriesFilter="industriesNames" :packagesFilter="packageSelect")
 </template>
 
 <script>
@@ -30,7 +30,7 @@ export default {
         return {
             targetSelect: ["All"],
             industriesSelect: [{name: "All"}],
-            serviceSelect: ["Copywriting"],
+            selectedSteps: ["Copywriting"],
             packageSelect: ["All"]
         }
     },
@@ -57,19 +57,19 @@ export default {
             }
             if(!this.industriesSelect.length) return this.industriesSelect = [{name: "All"}];
         },
-        setServiceFilter({option}) {
-            const position = this.serviceSelect.indexOf(option);
+        setStepsFilter({option}) {
+            const position = this.selectedSteps.indexOf(option);
             if(position !== -1) {
-                this.serviceSelect.splice(position, 1);
+                this.selectedSteps.splice(position, 1);
             } else {
-                this.serviceSelect = this.serviceSelect.filter(item => item !== "All");
-                this.serviceSelect.push(option);
+                this.selectedSteps = this.selectedSteps.filter(item => item !== "All");
+                this.selectedSteps.push(option);
             }
-            if(!this.serviceSelect.length) return this.serviceSelect = ["Copywriting"];
+            if(!this.selectedSteps.length) return this.selectedSteps = ["Copywriting"];
         },
-        setDefaultService() {
-            const defaultService = this.services.find(item => item.symbol === 'co');
-            this.serviceSelect = [defaultService.title];
+        setDefaultStep() {
+            const defaultStep = this.steps.find(item => item.symbol === 'copywriting');
+            this.selectedSteps = [defaultStep.title];
         }
     },
     components: {
@@ -79,14 +79,14 @@ export default {
     computed: {
         ...mapGetters({
             accountInfo: "getAccountInfo",
-            services: "getServices",
+            steps: "getSteps",
             packages: "getPackages"
         }),
         targetLanguages() {
             let result = [];
-            const { languageCombinations } = this.accountInfo;
-            if(languageCombinations.length) {
-                result = languageCombinations.map(item => item.target.lang);
+            const { monoRates } = this.accountInfo;
+            if(monoRates.length) {
+                result = monoRates.map(item => item.target.lang);
                 result = result.filter((item, i, arr) => arr.indexOf(item) === i);
                 result.sort((a, b) => {
                     if(a < b) return -1;
@@ -104,22 +104,29 @@ export default {
         industriesNames() {
             return this.industriesSelect.map(item => item.name);
         },
-        servicesNames() {
+        stepsNames() {
             let result = [];
-            if(this.services.length) {
-                result = this.services.filter(item => item.languageForm === "Mono")
+            if(this.steps.length) {
+                result = this.steps.filter(item => item.languageForm === "Mono")
                 .map(item => item.title);
             }
             return result;
         },
         allPackages() {
-            let result = this.packages;
+            let result = [...this.packages];
             result.unshift("All");
+            return result;
+        },
+        sortedRates() {
+            let result = [...this.accountInfo.monoRates];
+            if(result.length) {
+                result.sort((a,b) => a.target.lang > b.target.lang ? 1 : -1);
+            }
             return result;
         }
     },
     mounted() {
-        this.setDefaultService();
+        this.setDefaultStep();
     }
 }
 </script>

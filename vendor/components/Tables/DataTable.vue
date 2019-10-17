@@ -102,6 +102,8 @@
       background-color: $thead-background;
       color: $white;
     }
+    border-left: 0.5px solid $cell-border;
+    border-left: 0.5px solid $cell-border;
   }
 
   &__tbody {

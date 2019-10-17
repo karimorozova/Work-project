@@ -106,11 +106,7 @@ export default {
       const vendorToken = this.$cookie.get("vendor");
       this.$store.commit("SET_TOKEN", vendorToken);
     },
-    ...mapActions({
-      alertToggle: "alertToggle",
-      logout: "logout",
-      getVendorInfo: "getVendorInfo"
-    })
+    ...mapActions(["alertToggle", "logout", "getVendorInfo"])
   },
   computed: {
     ...mapGetters({

@@ -7,7 +7,7 @@ const state = {
   selectedJob: {},
   languages: [],
   timezones: [],
-  services: [],
+  steps: [],
   packages: [],
   applicationFormData: {
     name: "",
