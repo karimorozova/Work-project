@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest } = require('../models');
 const { getProjects } = require('../projects/');
 const { getClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
@@ -84,6 +84,16 @@ router.get('/all-requests', async (req, res) => {
         res.status(500).send('Something wrong with DB while getting requests!');
     }
 });
+
+router.get('/requests-quantity', async (req, res) => {
+    try {
+        const quantity = await ClientRequest.countDocuments({status: {$ne: 'Cancelled'}});
+        res.send({quantity});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Something wrong with DB while getting requests quantity');
+    }
+})
 
 router.get('/languages', async (req, res) => {
   try {

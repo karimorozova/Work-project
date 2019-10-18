@@ -8,14 +8,26 @@
 
 <script>
 import Allprojects from './Allprojects';
+import { mapActions } from 'vuex';
+
 export default {
-    data() {
-        return {
-        };
+    methods: {
+        ...mapActions(["setRequests", "alertToggle"]),
+        async getRequests() {
+            try {
+                const requests = await this.$http.get('/api/all-requests');
+                await this.setRequests([...requests.body]);
+            } catch(err) {
+                this.alertToggle({message: "Error on getting Requests", isShow: true, type: "error"});
+            }
+        }
     },
-  components: {
-    Allprojects
-  }
+    components: {
+        Allprojects
+    },
+    created() {
+        this.getRequests();
+    }
 };
 
 </script>

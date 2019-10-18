@@ -11,7 +11,7 @@
 
 <script>
 import Sidebar from '../Sidebar';
-import { mapGetters, mapActions } from "vuex";
+import { mapActions } from "vuex";
 import defaultSidebarLinks from "@/mixins/defaultSidebarLinks";
 
 export default {
@@ -24,40 +24,34 @@ export default {
                 {title: 'Previous Projects', routeName: 'prev-projects'}
             ],
             currentIndex: 0,
-            defaultRouteName: "projects"
+            defaultRouteName: "projects",
+            requestsCounter: ""
         }
     },
     methods: {
-        ...mapActions({
-            setStoreProjects: "setAllProjects",
-            setRequests: "setRequests"
-        }),
+        ...mapActions(["setAllProjects", "alertToggle"]),
         async getProjects() {
             try {
                 const projects = await this.$http.get('/api/allprojects?status=Others');
-                await this.setStoreProjects([...projects.body]);
+                await this.setAllProjects([...projects.body]);
             } catch(err) {
-
+                this.alertToggle({message: "Error on getting Projects", isShow: true, type: "error"});
             }
         },
-        async getRequests() {
+        async getRequestsQuantity() {
             try {
-                const requests = await this.$http.get('/api/all-requests');
-                await this.setRequests([...requests.body]);
+                const requests = await this.$http.get('/api/requests-quantity');
+                this.requestsCounter = requests.data.quantity;
             } catch(err) {
 
             }
-        },
+        }
     },
     computed: {
-        ...mapGetters({
-            requests: "getAllRequests",
-        }),
         sidebarLinks() {
-            const requestsCounter = this.requests.filter(item => item.status !== 'Cancelled').length;
             return this.links.map(item => {
                 if(item.routeName === 'requests') {
-                    item.counter = requestsCounter;
+                    item.counter = this.requestsCounter;
                 }
                 return item
             });
@@ -68,7 +62,7 @@ export default {
     },
     created() {
         this.getProjects();
-        this.getRequests();
+        this.getRequestsQuantity();
     }
 }
 </script>
