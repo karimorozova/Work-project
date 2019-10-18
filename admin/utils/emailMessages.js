@@ -210,7 +210,7 @@ function getTaskCode(tasksInfo) {
 function requestMessageForVendor(obj) {
     const date = Date.now();
     const expiryDate = new Date(date + 900000);
-    const langPair = obj.source + " >> " + obj.target + ";"
+    const langPair = obj.sourceLanguage ? `${obj.sourceLanguage} >> ${obj.targetLanguage}; ` : `${obj.targetLanguage} / ${obj.packageSize}; `;
     const token = jwt.sign({vendorId: obj.vendor.id}, secretKey, { expiresIn: '2h'});
     const stepId = obj.stepId.replace(/ /g, '%20');
     const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
@@ -225,7 +225,7 @@ function requestMessageForVendor(obj) {
                 Please find attached Quote(s).
             </p>
             <p>
-                By clicking on one of the links below, you can accept or reject out offer.
+                By clicking on one of the links below, you can accept or reject our offer.
             </p>
             <h3 class="detailsTitle">Step Details</h3>
             <table class="details">
