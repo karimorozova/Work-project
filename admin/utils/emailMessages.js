@@ -314,7 +314,7 @@ function managerAssignmentNotifyingMessage(obj) {
 function emailMessageForContact(obj) {
     const surname = obj.surname || "";
     const langPairs = obj.tasks.reduce((acc, cur) => {
-        const pair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}; ` : `${cur.targetLanguage} >> ${cur.packageSize}; `;
+        const pair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}; ` : `${cur.targetLanguage} / ${cur.packageSize}; `;
         return acc + pair;
     }, "")
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
@@ -362,7 +362,7 @@ function emailMessageForContact(obj) {
 
 function managerTaskCompleteNotificationMessage(obj) {
     const lastName = obj.projectManager.lastName || "";
-    const pair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} >> ${obj.task.packageSize}`;
+    const pair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} / ${obj.task.packageSize}`;
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.projectManager.firstName} ${lastName},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
@@ -418,6 +418,10 @@ function vendorNotificationMessage(obj) {
                     <h3 class="detailsTitle">Step Details</h3>
                     <table class="details">
                         <tr>
+                            <td>Step ID</td>
+                            <td>${obj.stepId}</td>
+                        </tr>
+                        <tr>
                             <td>Step</td>
                             <td>${obj.name}</td>
                         </tr>
@@ -435,6 +439,10 @@ function vendorNotificationMessage(obj) {
 }
 
 function vendorReassignmentMessage(obj, reason) {
+    const pairSourceTitle = obj.sourceLanguage ? "Source language:" : "Target language:";
+    const pairTargetTitle = obj.sourceLanguage ? "Target language:" : "Package size:";
+    const pairLeft = obj.sourceLanguage || obj.targetLanguage;
+    const pairRight = obj.sourceLanguage ? obj.targetLanguage : obj.packageSize;
     const reassignReason = `<p><h3>Reason</h3><span>${reason}</span></p>` || '';
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
@@ -454,12 +462,12 @@ function vendorReassignmentMessage(obj, reason) {
                             <td>${obj.name}</td>
                         </tr>
                         <tr>
-                            <td>Source language:</td>
-                            <td>${obj.source}</td>
+                            <td>${pairSourceTitle}</td>
+                            <td>${pairLeft}</td>
                         </tr>
                         <tr>
-                            <td>Target language</td>
-                            <td>${obj.target}</td>
+                            <td>${pairTargetTitle}</td>
+                            <td>${pairRight}</td>
                         </tr>
                     </table>
                 </div>
@@ -512,7 +520,7 @@ function deliverablesDownloadedMessage(obj) {
 }
 
 function tasksQuoteMessage(obj) {
-        const langPair = obj.task.sourceLanguage + " >> " + obj.task.targetLanguage;
+        const langPair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} / ${obj.task.packageSize}`;
         const receivables = obj.task.finance.Price.receivables;
         return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: auto">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
