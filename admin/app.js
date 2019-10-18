@@ -25,7 +25,12 @@ const allowedOrigins = [
   "http://localhost:8081"
 ];
 
-mongoose.connect(config.mongoDB.url);
+mongoose.connect(config.mongoDB.url, { 
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+});
 
 app.use(logger('dev'));
 app.use(
