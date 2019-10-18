@@ -313,8 +313,9 @@ function managerAssignmentNotifyingMessage(obj) {
 
 function emailMessageForContact(obj) {
     const surname = obj.surname || "";
-    const langPairs = obj.tasks.reduce((init, current) => {
-        return init + current.sourceLanguage + " >> " + current.targetLanguage + "; "
+    const langPairs = obj.tasks.reduce((acc, cur) => {
+        const pair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}; ` : `${cur.targetLanguage} >> ${cur.packageSize}; `;
+        return acc + pair;
     }, "")
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.firstName} ${surname},</h3>
@@ -361,6 +362,7 @@ function emailMessageForContact(obj) {
 
 function managerTaskCompleteNotificationMessage(obj) {
     const lastName = obj.projectManager.lastName || "";
+    const pair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} >> ${obj.task.packageSize}`;
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.projectManager.firstName} ${lastName},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
@@ -387,7 +389,7 @@ function managerTaskCompleteNotificationMessage(obj) {
                     </tr>
                     <tr>
                         <td>Language pair:</td>
-                        <td>${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}</td>
+                        <td>${pair}</td>
                     </tr>
                     <tr>
                         <td>Start date: </td>
@@ -403,6 +405,10 @@ function managerTaskCompleteNotificationMessage(obj) {
 }
 
 function vendorNotificationMessage(obj) {
+    const pairSourceTitle = obj.sourceLanguage ? "Source language:" : "Target language:";
+    const pairTargetTitle = obj.sourceLanguage ? "Target language:" : "Package size:";
+    const pairLeft = obj.sourceLanguage || obj.targetLanguage;
+    const pairRight = obj.sourceLanguage ? obj.targetLanguage : obj.packageSize;
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
                 <div class="all-info" style="padding: 0 15px 0 30px;">
@@ -416,12 +422,12 @@ function vendorNotificationMessage(obj) {
                             <td>${obj.name}</td>
                         </tr>
                         <tr>
-                            <td>Source language:</td>
-                            <td>${obj.source}</td>
+                            <td>${pairSourceTitle}</td>
+                            <td>${pairLeft}</td>
                         </tr>
                         <tr>
-                            <td>Target language</td>
-                            <td>${obj.target}</td>
+                            <td>${pairTargetTitle}</td>
+                            <td>${pairRight}</td>
                         </tr>
                     </table>
                 </div>
