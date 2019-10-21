@@ -6,35 +6,31 @@
     .technical__options
         span.technical__label Internet access:
         SelectSingle(
-            refersTo="internet"
             :selectedOption="selectedCompetence.internet"
             :options="competences.internet"
-            @chooseOption="chooseCompetence"
+            @chooseOption="(e) => chooseCompetence(e, 'internet')"
         )
     span.technical__comment Do you have any CAT experience?
     .technical__options
         span.technical__label Computer-Assisted Translation experience:
         SelectSingle(
-            refersTo="cat"
             :selectedOption="selectedCompetence.cat"
             :options="competences.cat"
-            @chooseOption="chooseCompetence"
+            @chooseOption="(e) => chooseCompetence(e, 'cat')"
         )
     span.technical__comment Do you have experience with any of the below? Check all that apply.
     .technical__options
         span.technical__label Software experience
         SelectMulti(
-            refersTo="software"
             :selectedOptions="selectedCompetence.software"
             :otherSoftwareChoice="otherSoftwareChoice"
             :otherDtpChoice="otherDtpChoice"
             :options="competences.software"
-            @chooseOptions="chooseCompetence"
+            @chooseOptions="(e) => chooseCompetence(e, 'software')"
         )
     OtherChoice(
         v-if="otherChoiceVisibile"
         :label="otherChoicelabel"
-        :refersTo="otherChoiceRef"
         @cancelChanges="cancelOtherChoice"
         @saveChanges="saveOtherChoice"
     )
@@ -71,15 +67,15 @@ export default {
         }
     },
     methods: {
-        chooseCompetence({option, refersTo}) {
-            if(refersTo != "software") {
-                if(option === "Yes" && refersTo === "cat") {
+        chooseCompetence({option}, prop) {
+            if(prop !== "software") {
+                if(option === "Yes" && prop === "cat") {
                     this.otherChoiceRef = "cat"
                     this.otherChoicelabel = "Please specify CAT tool"
                     this.$emit("showOtherChoice", {variable: 'otherTechVisibile'})
                     return
                 }
-                this.selectedCompetence[refersTo] = option;
+                this.selectedCompetence[prop] = option;
             } else {
                 this.otherChoiceRef = "software"
                 if(option === "DTP software") {
@@ -114,12 +110,12 @@ export default {
         cancelOtherChoice() {
             this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'});
         },
-        saveOtherChoice({refersTo, choice}) {
-            if(refersTo === "cat") {
+        saveOtherChoice({choice}) {
+            if(this.otherChoiceRef === "cat") {
                 this.selectedCompetence.cat = "Yes - " + choice;
             } else {
                 let otherChoice = "";
-                if(refersTo === "dtp") {
+                if(this.otherChoiceRef === "dtp") {
                     this.otherDtpChoice = "DTP software - " + choice;
                     otherChoice = this.otherDtpChoice;
                 } else {

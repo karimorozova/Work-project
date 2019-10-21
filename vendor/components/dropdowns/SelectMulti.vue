@@ -23,9 +23,6 @@ export default {
         options: {
             type: Array
         },
-        refersTo: {
-            type: String
-        },
         otherChoice: {
             type: String,
             default: ""
@@ -55,7 +52,7 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOptions(index) {
-            this.$emit("chooseOptions", {option: this.options[index], refersTo: this.refersTo})
+            this.$emit("chooseOptions", {option: this.options[index]})
         },
         activeClass(elem) {
             return (this.selectedOptions.indexOf(elem) != -1 ||

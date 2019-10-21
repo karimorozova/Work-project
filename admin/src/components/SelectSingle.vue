@@ -28,9 +28,6 @@ export default {
         positionStyle: {
             type: Object
         },
-        refersTo: {
-            type: String
-        },
         hasSearch: {
             type: Boolean,
             default: false
@@ -85,7 +82,7 @@ export default {
             this.showOptions(event);
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.filteredOptions[index], refersTo: this.refersTo});
+            this.$emit("chooseOption", {option: this.filteredOptions[index], index});
             this.outOptions();
         },
         activeClass(elem) {

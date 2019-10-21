@@ -23,10 +23,6 @@ export default {
             type: Object,
             default: () => {return {lang: ""}}
         },
-        refersTo: {
-            type: String,
-            default: ""
-        },
         label: {
             type: String,
             default: ""
@@ -72,7 +68,7 @@ export default {
             this.searchLang = "";
         },
         chooseLang(index) {
-            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex, refersTo: this.refersTo});
+            this.$emit("chooseLang", {lang: this.filteredLangs[index], index: this.parentIndex});
             this.outClick();
         }
     },

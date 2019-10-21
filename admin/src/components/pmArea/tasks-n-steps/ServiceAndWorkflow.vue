@@ -9,7 +9,6 @@
                     :selectedOption="service"
                     :options="allServices"
                     placeholder="Service"
-                    refersTo="service"
                     @chooseOption="setService"
                     :positionStyle="positionStyle"
                 )

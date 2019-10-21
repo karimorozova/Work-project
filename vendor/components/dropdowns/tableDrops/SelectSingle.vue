@@ -21,9 +21,6 @@ export default {
         options: {
             type: Array
         },
-        refersTo: {
-            type: String
-        },
         activeObject: {
             type: Object
         }
@@ -43,7 +40,7 @@ export default {
             this.$emit("toggleDropMenu", {isDropped: this.isDropped});
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo, activeObject: this.activeObject});
+            this.$emit("chooseOption", {option: this.options[index], activeObject: this.activeObject});
             this.outOptions();
         }
     },

@@ -21,9 +21,6 @@ export default {
         options: {
             type: Array
         },
-        refersTo: {
-            type: String
-        },
         customClass: {
             type: String
         }
@@ -41,7 +38,7 @@ export default {
             this.isDropped = !this.isDropped;
         },
         chooseOption(index) {
-            this.$emit("chooseOption", {option: this.options[index], refersTo: this.refersTo});
+            this.$emit("chooseOption", {option: this.options[index]});
             this.outOptions();
         },
         activeClass(elem) {

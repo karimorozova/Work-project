@@ -20,9 +20,6 @@ export default {
     props: {
         label: {
             type: String
-        },
-        refersTo: {
-            type: String
         }
     },
     data() {
@@ -35,7 +32,7 @@ export default {
             this.$emit("cancelChanges")
         },
         saveChanges({value}) {
-            this.$emit("saveChanges", {refersTo: this.refersTo, choice: this.inputText})
+            this.$emit("saveChanges", {choice: this.inputText})
         }
     },
     components: {

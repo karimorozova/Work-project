@@ -23,8 +23,7 @@
                             :options="allClients"
                             :hasSearch="isSearchClient"
                             placeholder="Name"
-                            refersTo="customer"
-                            @chooseOption="setValue"
+                            @chooseOption="(e) => setValue(e, 'customer')"
                         )
             .project__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
@@ -109,9 +108,9 @@ export default {
             if(prop === 'startDate' && this.project.tasks.length) return;
             await this.setProjectDate({date, projectId: this.project._id});
         },
-        setValue({option, refersTo}) {
-            this.$emit('setValue', {option: option, refersTo: refersTo});
-            if(refersTo === 'customer' && this.project.customer.industries.length == 1) {
+        setValue({option}, prop) {
+            this.$emit('setValue', {option, prop});
+            if(prop === 'customer' && this.project.customer.industries.length == 1) {
                 this.selectedIndustry = this.project.customer.industries[0];
             }
         },

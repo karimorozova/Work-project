@@ -6,7 +6,6 @@
     .translation-exp__options
         span.translation-exp__label Years of experience:
         SelectSingle(
-            refersTo="internet"
             :selectedOption="selectedExperience"
             :options="experiences"
             @chooseOption="chooseExperience"

@@ -42,8 +42,8 @@ export default {
                 this.isTaskData = !this.isTaskData;
             }
         },
-        setValue({option, refersTo}) {
-            this[refersTo] = option;
+        setValue({option, prop}) {
+            this[prop] = option;
         },
         setSource({symbol}) {
             this.sourceLanguages = symbol ? [symbol] : [];

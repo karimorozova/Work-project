@@ -3,21 +3,19 @@
     .language-pairs__row(v-for="(pair, index) in selectedLangPairs")
         .language-pairs__item
             SelectLanguage(
-                refersTo="source"
                 :parentIndex="index"
                 placeholder="Source language"
                 :selectedLang="pair.source"
-                @chooseLang="setPairLanguage"
+                @chooseLang="(e) => setPairLanguage(e, 'source')"
             )
         .language-pairs__image
             img(src="../../../assets/images/arrow_open.png")
         .language-pairs__item
             SelectLanguage(
-                refersTo="target"
                 :parentIndex="index"
                 placeholder="Target language"
                 :selectedLang="pair.target"
-                @chooseLang="setPairLanguage"
+                @chooseLang="(e) => setPairLanguage(e, 'target')"
             )
         .language-pairs__delete
             .language-pairs__button_rotated
@@ -44,8 +42,8 @@ export default {
         }
     },
     methods: {
-        setPairLanguage({lang, index, refersTo}) {
-            this.selectedLangPairs[index][refersTo] = lang;
+        setPairLanguage({lang, index}, prop) {
+            this.selectedLangPairs[index][prop] = lang;
             const { source, target } = this.selectedLangPairs[index];
             if(source._id && target._id) {
                 const langPairs = this.selectedLangPairs.map(item => {

@@ -6,9 +6,8 @@
             span.other__asterisk *
         SelectSingle(
             :selectedOption="selectedAvailability"
-            refersTo="selectedAvailability"
             :options="availabilityOptions"
-            @chooseOption="chooseOption"
+            @chooseOption="(e) => chooseOption(e, 'selectedAvailability')"
         )
     span.other__comment Are you willing to take a translation test (300 words)?
         span.other__asterisk *
@@ -16,9 +15,8 @@
         span.other__label Options:
         SelectSingle(
             :selectedOption="testAgree"
-            refersTo="testAgree"
             :options="testAnswers"
-            @chooseOption="chooseOption"
+            @chooseOption="(e) => chooseOption(e, 'testAgree')"
         )
     .other__options.rate-value
         span.other__label Please state your translation rate (Euro)
@@ -59,10 +57,10 @@ export default {
         }
     },
     methods: {
-        chooseOption({option, refersTo}) {
-            this[refersTo] = option;
-            let prop = (refersTo === "testAgree") ? "testAgree": "availability";
-            this.$emit("setValue", {property: prop, value: option})
+        chooseOption({option}, prop) {
+            this[prop] = option;
+            let property = prop === "testAgree" ? "testAgree": "availability";
+            this.$emit("setValue", {property, value: option})
         },
         setCoverLetter() {
             this.$emit("setValue", {property: 'coverLetter', value: this.coverLetter})

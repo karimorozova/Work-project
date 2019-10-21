@@ -31,8 +31,8 @@ export default {
         ...mapActions({
             storeProject: "setCurrentProject"
         }),
-        setValue({option, refersTo}) {
-            this.project[refersTo] = option;
+        setValue({option, prop}) {
+            this.project[prop] = option;
         },
         projectCreated({project, customer}) {
             this.project = project;
