@@ -2,21 +2,43 @@
 .projects
     .projects__table
         Allprojects(
-         projectsType="openProjects"
-         )
+            projectsType="openProjects"
+            @filterProjects="getProjects"
+            @bottomScrolled="bottomScrolled"
+        )
 </template>
 
 <script>
 import Allprojects from './Allprojects';
+import { mapActions, mapGetters } from "vuex";
+import projectsAndRequsets from '@/mixins/projectsAndRequests';
 
 export default {
+    mixins: [projectsAndRequsets],
     data() {
         return {
-            
+            isDataRemain: true,
+            lastDate: new Date(),
+            endpoint: "allprojects",
+            prop: "projects"
         }
+    },
+    methods: {
+        ...mapActions(["setAllProjects", "alertToggle"]),
+        async getProjects(filters) {
+            await this.getData(filters);
+        }
+    },
+    computed: {
+        ...mapGetters({
+            projects: "getAllProjects"
+        })
     },
     components: {
         Allprojects
+    },
+    created() {
+        this.getProjects({filters: null});
     }
 }
 </script>
@@ -24,7 +46,7 @@ export default {
 <style lang="scss" scoped>
 
 .projects {
-  width: calc(100% - 150px);
+    width: calc(100% - 150px);
 }
 
 </style>

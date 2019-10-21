@@ -8,8 +8,7 @@
                             :selectedOption="status"
                             :options="statuses"
                             placeholder="Select"
-                            refersTo="statusFilter"
-                            @chooseOption="setValue"
+                            @chooseOption="(e) => setValue(e, 'statusFilter')"
                             :projectsType="projectsType"
                         )
             .filters__item
@@ -19,8 +18,7 @@
                             :selectedOption="projectManager"
                             :options="managersNames"
                             placeholder="Name"
-                            refersTo="managerFilter"
-                            @chooseOption="setValue"
+                            @chooseOption="(e) => setValue(e, 'managerFilter')"
                         )
         .filters__col
             .filters__item
@@ -85,16 +83,20 @@ export default {
     },
     methods: {
         setStart(event) {
-            this.$emit("setFilter", {option: event, refersTo: 'startFilter'})
+            const date = event;
+            date.setHours(0,0,0,0);
+            this.$emit("setFilter", {option: date, prop: 'startFilter'})
         },
         setDeadline(event) {
-            this.$emit("setFilter", {option: event, refersTo: 'deadlineFilter'})
+            const date = event;
+            date.setHours(23,0,0,0);
+            this.$emit("setFilter", {option: date, prop: 'deadlineFilter'})
         },
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
         },
-        setValue({option, refersTo}) {
-            this.$emit('setFilter', {option, refersTo})
+        setValue({option, index}, prop) {
+            this.$emit('setFilter', {option, index, prop})
         },
         startOpen() {
             this.$refs.startDate.showCalendar()
@@ -103,7 +105,7 @@ export default {
             this.$refs.deadline.showCalendar()
         },
         addLang({lang}, goal) {
-            const prop = (goal === 'sourceFilter') ? 'sourceLangs' : 'targetLangs';
+            const prop = goal === 'sourceFilter' ? 'sourceLangs' : 'targetLangs';
             const position = this[prop].indexOf(lang.symbol);
             if(position != -1) {
                 this.$emit('removeLangFilter', {from: goal, position})
@@ -113,7 +115,7 @@ export default {
         },
         setClientName(event) {
             let option = event.target.value;
-            this.$emit('setFilter', {option, refersTo: 'clientFilter'})
+            this.$emit('setFilter', {option, prop: 'clientFilter'})
         }
     },
     computed: {

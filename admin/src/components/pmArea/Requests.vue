@@ -3,24 +3,36 @@
         .requests__table
             Allprojects(
                 projectsType="requests"
+                @filterProjects="getRequests"
+                @bottomScrolled="bottomScrolled"
             )
 </template>
 
 <script>
 import Allprojects from './Allprojects';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
+import projectsAndRequsets from '@/mixins/projectsAndRequests';
 
 export default {
+    mixins: [projectsAndRequsets],
+    data() {
+        return {
+            isDataRemain: true,
+            lastDate: new Date(),
+            endpoint: 'all-requests',
+            prop: 'requests'
+        }
+    },
     methods: {
         ...mapActions(["setRequests", "alertToggle"]),
-        async getRequests() {
-            try {
-                const requests = await this.$http.get('/api/all-requests');
-                await this.setRequests([...requests.body]);
-            } catch(err) {
-                this.alertToggle({message: "Error on getting Requests", isShow: true, type: "error"});
-            }
+        async getRequests(filters) {
+            await this.getData(filters);
         }
+    },
+    computed: {
+        ...mapGetters({
+            requests: "getAllRequests"
+        })
     },
     components: {
         Allprojects

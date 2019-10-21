@@ -4,8 +4,8 @@ const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
 const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest } = require('../models');
-const { getProjects } = require('../projects/');
-const { getClientRequests } = require('../clientRequests');
+const { getFilteredProjects } = require('../projects/');
+const { getFilteredClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
 const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
@@ -60,14 +60,10 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     }
 });
 
-router.get('/allprojects', async (req, res) => {
-    const { status } = req.query;
+router.post('/allprojects', async (req, res) => {
+    const filters = {...req.body};
     try {
-        let queryObj = {};
-        if(status) {
-            queryObj = status !== 'Requested' ? {status: {$ne:'Requested'}} : { status };
-        }
-        const projects = await getProjects(queryObj);
+        const projects = await getFilteredProjects(filters);
         res.send(projects)
     } catch(err) {
         console.log(err);
@@ -75,9 +71,10 @@ router.get('/allprojects', async (req, res) => {
     }
 });
 
-router.get('/all-requests', async (req, res) => {
+router.post('/all-requests', async (req, res) => {
+    const filters = {...req.body};
     try {
-        const requests = await getClientRequests();
+        const requests = await getFilteredClientRequests(filters);
         res.send(requests);
     } catch(err) {
         console.log(err);

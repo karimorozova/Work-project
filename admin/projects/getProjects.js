@@ -1,4 +1,5 @@
 const { Projects } = require('../models/');
+const { getFilterdProjectsQuery } = require('./filter');
 
 async function getProjects(obj) {
     return await Projects.find(obj)
@@ -30,4 +31,23 @@ async function updateProject(query, update) {
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
-module.exports = { getProject, getProjects, updateProject };
+async function getFilteredProjects(filters) {
+    const query = getFilterdProjectsQuery(filters);
+    const projects = await Projects.find(query).sort({startDate: -1}).limit(25)
+    try {
+        return Projects.populate(projects, [
+            'industry',
+            'customer',
+            'service',
+            {path: 'projectManager', select: ['firstName', 'lastName', 'photo']},
+            {path: 'accountManager', select: ['firstName', 'lastName', 'photo']},
+            {path: 'steps.vendor', select: ['firstName', 'lastName', 'photo']}
+
+        ])
+    } catch(err) {
+        console.log(err);
+        console.log("Error on getting filtered projects");
+    }
+}
+
+module.exports = { getProject, getProjects, updateProject, getFilteredProjects };

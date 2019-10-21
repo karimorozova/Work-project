@@ -6,6 +6,7 @@
         :bodyClass="['all-projects', {'tbody_visible-overflow': allProjects.length < 17}]"
         :tableheadRowClass="allProjects.length < 17 ? 'tbody_visible-overflow' : ''"
         @onRowClicked="onRowClicked"
+        @bottomScrolled="bottomScrolled"
     )
         template(slot="headerProjectId" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
@@ -116,6 +117,9 @@ export default {
         },
         edit() {
             console.log("edit");
+        },
+        bottomScrolled() {
+            this.$emit("bottomScrolled");
         }
     },
     components: {

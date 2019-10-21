@@ -1,4 +1,4 @@
-const { getProject, getProjects, updateProject } = require('./getProjects');
+const { getProject, getProjects, updateProject, getFilteredProjects } = require('./getProjects');
 const { storeFiles, getDeliverablesLink, storeTargetFile } = require('./files');
 const { toggleProjectProp, getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, 
     updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
@@ -11,6 +11,7 @@ module.exports = {
     getProject,
     getProjects,
     updateProject,
+    getFilteredProjects,
     storeFiles,
     storeTargetFile,
     toggleProjectProp,

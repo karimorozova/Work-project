@@ -1,4 +1,5 @@
 const { ClientRequest } = require('../models/');
+const { getFilterdRequestsQuery } = require('./filter');
 
 async function getClientRequest(obj) {
     const clientRequest = await ClientRequest.findOne(obj)
@@ -29,4 +30,21 @@ async function updateClientRequest(query, update) {
         .populate('customer');
 }
 
-module.exports = { getClientRequest, getClientRequests, updateClientRequest };
+async function getFilteredClientRequests(filters) {
+    const query = getFilterdRequestsQuery(filters);
+    const requests = await ClientRequest.find(query).sort({startDate: -1}).limit(25)
+    try {
+        return ClientRequest.populate(requests, [
+            'industry',
+            'customer',
+            'service',
+            'projectManager',
+            'accountManager'
+        ])
+    } catch(err) {
+        console.log(err);
+        console.log("Error on getting filtered client requests");
+    }
+}
+
+module.exports = { getClientRequest, getClientRequests, updateClientRequest, getFilteredClientRequests };

@@ -29,15 +29,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["setAllProjects", "alertToggle"]),
-        async getProjects() {
-            try {
-                const projects = await this.$http.get('/api/allprojects?status=Others');
-                await this.setAllProjects([...projects.body]);
-            } catch(err) {
-                this.alertToggle({message: "Error on getting Projects", isShow: true, type: "error"});
-            }
-        },
+        ...mapActions(["alertToggle"]),
         async getRequestsQuantity() {
             try {
                 const requests = await this.$http.get('/api/requests-quantity');
@@ -61,7 +53,6 @@ export default {
         Sidebar
     },
     created() {
-        this.getProjects();
         this.getRequestsQuantity();
     }
 }

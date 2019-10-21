@@ -15,8 +15,9 @@
             )
         .all-projects__table
             ProjectsTable(
-                :allProjects="filteredProjects"
+                :allProjects="tableData"
                 @selectProject="selectProject"
+                @bottomScrolled="bottomScrolled"
             )
 </template>
 
@@ -28,11 +29,11 @@ import ProjectFilters from "./ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-  props: {
-    projectsType: {
-      type: String
+    props: {
+        projectsType: {
+            type: String
+        }
     },
-  },
     data() {
         return {
             clientFilter: "",
@@ -42,28 +43,25 @@ export default {
             managerFilter: "All",
             startFilter: "",
             deadlineFilter: "",
-            managers: [],
-            jobs: [],
-            jobsShow: false,
-            selectedVendors: [{name: 'All'}],
+            managers: []
         }
     },
     methods: {
-        ...mapActions({
-            storeProject: "setCurrentProject",
-            loadingToggle: "loadingToggle",
-        }),
-        setFilter({option, refersTo}) {
-            this[refersTo] = option;
+        ...mapActions(["setCurrentProject"]),
+        setFilter({option, prop}) {
+            this[prop] = option;            
+            this.$emit('filterProjects', this.filters);
         },
         removeLangFilter({from, position}) {
             this[from].splice(position, 1);
+            this.$emit('filterProjects', this.filters);
         },
         addLangFilter({to, lang}) {
             this[to].push(lang.symbol);
+            this.$emit('filterProjects', this.filters);
         },
         selectProject({project}) {
-            this.storeProject(project);
+            this.setCurrentProject(project);
             const request = this.allRequests.find(item => item._id === project._id);
             if(request) {
                 return this.$router.push(`/request-details/${project._id}`); 
@@ -74,6 +72,9 @@ export default {
             const managers = await this.$http.get("/pm-manage/all-managers?groupFilter=Project%20Managers");
             this.managers = managers.body;
         },
+        bottomScrolled() {
+            this.$emit("bottomScrolled", {filters: this.filters});
+        }
     },
     computed: {
         ...mapGetters({
@@ -81,48 +82,20 @@ export default {
             allRequests: "getAllRequests",
             allCustomers: "getClients",
         }),
-        filteredProjects() {
-            let result = this.projectsType !== 'requests' ? this.allProjects : this.allRequests;
-            if(this.statusFilter && this.statusFilter !== 'All') {
-                result = result.filter(item => {
-                    return this.projectsType !== 'requests' ? item.status === this.statusFilter : item;
-                })
+        filters() {
+            const managersIds = this.managerFilter !== 'All' ? this.managers.filter(item => `${item.firstName} ${item.lastName}` === this.managerFilter) : null;
+            return {
+                statusFilter: this.statusFilter,
+                managersIds,
+                clientFilter: this.clientFilter,
+                startFilter: this.startFilter,
+                deadlineFilter: this.deadlineFilter,
+                sourceFilter: this.sourceFilter,
+                targetFilter: this.targetFilter
             }
-            if(this.managerFilter  && this.managerFilter !== 'All') {
-                result = result.filter(item => {
-                    return item.projectManager.firstName + ' ' + item.projectManager.lastName === this.managerFilter
-                })
-            }
-            if(this.clientFilter) {
-                result = result.filter(item => {
-                    return item.customer.name.toLowerCase().indexOf(this.clientFilter.toLowerCase().trim()) !=-1
-                })
-            }
-            if(this.startFilter) {
-                result = result.filter(item => {
-                    return new Date(item.startDate) >= this.startFilter
-                })
-            }
-            if(this.deadlineFilter) {
-                result = result.filter(item => {
-                    return new Date(item.deadline) >= this.deadlineFilter
-                })
-            }
-            if(this.sourceFilter.length) {
-                result = result.filter(item => {
-                    return this.sourceFilter.indexOf(item.tasks[0].sourceLanguage) != -1;
-                })
-            }
-            if(this.targetFilter.length) {
-                result = result.filter(item => {
-                    for(const task of item.tasks) {
-                        if (this.targetFilter.indexOf(task.targetLanguage) != -1) {
-                            return item;
-                        }
-                    }
-                })
-            }
-            return result;
+        },
+        tableData() {
+            return this.projectsType === 'requests' ? [...this.allRequests] : [...this.allProjects];
         }
     },
     created() {
