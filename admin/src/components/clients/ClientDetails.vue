@@ -71,8 +71,7 @@ export default {
             storeClient: "storeClient",
             storeCurrentClient: "storeCurrentClient",
             storeClientContact: "storeClientContact",
-            updateClientContact: "updateClientContact",
-            getAllClients: "getAllClients",
+            updateClientContact: "updateClientContact"
         })
     },
     computed: {

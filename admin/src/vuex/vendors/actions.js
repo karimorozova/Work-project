@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 export const storeCurrentVendor = ({ commit }, payload) => commit('setCurrentVendor', payload);
-export const setFiltereVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
+export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
 export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
 export const storeVendor = ({commit, state}, payload) => {

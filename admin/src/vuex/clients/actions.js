@@ -1,13 +1,5 @@
 import Vue from "vue";
 
-export const getAllClients = async ({commit}) => {
-    try {
-        const result = await Vue.http.get('/all-clients');
-        commit('allCustomers', result.body);
-    } catch(err) {
-        throw err
-    }
-}
 export const addNewClient = ({commit, rootState}, payload) => {
     rootState.a.customers.push(payload);
 }

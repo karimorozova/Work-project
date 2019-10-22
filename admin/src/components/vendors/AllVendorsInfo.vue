@@ -52,7 +52,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["setFiltereVendors", "alertToggle"]),
+        ...mapActions(["setFilteredVendors", "alertToggle"]),
         scrollBodyToTop() {
             let tbody = document.querySelector(".vendors-table__body");
             tbody.scrollTop = 0;
@@ -60,7 +60,7 @@ export default {
         async bottomScrolled() {
             if(this.isDataRemain) {
                 const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
-                this.setFiltereVendors([...this.vendors, ...result.body]);
+                this.setFilteredVendors([...this.vendors, ...result.body]);
                 this.isDataRemain = result.body.length === 25;
                 this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
             }
@@ -100,7 +100,7 @@ export default {
             this.isDataRemain = true;
             try {
                 const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
-                this.setFiltereVendors(result.body);
+                this.setFilteredVendors(result.body);
                 this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
                 this.scrollBodyToTop();
             } catch(err) {

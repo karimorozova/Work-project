@@ -68,9 +68,6 @@ export default {
         ...mapActions({
             alertToggle: "alertToggle"
         }),
-        filterByName() {
-            this.$emit("setNameFilter", { option: this.nameFilter })
-        },
         setStepFilter({option}) {
             if(option === 'All') {
                 return this.$emit("setStepFilter", { step: {title: 'All'} });    
@@ -109,7 +106,7 @@ export default {
             function doneTyping () {
                 vm.$emit("setNameFilter", { option: value })
             }
-        },
+        }
     },
     computed: {
         stepNames() {

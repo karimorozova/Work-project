@@ -76,7 +76,7 @@ export default {
         ...mapActions({
             addProjectTasks: "addProjectTasks",
             alertToggle: "alertToggle",
-            xtmCustomersGetting: "xtmCustomersGetting",
+            setAllXtmCustomers: "setAllXtmCustomers",
             setDataValue: "setTasksDataValue"
         }),
         setSourceLang({ symbol }) {
@@ -154,7 +154,7 @@ export default {
             try {
                 if (!this.xtmCustomers.length) {
                     let result = await this.$http.get('/xtm/xtm-customers');
-                    this.xtmCustomersGetting(result.body);
+                    this.setAllXtmCustomers(result.body);
                 }
             } catch (err) {
                 this.alertToggle({message: "Error on getting XTM customers",isShow: true,type: "error"});
