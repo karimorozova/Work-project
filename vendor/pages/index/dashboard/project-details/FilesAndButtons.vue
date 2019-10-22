@@ -78,9 +78,10 @@ export default {
             return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";
         },
         progress() {
-            if(this.job.progress) {
+            if(this.job.progress && this.job.progress.wordsTotal) {
                 return +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2);
             }
+            return this.job.progress;
         },
         isButton() {
             const statuses = ['Accepted', 'Ready to Start', 'Waiting to Start'];

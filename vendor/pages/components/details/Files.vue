@@ -67,14 +67,14 @@ export default {
         isTargetLink(file) {
             return this.getProgress(file) === 100 || this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
         },
-        getFilesJobId(file) {
-            const xtmJob = this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
-            return xtmJob ? xtmJob.jobId : "";
-        },
         getProgress(file) {
             const jobId = this.getFilesJobId(file);
             const progress = jobId ? this.job.progress[jobId] : "";
-            return progress ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2): "";
+            return progress ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2): this.job.progress;
+        },
+        getFilesJobId(file) {
+            const xtmJob = this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
+            return xtmJob ? xtmJob.jobId : "";
         },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
