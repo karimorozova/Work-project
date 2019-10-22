@@ -20,7 +20,7 @@
                     .project__drop-menu(v-else)
                         SelectSingle(
                             :selectedOption="project.customer.name"
-                            :options="allClients"
+                            :options="clients"
                             :hasSearch="isSearchClient"
                             placeholder="Name"
                             @chooseOption="(e) => setValue(e, 'customer')"
@@ -86,13 +86,13 @@ export default {
             isSearchClient: true,
             isRequiredField: true,
             errors: [],
-            areErrorsExist: false
+            areErrorsExist: false,
+            clients: []
         }
     },
     methods: {
         ...mapActions([
             "alertToggle",
-            "customersGetting",
             "setProjectDate"
         ]),
         customFormatter(date) {
@@ -165,13 +165,13 @@ export default {
             this.$refs.deadline.showCalendar();
         },
         goToClientInfo() {
-            this.$router.push(`/clients/details/${this.project.customer._id}`)
+            this.$router.push(`/clients/details/${this.project.customer._id}`);
         },
         async getCustomers() {
             try {
-                if(!this.allClients.length) {
-                    let result = await this.$http.get('/all-clients');
-                    this.customersGetting(result.body);
+                if(!this.clients.length) {
+                    let result = await this.$http.get(`/active-clients?status=Active`);
+                    this.clients = [...result.body];
                 }
             } catch(err) {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
@@ -179,9 +179,6 @@ export default {
         },
     },
     computed: {
-        ...mapGetters({
-            allClients: "getClients"
-        }),
         industriesList() {
             let result = this.industries;
             if(this.project.customer.name) {
