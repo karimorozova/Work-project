@@ -2,10 +2,11 @@
 .clients-table
     DataTable(
         :fields="fields"
-        :tableData="filteredClients"
+        :tableData="clients"
         @onRowClicked="onRowClicked"
-        :bodyClass="['clients__table', {'tbody_visible-overflow': filteredClients.length < 30}]"
-        :tableheadRowClass="filteredClients.length < 30 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['clients__table', {'tbody_visible-overflow': clients.length < 30}]"
+        :tableheadRowClass="clients.length < 30 ? 'tbody_visible-overflow' : ''"
+        @bottomScrolled="bottomScrolled"
     )
         template(slot="headerName" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
@@ -35,7 +36,7 @@
         template(slot="industry" slot-scope="{ row, index }")
             .clients-table__drop-menu(v-if="currentEditingIndex === index")
                 MultiClientIndustrySelect(
-                    :selectedInd="industrySelected"
+                    :selectedInd="selectedIndustry"
                     :filteredIndustries="selectedIndNames" 
                     :parentInd="index" 
                     @chosenInd="setIndustry"
@@ -81,13 +82,17 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
     mixins: [scrollDrop],
     props: {
-        filterName: {
+        clients: {
+            type: Array,
+            default: () => []
+        },
+        nameFilter: {
             type: String
         },
-        filterStatus: {
+        statusFilter: {
             type: String
         },
-        filterLeadsource: {
+        leadsourceFilter: {
             type: String
         },
         filterIndustry: {
@@ -113,7 +118,7 @@ export default {
             },
             currentEditingIndex: -1,
             isErrorShow: false,
-            industrySelected: [],
+            selectedIndustry: [],
             selectedStatus: "",
             selectedLeadsource: "",
             isDeleteMessageShow: false,
@@ -126,13 +131,11 @@ export default {
         }
     },
     methods: {
-        async getClients() {
-            if(!this.allClients.length) {
-                await this.getAllClients();
-            }
-        },
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 600;
+        },
+        bottomScrolled() {
+            this.$emit("bottomScrolled");
         },
         isIconClass(index, key) {
             if(this.currentEditingIndex !== index) {
@@ -149,25 +152,25 @@ export default {
             this.selectedLeadsource = leadSource;
         },
         setIndustry({industry, index}) {
-            const position = this.industrySelected.findIndex(item => {
+            const position = this.selectedIndustry.findIndex(item => {
                 return item._id === industry._id
             })
             if(position !== -1) {
-                return this.industrySelected.splice(position, 1);
+                return this.selectedIndustry.splice(position, 1);
             }
-            this.industrySelected.push(industry);
+            this.selectedIndustry.push(industry);
         },
         setCurrentEditionValues(index) {
             this.currentEditingIndex = index;
-            this.industrySelected = this.filteredClients[index].industries;
-            this.selectedStatus = this.filteredClients[index].status;
-            this.selectedLeadsource = this.filteredClients[index].leadSource;
-            this.currentWebsite = this.filteredClients[index].website;
-            this.currentName = this.filteredClients[index].name;
+            this.selectedIndustry = this.clients[index].industries;
+            this.selectedStatus = this.clients[index].status;
+            this.selectedLeadsource = this.clients[index].leadSource;
+            this.currentWebsite = this.clients[index].website;
+            this.currentName = this.clients[index].name;
         },
         setCurrentDefaults() {
             this.currentEditingIndex = -1;
-            this.industrySelected = [];
+            this.selectedIndustry = [];
             this.selectedStatus = "";
             this.selectedLeadsource = "";
             this.currentWebsite = "";
@@ -179,19 +182,20 @@ export default {
             if(this.currentEditingIndex === -1) return;
             let sendData = new FormData();
             const updatingClient = {
-                ...this.filteredClients[index],
+                ...this.clients[index],
                 name: this.currentName,
                 website: this.currentWebsite,
                 status: this.selectedStatus,
                 leadSource: this.selectedLeadsource,
-                industries: this.industrySelected
+                industries: this.selectedIndustry
             }
             sendData.append("client", JSON.stringify(updatingClient));
             try{
                 const updatedClient = await this.$http.post("/clientsapi/update-client", sendData);
                 const { client } = updatedClient.body;
-                await this.storeClient(client);
-                this.alertToggle({message: "Client info has been updated", isShow: true, type: "success"})
+                this.storeClient(client);
+                this.alertToggle({message: "Client info has been updated", isShow: true, type: "success"});
+                this.$emit("update", {status: this.selectedStatus});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Client info", isShow: true, type: "error"})
             }
@@ -218,7 +222,7 @@ export default {
         async approveDelete() {
             this.isDeleteMessageShow = false;
             this.currentEditingIndex = -1;
-            const client = this.filteredClients[this.deletingClientIndex];
+            const client = this.clients[this.deletingClientIndex];
             try {
                 const hasRelatedDocs = await this.$http.get(`/clientsapi/any-doc?id=${client._id}`);
                 if(hasRelatedDocs.body) {
@@ -239,7 +243,7 @@ export default {
             if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
-            this.$router.push(`/clients/details/${this.filteredClients[index]._id}`);
+            this.$router.push(`/clients/details/${this.clients[index]._id}`);
         },
         stopPropagation() {
             return
@@ -247,42 +251,16 @@ export default {
         closeErrorMessage() {
             this.isErrorShow = false;
         },
-        ...mapActions({
-            getAllClients: "getAllClients",
-            alertToggle: "alertToggle",
-            storeClient: "storeClient",
-            removeClient: "removeClient"
-        })
-    },
-    created() {
-        this.getClients();
+        ...mapActions([
+            "alertToggle",
+            "storeClient",
+            "removeClient"
+        ])
     },
     computed: {
-        ...mapGetters({
-            allClients: "getClients"
-        }),
-        filteredClients() {
-            let result = this.allClients;
-            if(this.filterName) {
-                result = result.filter(item => item.name.toLowerCase().indexOf(this.filterName.toLowerCase()) !== -1);
-            }
-            if(this.filterStatus && this.filterStatus !== "All") {
-                result = result.filter(item => item.status === this.filterStatus);
-            }
-            if(this.filterLeadsource && this.filterLeadsource !== "All") {
-                result = result.filter(item => item.leadSource === this.filterLeadsource);
-            }
-            if(this.filterIndustry && this.filterIndustry.name !== "All") {
-                result = result.filter(item => {
-                    const industryIds = item.industries.map(industry => industry._id);
-                    return industryIds.indexOf(this.filterIndustry._id) !== -1
-                })
-            }
-            return result
-        },
         selectedIndNames() {
             let result = [];
-            for(let ind of this.industrySelected) {
+            for(let ind of this.selectedIndustry) {
                 result.push(ind.name);
             }
             return result;

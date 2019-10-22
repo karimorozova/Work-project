@@ -1,7 +1,7 @@
 <template lang="pug">
     .potential-clients
         Allclients(
-            filterStatus="Potential"
+            statusFilter="Potential"
             )
 </template>
 

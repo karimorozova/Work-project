@@ -1,7 +1,7 @@
 <template lang="pug">
     .active-clients
         Allclients(
-            filterStatus="Active"
+            statusFilter="Active"
             )
 </template>
 

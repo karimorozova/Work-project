@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const path = require('path');
 const { User, Requests, Reports } = require('../models');
 const { getVendors } = require('../vendors');
-const { getClients } = require('../clients');
+const { gerFilteredClients, getClients } = require('../clients');
 const { requiresLogin } = require('../middleware/index');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../configs');
@@ -35,9 +34,21 @@ router.post('/reset-pass', async (req, res) => {
     }
 })
 
-router.get('/all-clients', requiresLogin, async (req, res, next) => {
+router.post('/all-clients', requiresLogin, async (req, res) => {
+    const { filters } = req.body;
     try {
-        const clients = await getClients({});
+        const clients = await gerFilteredClients(filters);
+        res.send(clients);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting Clients from DB ");
+    }
+})
+
+router.get('/active-clients', requiresLogin, async (req, res) => {
+    const { status } = req.query;
+    try {
+        const clients = await getClients({status});
         res.send(clients);
     } catch(err) {
         console.log(err);

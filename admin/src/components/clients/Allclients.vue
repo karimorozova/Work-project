@@ -5,7 +5,7 @@
                 .clients-filters__row
                     .clients-filters__item
                         label Name
-                        input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="filterName")
+                        input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="nameFilter" @keyup="filterByName")
                     .clients-filters__item
                         label Industry
                         .clients-filters__drop-menu
@@ -13,15 +13,18 @@
                     .clients-filters__item
                         label Lead Source
                         .clients-filters__drop-menu
-                            ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="filterLeadsource" @chosenLeadsource="chosenLeadsource")
+                            ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadsourceFilter" @chosenLeadsource="chosenLeadsource")
                 .clients-filters__row.clients-filters_flex-end
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
-                :filterName="filterName"
-                :filterStatus="filterStatus"
-                :filterLeadsource="filterLeadsource"
+                :clients="allClients"
+                :nameFilter="nameFilter"
+                :statusFilter="statusFilter"
+                :leadsourceFilter="leadsourceFilter"
                 :filterIndustry="industryFilter"
                 @showClientDetails="showClientDetails"
+                @update="update"
+                @bottomScrolled="bottomScrolled"
             )
 </template>
 
@@ -34,27 +37,51 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        filterStatus: {
+        statusFilter: {
             type: String,
             default: "All"
         }
     },
     data() {
         return {
-            filterName: "",
+            nameFilter: "",
             industryFilter: {name: 'All'},
-            filterLeadsource: "All",
-            industrySelected: [],
+            leadsourceFilter: "All",
             isAllIndustyFilter: true,
             isAllStatusExist: true,
-            isAllLeadExist: true
+            isAllLeadExist: true,
+            isDataRemain: true,
+            lastId: "",
+            typingTimer: "",
+            doneTypingInterval: 800
         }
     },
     methods: {
+        scrollBodyToTop() {
+            let tbody = document.querySelector(".clients__table");
+            tbody.scrollTop = 0;
+        },
+        async bottomScrolled() {
+            if(this.isDataRemain) {
+                const result = await this.$http.post('/all-clients', {filters: this.filters});
+                this.setAllCustomers([...this.allClients, ...result.body]);
+                this.isDataRemain = result.body.length === 25;
+                this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
+            }
+        },
+        async update({status}) {
+            if(this.statusFilter !== status) {
+                await this.getCustomers();
+            }
+        },
         async getCustomers() {
+            this.lastId = "";
+            this.isDataRemain = true;
             try {
-                let result = await this.$http.get('/all-clients');
-                this.customersGetting(result.body);
+                let result = await this.$http.post('/all-clients', { filters: this.filters });
+                this.setAllCustomers(result.body);
+                this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
+                this.scrollBodyToTop();
             } catch(err) {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
             }
@@ -75,25 +102,46 @@ export default {
         addClient() {
             this.$router.push('/clients/new-client');
         },
-        chosenLeadsource({leadSource}) {
-            this.filterLeadsource = leadSource;
+        filterByName(e) {
+            const { value } = e.target;
+            clearTimeout(this.typingTimer);
+            this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval);
+            const vm = this;
+            async function doneTyping () {
+                await vm.getCustomers();
+            }
         },
-        chosenStatus({status}) {
-            this.filterStatus = status;
+        async chosenLeadsource({leadSource}) {
+            this.leadsourceFilter = leadSource;
+            await this.getCustomers();
         },
-        chosenInd({industry}) {
+        async chosenStatus({status}) {
+            this.statusFilter = status;
+            await this.getCustomers();
+        },
+        async chosenInd({industry}) {
             this.industryFilter = industry;
+            await this.getCustomers();
         },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            customersGetting: "customersGetting",
-            storeCurrentClient: "storeCurrentClient"
-        })
+        ...mapActions([
+            "alertToggle",
+            "setAllCustomers",
+            "storeCurrentClient"
+        ])
     },
     computed: {
         ...mapGetters({
             allClients: "getClients"
         }),
+        filters() {
+            return {
+                nameFilter: this.nameFilter,
+                industryFilter: this.industryFilter,
+                leadsourceFilter: this.leadsourceFilter,
+                statusFilter: this.statusFilter,
+                lastId: this.lastId
+            }
+        }
     },
     components: {
         ClientsTable,

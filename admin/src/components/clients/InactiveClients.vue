@@ -1,7 +1,7 @@
 <template lang="pug">
     .inactive-clients
         Allclients(
-            filterStatus="Inactive"
+            statusFilter="Inactive"
             )
 </template>
 
