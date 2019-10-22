@@ -26,6 +26,7 @@
             :statusFilter="statusFilter"
             :stepFilter="stepFilter"
             @bottomScrolled="bottomScrolled"
+            @update="update"
         )
 </template>
 
@@ -63,6 +64,11 @@ export default {
                 this.setFilteredVendors([...this.vendors, ...result.body]);
                 this.isDataRemain = result.body.length === 25;
                 this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
+            }
+        },
+        async update({status}) {
+            if(this.statusFilter !== status) {
+                await this.getVendors();
             }
         },
         addVendor() {

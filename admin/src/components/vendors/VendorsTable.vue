@@ -223,7 +223,8 @@ export default {
             sendData.append('vendor', JSON.stringify(updatingVendor));
             try {
                 await this.updateCurrentVendor(sendData);
-                this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"}); 
+                this.alertToggle({message: "Vendor info updated", isShow: true, type: "success"});
+                this.$emit("update", {status: this.selectedStatus});
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
             }
