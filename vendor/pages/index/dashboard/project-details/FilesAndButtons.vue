@@ -1,7 +1,7 @@
 <template lang="pug">
     .files-buttons
         Files
-        .files-buttons__upload(v-if="job.status === 'Started'")
+        .files-buttons__upload(v-if="isFileUpload")
             UploadDeliverable(@setDeliverables="setDeliverables")
         .files-buttons__terms(v-if="job.status !== 'Completed'")
             TermsAgree(:job="job")
@@ -90,6 +90,9 @@ export default {
             const statuses = ["Created", "Request Sent"];
             return statuses.indexOf(this.job.status) !== -1;
         },
+        isFileUpload() {
+            return this.job.status === 'Started' && this.job.serviceStep.calculationUnit !== 'Words';
+        }
     },
     components: {
         Files,
