@@ -86,13 +86,15 @@ function getDataForRequest(object) {
 }
 
 function getMetrics({projectId, customerId}) {
+    console.log("projectId:  ", projectId);
+    console.log("customerId:  ", customerId);
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": xtmToken,
         'Content-Type': 'application/json'})
         .end(async (response) => {
             if(response.error) {
-                console.log("Error on getting metrics ");
+                console.log("Error in getMetrics");
                 reject(response.error);
             }
             try {
@@ -102,7 +104,7 @@ function getMetrics({projectId, customerId}) {
                 const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
                 resolve({taskMetrics, progress});
             } catch(err) {
-                console.log("Error on getting metrics ");
+                console.log("Error in getMetrics");
                 reject(err);
             }
         })
