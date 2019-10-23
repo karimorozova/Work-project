@@ -97,6 +97,8 @@ function getTaskSteps({steps, progress, task}) {
 function getCorrectServiceStep(key, serviceSteps) {
     const stage1 = serviceSteps.find(item => item.stage === "stage1");
     const stage2 = serviceSteps.find(item => item.stage === "stage2");
+    console.log("stage1:  ", stage1.step);
+    console.log("stage2:  ", stage2.step);
     return key === "translate1" ? stage1.step : stage2.step; 
 }
 
@@ -123,6 +125,7 @@ function setStepsProgress(name, progress) {
         const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[name];
         stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
     }
+    console.log("stepProgress:  ", stepProgress);
     return stepProgress;
 }
 
@@ -133,6 +136,8 @@ function getStepsDates({task, key}) {
         startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start;
         deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline;        
     }
+    console.log("startDate:  ", startDate)
+    console.log("deadline:  ", deadline)
     return {startDate, deadline};
 }
 
