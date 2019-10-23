@@ -4,7 +4,7 @@ export default {
             let tbody = document.querySelector(".all-projects");
             tbody.scrollTop = 0;
         },
-        async bottomScrolled() {
+        async bottomScrolled({filters}) {
             if(this.isDataRemain) {
                 const result = await this.$http.post(`/api/${this.endpoint}`, {...filters, lastDate: this.lastDate});
                 this.prop === 'requests' ? this.setRequests([...this.requests, ...result.body]) : this.setAllProjects([...this.projects, ...result.body]);;
