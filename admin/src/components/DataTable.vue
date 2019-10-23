@@ -48,6 +48,7 @@
       handleBodyScroll(e) {
         const element = e.target;
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+            console.log('bottom scrolled');
             this.$emit('bottomScrolled');
         }
       }
