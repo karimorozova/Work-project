@@ -43,12 +43,13 @@ async function getProjectWithUpdatedFinance(project) {
 }
 
 function getTaskSteps({steps, progress, task}) {
-    let updatedSteps = [...steps];
+    let updatedSteps = JSON.parse(JSON.stringify(steps));
     let counter = 1;
     for(const key in progress) {
         const existedTask = updatedSteps.find(item => {
             return item.taskId === task.taskId && item.catName === key
         })
+        console.log(existedTask);
         if(!existedTask) {
             const {startDate, deadline} = getStepsDates({task, key});
             let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
