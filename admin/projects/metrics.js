@@ -9,12 +9,15 @@ async function updateProjectMetrics({projectId}) {
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words') {
                 const { taskMetrics, progress } = await getMetrics({projectId: task.projectId, customerId: project.customer.id});
+                if(progress.invalid) {
+                    return false;
+                }
                 task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
                 task.finance.Wordcount = calculateWords(task.metrics);
                 steps = getTaskSteps({steps, progress, task});
             }
         }
-        await updateProject({"_id": projectId}, {tasks, steps, isMetricsExist: true});
+        return await updateProject({"_id": projectId}, {tasks, steps, isMetricsExist: true});
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectMetrics");
@@ -45,9 +48,7 @@ async function getProjectWithUpdatedFinance(project) {
 function getTaskSteps({steps, progress, task}) {
     let updatedSteps = JSON.parse(JSON.stringify(steps));
     let counter = 1;
-    console.log("progress:  ", progress)
     for(const key in progress) {
-        console.log("key: ", key)
         const existedTask = updatedSteps.find(item => {
             return item.taskId === task.taskId && item.catName === key
         })

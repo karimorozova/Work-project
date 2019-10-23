@@ -86,8 +86,6 @@ function getDataForRequest(object) {
 }
 
 function getMetrics({projectId, customerId}) {
-    console.log("projectId:  ", projectId);
-    console.log("customerId:  ", customerId);
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
         .headers({"Authorization": xtmToken,
