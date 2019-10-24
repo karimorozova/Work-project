@@ -85,8 +85,11 @@ export default {
         },
         async download(task) {
             try {
-                const result = await this.$axios.get(`/portal/deliverables?taskId=${task.taskId}`);
-                const href = result.data.link;
+                let href = task.deliverables;
+                if(!href) {
+                    const result = await this.$axios.get(`/portal/deliverables?taskId=${task.taskId}`);
+                    href = result.data.link;
+                }
                 let link = document.createElement('a');
                 link.href = this.domain + href;
                 link.target = "_blank";

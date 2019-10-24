@@ -364,7 +364,7 @@ function getAfterPathUpdate({xtmJobs, jobId, path, name}) {
     })
 }
 
-async function getAfterApproveFile({taskId, jobId, isFileApproved}) {
+async function getAfterApproveFile({taskId, jobId, isFileApproved, path}) {
     try {
         const project = await getProject({"tasks.taskId": taskId});
         const tasks = project.tasks.map(task => {
@@ -372,7 +372,10 @@ async function getAfterApproveFile({taskId, jobId, isFileApproved}) {
                 if(task.xtmJobs) {
                     task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
                 } else {
-                    task.targetFiles = getAfterApproveUpdate({jobs: task.targetFiles, jobId, isFileApproved});
+                    task.targetFiles = task.targetFiles.map(item => {
+                        item.isFileApproved = item.path === `./dist${path}`;
+                        return item;
+                    })
                 }
             }
             return task;

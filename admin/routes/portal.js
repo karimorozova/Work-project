@@ -7,7 +7,7 @@ const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
-const { Clients } = require('../models');
+const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
 const { setClientsContactNewPassword, updateAccountDetails } = require('../users');
@@ -219,7 +219,13 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
     try {
         const project = await getProject({"tasks.taskId": taskId});
         const task = project.tasks.find(item => item.taskId === taskId);
-        const link = await getDeliverablesLink({taskId, projectId: project.id, jobs: task.xtmJobs});
+        const taskFiles = task.xtmJobs || task.targetFiles;
+        const link = await getDeliverablesLink({
+            taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
+        });
+        if(link) {
+            await Projects.updateOne({"tasks.taskId": taskId}, {"tasks.$.deliverables": link});
+        }
         res.send({link});
     } catch(err) {
         console.log(err);

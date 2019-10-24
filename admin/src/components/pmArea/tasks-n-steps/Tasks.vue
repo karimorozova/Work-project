@@ -261,8 +261,11 @@ export default {
         },
         async downloadFiles(task) {
             try {
-                const result = await this.$http.get(`/pm-manage/deliverables?taskId=${task.taskId}`);
-                const href = result.body.link;
+                let href = task.deliverables;
+                if(!href) {
+                    const result = await this.$http.get(`/pm-manage/deliverables?taskId=${task.taskId}`);
+                    href = result.body.link;
+                }
                 let link = document.createElement('a');
                 link.href = __WEBPACK__API_URL__ + href;
                 link.target = "_blank";

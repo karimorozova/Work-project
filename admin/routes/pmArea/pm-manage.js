@@ -268,10 +268,10 @@ router.post("/steps-reopen", async (req, res) => {
 })
 
 router.post("/approve-files", async (req, res) => {
-    const { taskId, jobId, isFileApproved } = req.body;
+    const { taskId, jobId, isFileApproved,path } = req.body;
     try {
         const updatedProject = await getAfterApproveFile({
-            taskId, jobId, isFileApproved
+            taskId, jobId, isFileApproved, path
         })
         res.send(updatedProject);
     } catch(err) {
@@ -327,7 +327,13 @@ router.get("/deliverables", async (req, res) => {
     try {
         const project = await getProject({"tasks.taskId": taskId});
         const task = project.tasks.find(item => item.taskId === taskId);
-        const link = await getDeliverablesLink({taskId, projectId: project.id, jobs: task.xtmJobs});
+        const taskFiles = task.xtmJobs || task.targetFiles;
+        const link = await getDeliverablesLink({
+            taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
+        });
+        if(link) {
+            await Projects.updateOne({"tasks.taskId": taskId}, {"tasks.$.deliverables": link});
+        }
         res.send({link});
     } catch(err) {
         console.log(err);

@@ -68,12 +68,13 @@ export default {
         },
         getStepsFiles() {
             for(let task of this.tasks) {
-                const taskFiles = task.xtmJobs || task.targetFiles;
+                const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
+                const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
                 const files = taskFiles.reduce((prev, cur) => {
                     const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
                     prev.push({
                         fileName,
-                        pair: `${task.sourceLanguage} >> ${task.targetLanguage}`,
+                        pair,
                         taskId: task.taskId,
                         jobId: cur.jobId,
                         path: cur.targetFile || cur.path.split("./dist").pop(),
@@ -123,9 +124,9 @@ export default {
         },
         async approveFile({index}) {
             this.stepFiles[index].isFileApproved = !this.stepFiles[index].isFileApproved;
-            const { taskId, jobId, isFileApproved } = this.stepFiles[index];
+            const { taskId, jobId, isFileApproved, path } = this.stepFiles[index];
             try {
-                await this.approveDeliveryFile({taskId, jobId, isFileApproved});
+                await this.approveDeliveryFile({taskId, jobId, isFileApproved, path});
             } catch(err) { }
         },
         async saveChanges() {

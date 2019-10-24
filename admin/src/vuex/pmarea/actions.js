@@ -48,8 +48,8 @@ export const updateProgress = async ({ dispatch }, payload) => {
 export const approveDeliveryFile = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
-        const {taskId, jobId, isFileApproved} = payload
-        const updatedProject = await Vue.http.post("/pm-manage/approve-files", {taskId, jobId, isFileApproved})
+        const {taskId, jobId, isFileApproved, path} = payload
+        const updatedProject = await Vue.http.post("/pm-manage/approve-files", {taskId, jobId, isFileApproved, path})
         await dispatch('setCurrentProject', updatedProject.data);
         dispatch('alertToggle', {message: "Updated", isShow: true, type: "success"})
     } catch(err) {
