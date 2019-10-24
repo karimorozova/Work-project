@@ -18,10 +18,10 @@ async function setTasksDeliveryStatus({taskIds, project, status}) {
     const updatedTasks = getUpdatedTasks({taskIds, tasks: project.tasks, status});
     let projectStatus = project.status;
     if(status === "Ready for Delivery") {
-        projectStatus = getProjectStatus({tasks: updatedTasks, status: "Ready for Delivery", projectStatus});
+        projectStatus = getProjectStatus({tasks: updatedTasks, status, projectStatus});
     }
     if(status === "Delivered") {
-        projectStatus = getProjectStatus({tasks: updatedTasks, status: "Closed", projectStatus});
+        projectStatus = getProjectStatus({tasks: updatedTasks, status, projectStatus});
     }
     try {
         return await updateProject({"_id": project._id}, { tasks: updatedTasks, status: projectStatus});
@@ -32,9 +32,10 @@ async function setTasksDeliveryStatus({taskIds, project, status}) {
 }
 
 function getProjectStatus({tasks, status, projectStatus}) {
-    const cancelledStatuses = ["Cancelled", "Cancelled Halfway"];
-    const otherStatusTask = tasks.find(item => item.status !== status || cancelledStatuses.indexOf(item.status) === -1);
-    return otherStatusTask ? projectStatus : status;
+    const validStatuses = ["Cancelled", "Cancelled Halfway", status];
+    const newProjectStatus = status === "Delivered" ? "Closed" : status;
+    const otherStatusTask = tasks.find(item => validStatuses.indexOf(item.status) === -1);
+    return otherStatusTask ? projectStatus : newProjectStatus;
 }
 
 function getUpdatedTasks({taskIds, tasks, status}) {
