@@ -32,11 +32,25 @@ async function updateClientRequest(query, update) {
 
 async function getFilteredClientRequests(filters) {
     const query = getFilterdRequestsQuery(filters);
-    const requests = await ClientRequest.find(query).sort({startDate: -1}).limit(25)
     try {
+        const requests = await ClientRequest.aggregate([
+            {
+                $lookup: {
+                    from: "clients",
+                    localField: "customer",
+                    foreignField: "_id",
+                    as: "customer"
+                }
+            },
+            {
+                $match: {
+                    ...query
+                }
+            },
+            {$unwind: "$customer"}
+        ]).sort({startDate: -1}).limit(25)
         return ClientRequest.populate(requests, [
             'industry',
-            'customer',
             'service',
             'projectManager',
             'accountManager'
