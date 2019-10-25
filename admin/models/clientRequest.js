@@ -46,6 +46,9 @@ const ClientRequestSchema = new mongoose.Schema({
     projectManager: {
         type: Schema.Types.ObjectId, ref: 'User'
     },
+    salesManager: {
+        type: Schema.Types.ObjectId, ref: 'User'
+    },
     customer: {
         type: Schema.Types.ObjectId, ref: 'Clients'
     },

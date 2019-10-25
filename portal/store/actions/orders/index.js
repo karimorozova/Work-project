@@ -56,6 +56,7 @@ export const createWordsRequest = async function ({commit, dispatch, state}, pay
         customer: state.clientInfo._id,
         projectManager: state.clientInfo.projectManager._id,
         accountManager: state.clientInfo.accountManager._id,
+        salesManager: state.clientInfo.salesManager._id,
         status: 'Requested',
         service: payload.service._id,
         unit: payload.service.calculationUnit
@@ -81,6 +82,7 @@ export const createPackagesRequest = async function ({commit, dispatch, state}, 
         customer: state.clientInfo._id,
         projectManager: state.clientInfo.projectManager._id,
         accountManager: state.clientInfo.accountManager._id,
+        salesManager: state.clientInfo.salesManager._id,
         status: 'Requested',
         service: payload.service._id,
         unit: payload.service.calculationUnit
