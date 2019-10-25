@@ -1,7 +1,7 @@
 <template lang="pug">
     .filters
         .filters__col
-            .filters__item
+            .filters__item(v-if="projectsType !== 'requests'")
                 LabelValue(label="Status")
                     .filters__drop-menu
                         SelectSingle(
@@ -11,19 +11,28 @@
                             @chooseOption="(e) => setValue(e, 'statusFilter')"
                             :projectsType="projectsType"
                         )
-            .filters__item
-                LabelValue(label="Project Manager")
+            .filters__item(v-else)
+                LabelValue(label="Sales Manager")
                     .filters__drop-menu.filters_short-menu
                         SelectSingle(
-                            :selectedOption="projectManager"
-                            :options="managersNames"
+                            :selectedOption="salesFilter"
+                            :options="salesNames"
                             placeholder="Name"
-                            @chooseOption="(e) => setValue(e, 'managerFilter')"
+                            @chooseOption="(e) => setValue(e, 'salesFilter')"
+                        )
+            .filters__item
+                LabelValue(:label="projectsType === 'requests' ? 'Assigned To' : 'Project Manager'")
+                    .filters__drop-menu(:class="projectsType === 'requests' ? 'filters_medium-menu' : 'filters_short-menu'")
+                        SelectSingle(
+                            :selectedOption="pmFilter"
+                            :options="pmNames"
+                            placeholder="Name"
+                            @chooseOption="(e) => setValue(e, 'pmFilter')"
                         )
         .filters__col
             .filters__item
                 LabelValue(label="Client Name")
-                    input.filters__text-input(type="text" @input="setClientName")
+                    input.filters__text-input(type="text" :value="clientName" @keyup="filterByName")
             .filters__item
                 LabelValue(label="Source Langs")
                     .filters__drop-menu.filters_medium-menu
@@ -61,13 +70,14 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        isRequestedStatus: {type: Boolean},
         status: {type: String},
-        projectManager: {type: String},
+        pmFilter: {type: String},
+        salesFilter: {type: String},
         clientName: {type: String},
         sourceLangs: {type: Array},
         targetLangs: {type: Array},
-        managers: {type: Array},
+        projectManagers: {type: Array},
+        salesManagers: {type: Array},
         projectsType: {type: String},
     },
     data() {
@@ -78,7 +88,9 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            statuses: ["All", "Accepted", "Closed", "Cancelled", "Draft", "Open", "Quote sent", "Rejected"],
+            statuses: ["All", "Approved", "Closed", "Cancelled", "Cancelled Halfway", "Draft", "In Progress", "Quote sent", "Rejected"],
+            typingTimer: "",
+            doneTypingInterval: 800
         }
     },
     methods: {
@@ -116,7 +128,16 @@ export default {
         setClientName(event) {
             let option = event.target.value;
             this.$emit('setFilter', {option, prop: 'clientFilter'})
-        }
+        },
+        filterByName(e) {
+            const { value } = e.target;
+            clearTimeout(this.typingTimer);
+            this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval);
+            const vm = this;
+            function doneTyping () {
+                vm.$emit('setFilter', {option: value, prop: 'clientFilter'});
+            }
+        },
     },
     computed: {
         ...mapGetters({
@@ -127,8 +148,14 @@ export default {
                 return item.lang;
             })
         },
-        managersNames() {
-            const fullNames = this.managers.map(item => {
+        pmNames() {
+            const fullNames = this.projectManagers.map(item => {
+                return item.firstName + " " + item.lastName;
+            })
+            return ['All', ...fullNames];
+        },
+        salesNames() {
+            const fullNames = this.salesManagers.map(item => {
                 return item.firstName + " " + item.lastName;
             })
             return ['All', ...fullNames];

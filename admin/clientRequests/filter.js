@@ -20,9 +20,13 @@ function getFilterdRequestsQuery(filters) {
     if(filters.targetFilter && filters.targetFilter.length) {
         query["targetLanguages.symbol"] = {$in: filters.targetFilter};
     }
-    if(filters.managersIds) {
-        const managerFilter = filters.managersIds.map(item => ObjectId(item._id));
+    if(filters.pmIds) {
+        const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
         query.projectManager = {$in: managerFilter};
+    }
+    if(filters.salesIds) {
+        const managerFilter = filters.salesIds.map(item => ObjectId(item._id));
+        query.salesManager = {$in: managerFilter};
     }
     return query;
 }

@@ -23,8 +23,8 @@ function getFilterdProjectsQuery(filters) {
     if(filters.targetFilter && filters.targetFilter.length) {
         query["tasks.targetLanguage"] = {$in: filters.targetFilter};
     }
-    if(filters.managersIds) {
-        const managerFilter = filters.managersIds.map(item => ObjectId(item._id));
+    if(filters.pmIds) {
+        const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
         query.projectManager = {$in: managerFilter};
     }
     return query;
