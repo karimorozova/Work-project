@@ -33,11 +33,25 @@ async function updateProject(query, update) {
 
 async function getFilteredProjects(filters) {
     const query = getFilterdProjectsQuery(filters);
-    const projects = await Projects.find(query).sort({startDate: -1}).limit(25)
+    const projects = await Projects.aggregate([
+        {
+            $lookup: {
+                from: "clients",
+                localField: "customer",
+                foreignField: "_id",
+                as: "customer"
+            }
+        },
+        {
+            $match: {
+                ...query
+            }
+        },
+        {$unwind: "$customer"}
+    ]).sort({startDate: -1}).limit(25)
     try {
         return Projects.populate(projects, [
             'industry',
-            'customer',
             'service',
             {path: 'projectManager', select: ['firstName', 'lastName', 'photo']},
             {path: 'accountManager', select: ['firstName', 'lastName', 'photo']},

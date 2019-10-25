@@ -6,16 +6,16 @@ function getFilterdProjectsQuery(filters) {
         status
     }
     if(filters.lastDate) {
-        query.startDate = {$lt: filters.lastDate};
+        query.startDate = {$lt: new Date(filters.lastDate)};
     }
     if(filters.startFilter) {
-        query.startDate = filters.lastDate ? {$lt: filters.lastDate, $gte: filters.startFilter} : {$gte: filters.startFilter};
+        query.startDate = filters.lastDate ? {$lt: new Date(filters.lastDate), $gte: new Date(filters.startFilter)} : {$gte: new Date(filters.startFilter)};
     }
     if(filters.deadlineFilter) {
-        query.deadline = {$lte: filters.deadlineFilter};
+        query.deadline = {$lte: new Date(filters.deadlineFilter)};
     }
     if(filters.clientFilter) {
-        query.companyName = {"$regex": new RegExp(`${clientFilter}`, 'i')};
+        query["customer.name"] = {"$regex": new RegExp(`${filters.clientFilter}`, 'i')};
     }
     if(filters.sourceFilter && filters.sourceFilter.length) {
         query["tasks.sourceLanguage"] = {$in: filters.sourceFilter};
