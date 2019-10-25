@@ -6,15 +6,22 @@
                 :sourceLangs="sourceFilter"
                 :targetLangs="targetFilter"
                 :status="statusFilter"
-                :projectManager="managerFilter"
-                :managers="managers"
+                :pmFilter="pmFilter"
+                :salesFilter="salesFilter"
+                :projectManagers="projectManagers"
+                :salesManagers="salesManagers"
                 @addLangFilter="addLangFilter"
                 @removeLangFilter="removeLangFilter"
                 @setFilter="setFilter"
                 :projectsType="projectsType"
             )
         .all-projects__table
-            ProjectsTable(
+            ProjectsTable(v-if="projectsType !== 'requests'"
+                :allProjects="tableData"
+                @selectProject="selectProject"
+                @bottomScrolled="bottomScrolled"
+            )
+            RequestsTable(v-if="projectsType === 'requests'"
                 :allProjects="tableData"
                 @selectProject="selectProject"
                 @bottomScrolled="bottomScrolled"
@@ -24,6 +31,7 @@
 <script>
 import moment from "moment";
 import ProjectsTable from "./ProjectsTable";
+import RequestsTable from "./RequestsTable";
 import ProjectInfo from "./ProjectInfo";
 import ProjectFilters from "./ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
@@ -40,7 +48,8 @@ export default {
             sourceFilter: [],
             targetFilter: [],
             statusFilter: "All",
-            managerFilter: "All",
+            pmFilter: "All",
+            salesFilter: "All",
             startFilter: "",
             deadlineFilter: "",
             managers: []
@@ -69,7 +78,7 @@ export default {
             this.$router.push(`/project-details/${project._id}`);
         },
         async getManagers() {
-            const managers = await this.$http.get("/pm-manage/all-managers?groupFilter=Project%20Managers");
+            const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales");
             this.managers = managers.body;
         },
         bottomScrolled() {
@@ -83,10 +92,12 @@ export default {
             allCustomers: "getClients",
         }),
         filters() {
-            const managersIds = this.managerFilter !== 'All' ? this.managers.filter(item => `${item.firstName} ${item.lastName}` === this.managerFilter) : null;
+            const pmIds = this.pmFilter !== 'All' ? this.managers.filter(item => `${item.firstName} ${item.lastName}` === this.pmFilter) : null;
+            const salesIds = this.salesFilter !== 'All' ? this.managers.filter(item => `${item.firstName} ${item.lastName}` === this.salesFilter) : null;
             return {
                 statusFilter: this.statusFilter,
-                managersIds,
+                pmIds,
+                salesIds,
                 clientFilter: this.clientFilter,
                 startFilter: this.startFilter,
                 deadlineFilter: this.deadlineFilter,
@@ -96,6 +107,12 @@ export default {
         },
         tableData() {
             return this.projectsType === 'requests' ? [...this.allRequests] : [...this.allProjects];
+        },
+        projectManagers() {
+            return this.managers.filter(item => item.group.name === 'Project Managers')
+        },
+        salesManagers() {
+            return this.managers.filter(item => item.group.name === 'Sales')
         }
     },
     created() {
@@ -108,6 +125,7 @@ export default {
     },
     components: {
         ProjectsTable,
+        RequestsTable,
         ProjectInfo,
         ProjectFilters
     }

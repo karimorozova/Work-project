@@ -216,12 +216,6 @@ export default {
         flex-wrap: wrap;
         overflow: auto;
         position: relative;
-        .filters_short-menu & {
-            width: 72%;
-        }
-        .filters__drop-menu & {
-            width: 82%;
-        }
         .inner-component & {
             width: 83%;
         }
@@ -244,12 +238,6 @@ export default {
         }
         .reverse-icon {
             transform: rotate(180deg);
-        }
-        .filters_short-menu & {
-            width: 28%;
-        }
-        .filters__drop-menu & {
-            width: 18%;
         }
         .inner-component & {
             background-color: white;

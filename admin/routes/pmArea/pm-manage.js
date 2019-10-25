@@ -60,10 +60,10 @@ router.post("/new-project", async (req, res) => {
 })
 
 router.get("/all-managers", async (req, res) => {
-    const { groupFilter } = req.query;
+    const { groupFilters } = req.query;
     try {
-        const users = await User.find({}, {firstName: 1, lastName: 1}).populate("group");
-        const filteredUsers = groupFilter ? users.filter(item => item.group.name === groupFilter) : users;
+        const users = await User.find({}, {firstName: 1, lastName: 1, group: 1}).populate("group");
+        const filteredUsers = groupFilters ? users.filter(item => groupFilters.split(",").indexOf(item.group.name) !== -1) : users;
         res.send(filteredUsers);
     } catch(err) {
         console.log(err);
