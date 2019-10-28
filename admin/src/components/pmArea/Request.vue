@@ -5,11 +5,28 @@
             input.request__name(type="text" v-model="request.projectName" placeholder="Project Name")
             .request__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="request.startDate" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start")
+                    Datepicker(
+                        v-model="request.startDate" 
+                        :highlighted="highlighted" 
+                        monday-first=true 
+                        inputClass="datepicker-custom" 
+                        calendarClass="calendar-custom" 
+                        :format="customFormatter" 
+                        :disabled="disabled" 
+                        ref="start")
                 img.request__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
             .request__date
                 LabelValue(label="Requested Deadline" :isRequired="isRequiredField" customClass="project_margin")
-                    Datepicker(v-model="request.deadline" :highlighted="highlighted" monday-first=true :inputClass="deadlineClass" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+                    Datepicker(
+                        v-model="request.deadline" 
+                        :highlighted="highlighted" 
+                        monday-first=true 
+                        :inputClass="deadlineClass" 
+                        calendarClass="calendar-custom" 
+                        :format="customFormatter" 
+                        :disabled="disabled" 
+                        :disabledPicker="this.request.isDeadlineApproved"
+                        ref="deadline")
                 img.request__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
                 i.request__check-icon.fa.fa-check-circle(@click="approveDeadline" :class="{'request_green': request.isDeadlineApproved}")
         .request__info-row.request_right-padding-20
@@ -234,6 +251,7 @@ export default {
         position: absolute;
         right: -24px;
         top: 4px;
+        width: 18px;
     }
     &__client, &__industry, &__number {
         width: fit-content;

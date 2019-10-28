@@ -40,6 +40,10 @@ const ClientRequestSchema = new mongoose.Schema({
         default: '',
         trim: true
     },
+    isAssigned: {
+        type: Boolean,
+        default: false
+    },
     accountManager: {
         type: Schema.Types.ObjectId, ref: 'User'
     },

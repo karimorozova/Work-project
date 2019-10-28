@@ -39,7 +39,7 @@
         .tasks-data__button
             Button(value="Assign to PM")
         .tasks-data__button
-            Button(value="Analyze")
+            Button(value="Add tasks" :isDisabled="isAddTasksDisabled")
     slot(name="errors")
 </template>
 
@@ -222,6 +222,14 @@ export default {
         },
         currentUnit() {
             return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
+        },
+        areAllFilesApproved() {
+            const isNotApproved = this.currentProject.refFiles.find(item => !item.isApproved);
+            return !isNotApproved;
+        },
+        isAddTasksDisabled() {
+            return !this.currentProject.isDeadlineApproved || !this.currentProject.isBriefApproved
+                || !this.areAllFilesApproved;
         }
     },
     components: {
