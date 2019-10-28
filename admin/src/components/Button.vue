@@ -1,6 +1,6 @@
 <template lang="pug">
-.action-button(:class="customClass")
-    input.action-button__button(type="button" :value="value" @click="clicked")    
+.action-button(:class="[customClass, {disabled: isDisabled}]")
+    input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")    
 </template>
 
 <script>
@@ -8,6 +8,9 @@ export default {
     props: {
         value: {
             type: String
+        },
+        isDisabled: {
+            type: Boolean
         },
         customClass: {
             type: String
@@ -61,6 +64,23 @@ export default {
         }
         &:active {
             transform: scale(0.98);
+        }
+    }
+}
+
+.disabled {
+    .action-button__button {
+        opacity: 0.5;
+        box-shadow: none;
+        background-color: $orange;
+        border: 1px solid $orange;
+        cursor: default;
+        outline: none;
+        &:hover {
+            box-shadow: none;     
+        }
+        &:active {
+            box-shadow: none;
         }
     }
 }
