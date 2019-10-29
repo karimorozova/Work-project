@@ -4,6 +4,7 @@
     .request-info__all-info
         Request(:request="currentProject")
         GeneralInstructions(:project="currentProject")
+        .request-info__disabled(v-if="isDisabled")
     .request-info__all-info
         RequestTasksData(
             @setDate="setDate"
@@ -14,6 +15,7 @@
                 :isAbsolute="isBlockAbsoulte"
                 @closeErrors="closeErrorsBlock"
             )
+        .request-info__disabled(v-if="isDisabled")
 </template>
 
 <script>
@@ -86,8 +88,17 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject'
-        })
+            currentProject: 'getCurrentProject',
+            user: 'getUser'
+        }),
+        isDisabled() {
+            if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
+            if(this.currentProject.isAssigned) {
+                return this.currentProject.projectManager._id !== this.user._id;
+            } else {
+                return this.currentProject.accountManager._id !== this.user._id;
+            }
+        }
     },
     components: {
         ValidationErrors,
@@ -126,6 +137,16 @@ export default {
         align-items: flex-start;
         box-sizing: border-box;
         padding-left: 20px;
+        position: relative;
+    }
+    &__disabled {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        z-index: 10;
     }
     &__action {
         width: 20%;
