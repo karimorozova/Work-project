@@ -458,8 +458,12 @@ router.post("/prop-approvement", async (req, res) => {
 
 router.post("/request-value", async (req, res) => {
     const { id, prop, value } = req.body;
+    let updateQuery = {[prop]: value};
+    if(prop === 'accountManager') {
+        updateQuery.isAssigned = false;
+    }
     try {
-        const updatedRequest = await updateClientRequest({"_id": id}, {[prop]: value});
+        const updatedRequest = await updateClientRequest({"_id": id}, updateQuery);
         res.send(updatedRequest);
     } catch(err) {
         console.log(err);

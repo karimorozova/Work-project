@@ -37,7 +37,7 @@
         Button(value="Add tasks" @clicked="checkForErrors")
     .tasks-data__buttons(v-if="isRequest && isButton")
         .tasks-data__button
-            Button(value="Assign to PM")
+            Button(value="Assign to PM" @clicked="assignManager")
         .tasks-data__button
             Button(value="Add tasks" :isDisabled="isAddTasksDisabled")
     slot(name="errors")
@@ -73,29 +73,30 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            addProjectTasks: "addProjectTasks",
-            alertToggle: "alertToggle",
-            setAllXtmCustomers: "setAllXtmCustomers",
-            setDataValue: "setTasksDataValue"
-        }),
+        ...mapActions([
+            "addProjectTasks", 
+            "alertToggle",
+            "setAllXtmCustomers", 
+            "setTasksDataValue",
+            "setRequestValue"
+        ]),
         setSourceLang({ symbol }) {
             const value = this.languages.find(item => item.symbol === symbol);
-            this.setDataValue({prop: "source", value});
-            this.setDataValue({prop: "targets", value: []});
+            this.setTasksDataValue({prop: "source", value});
+            this.setTasksDataValue({prop: "targets", value: []});
             this.sourceLanguages = [value.symbol];
         },
         setTemplate({ option }) {
             const value = this.templates.find(item => item.name === option);
-            this.setDataValue({prop: "template", value});
+            this.setTasksDataValue({prop: "template", value});
         },
         setTargets({ targets }) {
-            this.setDataValue({prop: "targets", value: targets});
+            this.setTasksDataValue({prop: "targets", value: targets});
             this.targetLanguages = [...targets];
         },
         toggleJoin() {
             this.isJoinFiles = !this.isJoinFiles;
-            this.setDataValue({prop: "isJoinFiles", value: this.isJoinFiles});
+            this.setTasksDataValue({prop: "isJoinFiles", value: this.isJoinFiles});
         },
         isRefFilesHasSource() {
             const { sourceFiles, refFiles } = this.tasksData;
@@ -149,6 +150,13 @@ export default {
                     }
                 }
             }
+        },
+        async assignManager() {
+            await this.setRequestValue({
+                id: this.currentProject._id,
+                prop: "isAssigned",
+                value: true
+            })
         },
         async getCustomersFromXtm() {
             try {
@@ -244,7 +252,7 @@ export default {
         BigToggler
     },
     mounted() {
-        this.setDataValue({prop: "template", value: {name: 'Standard processing', id: '247336FD'}});
+        this.setTasksDataValue({prop: "template", value: {name: 'Standard processing', id: '247336FD'}});
     }
 }
 </script>
