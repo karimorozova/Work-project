@@ -37,7 +37,7 @@
         Button(value="Add tasks" @clicked="checkForErrors")
     .tasks-data__buttons(v-if="isRequest && isButton")
         .tasks-data__button
-            Button(value="Assign to PM" @clicked="assignManager")
+            Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'" @clicked="assignManager")
         .tasks-data__button
             Button(value="Add tasks" :isDisabled="isAddTasksDisabled")
     slot(name="errors")

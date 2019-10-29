@@ -3,7 +3,16 @@
     .request-info__title Request Details : {{currentProject.requestId}}
     .request-info__all-info
         Request(:request="currentProject")
-        GeneralInstructions(:project="currentProject")
+        GeneralInstructions(:project="currentProject" @reassignManager="reassignManager")
+            .request-info__modal(v-if="isModal")
+                ApproveModal(
+                    text="Are you sure you want to reassign this project?"
+                    approveValue="Yes"
+                    notApproveValue="Cancel"
+                    @close="closeModal"
+                    @notApprove="closeModal"
+                    @approve="setManager"
+                )
         .request-info__disabled(v-if="isDisabled")
     .request-info__all-info
         RequestTasksData(
@@ -23,6 +32,7 @@ const ValidationErrors = () => import("../ValidationErrors");
 import Request from "./Request";
 import GeneralInstructions from "./GeneralInstructions";
 import RequestTasksData from "./RequestTasksData";
+import ApproveModal from "@/components/ApproveModal";
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -34,19 +44,33 @@ export default {
             isEditAndSend: false,
             message: "",
             mailSubject: "",
+            isModal: false,
+            selectedManager: null,
+            managerProp: 'projectManager'
         }
     },
     methods: {
-        ...mapActions({
-            setProjectValue: "setProjectValue",
-            storeProject: "setCurrentProject",
-            alertToggle: 'alertToggle',
-            updateCurrentProject: "updateCurrentProject"
-        }),
+        ...mapActions([
+            "setProjectValue",
+            "setRequestValue",
+            "setCurrentProject",
+            "alertToggle",
+            "updateCurrentProject"
+        ]),
+        async reassignManager({prop, manager}) {
+            const groupName = this.user.group.name;
+            this.selectedManager = manager;
+            this.managerProp = prop;
+            if((groupName === 'Accounting' && prop === 'accountManager') || (groupName === 'Project Managers' && prop === 'projectManager')) {
+                this.isModal = true;
+            } else {
+                await this.setRequestValue({id: this.currentProject._id, prop, value: manager});
+            }
+        },
         async toggleProjectOption({key}) {
             try {
                 const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
-                await this.storeProject(result.body);
+                await this.setCurrentProject(result.body);
             } catch(err) {
                 this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
             }
@@ -73,17 +97,30 @@ export default {
             this.isEditAndSend = true;
             this.message = message.data.message;
             this.mailSubject = subject;
+        }, 
+        async setManager() {
+            try {
+                await this.setRequestValue({id: this.currentProject._id, prop: this.managerProp, value: this.selectedManager});
+            } catch(err) {}
+            finally {
+                this.closeModal();
+            }
         },
         async getRequest() {
             const { id } = this.$route.params;
             try {
                 if(!this.currentProject._id) {
                     const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
-                    await this.storeProject(curProject.body);
+                    this.setCurrentProject(curProject.body);
                 }
             } catch(err) {
-
+                this.alertToggle({message: err.response, isShow: true, type: "error"});
             }
+        },
+        closeModal() {
+            this.isModal = false;
+            this.selectedAm = null;
+            this.managerProp = "projectManager";
         }
     },
     computed: {
@@ -105,6 +142,7 @@ export default {
         Request,
         GeneralInstructions,
         RequestTasksData,
+        ApproveModal
     },
     created() {
         this.getRequest();
@@ -153,6 +191,11 @@ export default {
         @media (max-width: 1600px) {
             width: 23%;
         }
+    }
+    &__modal {
+        position: absolute;
+        top: -10px;
+        left: -15px;
     }
 }
 </style>

@@ -34,6 +34,7 @@
                         :options="projManagers" 
                         :selectedOption="selectedProjManager"
                         @chooseOption="(e) => setManager(e, 'projectManager')")
+            slot
 </template>
 
 <script>
@@ -51,18 +52,20 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle",
-            setRequestValue: "setRequestValue",
-            setProjectValue: "setProjectValue"
-        }),
+        ...mapActions([
+            "alertToggle",
+            "setRequestValue",
+            "setProjectValue"
+        ]),
         async setManager({option}, prop) {
             const manager = this.managers.find(item => `${item.firstName} ${item.lastName}` === option);
+            if(manager._id === this.project[prop]._id) return;
             try {
                 if(this.type === 'project') {
                     await this.setProjectValue({id: this.project._id, prop, value: manager});
                 } else {
-                    await this.setRequestValue({id: this.project._id, prop, value: manager});
+                    this.$emit('reassignManager', {prop, manager});
+                    await this.setRequestManager({prop, manager});
                 }
             } catch(err) { }
         },
@@ -77,7 +80,7 @@ export default {
     },
     computed: {
         accManagers() {
-            const result = this.managers.filter(item => item.group.name === "Sales" || item.group.name === "Account Managers");
+            const result = this.managers.filter(item => item.group.name === "Accounting");
             return result.map(item => `${item.firstName} ${item.lastName}`)
         },
         projManagers() {
@@ -154,6 +157,7 @@ export default {
 .drops {
     width: 100%;
     padding-top: 25px;
+    position: relative;
     &__menu {
         position: relative;
         width: 165px;
