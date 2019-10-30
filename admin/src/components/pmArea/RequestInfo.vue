@@ -67,14 +67,6 @@ export default {
                 await this.setRequestValue({id: this.currentProject._id, prop, value: manager});
             }
         },
-        async toggleProjectOption({key}) {
-            try {
-                const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
-                await this.setCurrentProject(result.body);
-            } catch(err) {
-                this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
-            }
-        },
         async setDate({date, prop, index}) {
             try {
                 await this.setStepDate({value: date, prop, index});

@@ -3,7 +3,7 @@ const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, toggleProjectProp, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
+const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
@@ -71,10 +71,10 @@ router.get("/all-managers", async (req, res) => {
     }
 })
 
-router.put("/project-option", async (req, res) => {
-    const { projectId, property } = req.body;
+router.put("/project-prop", async (req, res) => {
+    const { projectId, prop, value } = req.body;
     try {
-        const result = await toggleProjectProp(projectId, property);
+        const result = await updateProject({"_id": projectId}, {[prop]: value});
         res.send(result);
     } catch(err) {
         console.log(err);

@@ -2,7 +2,7 @@
 .request
     .request__all-info
         .request__info-row.request_right-padding-20
-            input.request__name(type="text" v-model="request.projectName" placeholder="Project Name")
+            input.request__name(type="text" :value="request.projectName" placeholder="Project Name" @change="(e) => setRequestValue(e, 'projectName')")
             .request__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(
@@ -53,7 +53,7 @@
                         )
             .request__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
-                    input.request__input-text(type="text" v-model="request.projectId" placeholder="Project Number")
+                    input.request__input-text(type="text" :value="request.clientProjectNumber" placeholder="Project Number" @change="(e) => setRequestValue(e, 'clientProjectNumber')")
         .request__info-row.request_no-margin
             .request__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
@@ -106,7 +106,8 @@ export default {
     methods: {
         ...mapActions([
             "alertToggle",
-            "approveRequestProp"
+            "approveRequestProp",
+            "setCurrentProject"
         ]),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
@@ -119,6 +120,15 @@ export default {
         },
         setIndustry({option}) {
             this.selectedIndustry = option;
+        },
+        async setRequestValue(e, prop) {
+            const { value } = e.target;
+            try {
+                const result = await this.$http.post("/pm-manage/request-value", {id: this.request._id, prop, value});
+                await this.setCurrentProject(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Server Error / Cannot update Project", isShow: true, type: "error"})
+            }
         },
         closeErrors() {
             this.areErrorsExist = false;

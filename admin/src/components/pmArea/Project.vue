@@ -37,7 +37,7 @@
                         )
             .project__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
-                    input.project__input-text(type="text" v-model="project.projectId" placeholder="Project Number")
+                    input.project__input-text(type="text" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__info-row.project_no-margin
             .project__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
@@ -93,7 +93,8 @@ export default {
     methods: {
         ...mapActions([
             "alertToggle",
-            "setProjectDate"
+            "setProjectDate",
+            "setCurrentProject"
         ]),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
@@ -107,6 +108,21 @@ export default {
         async setDate(prop, date) {
             if(prop === 'startDate' && this.project.tasks.length) return;
             await this.setProjectDate({date, projectId: this.project._id});
+        },
+        async setClientNumber(e) {
+            const { value } = e.target;
+            if(!this.project._id) {
+               return this.$emit('setValue', {prop: 'clientProjectNumber', option: value});
+            } 
+            await this.setProjectProp({prop: 'clientProjectNumber', value});
+        },
+        async setProjectProp({prop, value}) {
+            try {
+                const result = await this.$http.put("/pm-manage/project-prop", {projectId: this.project._id, prop, value});
+                await this.setCurrentProject(result.body);
+            } catch(err) {
+                this.alertToggle({message: "Server Error / Cannot update Project", isShow: true, type: "error"})
+            }
         },
         setValue({option}, prop) {
             this.$emit('setValue', {option, prop});

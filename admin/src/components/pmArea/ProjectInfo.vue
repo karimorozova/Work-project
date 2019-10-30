@@ -68,14 +68,6 @@ export default {
             "sendClientQuote",
             "sendProjectDetails"
         ]),
-        async toggleProjectOption({key}) {
-            try {
-                const result = await this.$http.put("/pm-manage/project-option", {projectId: this.currentProject._id, property: key});
-                await this.setCurrentProject(result.body);
-            } catch(err) {
-                this.alertToggle({message: "Internal Server Error / Cannot update Project", isShow: true, type: "error"})
-            }
-        },
         async setVendor({vendor, index}) {
             if(this.currentProject.steps[index].vendor &&
                 this.currentProject.steps[index].vendor._id === vendor._id) {

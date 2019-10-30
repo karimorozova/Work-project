@@ -12,6 +12,11 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  clientProjectNumber: {
+    type: String,
+    default: '',
+    trim: true
+  },
   startDate: {
     type: Date,
     default: Date.now

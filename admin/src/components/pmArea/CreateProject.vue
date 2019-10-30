@@ -15,7 +15,7 @@ export default {
     data() {
         return {
             project: {
-                projectId: "",
+                clientProjectNumber: "",
                 template: "",
                 projectName: "",
                 customer: {name: ""},
@@ -28,16 +28,14 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            storeProject: "setCurrentProject"
-        }),
+        ...mapActions(["setCurrentProject"]),
         setValue({option, prop}) {
-            this.project[prop] = option;
+            this.project = {...this.project, [prop]: option};
         },
         projectCreated({project, customer}) {
             this.project = project;
             this.project.customer = customer;
-            this.storeProject(this.project);
+            this.setCurrentProject(this.project);
             this.$router.push(`/project-details/${project._id}`);
         }
     },
