@@ -22,7 +22,7 @@
         .drops
             .drops__item
                 .drops__label Account Manager:
-                    //- img.drops__assigned-icon(src="../../assets/images/Other/assigned_status.png")
+                    img.drops__assigned-icon(v-if="!project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
                 .drops__menu
                     SelectSingle(
                         :options="accManagers" 
@@ -30,6 +30,7 @@
                         @chooseOption="(e) => setManager(e, 'accountManager')")
             .drops__item
                 .drops__label Project Manager:
+                    img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
                 .drops__menu
                     SelectSingle(
                         :options="projManagers" 
@@ -172,6 +173,14 @@ export default {
     &__text {
         font-size: 14px;
         font-weight: bolder;
+    }
+    &__label {
+        position: relative;
+    }
+    &__assigned-icon {
+        position: absolute;
+        left: -18px;
+        width: 15px;
     }
 }
 
