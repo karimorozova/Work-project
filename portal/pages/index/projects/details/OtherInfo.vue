@@ -2,10 +2,10 @@
     .other-info
         .other-info__header
             .other-info__photo
-                img.other-info__image(v-if="project.projectManager && project.projectManager.photo" :src="domain+project.projectManager.photo")
+                img.other-info__image(v-if="project.accountManager && project.accountManager.photo" :src="domain+project.accountManager.photo")
                 img.other-info__image.other-info_no-photo(v-else src="../../../../assets/images/man.png")
             .other__info__item
-                LabelValue(title="Project Manager" :value="fullManagerName" customClass="pair_column-flex")
+                LabelValue(title="Account Manager" :value="fullManagerName" customClass="pair_column-flex")
         .other-info__item
             LabelValue(title="Services" :value="getServices()" customClass="pair_column-flex")
         .other-info__item
@@ -53,8 +53,8 @@ export default {
         }),
         fullManagerName() {
             let result = "";
-            if(this.project.projectManager) {
-                result = this.project.projectManager.firstName + " " + this.project.projectManager.lastName;
+            if(this.project.accountManager) {
+                result = this.project.accountManager.firstName + " " + this.project.accountManager.lastName;
             }
             return result;
         }
