@@ -22,6 +22,7 @@
         .drops
             .drops__item
                 .drops__label Account Manager:
+                    //- img.drops__assigned-icon(src="../../assets/images/Other/assigned_status.png")
                 .drops__menu
                     SelectSingle(
                         :options="accManagers" 
@@ -80,7 +81,7 @@ export default {
     },
     computed: {
         accManagers() {
-            const result = this.managers.filter(item => item.group.name === "Accounting");
+            const result = this.managers.filter(item => item.group.name === "Account Managers");
             return result.map(item => `${item.firstName} ${item.lastName}`)
         },
         projManagers() {

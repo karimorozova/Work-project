@@ -168,7 +168,7 @@ const usersDefault = [
     {
       "email" : "eirini@pangea-langs.com",
       "username" : "eirini.loi",
-      "group" : "Accounting",
+      "group" : "Account Managers",
       "firstName" : "Eri",
       "lastName" : "Loi",
       "gender" : "FEMALE",
@@ -217,7 +217,7 @@ const usersDefault = [
 
 const leadSourcesDefault = ["Advertising", "Friend", "Landing Pages", "Internet", "Social Media", "Website"]
 
-const groupsDefault = ["Administrators", "Accounting", "Developers", "Project Managers", "Sales", "Vendor Managers"]
+const groupsDefault = ["Administrators", "Account Managers", "Developers", "Project Managers", "Sales", "Vendor Managers"]
 
 const stepsDefault = [
     {title: "Translation", symbol: "translation", isStage1: true, isStage2: false, isEditor: true, isActive: true, calculationUnit: "Words"},

@@ -61,7 +61,7 @@ export default {
             const groupName = this.user.group.name;
             this.selectedManager = manager;
             this.managerProp = prop;
-            if((groupName === 'Accounting' && prop === 'accountManager') || (groupName === 'Project Managers' && prop === 'projectManager')) {
+            if((groupName === 'Account Managers' && prop === 'accountManager') || (groupName === 'Project Managers' && prop === 'projectManager')) {
                 this.isModal = true;
             } else {
                 await this.setRequestValue({id: this.currentProject._id, prop, value: manager});

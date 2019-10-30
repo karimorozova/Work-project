@@ -38,7 +38,7 @@
                 label.block-item__label.block-item_relative Account Manager:
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
-                    AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Accounting")
+                    AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
             .block-item
                 label.block-item__label.block-item_relative Sales Manager:
                     Asterisk(:customStyle="asteriskStyle")
