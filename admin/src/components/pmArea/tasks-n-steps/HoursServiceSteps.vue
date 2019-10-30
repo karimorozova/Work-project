@@ -37,7 +37,7 @@ export default {
         }),
         serviceSteps() {
             let result = [...this.tasksData.service.steps];
-            if(this.tasksData.workflow.name === '1 Step') {
+            if(this.tasksData.workflow.name === '1 Step' && result.length > 1) {
                 result.pop();
             }
             return result;
