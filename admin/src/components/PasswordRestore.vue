@@ -11,6 +11,8 @@
         ValidationErrors(:errors="errors" @closeErrors="closeErrors" isAbsolute)
     .restore__success(v-if="!isForm")
         .restore__message Thank you. Please, check your email and follow instructions.
+        .restore__buttons
+            router-link.restore__back(to="/login") Back to login page
 </template>
 
 <script>
@@ -27,10 +29,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions({
-        sendNewPassword: "sendNewPassword",
-        alertToggle: "alertToggle"
-    }),
+    ...mapActions(["alertToggle"]),
     async send() {
         this.errors = [];
         const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -39,10 +38,10 @@ export default {
             return this.isError = true;
         }
         try {
-            await this.sendNewPassword(this.email);
+            await this.$http.post('/reset-pass', {email: this.email});
             this.isForm = false;
         } catch(err) {
-            this.alertToggle({message: err.message, isShow: true, type: "error"});
+            this.alertToggle({message: err.body, isShow: true, type: "error"});
         }
     },
     closeErrors() {

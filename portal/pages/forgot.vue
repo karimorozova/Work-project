@@ -11,6 +11,8 @@
         ValidationErrors(:errors="errors" @closeErrors="closeErrors" isAbsolute)
     .restore__success(v-if="!isForm")
         .restore__message Thank you. Please, check your email and follow instructions.
+        .restore__buttons
+            router-link.restore__back(to="/login") Back to login page
 </template>
 
 <script>
@@ -27,9 +29,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions([
-        "sendNewPassword"
-    ]),
+    ...mapActions(["alertToggle"]),
     async send() {
         this.errors = [];
         const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -38,9 +38,11 @@ export default {
             return this.isError = true;
         }
         try {
-            await this.sendNewPassword(this.email);
+            await this.$axios.post('/portal/reset-pass', {email: this.email});
             this.isForm = false;
-        } catch(err) { }
+        } catch(err) { 
+            this.alertToggle({message: err.response.data, isShow: true, type: "error"})
+        }
     },
     closeErrors() {
         this.isError = false;
