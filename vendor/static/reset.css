@@ -9,12 +9,13 @@ html {
 	line-height: 1.15
 }
 
-div, p, input, span, textarea, button, a, ul, li {
-	font-family: MyriadPro;
+input, textarea {
+    color: #67573E;
+    font-family: MyriadPro;
 }
 
-input, textarea {
-	color: #67573E;
+button {
+    font-family: MyriadPro;
 }
 
 blockquote, q {

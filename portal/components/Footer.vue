@@ -5,8 +5,10 @@
     .footer__legal
         .footer__item
             a.footer__link.footer_font-14(href="http://www.aboutcookies.org/" target="_blank") Use cookies
-            p.footer__legal-text
-                a.footer__link(href="https://www.google.com/maps/place/Pangea+Localization+Services/@34.6831861,33.0312479,15z/data=!4m5!3m4!1s0x0:0xd80067655ceaa5df!8m2!3d34.6831861!4d33.0312479" target="_blank") Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol
+            p.footer__legal-maps
+                a.footer__link(href="https://www.google.com/maps/place/Pangea+Localization+Services/@34.6831861,33.0312479,15z/data=!4m5!3m4!1s0x0:0xd80067655ceaa5df!8m2!3d34.6831861!4d33.0312479" target="_blank")
+                    img.footer__legal-icon(src="../assets/images/direction_icon.svg")
+                span.footer__legal-text Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol
             p.footer__legal-text office : +35725252150
             p.footer__legal-text Reg. No. HE362046  VAT. No. 10362046H
             p.footer__legal-text © {{ year }} 
@@ -57,30 +59,35 @@ export default {
     &_font-14 {
         font-size: 14px;
     }
-}
-
-.footer__legal {
-    width: 600px;
-    font-family: 'Open Sans';
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    @media (max-width: 620px) {
-        flex-direction: column;
-        width: 100%;
-        .footer__item {
-            &:last-child {
-                margin-top: 5px;
+    &__legal {
+        width: 600px;
+        font-family: 'Open Sans';
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media (max-width: 620px) {
+            flex-direction: column;
+            width: 100%;
+            .footer__item {
+                &:last-child {
+                    margin-top: 5px;
+                }
             }
         }
     }
-    &-text {
+    &__legal-maps {
+        display: flex;
+        align-items: center;
+        margin-top: 8px;
+        margin-bottom: 0;
+        height: 20px;
+    }
+    &__legal-text {
         color: #fff;
         font-size: 12px;
-        margin-top: 0.5px;
-        margin-bottom: 0.5px;
+        margin: 5px 0;
     }
-    &-copywrite-text {
+    &__legal-copywrite-text {
         font-weight: bold;
     }
 }
