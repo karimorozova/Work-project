@@ -155,7 +155,7 @@ export default {
             await this.setRequestValue({
                 id: this.currentProject._id,
                 prop: "isAssigned",
-                value: true
+                value: !this.currentProject.isAssigned
             })
         },
         async getCustomersFromXtm() {
