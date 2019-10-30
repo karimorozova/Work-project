@@ -1,7 +1,7 @@
 <template lang="pug">
     .project-number
         TitleInput(title="Client Project Number:")
-            input.project-number__input(type="text" placeholder="Project ID" :value="orderDetails.projectNumber" @input="setProjectNumber")
+            input.project-number__input(type="text" placeholder="Project ID" :value="orderDetails.clientProjectNumber" @input="setProjectNumber")
 </template>
 
 <script>
@@ -15,7 +15,7 @@ export default {
         }),
         setProjectNumber(e) {
             const value = e.target.value;
-            this.setOrderDetail({prop: 'projectNumber', value})
+            this.setOrderDetail({prop: 'clientProjectNumber', value})
         }
     },
     computed: {
@@ -23,7 +23,7 @@ export default {
             orderDetails: "getOrderDetails"
         }),
         projectNumber() {
-            return this.orderDetails.projectNumber || "";
+            return this.orderDetails.clientProjectNumber || "";
         }
     },
     components: {
