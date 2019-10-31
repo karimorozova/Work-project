@@ -1,21 +1,20 @@
 <template lang="pug">
     .details(v-click-outside="cancel")
-        .details__icons
+        .details__icons(v-if="areIcons")
             img.details__icon(v-for="(icon, key) in icons" :src="icon.src" :class="{'details_opacity-06': isActive(key)}" @click="makeAction(key)")
         .details__row
             .details__col
                 .details__item
                     LabelVal(text="Rate:" customClass="finance-details")
                         span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.rateValue }} &euro;
-                        input.details__input(v-else type="text" size="6" v-model="currentData.rateValue" @blur="(e) => recalcSubtotal(e, 'quantityRelative')")
+                        input.details__input(v-else type="text" size="6" v-model="currentData.rateValue")
                 .details__item
                     LabelVal(text="Quantity[Relative]:" customClass="finance-details")
-                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.quantityRelative }}
-                        input.details__input(v-else type="text" size="6" v-model="currentData.quantityRelative" @blur="(e) => recalcSubtotal(e, 'rateValue')")
+                        span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.quantityRelative }}
+                        input.details__input(v-else type="text" size="6" v-model="currentData.quantityRelative")
                 .details__item
                     LabelVal(text="Subtotal:" customClass="finance-details")
-                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.subtotal }} &euro;
-                        input.details__input(v-else type="text" size="6" v-model="currentData.subtotal")
+                        span.details__data.details_opacity-06 {{ financeData.subtotal }} &euro;
             .details__col
                 .details__item
                     LabelVal(text="Minimum charge:" customClass="finance-details")
@@ -23,7 +22,7 @@
                         input.details__input(v-else type="text" size="6" v-model="currentData.minimum")
                 .details__item
                     LabelVal(text="Quantity [Total]:" customClass="finance-details")
-                        span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.quantityTotal }}
+                        span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
                         input.details__input(v-else type="text" size="6" v-model="currentData.quantityTotal")
                 .details__item
                     LabelVal(text="Discounts/Surcharges:" customClass="finance-details")
@@ -41,6 +40,7 @@
 import LabelVal from "@/components/LabelVal";
 import ValidationErrors from "../../../ValidationErrors";
 import ClickOutside from "vue-click-outside";
+import { mapGetters } from "vuex";
 
 export default {
     props: {
@@ -64,6 +64,7 @@ export default {
             return key === 'edit' ? this.isEditing : !this.isEditing;
         },
         makeAction(key) {
+            if(key === 'edit' && this.isEditing) return;
             if(key === 'edit') {
                 this.isEditing = true;
                 this.currentData = Object.keys(this.financeData).reduce((prev, cur) => {
@@ -75,25 +76,16 @@ export default {
                 this.checkForErrors();
             }
         },
-        recalcSubtotal(e, propMultiply) {
-            const { value } = e.target;
-            const regex = propMultiply === 'rateValue' ? this.integerRegex : this.floatRegex;
-            if(regex.test(value)) {
-                this.currentData.subtotal = (+value*this.currentData[propMultiply]).toFixed(2);
-            }
-        },
         checkForErrors() {
             this.errors = [];
             if(!this.currentData.rateValue || !this.floatRegex.test(this.currentData.rateValue)) this.errors.push("Set valid Rate value (integer/float)");
             if(this.currentData.minimum && !this.floatRegex.test(this.currentData.minimum)) this.errors.push("Set valid Minimum Charge value (integer/float)");
             if(this.currentData.discount && !this.floatRegex.test(this.currentData.discount)) this.errors.push("Set valid Discount value (integer/float)");
-            if(!this.currentData.subtotal || !this.floatRegex.test(this.currentData.subtotal)) this.errors.push("Set valid Subtotal value (integer/float)");
             if(!this.currentData.quantityRelative || !this.integerRegex.test(this.currentData.quantityRelative)) this.errors.push("Set valid Quantity[Relative] value(integer)");
             if(!this.currentData.quantityTotal || !this.integerRegex.test(this.currentData.quantityTotal)) this.errors.push("Set valid Quantity[Total] value(integer)");
             if (this.errors.length) {
                 return this.areErrorsExist = true;
             }
-            this.currentData.subtotal = this.currentData.subtotal < this.currentData.minimum ? this.currentData.mininmum : this.currentData.subtotal;
             this.$emit("save", this.currentData);
             this.cancel();
         },
@@ -107,12 +99,27 @@ export default {
         }
     },
     computed: {
+        ...mapGetters({
+            userGroup: "getUserGroup"
+        }),
         total() {
             let result = (+this.financeData.subtotal - +(this.financeData.subtotal*this.financeData.discount/100)).toFixed(2);
             if(this.isEditing) {
                 result = (+this.currentData.subtotal - +(this.currentData.subtotal*this.currentData.discount/100)).toFixed(2);
             }
             return result;
+        },
+        isQuantityEditable() {
+            const groups = ["Administrators", "Developers"];
+            return this.isEditing && groups.indexOf(this.userGroup.name) !== -1;
+        },
+        areIcons() {
+            let forbidden = ["Cancelled", "Cancelled Halfway", "Completed"];
+            const groups = ["Administrators", "Developers"];
+            if(groups.indexOf(this.userGroup.name) !== -1) {
+                return forbidden.indexOf(this.financeData.stepStatus) === -1;
+            }
+            return [...forbidden, "Started"].indexOf(this.financeData.stepStatus) === -1;
         }
     },
     components: {

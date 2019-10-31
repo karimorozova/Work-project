@@ -90,14 +90,9 @@ export default {
             } catch(err) { }
         },
         collectData(data) {
-            const { subtotal, quantityTotal, quantityRelative } = data;
+            const { quantityTotal, quantityRelative } = data;
             const Wordcount = {receivables: +quantityTotal, payables: +quantityRelative};
-            let Price = Object.keys(this.step.finance.Price).reduce((prev, cur) => {
-                prev[cur] = this.step.finance.Price[cur];
-                return prev;
-            }, {});
-            this.selectedTab === "Receivables" ? Price.receivables = +subtotal : Price.payables = +subtotal;
-            return { Price, Wordcount };
+            return { Price: {...this.step.finance.Price}, Wordcount };
         }
     },
     computed: {
@@ -111,6 +106,7 @@ export default {
                 subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.halfReceivables : +this.step.finance.Price.halfPayables;
             }
             return {
+                stepStatus: this.step.status,
                 rateValue,
                 quantityRelative: +this.step.finance.Wordcount.payables,
                 quantityTotal: +this.step.finance.Wordcount.receivables,
