@@ -55,7 +55,7 @@ async function getFilteredProjects(filters) {
             'service',
             {path: 'projectManager', select: ['firstName', 'lastName', 'photo']},
             {path: 'accountManager', select: ['firstName', 'lastName', 'photo']},
-            {path: 'steps.vendor', select: ['firstName', 'lastName', 'photo']}
+            {path: 'steps.vendor', select: ['firstName', 'surname', 'photo']}
 
         ])
     } catch(err) {
