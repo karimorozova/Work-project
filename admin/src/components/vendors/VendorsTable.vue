@@ -94,11 +94,10 @@ import NativeLanguageSelect from "./NativeLanguageSelect";
 import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 import Button from "../Button";
 import scrollDrop from "@/mixins/scrollDrop";
-import vendorsFiltered from "@/mixins/vendorsFiltered";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    mixins: [scrollDrop, vendorsFiltered],
+    mixins: [scrollDrop],
     props: {
         nameFilter: {
             type: String
