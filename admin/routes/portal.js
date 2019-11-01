@@ -5,7 +5,7 @@ const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
-const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest } = require("../clientRequests");
+const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
@@ -207,6 +207,7 @@ router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles'
             createdRequest.refFiles = refFiles ? await storeRequestFiles(refFiles, createdRequest.id) : [];
         }
         createdRequest.save();
+        await clientRequestNotification(createdRequest);
         res.send(createdRequest);
     } catch(err) {
         console.log(err);

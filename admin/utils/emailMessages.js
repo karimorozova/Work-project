@@ -564,6 +564,36 @@ function tasksQuoteMessage(obj) {
     </div>`;
 }
 
+function managerRequestNotifyingMessage(obj) {
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.user.firstName},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="description" style="font-size: 18px;">
+                    Please pay attention to the fact that there is a request from client ${obj.customer.name} that has been assigned to you. 
+                </p>
+                <h3 class="detailsTitle">Request Details</h3>
+                <table class="details">
+                    <tr>
+                        <td>Request ID:</td>
+                        <td>${obj.requestId}</td>
+                    </tr>
+                    <tr>
+                        <td>Request name:</td>
+                        <td>${obj.projectName}</td>
+                    </tr>
+                    <tr>
+                        <td>Start date: </td>
+                        <td>${obj.startDate}</td>
+                    </tr>
+                    <tr>
+                        <td>Suggested Deadline: </td>
+                        <td>${obj.deadline}</td>
+                    </tr>
+                </table>
+            </div>
+            </div>`;
+}
+
 module.exports = { 
     getMessageWithRandomPassword,
     applicationMessage, 
@@ -576,5 +606,6 @@ module.exports = {
     taskReadyMessage,
     deliverablesDownloadedMessage,
     tasksQuoteMessage,
-    vendorReassignmentMessage
+    vendorReassignmentMessage,
+    managerRequestNotifyingMessage
 };
