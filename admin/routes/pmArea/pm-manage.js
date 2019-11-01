@@ -3,7 +3,7 @@ const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
+const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
@@ -283,15 +283,11 @@ router.post("/approve-files", async (req, res) => {
 router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) => {
     const fileData = {...req.body};
     try {
+        const project = await getProject({"tasks.taskId": fileData.taskId});
         const files = req.files["targetFile"];
-        const file = files[0];
-        const fileNameParts = file.filename.split('.');
-        if(fileNameParts.slice(-1).toString() === 'zip') {
-            await moveFile(files[0], `./dist${fileData.path}`);
-        } else {
-            await archiveFile({outputPath: `./dist${fileData.path}`, originFile: file});
-        }
-        res.send("");
+        const { tasks, steps } = await manageDeliveryFile({fileData, project, file: files[0]});
+        const updatedProject = await updateProject({"_id": project.id}, { tasks, steps });
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on uploading target file");

@@ -85,7 +85,7 @@
             @notApprove="notApproveAction"
             @close="closeApproveModal")
     .tasks__review(v-if="isDeliveryReview")
-        DeliveryReview(@close="closeReview" :tasks="reviewTasks")
+        DeliveryReview(@close="closeReview" :tasks="reviewTasks" @updateTasks="updateReviewTasks")
 </template>
 
 <script>
@@ -165,6 +165,9 @@ export default {
                 return item;
             })
             this.storeProject({...this.currentProject, tasks: unchecked});
+        },
+        updateReviewTasks({tasksIds}) {
+            this.reviewTasks = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
         },
         setModalTexts(option) {
             this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};

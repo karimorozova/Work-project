@@ -45,7 +45,6 @@ const Button = () => import("@/components/Button");
 export default {
     data() {
         return {
-            stepFiles: [],
             areFilesChecked: false,
             areFilesConverted: false,
             areOptions: true,
@@ -67,6 +66,7 @@ export default {
             this.$emit("close")
         },
         getStepsFiles() {
+            this.stepFiles = [];
             for(let task of this.tasks) {
                 const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
                 const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
@@ -114,19 +114,25 @@ export default {
             }
         },
         async uploadFile({file, index}) {
-            const { path } = this.stepFiles[index];
+            const { path, taskId } = this.stepFiles[index];
             const fileData = new FormData();
             fileData.append("targetFile", file);
             fileData.append("path", path);
+            fileData.append("taskId", taskId);
             try {
                 await this.uploadTarget(fileData);
-            } catch(err) {}
+                this.refreshTasks();
+            } catch(err) { }
+        },
+        refreshTasks() {
+            const tasksIds = this.tasks.map(item => item.taskId);
+            this.$emit('updateTasks', {tasksIds});
         },
         async approveFile({index}) {
-            this.stepFiles[index].isFileApproved = !this.stepFiles[index].isFileApproved;
             const { taskId, jobId, isFileApproved, path } = this.stepFiles[index];
             try {
-                await this.approveDeliveryFile({taskId, jobId, isFileApproved, path});
+                await this.approveDeliveryFile({taskId, jobId, isFileApproved: !isFileApproved, path});
+                this.refreshTasks();
             } catch(err) { }
         },
         async saveChanges() {
@@ -154,6 +160,29 @@ export default {
             const unchecked = this.stepFiles.filter(item => !item.isFileApproved);
             return this.areFilesChecked && this.areFilesConverted && !unchecked.length;
         },
+        stepFiles() {
+            let result = [];
+            if(this.tasks.length) {
+                for(let task of this.tasks) {
+                    const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
+                    const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
+                    const files = taskFiles.reduce((prev, cur) => {
+                        const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
+                        prev.push({
+                            fileName,
+                            pair,
+                            taskId: task.taskId,
+                            jobId: cur.jobId,
+                            path: cur.targetFile || cur.path.split("./dist").pop(),
+                            isFileApproved: cur.isFileApproved
+                        })
+                        return [...prev];
+                    }, [])
+                    result.push(...files);
+                }
+            }
+            return result;
+        }
     },
     components: {
         Table,
@@ -161,9 +190,6 @@ export default {
         Options,
         CheckBox,
         Button
-    },
-    mounted() {
-        this.getStepsFiles();
     }
 }
 </script>

@@ -62,7 +62,8 @@ export const approveDeliveryFile = async ({dispatch}, payload) => {
 export const uploadTarget = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
-        await Vue.http.post("/pm-manage/target", payload);
+        const updatedProject = await Vue.http.post("/pm-manage/target", payload);
+        dispatch('setCurrentProject', updatedProject.body);
         dispatch('alertToggle', {message: "Updated", isShow: true, type: "success"})
     } catch(err) {
         dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});

@@ -16,7 +16,7 @@
             .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId }}
             .review-table__data(slot="action" slot-scope="{ row, index }")
                 .review-table__icons
-                    template(v-for="(icon, key) in icons")
+                    template(v-for="(icon, key) in allIcons")
                         img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeAction(index, key)")
                         .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved}")
                             input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
@@ -40,8 +40,7 @@ export default {
             ],
             icons: {
                 download: {src: require("../../../assets/images/Other/Download-icon.png")},
-                upload: {src: require("../../../assets/images/Other/upload-icon.png")},
-                delete: {src: require("../../../assets/images/Other/delete-icon-qa-form.png")}
+                upload: {src: require("../../../assets/images/Other/upload-icon.png")}
             }
         }
     },
@@ -56,6 +55,17 @@ export default {
             const file = e.target.files[0];
             this.$emit('uploadFile', {file, index});
             e.target.value = "";
+        }
+    },
+    computed: {
+        allIcons() {
+            let result = this.icons;
+            if(this.tableData.length > 1) {
+                result = {
+                    ...result, 
+                    delete: {src: require("../../../assets/images/Other/delete-icon-qa-form.png")}};
+            }
+            return result;
         }
     },
     components: {
