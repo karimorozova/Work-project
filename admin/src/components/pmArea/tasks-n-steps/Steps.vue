@@ -312,7 +312,7 @@ export default {
         },
         getAcceptedStepStatus() {
             let status = "Accepted";
-            if(this.currentProject.status === 'Approved' || this.currentProject.status === 'Started') {
+            if(this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
                 status = "Ready to Start"
             }
             return status;
