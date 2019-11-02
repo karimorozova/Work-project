@@ -191,7 +191,12 @@ export default {
             this.setDataValue({prop: "source", value: this.currentProject.sourceLanguage});
             this.setDataValue({prop: "target", value: this.currentProject.targetLanguages});
             this.targetChosen = [...this.currentProject.targetLanguages];
+            this.targetAll = this.getFilteredTargets(this.targetChosen);
             this.sortLangs('targetChosen');
+        },
+        getFilteredTargets(langs) {
+            const symbols = langs.length ? langs.map(item => item.symbol) : [];
+            return symbols.length ? this.targetAll.filter(item => symbols.indexOf(item.symbol) === -1) : this.targetAll;
         }
     },
     computed: {
