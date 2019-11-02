@@ -5,11 +5,11 @@ const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculatio
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
-const { upload, moveFile, archiveFile, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
+const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
-const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles } = require("../../clientRequests");
+const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -453,13 +453,13 @@ router.post("/prop-approvement", async (req, res) => {
 })
 
 router.post("/request-value", async (req, res) => {
-    const { id, prop, value } = req.body;
-    let updateQuery = {[prop]: value};
-    if(prop === 'accountManager') {
-        updateQuery.isAssigned = false;
-    }
+    const { id, prop, value, isEmail } = req.body;
+    let updateQuery = prop === 'accountManager' ? {[prop]: value, isAssigned: false} : {[prop]: value};
     try {
         const updatedRequest = await updateClientRequest({"_id": id}, updateQuery);
+        if(isEmail) {
+            await sendNotificationToManager(updatedRequest, prop);
+        }
         res.send(updatedRequest);
     } catch(err) {
         console.log(err);

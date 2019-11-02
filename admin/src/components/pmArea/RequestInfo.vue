@@ -92,7 +92,12 @@ export default {
         }, 
         async setManager() {
             try {
-                await this.setRequestValue({id: this.currentProject._id, prop: this.managerProp, value: this.selectedManager});
+                await this.setRequestValue({
+                    id: this.currentProject._id, 
+                    prop: this.managerProp, 
+                    value: this.selectedManager,
+                    isEmail: true
+                    });
             } catch(err) {}
             finally {
                 this.closeModal();

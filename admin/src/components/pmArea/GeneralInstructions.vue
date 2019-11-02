@@ -67,7 +67,6 @@ export default {
                     await this.setProjectValue({id: this.project._id, prop, value: manager});
                 } else {
                     this.$emit('reassignManager', {prop, manager});
-                    await this.setRequestManager({prop, manager});
                 }
             } catch(err) { }
         },
