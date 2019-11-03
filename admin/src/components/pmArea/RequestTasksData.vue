@@ -12,6 +12,7 @@
             @setSourceLang="setSource"
             @setTargets="setTargets"
             @showErrors="showErrors"
+            @addTasks="addTasks"
             :isRequest="true"
         )
             template(slot="errors")
@@ -33,10 +34,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle",
-            addProjectTasks: "addProjectTasks",
-        }),
+        ...mapActions(["alertToggle", "addProjectTasks"]),
         toggleTaskData() {
             if(this.currentProject.status !== 'Delivered') {
                 this.isTaskData = !this.isTaskData;
@@ -56,6 +54,9 @@ export default {
         },
         showErrors({errors}) {
             this.$emit("showErrors", { errors });
+        },
+        async addTasks(tasksData) {
+            console.log(tasksData);
         }
     },
     computed: {

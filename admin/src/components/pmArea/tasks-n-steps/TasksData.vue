@@ -39,7 +39,7 @@
         .tasks-data__button
             Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'" @clicked="assignManager")
         .tasks-data__button
-            Button(value="Add tasks" :isDisabled="isAddTasksDisabled")
+            Button(value="Add tasks" @clicked="checkForErrors" :isDisabled="isAddTasksDisabled")
     slot(name="errors")
 </template>
 
@@ -113,12 +113,21 @@ export default {
             }
             return /^[1-9]{1,}(\d{1,})?/.test(quantity);
         },
+        checkRequestErrors() {
+            let errors = [];
+            if(!this.currentProject.industry) errors.push("Please, select industry.");
+            if(!this.currentProject.projectName) errors.push("Please, enter project name.");
+            return errors;
+        },
         async checkForErrors() {
             this.errors = [];
             const { source, targets, sourceFiles, refFiles, quantity } = this.tasksData;
+            if(this.isRequest) {
+                this.errors = this.checkRequestErrors();
+            }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
-            this.checkFiles(sourceFiles, refFiles);
+            this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
             this.checkHoursSteps();
             if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity."); 
             if (this.errors.length) {
@@ -129,6 +138,11 @@ export default {
             } catch (err) {
                 this.alertToggle({message: "Error on adding tasks", isShow: true, type: "error"});
             }
+        },
+        checkRequestFies() {
+            const { sourceFiles, refFiles } = this.currentProject;
+            if(this.currentUnit === 'Words' && !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
+            if(this.currentUnit !== 'Words' && !refFiles.length) this.errors.push("Please, upload Reference file(s).");
         },
         checkFiles(sourceFiles, refFiles) {
             if(this.currentUnit === 'Words') {
@@ -233,7 +247,8 @@ export default {
             return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
         },
         areAllFilesApproved() {
-            const isNotApproved = this.currentProject.refFiles.find(item => !item.isApproved);
+            const allFiles = [ ...this.currentProject.sourceFiles, ...this.currentProject.refFiles];
+            const isNotApproved = !allFiles.length || allFiles.find(item => !item.isApproved);
             return !isNotApproved;
         },
         isAddTasksDisabled() {

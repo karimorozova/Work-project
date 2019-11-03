@@ -155,7 +155,7 @@ export default {
             return this.allFiles.find(item => !item.fileName);
         },
         isAnyUnchecked() {
-            return this.allFiles.find(item => !item.isChecked);
+            return !this.allFiles.length || this.allFiles.find(item => !item.isChecked);
         }
     },
     components: {

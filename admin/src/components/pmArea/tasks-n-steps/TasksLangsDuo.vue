@@ -189,7 +189,7 @@ export default {
             const { symbol } = this.currentProject.sourceLanguage;
             this.$emit('setSourceLanguage', { symbol });
             this.setDataValue({prop: "source", value: this.currentProject.sourceLanguage});
-            this.setDataValue({prop: "target", value: this.currentProject.targetLanguages});
+            this.setDataValue({prop: "targets", value: this.currentProject.targetLanguages});
             this.targetChosen = [...this.currentProject.targetLanguages];
             this.targetAll = this.getFilteredTargets(this.targetChosen);
             this.sortLangs('targetChosen');

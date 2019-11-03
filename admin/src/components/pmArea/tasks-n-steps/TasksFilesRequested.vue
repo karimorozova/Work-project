@@ -148,13 +148,11 @@ export default {
                 item.isChecked = false;
                 return item;
             });
-            const refFiles = this.currentRequest.refFiles.length ?
-                this.currentRequest.refFiles.map(item => {
+            const refFiles = this.currentRequest.refFiles.map(item => {
                     item.type = "Reference File";
                     item.isChecked = false;
                     return item;
-                }) :
-                [];
+                });
             this.allFiles.push(...sourceFiles, ...refFiles);
         }
     },
