@@ -2,7 +2,7 @@
 .request
     .request__all-info
         .request__info-row.request_right-padding-20
-            input.request__name(type="text" :value="request.projectName" placeholder="Project Name" @change="(e) => setRequestValue(e, 'projectName')")
+            input.request__name(type="text" :value="request.projectName" placeholder="Project Name" @change="(e) => setRequestTextValue(e, 'projectName')")
             .request__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(
@@ -34,14 +34,14 @@
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
                     .request__client-link(v-if="request._id")
                         .request__link(@click="goToClientInfo") {{ customerName }}
-                    .request__drop-menu(v-else)
-                        SelectSingle(
-                            :selectedOption="customerName"
-                            :options="clients"
-                            :hasSearch="isSearchClient"
-                            placeholder="Name"
-                            @chooseOption="(e) => setValue(e, 'customer')"
-                        )
+                    //- .request__drop-menu(v-else)
+                    //-     SelectSingle(
+                    //-         :selectedOption="customerName"
+                    //-         :options="clients"
+                    //-         :hasSearch="isSearchClient"
+                    //-         placeholder="Name"
+                    //-         @chooseOption="(e) => setValue(e, 'customer')"
+                    //-     )
             .request__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
                     .request__drop-menu
@@ -53,7 +53,7 @@
                         )
             .request__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
-                    input.request__input-text(type="text" :value="request.clientProjectNumber" placeholder="Project Number" @change="(e) => setRequestValue(e, 'clientProjectNumber')")
+                    input.request__input-text(type="text" :value="request.clientProjectNumber" placeholder="Project Number" @change="(e) => setRequestTextValue(e, 'clientProjectNumber')")
         .request__info-row.request_no-margin
             .request__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
@@ -96,6 +96,7 @@ export default {
             },
             startDate: new Date(),
             deadline: "",
+            selectedIndustry: "",
             isSearchClient: true,
             isRequiredField: true,
             errors: [],
@@ -107,25 +108,19 @@ export default {
         ...mapActions([
             "alertToggle",
             "approveRequestProp",
-            "setCurrentProject"
+            "setCurrentProject",
+            "setRequestValue"
         ]),
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
         },
-        setValue({option}, prop) {
-            this.$emit('setValue', {option, prop});
-            if(prop === 'customer' && this.request.customer.industries.length == 1) {
-                this.selectedIndustry = this.request.customer.industries[0];
-            }
+        async setIndustry({option}) {
+            await this.setRequestValue({id: this.request._id, prop: 'industry', value: option});
         },
-        setIndustry({option}) {
-            this.selectedIndustry = option;
-        },
-        async setRequestValue(e, prop) {
+        async setRequestTextValue(e, prop) {
             const { value } = e.target;
             try {
-                const result = await this.$http.post("/pm-manage/request-value", {id: this.request._id, prop, value});
-                await this.setCurrentProject(result.body);
+                await this.setRequestValue({id: this.request._id, prop, value});
             } catch(err) {
                 this.alertToggle({message: "Server Error / Cannot update Project", isShow: true, type: "error"})
             }

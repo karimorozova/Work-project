@@ -17,7 +17,7 @@ async function createProject(project) {
         const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']': '[' + (todaysProjects.length + 1) + ']';
         project.status = project.status || "Draft";
         project.projectId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
-        const createdProject = await Projects.create(project);
+        const createdProject = await Projects.create({...project, startDate: new Date()});
         await createProjectFolder(createdProject.id);
         return await getProject({"_id": createdProject.id});
     } catch(err) {
@@ -51,15 +51,19 @@ async function createTasksFromRequest({project, dataForTasks}) {
     let newTasksInfo = {...dataForTasks};
     newTasksInfo.template = dataForTasks.template ? dataForTasks.template.id : '247336FD';
     newTasksInfo.workflow = dataForTasks.workflow ? dataForTasks.workflow.id : 2917;
+    const sourceFiles = getModifiedFiles(project.sourceFiles);
+    const refFiles = getModifiedFiles(project.refFiles);
     try {
         if(calculationUnit === 'Words') {
-            const sourceFiles = getModifiedFiles(project.sourceFiles);
-            const refFiles = getModifiedFiles(project.refFiles);
             newTasksInfo.customerId = dataForTasks.xtmId || await createNewXtmCustomer(project.customer.name);
             newTasksInfo.filesToTranslate = await storeFiles(sourceFiles, project.id);
             newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
             await addTasksToXtm({newTasksInfo, project});
             return await getProject({"_id": project.id});
+        } else {
+            const taskRefFiles = await storeFiles(refFiles, project.id);
+            const allInfo = {...dataForTasks, taskRefFiles, project};
+            return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
         }
     } catch(err) {
         console.log(err);
