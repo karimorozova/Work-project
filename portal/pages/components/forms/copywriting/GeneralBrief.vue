@@ -39,7 +39,7 @@ export default {
     methods: {
         ...mapActions(["setOrderNestedDetail"]),
         setValue({value}, prop) {
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop, value});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop, value});
         }
     },
     components: {

@@ -25,7 +25,7 @@ export default {
             this.isSubject = !this.isSubject;
         },
         setSubject({value}) {
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Subject line', value});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'Subject line', value});
         }
     },
     components: {

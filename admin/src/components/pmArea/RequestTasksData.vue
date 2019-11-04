@@ -34,7 +34,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["alertToggle", "addProjectTasks"]),
+        ...mapActions([
+            "alertToggle", 
+            "addProjectTasks",
+            "addTasksFromRequest"
+            ]),
         toggleTaskData() {
             if(this.currentProject.status !== 'Delivered') {
                 this.isTaskData = !this.isTaskData;
@@ -56,7 +60,20 @@ export default {
             this.$emit("showErrors", { errors });
         },
         async addTasks(tasksData) {
-            console.log(tasksData);
+            let dataForTasks = {...tasksData};
+            if(dataForTasks.service.calculationUnit === 'Hours') {
+                const steps = [...dataForTasks.service.steps];
+                const length = +dataForTasks.workflow.name.split(" ")[0];
+                for(let i = 0; i < length; i++) {
+                    tasksData.append(`${steps[i].step.symbol}-hours`, dataForTasks[`${steps[i].step.symbol}-hours`])
+                    tasksData.append(`${steps[i].step.symbol}-quantity`, dataForTasks[`${steps[i].step.symbol}-quantity`])
+                }
+            }
+            try {
+                const request = {...this.currentProject, status: "Draft"};
+                await this.addTasksFromRequest({dataForTasks, request});
+                this.$router.push(`/project-details/${this.currentProject._id}`);
+            } catch(err) { }
         }
     },
     computed: {

@@ -29,19 +29,19 @@
                     span.itemName BRIEF:
                         .inner-w
                             span.itemNameSm DESCRIPTION:
-                            span.itemData {{ orderDetails.genbrief.Description }}
+                            span.itemData {{ orderDetails.genBrief.Description }}
                         .inner-w
                             span.itemNameSm AUDIENCE:
-                            span.itemData {{ orderDetails.genbrief['Targeted Audience'] }}
+                            span.itemData {{ orderDetails.genBrief['Targeted Audience'] }}
                         .inner-w
                             span.itemNameSm TITLE:
-                            span.itemData {{ orderDetails.genbrief['Suggested title'] }}
+                            span.itemData {{ orderDetails.genBrief['Suggested title'] }}
                         .inner-w
                             span.itemNameSm TOPICS:
-                            span.itemData {{ orderDetails.genbrief.Topics }}
+                            span.itemData {{ orderDetails.genBrief.Topics }}
                         .inner-w
                             span.itemNameSm URL:
-                            span.itemData {{ orderDetails.genbrief.Examples }}
+                            span.itemData {{ orderDetails.genBrief.Examples }}
                         .inner-w
                             span.itemNameSm REFERENCE FILE(S):
                             span.itemData {{ refFilesList }}
@@ -88,7 +88,7 @@ export default {
         // return {
         //     orderDetails: {
         //         quoteDecision: 'Send',
-        //         genbrief: {
+        //         genBrief: {
         //             Description: 'svsdvvwevvsvwsvsdvsdgsdv svsv wesdv wevwev wevvs dvsd sdvwev vs dv wevsdvsdv \nwevsv wvsvsvsdv sdvs\n s vsdvsdvsdvsesvsdvwe vw evw vwevvsdv',
         //             'Targeted Audience': ' dvs sd svd sdv svd sdvsvsdvsvxcv',
         //             'Suggested title': 'sdvsvsvsdvwevsdv s',

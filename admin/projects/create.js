@@ -44,6 +44,41 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
     }
 }
 
+/// Creating tasks using info from client request start ///
+
+async function createTasksFromRequest({project, dataForTasks}) {
+    const { calculationUnit } = dataForTasks.service;
+    let newTasksInfo = {...dataForTasks};
+    newTasksInfo.template = dataForTasks.template ? dataForTasks.template.id : '247336FD';
+    newTasksInfo.workflow = dataForTasks.workflow ? dataForTasks.workflow.id : 2917;
+    try {
+        if(calculationUnit === 'Words') {
+            const sourceFiles = getModifiedFiles(project.sourceFiles);
+            const refFiles = getModifiedFiles(project.refFiles);
+            newTasksInfo.customerId = dataForTasks.xtmId || await createNewXtmCustomer(project.customer.name);
+            newTasksInfo.filesToTranslate = await storeFiles(sourceFiles, project.id);
+            newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+            await addTasksToXtm({newTasksInfo, project});
+            return await getProject({"_id": project.id});
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in createTasksFromRequest");
+    }
+}
+
+function getModifiedFiles(files) {
+    if(files && files.length) {
+        return files.map(item => {
+            item.path = `./dist${item.path}`;
+            item.filename = item.fileName;
+            return item;
+        })
+    }
+    return [];
+}
+
+/// Creating tasks using info from client request start ///
 
 /// Creating tasks for wordcount unit services start ///
 
@@ -305,4 +340,4 @@ function getProjectFinance(tasks, projectFinance) {
     }
 }
 
-module.exports = { createProject, createTasks }
+module.exports = { createProject, createTasks, createTasksFromRequest }

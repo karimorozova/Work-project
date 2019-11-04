@@ -3,13 +3,13 @@ const { User, Clients } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile,
+const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
-const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager } = require("../../clientRequests");
+const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -472,6 +472,20 @@ router.post("/project-value", async (req, res) => {
     try {
         const updatedProject = await updateProject({"_id": id}, {[prop]: value});
         res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving project property value");
+    }
+})
+
+router.post("/add-tasks", async (req, res) => {
+    const { dataForTasks, request } = req.body;
+    const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request; 
+    try {
+        const updatedProject =  await createProject(project);
+        const projectWithTasks = await createTasksFromRequest({project: updatedProject, dataForTasks});
+        await removeClientRequest(_id);
+        res.send(projectWithTasks);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on saving project property value");

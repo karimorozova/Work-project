@@ -46,20 +46,20 @@ export default {
     methods: {
         ...mapActions(["setOrderNestedDetail"]),
         setTopics({value}) {
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Topics', value});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'Topics', value});
         },
         toggleOption() {
             this.isNotSure = !this.isNotSure;
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isNotSure', value: this.isNotSure});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'isNotSure', value: this.isNotSure});
             if(this.isNotSure && !this.isMarketing) {
-                this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isFreedom', value: this.isFreedom});
+                this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'isFreedom', value: this.isFreedom});
             }
         },
         toggleFreedom(trueProp, falseProp) {
             this[trueProp] = true;
             this[falseProp] = false;
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isFreedom', value: this.isFreedom});
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isOutline', value: this.isOutline});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'isFreedom', value: this.isFreedom});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'isOutline', value: this.isOutline});
         }
     },
     components: {

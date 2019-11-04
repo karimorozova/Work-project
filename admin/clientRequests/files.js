@@ -1,5 +1,22 @@
+const { ClientRequest } = require('../models');
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
+const rimraf = require('rimraf');
+
+async function removeClientRequest(_id) {
+    try {
+        await ClientRequest.deleteOne({_id});
+        return new Promise((resolve, reject) => {
+            rimraf(`./dist/reqfiles/${_id}`, (err) => {
+                if(err) reject(err);
+                resolve("done");
+            })
+        })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeClientRequest");
+    }
+}
 
 async function storeRequestFiles(filesArr, requestId) {
     try {
@@ -69,4 +86,4 @@ function deleteOldFile(path) {
     })
 }
 
-module.exports = { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles };
+module.exports = { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles, removeClientRequest };

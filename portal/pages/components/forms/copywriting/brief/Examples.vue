@@ -28,7 +28,7 @@ export default {
         ]),
         setExamples(e) {
             const { value } = e.target;
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Examples', value});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'Examples', value});
         },
         setFiles({files}) {
             this.setOrderDetail({prop: 'refFiles', value: Array.from(files)});

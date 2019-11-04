@@ -40,12 +40,12 @@ async function createPackagesRequest(request) {
     try {
         const targetLanguages = JSON.parse(request.targets);
         const packageSize = request.packageSize ? JSON.parse(request.packageSize) : "";
-        const genbrief = request.genbrief ? JSON.parse(request.genbrief) : "";
+        const genBrief = request.genBrief ? JSON.parse(request.genBrief) : "";
         const tones = request.tones ? JSON.parse(request.tones) : "";
         const designs = request.designs ? JSON.parse(request.designs) : "";
         const seo = getSeo(request);
         const newRequest = await ClientRequest.create({...request, 
-            packageSize, targetLanguages, genbrief, tones, designs, seo
+            packageSize, targetLanguages, genBrief, tones, designs, seo
         });
         return await getClientRequest({"_id": newRequest.id});
     } catch(err) {

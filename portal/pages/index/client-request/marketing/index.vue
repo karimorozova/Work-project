@@ -37,9 +37,9 @@ export default {
             if(!this.orderDetails.projectName) this.errors.push('Enter Project name');
             if(!this.orderDetails.deadline) this.errors.push('Set Suggested deadline');
             if(!this.orderDetails.targets || !this.orderDetails.targets.length) this.errors.push('Select Target language(s)');
-            if(!this.orderDetails.genbrief.Description) this.errors.push('Fill the Description field');
-            if(!this.orderDetails.genbrief['Targeted Audience']) this.errors.push('Fill the Targeted audience field');
-            if(!this.orderDetails.genbrief.isNotSure && !this.orderDetails.genbrief.Topics) this.errors.push('Enter Topics');
+            if(!this.orderDetails.genBrief.Description) this.errors.push('Fill the Description field');
+            if(!this.orderDetails.genBrief['Targeted Audience']) this.errors.push('Fill the Targeted audience field');
+            if(!this.orderDetails.genBrief.isNotSure && !this.orderDetails.genBrief.Topics) this.errors.push('Enter Topics');
             if(!this.orderDetails.tones || !this.orderDetails.tones.length) this.errors.push('Select Tone of Voice');
             if(this.errors.length) {
                 return this.areErrors = true;
@@ -76,7 +76,7 @@ export default {
     created() {
         this.setOrderDetails({});
         this.setOrderDetail({prop: 'quoteDecision', value: 'Send'});
-        this.setOrderDetail({prop: 'genbrief', value: {}});
+        this.setOrderDetail({prop: 'genBrief', value: {}});
         this.setService();
     }
 }

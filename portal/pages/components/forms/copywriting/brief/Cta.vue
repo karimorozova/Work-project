@@ -21,7 +21,7 @@ export default {
         ...mapActions(["setOrderNestedDetail"]),
         toggle() {
             this.isCta = !this.isCta;
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'isCta', value: this.isCta});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'isCta', value: this.isCta});
         }
     },
     components: {

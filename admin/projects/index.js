@@ -3,7 +3,7 @@ const { storeFiles, getDeliverablesLink, storeTargetFile, manageDeliveryFile } =
 const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, 
     updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
 const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded, sendTasksQuote } = require('./emails');
-const  { createProject, createTasks } = require('./create');
+const  { createProject, createTasks, createTasksFromRequest } = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
 
@@ -35,5 +35,6 @@ module.exports = {
     sendTasksQuote,
     getAfterReopenSteps,
     getProjectAfterFinanceUpdated,
-    updateNonWordsTaskTargetFiles
+    updateNonWordsTaskTargetFiles,
+    createTasksFromRequest
 }

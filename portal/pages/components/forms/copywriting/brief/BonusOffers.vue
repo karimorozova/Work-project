@@ -27,7 +27,7 @@ export default {
             this.isBonus = !this.isBonus;
         },
         setBonus({value}) {
-            this.setOrderNestedDetail({rootProp: 'genbrief', prop: 'Bonus/Offers', value});
+            this.setOrderNestedDetail({rootProp: 'genBrief', prop: 'Bonus/Offers', value});
         }
     },
     components: {
