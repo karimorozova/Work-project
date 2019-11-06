@@ -105,25 +105,28 @@ export default {
         },
         async getRequest() {
             const { id } = this.$route.params;
+            let curRequest = JSON.parse(JSON.stringify(this.currentRequest));
             try {
                 if(!this.currentRequest._id) {
                     const result = await this.$http.get(`/pm-manage/request?id=${id}`);
-                    let curRequest = result.body;
-                    if(curRequest.service.calculationunit !== 'Words') {
-                        curRequest.brief = this.setRequestBrief(curRequest);
-                    }
-                    this.setCurrentProject(curRequest);
+                    curRequest = result.body;
                 }
+                if(curRequest.service.calculationunit !== 'Words') {
+                    curRequest.brief = this.setRequestBrief(curRequest);
+                }
+                this.setCurrentProject(curRequest);
             } catch(err) {
                 this.alertToggle({message: err.response, isShow: true, type: "error"});
             }
         },
         setRequestBrief(curRequest) {
             let { brief, genBrief } = curRequest;
-            const bools = ['isNotSure', 'isFreedom', 'isOutline'];
-            brief += this.parseGenBrief(genBrief, bools);
-            if(genBrief.isNotSure) {
-                brief += genBrief.isFreedom ? 'Topics: Give the copywriter freedom' : 'Topics: Request an outline from the copywriter';
+            if(curRequest.service.calculationunit !== 'Words') {
+                const bools = ['isNotSure', 'isFreedom', 'isOutline'];
+                brief += this.parseGenBrief(genBrief, bools);
+                if(genBrief.isNotSure) {
+                    brief += genBrief.isFreedom ? 'Topics: Give the copywriter freedom' : 'Topics: Request an outline from the copywriter';
+                }
             }
             return brief;
         },
