@@ -9,7 +9,7 @@
                 placeholder="Select Action"
                 @chooseOption="setAction"
             )
-    .steps__table(v-click-outside="closeStepInfo")
+    .steps__table
         .steps__tabs
             Tabs(
                 :tabs="tabs"
@@ -140,7 +140,6 @@ const Reassignment = () => import("../stepinfo/Reassignment");
 import SelectSingle from "../../SelectSingle";
 const Datepicker = () => import("../../Datepicker");
 import moment from "moment";
-import ClickOutside from "vue-click-outside";
 import scrollDrop from "@/mixins/scrollDrop";
 import stepVendor from "@/mixins/stepVendor";
 import { mapGetters, mapActions } from 'vuex';
@@ -419,9 +418,6 @@ export default {
         Reassignment,
         ApproveModal,
         Tabs
-    },
-    directives: {
-        ClickOutside
     }
 }
 </script>
