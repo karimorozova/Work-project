@@ -29,7 +29,7 @@ export default {
     },
     methods: {
         getFormattedDate(date) {
-            return moment(this.job.start).format("DD-MM-YYYY")
+            return moment(date).format("DD-MM-YYYY")
         }
     },
     computed: {
