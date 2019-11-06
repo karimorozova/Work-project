@@ -134,20 +134,22 @@ function getWithReadyToStartSteps({task, steps}) {
 
 function setAcceptedStepStatus({project, steps, jobId}) {
     let status = "Accepted";
-    if(project.status === "Started" || project.status === "Approved") {
+    if(project.status === "In progress" || project.status === "Approved") {
         status = "Ready to Start";
     }
-    const updatedSteps = steps.map(item => {
-        if(item.id === jobId) {
-            if(item.name === "translate1") {
-                item.status = status; 
-            } else {
-                item.status = status === "Accepted" ? status : "Waiting to Start";
-            }
+    const step = steps.find(item => item.id === jobId);
+    const task = project.tasks.find(item => item.taskId === step.taskId);
+    const taskSteps = steps.filter(item=> item.taskId === task.taskId);
+    if(taskSteps.length > 1) {
+        const stage1 = task.service.steps.find(item => item.stage === 'stage1');
+        if(step.serviceStep.symbol !== stage1.step.symbol) {
+            status = taskSteps[0].status === 'Completed' ? status : 'Waiting to Start';
         }
+    }
+    return steps.map(item => {
+        item.status = item.id === jobId ? status : item.status;
         return item;
     })
-    return updatedSteps;
 }
 
 function setRejectedStatus({steps, jobId}) {

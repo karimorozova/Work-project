@@ -36,11 +36,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            setJobStatus: "setJobStatus",
-            selectJob: "selectJob",
-            alertToggle: "alertToggle"
-        }),
+        ...mapActions([
+            "setJobStatus",
+            "selectJob",
+            "alertToggle"
+        ]),
         setDeliverables({files}) {
             this.$emit('setDeliverables', {files});
         },
