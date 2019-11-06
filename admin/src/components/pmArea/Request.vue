@@ -34,14 +34,6 @@
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
                     .request__client-link(v-if="request._id")
                         .request__link(@click="goToClientInfo") {{ customerName }}
-                    //- .request__drop-menu(v-else)
-                    //-     SelectSingle(
-                    //-         :selectedOption="customerName"
-                    //-         :options="clients"
-                    //-         :hasSearch="isSearchClient"
-                    //-         placeholder="Name"
-                    //-         @chooseOption="(e) => setValue(e, 'customer')"
-                    //-     )
             .request__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
                     .request__drop-menu
@@ -97,7 +89,6 @@ export default {
             startDate: new Date(),
             deadline: "",
             selectedIndustry: "",
-            isSearchClient: true,
             isRequiredField: true,
             errors: [],
             areErrorsExist: false,

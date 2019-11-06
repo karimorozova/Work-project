@@ -1,9 +1,9 @@
 <template lang="pug">
-.request-info(v-if="currentProject._id")
-    .request-info__title Request Details : {{currentProject.requestId}}
+.request-info(v-if="currentRequest._id")
+    .request-info__title Request Details : {{currentRequest.requestId}}
     .request-info__all-info
-        Request(:request="currentProject")
-        GeneralInstructions(:project="currentProject" @reassignManager="reassignManager")
+        Request(:request="currentRequest")
+        GeneralInstructions(:project="currentRequest" @reassignManager="reassignManager")
             .request-info__modal(v-if="isModal")
                 ApproveModal(
                     text="Are you sure you want to reassign this project?"
@@ -64,17 +64,17 @@ export default {
             if((groupName === 'Account Managers' && prop === 'accountManager') || (groupName === 'Project Managers' && prop === 'projectManager')) {
                 this.isModal = true;
             } else {
-                await this.setRequestValue({id: this.currentProject._id, prop, value: manager});
+                await this.setRequestValue({id: this.currentRequest._id, prop, value: manager});
             }
         },
         async setDate({date, prop, index}) {
             try {
                 await this.setStepDate({value: date, prop, index});
-                await this.updateCurrentProject({...this.currentProject, id: this.currentProject._id});
+                await this.updateCurrentProject({...this.currentRequest, id: this.currentRequest._id});
             } catch(err) { }
         },
         async refreshCustomerInfo() {
-            const client = await this.$http.get(`/clientsapi/client?id=${this.currentProject.customer._id}`);
+            const client = await this.$http.get(`/clientsapi/client?id=${this.currentRequest.customer._id}`);
             await this.setProjectValue({prop: 'customer', value: client.body});
         },
         showErrors({errors}) {
@@ -93,7 +93,7 @@ export default {
         async setManager() {
             try {
                 await this.setRequestValue({
-                    id: this.currentProject._id, 
+                    id: this.currentRequest._id, 
                     prop: this.managerProp, 
                     value: this.selectedManager,
                     isEmail: true
@@ -106,13 +106,34 @@ export default {
         async getRequest() {
             const { id } = this.$route.params;
             try {
-                if(!this.currentProject._id) {
-                    const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
-                    this.setCurrentProject(curProject.body);
+                if(!this.currentRequest._id) {
+                    const result = await this.$http.get(`/pm-manage/request?id=${id}`);
+                    let curRequest = result.body;
+                    if(curRequest.service.calculationunit !== 'Words') {
+                        curRequest.brief = this.setRequestBrief(curRequest);
+                    }
+                    this.setCurrentProject(curRequest);
                 }
             } catch(err) {
                 this.alertToggle({message: err.response, isShow: true, type: "error"});
             }
+        },
+        setRequestBrief(curRequest) {
+            let { brief, genBrief } = curRequest;
+            const bools = ['isNotSure', 'isFreedom', 'isOutline'];
+            brief += this.parseGenBrief(genBrief, bools);
+            if(genBrief.isNotSure) {
+                brief += genBrief.isFreedom ? 'Topics: Give the copywriter freedom' : 'Topics: Request an outline from the copywriter';
+            }
+            return brief;
+        },
+        parseGenBrief(genBrief, bools) {
+            return Object.keys(genBrief).reduce((acc, cur) => {
+                if(bools.indexOf(cur) === -1) {
+                    acc += `${cur}: ${genBrief[cur]}\n`
+                }
+                return acc;
+            }, "")
         },
         closeModal() {
             this.isModal = false;
@@ -122,15 +143,15 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject',
+            currentRequest: 'getCurrentProject',
             user: 'getUser'
         }),
         isDisabled() {
             if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
-            if(this.currentProject.isAssigned) {
-                return this.currentProject.projectManager._id !== this.user._id;
+            if(this.currentRequest.isAssigned) {
+                return this.currentRequest.projectManager._id !== this.user._id;
             } else {
-                return this.currentProject.accountManager._id !== this.user._id;
+                return this.currentRequest.accountManager._id !== this.user._id;
             }
         }
     },
