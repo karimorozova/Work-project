@@ -16,6 +16,7 @@ function getPrices(step, metrics) {
     const { clientRate, vendorRate } = step;
     let receivables = metrics.totalWords*clientRate.value
     let payables = metrics.totalWords*vendorRate.value;
+    let wordsSum = 0;
     if(step.catName === "translate1") {
         for(let key in metrics) {
             if(key !== 'totalWords' && key !== "nonTranslatable") {
