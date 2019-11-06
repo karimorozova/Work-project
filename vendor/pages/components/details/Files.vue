@@ -104,7 +104,7 @@ export default {
         async goToXtmEditor(file) {
             const jobId = this.getFilesJobId(file);
             try {
-                const url = await this.$axios.get(`/xtm/editor?jobId=${jobId}&stepName=${this.job.name}`);
+                const url = await this.$axios.post('/xtm/editor', {jobId, stepName: this.job.catName, xtmProjectId: this.job.xtmProjectId});
                 let link = document.createElement("a");
                 link.target = "_blank";
                 link.href = url.data;

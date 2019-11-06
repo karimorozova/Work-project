@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { getRequestOptions, generateTargetFile, getXtmCustomers} = require('../services/');
+const { getRequestOptions, generateTargetFile, getXtmCustomers, getEditorUrl } = require('../services/');
 const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, storeFiles} = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../сalculations/wordcount');
 const { updateProjectMetrics } = require('../projects/metrics');
@@ -101,75 +101,11 @@ router.post('/update-project', async (req, res) => {
     }
 })
 
-router.get('/editor', async (req, res) => {
+router.post('/editor', async (req, res) => {
     try {
-        let jobId = parseInt(req.query.jobId);
-        const { stepName } = req.query;
-        let str = '<?xml version="1.0" encoding="UTF-8"?>' +
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://pm.v2.webservice.projectmanagergui.xmlintl.com/">' +
-    '<soapenv:Header/>' +
-    '<soapenv:Body>' +
-        '<pm:obtainXTMEditorLink>' +
-            '<loginAPI>' +
-                '<client>Pangea</client>' +
-                '<password>pm</password>' +
-                '<userId>3150</userId>' +
-            '</loginAPI>' +
-            '<editor>' +
-                '<customerDescriptor>' +
-                '<id>26216</id>' +
-                '</customerDescriptor>' +
-                '<jobDescriptor>' +
-                `<id>${jobId}</id>` +
-                '</jobDescriptor>' +
-                '<userDescriptor>' +
-                '<id>3150</id>' +
-                '</userDescriptor>' +
-                '<userOptions>' +
-                '<role>TRANSLATOR</role>' +
-                '<terminologyRights>UPDATE_APPROVE</terminologyRights>' +
-                '</userOptions>' +
-                '<workflowOptions>' +
-                '<currentWorkflowStep>' +
-                `<workflowStepName>${stepName}</workflowStepName>` +
-                '</currentWorkflowStep>' +
-                '</workflowOptions>' + 
-            '</editor>' +
-            '<options/>' +
-        '</pm:obtainXTMEditorLink>' +
-        '</soapenv:Body>' +
-        '</soapenv:Envelope>';
-
-        function createCORSRequest(method, url) {
-            let xhr = new XMLHttpRequest();
-            if ("withCredentials" in xhr) {
-                xhr.open(method, url, false);
-            } else if (typeof XDomainRequest != "undefined") {
-                alert
-                xhr = new XDomainRequest();
-                xhr.open(method, url);
-            } else {
-                console.log("CORS not supported");
-                alert("CORS not supported");
-                xhr = null;
-            }
-            return xhr;
-        }
-        let xhr = createCORSRequest("POST", `${xtmBaseUrl}/project-manager-gui/services/v2/XTMProjectManagerMTOMWebService?wsdl`);
-        if(!xhr){
-            console.log("XHR issue");
-            return;
-        }
-
-        xhr.onload = function (){
-            let results = '<?xml version="1.0" encoding="UTF-8"?><editorURL>' + xhr.responseText.split('<editorURL>')[1].split('</editorURL>')[0] + '</editorURL>';
-            let object = JSON.parse(parser.toJson(results));
-            let editorLink = object.editorURL;
-            res.send(editorLink);
-        }
-
-        xhr.setRequestHeader('Content-Type', 'text/xml');
-        xhr.send(str);
+        const { jobId, stepName, xtmProjectId } = req.body;
+        const { url } = await getEditorUrl({jobId, stepName, xtmProjectId});
+    res.send(url);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on trying to get editor URL");

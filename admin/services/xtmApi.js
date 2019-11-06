@@ -58,6 +58,30 @@ function saveTemplateTasks(object) {
     })    
 }
 
+function getEditorUrl({jobId, stepName, xtmProjectId}) {
+    return new Promise((resolve, reject) => {
+        unirest.post(`${xtmBaseUrl}/project-manager-api-rest/projects/${xtmProjectId}/links/editor`)
+        .headers({"Authorization": xtmToken,
+        'Content-Type': 'application/json'})
+        .send({ 
+            "editorMode": "STANDARD",
+            "externaluser": {
+                "id": 20,
+                "name": "admin"
+            },
+            "jobs": [{jobId}],
+            stepName,
+            "userId": 20
+        })
+        .end(response => {
+            if(response.err) {
+                reject(err);
+            }
+            resolve(response.body)
+        })
+    })
+}
+
 function getDataForRequest(object) {
     const withJoinObject = object.join && object.join !== "false" ? {
         'workflowId': object.workflowId,
@@ -213,4 +237,4 @@ function getTaskProgress(task) {
     })
 }
 
-module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile };
+module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile, getEditorUrl };
