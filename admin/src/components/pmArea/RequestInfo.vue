@@ -105,38 +105,14 @@ export default {
         },
         async getRequest() {
             const { id } = this.$route.params;
-            let curRequest = JSON.parse(JSON.stringify(this.currentRequest));
             try {
                 if(!this.currentRequest._id) {
                     const result = await this.$http.get(`/pm-manage/request?id=${id}`);
-                    curRequest = result.body;
-                }
-                if(curRequest.service.calculationunit !== 'Words') {
-                    curRequest.brief = this.setRequestBrief(curRequest);
-                }
-                this.setCurrentProject(curRequest);
+                    this.setCurrentProject(result.body);
+                }                
             } catch(err) {
                 this.alertToggle({message: err.response, isShow: true, type: "error"});
             }
-        },
-        setRequestBrief(curRequest) {
-            let { brief, genBrief } = curRequest;
-            if(curRequest.service.calculationunit !== 'Words') {
-                const bools = ['isNotSure', 'isFreedom', 'isOutline'];
-                brief += this.parseGenBrief(genBrief, bools);
-                if(genBrief.isNotSure) {
-                    brief += genBrief.isFreedom ? 'Topics: Give the copywriter freedom' : 'Topics: Request an outline from the copywriter';
-                }
-            }
-            return brief;
-        },
-        parseGenBrief(genBrief, bools) {
-            return Object.keys(genBrief).reduce((acc, cur) => {
-                if(bools.indexOf(cur) === -1) {
-                    acc += `${cur}: ${genBrief[cur]}\n`
-                }
-                return acc;
-            }, "")
         },
         closeModal() {
             this.isModal = false;
