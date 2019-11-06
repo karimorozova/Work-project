@@ -89,9 +89,10 @@ export default {
                 });
         },
         addRow() {
+            const type = this.currentRequest.service.calculationUnit !== "Words" ? "Reference File" : "";
             this.allFiles.push({
                 fileName: "",
-                type: "",
+                type,
                 path: "",
                 isApproved: false,
                 isChecked: false

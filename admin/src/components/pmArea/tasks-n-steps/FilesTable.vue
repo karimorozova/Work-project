@@ -30,7 +30,7 @@
                     .files-table__drop(v-else :class="{'files-table_red-shadow': !row.type}")
                         SelectSingle(
                             :isTableDropMenu="true"
-                            :options="types" 
+                            :options="fileTypes" 
                             :selectedOption="row.type" 
                             @scrollDrop="scrollDrop"
                             @chooseOption="(e) => setType(e, index)")
@@ -73,7 +73,7 @@ export default {
                 delete: require('../../../assets/images/Other/delete-icon-qa-form.png'),
                 cancel: require("../../../assets/images/cancel-icon.png"),
             },
-            types: ["Source File", "Reference File"]
+            types: ["Reference File"]
         }
     },
     methods: {
@@ -156,6 +156,13 @@ export default {
         },
         isAnyUnchecked() {
             return !this.allFiles.length || this.allFiles.find(item => !item.isChecked);
+        },
+        fileTypes() {
+            let result = this.types;
+            if(this.currentRequest.service.calculationUnit === 'Words') {
+                result.unshift("Source File");
+            }
+            return result;
         }
     },
     components: {
