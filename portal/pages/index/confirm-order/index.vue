@@ -9,10 +9,10 @@
 </template>
 
 <script>
-  import Translationconfirm from '~/components/requests/orderConfirm/Translationconfirm.vue';
+  import Translationconfirm from '~/components/requests/orderConfirm/Translationconfirm';
   import Copywritingconfirm from '~/components/requests/orderConfirm/Copywritingconfirm';
   import Marketingconfirm from '~/components/requests/orderConfirm/Marketingconfirm';
-  import Proofingconfirm from '~/components/requests/orderConfirm/Proofingconfirm.vue';
+  import Proofingconfirm from '~/components/requests/orderConfirm/Proofingconfirm';
   import { mapGetters } from "vuex";
 
   export default {

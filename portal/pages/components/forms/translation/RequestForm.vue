@@ -84,6 +84,7 @@ export default {
             try {
                 const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
                 this.service = serv.data;
+                this.setOrderDetail({prop: "service", value: this.service._id});
                 const unit = this.service.calculationUnit ? this.service.calculationUnit.toLowerCase() : "";
                 const ratesProp = unit ? `${unit}Rates` : 'wordsRates'
                 await this.setDefaultSource({ratesProp});
