@@ -4,7 +4,8 @@ async function clientRequestNotification(request, prop) {
     try {
         const msg = prop ? managerRequestNotifyingMessage({...request._doc, user: request[prop]}) : managerRequestNotifyingMessage({...request._doc, user: request.accountManager});
         const subject = "Client's request assignment notification";
-        await managerNotifyMail(request[prop], msg, subject);
+        const manager = prop ? request[prop] : request.accountManager;
+        await managerNotifyMail(manager, msg, subject);
     } catch(err) {
         console.log(err);
         console.log("Error in clientRequestNotification");
