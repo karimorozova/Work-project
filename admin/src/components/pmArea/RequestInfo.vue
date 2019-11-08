@@ -146,10 +146,6 @@ export default {
     },
     created() {
         this.getRequest();
-        console.log("user", this.user);
-    },
-    mounted() {
-        console.log("user", this.user);
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
