@@ -148,7 +148,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
-            if(from.name === "client-details") {
+            if(from && from.name === "client-details") {
                 await vm.refreshCustomerInfo();
             }
         })
