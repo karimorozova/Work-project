@@ -49,11 +49,11 @@
         .request__info-row.request_no-margin
             .request__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
-                    textarea.request__text(type="text" rows="10" v-model="request.brief")
+                    textarea.request__text(type="text" rows="10" :value="request.brief" @change="(e) => setRequestTextValue(e, 'brief')")
                 i.request__check-icon.fa.fa-check-circle.request_left-90(@click="approveBrief" :class="{'request_green': request.isBriefApproved}")
             .request__textarea
                 LabelValue(label="Internal Notes" customClass="project_textarea")
-                    textarea.request__text(type="text" rows="10" v-model="request.notes")
+                    textarea.request__text(type="text" rows="10" :value="request.notes" @change="(e) => setRequestTextValue(e, 'notes')")
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors")
