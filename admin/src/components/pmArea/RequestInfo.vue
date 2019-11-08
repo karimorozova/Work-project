@@ -126,11 +126,13 @@ export default {
             user: 'getUser'
         }),
         isDisabled() {
-            if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
-            if(this.currentRequest.isAssigned) {
-                return this.currentRequest.projectManager._id !== this.user._id;
-            } else {
-                return this.currentRequest.accountManager._id !== this.user._id;
+            if(this.user) {
+                if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
+                if(this.currentRequest.isAssigned) {
+                    return this.currentRequest.projectManager._id !== this.user._id;
+                } else {
+                    return this.currentRequest.accountManager._id !== this.user._id;
+                }
             }
         }
     },
