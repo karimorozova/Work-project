@@ -127,14 +127,14 @@ export default {
         }),
         isDisabled() {
             return false
-            // if(this.user) {
-            //     if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
-            //     if(this.currentRequest.isAssigned) {
-            //         return this.currentRequest.projectManager._id !== this.user._id;
-            //     } else {
-            //         return this.currentRequest.accountManager._id !== this.user._id;
-            //     }
-            // }
+            if(this.user && this.user.group) {
+                if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
+                if(this.currentRequest.isAssigned) {
+                    return this.currentRequest.projectManager._id !== this.user._id;
+                } else {
+                    return this.currentRequest.accountManager._id !== this.user._id;
+                }
+            }
         }
     },
     components: {
@@ -146,10 +146,13 @@ export default {
     },
     created() {
         this.getRequest();
+        console.log("user", this.user);
+    },
+    mounted() {
+        console.log("user", this.user);
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {
-            console.log(from);
             if(from && from.name === "client-details") {
                 await vm.refreshCustomerInfo();
             }

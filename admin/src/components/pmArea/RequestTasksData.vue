@@ -4,10 +4,6 @@
         img.request-tasks__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'request-tasks_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
         TasksData(v-if="isTaskData"
-            :selectedWorkflow="selectedWorkflow"
-            :template="template"
-            :sourceLanguages="sourceLanguages"
-            :targetLanguages="targetLangs"
             @setValue="setValue"
             @setSourceLang="setSource"
             @setTargets="setTargets"
