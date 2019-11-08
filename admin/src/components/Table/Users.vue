@@ -276,6 +276,7 @@ export default {
     width: 900px;
     &__data {
         @extend %table-data;
+        overflow-x: hidden;
     }
     &__editing-data {
         @extend %table-data;
