@@ -81,12 +81,20 @@ export default {
     },
     computed: {
         accManagers() {
-            const result = this.managers.filter(item => item.group.name === "Account Managers");
-            return result.map(item => `${item.firstName} ${item.lastName}`)
+            let result = [];
+            if(this.managers.length) {
+                result = this.managers.filter(item => item.group.name === "Account Managers");
+                result = result.map(item => `${item.firstName} ${item.lastName}`)
+            }
+            return result;
         },
         projManagers() {
-            const result = this.managers.filter(item => item.group.name === "Project Managers");
-            return result.map(item => `${item.firstName} ${item.lastName}`)
+            let result = [];
+            if(this.managers.length) {
+                result = this.managers.filter(item => item.group.name === "Project Managers");
+                result = result.map(item => `${item.firstName} ${item.lastName}`)
+            }
+            return result;
         },
         selectedAccManager() {
             return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : "";

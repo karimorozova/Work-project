@@ -172,7 +172,7 @@ export default {
             let result = this.industries;
             if(this.request.customer) {
                 const industries = this.request.customer.industries;
-                if(industries[0].name) {
+                if(industries.length && industries[0].name) {
                     return result = industries;
                 }
                 return result = result.filter(item => industries.indexOf(item._id) !== -1);
