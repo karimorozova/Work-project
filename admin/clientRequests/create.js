@@ -8,7 +8,7 @@ async function createRequest(request) {
     let todayEnd = new Date(todayStart);
     todayEnd.setUTCHours(23,59,59,0);
     try {
-        const todaysRequests = await ClientRequest.find({"createdAt" : { $gte : todayStart, $lt: todayEnd }});
+        const todaysRequests = await ClientRequest.find({"startDate" : { $gte : todayStart, $lt: todayEnd }});
         const nextNumber = (todaysRequests.length < 10) ? '[0' + (todaysRequests.length + 1) + ']': '[' + (todaysRequests.length + 1) + ']';
         const requestId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
         const requestData = {...request, requestId};
