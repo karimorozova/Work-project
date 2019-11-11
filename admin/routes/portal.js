@@ -204,9 +204,9 @@ router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles'
             createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);
         }
         if(refFiles) {
-            createdRequest.refFiles = refFiles ? await storeRequestFiles(refFiles, createdRequest.id) : [];
+            createdRequest.refFiles = await storeRequestFiles(refFiles, createdRequest.id);
         }
-        createdRequest.save();
+        await createdRequest.save();
         await clientRequestNotification(createdRequest);
         res.send(createdRequest);
     } catch(err) {
