@@ -134,7 +134,6 @@ export default {
         }
     },
     mounted() {
-        this.setDataValue({prop: "workflow", value: this.workflowSteps[1]});
         this.setDefaultStepDates();
     },
     components: {

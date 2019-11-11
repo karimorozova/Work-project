@@ -19,6 +19,8 @@ export default {
                 return item.symbol === serviceSymbol;
             });
             this.service = service.title;
+            const option = service.steps.length === 1 ? '1 Step' : '2 Steps';
+            this.setWorkflow({option});
             this.storeDefaultService(service);
         },
     },
