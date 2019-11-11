@@ -134,7 +134,7 @@ const ProjectsSchema = new mongoose.Schema({
     default: ""
   },
   genBrief: {
-    type: String,
+    type: String | Object,
     default: ""
   },
   isClientOfferClicked: {
