@@ -25,7 +25,7 @@
         .tasks-langs__title Quantity:
             Asterisk(:customStyle="asteriskStyle")
         .tasks-langs__input
-            input.tasks-langs__quantity(type="number" min="1" max="1000" @change="setQuantity" @input="setLimit" @keydown="removeNonDigit")
+            input.tasks-langs__quantity(type="number" min="1" max="20" @change="setQuantity" @input="setLimit" @keydown="removeNonDigit")
 </template>
 
 <script>
