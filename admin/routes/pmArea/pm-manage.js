@@ -488,7 +488,7 @@ router.post("/add-tasks", async (req, res) => {
         res.send(projectWithTasks);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on saving project property value");
+        res.status(500).send("Error on adding tasks");
     }
 })
 
