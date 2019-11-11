@@ -15,9 +15,11 @@ import FormWrapper from "@/pages/components/forms/FormWrapper";
 import OrderInfo from "@/pages/components/forms/OrderInfo";
 import RequestForm from "@/pages/components/forms/copywriting/RequestForm";
 import ValidationErrors from "@/components/ValidationErrors";
+import briefParser from "@/mixins/briefParser";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [briefParser],
     data() {
         return {
             requestService: "co",
@@ -45,6 +47,7 @@ export default {
                 return this.areErrors = true;
             }
             try {
+                this.setOrderDetail({prop: "brief", value: this.setRequestBrief()});
                 await this.createPackagesRequest({service: this.service});
                 this.$router.push("/confirm-order");
             } catch(err) { }

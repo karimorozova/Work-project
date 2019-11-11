@@ -15,9 +15,11 @@ import FormWrapper from "@/pages/components/forms/FormWrapper";
 import OrderInfo from "@/pages/components/forms/OrderInfo";
 import RequestForm from "@/pages/components/forms/copywriting/RequestForm";
 import ValidationErrors from "@/components/ValidationErrors";
+import briefParser from "@/mixins/briefParser";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    mixins: [briefParser],
     data() {
         return {
             requestService: "co",
@@ -48,22 +50,6 @@ export default {
                 await this.createPackagesRequest({service: this.service});
                 this.$router.push("/confirm-order");
             } catch(err) { }
-        },
-        setRequestBrief() {
-            let { genBrief } = this.orderDetails;
-            const bools = ['isNotSure', 'isFreedom', 'isOutline'];
-            return this.parseGenBrief(genBrief, bools);
-            if(genBrief.isNotSure) {
-                brief += genBrief.isFreedom ? 'Topics: Give the copywriter freedom' : 'Topics: Request an outline from the copywriter';
-            }
-        },
-        parseGenBrief(genBrief, bools) {
-            return Object.keys(genBrief).reduce((acc, cur) => {
-                if(bools.indexOf(cur) === -1) {
-                    acc += `${cur}: ${genBrief[cur]}\n`
-                }
-                return acc;
-            }, "")
         },
         closeErrors() {
             this.areErrors = false;
