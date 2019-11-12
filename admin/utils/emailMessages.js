@@ -125,7 +125,7 @@ function messageForClient(obj) {
                 ***This is an automated message***
             </p>
             <p class="description" style="font-size: 18px;">
-                Please fined attached the quote on behalf of ${obj.customer.projectManager.firstName} ${obj.customer.projectManager.lastName}.
+                Please fined attached the quote on behalf of ${obj.projectManager.firstName} ${obj.projectManager.lastName}.
             </p>
             <h3 class="detailsTitle">Quote Details</h3>
             <table class="details" style="width: 600px;box-sizing: border-box;border: 1px solid rgb(129, 129, 129);border-collapse: collapse;">
