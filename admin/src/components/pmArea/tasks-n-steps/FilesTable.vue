@@ -1,5 +1,5 @@
 <template lang="pug">
-    .request-files(v-click-outside="cancel")
+    .request-files
         .files-table
             DataTable(
                 :fields="fields"
@@ -52,7 +52,6 @@ import SelectSingle from "@/components/SelectSingle";
 import CheckBox from "@/components/CheckBox";
 import Add from "@/components/Add";
 import { mapGetters, mapActions } from "vuex";
-import ClickOutside from "vue-click-outside";
 import scrollDrop from "@/mixins/scrollDrop";
 
 export default {
@@ -72,8 +71,7 @@ export default {
                 download: require('../../../assets/images/Other/Download-icon.png'),
                 delete: require('../../../assets/images/Other/delete-icon-qa-form.png'),
                 cancel: require("../../../assets/images/cancel-icon.png"),
-            },
-            types: ["Reference File"]
+            }
         }
     },
     methods: {
@@ -158,7 +156,7 @@ export default {
             return !this.allFiles.length || this.allFiles.find(item => !item.isChecked);
         },
         fileTypes() {
-            let result = this.types;
+            let result = ["Reference File"];
             if(this.currentRequest.service.calculationUnit === 'Words') {
                 result.unshift("Source File");
             }
@@ -170,9 +168,6 @@ export default {
         SelectSingle,
         CheckBox,
         Add
-    },
-    directives: {
-        ClickOutside
     }
 }
 </script>
