@@ -126,7 +126,6 @@ export default {
             user: 'getUser'
         }),
         isDisabled() {
-            return false
             if(this.user && this.user.group) {
                 if(this.user.group.name === 'Administrators' || this.user.group.name === 'Developers') return false;
                 if(this.currentRequest.isAssigned) {
