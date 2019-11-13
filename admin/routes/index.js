@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { requiresLogin } = require('../middleware');
 
 const apiRouter = require('./api');
+const reportsapi = require('./reportsapi');
 const admin = require('./admin');
 const vendorRouter = require('./vendors/vendor');
 const pmareaRouter = require('./pmArea/pm-manage');
@@ -20,6 +21,7 @@ const settingsUpdate = require('./settings/updates');
 
 router.use('/', admin);
 router.use('/api', apiRouter);
+router.use('/reportsapi', requiresLogin, reportsapi);
 router.use('/vendor', vendorRouter);
 router.use('/pm-manage', pmareaRouter);
 router.use('/prices', requiresLogin, pricelistsRouter);

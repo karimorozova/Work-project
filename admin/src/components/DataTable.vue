@@ -200,4 +200,7 @@
   .request-files_table {
       max-height: 136px;
   }
+  .height-700 {
+      max-height: 700px;
+  }
 </style>

@@ -49,6 +49,9 @@ import PrevProjects from '@/components/pmArea/PrevProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
+import TierReport from '@/components/reports/langPair/TierReport'
+import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
+import LqaReport from '@/components/reports/lqa/LqaReport'
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -351,7 +354,26 @@ const router = new Router({
                 {
                     path: 'reports',
                     name: 'reports',
-                    component: ReportsSettings
+                    component: ReportsSettings,
+                    children: [
+                        {
+                            path: 'lang-pair-tier',
+                            name: 'lang-pair-tier',
+                            component: TierReport,
+                            props: true
+                        },
+                        {
+                            path: 'lqa',
+                            name: 'lqa',
+                            component: LqaReport,
+                            props: true
+                        },
+                        {
+                            path: 'benchmark',
+                            name: 'benchmark',
+                            component: BenchmarkReport
+                        }
+                    ]
                 }
             ]
         },
