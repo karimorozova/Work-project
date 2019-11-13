@@ -32,7 +32,7 @@ export default {
         async getIndustries() {
             try {
                 const result = await this.$axios.get("/api/industries");
-                this.industries = result.data;
+                this.industries = result.data.filter(item => item.active);
             } catch(err) {
 
             }
