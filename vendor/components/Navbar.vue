@@ -6,7 +6,7 @@
                 a.navbar__link(:href='link.url') {{ link.title }}
     .navbar__block
         ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Rewards Program'}")
+            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Blog'}")
                 a.navbar__link(:href='link.url') {{ link.title }}    
 </template>
 
@@ -25,7 +25,7 @@ export default {
                 secondRow: [
                     {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'},
                     {url: 'https://www.pangea.global/blog', title: 'Blog'},
-                    {url: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
+                    // {url: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
                 ]
             }
         }

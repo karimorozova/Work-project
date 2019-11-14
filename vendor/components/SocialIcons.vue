@@ -15,7 +15,7 @@ export default {
                 {url: 'https://www.linkedin.com/company/pangea-language-service', image: require('../assets/images/social/linkedin.png')},
                 {url: 'https://twitter.com/Pangea_Local', image: require('../assets/images/social/twitter.png')},
                 {url: 'https://www.youtube.com/channel/UCKlcUH-8dbg7eZy-nZyDREw', image: require('../assets/images/social/youtube.png')},
-                {url: 'https://www.instagram.com/pangea_local/', image: require('../assets/images/social/instagram.png')},
+                {url: 'https://www.instagram.com/pangea_global/', image: require('../assets/images/social/instagram.png')},
                 {url: 'https://www.pinterest.com/pangealocalizat/', image: require('../assets/images/social/pinterest.png')}
             ]
         }
