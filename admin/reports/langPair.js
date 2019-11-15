@@ -1,20 +1,12 @@
-const { Languages, Industries, Projects } = require("../models");
+const { Languages, Industries } = require("../models");
 
-async function getLangPairReport() {
-    let date = new Date();
-    date.setMonth(date.getMonth() - 6);
+async function getLangPairReport(projects) {
     const finance = ["CFDs & Online Trading", "ICOs & Cryptocurrency"];
     const gaming = ["Poker", "Video Games", "iGaming (Casino, Slot games, Gambling, etc.)"];
     try {
         const langs = await Languages.find({symbol: {$nin: ["EN", "EN-GB", "EN-US"]}});
         const financeIndustries = await Industries.find({name: {$in: finance}});
         const gameIndustries = await Industries.find({name: {$in: gaming}});
-        const projects = await Projects.find({
-            "tasks.service.symbol": "tr", 
-            "tasks.sourceLanguage": "EN-GB", 
-            status: {$ne: "Cancelled"},
-            startDate: {$gt: new Date(date)}
-        });
         return getParsedReport({langs, projects, financeIndustries, gameIndustries});
     } catch(err) {
         console.log(err);
@@ -44,7 +36,7 @@ function getParsedReport({langs, projects, financeIndustries, gameIndustries}) {
 function getWordcountAndClients({projects, lang, industries}) {
     let clients = [];
     const industriesIds = industries ? industries.map(item => item.id) : [];
-    const filteredProjects = industriesIds.length ? projects.filter(item => industriesIds.indexOf(item.industry) !== -1) : projects;
+    const filteredProjects = industriesIds.length ? projects.filter(item => industriesIds.indexOf(item.industry.id) !== -1) : projects;
     const wordcount = filteredProjects.reduce((acc, cur) => {
         if(clients.indexOf(cur.customer) === -1) {
             clients.push(cur.customer);
