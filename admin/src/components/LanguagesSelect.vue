@@ -21,7 +21,8 @@ import ClickOutside from "vue-click-outside";
 export default {
     props: {
         selectedLangs: {
-            type: Array
+            type: Array,
+            default: () => []
         },
         parentIndex: {
             type: Number,
