@@ -3,7 +3,15 @@
         .services-menu__title(@click="toggle" :class="{'services-menu_opacity-07': isOpacity}") {{ selectedService.title }}
             img.service-menu__arrow(src="../../../../assets/images/arrow_open.png" :class="{'services-menu_rotate': isOpen}")
         .services-menu__drop(v-if="isOpen")
-            .services-menu__item(v-for="service in services" @click="selectService(service)" :class="{'services-menu_active': isActive(service)}") {{ service.title }}
+            template(v-for="(service, index) in services" )
+                .services-menu__item.left-aligned(
+                    v-if="service && !isEven(index)" 
+                    @click="selectService(service)" 
+                    :class="{'services-menu_active': isActive(service)}") {{ service.title }}
+                .services-menu__item(
+                    v-if="service && isEven(index)" 
+                    @click="selectService(service)" 
+                    :class="{'services-menu_active': isActive(service)}") {{ service.title }}
 </template>
 
 <script>
@@ -28,10 +36,13 @@ export default {
         toggle() {
             this.isOpen = !this.isOpen;
         },
+        isEven(index) {
+            return index % 2 === 0;
+        },
         async getServices() {
             try {
                 const result = await this.$axios.get("/api/services");
-                this.services = result.data;
+                this.services = result.data.filter(item => item.active);
             } catch(err) {
                 console.log(err);
             }
@@ -80,14 +91,12 @@ export default {
         box-sizing: border-box;
         border-top: 1px solid $light-brown;
         display: flex;
-        flex-direction: column;
-        max-height: 160px;
         flex-wrap: wrap;
         align-items: center
     }
     &__item {
         font-size: 12px;
-        width: 48%;
+        width: 50%;
         border: 1px solid $main-color;
         border-radius: 3px;
         box-sizing: border-box;
