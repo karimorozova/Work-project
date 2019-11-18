@@ -18,7 +18,7 @@ async function reassignVendor(project, reassignData) {
         return { steps, tasks };
     } catch(err) {
         console.log(err);
-        console.log("Error in getNewStep");
+        console.log("Error in reassignVendor");
     }
 }
 
@@ -64,7 +64,7 @@ async function getStepPayables({task, step, project}) {
     const unit = step.serviceStep.calculationUnit;
     try {
         if(unit === 'Words') {
-            return await payablesCalc({task, project, step: newStep});
+            return await payablesCalc({task, project, step});
         } else {
             const ratesProp = unit === 'Packages' ? 'monoRates' : 'hoursRates';
             const { payables, vendorRate } = getVendorRate({
