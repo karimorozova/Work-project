@@ -70,17 +70,6 @@ export default {
             padding-top: 7px;
         }
     }
-    &__input {
-        top: 0px;
-        right: -25px;
-        z-index: 2;
-        position: absolute;
-        cursor: pointer;
-        opacity: 0;
-        filter: alpha(opacity=0);
-        font-size: 30px;
-        font-family: MyriadPro;
-    }
     &__label {
         font-size: 12px;
     }

@@ -130,6 +130,7 @@ const middleware = {
             '/request-details',
             '/finance',
             '/reports',
+            '/xtrf',
             '/translation-request',
             '/zoho-code'
         ];

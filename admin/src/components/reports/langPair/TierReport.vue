@@ -34,7 +34,7 @@ export default {
     methods: {
         async getReport() {
             try {
-                const result = await this.$http.get("/reportsapi/tier-report?type=langPair");
+                const result = await this.$http.get("/reportsapi/xtrf-tier-report");
                 this.reportData = result.body;
             } catch(err) {
 

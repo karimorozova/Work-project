@@ -2,7 +2,7 @@ const { Projects } = require("../models");
 const { getLangPairReport } = require("./langPair");
 const { getLqaReport } = require("./lqa");
 
-async function getReport(type) {
+async function getReport(type, filters) {
     let date = new Date();
     date.setMonth(date.getMonth() - 6);
     try {
@@ -18,7 +18,7 @@ async function getReport(type) {
                 reportData = await getLangPairReport(projects);
                 break;
             case "lqa":
-                reportData = await getLqaReport(projects);
+                reportData = await getLqaReport(projects, filters);
                 break;
             default:
                 reportData = await getBenchmartReport(projects);

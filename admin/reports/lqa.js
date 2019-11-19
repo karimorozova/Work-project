@@ -1,10 +1,10 @@
 const { Languages } = require("../models");
 
-async function getLqaReport(projects) {
+async function getLqaReport(projects, filters) {
     const steps = projects.reduce((acc, cur) => {
         if(cur.steps.length) {
             const stepsWithindustry = cur.steps
-                .filter(item => item.vendor && item.serviceStep.symbol === 'translation' && item.sourceLanguage === 'EN-GB')
+                .filter(step => getFilteredSteps(step, filters))
                 .map(item => {
                     item.industry = cur.industry;
                     return item;
@@ -21,6 +21,13 @@ async function getLqaReport(projects) {
         console.log(err);
         console.log("Error in getLqaReport");
     }
+}
+
+function getFilteredSteps(step, filters) {
+    const { vendor, serviceStep, sourceLanguage } = step;
+    if(serviceStep.symbol !== 'translation' || sourceLanguage !== 'EN-GB') return false;
+    const { nameFilter } = filters;
+    return vendor && `${vendor.firstName} ${vendor.surname}`.toLowerCase().indexOf(nameFilter.toLowerCase()) !== -1;
 }
 
 function getParsedReport({steps, langs}) {

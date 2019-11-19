@@ -16,9 +16,10 @@ const Package = require('./packages');
 const Zoho = require('./zoho');
 const ZohoReport = require('./zohoReport');
 const ClientRequest = require('./clientRequest');
-const Instruction = require('./instruction')
-const CancelReason = require('./cancelReason')
-const DiscountChart = require('./discountChart')
+const Instruction = require('./instruction');
+const CancelReason = require('./cancelReason');
+const DiscountChart = require('./discountChart');
+const XtrfTier = require('./xtrfTier');
 
 const Models = {
     Languages,
@@ -41,7 +42,8 @@ const Models = {
     ClientRequest,
     Instruction,
     CancelReason,
-    DiscountChart
+    DiscountChart,
+    XtrfTier
 };
 
 module.exports = Models;

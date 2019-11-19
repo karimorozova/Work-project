@@ -52,6 +52,7 @@ import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
+import Xtrf from '@/components/reports/Xtrf'
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -59,6 +60,11 @@ Vue.use(Router)
 const router = new Router({
     mode: 'history',
     routes: [
+        {
+            path: '/xtrf',
+            name: 'xtrf',
+            component: Xtrf
+        },
         {
             path: '/register',
             name: 'register',
