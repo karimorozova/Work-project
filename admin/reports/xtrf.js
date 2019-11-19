@@ -25,6 +25,7 @@ function getParsedReport(reports, languages) {
         const langReport = getLangReport(lang, reports);    
         result.push(langReport);
     }
+    result = result.sort((a,b) => a.target > b.target ? 1 : -1);
     return result;
 }
 
@@ -60,23 +61,23 @@ function getClientsWordcount(targetLang) {
 }
 
 function getAllTier(words, clients) {
-    let tier = "Tier 2";
+    let tier = 2;
     if((words > 55000 && clients > 9) || words > 100000) {
-        tier = "Tier 1"
+        tier = 1;
     }
     if(words < 5000 || (words < 10000 && clients < 5))  {
-        tier = "Tier 3"
+        tier = 3;
     }
     return tier;
 }
 
 function getSpecificTier(words, clients) {
-    let tier = "Tier 2";
+    let tier = 2;
     if((words > 30000 && clients > 4) || words > 60000) {
-        tier = "Tier 1"
+        tier = 1;
     }
     if(words < 2500 || (words < 5000 && clients < 3))  {
-        tier = "Tier 3"
+        tier = 3;
     }
     return tier;
 }
