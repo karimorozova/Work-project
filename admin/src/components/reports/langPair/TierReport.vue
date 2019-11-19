@@ -1,5 +1,7 @@
 <template lang="pug">
     .tier
+        .tier__filters
+            Filters
         .tier__table
             DataTable(
                 :fields="fields"
@@ -30,6 +32,7 @@
 
 <script>
 import DataTable from "@/components/DataTable";
+import Filters from "./Filters";
 
 export default {
     data() {
@@ -65,7 +68,8 @@ export default {
         }
     },
     components: {
-        DataTable
+        DataTable,
+        Filters
     },
     created() {
         this.getReport();
@@ -78,6 +82,10 @@ export default {
 .tier {
     box-sizing: border-box;
     padding: 40px;
+    &__filters {
+        margin-bottom: 20px;
+        width: 60%;
+    }
     &__table {
         width: 60%;
     }

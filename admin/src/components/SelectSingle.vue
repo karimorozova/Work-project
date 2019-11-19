@@ -293,4 +293,10 @@ export default {
     }
 }
 
+.height-32 {
+    .select {
+        height: 32px;
+    }
+}
+
 </style>
