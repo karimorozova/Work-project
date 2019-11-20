@@ -83,6 +83,7 @@ export default {
             }
         },
         sortData(tierProp, prop) {
+            this.activeIndex = -1;
             this[prop] = !this[prop];
             if(this[prop]) {
                 this.reportData = this.reportData.sort((a,b) => a[tierProp].tier - b[tierProp].tier || a[tierProp].wordcount - b[tierProp].wordcount);
