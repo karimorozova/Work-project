@@ -1,18 +1,26 @@
 const { XtrfTier, Languages } = require("../models");
 
-async function getXtrfTierReport() {
+async function getXtrfTierReport(filters) {
     const today = new Date();
     let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
     start.setHours(0, 0, 0, 0);
     try {
-        let languages =  await Languages.find();
+        let languages = filters.targetFilter ? await Languages.find({symbol: {$in: filters.targetFilter}}) : await Languages.find();
         languages = languages.map(item => {
             const symbolParts = item.symbol.split("-");
             const symbol = symbolParts.length > 1 ? `${symbolParts[0].toLowerCase()}-${symbolParts[1]}` : item.symbol;
             return `${item.lang} [${symbol}]`
         });
         let reports = await XtrfTier.find({start: {$gte: start}});
-        return getParsedReport(reports, languages);
+        let result = getParsedReport(reports, languages);
+        if(filters.tierFilter) {
+            result = result.filter(item => {
+                return item.allTier.tier === filters.tierFilter 
+                    || item.financeTier.tier === filters.tierFilter
+                    || item.gameTier.tier === filters.tierFilter
+            })
+        }
+        return result;
     } catch(err) {
         console.log(err);
         console.log("Error in getXtrfTierReport")
@@ -60,26 +68,26 @@ function getClientsWordcount(targetLang) {
     return { wordcount, clients };
 }
 
-function getAllTier(words, clients) {
+function getAllTier(wordcount, clients) {
     let tier = 2;
-    if((words > 55000 && clients > 9) || words > 100000) {
+    if((wordcount > 55000 && clients > 9) || wordcount > 100000) {
         tier = 1;
     }
-    if(words < 5000 || (words < 10000 && clients < 5))  {
+    if(wordcount < 5000 || (wordcount < 10000 && clients < 5))  {
         tier = 3;
     }
-    return tier;
+    return {tier, wordcount, clients};
 }
 
-function getSpecificTier(words, clients) {
+function getSpecificTier(wordcount, clients) {
     let tier = 2;
-    if((words > 30000 && clients > 4) || words > 60000) {
+    if((wordcount > 30000 && clients > 4) || wordcount > 60000) {
         tier = 1;
     }
-    if(words < 2500 || (words < 5000 && clients < 3))  {
+    if(wordcount < 2500 || (wordcount < 5000 && clients < 3))  {
         tier = 3;
     }
-    return tier;
+    return {tier, wordcount, clients};
 }
 
 module.exports = { getXtrfTierReport }

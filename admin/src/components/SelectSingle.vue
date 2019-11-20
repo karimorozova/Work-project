@@ -134,7 +134,7 @@ export default {
     flex-direction: column;
     box-sizing: border-box;
     .drop {
-        max-height: 100px;
+        max-height: 110px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: #FFF;

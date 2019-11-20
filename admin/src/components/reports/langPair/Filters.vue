@@ -6,7 +6,7 @@
                     SelectSingle(
                         customClass="height-32"
                         :options="tierNames"
-                        :selectedOption="tierFilter"
+                        :selectedOption="selectedTier"
                         @chooseOption="setTierFilter"
                     )
         .tier-filters__item
@@ -25,35 +25,26 @@ import LanguagesSelect from "@/components/LanguagesSelect";
 import SelectSingle from "@/components/SelectSingle";
 
 export default {
+    props: {
+        targetFilter: {type: Array, default: () => []},
+        selectedLangs: {type: Array, default: () => []}
+    },
     data() {
         return {
-            targetFilter: [{symbol: "All"}],
-            tierFilter: "All",
-            tiers: {'Tier 1': 1, 'Tier 2': 2, 'Tier 3': 3}
+            tiers: {'All': 'All', 'Tier 1': '1', 'Tier 2': '2', 'Tier 3': '3'},
+            selectedTier: "All"
         }
     },
     methods: {
         setTierFilter({option}) {
-            this.tierFilter = option;
-            this.$emit('setTierFilter', {tier: this.tiers[option]});
+            this.selectedTier = option;
+            this.$emit('setTierFilter', {filter: this.tiers[option]});
         },
         setTargetFilter({lang}) {
-            if(lang.symbol !== 'All') {
-                this.targetFilter = this.targetFilter.filter(item => item.symbol !== 'All');
-                const position = this.selectedLangs.indexOf(lang.symbol);
-                if(position === -1) {
-                    return this.targetFilter.push(lang);
-                }
-                this.targetFilter.splice(position, 1);
-            }
-            this.targetFilter = !this.targetFilter.length || lang.symbol === 'All' ? [{symbol: "All"}] : this.targetFilter;
-            this.$emit("setTargetFilter", { targets: this.selectedLangs });
+            this.$emit("setTargetFilter", { lang });
         }
     },
     computed: {
-        selectedLangs() {
-            return this.targetFilter.map(item => item.symbol);
-        },
         tierNames() {
             return Object.keys(this.tiers);
         }
