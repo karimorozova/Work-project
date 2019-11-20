@@ -68,10 +68,8 @@ export default {
     methods: {
         ...mapActions(['alertToggle']),
         getAverages(tier) {
-            let result = `Clients - ${tier.clients};   `;
-            const words = tier.clients ? Math.round(tier.wordcount/tier.clients): 0;
-            result += `Words - ${words}`;
-            return result;
+            return `Clients - ${tier.clients};   Words - ${Math.round(tier.wordcount/6)}`;
+            
         },
         async getReport() {
             this.activeIndex = -1;
@@ -86,9 +84,9 @@ export default {
             this.activeIndex = -1;
             this[prop] = !this[prop];
             if(this[prop]) {
-                this.reportData = this.reportData.sort((a,b) => a[tierProp].tier - b[tierProp].tier || a[tierProp].wordcount - b[tierProp].wordcount);
+                this.reportData = this.reportData.sort((a,b) => a[tierProp].tier - b[tierProp].tier || b[tierProp].wordcount/6 - a[tierProp].wordcount/6);
             } else {
-                this.reportData = this.reportData.sort((a,b) => b[tierProp].tier - a[tierProp].tier || b[tierProp].wordcount - a[tierProp].wordcount);
+                this.reportData = this.reportData.sort((a,b) => b[tierProp].tier - a[tierProp].tier || a[tierProp].wordcount/6 - b[tierProp].wordcount/6);
             }
         },
         async setTierFilter({filter}) {
