@@ -68,7 +68,7 @@ export default {
     methods: {
         ...mapActions(['alertToggle']),
         getAverages(tier) {
-            return `Clients - ${tier.clients};   Words - ${Math.round(tier.wordcount/6)}`;
+            return `Clients - ${(tier.clients/6).toFixed(1)};   Words - ${Math.round(tier.wordcount/6)}`;
             
         },
         async getReport() {

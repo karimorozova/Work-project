@@ -1,16 +1,11 @@
-const { XtrfTier, Languages } = require("../models");
+const { XtrfTier, XtrfReportLang } = require("../models");
 
 async function getXtrfTierReport(filters) {
     const today = new Date();
     let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
     start.setHours(0, 0, 0, 0);
     try {
-        let languages = filters.targetFilter ? await Languages.find({symbol: {$in: filters.targetFilter}}) : await Languages.find();
-        languages = languages.map(item => {
-            const symbolParts = item.symbol.split("-");
-            const symbol = symbolParts.length > 1 ? `${symbolParts[0].toLowerCase()}-${symbolParts[1]}` : item.symbol;
-            return `${item.lang} [${symbol}]`
-        });
+        const languages = await XtrfReportLang.find();
         let reports = await XtrfTier.find({start: {$gte: start}});
         let result = getParsedReport(reports, languages);
         if(filters.tierFilter) {
@@ -29,7 +24,7 @@ async function getXtrfTierReport(filters) {
 
 function getParsedReport(reports, languages) {
     let result = [];
-    for(let lang of languages) {
+    for(let { lang } of languages) {
         const langReport = getLangReport(lang, reports);    
         result.push(langReport);
     }
@@ -50,7 +45,7 @@ function getTier(lang, reports, industry) {
     let totalClients = 0;
     const filteredReports = reports.filter(item => item.industry === industry);
     for(let report of filteredReports) {
-        const targetLang = report.languages.find(item => item.target === lang);
+        const targetLang = report.languages.find(item => Object.keys(item)[0] === lang);
         const { wordcount, clients } = targetLang ? getClientsWordcount(targetLang) : {wordcount: 0, clients: 0};
         totalWords += wordcount;
         totalClients += clients;
@@ -59,12 +54,12 @@ function getTier(lang, reports, industry) {
 }
 
 function getClientsWordcount(targetLang) {
-    const clientsWorcount = Object.keys(targetLang).filter(item => item !== 'target');
-    const wordcount = clientsWorcount.reduce((acc, cur) => {
-            acc += targetLang[cur];
+    const clientsWords = targetLang[Object.keys(targetLang)[0]];
+    const wordcount = Object.keys(clientsWords).reduce((acc, cur) => {
+            acc += clientsWords[cur];
             return acc;
         }, 0)
-    const clients = clientsWorcount.length;
+    const clients = Object.keys(clientsWords).length;
     return { wordcount, clients };
 }
 
