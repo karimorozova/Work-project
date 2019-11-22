@@ -5,7 +5,8 @@ async function getXtrfTierReport(filters) {
     let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
     start.setHours(0, 0, 0, 0);
     try {
-        const languages = await XtrfReportLang.find();
+        const filterQuery = filters.targetFilter ? {lang: {$in: filters.targetFilter}} : {};
+        const languages = await XtrfReportLang.find(filterQuery);
         let reports = await XtrfTier.find({start: {$gte: start}});
         let result = getParsedReport(reports, languages);
         if(filters.tierFilter) {

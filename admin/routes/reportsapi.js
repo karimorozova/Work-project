@@ -3,13 +3,28 @@ const { getReport } = require("../reports/get");
 const { getXtrfTierReport } = require("../reports/xtrf");
 const  { upload } = require("../utils");
 const { getFilteredJson } = require("../services");
-const { XtrfTier } = require("../models");
+const { XtrfTier, XtrfReportLang } = require("../models");
 convertExcel = require('excel-as-json').processFile;
+
+router.get('/languages', async (req, res) => {
+    try {
+        const langs = await XtrfReportLang.find().sort({lang: 1});
+        res.send(langs);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting xtrf languages");
+    }
+})
 
 router.post('/tier-report', async (req, res) => {
     const { type, filters } = req.body;
-    const reportData = await getReport(type, filters);
-    res.send(reportData);
+    try {
+        const reportData = await getReport(type, filters);
+        res.send(reportData);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting tier report");
+    }
 })
 
 router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
@@ -23,7 +38,8 @@ router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, 
         try {
             await XtrfTier.create({languages, start: new Date(start), end: new Date(end), industry});
         } catch(err) {
-            res.send(err);
+            console.log(err);
+            res.status(500).send("Error on saving xtrf tier");
         }
         res.send(data);
     }); 

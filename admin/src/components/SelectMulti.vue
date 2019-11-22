@@ -1,12 +1,13 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index1': isDropped}, customClass]")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
             span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
             .arrow-button
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            .drop__item(v-for="(option, index) in options" @click="chooseOptions(index)")
+            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
+            .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: activeClass(option)}")
                 span {{ showOption(option) }}
@@ -17,23 +18,18 @@ import ClickOutside from "vue-click-outside";
 
 export default {
     props: {
+        customClass: {
+            type: String
+        },
         selectedOptions: {
             type: Array
         },
         options: {
             type: Array
         },
-        otherChoice: {
-            type: String,
-            default: ""
-        },
-        otherDtpChoice: {
-            type: String,
-            default: ""
-        },
-        otherSoftwareChoice: {
-            type: String,
-            default: ""
+        hasSearch: {
+            type: Boolean,
+            default: false
         },
         placeholder: {
             type: String,
@@ -42,7 +38,8 @@ export default {
     },
     data() {
         return {
-            isDropped: false
+            isDropped: false,
+            searchValue: ""
         }
     },
     methods: {
@@ -51,19 +48,30 @@ export default {
         },
         outOptions() {
             this.isDropped = false;
+            this.searchValue = "";
         },
         toggleOptions() {
             this.isDropped = !this.isDropped;
+            this.searchValue = "";
         },
         chooseOptions(index) {
-            this.$emit("chooseOptions", {option: this.options[index]})
+            this.$emit("chooseOptions", {option: this.filteredOptions[index]})
         },
         activeClass(elem) {
             return (this.selectedOptions.indexOf(elem) != -1 ||
-                this.selectedOptions.indexOf(elem.name) != -1 ||
-                this.otherChoice.indexOf(elem) != -1 ||
-                this.otherDtpChoice.indexOf(elem) != -1 || 
-                this.otherSoftwareChoice.indexOf(elem) != -1)
+                this.selectedOptions.indexOf(elem.name) != -1)
+        },
+        search(e) {
+            this.searchValue = e.target.value;
+        }
+    },
+    computed: {
+        filteredOptions() {
+            let result = this.options;
+            if(this.searchValue) {
+                return result.filter(item => item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
+            }
+            return result;
         }
     },
     directives: {
@@ -80,8 +88,6 @@ export default {
     border: 1px solid #67573E;
     border-radius: 5px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
     box-sizing: border-box;
     .drop {
         width: 100%;
@@ -92,6 +98,7 @@ export default {
         z-index: 10;
         border-top: 1px solid #67573E; 
         box-sizing: border-box; 
+        z-index: 10;
         &__item {
             display: flex;
             align-items: center;
@@ -100,15 +107,22 @@ export default {
             cursor: pointer;
             font-size: 14px;
             transition: all 0.4s;
-            &:first-child {
-                border-top: .5px solid #BFB09D;
-            }
             &:last-child {
                 border-bottom: none;
             }
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
             }
+        }
+        &__search {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px 0 5px 5px;
+            color: #67573E;
+            outline: none;
+            box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
+            border: 1px solid rgba(104, 87, 62, 0.3);
+            border-right: none;
         }
         .domain__options & {
             max-height: 170px;
@@ -126,6 +140,10 @@ export default {
     .filters & {
         width: 100%;
     }
+}
+
+.z-index1 {
+    z-index: 1;
 }
 
 .select {
@@ -177,11 +195,10 @@ export default {
 }
 
 .checkbox {
-    width: 13px;
+    min-width: 13px;
     height: 13px;
     border: 1px solid #67573E;
     margin-right: 3px;
-    margin-left: 5px;
     .checked {
         width: 100%;
         height: 100%;
@@ -205,8 +222,14 @@ export default {
             transform: rotate(-58deg);
         }
     }
-    .filters & {
-        margin-left: 3px;
+}
+
+.height-32 {
+    .select {
+        height: 32px;
+    }
+    .drop {
+        max-height: 160px;
     }
 }
 

@@ -3,7 +3,6 @@
         .tier__filters
             Filters(
                 :targetFilter="targetFilter"
-                :selectedLangs="selectedLangs"
                 @setTierFilter="setTierFilter"
                 @setTargetFilter="setTargetFilter"
             )
@@ -61,7 +60,7 @@ export default {
             isFinanceSorted: false,
             isGamingSorted: false,
             tierFilter: "All",
-            targetFilter: [{symbol: 'All'}],
+            targetFilter: ["All"],
             activeIndex: -1
         }
     },
@@ -94,16 +93,16 @@ export default {
             await this.getReport();
         },
         async setTargetFilter({lang}) {
-            if(lang.symbol !== 'All') {
-                this.targetFilter = this.targetFilter.filter(item => item.symbol !== 'All');
-                const position = this.selectedLangs.indexOf(lang.symbol);
+            if(lang !== 'All') {
+                this.targetFilter = this.targetFilter.filter(item => item !== 'All');
+                const position = this.targetFilter.indexOf(lang);
                 if(position === -1) {
                     this.targetFilter.push(lang);
                     return await this.getReport();
                 }
                 this.targetFilter.splice(position, 1);
             }
-            this.targetFilter = !this.targetFilter.length || lang.symbol === 'All' ? [{symbol: "All"}] : this.targetFilter;
+            this.targetFilter = !this.targetFilter.length || lang === 'All' ? ["All"] : this.targetFilter;
             await this.getReport();
         },
         showInfo({index}) {
@@ -113,16 +112,13 @@ export default {
     computed: {
         filters() {
             let result = {};
-            if(this.selectedLangs[0] !== 'All') {
-                result.targetFilter = this.selectedLangs;
+            if(this.targetFilter[0] !== 'All') {
+                result.targetFilter = this.targetFilter;
             }
             if(this.tierFilter !== 'All') {
                 result.tierFilter = +this.tierFilter;
             }
             return result;
-        },
-        selectedLangs() {
-            return this.targetFilter.map(item => item.symbol);
         }
     },
     components: {

@@ -12,36 +12,50 @@
         .tier-filters__item
             LabelVal(text="Target Language:" customClass="new-chart-label")
                 .tier-filters__drop
-                    LanguagesSelect(
-                        :addAll="true"
-                        :selectedLangs="selectedLangs"
-                        @chosenLang="setTargetFilter"
+                    SelectMulti(
+                        placeholder="Select"
+                        :hasSearch="true"
+                        customClass="height-32"
+                        :options="languages"
+                        :selectedOptions="targetFilter"
+                        @chooseOptions="setTargetFilter"
                     )
 </template>
 
 <script>
 import LabelVal from "@/components/LabelVal";
-import LanguagesSelect from "@/components/LanguagesSelect";
 import SelectSingle from "@/components/SelectSingle";
+import SelectMulti from "@/components/SelectMulti";
+import { mapActions } from "vuex";
 
 export default {
     props: {
-        targetFilter: {type: Array, default: () => []},
-        selectedLangs: {type: Array, default: () => []}
+        targetFilter: {type: Array, default: () => []}
     },
     data() {
         return {
             tiers: {'All': 'All', 'Tier 1': '1', 'Tier 2': '2', 'Tier 3': '3'},
-            selectedTier: "All"
+            selectedTier: "All",
+            languages: []
         }
     },
     methods: {
+        ...mapActions(['alertToggle']),
         setTierFilter({option}) {
             this.selectedTier = option;
             this.$emit('setTierFilter', {filter: this.tiers[option]});
         },
-        setTargetFilter({lang}) {
-            this.$emit("setTargetFilter", { lang });
+        setTargetFilter({option}) {
+            this.$emit("setTargetFilter", { lang: option });
+        },
+        async getXtrfLangs() {
+            try {
+                const result = await this.$http.get('/reportsapi/languages');
+                this.languages = result.body.map(item => item.lang);
+                this.languages.unshift("All");
+            } catch(err) {
+                this.alertToggle({message: "Error on getting XTRF languages", isShow: true, type: "error"});
+            }
         }
     },
     computed: {
@@ -52,7 +66,10 @@ export default {
     components: {
         LabelVal,
         SelectSingle,
-        LanguagesSelect
+        SelectMulti
+    },
+    created() {
+        this.getXtrfLangs();
     }
 }
 </script>
