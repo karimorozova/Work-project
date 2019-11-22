@@ -2,11 +2,11 @@
 .navbar
     .navbar__block
         ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border-mobile': link.title === 'Privacy Policy'}")
+            li.navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border': link.title === 'Package Prices & Rewards Program'}")
                 a.navbar__link(:href='link.url') {{ link.title }}
-    .navbar__block
+    .navbar__block.navbar_margin-bottom-20
         ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Package Prices & Rewards Program'}")
+            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Contact Us'}")
                 a.navbar__link(:href='link.url') {{ link.title }}    
 </template>
 
@@ -18,14 +18,15 @@ export default {
                 firstRow:
                 [
                     {url: 'https://www.pangea.global', title: 'Home'},
-                    {url: 'https://www.pangea.global/careers', title: 'Careers'},
-                    {url: 'https://www.pangea.global/faq', title: 'FAQ'},
-                    {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
+                    {url: 'https://www.pangea.global/careers', title: 'Careers'},                    
+                    {url: 'https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf', title: 'Clients Terms & Conditions'},
+                    {url: 'https://www.pangea.global/package-prices-rewards-program/', title: 'Package Prices & Rewards Program'}
                 ],
                 secondRow: [
-                    {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'},
+                    {url: 'https://www.pangea.global/faq', title: 'FAQ'},
+                    {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'},
                     {url: 'https://www.pangea.global/blog', title: 'Blog'},
-                    {url: 'https://www.pangea.global/package-prices-rewards-program/', title: 'Package Prices & Rewards Program'}
+                    {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'}
                 ]
             }
         }
@@ -37,17 +38,27 @@ export default {
 .navbar {
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
     @media (max-width: 580px) {
         flex-direction: column;
         align-items: center;
         padding-top: 15px;
         padding-bottom: 15px;
     }
+    &__block {
+        max-width: 700px;
+    }
     &__list {
-        list-style: none;
-        padding-left: 0;
+        margin: 10px 0;
+        padding-left: 0; 
         @media (max-width: 450px) {
-            margin: 6px 0;
+            margin: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .no-border {
             border-right: none;
@@ -64,6 +75,7 @@ export default {
         text-shadow: 0 3px 5px black;
         border-right: 1.5px solid #fff;
         font-size: 12px;
+        margin: 10px 0;
     }
     &__link {
         text-decoration: none;
@@ -73,6 +85,12 @@ export default {
         margin: 9px;
         @media (max-width: 768px) {
             font-size: 13px;
+        }
+    }
+    &_margin-bottom-20 {
+        margin-bottom: 20px;
+        @media (max-width: 450px) {
+            margin-bottom: 0;
         }
     }
 }

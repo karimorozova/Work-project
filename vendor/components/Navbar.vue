@@ -23,9 +23,9 @@ export default {
                     {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
                 ],
                 secondRow: [
+                    {url: 'https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf', title: 'Clients Terms & Conditions'},
                     {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'},
-                    {url: 'https://www.pangea.global/blog', title: 'Blog'},
-                    // {url: 'https://www.pangea.global/rewards-program', title: 'Rewards Program'}
+                    {url: 'https://www.pangea.global/blog', title: 'Blog'}
                 ]
             }
         }
