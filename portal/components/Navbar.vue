@@ -1,12 +1,12 @@
 <template lang="pug">
 .navbar
     .navbar__block
-        ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border': link.title === 'Package Prices & Rewards Program'}")
+        .navbar__list
+            .navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border': link.title === 'Package Prices & Rewards Program'}")
                 a.navbar__link(:href='link.url') {{ link.title }}
     .navbar__block.navbar_margin-bottom-20
-        ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Contact Us'}")
+        .navbar__list
+            .navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Contact Us'}")
                 a.navbar__link(:href='link.url') {{ link.title }}    
 </template>
 
@@ -51,7 +51,7 @@ export default {
         max-width: 700px;
     }
     &__list {
-        margin: 10px 0;
+        margin-top: 10px;
         padding-left: 0; 
         @media (max-width: 450px) {
             margin: 0;
@@ -76,6 +76,9 @@ export default {
         border-right: 1.5px solid #fff;
         font-size: 12px;
         margin: 10px 0;
+        @media (max-width: 450px) {
+            margin: 5px 0;
+        }
     }
     &__link {
         text-decoration: none;
