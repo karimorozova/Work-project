@@ -21,6 +21,8 @@ const CancelReason = require('./cancelReason');
 const DiscountChart = require('./discountChart');
 const XtrfTier = require('./xtrfTier');
 const XtrfReportLang = require('./xtrfReportLang');
+const XtrfVendor = require('./xtrfVendor');
+const XtrfLqa = require('./xtrfLqa');
 
 const Models = {
     Languages,
@@ -45,7 +47,9 @@ const Models = {
     CancelReason,
     DiscountChart,
     XtrfTier,
-    XtrfReportLang
+    XtrfReportLang,
+    XtrfVendor,
+    XtrfLqa
 };
 
 module.exports = Models;

@@ -1,4 +1,6 @@
-const { XtrfTier, XtrfReportLang } = require("../models");
+const { XtrfTier, XtrfLqa, XtrfReportLang } = require("../models");
+
+//// Tier report /////
 
 async function getXtrfTierReport(filters) {
     const today = new Date();
@@ -86,4 +88,92 @@ function getSpecificTier(wordcount, clients) {
     return {tier, wordcount, clients};
 }
 
-module.exports = { getXtrfTierReport }
+//// Lqa report /////
+
+async function getXtrfLqaReport(filters) {
+    const filterQuery = getFilteringQuery(filters);
+    try {
+        let reports = await getXtrfTierReport({target: filterQuery.language});
+        reports = reports.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
+            .map(item => {
+                return {
+                    target: item.target,
+                    finance: item.financeTier.tier,
+                    game: item.gameTier.tier
+                }
+            });
+        const lqas = await getFilteredLqas(filterQuery);
+        let result = [];
+        for(let report of reports) {
+            let finance = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.Finance);
+            let gaming = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.iGaming);
+            if(finance.length || gaming.length) {
+                result.push({
+                    ...report,
+                    financeVendors: finance,
+                    gamingVendors: gaming
+                })
+            }
+        }
+        return result;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getXtrfLqaReport");
+    }
+}
+
+function getFilteringQuery(filters) {
+    let query = {};
+    query["name"] = filters.nameFilter ? {"$regex": new RegExp(`${filters.nameFilter}`, 'i')} : {$ne: null};
+    query["language"] = filters.targetFilter ? {$in: filters.targetFilter} : {$nin: []};
+    return query;
+}
+
+async function getFilteredLqas(query) {
+    try {
+        return await XtrfLqa.aggregate([
+            {
+                $lookup: 
+                {
+                    from: "xtrfvendors",
+                    localField: "vendor",
+                    foreignField: "_id",
+                    as: "vendor"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$vendor"
+                }
+            },
+            {
+                $match: {
+                    "vendor.name": query.name
+                }
+            },
+            {
+                $lookup: 
+                {
+                    from: "xtrfreportlangs",
+                    localField: "vendor.language",
+                    foreignField: "_id",
+                    as: "vendor.language"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$vendor.language"
+                }
+            },
+            {
+                $match: {
+                    "vendor.language.lang": query.language
+                }
+            }
+        ])
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getFilteredLqas");
+    }
+}
+module.exports = { getXtrfTierReport, getXtrfLqaReport }

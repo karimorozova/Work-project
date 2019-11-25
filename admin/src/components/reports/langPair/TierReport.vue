@@ -2,6 +2,7 @@
     .tier
         .tier__filters
             Filters(
+                :languages="languages"
                 :targetFilter="targetFilter"
                 @setTierFilter="setTierFilter"
                 @setTargetFilter="setTargetFilter"
@@ -47,6 +48,9 @@ import Filters from "./Filters";
 import { mapActions } from "vuex";
 
 export default {
+    props: {
+        languages: {type: Array, default: () => []}
+    },
     data() {
         return {
             fields: [

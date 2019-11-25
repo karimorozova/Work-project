@@ -1,3 +1,5 @@
+const { XtrfVendor, XtrfLqa, XtrfReportLang } = require('../models');
+
 function getFilteredJson(data) {
     let result = data.filter(item => item.target).reduce((acc, cur) => {
         const targetIndex = acc.findIndex(item => {
@@ -38,4 +40,22 @@ function updateWordcounts(oldData, newData) {
     return {[target]: result}
 }
 
-module.exports = { getFilteredJson }
+async function fillXtrfLqa(data) {
+    try {
+        for(let wordData of data) {
+            const { name, language, tqi, lqa1, lqa2, lqa3, providerType: type, ...wordcounts } = wordData;
+            let xtrfLang = await XtrfReportLang.findOne({lang: language});
+            if(!xtrfLang) {
+                xtrfLang = await XtrfReportLang.create({lang: language});
+            }
+            const steps = wordData.steps.split(",");
+            let vendor = await XtrfVendor.create({name, language: xtrfLang, tqi, lqa1, lqa2, lqa3, type, steps});
+            await XtrfLqa.create({vendor, wordcounts});
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in fillXtrfLqa")
+    }
+}
+
+module.exports = { getFilteredJson, fillXtrfLqa }

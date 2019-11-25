@@ -9,7 +9,7 @@
         )
 
     .reports__table
-        router-view
+        router-view(:languages="languages")
 </template>
 
 <script>
@@ -23,7 +23,8 @@ export default {
                 {title: "LQA", routeName: "lqa"}, 
                 {title: "Benchmark", routeName: "benchmark"}, 
             ],
-            currentIndex: -1
+            currentIndex: -1,
+            languages: []
         }
     },
     methods: {
@@ -31,6 +32,15 @@ export default {
             this.currentIndex = index;
             const { routeName } = this.sidebarLinks[index];
             this.$router.push({name: routeName});
+        },
+        async getXtrfLangs() {
+            try {
+                const result = await this.$http.get('/reportsapi/languages');
+                this.languages = result.body.map(item => item.lang);
+                this.languages.unshift("All");
+            } catch(err) {
+                this.alertToggle({message: "Error on getting XTRF languages", isShow: true, type: "error"});
+            }
         }
     },
     computed: {
@@ -41,6 +51,9 @@ export default {
     },
     components: {
         Sidebar
+    },
+    created() {
+        this.getXtrfLangs();
     }
 };
 </script>

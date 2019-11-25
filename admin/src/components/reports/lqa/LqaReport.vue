@@ -2,33 +2,45 @@
     .lqa
         .lqa__filters
             Filters(
+                :languages="languages"
                 :targetFilter="targetFilter"
                 @setNameFilter="setFilter"
                 @setTargetFilter="setTargetFilter"
             )
-        .lqa__table
-            Table(:reportData="reportData")
+        .lqa__language(v-for="report in reportData")
+            h3.lga__text Target Language: {{ report.target }}
+            .lqa__industry(v-if="report.financeVendors.length")
+                h4.lqa__text Industry: Finance,  Tier {{ report.finance }}
+                Table(:vendorsData="report.financeVendors" field="Finance")
+            .lqa__industry(v-if="report.gamingVendors.length")
+                h4.lqa__text Industry: iGaming,  Tier {{ report.game }}
+                Table(:vendorsData="report.gamingVendors" field="iGaming")
 </template>
 
 <script>
 import Filters from "./Filters";
 import Table from "./Table";
+import { mapActions } from "vuex";
 
 export default {
+    props: {
+        languages: {type: Array, default: () => []}
+    },
     data() {
         return {
             reportData: null,
             nameFilter: "",
-            targetFilter: [{symbol: "All"}]
+            targetFilter: ["All"]
         }
     },
     methods: {
+        ...mapActions(['alertToggle']),
         async getReport() {
             try {
-                const result = await this.$http.post("/reportsapi/tier-report" ,{ type: "lqa", filters: this.filters});
+                const result = await this.$http.post("/reportsapi/xtrf-lqa-report" ,{ type: "lqa", filters: this.filters});
                 this.reportData = result.body;
             } catch(err) {
-                console.log(err);
+                this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }
         },
         async setFilter({value}) {
@@ -36,23 +48,26 @@ export default {
             await this.getReport();
         },
         async setTargetFilter({lang}) {
-            if(lang.symbol !== 'All') {
-                this.targetFilter = this.targetFilter.filter(item => item.symbol !== 'All');
-                const position = this.targetFilterSymbols.indexOf(lang.symbol);
+            if(lang !== 'All') {
+                this.targetFilter = this.targetFilter.filter(item => item !== 'All');
+                const position = this.targetFilter.indexOf(lang);
                 if(position === -1) {
-                    return this.targetFilter.push(lang);
+                    this.targetFilter.push(lang);
+                    return await this.getReport();
                 }
                 this.targetFilter.splice(position, 1);
             }
-            this.targetFilter = !this.targetFilter.length || lang.symbol === 'All' ? [{symbol: "All"}] : this.targetFilter;
-        }
+            this.targetFilter = !this.targetFilter.length || lang === 'All' ? ["All"] : this.targetFilter;
+            await this.getReport();
+        },
     },
     computed: {
         filters() {
-            return {
-                nameFilter: this.nameFilter,
-                targets: this.targetFilterSymbols
+            let result = {nameFilter: this.nameFilter};
+            if(this.targetFilter[0] !== 'All') {
+                result.targetFilter = this.targetFilter;
             }
+            return result;
         },
         targetFilterSymbols() {
             return this.targetFilter.map(item => item.symbol);
@@ -70,9 +85,20 @@ export default {
 
 <style lang="scss" scoped>
 
+h3, h4 {
+    margin: 0;
+    padding: 0;
+}
+
 .lqa {
     box-sizing: border-box;
     padding: 40px;
+    &__text {
+        margin: 10px 0 5px;
+    }
+    &__language {
+        margin-top: 40px;
+    }
 }
 
 </style>

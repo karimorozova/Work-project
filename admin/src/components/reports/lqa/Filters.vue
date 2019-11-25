@@ -10,23 +10,27 @@
         .lqa-filters__item
             LabelVal(text="Target Language:" customClass="new-chart-label")
                 .lqa-filters__drop
-                    LanguagesSelect(
-                        :addAll="true"
-                        :selectedLangs="selectedLangs"
-                        @chosenLang="setTargetFilter"
+                    SelectMulti(
+                        placeholder="Select"
+                        :hasSearch="true"
+                        customClass="height-32"
+                        :options="languages"
+                        :selectedOptions="targetFilter"
+                        @chooseOptions="setTargetFilter"
                     )
 </template>
 
 <script>
 import LabelVal from "@/components/LabelVal";
-import LanguagesSelect from "@/components/LanguagesSelect";
+import SelectMulti from "@/components/SelectMulti";
 import IndustrySelect from "@/components/IndustrySelect";
 
 export default {
     props: {
         nameFilter: {type: String},
         industryFilter: {type: Array, default: () => []},
-        targetFilter: {type: Array, default: () => []}
+        targetFilter: {type: Array, default: () => []},
+        languages: {type: Array, default: () => []}
     },
     data() {
         return {
@@ -44,9 +48,9 @@ export default {
                 vm.$emit("setNameFilter", { value })
             }
         },
-        setTargetFilter({lang}) {
-            this.$emit("setTargetFilter", { lang });
-        }
+        setTargetFilter({option}) {
+            this.$emit("setTargetFilter", { lang: option });
+        },
     },
     computed: {
         selectedLangs() {
@@ -56,7 +60,7 @@ export default {
     components: {
         LabelVal,
         IndustrySelect,
-        LanguagesSelect
+        SelectMulti
     }
 }
 </script>
