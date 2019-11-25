@@ -6,7 +6,12 @@
         .lqa-filters__item
             LabelVal(text="Industry:" customClass="new-chart-label")
                 .lqa-filters__drop
-                    IndustrySelect
+                    SelectSingle(
+                        customClass="height-32"
+                        :options="industries"
+                        :selectedOption="industryFilter"
+                        @chooseOption="setIndustryFilter"
+                    )
         .lqa-filters__item
             LabelVal(text="Target Language:" customClass="new-chart-label")
                 .lqa-filters__drop
@@ -23,19 +28,20 @@
 <script>
 import LabelVal from "@/components/LabelVal";
 import SelectMulti from "@/components/SelectMulti";
-import IndustrySelect from "@/components/IndustrySelect";
+import SelectSingle from "@/components/SelectSingle";
 
 export default {
     props: {
         nameFilter: {type: String},
-        industryFilter: {type: Array, default: () => []},
+        industryFilter: {type: String},
         targetFilter: {type: Array, default: () => []},
         languages: {type: Array, default: () => []}
     },
     data() {
         return {
             typingTimer: "",
-            doneTypingInterval: 800
+            doneTypingInterval: 800,
+            industries: ["All", "Finance", "iGaming"]
         }
     },
     methods: {
@@ -51,6 +57,9 @@ export default {
         setTargetFilter({option}) {
             this.$emit("setTargetFilter", { lang: option });
         },
+        setIndustryFilter({option}) {
+            this.$emit("setIndustryFilter", { industry: option})
+        }
     },
     computed: {
         selectedLangs() {
@@ -59,7 +68,7 @@ export default {
     },
     components: {
         LabelVal,
-        IndustrySelect,
+        SelectSingle,
         SelectMulti
     }
 }

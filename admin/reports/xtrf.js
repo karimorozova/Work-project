@@ -108,17 +108,38 @@ async function getXtrfLqaReport(filters) {
             let finance = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.Finance);
             let gaming = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.iGaming);
             if(finance.length || gaming.length) {
-                result.push({
-                    ...report,
-                    financeVendors: finance,
-                    gamingVendors: gaming
-                })
+                if(!filters.industryFilter) {
+                    result.push({
+                        ...report,
+                        financeVendors: finance,
+                        gamingVendors: gaming
+                    })
+                } else {
+                    const filteredReport = getFilteredReport({report, finance, gaming, filters});
+                    result = filteredReport ? [...result, {...filteredReport}] :  result;
+                }
             }
         }
         return result;
     } catch(err) {
         console.log(err);
         console.log("Error in getXtrfLqaReport");
+    }
+}
+
+function getFilteredReport({report, finance, gaming, filters}) {
+    if(filters.industryFilter === 'Finance' && finance.length) {
+        return {
+            ...report,
+            financeVendors: finance,
+            gamingVendors: []
+        }
+    } else if(filters.industryFilter === 'iGaming' && gaming.length) {
+        return {
+            ...report,
+            financeVendors: [],
+            gamingVendors: gaming
+        }
     }
 }
 

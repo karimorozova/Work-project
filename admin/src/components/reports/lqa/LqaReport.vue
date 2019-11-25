@@ -4,8 +4,10 @@
             Filters(
                 :languages="languages"
                 :targetFilter="targetFilter"
+                :industryFilter="industryFilter"
                 @setNameFilter="setFilter"
                 @setTargetFilter="setTargetFilter"
+                @setIndustryFilter="setIndustryFilter"
             )
         .lqa__language(v-for="report in reportData")
             h3.lga__text Target Language: {{ report.target }}
@@ -30,7 +32,8 @@ export default {
         return {
             reportData: null,
             nameFilter: "",
-            targetFilter: ["All"]
+            targetFilter: ["All"],
+            industryFilter: "All"
         }
     },
     methods: {
@@ -45,6 +48,11 @@ export default {
         },
         async setFilter({value}) {
             this.nameFilter = value;
+            await this.getReport();
+        },
+        async setIndustryFilter({industry}) {
+            console.log(industry);
+            this.industryFilter = industry;
             await this.getReport();
         },
         async setTargetFilter({lang}) {
@@ -66,6 +74,9 @@ export default {
             let result = {nameFilter: this.nameFilter};
             if(this.targetFilter[0] !== 'All') {
                 result.targetFilter = this.targetFilter;
+            }
+            if(this.industryFilter !== 'All') {
+                result.industryFilter = this.industryFilter;
             }
             return result;
         },
