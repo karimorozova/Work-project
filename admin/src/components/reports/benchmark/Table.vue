@@ -1,17 +1,17 @@
 <template lang="pug">
-    .lqa-table(v-if="vendorsData")
+    .benchmark-table(v-if="vendorsData")
         DataTable(
             :fields="fields"
             :tableData="vendorsData"
-            :bodyClass="vendorsData.length < 5 ? 'tbody_visible-overflow' : ''"
-            :tableheadRowClass="vendorsData.length < 5 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="vendorsData.length < 7 ? 'tbody_visible-overflow' : ''"
+            :tableheadRowClass="vendorsData.length < 7 ? 'tbody_visible-overflow' : ''"
         )
-            .lqa-table__header(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
-            .lqa-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}
-            .lqa-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
-            .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
-            .lqa-table__header(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrice }}
-            .lqa-table__header(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrice)") {{ getMargin(row.vendor.basicPrice) }}
+            .benchmark-table__header(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
+            .benchmark-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}
+            .benchmark-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
+            .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
+            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrice }}
+            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrice)") {{ getMargin(row.vendor.basicPrice) }}
 </template>
 
 <script>
@@ -36,7 +36,7 @@ export default {
             return (this.benchmarkPrice - vendorPrice).toFixed(2);
         },
         getMarginClass(vendorPrice) {
-            return this.getMargin(vendorPrice) < 0 ? 'lqa-table_red' : 'lqa-table_green';
+            return this.getMargin(vendorPrice) < 0 ? 'benchmark-table_red' : 'benchmark-table_green';
         }
     },
     components: {
@@ -47,7 +47,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.lqa-table {
+.benchmark-table {
     width: 30%;
     max-width: 730px;
     margin: 10px 0 20px;
