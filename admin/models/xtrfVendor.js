@@ -10,6 +10,11 @@ const XtrfVendorSchema = new mongoose.Schema({
     language: { 
         type : Schema.Types.ObjectId, ref: 'XtrfReportLang',
     },
+    basicPrice: {
+        type : String, 
+        default : '', 
+        trim : true
+    },
     tqi: {
         type : String, 
         default : '', 
