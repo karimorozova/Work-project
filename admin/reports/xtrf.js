@@ -93,7 +93,11 @@ function getSpecificTier(wordcount, clients) {
 async function getXtrfLqaReport(filters) {
     const filterQuery = getFilteringQuery(filters);
     try {
-        let reports = await getXtrfTierReport({target: filterQuery.language});
+        let reportsFilter = {target: filterQuery.language};
+        if(filters.tierFilter) {
+            reportsFilter.tierFilter = filters.tierFilter;
+        }
+        let reports = await getXtrfTierReport(reportsFilter);
         reports = reports.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
             .map(item => {
                 return {
@@ -103,31 +107,43 @@ async function getXtrfLqaReport(filters) {
                 }
             });
         const lqas = await getFilteredLqas(filterQuery);
-        let result = [];
-        for(let report of reports) {
-            let finance = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.Finance);
-            let gaming = lqas.filter(item => item.vendor.language.lang === report.target && item.wordcounts.iGaming);
-            if(finance.length || gaming.length) {
-                if(!filters.industryFilter) {
-                    result.push({
-                        ...report,
-                        financeVendors: finance,
-                        gamingVendors: gaming
-                    })
-                } else {
-                    const filteredReport = getFilteredReport({report, finance, gaming, filters});
-                    result = filteredReport ? [...result, {...filteredReport}] :  result;
-                }
-            }
-        }
-        return result;
+        return getFilteredLqaReports({reports, lqas, filters});
     } catch(err) {
         console.log(err);
         console.log("Error in getXtrfLqaReport");
     }
 }
 
-function getFilteredReport({report, finance, gaming, filters}) {
+function getFilteredLqaReports({reports, lqas, filters}) {
+    let result = [];
+    for(let report of reports) {
+        let finance = lqas.filter(item => {
+            let isFit = item.vendor.language.lang === report.target && item.wordcounts.Finance; 
+            isFit = isFit && filters.tierFilter ? report.finance === filters.tierFilter : isFit;
+            return isFit;
+        });
+        let gaming = lqas.filter(item => {
+            let isFit = item.vendor.language.lang === report.target && item.wordcounts.iGaming;
+            isFit = isFit && filters.tierFilter ? report.game === filters.tierFilter : isFit;
+            return isFit;
+        });
+        if(finance.length || gaming.length) {
+            if(!filters.industryFilter) {
+                result.push({
+                    ...report,
+                    financeVendors: finance,
+                    gamingVendors: gaming
+                })
+            } else {
+                let filteredReport = getFilteredByIndustry({report, finance, gaming, filters});
+                result = filteredReport ? [...result, {...filteredReport}] :  result;
+            }
+        }
+    }
+    return result;
+}
+
+function getFilteredByIndustry({report, finance, gaming, filters}) {
     if(filters.industryFilter === 'Finance' && finance.length) {
         return {
             ...report,
@@ -141,6 +157,10 @@ function getFilteredReport({report, finance, gaming, filters}) {
             gamingVendors: gaming
         }
     }
+}
+
+function getFilteredByTier(report, tierFilter) {
+
 }
 
 function getFilteringQuery(filters) {

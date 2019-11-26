@@ -2,8 +2,10 @@
     .tier
         .tier__filters
             Filters(
+                :isLqa="false"
                 :languages="languages"
                 :targetFilter="targetFilter"
+                :tierFilter="tierFilter"
                 @setTierFilter="setTierFilter"
                 @setTargetFilter="setTargetFilter"
             )
@@ -44,7 +46,7 @@
 
 <script>
 import DataTable from "@/components/DataTable";
-import Filters from "./Filters";
+import Filters from "../Filters";
 import { mapActions } from "vuex";
 
 export default {
@@ -92,8 +94,8 @@ export default {
                 this.reportData = this.reportData.sort((a,b) => b[tierProp].tier - a[tierProp].tier || a[tierProp].wordcount/6 - b[tierProp].wordcount/6);
             }
         },
-        async setTierFilter({filter}) {
-            this.tierFilter = filter;
+        async setTierFilter({value}) {
+            this.tierFilter = value;
             await this.getReport();
         },
         async setTargetFilter({lang}) {

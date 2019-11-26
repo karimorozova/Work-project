@@ -5,9 +5,12 @@
                 :languages="languages"
                 :targetFilter="targetFilter"
                 :industryFilter="industryFilter"
-                @setNameFilter="setFilter"
+                :tierFilter="tierFilter"
+                :nameFilter="nameFilter"
+                @setNameFilter="(e) => setFilter(e, 'nameFilter')"
                 @setTargetFilter="setTargetFilter"
-                @setIndustryFilter="setIndustryFilter"
+                @setIndustryFilter="(e) => setFilter(e, 'industryFilter')"
+                @setTierFilter="(e) => setFilter(e, 'tierFilter')"
             )
         .lqa__language(v-for="report in reportData")
             h3.lga__text Target Language: {{ report.target }}
@@ -20,7 +23,7 @@
 </template>
 
 <script>
-import Filters from "./Filters";
+import Filters from "../Filters";
 import Table from "./Table";
 import { mapActions } from "vuex";
 
@@ -33,7 +36,8 @@ export default {
             reportData: null,
             nameFilter: "",
             targetFilter: ["All"],
-            industryFilter: "All"
+            industryFilter: "All",
+            tierFilter: "All"
         }
     },
     methods: {
@@ -46,13 +50,16 @@ export default {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }
         },
-        async setFilter({value}) {
+        async setFilter({value}, prop) {
             this.nameFilter = value;
             await this.getReport();
         },
-        async setIndustryFilter({industry}) {
-            console.log(industry);
-            this.industryFilter = industry;
+        async setFilter({value}, prop) {
+            this[prop] = value;
+            await this.getReport();
+        },
+        async setFilter({value}, prop) {
+            this[prop] = value;
             await this.getReport();
         },
         async setTargetFilter({lang}) {
@@ -77,6 +84,9 @@ export default {
             }
             if(this.industryFilter !== 'All') {
                 result.industryFilter = this.industryFilter;
+            }
+            if(this.tierFilter !== 'All') {
+                result.tierFilter = +this.tierFilter;
             }
             return result;
         },
