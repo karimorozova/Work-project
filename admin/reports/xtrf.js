@@ -1,4 +1,4 @@
-const { XtrfTier, XtrfLqa, XtrfReportLang } = require("../models");
+const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice } = require("../models");
 
 //// Tier report /////
 
@@ -7,7 +7,7 @@ async function getXtrfTierReport(filters) {
     let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
     start.setHours(0, 0, 0, 0);
     try {
-        const filterQuery = filters.targetFilter ? {lang: {$in: filters.targetFilter}} : {};
+        const filterQuery = filters.targetFilter ? {lang: {$in: filters.targetFilter, $ne: 'English [grouped]'}} : {lang: {$ne: 'English [grouped]'}};
         const languages = await XtrfReportLang.find(filterQuery);
         let reports = await XtrfTier.find({start: {$gte: start}});
         let result = getParsedReport(reports, languages);
@@ -107,40 +107,48 @@ async function getXtrfLqaReport(filters) {
                 }
             });
         const lqas = await getFilteredLqas(filterQuery);
-        return getFilteredLqaReports({reports, lqas, filters});
+        return await getFilteredLqaReports({reports, lqas, filters});
     } catch(err) {
         console.log(err);
         console.log("Error in getXtrfLqaReport");
     }
 }
 
-function getFilteredLqaReports({reports, lqas, filters}) {
+async function getFilteredLqaReports({reports, lqas, filters}) {
     let result = [];
-    for(let report of reports) {
-        let finance = lqas.filter(item => {
-            let isFit = item.vendor.language.lang === report.target && item.wordcounts.Finance; 
-            isFit = isFit && filters.tierFilter ? report.finance === filters.tierFilter : isFit;
-            return isFit;
-        });
-        let gaming = lqas.filter(item => {
-            let isFit = item.vendor.language.lang === report.target && item.wordcounts.iGaming;
-            isFit = isFit && filters.tierFilter ? report.game === filters.tierFilter : isFit;
-            return isFit;
-        });
-        if(finance.length || gaming.length) {
-            if(!filters.industryFilter) {
-                result.push({
-                    ...report,
-                    financeVendors: finance,
-                    gamingVendors: gaming
-                })
-            } else {
-                let filteredReport = getFilteredByIndustry({report, finance, gaming, filters});
-                result = filteredReport ? [...result, {...filteredReport}] :  result;
+    try {
+        for(let report of reports) {
+            let finance = getIndustriesLqas({lqas, report, reportProp: "finance", filters, prop: "Finance"});
+            let gaming = getIndustriesLqas({lqas, report, reportProp: "game", filters, prop: "iGaming"});
+            if(finance.length || gaming.length) {
+                let price = await getLanguagePrices(report.target);
+                const prices = price.length ? price[0].prices : null;
+                if(!filters.industryFilter) {
+                    result.push({
+                        ...report,
+                        prices,
+                        financeVendors: finance,
+                        gamingVendors: gaming
+                    })
+                } else {
+                    let filteredReport = getFilteredByIndustry({report, finance, gaming, filters});
+                    result = filteredReport ? [...result, {...filteredReport, prices}] :  result;
+                }
             }
         }
+        return result;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getFilteredLqaReports");
     }
-    return result;
+}
+
+function getIndustriesLqas({lqas, report, reportProp, filters, prop}) {
+    return lqas.filter(item => {
+        let isFit = item.vendor.language.lang === report.target && item.wordcounts[prop]; 
+        isFit = isFit && filters.tierFilter ? report[reportProp] === filters.tierFilter : isFit;
+        return isFit;
+    });
 }
 
 function getFilteredByIndustry({report, finance, gaming, filters}) {
@@ -159,14 +167,10 @@ function getFilteredByIndustry({report, finance, gaming, filters}) {
     }
 }
 
-function getFilteredByTier(report, tierFilter) {
-
-}
-
 function getFilteringQuery(filters) {
     let query = {};
     query["name"] = filters.nameFilter ? {"$regex": new RegExp(`${filters.nameFilter}`, 'i')} : {$ne: null};
-    query["language"] = filters.targetFilter ? {$in: filters.targetFilter} : {$nin: []};
+    query["language"] = filters.targetFilter ? {$in: filters.targetFilter, $ne: 'English [grouped]'} : {$ne: 'English [grouped]'};
     return query;
 }
 
@@ -217,4 +221,42 @@ async function getFilteredLqas(query) {
         console.log("Error in getFilteredLqas");
     }
 }
-module.exports = { getXtrfTierReport, getXtrfLqaReport }
+
+async function getLanguagePrices(target) {
+    try {
+        return await XtrfPrice.aggregate([
+            {
+                $lookup: 
+                    {
+                        from: "xtrfreportlangs",
+                        localField: "language",
+                        foreignField: "_id",
+                        as: "language"
+                    }
+            },
+            {
+                $unwind: {
+                    path: "$language"
+                }
+            },
+            {
+                $match: {
+                    "language.lang": target
+                }
+            }
+        ])
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getLanguagePrices");
+    }
+}
+async function getXtrfBenchmarkReport(filters) {
+    try {
+
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getXtrfBenchmarkReport");
+    }
+}
+
+module.exports = { getXtrfTierReport, getXtrfLqaReport, getXtrfBenchmarkReport }

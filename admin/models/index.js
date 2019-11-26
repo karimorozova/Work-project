@@ -23,6 +23,7 @@ const XtrfTier = require('./xtrfTier');
 const XtrfReportLang = require('./xtrfReportLang');
 const XtrfVendor = require('./xtrfVendor');
 const XtrfLqa = require('./xtrfLqa');
+const XtrfPrice = require('./xtrfPrice');
 
 const Models = {
     Languages,
@@ -49,7 +50,8 @@ const Models = {
     XtrfTier,
     XtrfReportLang,
     XtrfVendor,
-    XtrfLqa
+    XtrfLqa,
+    XtrfPrice
 };
 
 module.exports = Models;

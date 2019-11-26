@@ -1,6 +1,6 @@
 <template lang="pug">
     .xtrf
-        .xtrf-tier TIER
+        .xtrf__item TIER
             .xtrf__upload
                 input.xtrf__input(type="file" @change="uploadFiles" multiple)
             .xtrf__dates
@@ -11,12 +11,18 @@
             .xtrf__industries
                 .xtrf__text(v-for="indus in industries" @click="setIndustry(indus)" :class="{'xtrf_active': indus === industry}") {{ indus }}
             Button(value="Save Tier" @clicked="saveTier")
-        .xtrf-lqa LQA
+        .xtrf__item LQA
             .xtrf__upload
                 input.xtrf__input(type="file" @change="uploadFiles")
             .xtrf__dates
                 input.xtrf__date(type="date" v-model="start")
             Button(value="Save Lqa" @clicked="saveLqa")
+        .xtrf__item Benchmark
+            .xtrf__upload
+                input.xtrf__input(type="file" @change="uploadFiles")
+            .xtrf__dates
+                input.xtrf__date(type="date" v-model="start")
+            Button(value="Save Prices" @clicked="savePrices")
 </template>
 
 <script>
@@ -73,6 +79,18 @@ export default {
             } catch(err) {
                 console.log(err);
             }
+        },
+        async savePrices() {
+            let formData = new FormData();
+            for(let file of this.files) {
+                formData.append("reportFiles", file);
+            } 
+            try {
+                const result = await this.$http.post("/reportsapi/xtrf-prices", formData);
+                console.log(result);
+            } catch(err) {
+                console.log(err);
+            }
         }
     },
     components: {
@@ -110,8 +128,8 @@ export default {
         background-color: green;
         color: white;
     }
-    &-lqa {
-        margin-top: 40px;
+    &__item {
+        margin-bottom: 40px;
     }
 }
 

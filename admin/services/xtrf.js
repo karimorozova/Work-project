@@ -1,4 +1,4 @@
-const { XtrfVendor, XtrfLqa, XtrfReportLang } = require('../models');
+const { XtrfVendor, XtrfLqa, XtrfReportLang, XtrfPrice } = require('../models');
 
 function getFilteredJson(data) {
     let result = data.filter(item => item.target).reduce((acc, cur) => {
@@ -58,4 +58,23 @@ async function fillXtrfLqa(data) {
     }
 }
 
-module.exports = { getFilteredJson, fillXtrfLqa }
+async function fillXtrfPrices(data) {
+    try {
+        for(let priceData of data) {
+            let { language, ...prices } = priceData;
+            let xtrfLang = await XtrfReportLang.findOne({lang: language});
+            if(!xtrfLang) {
+                xtrfLang = await XtrfReportLang.create({lang: language});
+            }
+            prices = Object.keys(prices).reduce((acc, cur) => {
+                const clientPrice = (prices[cur]/2).toFixed(2);
+                return {...acc, [cur]: +clientPrice}
+            }, {})
+            await XtrfPrice.create({language: xtrfLang, prices})
+        }
+    } catch(err) {
+
+    }
+}
+
+module.exports = { getFilteredJson, fillXtrfLqa, fillXtrfPrices }

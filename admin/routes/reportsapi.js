@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { getReport } = require("../reports/get");
-const { getXtrfTierReport, getXtrfLqaReport } = require("../reports/xtrf");
+const { getXtrfTierReport, getXtrfLqaReport, getXtrfBenchmarkReport } = require("../reports/xtrf");
 const  { upload } = require("../utils");
-const { getFilteredJson, fillXtrfLqa } = require("../services");
+const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
@@ -87,4 +87,37 @@ router.post('/xtrf-lqa-report', async (req, res) => {
         res.status(500).send("Error on getting reports");
     }
 })
+
+router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
+    const { reportFiles } = req.files; 
+    try {
+        convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
+            if(err) {
+                res.send(err);
+            }
+            try {
+                await fillXtrfPrices(data);
+            } catch(err) {
+                console.log(err);
+                res.status(500).send("Error on filling xtrf prices");
+            }
+            res.send(data);
+        });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting reports");
+    }
+})
+
+router.post('/xtrf-benchmark-report', async (req, res) => {
+    const { filters } = req.body; 
+    try {
+        const reports = await getXtrfBenchmarkReport(filters);
+        res.send(reports);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting reports");
+    }
+})
+
 module.exports = router;
