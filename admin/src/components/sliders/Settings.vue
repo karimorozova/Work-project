@@ -22,7 +22,7 @@ export default {
       openQuotes: true,
       sidebarLinks: [
           {title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, 
-          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}
+          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}, {title: "LQA"}
           ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
@@ -53,6 +53,9 @@ export default {
           break;
         case "Cancellation Reasons":
           this.$router.push("/settings/cancel-reasons");
+          break;
+        case "LQA":
+          this.$router.push("/settings/tiers-lqas");
           break;
         case "Discount Chart":
           this.$router.push("/settings/discount-chart");

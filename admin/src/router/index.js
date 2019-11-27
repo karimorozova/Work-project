@@ -25,6 +25,7 @@ import DiscountChart from '@/components/Table/DiscountChart'
 import ChartMatrix from '@/components/Table/ChartMatrix'
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
+import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
 import ClientDetails from '@/components/clients/ClientDetails'
 import Allclients from '@/components/clients/Allclients'
@@ -171,6 +172,11 @@ const router = new Router({
                             path: 'cancel-reasons',
                             name: 'cancel-reasons',
                             component: CancelReasons
+                        },
+                        {
+                            path: 'tiers-lqas',
+                            name: 'tiers-lqas',
+                            component: TierLqas
                         },
                         {
                             path: 'rates',
