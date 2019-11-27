@@ -32,7 +32,7 @@ const vendorMail = function(vendor) {
       secure: false, // upgrade later with STARTTLS
       auth: {
         user: 'translation@pangea.global', //2a629a8646758c2140a8aced91f03dcb
-        pass: '@Png122019!!' //fc72170d536b40480711bfad6ff1a8c1
+        pass: '@Png122019!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
     var msg = `<li>Hello dear ${vendor.firstName}</li>`;

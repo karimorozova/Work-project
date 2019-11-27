@@ -6,7 +6,7 @@ const mailTransporter = nodemailer.createTransport({
     secure: false, 
     auth: {
       user: 'translation@pangea.global',
-      pass: '@Png122019!!'
+      pass: '@Png122019!'
     }
 });
 
