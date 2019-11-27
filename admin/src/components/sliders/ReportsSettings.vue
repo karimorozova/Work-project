@@ -21,6 +21,7 @@ export default {
             sidebarLinks: [
                 {title: "Language Tier", routeName: "lang-pair-tier"}, 
                 {title: "LQA Status", routeName: "lqa"}, 
+                {title: "Upcoming LQAs", routeName: "upcoming-lqa"}, 
                 {title: "Vendor Cost Benchmark", routeName: "benchmark"}, 
             ],
             currentIndex: -1,

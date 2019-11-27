@@ -1,4 +1,4 @@
-const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice } = require("../models");
+const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice, TierLqa } = require("../models");
 
 //// Tier report /////
 
@@ -117,9 +117,10 @@ async function getXtrfLqaReport(filters) {
 async function getFilteredLqaReports({reports, lqas, filters}) {
     let result = [];
     try {
+        const tierLqas = await TierLqa.find();
         for(let report of reports) {
-            let finance = getIndustriesLqas({lqas, report, reportProp: "finance", filters, prop: "Finance"});
-            let gaming = getIndustriesLqas({lqas, report, reportProp: "game", filters, prop: "iGaming"});
+            let finance = getIndustriesLqas({lqas, tierLqas, report, reportProp: "finance", filters, prop: "Finance"});
+            let gaming = getIndustriesLqas({lqas, tierLqas, report, reportProp: "game", filters, prop: "iGaming"});
             if(finance.length || gaming.length) {
                 let price = await getLanguagePrices(report.target);
                 const prices = price.length ? price[0].prices : null;
@@ -143,12 +144,30 @@ async function getFilteredLqaReports({reports, lqas, filters}) {
     }
 }
 
-function getIndustriesLqas({lqas, report, reportProp, filters, prop}) {
-    return lqas.filter(item => {
+function getIndustriesLqas({lqas, tierLqas, report, reportProp, filters, prop}) {
+    const tierLqaWords = tierLqas.find(item => item.category == report[reportProp]);
+    const withLqaVendors = lqas.map(item => {
+        const isLqa1 = +item.wordcounts[prop] >= +tierLqaWords.lqa1 && !item.vendor.lqa1;
+        const isLqa2 = +item.wordcounts[prop] >= +tierLqaWords.lqa2 && !isLqa1 && !item.vendor.lqa2;
+        const isLqa3 = +item.wordcounts[prop] >= +tierLqaWords.lqa3 && !isLqa1 && !isLqa2 && !item.vendor.lqa3;
+        return {
+            ...item,
+            tier: report[reportProp],
+            industry: prop,
+            isLqa1,
+            isLqa2,
+            isLqa3
+        }
+    })
+    return withLqaVendors.filter(item => {
         let isFit = item.vendor.language.lang === report.target && item.wordcounts[prop]; 
         isFit = isFit && filters.tierFilter ? report[reportProp] === filters.tierFilter : isFit;
+        if(isFit) {
+            const lqaProp = item[`isLqa${filters.lqaFilter}`];
+            isFit = filters.lqaFilter ? lqaProp : isFit;
+        }
         return isFit;
-    });
+    });    
 }
 
 function getFilteredByIndustry({report, finance, gaming, filters}) {

@@ -53,6 +53,7 @@ import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
+import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 import Xtrf from '@/components/reports/Xtrf'
 import { store } from '../vuex/store'
 
@@ -379,6 +380,11 @@ const router = new Router({
                             name: 'lqa',
                             component: LqaReport,
                             props: true
+                        },
+                        {
+                            path: 'upcoming-lqa',
+                            name: 'upcoming-lqa',
+                            component: LqaVendors
                         },
                         {
                             path: 'benchmark',
