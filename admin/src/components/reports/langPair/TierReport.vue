@@ -35,13 +35,13 @@
                 .tier__data(slot="target" slot-scope="{ row }") {{ row.target }}
                 template(slot="all" slot-scope="{ row, index }")
                     .tier__data(v-if="activeIndex !== index") Tier {{ row.allTier.tier }}
-                    .tier__data.tier_orange(v-else) {{ getAverages(row.allTier) }}
+                    .tier__data.tier_orange(v-else) Clients - {{ row.allTier.clients }}; &nbsp; &nbsp; Words - {{ row.allTier.wordcount }}
                 template(slot="fin" slot-scope="{ row, index }")
                     .tier__data(v-if="activeIndex !== index") Tier {{ row.financeTier.tier }}
-                    .tier__data.tier_orange(v-else) {{ getAverages(row.financeTier) }}
+                    .tier__data.tier_orange(v-else) Clients - {{ row.financeTier.clients }}; &nbsp; &nbsp; Words - {{ row.financeTier.wordcount }}
                 template(slot="game" slot-scope="{ row, index }")
                     .tier__data(v-if="activeIndex !== index") Tier {{ row.gameTier.tier }}
-                    .tier__data.tier_orange(v-else) {{ getAverages(row.gameTier) }}
+                    .tier__data.tier_orange(v-else) Clients - {{ row.gameTier.clients }}; &nbsp; &nbsp; Words - {{ row.gameTier.wordcount }}
 </template>
 
 <script>
@@ -72,10 +72,6 @@ export default {
     },
     methods: {
         ...mapActions(['alertToggle']),
-        getAverages(tier) {
-            return `Clients - ${(tier.clients/6).toFixed(1)};   Words - ${Math.round(tier.wordcount/6)}`;
-            
-        },
         async getReport() {
             this.activeIndex = -1;
             try {

@@ -53,6 +53,8 @@ function getTier(lang, reports, industry) {
         totalWords += wordcount;
         totalClients += clients;
     }
+    totalWords = Math.round(totalWords/6);
+    totalClients = +(totalClients/6).toFixed(1);
     return industry === 'All' ? getAllTier(totalWords, totalClients) : getSpecificTier(totalWords, totalClients);
 }
 
@@ -70,8 +72,7 @@ function getAllTier(wordcount, clients) {
     let tier = 2;
     if((wordcount > 55000 && clients > 9) || wordcount > 100000) {
         tier = 1;
-    }
-    if(wordcount < 5000 || (wordcount < 10000 && clients < 5))  {
+    } else if(wordcount < 5000 || (wordcount < 10000 && clients < 5))  {
         tier = 3;
     }
     return {tier, wordcount, clients};
@@ -81,8 +82,7 @@ function getSpecificTier(wordcount, clients) {
     let tier = 2;
     if((wordcount > 30000 && clients > 4) || wordcount > 60000) {
         tier = 1;
-    }
-    if(wordcount < 2500 || (wordcount < 5000 && clients < 3))  {
+    } else if(wordcount < 2500 || (wordcount < 5000 && clients < 3))  {
         tier = 3;
     }
     return {tier, wordcount, clients};
@@ -250,13 +250,5 @@ async function getLanguagePrices(target) {
         console.log("Error in getLanguagePrices");
     }
 }
-async function getXtrfBenchmarkReport(filters) {
-    try {
 
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getXtrfBenchmarkReport");
-    }
-}
-
-module.exports = { getXtrfTierReport, getXtrfLqaReport, getXtrfBenchmarkReport }
+module.exports = { getXtrfTierReport, getXtrfLqaReport }

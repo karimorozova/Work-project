@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { getReport } = require("../reports/get");
-const { getXtrfTierReport, getXtrfLqaReport, getXtrfBenchmarkReport } = require("../reports/xtrf");
+const { getXtrfTierReport, getXtrfLqaReport } = require("../reports/xtrf");
 const  { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang } = require("../models");
@@ -103,17 +103,6 @@ router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req
             }
             res.send(data);
         });
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting reports");
-    }
-})
-
-router.post('/xtrf-benchmark-report', async (req, res) => {
-    const { filters } = req.body; 
-    try {
-        const reports = await getXtrfBenchmarkReport(filters);
-        res.send(reports);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting reports");
