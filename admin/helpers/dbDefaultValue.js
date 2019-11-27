@@ -419,6 +419,12 @@ const cancelReasonsDefault = [
     {reason: "Reason 1"}, {reason: "Reason 2"}, {reason: "Reason 3"}
 ]
 
+const tierLqasDefault = [
+    {category: "1", lqa1: "10000", lqa2: "50000", lqa3: "100000"},
+    {category: "2", lqa1: "5000", lqa2: "25000", lqa3: "50000"},
+    {category: "3", lqa1: "1000", lqa2: "5000", lqa3: "10000"}
+]
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
@@ -436,7 +442,8 @@ const defaultValue = {
     emptyMetrics,
     instructionsDefault,
     cancelReasonsDefault,
-    discountChartsDefault
+    discountChartsDefault,
+    tierLqasDefault
 };
 
 module.exports = defaultValue;

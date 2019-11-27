@@ -15,7 +15,8 @@ const {
   Vendors,
   Instruction,
   CancelReason,
-  DiscountChart
+  DiscountChart,
+  TierLqa
 } = require('../models');
 
 const {
@@ -34,8 +35,21 @@ const {
   vendorsDefault,
   instructionsDefault,
   cancelReasonsDefault,
-  discountChartsDefault
+  discountChartsDefault,
+  tierLqasDefault
 } = require('./dbDefaultValue');
+
+async function fillTierLqa() {
+    try {
+        const tierLqas = await TierLqa.find();
+        if(!tierLqas.length) {
+            await TierLqa.create(tierLqasDefault);
+        }
+    } catch(err) {
+        console.log("Error on filling default Tier Lqas");
+        console.log(err);
+    }
+}
 
 async function fillPackages() {
   try {
@@ -460,6 +474,7 @@ async function fillPricelist() {
 }
 
 async function checkCollections() {
+    await fillTierLqa();
     await fillPackages();
     await fillInstructions();
     await fillCancelReasons();
