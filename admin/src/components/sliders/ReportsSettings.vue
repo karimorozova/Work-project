@@ -19,9 +19,9 @@ export default {
     data() {
         return {
             sidebarLinks: [
-                {title: "Lang-pair TPI", routeName: "lang-pair-tier"}, 
-                {title: "LQA", routeName: "lqa"}, 
-                {title: "Benchmark", routeName: "benchmark"}, 
+                {title: "Language Tier", routeName: "lang-pair-tier"}, 
+                {title: "LQA Status", routeName: "lqa"}, 
+                {title: "Vendor Cost Benchmark", routeName: "benchmark"}, 
             ],
             currentIndex: -1,
             languages: []

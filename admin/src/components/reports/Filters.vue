@@ -1,7 +1,7 @@
 <template lang="pug">
     .report-filters
         .report-filters__row(:class="{'report-filters_spaced': isLqa}")
-            .report-filters__item(:class="{'report-filters_right-margin-80': !isLqa}")
+            .report-filters__item.report-filters_width-300(:class="{'report-filters_right-margin-80': !isLqa}")
                 LabelVal(text="Target Language:" customClass="new-chart-label")
                     .report-filters__drop
                         SelectMulti(
@@ -31,7 +31,7 @@
                             @chooseOption="setTierFilter"
                         )                
         .report-filters__row(v-if="isLqa")
-            .report-filters__item
+            .report-filters__item.report-filters_width-300
                 LabelVal(text="Vendor Name:" customClass="new-chart-label")
                     input.report-filters__text(type="text" :value="nameFilter" placeholder="Vendor Name" @keyup="filterByName")
 </template>
@@ -101,6 +101,7 @@ export default {
     width: 70%;
     max-width: 1030px;
     &__row {
+        width: 100%;
         display: flex;
         align-items: center;
         margin-bottom: 30px;
@@ -121,13 +122,16 @@ export default {
         position: relative;
         height: 32px;
         width: 191px;
-        margin-left: 5px;
+        margin-left: 8px;
     }
     &_spaced {
         justify-content: space-between;
     }
     &_right-margin-80 {
         margin-right: 80px; 
+    }
+    &_width-300 {
+        width: 300px;
     }
 }
 
