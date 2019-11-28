@@ -1,4 +1,4 @@
-import { downloadJobTargets } from "../../../utils/job-targets";
+import { generateJobTargets } from "../../../utils/job-targets";
 
 export const getJobs = async function({ commit, dispatch, state}) {
     try {
@@ -20,7 +20,7 @@ export const setJobStatus = async function({commit, dispatch, state}, payload) {
             await this.$axios.post('/xtm/step-target', fileData);
         }
         if(status === "Completed" && !targetFile) {
-            await downloadJobTargets(this, state.selectedJob);
+            await generateJobTargets(this, state.selectedJob);
         }
         await dispatch("getJobs");
     } catch(err) {

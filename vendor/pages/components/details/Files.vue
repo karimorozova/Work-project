@@ -62,19 +62,19 @@ export default {
     methods: {
         ...mapActions({
             setJob: "selectJob",
+            getJobs: "getJobs",
             alertToggle: "alertToggle"
         }),
         isTargetLink(file) {
             return this.getProgress(file) === 100 || this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
         },
         getProgress(file) {
-            const jobId = this.getFilesJobId(file);
-            const progress = jobId ? this.job.progress[jobId] : "";
+            const xtmJob = this.getFilesJobId(file);
+            const progress = xtmJob ? this.job.progress[xtmJob.jobId] : "";
             return progress ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2): this.job.progress;
         },
         getFilesJobId(file) {
-            const xtmJob = this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
-            return xtmJob ? xtmJob.jobId : "";
+            return this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
         },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
@@ -102,7 +102,7 @@ export default {
             return files;
         },
         async goToXtmEditor(file) {
-            const jobId = this.getFilesJobId(file);
+            const { jobId } = this.getFilesJobId(file);
             try {
                 const url = await this.$axios.post('/xtm/editor', {jobId, stepName: this.job.catName, xtmProjectId: this.job.xtmProjectId});
                 let link = document.createElement("a");
@@ -117,15 +117,26 @@ export default {
             if(this.job.serviceStep.calculationUnit !== 'Words') {
                 return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
             }
-            const jobId = this.getFilesJobId(file);
-            const existingTarget = this.getExistingTargetPath(jobId);
-            if(this.job.status === "Completed") {
+            const xtmJob = this.getFilesJobId(file);
+            const existingTarget = this.getExistingTargetPath(xtmJob.jobId);
+            if(this.job.status === "Completed" && existingTarget) {
                 return this.createLinkAndDownolad(existingTarget);
             }
+            await this.generateAndDownloadFile(xtmJob, file);
+        },
+        async generateAndDownloadFile(xtmJob, file) {
+            let xtmInfo = {...xtmJob, projectId: this.job.xtmProjectId};
             try {
-                const fileId = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId});
-                let fileLink = await this.$axios.post('/xtm/target-file', 
-                    {step: this.job, id: this.job.project_Id, projectId: this.job.xtmProjectId, file: {...fileId.data[0], fileName: file.fileName}});
+                if(!xtmInfo.fileId) {
+                    const updatedProject = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId: xtmJob.jobId});
+                    this.setCurrentJob(updatedProject.data);
+                    xtmInfo = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
+                    xtmInfo.projectId = this.job.xtmProjectId;
+                }
+                let fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, file: {...xtmInfo}});
+                if(fileLink.data.status && fileLink.data.status !== "FINISHED") {
+                    return this.alertToggle({message: "File is not ready yet. Try later, please.", isShow: true, type: "error"});
+                }
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 this.setCurrentJob(fileLink.data.updatedProject);
