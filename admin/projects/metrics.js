@@ -1,6 +1,25 @@
 const { getProject, updateProject } = require('./getProjects');
 const { receivablesCalc } = require('../сalculations/wordcount');
-const { getMetrics } = require('../services');
+const { getMetrics, getAnalysis } = require('../services');
+
+async function checkProjectForMetrics({projectId}) {
+    try {
+        const project = await getProject({"_id": projectId});
+        const { tasks } = project;
+        for(let task of tasks) {
+            if(task.service.calculationUnit === 'Words') {
+                const { status } = await getAnalysis(task.projectId);
+                if(status !== 'FINISHED') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in checkProjectForMetrics");
+    }
+}
 
 async function updateProjectMetrics({projectId}) {
     try {
@@ -9,9 +28,6 @@ async function updateProjectMetrics({projectId}) {
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words') {
                 const { taskMetrics, progress } = await getMetrics({projectId: task.projectId, customerId: project.customer.id});
-                if(progress.invalid) {
-                    return false;
-                }
                 task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
                 task.finance.Wordcount = calculateWords(task.metrics);
                 steps = getTaskSteps({steps, progress, task});
@@ -138,4 +154,4 @@ function getStepsDates({task, key}) {
     return {startDate, deadline};
 }
 
-module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance }
+module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance, checkProjectForMetrics }

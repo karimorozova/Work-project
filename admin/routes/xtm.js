@@ -1,14 +1,13 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
 const { getRequestOptions, generateTargetFile, getXtmCustomers, getEditorUrl } = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, storeFiles} = require('../projects/');
+const { getProject, updateProject, createTasks, updateProjectProgress, 
+    storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, 
+    storeFiles } = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../сalculations/wordcount');
-const { updateProjectMetrics } = require('../projects/metrics');
+const { updateProjectMetrics, checkProjectForMetrics } = require('../projects/metrics');
 const fs = require('fs');
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-const parser = require('xml2json');
 const https = require('https');
-const { xtmBaseUrl } = require('../configs/');
 
 router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     try {
@@ -59,9 +58,12 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/metrics', async (req, res) => {
     const { projectId } = req.query;
     try {
-        const isMetrics = await updateProjectMetrics({projectId});
-        const status = isMetrics ? 'received' : 'invalid';
-        res.send({status});
+        const isFinished = await checkProjectForMetrics({projectId});
+        if(isFinished) {
+            await updateProjectMetrics({projectId});
+            return res.send({status: 'received'});
+        }
+        return res.send({status: 'invalid'});
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting metrics ");

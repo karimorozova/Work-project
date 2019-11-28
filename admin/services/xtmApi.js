@@ -109,6 +109,27 @@ function getDataForRequest(object) {
     }
 }
 
+function getAnalysis(projectId) {
+    return new Promise((resolve, reject) => {
+        unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/analysis?fetchLevel=JOBS`)
+        .headers({"Authorization": xtmToken,
+        'Content-Type': 'application/json'})
+        .end(async (response) => {
+            if(response.error) {
+                console.log("Error in getAnalysis");
+                reject(response.error);
+            }
+            try {
+                const { status } = response.body;
+                resolve({status});
+            } catch(err) {
+                console.log("Error in getAnalysis");
+                reject(err);
+            }
+        })
+    })
+}
+
 function getMetrics({projectId, customerId}) {
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${projectId}/metrics`)
@@ -237,4 +258,6 @@ function getTaskProgress(task) {
     })
 }
 
-module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile, getEditorUrl };
+module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, 
+    createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile, 
+    getEditorUrl, getAnalysis };
