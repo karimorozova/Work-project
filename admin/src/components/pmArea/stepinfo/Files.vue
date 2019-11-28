@@ -84,14 +84,26 @@ export default {
             if(this.step.serviceStep.calculationUnit !== 'Words') {
                 return this.createLinkAndDownolad(this.stepFiles[index].target.split("./dist")[1]);
             }
-            const xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
+            let xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
+            if(xtmJob[`${this.step.name}-targetFile`]) {
+                return this.createLinkAndDownolad(xtmJob[`${this.step.name}-targetFile`]);
+            }
+            await this.generateAndDownloadFile(xtmJob, index);
+        },
+        async generateAndDownloadFile(xtmJob, index) {
+            const id = this.currentProject._id;
+            let xtmInfo = {...xtmJob, projectId: this.projectId};
             try {
-                if(xtmJob[`${this.step.name}-targetFile`]) {
-                    return this.createLinkAndDownolad(xtmJob[`${this.step.name}-targetFile`]);
+                if(!xtmInfo.fileId) {
+                    const updatedProject = await this.$http.post('/xtm/generate-file', {...xtmInfo});
+                    await this.storeProject(updatedProject.data);
+                    xtmInfo = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
+                    xtmInfo.projectId = this.projectId;
                 }
-                const id = this.currentProject._id;
-                const fileId = await this.$http.post('/xtm/generate-file', {projectId: this.projectId, jobId: xtmJob.jobId});
-                let fileLink = await this.$http.post('/xtm/target-file', {step: this.step, id, projectId: this.projectId, file: {...fileId.data[0], fileName: this.stepFiles[index].fileName}});
+                let fileLink = await this.$http.post('/xtm/target-file', { step: this.step, id, file: {...xtmInfo}});
+                if(fileLink.data.status && fileLink.data.status !== "FINISHED") {
+                    return this.alertToggle({message: "File is not ready yet. Try later, please.", isShow: true, type: "error"});
+                }
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 await this.storeProject(fileLink.data.updatedProject);

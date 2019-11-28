@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { getRequestOptions, generateTargetFile, getXtmCustomers, getEditorUrl } = require('../services/');
+const { Projects } = require('../models');
+const { getRequestOptions, generateTargetFile, getXtmCustomers, getEditorUrl, getXtmFileStatus } = require('../services/');
 const { getProject, updateProject, createTasks, updateProjectProgress, 
     storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, 
     storeFiles } = require('../projects/');
@@ -132,7 +133,11 @@ router.post('/generate-file', async (req, res) => {
     const { projectId, jobId } = req.body;
     try {
         const generatedFiles = await generateTargetFile({projectId, jobId});
-        res.send(generatedFiles);
+        await Projects.updateOne({"tasks.xtmJobs.jobId": jobId}, 
+            {"tasks.$[i].xtmJobs.$[j].fileId": generatedFiles[0].fileId}, 
+            {arrayFilters: [{"i.xtmJobs": {$exists: true}}, {"j.jobId": jobId}]});
+        const updatedProject = await getProject({"tasks.xtmJobs.jobId": jobId});
+        res.send(updatedProject);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error / Cannot generate file in XTM');
@@ -140,9 +145,13 @@ router.post('/generate-file', async (req, res) => {
 })
 
 router.post('/target-file', async (req, res) => {
-    const { step, id, projectId, file } = req.body;
+    const { step, id, file } = req.body;
     try {
-        const { path } = await storeTargetFile({ step, id, projectId, file });
+        const { status } = await getXtmFileStatus(file);
+        if(status !== 'FINISHED') {
+            return res.send({status});
+        }
+        const { path } = await storeTargetFile({ step, id, projectId: file.projectId, file });
         const updatedProject = await updateTaskTargetFiles({step, jobId: file.jobId, path});
         res.send({path, updatedProject});
     } catch(err) {

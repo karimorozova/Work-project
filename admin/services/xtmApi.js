@@ -236,6 +236,20 @@ function generateTargetFile({projectId, jobId}) {
     })
 }
 
+function getXtmFileStatus(file) {
+    return new Promise((resolve, reject) => {
+        unirest.get(`${xtmBaseUrl}/rest-api/projects/${file.projectId}/files/status?fileIds=${file.fileId}`)
+            .headers({"Authorization": xtmToken})
+            .end( (response) => {
+                if(response.error) {
+                   reject(response.error);
+                }
+                const { status } = response.body[0];
+                resolve({status});
+            }) 
+    })
+}
+
 function getTaskProgress(task) {
     return new Promise((resolve, reject) => {
         unirest.get(`${xtmBaseUrl}/rest-api/projects/${task.projectId}/metrics`)
@@ -260,4 +274,4 @@ function getTaskProgress(task) {
 
 module.exports = { getXtmCustomers, saveTasks, saveTemplateTasks, getMetrics, 
     createNewXtmCustomer, getRequestOptions, getTaskProgress, generateTargetFile, 
-    getEditorUrl, getAnalysis };
+    getEditorUrl, getAnalysis, getXtmFileStatus };
