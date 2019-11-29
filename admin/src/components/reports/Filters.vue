@@ -1,6 +1,6 @@
 <template lang="pug">
     .report-filters
-        .report-filters__row(:class="{'report-filters_spaced': isLqa}")
+        .report-filters__row(:class="{'report-filters_no-space': !isLqa}")
             .report-filters__item.report-filters_width-300(v-if="isTarget" :class="{'report-filters_right-margin-80': !isLqa}")
                 LabelVal(text="Target Language:" customClass="new-chart-label")
                     .report-filters__drop
@@ -43,12 +43,15 @@
             .report-filters__item.report-filters_width-300(:class="{'report-filters_width-280': !isTarget}")
                 LabelVal(text="Vendor Name:" customClass="new-chart-label")
                     input.report-filters__text(type="text" :value="nameFilter" placeholder="Vendor Name" @keyup="filterByName")
+            .report-filters__item(v-if="isAddVendor")
+                Button(value="Add new XTRF Vendor" customClass="width-191")
 </template>
 
 <script>
 import LabelVal from "@/components/LabelVal";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
+import Button from "@/components/Button";
 
 export default {
     props: {
@@ -59,7 +62,8 @@ export default {
         tierFilter: {type: String},
         lqaFilter: {type: String},
         isLqa: {type: Boolean, default: true},
-        isTarget: {type: Boolean, default: true}
+        isTarget: {type: Boolean, default: true},
+        isAddVendor: {type: Boolean, default: true}
     },
     data() {
         return {
@@ -104,7 +108,8 @@ export default {
     components: {
         LabelVal,
         SelectSingle,
-        SelectMulti
+        SelectMulti,
+        Button
     }
 }
 </script>
@@ -118,6 +123,7 @@ export default {
     &__row {
         width: 100%;
         display: flex;
+        justify-content: space-between;
         align-items: center;
         margin-bottom: 30px;
         box-sizing: border-box;
@@ -139,8 +145,8 @@ export default {
         width: 191px;
         margin-left: 8px;
     }
-    &_spaced {
-        justify-content: space-between;
+    &_no-space {
+        justify-content: flex-start;
     }
     &_right-margin-80 {
         margin-right: 80px; 

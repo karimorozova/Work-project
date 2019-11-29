@@ -85,4 +85,10 @@ export default {
     }
 }
 
+.width-191 {
+    .action-button__button {
+        width: 191px;
+    }
+}
+
 </style>

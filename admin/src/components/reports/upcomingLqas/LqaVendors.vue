@@ -2,6 +2,7 @@
     .lqa-vendors
         .lqa-vendors__filters
             Filters(
+                :isAddVendor="false"
                 :isTarget="false"
                 :languages="languages"
                 :industryFilter="industryFilter"
