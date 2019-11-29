@@ -3,7 +3,7 @@ const { getReport } = require("../reports/get");
 const { getXtrfTierReport, getXtrfLqaReport } = require("../reports/xtrf");
 const  { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
-const { XtrfTier, XtrfReportLang } = require("../models");
+const { XtrfTier, XtrfReportLang, XtrfVendor } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {
@@ -106,6 +106,19 @@ router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting reports");
+    }
+})
+
+router.post('/xtrf-vendor-lqa', async (req, res) => {
+    const { vendorData } = req.body;
+    const key = `${vendorData.lqa}s.${[vendorData.industry]}`;
+    const updateQuery = {[key]: vendorData.grade};
+    try {
+        await XtrfVendor.updateOne({_id: vendorData.vendor._id}, updateQuery);
+        res.send("ok");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on updating vendor's lqa");
     }
 })
 

@@ -15,10 +15,30 @@ const XtrfVendorSchema = new mongoose.Schema({
         default : '', 
         trim : true
     },
+    basicPrices: {
+        type : Object, 
+        default : {}
+    },
     tqi: {
         type : String, 
         default : '', 
         trim : true
+    },
+    tqis: {
+        type : Object, 
+        default : {}
+    },
+    lqa1s: {
+        type : Object, 
+        default : {}
+    },
+    lqa2s: {
+        type : Object, 
+        default : {}
+    },
+    lqa3s: {
+        type : Object, 
+        default : {}
     },
     lqa1: {
         type : String, 

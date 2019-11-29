@@ -14,10 +14,10 @@
             .lqa-table__header(slot="headerLqa3" slot-scope="{ field }") {{ field.label }}
             .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
             .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordcounts[field] }}
-            .lqa-table__header(slot="tqi" slot-scope="{ row }") {{ row.vendor.tqi }}
-            .lqa-table__header(slot="lqa1" slot-scope="{ row }") {{ row.vendor.lqa1 }}
-            .lqa-table__header(slot="lqa2" slot-scope="{ row }") {{ row.vendor.lqa2 }}
-            .lqa-table__header(slot="lqa3" slot-scope="{ row }") {{ row.vendor.lqa3 }}
+            .lqa-table__header(slot="tqi" slot-scope="{ row }") {{ row.vendor.tqis[field] }}
+            .lqa-table__header(slot="lqa1" slot-scope="{ row }") {{ row.vendor.lqa1s[field] }}
+            .lqa-table__header(slot="lqa2" slot-scope="{ row }") {{ row.vendor.lqa2s[field] }}
+            .lqa-table__header(slot="lqa3" slot-scope="{ row }") {{ row.vendor.lqa3s[field] }}
 </template>
 
 <script>

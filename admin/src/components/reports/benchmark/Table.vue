@@ -10,8 +10,8 @@
             .benchmark-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
-            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrice }}
-            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrice)") {{ getMargin(row.vendor.basicPrice) }}
+            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrices[field] }}
+            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrice)") {{ getMargin(row.vendor.basicPrices[field]) }}
 </template>
 
 <script>
@@ -20,7 +20,8 @@ import DataTable from "@/components/DataTable";
 export default {
     props: {
         vendorsData: {type: Array, default: () => []},
-        benchmarkPrice: {type: Number}
+        benchmarkPrice: {type: Number},
+        field: {type: String}
     },
     data() {
         return {

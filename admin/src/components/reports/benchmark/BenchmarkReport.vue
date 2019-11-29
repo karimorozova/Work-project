@@ -16,10 +16,10 @@
             h3.benchmark__text Target Language: {{ report.target }}
             .benchmark__industry(v-if="report.financeVendors.length")
                 h4.benchmark__text Industry: Finance,  Tier {{ report.finance }}, Benchmark &euro; {{ getPrice(report.prices, 'Finance') }}
-                Table(:vendorsData="report.financeVendors" :benchmarkPrice="getPrice(report.prices, 'Finance')")
+                Table(:vendorsData="report.financeVendors" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
             .benchmark__industry(v-if="report.gamingVendors.length")
                 h4.benchmark__text Industry: iGaming,  Tier {{ report.game }}, Benchmark &euro; {{ getPrice(report.prices, 'iGaming') }}
-                Table(:vendorsData="report.gamingVendors" :benchmarkPrice="getPrice(report.prices, 'iGaming')")
+                Table(:vendorsData="report.gamingVendors" :benchmarkPrice="getPrice(report.prices, 'iGaming')" field="iGaming")
 </template>
 
 <script>

@@ -60,4 +60,8 @@ export default {
         align-items: center;
     }
 }
+
+.start-justified {
+    justify-content: flex-start;
+}
 </style>

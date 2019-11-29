@@ -5,6 +5,7 @@
             :tableData="vendorsData"
             :bodyClass="vendorsData.length < 24 ? 'tbody_visible-overflow height-700' : 'height-700'"
             :tableheadRowClass="vendorsData.length < 24 ? 'tbody_visible-overflow' : ''"
+            @onRowClicked="selectVendor"
         )
             .lqa-vendors-table__header(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
             .lqa-vendors-table__header(slot="headerWords" slot-scope="{ field }") {{ field.label }}
@@ -42,6 +43,9 @@ export default {
             if(row.isLqa2) result = 2;
             result = row.isLqa3 ? 3 : result;
             return result;
+        },
+        selectVendor({index}) {
+            this.$emit('selectVendor', {vendor: this.vendorsData[index]});
         }
     },
     components: {

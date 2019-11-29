@@ -14,12 +14,15 @@
                 @setLqaFilter="(e) => setFilter(e, 'lqaFilter')"
             )
         .lqa-vendors__table
-            Table(:vendorsData="allVendors")
+            Table(:vendorsData="allVendors" @selectVendor="selectVendor")
+        .lqa-vendors__form(v-if="isForm")
+            VendorLqaForm(:vendorData="selectedVendor" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
 </template>
 
 <script>
 import Filters from "../Filters";
 import Table from "./Table";
+import VendorLqaForm from "./VendorLqaForm";
 import { mapActions } from "vuex";
 
 export default {
@@ -32,7 +35,9 @@ export default {
             nameFilter: "",
             industryFilter: "All",
             tierFilter: "All",
-            lqaFilter: "All"
+            lqaFilter: "All",
+            isForm: false,
+            selectedVendor: null
         }
     },
     methods: {
@@ -49,6 +54,23 @@ export default {
             this[prop] = value;
             await this.getReport();
         },
+        selectVendor({vendor}) {
+            this.selectedVendor = vendor;
+            this.isForm = true;
+        },
+        closeForm() {
+            this.isForm = false;
+        },
+        async saveVendorLqa({vendorData}) {
+            try {
+                await this.$http.post("/reportsapi/xtrf-vendor-lqa", { vendorData });
+                await this.getReport();
+            } catch(err) {
+                this.alertToggle({message: "Error on updating Vendor's LQA", isShow: true, type: "error"});
+            } finally {
+                this.closeForm();
+            }
+        }
     },
     computed: {
         allVendors() {
@@ -78,7 +100,8 @@ export default {
     },
     components: {
         Filters,
-        Table
+        Table,
+        VendorLqaForm
     },
     mounted() {
         this.getReport();
@@ -90,7 +113,16 @@ export default {
 
 .lqa-vendors {
     box-sizing: border-box;
-    padding: 40px;
+    padding: 40px 40px 0 40px;
+    position: relative;
+    &__form {
+        width: 70%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
 }
 
 </style>

@@ -147,9 +147,9 @@ async function getFilteredLqaReports({reports, lqas, filters}) {
 function getIndustriesLqas({lqas, tierLqas, report, reportProp, filters, prop}) {
     const tierLqaWords = tierLqas.find(item => item.category == report[reportProp]);
     const withLqaVendors = lqas.map(item => {
-        const isLqa1 = +item.wordcounts[prop] >= +tierLqaWords.lqa1 && !item.vendor.lqa1;
-        const isLqa2 = +item.wordcounts[prop] >= +tierLqaWords.lqa2 && !isLqa1 && !item.vendor.lqa2;
-        const isLqa3 = +item.wordcounts[prop] >= +tierLqaWords.lqa3 && !isLqa1 && !isLqa2 && !item.vendor.lqa3;
+        const isLqa1 = +item.wordcounts[prop] >= +tierLqaWords.lqa1 && !item.vendor.lqa1s[prop];
+        const isLqa2 = +item.wordcounts[prop] >= +tierLqaWords.lqa2 && !isLqa1 && !item.vendor.lqa2s[prop];
+        const isLqa3 = +item.wordcounts[prop] >= +tierLqaWords.lqa3 && !isLqa1 && !isLqa2 && !item.vendor.lqa3s[prop];
         return {
             ...item,
             tier: report[reportProp],
