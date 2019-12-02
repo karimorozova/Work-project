@@ -160,7 +160,7 @@ function getIndustriesLqas({lqas, tierLqas, report, reportProp, filters, prop}) 
         }
     })
     return withLqaVendors.filter(item => {
-        let isFit = item.vendor.language.lang === report.target && item.wordcounts[prop]; 
+        let isFit = item.vendor.language.lang === report.target; 
         isFit = isFit && filters.tierFilter ? report[reportProp] === filters.tierFilter : isFit;
         if(isFit) {
             const lqaProp = item[`isLqa${filters.lqaFilter}`];
