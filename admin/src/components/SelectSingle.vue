@@ -102,10 +102,12 @@ export default {
         filteredOptions() {
             let result = this.options;
             if(this.searchValue) {
-                if(typeof opt === "string") {
-                    return result.filter(item => item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
-                }
-                return result.filter(item => item.name.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
+                return result.filter(item => {
+                    if(item.name) {
+                        return item.name.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
+                    }
+                    return item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
+                    });
             }
             return result;
         }
