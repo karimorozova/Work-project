@@ -50,7 +50,8 @@ export default {
             this.isGradeEmpty = false;
             const { value } = e.target;
             const regex = /^[0-9]+$/;
-            const characters = value.split("").filter(item => regex.test(item));
+            let characters = value.split("").filter(item => regex.test(item));
+            characters = characters[0] === "0" ? characters.slice(1) : characters;
             const clearedValue = characters.join("");
             const gradeValue = +clearedValue > 100 ? 100 : clearedValue;
             e.target.value = gradeValue;

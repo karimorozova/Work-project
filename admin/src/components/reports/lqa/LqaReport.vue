@@ -11,23 +11,30 @@
                 @setTargetFilter="setTargetFilter"
                 @setIndustryFilter="(e) => setFilter(e, 'industryFilter')"
                 @setTierFilter="(e) => setFilter(e, 'tierFilter')"
+                @showNewVendorForm="showNewVendorForm"
             )
-        .lqa__language(v-for="report in reportData")
-            h3.lga__text Target Language: {{ report.target }}
-            .lqa__industry(v-if="report.financeVendors.length")
-                h4.lqa__text Industry: Finance,  Tier {{ report.finance }}
-                Table(:vendorsData="report.financeVendors" field="Finance")
-            .lqa__industry(v-if="report.gamingVendors.length")
-                h4.lqa__text Industry: iGaming,  Tier {{ report.game }}
-                Table(:vendorsData="report.gamingVendors" field="iGaming")
+        .lqa__languages
+            .lqa__language(v-for="report in reportData")
+                h3.lga__text Target Language: {{ report.target }}
+                .lqa__industry(v-if="report.financeVendors.length")
+                    h4.lqa__text Industry: Finance,  Tier {{ report.finance }}
+                    Table(:vendorsData="report.financeVendors" field="Finance")
+                .lqa__industry(v-if="report.gamingVendors.length")
+                    h4.lqa__text Industry: iGaming,  Tier {{ report.game }}
+                    Table(:vendorsData="report.gamingVendors" field="iGaming")
+            .lqa__form(v-if="isNewVendorForm")
+                NewVendor(:languages="languages" @close="closeForm" @saveVendor="saveVendor")
 </template>
 
 <script>
 import Filters from "../Filters";
+import NewVendor from "../NewVendor";
 import Table from "./Table";
 import { mapActions } from "vuex";
+import newXtrfVendor from "@/mixins/newXtrfVendor";
 
 export default {
+    mixins: [newXtrfVendor],
     props: {
         languages: {type: Array, default: () => []}
     },
@@ -66,8 +73,8 @@ export default {
             }
             this.targetFilter = !this.targetFilter.length || lang === 'All' ? ["All"] : this.targetFilter;
             await this.getReport();
-        },
-    },
+        }
+    }, 
     computed: {
         filters() {
             let result = {nameFilter: this.nameFilter};
@@ -88,6 +95,7 @@ export default {
     },
     components: {
         Filters,
+        NewVendor,
         Table
     },
     mounted() {
@@ -106,11 +114,22 @@ h3, h4 {
 .lqa {
     box-sizing: border-box;
     padding: 40px;
+    position: relative;
     &__text {
         margin: 10px 0 5px;
     }
-    &__language {
+    &__languages {
+        width: 70%;
+        max-height: 680px;
+        overflow-y: auto;
         margin-top: 40px;
+    }
+    &__form {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 }
 

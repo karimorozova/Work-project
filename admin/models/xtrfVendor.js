@@ -30,15 +30,24 @@ const XtrfVendorSchema = new mongoose.Schema({
     },
     lqa1s: {
         type : Object, 
-        default : {}
+        default : {
+            Finance: "",
+            iGaming: ""
+        }
     },
     lqa2s: {
         type : Object, 
-        default : {}
+        default : {
+            Finance: "",
+            iGaming: ""
+        }
     },
     lqa3s: {
         type : Object, 
-        default : {}
+        default : {
+            Finance: "",
+            iGaming: ""
+        }
     },
     lqa1: {
         type : String, 

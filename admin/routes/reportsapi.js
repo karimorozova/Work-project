@@ -3,7 +3,7 @@ const { getReport } = require("../reports/get");
 const { getXtrfTierReport, getXtrfLqaReport } = require("../reports/xtrf");
 const  { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
-const { XtrfTier, XtrfReportLang, XtrfVendor } = require("../models");
+const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {
@@ -119,6 +119,27 @@ router.post('/xtrf-vendor-lqa', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on updating vendor's lqa");
+    }
+})
+
+router.post('/new-xtrf-vendor', async (req, res) => {
+    const { industriesData, language, name } = req.body;
+    const basicPrices = industriesData.reduce((acc, cur) => {
+        acc[cur.industry] = cur.basicPrice;
+        return acc;
+    }, {})
+    const tqis = industriesData.reduce((acc, cur) => {
+        acc[cur.industry] = cur.tqi;
+        return acc;
+    }, {})
+    try {
+        const xtrfLang = await XtrfReportLang.findOne({lang: language});
+        const vendor = await XtrfVendor.create({name, language: xtrfLang, basicPrices, tqis});
+        await XtrfLqa.create({vendor, wordcounts: {Finance: 0, iGaming: 0, General: 0}});
+        res.send('saved');
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on saving new xtrf vendor");
     }
 })
 

@@ -49,7 +49,6 @@ export default {
 <style lang="scss" scoped>
 
 .lqa-table {
-    width: 70%;
     max-width: 1030px;
     margin: 10px 0 20px;
 }

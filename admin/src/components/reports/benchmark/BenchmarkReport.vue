@@ -11,22 +11,29 @@
                 @setTargetFilter="setTargetFilter"
                 @setIndustryFilter="(e) => setFilter(e, 'industryFilter')"
                 @setTierFilter="(e) => setFilter(e, 'tierFilter')"
+                @showNewVendorForm="showNewVendorForm"
             )
-        .benchmark__language(v-for="report in reportData")
-            h3.benchmark__text Target Language: {{ report.target }}
-            .benchmark__industry(v-if="report.financeVendors.length")
-                h4.benchmark__text Industry: Finance,  Tier {{ report.finance }}, Benchmark &euro; {{ getPrice(report.prices, 'Finance') }}
-                Table(:vendorsData="report.financeVendors" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
-            .benchmark__industry(v-if="report.gamingVendors.length")
-                h4.benchmark__text Industry: iGaming,  Tier {{ report.game }}, Benchmark &euro; {{ getPrice(report.prices, 'iGaming') }}
-                Table(:vendorsData="report.gamingVendors" :benchmarkPrice="getPrice(report.prices, 'iGaming')" field="iGaming")
+        .benchmark__languages
+            .benchmark__language(v-for="report in reportData")
+                h3.benchmark__text Target Language: {{ report.target }}
+                .benchmark__industry(v-if="report.financeVendors.length")
+                    h4.benchmark__text Industry: Finance,  Tier {{ report.finance }}, Benchmark &euro; {{ getPrice(report.prices, 'Finance') }}
+                    Table(:vendorsData="report.financeVendors" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
+                .benchmark__industry(v-if="report.gamingVendors.length")
+                    h4.benchmark__text Industry: iGaming,  Tier {{ report.game }}, Benchmark &euro; {{ getPrice(report.prices, 'iGaming') }}
+                    Table(:vendorsData="report.gamingVendors" :benchmarkPrice="getPrice(report.prices, 'iGaming')" field="iGaming")
+        .benchmark__form(v-if="isNewVendorForm")
+            NewVendor(:languages="languages" @close="closeForm" @saveVendor="saveVendor")
 </template>
 
 <script>
 import Filters from "../Filters";
 import Table from "./Table";
+import NewVendor from "../NewVendor";
+import newXtrfVendor from "@/mixins/newXtrfVendor";
 
 export default {
+    mixins: [newXtrfVendor],
     props: {
         languages: {type: Array, default: () => []}
     },
@@ -42,7 +49,7 @@ export default {
     methods: {
         async getReport() {
             try {
-                const result = await this.$http.post("/reportsapi/xtrf-lqa-report" ,{ type: "lqa", filters: this.filters});
+                const result = await this.$http.post("/reportsapi/xtrf-lqa-report" ,{ filters: this.filters});
                 this.reportData = result.body;
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
@@ -97,7 +104,8 @@ export default {
     },
     components: {
         Filters,
-        Table
+        Table,
+        NewVendor
     },
     mounted() {
         this.getReport();
@@ -115,11 +123,22 @@ h3, h4 {
 .benchmark {
     box-sizing: border-box;
     padding: 40px;
+    position: relative;
     &__text {
         margin: 10px 0 5px;
     }
-    &__language {
+    &__languages {
+        width: 30%;
+        max-height: 680px;
+        overflow-y: auto;
         margin-top: 40px;
+    }
+    &__form {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 }
 

@@ -11,7 +11,7 @@
             .benchmark-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
             .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrices[field] }}
-            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrice)") {{ getMargin(row.vendor.basicPrices[field]) }}
+            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrices[field])") {{ getMargin(row.vendor.basicPrices[field]) }}
 </template>
 
 <script>
@@ -37,7 +37,7 @@ export default {
             return (this.benchmarkPrice - vendorPrice).toFixed(2);
         },
         getMarginClass(vendorPrice) {
-            return this.getMargin(vendorPrice) < 0 ? 'benchmark-table_red' : 'benchmark-table_green';
+            return this.benchmarkPrice < +vendorPrice ? 'benchmark-table_red' : 'benchmark-table_green';
         }
     },
     components: {
@@ -49,7 +49,6 @@ export default {
 <style lang="scss" scoped>
 
 .benchmark-table {
-    width: 30%;
     max-width: 730px;
     margin: 10px 0 20px;
     &_red {
