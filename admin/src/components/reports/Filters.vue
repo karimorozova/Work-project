@@ -44,7 +44,7 @@
                 LabelVal(text="Vendor Name:" customClass="new-chart-label")
                     input.report-filters__text(type="text" :value="nameFilter" placeholder="Vendor Name" @keyup="filterByName")
             .report-filters__item(v-if="isAddVendor")
-                Button(value="Add new XTRF Vendor" customClass="width-191")
+                Button(value="Add new XTRF Vendor" customClass="width-191" @clicked="showForm")
 </template>
 
 <script>
@@ -95,6 +95,9 @@ export default {
         },
         setIndustryFilter({option}) {
             this.$emit("setIndustryFilter", { value: option})
+        },
+        showForm() {
+            this.$emit("showNewVendorForm");
         }
     },
     computed: {
