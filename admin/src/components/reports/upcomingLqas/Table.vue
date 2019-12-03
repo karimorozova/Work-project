@@ -13,7 +13,7 @@
             .lqa-vendors-table__header(slot="headerTier" slot-scope="{ field }") {{ field.label }}
             .lqa-vendors-table__header(slot="headerLqa" slot-scope="{ field }") {{ field.label }}
             .lqa-vendors-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
-            .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ row.wordcounts[row.industry] }}
+            .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordcounts[row.industry]) }}
             .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry }}
             .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier }}
             .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{ getLqaNumber(row) }}
@@ -43,6 +43,12 @@ export default {
             if(row.isLqa2) result = 2;
             result = row.isLqa3 ? 3 : result;
             return result;
+        },
+        presentWordcount(words) {
+            if(words.toString().indexOf(".") !== -1) {
+                return words.toFixed(2);
+            }
+            return words;
         },
         selectVendor({index}) {
             this.$emit('selectVendor', {vendor: this.vendorsData[index]});

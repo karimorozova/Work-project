@@ -13,7 +13,7 @@
             .lqa-table__header(slot="headerLqa2" slot-scope="{ field }") {{ field.label }}
             .lqa-table__header(slot="headerLqa3" slot-scope="{ field }") {{ field.label }}
             .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
-            .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordcounts[field] }}
+            .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ presentWordcount(row.wordcounts[field]) }}
             .lqa-table__header(slot="tqi" slot-scope="{ row }") {{ row.vendor.tqis[field] }}
             .lqa-table__header(slot="lqa1" slot-scope="{ row }") {{ row.vendor.lqa1s[field] }}
             .lqa-table__header(slot="lqa2" slot-scope="{ row }") {{ row.vendor.lqa2s[field] }}
@@ -38,6 +38,14 @@ export default {
                 {label: "LQA 2", headerKey: "headerLqa2", key: "lqa2", width: "16%"},
                 {label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "16%"}
             ]
+        }
+    },
+    methods: {
+        presentWordcount(words) {
+            if(words.toString().indexOf(".") !== -1) {
+                return words.toFixed(2);
+            }
+            return words;
         }
     },
     components: {
