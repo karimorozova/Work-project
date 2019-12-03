@@ -9,7 +9,7 @@
         )
 
     .reports__table
-        router-view(:languages="languages")
+        router-view(:allXtrfLangs="allXtrfLangs")
 </template>
 
 <script>
@@ -25,7 +25,7 @@ export default {
                 {title: "Vendor Cost Benchmark", routeName: "benchmark"}, 
             ],
             currentIndex: -1,
-            languages: []
+            allXtrfLangs: []
         }
     },
     methods: {
@@ -37,8 +37,8 @@ export default {
         async getXtrfLangs() {
             try {
                 const result = await this.$http.get('/reportsapi/languages');
-                this.languages = result.body.map(item => item.lang).filter(item => item !== 'English [grouped]');
-                this.languages.unshift("All");
+                this.allXtrfLangs = result.body.map(item => item.lang).filter(item => item !== 'English [grouped]');
+                this.allXtrfLangs.unshift("All");
             } catch(err) {
                 this.alertToggle({message: "Error on getting XTRF languages", isShow: true, type: "error"});
             }

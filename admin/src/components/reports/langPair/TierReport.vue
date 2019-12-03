@@ -3,7 +3,7 @@
         .tier__filters
             Filters(
                 :isLqa="false"
-                :languages="languages"
+                :languages="allXtrfLangs"
                 :targetFilter="targetFilter"
                 :tierFilter="tierFilter"
                 @setTierFilter="setTierFilter"
@@ -51,7 +51,7 @@ import { mapActions } from "vuex";
 
 export default {
     props: {
-        languages: {type: Array, default: () => []}
+        allXtrfLangs: {type: Array, default: () => []}
     },
     data() {
         return {

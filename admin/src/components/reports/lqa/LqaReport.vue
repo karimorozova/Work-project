@@ -23,7 +23,7 @@
                     h4.lqa__text Industry: iGaming,  Tier {{ report.game }}
                     Table(:vendorsData="report.gamingVendors" field="iGaming")
             .lqa__form(v-if="isNewVendorForm")
-                NewVendor(:languages="languages" @close="closeForm" @saveVendor="saveVendor")
+                NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
 
 <script>
@@ -35,6 +35,9 @@ import newXtrfVendor from "@/mixins/newXtrfVendor";
 
 export default {
     mixins: [newXtrfVendor],
+    props: {
+        allXtrfLangs: {type: Array, default: () => []}
+    },
     data() {
         return {
             reportData: null,

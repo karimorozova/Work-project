@@ -4,7 +4,7 @@
             Filters(
                 :isAddVendor="false"
                 :isTarget="false"
-                :languages="languages"
+                :languages="allXtrfLangs"
                 :industryFilter="industryFilter"
                 :tierFilter="tierFilter"
                 :lqaFilter="lqaFilter"
@@ -28,7 +28,7 @@ import { mapActions } from "vuex";
 
 export default {
     props: {
-        languages: {type: Array, default: () => []}
+        allXtrfLangs: {type: Array, default: () => []}
     },
     data() {
         return {
