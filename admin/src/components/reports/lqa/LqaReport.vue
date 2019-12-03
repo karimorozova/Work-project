@@ -35,16 +35,15 @@ import newXtrfVendor from "@/mixins/newXtrfVendor";
 
 export default {
     mixins: [newXtrfVendor],
-    props: {
-        languages: {type: Array, default: () => []}
-    },
     data() {
         return {
             reportData: null,
             nameFilter: "",
             targetFilter: ["All"],
             industryFilter: "All",
-            tierFilter: "All"
+            tierFilter: "All",
+            languages: [],
+            isLanguages: true
         }
     },
     methods: {
@@ -53,6 +52,11 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
                 this.reportData = result.body;
+                if(this.isLanguages) {
+                    this.languages = this.reportData.map(item => item.target);
+                    this.languages.unshift("All");
+                }
+                this.isLanguages = false;
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }
@@ -88,9 +92,6 @@ export default {
                 result.tierFilter = +this.tierFilter;
             }
             return result;
-        },
-        targetFilterSymbols() {
-            return this.targetFilter.map(item => item.symbol);
         }
     },
     components: {
