@@ -122,6 +122,17 @@ router.post('/xtrf-vendor-lqa', async (req, res) => {
     }
 })
 
+router.get('/check-vendor', async (req, res) => {
+    const { name } = req.query;
+    try {
+        const vendor = await XtrfVendor.find({name: {"$regex": new RegExp(`${name}`, 'i')}});
+        res.send(vendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking for vendor existence");
+    }
+})
+
 router.post('/new-xtrf-vendor', async (req, res) => {
     const { industriesData, language, name } = req.body;
     const basicPrices = industriesData.reduce((acc, cur) => {
