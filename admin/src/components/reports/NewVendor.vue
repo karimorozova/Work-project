@@ -37,6 +37,7 @@
                         input.table__text(type="text" :value="row.tqi" @input="(e) => setTqi(e, index)")
                     .table__data(slot="basicPrice" slot-scope="{ row, index }")
                         input.table__text(type="text" :value="row.basicPrice" @input="(e) => setPrice(e, index)")
+                .table__error(v-if="isIndustriesError") Both TQI and Basic Price for industry should be filled or empty!
             .buttons
                 .buttons__button
                     Button(value="Save" @clicked="checkData")
@@ -70,7 +71,8 @@ export default {
                 {industry: "Finance", tqi: "", basicPrice: ""},
             ],
             isSaveClicked: false,
-            isVendorExists: false
+            isVendorExists: false,
+            isIndustriesError: false
         }
     },
     methods: {
@@ -85,6 +87,9 @@ export default {
             if(!this.firstName || !this.language) {
                 return this.isSaveClicked = true;
             }
+            if(!this.isIndutriesDataCorrect()) {
+                return this.isIndustriesError = true;
+            }
             try {
                 const result = await this.$http.get(`/reportsapi/check-vendor?name=${this.name}`);
                 if(result.body.length) {
@@ -95,7 +100,16 @@ export default {
                 this.alertToggle({message: "Error on checking Vendor for exictence", isShow: true, type: "error"});
             }
         },
+        isIndutriesDataCorrect() {
+            for(let industryData of this.industriesData) {
+                if(industryData.tqi && !industryData.basicPrice || industryData.basicPrice && !industryData.tqi) {
+                    return false;
+                }
+            }
+            return true;
+        },
         setTqi(e, index) {
+            this.isIndustriesError = false;
             const { value } = e.target;
             const regex = /^[0-9]+$/;
             let characters = value.split("").filter(item => regex.test(item));
@@ -106,6 +120,7 @@ export default {
             this.industriesData[index].tqi = tqiValue;            
         },
         setPrice(e, index) {
+            this.isIndustriesError = false;
             let { value } = e.target;
             let values = value.split(".");
             if(values.length > 2) {
@@ -222,13 +237,16 @@ export default {
         border: none;
         background: transparent;
     }
+    &__error {
+        color: $red;
+    }
 }
 
 .buttons {
     display: flex;
     justify-content: center;
     &__button {
-        margin: 0 10px;
+        margin: 10px;
     }
 }
 
