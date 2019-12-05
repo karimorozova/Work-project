@@ -11,8 +11,7 @@ export const getJobs = async function({ commit, dispatch, state}) {
 
 export const setJobStatus = async function({commit, dispatch, state}, payload) {
     try {
-        const { jobId, status, targetFile } = payload;
-        await this.$axios.post('/vendor/job', { jobId, status, targetFile });
+        let { jobId, status, targetFile } = payload;
         if(targetFile) {
             let fileData = new FormData();
             fileData.append('jobId', jobId);
@@ -22,6 +21,7 @@ export const setJobStatus = async function({commit, dispatch, state}, payload) {
         if(status === "Completed" && !targetFile) {
             await generateJobTargets(this, state.selectedJob);
         }
+        await this.$axios.post('/vendor/job', { jobId, status });
         await dispatch("getJobs");
     } catch(err) {
         console.log(err);

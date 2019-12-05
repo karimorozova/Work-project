@@ -133,11 +133,7 @@ router.post('/generate-file', async (req, res) => {
     const { projectId, jobId } = req.body;
     try {
         const generatedFiles = await generateTargetFile({projectId, jobId});
-        await Projects.updateOne({"tasks.xtmJobs.jobId": jobId}, 
-            {"tasks.$[i].xtmJobs.$[j].fileId": generatedFiles[0].fileId}, 
-            {arrayFilters: [{"i.xtmJobs": {$exists: true}}, {"j.jobId": jobId}]});
-        const updatedProject = await getProject({"tasks.xtmJobs.jobId": jobId});
-        res.send(updatedProject);
+        res.send(generatedFiles);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error / Cannot generate file in XTM');

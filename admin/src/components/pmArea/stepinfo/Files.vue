@@ -94,16 +94,12 @@ export default {
             const id = this.currentProject._id;
             let xtmInfo = {...xtmJob, projectId: this.projectId};
             try {
-                if(!xtmInfo.fileId) {
-                    const updatedProject = await this.$http.post('/xtm/generate-file', {...xtmInfo});
-                    await this.storeProject(updatedProject.data);
-                    xtmInfo = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
-                    xtmInfo.projectId = this.projectId;
+                const generatedFiles = await this.$http.post('/xtm/generate-file', {...xtmInfo});
+                let fileLink = "";
+                do { 
+                    fileLink = await this.$http.post('/xtm/target-file', { step: this.step, id, file: {...generatedFiles.data[0], ...xtmInfo}});
                 }
-                let fileLink = await this.$http.post('/xtm/target-file', { step: this.step, id, file: {...xtmInfo}});
-                if(fileLink.data.status && fileLink.data.status !== "FINISHED") {
-                    return this.alertToggle({message: "File is not ready yet. Try later, please.", isShow: true, type: "error"});
-                }
+                while(fileLink.data.status && fileLink.data.status !== "FINISHED");
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 await this.storeProject(fileLink.data.updatedProject);

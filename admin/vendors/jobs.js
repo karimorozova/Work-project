@@ -1,5 +1,5 @@
 const { getProjects, getProject, taskCompleteNotifyPM } = require('../projects');
-const { Projects } = require('../models');
+const { Projects, Delivery } = require('../models');
 
 async function getJobs(id) {
     try {
@@ -107,6 +107,7 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
     try {
         if(isAllStepsCompleted({jobId, steps})) {
             await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval"});
+            await addToDelivery(project, {...task, status: "Pending Approval", deliveryStatus: "[DR1]"});
             return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
@@ -120,6 +121,44 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
         console.log(err);
         console.log("Error in manageCompletedStatus");
     }
+}
+
+async function addToDelivery(project, task) {
+    const files = getTaskTargetFiles(task);
+    const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
+    const instructions = [
+        {text: "Download and check file", isChecked: false},
+        {text: "Make sure to convert all doc files into PDF", isChecked: false}
+    ]
+    try {
+        await Delivery.updateOne({projectId: project.id},{
+            $push: {tasks: {
+                manager: project.accountManager,
+                status: task.deliveryStatus,
+                pair,
+                taskId: task.taskId,
+                instructions,
+                files
+            }}
+        },{upsert: true})
+    } catch(err) {
+        console.log(err);
+        console.log("Error in the addToDelivery");
+    }
+}
+
+function getTaskTargetFiles(task) {
+    const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
+    return taskFiles.reduce((prev, cur) => {
+        const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
+        prev.push({
+            fileName,
+            path: cur.targetFile || cur.path.split("./dist").pop(),
+            isFileApproved: cur.isFileApproved,
+            isOriginal: true
+        })
+        return [...prev];
+    }, [])
 }
 
 function getWithReadyToStartSteps({task, steps}) {

@@ -127,16 +127,12 @@ export default {
         async generateAndDownloadFile(xtmJob, file) {
             let xtmInfo = {...xtmJob, projectId: this.job.xtmProjectId};
             try {
-                if(!xtmInfo.fileId) {
-                    const updatedProject = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId: xtmJob.jobId});
-                    this.setCurrentJob(updatedProject.data);
-                    xtmInfo = this.job.xtmJobIds.find(item => item.fileName === file.fileName);
-                    xtmInfo.projectId = this.job.xtmProjectId;
+                const generatedFiles = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId: xtmJob.jobId});
+                let fileLink = "";
+                do {
+                    fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, file: {...generatedFiles.data[0], ...xtmInfo}});
                 }
-                let fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, file: {...xtmInfo}});
-                if(fileLink.data.status && fileLink.data.status !== "FINISHED") {
-                    return this.alertToggle({message: "File is not ready yet. Try later, please.", isShow: true, type: "error"});
-                }
+                while(fileLink.data.status && fileLink.data.status === 'FINISHED');
                 let href = fileLink.data.path;
                 this.createLinkAndDownolad(href);
                 this.setCurrentJob(fileLink.data.updatedProject);
