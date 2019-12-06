@@ -3,7 +3,7 @@
         .review__top-icons
             img.review__save(src="../../../assets/images/Other/save-icon-qa-form.png" @click="saveChanges")
             span.review__close(@click="close") +
-        .review__title Delivery Review
+        .review__title Delivery Review {{ dr }}
         Drops(:project="project" :user="user" :assignedManager="assignedManager" @assignManager="assignManager")
         .review__title.review_left-align PM Checklist
         .review__check 
@@ -180,6 +180,9 @@ export default {
         isAllChecked() {
             const unchecked = this.files.filter(item => !item.isFileApproved);
             return this.areFilesChecked && this.areFilesConverted && !unchecked.length;
+        },
+        dr() {
+            return this.tasks[0].status === "Pending Approval [DR1]" ? 1 : 2;
         }
     },
     components: {
