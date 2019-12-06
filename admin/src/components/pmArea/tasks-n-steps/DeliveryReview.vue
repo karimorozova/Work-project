@@ -19,7 +19,6 @@
             Table(
                 :tableData="files" 
                 @approveFile="approveFile" 
-                @makeAction="makeFileAction" 
                 @uploadFile="uploadFile"
                 @checkAll="checkAllFiles"
                 @checkFile="checkFile")
@@ -30,10 +29,11 @@
                     @check="(e) => toggleOptions(e, true)" 
                     @uncheck="(e) => toggleOptions(e, false)")
             Options(v-if="areOptions"
+                :isAssign="isAssign"
                 :isDeliver="isDeliver"
                 :isNotify="isNotify"
-                @toggleDelivery="toggleDelivery"
-                @toggleNotify="toggleDelivery"
+                :isDr1="isDr1"
+                @toggleOption="toggleOption"
             )
         .review__button
             Button(v-if="isAllChecked"
@@ -60,8 +60,10 @@ export default {
             areFilesChecked: false,
             areFilesConverted: false,
             areOptions: true,
-            isDeliver: true,
+            isDeliver: false,
             isNotify: false,
+            isDr1: true,
+            isAssign: true,
             files: [],
             assignedManager: null
         }
@@ -77,16 +79,26 @@ export default {
         close() {
             this.$emit("close")
         },
-        toggleDelivery({bool}) {
-            this.isDeliver = bool;
-            this.isNotify = !bool;
+        toggleOption({prop}) {
+            this[prop] = true;
+            if(prop === 'isAssign') {
+                this.isDeliver = false;
+                this.isNotify = false;
+            } else if(prop === 'isDeliver') {
+                this.isAssign = false;
+                this.isNotify = false;
+            } else {
+                this.isAssign = false;
+                this.isDeliver = false;
+            }
         },
         toggle(e, prop) {
             this[prop] = !this[prop];
         },
         toggleOptions(e, bool) {
             this.areOptions = bool;
-            this.isDeliver = bool;
+            this.isAssign = this.isDr1;
+            this.isDeliver = !this.isAssign;
             this.isNotify = false;
         },
         checkAllFiles({bool}) {
@@ -143,6 +155,8 @@ export default {
             const tasksIds = this.tasks.map(item => item.taskId);
             if(this.tasks[0].status === "Pending Approval [DR2]") {
                 this.assignedManager = this.user;
+                this.isDr1 = false;
+                this.isDeliver = true;
             }
             try {
                 const result = await this.$http.post("/pm-manage/delivery-data", {projectId: this.project._id, tasksIds, manager: this.assignedManager});
@@ -230,7 +244,7 @@ export default {
     }
     &__options {
         align-self: center;
-        width: 330px;
+        width: 430px;
         height: 28px;
         margin: 20px 0; 
         display: flex;

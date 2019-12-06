@@ -1,17 +1,21 @@
 <template lang="pug">
     .options
-        .options__item(:class="{'options_brown': isDeliver}" @click="(e) => toggleDelivery(e, true)") Deliver to Client
-        .options__item(:class="{'options_brown': !isDeliver}" @click="(e) => toggleDelivery(e, false)") Notify Client
+        .options__item(v-if="isDr1" :class="{'options_brown': isAssign}" @click="(e) => toggle(e, 'isAssign')") Assign DR2
+        .options__item.options_bordered(:class="{'options_brown': isDeliver}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
+        .options__item(:class="{'options_brown': isNotify}" @click="(e) => toggle(e, 'isNotify')") Notify Client
 </template>
 
 <script>
 export default {
     props: {
-        isDeliver: {type: Boolean},
+        isDeliver: {type: Boolean, default: false},
+        isNotify: {type: Boolean, default: false},
+        isDr1: {type: Boolean, default: true},
+        isAssign: {type: Boolean, default: true},
     },
     methods: {
-        toggleDelivery(e, bool) {
-            this.$emit("toggleDelivery", { bool })
+        toggle(e, prop) {
+            this.$emit("toggleOption", { prop })
         }
     }
 }
@@ -26,7 +30,7 @@ export default {
     border: 1px solid $main-color;
     border-radius: 8px;
     box-sizing: border-box;
-    width: 260px;
+    width: 350px;
     font-size: 14px;
     overflow: hidden;
     &__item {
@@ -38,15 +42,20 @@ export default {
         cursor: pointer;
         color: $main-color;
         font-weight: 600;
-        &:first-child {
-            border-right: 1px solid $main-color;
-        }
+        // &:first-child {
+        //     border-right: 1px solid $main-color;
+        // }
+    }
+    &_bordered {
+        border-right: 1px solid $main-color;
+        border-left: 1px solid $main-color;
     }
     &_brown {
         background-color: $main-color;
         color: $white;
         &:first-child {
-            border-right: 1px solid $white;
+            border-right-color: $white;
+            border-left-color: $white;
         }
     }
 }
