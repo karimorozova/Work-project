@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User, Clients } = require("../../models");
+const { User, Clients, Delivery } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
@@ -315,6 +315,19 @@ router.post("/tasks-approve", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.post("/delivery-data", async (req, res) => {
+    const { tasksIds, projectId, manager } = req. body;
+    const query = manager ? { projectId, 'tasks.manager': manager._id} : { projectId }; 
+    try {
+        const projectDelivery = await Delivery.findOne(query).populate("tasks.manager");
+        const result = projectDelivery.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+        res.send(result);
+    }  catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting delivery data");
     }
 })
 

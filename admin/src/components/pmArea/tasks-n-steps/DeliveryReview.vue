@@ -4,7 +4,7 @@
             img.review__save(src="../../../assets/images/Other/save-icon-qa-form.png" @click="saveChanges")
             span.review__close(@click="close") +
         .review__title Delivery Review
-        Drops(:project="project" :user="user")
+        Drops(:project="project" :user="user" :assignedManager="assignedManager" @assignManager="assignManager")
         .review__title.review_left-align PM Checklist
         .review__check 
             .review__check-item
@@ -16,7 +16,13 @@
                     :isApproved="areFilesConverted"
                     text="Make sure to convert all doc files into PDF")
         .review__table
-            Table(:tableData="files" @approveFile="approveFile" @makeAction="makeFileAction" @uploadFile="uploadFile")
+            Table(
+                :tableData="files" 
+                @approveFile="approveFile" 
+                @makeAction="makeFileAction" 
+                @uploadFile="uploadFile"
+                @checkAll="checkAllFiles"
+                @checkFile="checkFile")
         .review__options(v-if="isAllChecked")
             .review__options-check
                 CheckBox(:isChecked="areOptions" 
@@ -56,39 +62,21 @@ export default {
             areOptions: true,
             isDeliver: true,
             isNotify: false,
-            files: []
+            files: [],
+            assignedManager: null
         }
     },
     methods: {
-        ...mapActions({
-            approveDeliveryFile: "approveDeliveryFile",
-            uploadTarget: "uploadTarget",
-            approveWithOption: "approveWithOption",
-            approveDeliverable: "approveDeliverable"
-        }),
+        ...mapActions([
+            "approveDeliveryFile",
+            "uploadTarget",
+            "approveWithOption",
+            "approveDeliverable",
+            "alertToggle"
+        ]),
         close() {
             this.$emit("close")
         },
-        // getStepsFiles() {
-        //     this.stepFiles = [];
-        //     for(let task of this.tasks) {
-        //         const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
-        //         const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
-        //         const files = taskFiles.reduce((prev, cur) => {
-        //             const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
-        //             prev.push({
-        //                 fileName,
-        //                 pair,
-        //                 taskId: task.taskId,
-        //                 jobId: cur.jobId,
-        //                 path: cur.targetFile || cur.path.split("./dist").pop(),
-        //                 isFileApproved: cur.isFileApproved
-        //             })
-        //             return [...prev];
-        //         }, [])
-        //         this.stepFiles.push(...files);
-        //     }
-        // },
         toggleDelivery({bool}) {
             this.isDeliver = bool;
             this.isNotify = !bool;
@@ -100,6 +88,14 @@ export default {
             this.areOptions = bool;
             this.isDeliver = bool;
             this.isNotify = false;
+        },
+        checkAllFiles({bool}) {
+            this.files = this.files.map(item => {
+                return {...item, isChecked: bool}
+            })
+        },
+        checkFile({index, bool}) {
+            this.files[index].isChecked = bool;
         },
         createLinkAndDownolad(href) {
             let link = document.createElement('a');
@@ -156,24 +152,23 @@ export default {
                 this.$emit("close");
             }
         },
-        setFiles() {
-            this.files = [];
-            for(let task of this.tasks) {
-                const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
-                const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
-                const targetFiles = taskFiles.reduce((prev, cur) => {
-                    const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
-                    prev.push({
-                        fileName,
-                        pair,
-                        taskId: task.taskId,
-                        jobId: cur.jobId,
-                        path: cur.targetFile || cur.path.split("./dist").pop(),
-                        isFileApproved: cur.isFileApproved
-                    })
-                    return [...prev];
-                }, [])
-                this.files.push(...targetFiles);
+        assignManager({manager}) {
+            this.assignedManager = manager;
+        },
+        async getDeliveryData() {
+            const tasksIds = this.tasks.map(item => item.taskId);
+            if(this.tasks[0].status === "Pending Approval [DR2]") {
+                this.assignedManager = this.user;
+            }
+            try {
+                const result = await this.$http.post("/pm-manage/delivery-data", {projectId: this.project._id, tasksIds, manager: this.assignedManager});
+                this.files = result.data.reduce((acc, cur) => {
+                    const taskFiles = cur.files.map(item => { return {...item, taskId: cur.taskId, pair: cur.pair, isChecked: false} });
+                    return [...acc, ...taskFiles];
+                }, []);
+                this.assignedManager = this.assignedManager || this.project.accountManager;
+            } catch(err) {
+                this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});
             }
         }
     },
@@ -185,30 +180,7 @@ export default {
         isAllChecked() {
             const unchecked = this.files.filter(item => !item.isFileApproved);
             return this.areFilesChecked && this.areFilesConverted && !unchecked.length;
-        },
-        // stepFiles() {
-        //     let result = [];
-        //     if(this.tasks.length) {
-        //         for(let task of this.tasks) {
-        //             const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
-        //             const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
-        //             const files = taskFiles.reduce((prev, cur) => {
-        //                 const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
-        //                 prev.push({
-        //                     fileName,
-        //                     pair,
-        //                     taskId: task.taskId,
-        //                     jobId: cur.jobId,
-        //                     path: cur.targetFile || cur.path.split("./dist").pop(),
-        //                     isFileApproved: cur.isFileApproved
-        //                 })
-        //                 return [...prev];
-        //             }, [])
-        //             result.push(...files);
-        //         }
-        //     }
-        //     return result;
-        // }
+        }
     },
     components: {
         Drops,
@@ -219,7 +191,7 @@ export default {
         Button
     },
     mounted() {
-        this.setFiles();
+        this.getDeliveryData();
     }
 }
 </script>

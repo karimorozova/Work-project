@@ -13,13 +13,13 @@
             :tableheadRowClass="tableData.length < 5 ? 'tbody_visible-overflow' : ''"
         )
             .review-table__header.review-table__check-cell(slot="headerCheck" slot-scope="{ field }")
-                CheckBox(:isChecked="true" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+                CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
             .review-table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
             .review-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
             .review-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
             .review-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
-            .review-table__data.review-table__check-cell(slot="check" slot-scope="{ row }")
-                CheckBox(:isChecked="false" customClass="tasks-n-steps")
+            .review-table__data.review-table__check-cell(slot="check" slot-scope="{ row, index }")
+                CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
             .review-table__data(slot="name" slot-scope="{ row }")
                 img.review-table__file-icon(src="../../../assets/images/file_icon.png")
                 span.review-table__file-name {{ row.fileName }}
@@ -76,7 +76,10 @@ export default {
             e.target.value = "";
         },
         toggleAll(e, bool) {
-
+            this.$emit("checkAll", {bool});
+        },
+        toggle(e, index, bool) {
+            this.$emit("checkFile", { index, bool });
         }
     },
     computed: {
@@ -88,6 +91,9 @@ export default {
                     delete: {src: require("../../../assets/images/Other/delete-icon-qa-form.png")}};
             }
             return result;
+        },
+        isAllChecked() {
+            return !this.tableData.find(item => !item.isChecked);
         }
     },
     components: {

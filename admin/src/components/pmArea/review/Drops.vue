@@ -3,17 +3,13 @@
         .block
             h4.block__title Delivery Review 1
             .block__text {{ user.firstName + ' ' + user.lastName }}
-            //- .block__menu
-            //-     SelectSingle(
-            //-         :options="del1"
-            //-         :selectedOption="user.firstName + ' ' + user.lastName"
-            //-     )
         .block
             h4.block__title Delivery Review 2
             .block__menu
                 SelectSingle(
                     :options="managersNames"
                     :selectedOption="selectedManager"
+                    @chooseOption="setManager"
                 )
         .block
             h4.block__title Contacts
@@ -33,15 +29,13 @@ import { mapActions } from "vuex";
 export default {
     props: {
         project: {type: Object},
-        user: {type: Object}
+        user: {type: Object},
+        assignedManager: {type: Object}
     },
     data() {
         return {
-            del1: ["User1", "User2"],
             managers: [],
             contacts: [],
-            del1Selected: "",
-            selectedManager: "",
             slectedContacts: []
         }
     },
@@ -62,8 +56,9 @@ export default {
             this.slectedContacts = this.project.customer.contacts.filter(item => item.leadContact)
                 .map(item => `${item.firstName} ${item.surname}`);
         },
-        setDefaultManager() {
-            this.selectedManager = `${this.project.accountManager.firstName} ${this.project.accountManager.lastName}`;
+        setManager({option}) {
+            const managerIndex = this.managersNames.indexOf(option);
+            this.$emit("assignManager", {manager: this.managers[managerIndex]});
         },
         async getManagers() {
             try {
@@ -83,11 +78,14 @@ export default {
             let result = [];
             if(this.managers.length) {
                 result = this.managers.map(item => {
-                    const position = item.group.name === "Account Managers" ? "(AM)" : "(PM)";
+                    const position = item.group.name === "Account Managers" ? "[AM]" : "[PM]";
                     return `${item.firstName} ${item.lastName} ${position}`
                 })
             }
             return result;
+        },
+        selectedManager() {
+            return this.assignedManager ? `${this.assignedManager.firstName} ${this.assignedManager.lastName}` : "";
         }
     },
     components: {
@@ -99,7 +97,6 @@ export default {
     },
     mounted() {
         this.setDefaultContact();
-        this.setDefaultManager()
     }
 }
 </script>
