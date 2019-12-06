@@ -150,12 +150,11 @@ export default {
             this.isApproveActionShow = true;
         },
         deliveryReviewAction() {
-            const validStatuses = ["Pending Approval [DR1]", "Pending Approval [DR2]", "Cancelled Halfway"];
-            const checkedTasks = this.allTasks.filter(item => item.isChecked && validStatuses.indexOf(item.status) !== -1);
-            if(checkedTasks.length) {
-                this.reviewTasks = checkedTasks;
-                this.isDeliveryReview = true;
-            }
+            const checkedDr1Tasks = this.allTasks.filter(item => item.isChecked && item.status === "Pending Approval [DR1]");
+            const checkedDr2Tasks = this.allTasks.filter(item => item.isChecked && item.status === "Pending Approval [DR2]");
+            if(!checkedDr2Tasks.length && !checkedDr1Tasks.length) return;
+            this.reviewTasks = checkedDr2Tasks.length ? checkedDr2Tasks : checkedDr1Tasks;
+            this.isDeliveryReview = true;
             this.selectedAction = "";
             this.unCheckAllTasks();
         },
