@@ -1,29 +1,36 @@
 <template lang="pug">
     .drops
-        .block
-            h4.block__title Delivery Review 1
-            .block__text {{ user.firstName + ' ' + user.lastName }}
-        .block
-            h4.block__title Delivery Review 2
-            .block__menu
-                SelectSingle(
-                    :options="managersNames"
-                    :selectedOption="selectedManager"
-                    @chooseOption="setManager"
-                )
-        .block
-            h4.block__title Contacts
-            .block__menu
-                SelectMulti(
-                    :options="contactsNames"
-                    :selectedOptions="slectedContacts"
-                    @chooseOptions="setContacts"
-                )
+        DataTable(
+            :fields="fields"
+            :tableData="['']"
+            bodyRowClass="delivery_no-hover-change"
+            bodyClass="tbody_visible-overflow"
+            tableheadRowClass="tbody_visible-overflow"
+        )
+            .drops__header(slot="headerDr1" slot-scope="{ field }") {{ field.label }}
+            .drops__header(slot="headerDr2" slot-scope="{ field }") {{ field.label }}
+            .drops__header(slot="headerContacts" slot-scope="{ field }") {{ field.label }}
+            .drops__data(slot="dr1" slot-scope="{ row }") {{ user.firstName + ' ' + user.lastName }}
+            .drops__data(slot="dr2" slot-scope="{ row }")
+                .drops__menu
+                    SelectSingle(
+                        :options="managersNames"
+                        :selectedOption="selectedManager"
+                        @chooseOption="setManager"
+                    )
+            .drops__data(slot="contacts" slot-scope="{ row }")
+                .drops__menu
+                    SelectMulti(
+                        :options="contactsNames"
+                        :selectedOptions="slectedContacts"
+                        @chooseOptions="setContacts"
+                    )
 </template>
 
 <script>
 import SelectSingle from "@/components/SelectSingle";
 import SelectMulti from "@/components/SelectMulti";
+import DataTable from "@/components/DataTable";
 import { mapActions } from "vuex";
 
 export default {
@@ -36,7 +43,12 @@ export default {
         return {
             managers: [],
             contacts: [],
-            slectedContacts: []
+            slectedContacts: [],
+            fields: [
+                {label: "Delivery 1", headerKey: "headerDr1", key: "dr1", width: "33%", padding: 0},
+                {label: "Delivery 2", headerKey: "headerDr2", key: "dr2", width: "34%", padding: 0},
+                {label: "Contacts", headerKey: "headerContacts", key: "contacts", width: "33%", padding: 0},
+            ]
         }
     },
     methods: {
@@ -90,7 +102,8 @@ export default {
     },
     components: {
         SelectSingle,
-        SelectMulti
+        SelectMulti,
+        DataTable
     },
     created() {
         this.getManagers();
@@ -105,28 +118,24 @@ export default {
 @import "../../../assets/scss/colors.scss";
 
 .drops {
-    display: flex;
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid $main-color;
-    margin: 20px 0;
-}
-
-.block {
-    flex: 1;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-right: 1px solid $main-color;
-    padding-bottom: 10px;
-    &:last-child {
-        border-right: none;
-    }
+    margin-top: 20px;
     &__menu {
         position: relative;
         height: 30px;
         width: 191px;
+    }
+    &__header {
+        text-align: center;
+    }
+    &__data {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        height: 50px;
+        padding: 10px;
     }
 }
 

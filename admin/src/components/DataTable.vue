@@ -91,6 +91,14 @@
       .steps-table-row, .rates-matrix-row {
         cursor: default;
       }
+      .delivery_no-hover-change {
+        cursor: default;
+        &:hover {
+          .table__tbody-cell {
+            background-color: $table-row-zebra-background;
+          }
+        }
+      }
     }
     &__thead-cell {
       box-sizing: border-box;
