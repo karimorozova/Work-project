@@ -150,7 +150,7 @@ export default {
             this.isApproveActionShow = true;
         },
         deliveryReviewAction() {
-            const validStatuses = ["Pending Approval", "Cancelled Halfway"];
+            const validStatuses = ["Pending Approval [DR1]", "Pending Approval [DR2]", "Cancelled Halfway"];
             const checkedTasks = this.allTasks.filter(item => item.isChecked && validStatuses.indexOf(item.status) !== -1);
             if(checkedTasks.length) {
                 this.reviewTasks = checkedTasks;
@@ -292,7 +292,7 @@ export default {
         }),
         availableActions() {
             let result = ["Cancel"];
-            const completedTask = this.allTasks.find(item => item.status === 'Pending Approval' || item.status === "Cancelled Halfway");
+            const completedTask = this.allTasks.find(item => item.status.indexOf('Pending Approval') !== -1 || item.status === "Cancelled Halfway");
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
             const createdTask = this.allTasks.find(item => item.status === 'Created');
             if(completedTask) {

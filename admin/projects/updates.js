@@ -17,8 +17,8 @@ async function updateProjectProgress(project, isCatTool) {
             } else if(!isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
-            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval" : task.status;
-            if(task.status === "Pending Approval") {
+            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval [DR1]" : task.status;
+            if(task.status === "Pending Approval [DR1]") {
                 task.deliveryStatus = "[DR1]";
                 await addToDelivery(project, task);
             }
@@ -116,7 +116,7 @@ function cancelSteps({stepIdentify, steps}) {
 }
 
 async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
-    const unchangingStatuses = ['Ready for Delivery', 'Pending Approval', 'Delivered'];
+    const unchangingStatuses = ['Ready for Delivery', 'Pending Approval [DR1]', 'Pending Approval [DR2]', 'Delivered'];
     let tasks = [...projectTasks];
     for(let task of tasks) {
         if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
@@ -179,7 +179,7 @@ function getTaskStatusAfterCancel(steps, taskId) {
         return "Cancelled"
     }
     if(completedSteps.length === taskSteps.length) {
-        return "Pending Approval"
+        return "Pending Approval [DR1]"
     }
     if(halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
         return "Cancelled Halfway"
