@@ -97,22 +97,6 @@ export default {
         checkFile({index, bool}) {
             this.files[index].isChecked = bool;
         },
-        createLinkAndDownolad(href) {
-            let link = document.createElement('a');
-            link.href = __WEBPACK__API_URL__ + href;
-            link.target = "_blank";
-            link.click();
-        },
-        async makeFileAction({index, key}) {
-            const file = this.files[index];
-            if(file.isFileApproved) return;
-            if(key === 'download') {
-                this.createLinkAndDownolad(file.path);
-            }
-            if(key === 'delete') {
-                
-            }
-        },
         async uploadFile({file, index}) {
             const { path, taskId } = this.files[index];
             const fileData = new FormData();

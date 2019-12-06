@@ -68,7 +68,17 @@ export default {
             this.$emit('approveFile', { index });
         },
         makeAction(index, key) {
-            this.$emit('makeAction', { index, key })
+            const file = this.tableData[index];
+            if(file.isFileApproved) return;
+            if(key === 'download') {
+                return this.createLinkAndDownolad(file.path);
+            }
+        },
+        createLinkAndDownolad(href) {
+            let link = document.createElement('a');
+            link.href = __WEBPACK__API_URL__ + href;
+            link.target = "_blank";
+            link.click();
         },
         uploadFile(e, index) {
             const file = e.target.files[0];
