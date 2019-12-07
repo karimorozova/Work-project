@@ -75,8 +75,9 @@ async function storeTargetFile({ step, id, projectId, file }) {
 
 async function manageDeliveryFile({fileData, file}) {
     const { path, taskId, isOriginal, projectId } = fileData;
+    const additionFileInfo = `DR-${taskId.replace(/\s+/g, '')}`
     try {
-        const newPath = `/projectFiles/${projectId}/Dr-${file.filename.replace(/\s+/g, '_')}`;
+        const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/\s+/g, '_')}`;
         await moveFile(file, `./dist${newPath}`);
         if(path !== newPath && isOriginal === "false") {
             fs.unlink(`./dist${path}`, (err) => err ? console.log(err) : "");
