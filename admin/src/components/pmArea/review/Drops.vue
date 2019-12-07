@@ -10,7 +10,11 @@
             .drops__header(slot="headerDr1" slot-scope="{ field }") {{ field.label }}
             .drops__header(slot="headerDr2" slot-scope="{ field }") {{ field.label }}
             .drops__header(slot="headerContacts" slot-scope="{ field }") {{ field.label }}
-            .drops__data(slot="dr1" slot-scope="{ row }") {{ user.firstName + ' ' + user.lastName }}
+            .drops__data(slot="dr1" slot-scope="{ row }") 
+                .drops__name {{ user.firstName + ' ' + user.lastName }}    
+                    .drops__timestamp(v-if="timestamp")
+                        img.drops__time-icon(src="../../../assets/images/time_icon.png")
+                        .drops__time-data {{ getDeliveredTime() }} 
             .drops__data(slot="dr2" slot-scope="{ row }")
                 .drops__menu
                     SelectSingle(
@@ -31,13 +35,15 @@
 import SelectSingle from "@/components/SelectSingle";
 import SelectMulti from "@/components/SelectMulti";
 import DataTable from "@/components/DataTable";
+import moment from "moment";
 import { mapActions } from "vuex";
 
 export default {
     props: {
         project: {type: Object},
         user: {type: Object},
-        assignedManager: {type: Object}
+        assignedManager: {type: Object},
+        timestamp: {type: String, default: ""}
     },
     data() {
         return {
@@ -53,6 +59,9 @@ export default {
     },
     methods: {
         ...mapActions(["alertToggle"]),
+        getDeliveredTime(date) {
+            return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
+        },
         setContacts({option}) {
             const position = this.slectedContacts.indexOf(option);
             if(position === -1) {
@@ -136,6 +145,32 @@ export default {
         box-sizing: border-box;
         height: 50px;
         padding: 10px;
+    }
+    &__name {
+        position: relative;
+    }
+    &__timestamp {
+        cursor: pointer;
+        margin-left: 10px;
+        &:hover {
+            .drops__time-data {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+    }
+    &__time-data {
+        position: absolute;
+        top: -2px;
+        width: 150px;
+        background-color: $white;
+        padding: 3px;
+        border-radius: 3px;
+        margin-left: 22px;
+        box-shadow: 0 0 10px $brown-shadow;
+        opacity: 0;
+        z-index: -2;
+        transition: all 0.2s;
     }
 }
 

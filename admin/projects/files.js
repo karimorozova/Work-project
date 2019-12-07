@@ -73,51 +73,19 @@ async function storeTargetFile({ step, id, projectId, file }) {
     }
 }
 
-async function manageDeliveryFile({fileData, project, file}) {
-    const { path, taskId } = fileData;
-    let { steps, tasks } = project;
-    const taskIndex = tasks.findIndex(item => item.taskId === taskId);
+async function manageDeliveryFile({fileData, file}) {
+    const { path, taskId, isOriginal, projectId } = fileData;
     try {
-        const newPath = `/projectFiles/${project.id}/${file.filename.replace(/\s+/g, '_')}`;
+        const newPath = `/projectFiles/${projectId}/Dr-${file.filename.replace(/\s+/g, '_')}`;
         await moveFile(file, `./dist${newPath}`);
-        tasks[taskIndex] = getUpdatedTask({oldPath: path, newPath, task: tasks[taskIndex]});
-        steps = getUpdatedSteps({steps, oldPath: path, newPath, taskId});
-        if(path !== newPath) {
+        if(path !== newPath && isOriginal === "false") {
             fs.unlink(`./dist${path}`, (err) => err ? console.log(err) : "");
         }
-        return { tasks, steps };
+        return newPath;
     } catch(err) {
         console.log(err);
         console.log("Error in manageDeliveryFile");
     }
 }
-
-function getUpdatedTask({oldPath, newPath, task}) {
-    if(task.service.calculationUnit === 'Words') {
-        const xtmJobs = task.xtmJobs.map(item => {
-            item.targetFile = item.targetFile === oldPath ? newPath : item.targetFile;
-            return item;
-        })
-        return {...task, xtmJobs}
-    }
-    const targetFiles = task.targetFiles.map(item => {
-        if(item.path === oldPath) {
-            item.path = `./dist${newPath}`;
-            item.isApproved = false;
-            item.fileName = newPath.split(".").pop();
-        }
-        return item;
-    })
-    return {...task, targetFiles};
-}
-
-function getUpdatedSteps({steps, oldPath, newPath, taskId}) {
-    return steps.map(item => {
-        if(item.serviceStep.calculationUnit !== 'Words' && item.taskId === taskId) {
-            item.targetFile = item.targetFile === oldPath ? newPath : item.targetFile;
-        }
-        return item;
-    })
-} 
 
 module.exports = { storeFiles, getDeliverablesLink, storeTargetFile, manageDeliveryFile };

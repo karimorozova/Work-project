@@ -40,6 +40,7 @@ import DataTable from "@/components/DataTable";
 import SelectSingle from "@/components/SelectSingle";
 import CheckBox from "@/components/CheckBox"
 import Add from "@/components/Add"
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -64,14 +65,19 @@ export default {
         }
     },
     methods: {
+        ...mapActions(["removeDrFile"]),
         approveFile(index) {
             this.$emit('approveFile', { index });
         },
-        makeAction(index, key) {
+        async makeAction(index, key) {
             const file = this.tableData[index];
             if(file.isFileApproved) return;
             if(key === 'download') {
                 return this.createLinkAndDownolad(file.path);
+            }
+            if(key === 'delete') {
+                await this.removeDrFile(file);
+                this.$emit("updateDeliveryData");
             }
         },
         createLinkAndDownolad(href) {

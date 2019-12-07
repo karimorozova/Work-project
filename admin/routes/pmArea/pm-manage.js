@@ -268,12 +268,12 @@ router.post("/steps-reopen", async (req, res) => {
 })
 
 router.post("/approve-files", async (req, res) => {
-    const { taskId, jobId, isFileApproved,path } = req.body;
+    const { taskIds, isFileApproved, path } = req.body;
     try {
-        const updatedProject = await getAfterApproveFile({
-            taskId, jobId, isFileApproved, path
-        })
-        res.send(updatedProject);
+        await Delivery.updateOne({"tasks.taskId": {$in: taskIds}, "tasks.files.path": path}, 
+            {"tasks.$[i].files.$[j].isFileApproved": isFileApproved}, 
+            {arrayFilters: [{"i.taskId": {$in: taskIds}}, {"j.path": path}]});
+        res.send("done");
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on approve files");
@@ -283,14 +283,30 @@ router.post("/approve-files", async (req, res) => {
 router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) => {
     const fileData = {...req.body};
     try {
-        const project = await getProject({"tasks.taskId": fileData.taskId});
         const files = req.files["targetFile"];
-        const { tasks, steps } = await manageDeliveryFile({fileData, project, file: files[0]});
-        const updatedProject = await updateProject({"_id": project.id}, { tasks, steps });
-        res.send(updatedProject);
+        const newPath = await manageDeliveryFile({fileData, file: files[0]});
+        await Delivery.updateOne({"tasks.taskId": fileData.taskId, "tasks.files.path": fileData.path}, 
+            {"tasks.$[i].files.$[j]": {
+                isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath
+            }}, 
+            {arrayFilters: [{"i.taskId": fileData.taskId}, {"j.path": fileData.path}], upsert: true});
+        res.send("uploaded");
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on uploading target file");
+    }
+})
+
+router.post("/remove-dr-file", async (req, res) => {
+    const { taskId, path, isOriginal } = req.body;
+    try {
+        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": path}, 
+            {$pull: {"tasks.$[i].files": { path }}}, 
+            {arrayFilters: [{"i.taskId": taskId}]});
+        res.send("done");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing dr file");
     }
 })
 
@@ -299,6 +315,21 @@ router.post("/tasks-approve-notify", async (req, res) => {
     try {
         const project = await getProject({"tasks.taskId": taskIds[0]});
         const updatedProject = await getProjectAfterApprove({taskIds, project, isDeliver});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.post("/assign-dr2", async (req, res) => {
+    const { taskIds, projectId, manager } = req.body;
+    try {
+        await Delivery.updateOne(
+                {projectId, "tasks.taskId": {$in: taskIds}}, 
+                {"tasks.$.manager": manager, "tasks.$.isAssigned": true, "tasks.$.status": "[DR2]", "tasks.$.timeStamp": new Date()}
+            );
+        const updatedProject = await updateProject({"tasks.taskId": {$in: taskIds}}, {"tasks.$.status": "Pending Approval [DR2]"});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

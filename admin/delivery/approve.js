@@ -1,4 +1,4 @@
-const { getProject, updateProject, notifyClientTaskReady, sendClientDeliveries } = require('../projects');
+const { updateProject, notifyClientTaskReady, sendClientDeliveries } = require('../projects');
 
 async function getProjectAfterApprove({taskIds, project, isDeliver}) {
     try {
