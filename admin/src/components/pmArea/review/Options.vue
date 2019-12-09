@@ -1,7 +1,7 @@
 <template lang="pug">
     .options
         .options__item(v-if="isDr1" :class="{'options_brown': isAssign}" @click="(e) => toggle(e, 'isAssign')") Assign DR2
-        .options__item.options_bordered(:class="{'options_brown': isDeliver}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
+        .options__item(:class="{'options_brown': isDeliver, 'options_bordered': isDr1}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
         .options__item(:class="{'options_brown': isNotify}" @click="(e) => toggle(e, 'isNotify')") Notify Client
 </template>
 

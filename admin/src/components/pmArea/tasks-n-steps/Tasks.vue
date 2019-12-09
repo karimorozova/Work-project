@@ -76,6 +76,7 @@
                 span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
                 img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+                img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review.png" @click="reviewForDelivery(row)")
     .tasks__approve-action(v-if="isApproveActionShow")
         ApproveModal(
             :text="modalTexts.main" 
@@ -85,7 +86,7 @@
             @notApprove="notApproveAction"
             @close="closeApproveModal")
     .tasks__review(v-if="isDeliveryReview")
-        DeliveryReview(@close="closeReview" :tasks="reviewTasks" @updateTasks="updateReviewTasks")
+        DeliveryReview(@close="closeReview" :task="reviewTask" @updateTasks="updatereviewTask")
 </template>
 
 <script>
@@ -125,7 +126,7 @@ export default {
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             isDeliveryReview: false,
-            reviewTasks: []
+            reviewTask: []
         }
     },
     methods: {
@@ -143,20 +144,12 @@ export default {
         },
         setAction({option}) {
             this.selectedAction = option;
-            if(option === "Delivery Review") {
-                return this.deliveryReviewAction();
-            }
             this.setModalTexts(option);
             this.isApproveActionShow = true;
         },
-        deliveryReviewAction() {
-            const checkedDr1Tasks = this.allTasks.filter(item => item.isChecked && item.status === "Pending Approval [DR1]");
-            const checkedDr2Tasks = this.allTasks.filter(item => item.isChecked && item.status === "Pending Approval [DR2]");
-            if(!checkedDr2Tasks.length && !checkedDr1Tasks.length) return;
-            this.reviewTasks = checkedDr2Tasks.length ? checkedDr2Tasks : checkedDr1Tasks;
+        reviewForDelivery(task) {
+            this.reviewTask = task;
             this.isDeliveryReview = true;
-            this.selectedAction = "";
-            this.unCheckAllTasks();
         },
         unCheckAllTasks() {
             const unchecked = this.allTasks.map(item => {
@@ -165,8 +158,8 @@ export default {
             })
             this.storeProject({...this.currentProject, tasks: unchecked});
         },
-        updateReviewTasks({tasksIds}) {
-            this.reviewTasks = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+        updatereviewTask({tasksIds}) {
+            this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
         },
         setModalTexts(option) {
             this.modalTexts = {main: "Are you sure?", approve: "Yes", notApprove: "No"};
@@ -291,14 +284,8 @@ export default {
         }),
         availableActions() {
             let result = ["Cancel"];
-            const completedTask = this.allTasks.find(item => item.status.indexOf('Pending Approval') !== -1 || item.status === "Cancelled Halfway");
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
             const createdTask = this.allTasks.find(item => item.status === 'Created');
-            if(completedTask) {
-                if(result.indexOf('Delivery Review') === -1) {
-                    result.push('Delivery Review')
-                }
-            }
             if(approvedTask) {
                 if(result.indexOf('Deliver') === -1) {
                     result.push('Deliver')

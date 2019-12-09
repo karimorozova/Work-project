@@ -4,12 +4,13 @@ const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
-    setStepsStatus, getMessage, getAfterApproveFile, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
+    setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
+const fs = require("fs");
 
 router.get("/project", async (req, res) => {
     const { id } = req.query;
@@ -268,11 +269,11 @@ router.post("/steps-reopen", async (req, res) => {
 })
 
 router.post("/approve-files", async (req, res) => {
-    const { taskIds, isFileApproved, path } = req.body;
+    const { taskId, isFileApproved, paths } = req.body;
     try {
-        await Delivery.updateOne({"tasks.taskId": {$in: taskIds}, "tasks.files.path": path}, 
+        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": {$in: paths}}, 
             {"tasks.$[i].files.$[j].isFileApproved": isFileApproved}, 
-            {arrayFilters: [{"i.taskId": {$in: taskIds}}, {"j.path": path}]});
+            {arrayFilters: [{"i.taskId": taskId}, {"j.path": {$in: paths}}]});
         res.send("done");
     } catch(err) {
         console.log(err);
@@ -303,7 +304,14 @@ router.post("/remove-dr-file", async (req, res) => {
         await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": path}, 
             {$pull: {"tasks.$[i].files": { path }}}, 
             {arrayFilters: [{"i.taskId": taskId}]});
-        res.send("done");
+        if(!isOriginal) {
+            fs.unlink(`./dist${path}`, (err) => {
+                if(err) throw(err);
+                res.send("done");
+            })
+        } else {
+            res.send("done");
+        }
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on removing dr file");
@@ -350,11 +358,10 @@ router.post("/tasks-approve", async (req, res) => {
 })
 
 router.post("/delivery-data", async (req, res) => {
-    const { tasksIds, projectId, manager } = req. body;
-    const query = manager ? { projectId, 'tasks.manager': manager._id} : { projectId }; 
+    const { taskId, projectId } = req. body;
     try {
-        const projectDelivery = await Delivery.findOne(query).populate("tasks.manager");
-        const result = projectDelivery.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+        const projectDelivery = await Delivery.findOne({projectId, "tasks.taskId": taskId},{"tasks.$": 1}).populate("tasks.manager");
+        const result = projectDelivery.tasks[0];
         res.send(result);
     }  catch(err) {
         console.log(err);

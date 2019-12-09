@@ -1,8 +1,6 @@
 <template lang="pug">
     .review
-        .review__top-icons
-            img.review__save(src="../../../assets/images/Other/save-icon-qa-form.png" @click="saveChanges")
-            span.review__close(@click="close") +
+        span.review__close(@click="close") +
         .review__title Delivery Review {{ dr }}
         Drops(:project="project" :user="user" :assignedManager="assignedManager" @assignManager="assignManager" :timestamp="timestamp")
         .review__title.review_left-align PM Checklist
@@ -17,8 +15,9 @@
                     text="Make sure to convert all doc files into PDF")
         .review__table
             Table(
-                :tableData="files" 
-                @approveFile="approveFile" 
+                :files="files" 
+                @approveFile="approveFile"
+                @approveFiles="approveFiles"
                 @uploadFile="uploadFile"
                 @checkAll="checkAllFiles"
                 @checkFile="checkFile"
@@ -54,7 +53,7 @@ const Button = () => import("@/components/Button");
 
 export default {
     props: {
-        tasks: {type: Array}
+        task: {type: Object}
     },
     data() {
         return {
@@ -113,29 +112,30 @@ export default {
             this.files[index].isChecked = bool;
         },
         async uploadFile({file, index}) {
-            const { path, taskId, isOriginal } = this.files[index];
+            const { path, isOriginal } = this.files[index];
             const fileData = new FormData();
             fileData.append("targetFile", file);
             fileData.append("projectId", this.project._id);
             fileData.append("path", path);
-            fileData.append("taskId", taskId);
+            fileData.append("taskId", this.task.taskId);
             fileData.append("isOriginal", isOriginal);
             try {
                 await this.uploadTarget(fileData);
                 await this.getDeliveryData();
             } catch(err) { }
         },
-        refreshTasks() {
-            const tasksIds = this.tasks.map(item => item.taskId);
-            this.$emit('updateTasks', {tasksIds});
-        },
         async approveFile({index}) {
             this.files[index].isFileApproved = !this.files[index].isFileApproved;
             const { taskId, isFileApproved, path } = this.files[index];
             try {
-                await this.approveDeliveryFile({taskIds: [taskId], isFileApproved, path});
+                await this.approveDeliveryFile({taskId, isFileApproved, paths: [path]});
                 await this.getDeliveryData();
             } catch(err) { }
+        },
+        async approveFiles({checked}) {
+            const paths = checked.map(item => item.path);
+            await this.approveDeliveryFile({taskId: this.task.taskId, isFileApproved: true, paths});
+            await this.getDeliveryData();
         },
         async saveChanges() {
             
@@ -160,19 +160,16 @@ export default {
             this.assignedManager = manager;
         },
         async getDeliveryData() {
-            const tasksIds = this.tasks.map(item => item.taskId);
-            if(this.tasks[0].status === "Pending Approval [DR2]") {
-                this.assignedManager = this.user;
+            if(this.task.status === "Pending Approval [DR2]") {
                 this.isDr1 = false;
                 this.isDeliver = true;
             }
             try {
-                const result = await this.$http.post("/pm-manage/delivery-data", {projectId: this.project._id, tasksIds, manager: this.assignedManager});
-                this.files = result.data.reduce((acc, cur) => {
-                    const taskFiles = cur.files.map(item => { return {...item, taskId: cur.taskId, pair: cur.pair, isChecked: false} });
-                    return [...acc, ...taskFiles];
-                }, []);
-                this.timestamp = this.tasks[0].status === "Pending Approval [DR2]" ? result.data[0].timestamp : "";
+                const result = await this.$http.post("/pm-manage/delivery-data", {projectId: this.project._id, taskId: this.task.taskId});
+                if(result.data.files.length) {
+                    this.files = result.data.files.map(item => { return {...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false} });
+                }
+                this.timestamp = this.task.status === "Pending Approval [DR2]" ? result.data.timestamp : "";
                 this.assignedManager = this.assignedManager || this.project.accountManager;
             } catch(err) {
                 this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});
@@ -189,7 +186,7 @@ export default {
             return this.areFilesChecked && this.areFilesConverted && !unchecked.length;
         },
         dr() {
-            return this.tasks[0].status === "Pending Approval [DR1]" ? 1 : 2;
+            return this.task.status === "Pending Approval [DR1]" ? 1 : 2;
         }
     },
     components: {
@@ -223,19 +220,10 @@ export default {
         font-weight: 600;
         text-align: center;
     }
-    &__top-icons {
+    &__close {
         position: absolute;
         top: 0;
         right: 10px;
-        display: flex;
-        align-items: center;
-    }
-    &__save {
-        margin-right: 10px;
-        padding-bottom: 3px;
-        cursor: pointer;
-    }
-    &__close {
         transform: rotate(45deg);
         cursor: pointer;
         font-size: 30px;

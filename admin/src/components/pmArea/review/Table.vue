@@ -5,12 +5,13 @@
                 placeholder="Select action"
                 :options="actions"
                 :selectedOption="selectedAction"
+                @chooseOption="makeActions"
             )
         DataTable(
             :fields="fields"
-            :tableData="tableData"
-            :bodyClass="['review-body', {'tbody_visible-overflow': tableData.length < 5}]"
-            :tableheadRowClass="tableData.length < 5 ? 'tbody_visible-overflow' : ''"
+            :tableData="files"
+            :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 5}]"
+            :tableheadRowClass="files.length < 5 ? 'tbody_visible-overflow' : ''"
         )
             .review-table__header.review-table__check-cell(slot="headerCheck" slot-scope="{ field }")
                 CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
@@ -28,7 +29,7 @@
             .review-table__data(slot="action" slot-scope="{ row, index }")
                 .review-table__icons
                     template(v-for="(icon, key) in allIcons")
-                        img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeAction(index, key)")
+                        img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, key)")
                         .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved}")
                             input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
                     i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
@@ -44,7 +45,7 @@ import { mapActions } from "vuex";
 
 export default {
     props: {
-        tableData: {type: Array}
+        files: {type: Array}
     },
     data() {
         return {
@@ -61,7 +62,7 @@ export default {
                 delete: {src: require("../../../assets/images/Other/delete-icon-qa-form.png")}
             },
             selectedAction: "",
-            actions: ["Action 1", "Action 2"]
+            actions: ["Approve", "Download"]
         }
     },
     methods: {
@@ -69,8 +70,8 @@ export default {
         approveFile(index) {
             this.$emit('approveFile', { index });
         },
-        async makeAction(index, key) {
-            const file = this.tableData[index];
+        async makeOneAction(index, key) {
+            const file = this.files[index];
             if(file.isFileApproved) return;
             if(key === 'download') {
                 return this.createLinkAndDownolad(file.path);
@@ -78,6 +79,18 @@ export default {
             if(key === 'delete') {
                 await this.removeDrFile(file);
                 this.$emit("updateDeliveryData");
+            }
+        },
+        async makeActions({option}) {
+            const checked = this.files.filter(item => item.isChecked);
+            if(!checked.length) return;
+            if(option === 'Download') {
+                for(let file of checked) {
+                    this.createLinkAndDownolad(file.path);
+                }
+            }
+            if(option === 'Approve') {
+                this.$emit('approveFiles', { checked });
             }
         },
         createLinkAndDownolad(href) {
@@ -101,7 +114,7 @@ export default {
     computed: {
         allIcons() {
             let result = this.icons;
-            if(this.tableData.length > 1) {
+            if(this.files.length > 1) {
                 result = {
                     ...result, 
                     delete: {src: require("../../../assets/images/Other/delete-icon-qa-form.png")}};
@@ -109,7 +122,7 @@ export default {
             return result;
         },
         isAllChecked() {
-            return !this.tableData.find(item => !item.isChecked);
+            return !this.files.find(item => !item.isChecked);
         }
     },
     components: {
