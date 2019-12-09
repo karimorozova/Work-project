@@ -15,7 +15,7 @@
                     text="Make sure to convert all doc files into PDF")
         .review__table
             Table(
-                :files="files" 
+                :files="files"
                 @approveFile="approveFile"
                 @approveFiles="approveFiles"
                 @uploadFile="uploadFile"
@@ -112,7 +112,7 @@ export default {
             this.files[index].isChecked = bool;
         },
         async uploadFile({file, index}) {
-            const { path, isOriginal } = this.files[index];
+            const { path, isOriginal } = index !== undefined ? this.files[index] : {path: "", isOriginal: false};
             const fileData = new FormData();
             fileData.append("targetFile", file);
             fileData.append("projectId", this.project._id);

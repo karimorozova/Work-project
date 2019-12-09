@@ -79,10 +79,14 @@ async function manageDeliveryFile({fileData, file}) {
     try {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/\s+/g, '_')}`;
         await moveFile(file, `./dist${newPath}`);
-        if(path !== newPath && isOriginal === "false") {
-            fs.unlink(`./dist${path}`, (err) => err ? console.log(err) : "");
+        if(path && path !== newPath && isOriginal === "false") {
+            fs.unlink(`./dist${path}`, (err) => {
+                if(err) throw(err);
+                return newPath;
+            });
+        } else {
+            return newPath;
         }
-        return newPath;
     } catch(err) {
         console.log(err);
         console.log("Error in manageDeliveryFile");

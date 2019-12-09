@@ -33,7 +33,9 @@
                         .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved}")
                             input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
                     i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
-        Add
+        .review-table__upload.review-table_no-back
+            input.review-table__file-input(type="file" @change="uploadFile")
+            Add
 </template>
 
 <script>
@@ -109,6 +111,9 @@ export default {
         },
         toggle(e, index, bool) {
             this.$emit("checkFile", { index, bool });
+        },
+        addRow() {
+            this.$emit("addFileRow");
         }
     },
     computed: {
@@ -192,7 +197,12 @@ export default {
         input[type=file]::-webkit-file-upload-button {
             cursor: pointer; 
         }
-    } 
+    }
+    &_no-back {
+        background: none;
+        width: 30px;
+        height: 30px;
+    }
     &__file-input {
         padding-left: 0;
         padding-right: 0;

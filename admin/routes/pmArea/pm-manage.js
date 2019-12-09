@@ -286,11 +286,16 @@ router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) =
     try {
         const files = req.files["targetFile"];
         const newPath = await manageDeliveryFile({fileData, file: files[0]});
-        await Delivery.updateOne({"tasks.taskId": fileData.taskId, "tasks.files.path": fileData.path}, 
-            {"tasks.$[i].files.$[j]": {
-                isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath
-            }}, 
-            {arrayFilters: [{"i.taskId": fileData.taskId}, {"j.path": fileData.path}], upsert: true});
+        if(fileData.path) {
+            await Delivery.updateOne({"tasks.taskId": fileData.taskId, "tasks.files.path": fileData.path}, 
+                {"tasks.$[i].files.$[j]": {
+                    isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath
+                }}, 
+                {arrayFilters: [{"i.taskId": fileData.taskId}, {"j.path": fileData.path}]});
+        } else {
+            await Delivery.updateOne({"tasks.taskId": fileData.taskId}, 
+                {$push: {"tasks.$.files": {isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath}}});
+        }
         res.send("uploaded");
     } catch(err) {
         console.log(err);
