@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
-const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
@@ -268,6 +268,30 @@ router.post("/steps-reopen", async (req, res) => {
     }
 })
 
+router.get("/review-status", async (req, res) => {
+    const { projectId, taskId, userId } = req.query;
+    try {
+        const reviewStatus = await checkPermission({projectId, taskId, userId});
+        res.send(reviewStatus);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking delivery review status");
+    }
+})
+
+router.post("/change-manager", async (req, res) => {
+    const { projectId, taskId, manager, prop } = req.body;
+    const key = `tasks.$.${prop}`;
+    const updateQuery = {[key]: manager._id};
+    try {
+        await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
+        res.send("updated");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on changing review manager");
+    }
+})
+
 router.post("/approve-instruction", async (req, res) => {
     const { taskId, projectId, instruction } = req.body;
     try {
@@ -378,7 +402,9 @@ router.post("/tasks-approve", async (req, res) => {
 router.post("/delivery-data", async (req, res) => {
     const { taskId, projectId } = req. body;
     try {
-        const projectDelivery = await Delivery.findOne({projectId, "tasks.taskId": taskId},{"tasks.$": 1})
+        const projectDelivery = await Delivery.findOne(
+            {projectId, "tasks.taskId": taskId},
+            {"tasks.$": 1})
             .populate("tasks.dr1Manager")
             .populate("tasks.dr2Manager");
         const result = projectDelivery.tasks[0];

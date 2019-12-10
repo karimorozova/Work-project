@@ -2,7 +2,13 @@
     .review
         span.review__close(@click="close") +
         .review__title Delivery Review {{ dr }}
-        Drops(:project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
+        Drops(
+            :project="project" 
+            :user="user" 
+            :dr1Manager="dr1Manager" 
+            :dr2Manager="dr2Manager" 
+            :timestamp="timestamp"
+            @assignManager="assignManager")
         .review__title.review_left-align PM Checklist
         .review__check 
             .review__check-item(v-for="instruction in instructions")
@@ -49,7 +55,9 @@ const Button = () => import("@/components/Button");
 
 export default {
     props: {
-        task: {type: Object}
+        task: {type: Object},
+        user: {type: Object},
+        project: {type: Object}
     },
     data() {
         return {
@@ -64,7 +72,8 @@ export default {
             dr1Manager: null,
             dr2Manager: null,
             timestamp: "",
-            instructions: []
+            instructions: [],
+            isReviewing: false
         }
     },
     methods: {
@@ -75,6 +84,7 @@ export default {
             "approveWithOption",
             "approveDeliverable",
             "assignDr2",
+            "changeReviewManager",
             "alertToggle"
         ]),
         close() {
@@ -94,6 +104,8 @@ export default {
             }
         },
         async toggle(e, instruction) {
+            await this.checkPermission();
+            if(this.isReviewing) return;
             await this.approveInstruction({
                 projectId: this.project._id,
                 taskId: this.task.taskId, 
@@ -116,6 +128,8 @@ export default {
             this.files[index].isChecked = bool;
         },
         async uploadFile({file, index}) {
+            await this.checkPermission();
+            if(this.isReviewing) return;
             const { path, isOriginal } = index !== undefined ? this.files[index] : {path: "", isOriginal: false};
             const fileData = new FormData();
             fileData.append("targetFile", file);
@@ -129,6 +143,8 @@ export default {
             } catch(err) { }
         },
         async approveFile({index}) {
+            await this.checkPermission();
+            if(this.isReviewing) return;
             this.files[index].isFileApproved = !this.files[index].isFileApproved;
             const { taskId, isFileApproved, path } = this.files[index];
             try {
@@ -137,12 +153,24 @@ export default {
             } catch(err) { }
         },
         async approveFiles({checked}) {
+            await this.checkPermission();
+            if(this.isReviewing) return;
             const paths = checked.map(item => item.path);
             await this.approveDeliveryFile({taskId: this.task.taskId, isFileApproved: true, paths});
             await this.getDeliveryData();
         },
-        async saveChanges() {
-            
+        async checkPermission() {
+            if(!this.isReviewing) {
+                try {
+                    const reviewStatus = await this.$http.get(`/pm-manage/review-status?projectId=${this.project._id}&taskId=${this.task.taskId}&userId=${this.user._id}`);
+                    if(reviewStatus.data === "forbidden") {
+                        this.isReviewing = true;
+                        return this.alertToggle({message: "Someone is reviewing this delivery", isShow: true, type: "error"});
+                    }
+                } catch(err) {
+                    this.alertToggle({message: "Error on checking review status", isShow: true, type: "error"});
+                }
+            }
         },
         async approve() {
             const taskIds = this.files.map(item => item.taskId)
@@ -160,8 +188,13 @@ export default {
                 this.$emit("close");
             }
         },
-        assignManager({manager, prop}) {
-            this[prop] = manager;
+        async assignManager({manager, prop}) {
+            await this.checkPermission();
+            if(this.isReviewing || this.dr1Manager._id === manager._id) return;
+            await this.changeReviewManager({
+                manager, prop, projectId: this.project._id, taskId: this.task.taskId
+                });
+            await this.getDeliveryData();
         },
         async getDeliveryData() {
             if(this.task.status === "Pending Approval [DR2]") {
@@ -185,10 +218,6 @@ export default {
         }
     },
     computed: {
-        ...mapGetters({
-            project: "getCurrentProject",
-            user: "getUser"
-        }),
         isAllChecked() {
             const uncheckedFiles = this.files.filter(item => !item.isFileApproved);
             const uncheckedInstructions = this.instructions.filter(item => !item.isChecked);
@@ -207,7 +236,8 @@ export default {
         Button
     },
     mounted() {
-        this.getDeliveryData();
+        this.checkPermission()
+            .then(res => this.getDeliveryData());
     }
 }
 </script>

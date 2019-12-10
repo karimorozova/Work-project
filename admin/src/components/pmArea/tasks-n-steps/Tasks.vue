@@ -86,7 +86,7 @@
             @notApprove="notApproveAction"
             @close="closeApproveModal")
     .tasks__review(v-if="isDeliveryReview")
-        DeliveryReview(@close="closeReview" :task="reviewTask" @updateTasks="updatereviewTask")
+        DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updatereviewTask")
 </template>
 
 <script>
@@ -280,7 +280,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject' 
+            currentProject: 'getCurrentProject',
+            user: 'getUser'
         }),
         availableActions() {
             let result = ["Cancel"];
