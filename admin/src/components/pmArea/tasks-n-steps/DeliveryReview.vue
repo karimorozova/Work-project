@@ -208,9 +208,7 @@ export default {
                 }
                 this.dr1Manager = result.data.dr1Manager;
                 this.dr2Manager = result.data.dr2Manager;
-                this.instructions = result.data.instructions.filter(item => {
-                    return result.data.status === "[DR2]" ? item.step === 'dr2' : item.step === 'dr1';
-                })
+                this.instructions = result.data.instructions.filter(item => item.step === result.data.status);
                 this.timestamp = this.task.status === "Pending Approval [DR2]" ? result.data.timestamp : "";
             } catch(err) {
                 this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});

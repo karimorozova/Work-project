@@ -22,8 +22,8 @@ async function checkPermission({projectId, taskId, userId}) {
 }
 
 function getCorrectStatus({status, dr1Manager, dr2Manager, userId}) {
-    if(status === "[DR1]" && userId !== dr1Manager.id
-         || status === "[DR2]" && (userId !== dr2Manager.id || userId !== dr1Manager.id)
+    if(status === "dr1" && userId !== dr1Manager.id
+         || status === "dr2" && (userId !== dr2Manager.id || userId !== dr1Manager.id)
         ) { 
             return "forbidden";
     }
@@ -32,11 +32,11 @@ function getCorrectStatus({status, dr1Manager, dr2Manager, userId}) {
 
 async function checkForReassign({status, dr1Manager, projectId, taskId, userId}) {
     try {
-        if(status === "[DR1]" && userId !== dr1Manager.id) {
+        if(status === "dr1" && userId !== dr1Manager.id) {
             return await Delivery.updateOne({projectId, "tasks.taskId": taskId},
                 {"tasks.$.dr1Manager": userId});
         }
-        if(status === "[DR2]" && userId !== dr1Manager.id) {
+        if(status === "dr2" && userId !== dr1Manager.id) {
             return await Delivery.updateOne({projectId, "tasks.taskId": taskId},
                 {"tasks.dr2Manager": userId});
         }

@@ -124,8 +124,8 @@ export const changeReviewManager = async ({dispatch}, payload) => {
 export const assignDr2 = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {
-        const { taskIds, projectId } = payload;
-        const updatedProject = await Vue.http.post("/pm-manage/assign-dr2", { taskIds, projectId });
+        const { taskId, projectId } = payload;
+        const updatedProject = await Vue.http.post("/pm-manage/assign-dr2", { taskId, projectId });
         await dispatch('setCurrentProject', updatedProject.data);
         dispatch('alertToggle', {message: "Success", isShow: true, type: "success"})
     } catch(err) {

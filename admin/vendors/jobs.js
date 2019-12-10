@@ -107,7 +107,7 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
     try {
         if(isAllStepsCompleted({jobId, steps})) {
             await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval [DR1]"});
-            await addToDelivery(project, {...task, status: "Pending Approval [DR1]", deliveryStatus: "[DR1]"});
+            await addToDelivery(project, {...task, status: "Pending Approval [DR1]", deliveryStatus: "dr1"});
             return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
@@ -133,7 +133,8 @@ async function addToDelivery(project, task) {
     try {
         await Delivery.updateOne({projectId: project.id},{
             $push: {tasks: {
-                manager: project.accountManager,
+                dr1Manager: project.projectManager,
+                dr2Manager: project.accountManager,
                 status: task.deliveryStatus,
                 pair,
                 taskId: task.taskId,

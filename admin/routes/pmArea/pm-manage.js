@@ -373,11 +373,11 @@ router.post("/tasks-approve-notify", async (req, res) => {
 })
 
 router.post("/assign-dr2", async (req, res) => {
-    const { taskIds, projectId, manager } = req.body;
+    const { taskId, projectId } = req.body;
     try {
         await Delivery.updateOne(
-                {projectId, "tasks.taskId": {$in: taskIds}}, 
-                {"tasks.$.manager": manager, "tasks.$.isAssigned": true, "tasks.$.status": "[DR2]", "tasks.$.timeStamp": new Date()}
+                {projectId, "tasks.taskId": taskId}, 
+                {"tasks.$.isAssigned": true, "tasks.$.status": "dr2", "tasks.$.timeStamp": new Date()}
             );
         const updatedProject = await updateProject({"tasks.taskId": {$in: taskIds}}, {"tasks.$.status": "Pending Approval [DR2]"});
         res.send(updatedProject);
