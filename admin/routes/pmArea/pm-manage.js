@@ -268,6 +268,19 @@ router.post("/steps-reopen", async (req, res) => {
     }
 })
 
+router.post("/approve-instruction", async (req, res) => {
+    const { taskId, projectId, instruction } = req.body;
+    try {
+        await Delivery.updateOne({projectId, "tasks.taskId": taskId, "tasks.instructions.text": instruction.text}, 
+            {"tasks.$[i].instructions.$[j].isChecked": !instruction.isChecked}, 
+            {arrayFilters: [{"i.taskId": taskId}, {"j.text": instruction.text}]});
+        res.send("done");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approve files");
+    }
+})
+
 router.post("/approve-files", async (req, res) => {
     const { taskId, isFileApproved, paths } = req.body;
     try {
@@ -294,7 +307,7 @@ router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) =
                 {arrayFilters: [{"i.taskId": fileData.taskId}, {"j.path": fileData.path}]});
         } else {
             await Delivery.updateOne({"tasks.taskId": fileData.taskId}, 
-                {$push: {"tasks.$.files": {isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath}}});
+                {$push: {"tasks.$.files": {isFileApproved: true, isOriginal: false, fileName: files[0].filename, path: newPath}}});
         }
         res.send("uploaded");
     } catch(err) {
@@ -365,7 +378,9 @@ router.post("/tasks-approve", async (req, res) => {
 router.post("/delivery-data", async (req, res) => {
     const { taskId, projectId } = req. body;
     try {
-        const projectDelivery = await Delivery.findOne({projectId, "tasks.taskId": taskId},{"tasks.$": 1}).populate("tasks.manager");
+        const projectDelivery = await Delivery.findOne({projectId, "tasks.taskId": taskId},{"tasks.$": 1})
+            .populate("tasks.dr1Manager")
+            .populate("tasks.dr2Manager");
         const result = projectDelivery.tasks[0];
         res.send(result);
     }  catch(err) {

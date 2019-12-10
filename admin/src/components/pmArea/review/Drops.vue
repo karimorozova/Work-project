@@ -19,8 +19,8 @@
                 .drops__menu
                     SelectSingle(
                         :options="managersNames"
-                        :selectedOption="selectedManager"
-                        @chooseOption="setManager"
+                        :selectedOption="selectedDr2Manager"
+                        @chooseOption="(e) => setManager(e, 'dr2Manager')"
                     )
             .drops__data(slot="contacts" slot-scope="{ row }")
                 .drops__menu
@@ -42,7 +42,8 @@ export default {
     props: {
         project: {type: Object},
         user: {type: Object},
-        assignedManager: {type: Object},
+        dr1Manager: {type: Object},
+        dr2Manager: {type: Object},
         timestamp: {type: String, default: ""}
     },
     data() {
@@ -77,9 +78,9 @@ export default {
             this.slectedContacts = this.project.customer.contacts.filter(item => item.leadContact)
                 .map(item => `${item.firstName} ${item.surname}`);
         },
-        setManager({option}) {
+        setManager({option}, prop) {
             const managerIndex = this.managersNames.indexOf(option);
-            this.$emit("assignManager", {manager: this.managers[managerIndex]});
+            this.$emit("assignManager", {manager: this.managers[managerIndex], prop});
         },
         async getManagers() {
             try {
@@ -105,8 +106,11 @@ export default {
             }
             return result;
         },
-        selectedManager() {
-            return this.assignedManager ? `${this.assignedManager.firstName} ${this.assignedManager.lastName}` : "";
+        selectedDr1Manager() {
+            return this.dr1Manager ? `${this.dr1Manager.firstName} ${this.dr1Manager.lastName}` : "";
+        },
+        selectedDr2Manager() {
+            return this.dr2Manager ? `${this.dr2Manager.firstName} ${this.dr2Manager.lastName}` : "";
         }
     },
     components: {

@@ -58,6 +58,19 @@ export const updateProgress = async ({ dispatch }, payload) => {
     }
 }
 
+export const approveInstruction = async ({dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const {taskId, projectId, instruction} = payload;
+        await Vue.http.post("/pm-manage/approve-instruction", {taskId, projectId, instruction});
+        dispatch('alertToggle', {message: "Updated", isShow: true, type: "success"});
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter');
+    }
+}
+
 export const approveDeliveryFile = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {

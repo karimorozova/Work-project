@@ -6,7 +6,8 @@ const DeliverySchema = new mongoose.Schema({
     tasks: [{
         timeStamp: { type: Date, default: new Date() },
         isAssigned: { type: Boolean, default: false },
-        manager: { type: Schema.Types.ObjectId, ref: 'User' },
+        dr1Manager: { type: Schema.Types.ObjectId, ref: 'User' },
+        dr2Manager: { type: Schema.Types.ObjectId, ref: 'User' },
         status: { type: String, default: "", trim: true },
         pair: { type: String, default: "", trim: true },
         taskId: { type: String, default: "", trim: true },
@@ -17,6 +18,7 @@ const DeliverySchema = new mongoose.Schema({
             isOriginal: { type: Boolean, default: false },
         }],
         instructions: [{
+            step: { type: String, default: "dr1", trim: true },
             text: { type: String, default: "", trim: true },
             isChecked: { type: Boolean, default: false }
         }],

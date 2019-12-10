@@ -2,17 +2,13 @@
     .review
         span.review__close(@click="close") +
         .review__title Delivery Review {{ dr }}
-        Drops(:project="project" :user="user" :assignedManager="assignedManager" @assignManager="assignManager" :timestamp="timestamp")
+        Drops(:project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
         .review__title.review_left-align PM Checklist
         .review__check 
-            .review__check-item
-                Check(@toggleApprovement="(e) => toggle(e, 'areFilesChecked')" 
-                    :isApproved="areFilesChecked"
-                    text="Download and check file")
-            .review__check-item
-                Check(@toggleApprovement="(e) => toggle(e, 'areFilesConverted')" 
-                    :isApproved="areFilesConverted"
-                    text="Make sure to convert all doc files into PDF")
+            .review__check-item(v-for="instruction in instructions")
+                Check(@toggleApprovement="(e) => toggle(e, instruction)" 
+                    :isApproved="instruction.isChecked"
+                    :text="instruction.text")
         .review__table
             Table(
                 :files="files"
@@ -36,7 +32,7 @@
                 @toggleOption="toggleOption"
             )
         .review__button
-            Button(v-if="isAllChecked || areOptions && isAssign"
+            Button(v-if="isAllChecked"
                 value="Approve Deliverable"
                 @clicked="approve"
             )
@@ -65,12 +61,15 @@ export default {
             isDr1: true,
             isAssign: true,
             files: [],
-            assignedManager: null,
-            timestamp: ""
+            dr1Manager: null,
+            dr2Manager: null,
+            timestamp: "",
+            instructions: []
         }
     },
     methods: {
         ...mapActions([
+            "approveInstruction",
             "approveDeliveryFile",
             "uploadTarget",
             "approveWithOption",
@@ -94,8 +93,13 @@ export default {
                 this.isDeliver = false;
             }
         },
-        toggle(e, prop) {
-            this[prop] = !this[prop];
+        async toggle(e, instruction) {
+            await this.approveInstruction({
+                projectId: this.project._id,
+                taskId: this.task.taskId, 
+                instruction
+                });
+            await this.getDeliveryData();
         },
         toggleOptions(e, bool) {
             this.areOptions = bool;
@@ -156,8 +160,8 @@ export default {
                 this.$emit("close");
             }
         },
-        assignManager({manager}) {
-            this.assignedManager = manager;
+        assignManager({manager, prop}) {
+            this[prop] = manager;
         },
         async getDeliveryData() {
             if(this.task.status === "Pending Approval [DR2]") {
@@ -169,8 +173,12 @@ export default {
                 if(result.data.files.length) {
                     this.files = result.data.files.map(item => { return {...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false} });
                 }
+                this.dr1Manager = result.data.dr1Manager;
+                this.dr2Manager = result.data.dr2Manager;
+                this.instructions = result.data.instructions.filter(item => {
+                    return result.data.status === "[DR2]" ? item.step === 'dr2' : item.step === 'dr1';
+                })
                 this.timestamp = this.task.status === "Pending Approval [DR2]" ? result.data.timestamp : "";
-                this.assignedManager = this.assignedManager || this.project.accountManager;
             } catch(err) {
                 this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});
             }
@@ -182,8 +190,9 @@ export default {
             user: "getUser"
         }),
         isAllChecked() {
-            const unchecked = this.files.filter(item => !item.isFileApproved);
-            return this.areFilesChecked && this.areFilesConverted && !unchecked.length;
+            const uncheckedFiles = this.files.filter(item => !item.isFileApproved);
+            const uncheckedInstructions = this.instructions.filter(item => !item.isChecked);
+            return !uncheckedInstructions.length && !uncheckedFiles.length;
         },
         dr() {
             return this.task.status === "Pending Approval [DR1]" ? 1 : 2;
