@@ -8,7 +8,7 @@ const DeliverySchema = new mongoose.Schema({
         isAssigned: { type: Boolean, default: false },
         dr1Manager: { type: Schema.Types.ObjectId, ref: 'User' },
         dr2Manager: { type: Schema.Types.ObjectId, ref: 'User' },
-        status: { type: String, default: "", trim: true },
+        status: { type: String, default: "dr1", trim: true },
         pair: { type: String, default: "", trim: true },
         taskId: { type: String, default: "", trim: true },
         files: [{

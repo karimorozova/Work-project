@@ -8,7 +8,7 @@ async function checkPermission({projectId, taskId, userId}) {
         const task = review.tasks.find(item => item.taskId === taskId);
         const { status, dr1Manager, dr2Manager, files, instructions } = task;
         const isCheckedFile = !!files.find(item => item.isFileApproved);
-        const isCheckedInstruction = !!instructions.find(item => item.isChecked);
+        const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.step === status);
         if(!isCheckedFile && !isCheckedInstruction) {
             await checkForReassign({status, dr1Manager, projectId, taskId, userId});
         } else {
