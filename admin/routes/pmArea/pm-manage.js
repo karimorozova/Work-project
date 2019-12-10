@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
-const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeReviewStage } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
@@ -375,11 +375,12 @@ router.post("/tasks-approve-notify", async (req, res) => {
 router.post("/assign-dr2", async (req, res) => {
     const { taskId, projectId } = req.body;
     try {
-        await Delivery.updateOne(
-                {projectId, "tasks.taskId": taskId}, 
-                {"tasks.$.isAssigned": true, "tasks.$.status": "dr2", "tasks.$.timeStamp": new Date()}
-            );
-        const updatedProject = await updateProject({"tasks.taskId": {$in: taskIds}}, {"tasks.$.status": "Pending Approval [DR2]"});
+        // await Delivery.updateOne(
+        //         {projectId, "tasks.taskId": taskId}, 
+        //         {"tasks.$.isAssigned": true, "tasks.$.status": "dr2", "tasks.$.timeStamp": new Date()}
+        //     );
+        await changeReviewStage({taskId, projectId})
+        const updatedProject = await updateProject({"_id": projectId, "tasks.taskId": taskId}, {"tasks.$.status": "Pending Approval [DR2]"});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

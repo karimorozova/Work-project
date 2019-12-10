@@ -3,17 +3,15 @@ const { Delivery } = require("../models");
 async function checkPermission({projectId, taskId, userId}) {
     let reviewStatus = "available";
     try {
-        const review = await Delivery.findOne({projectId, "tasks.taskId": taskId})
+        let review = await Delivery.findOne({projectId, "tasks.taskId": taskId})
             .populate("tasks.dr1Manager").populate("tasks.dr2Manager")
-        const task = review.tasks.find(item => item.taskId === taskId);
-        const { status, dr1Manager, dr2Manager, files, instructions } = task;
+        const { status, dr1Manager, files, instructions } = getTaskData(review, taskId);
         const isCheckedFile = !!files.find(item => item.isFileApproved);
         const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.step === status);
         if(!isCheckedFile && !isCheckedInstruction) {
-            await checkForReassign({status, dr1Manager, projectId, taskId, userId});
-        } else {
-            reviewStatus = getCorrectStatus({status, dr1Manager, dr2Manager, userId})
+            review = await checkForReassign({status, dr1Manager, projectId, taskId, userId}) || review;
         }
+        reviewStatus = getCorrectStatus({review, userId, taskId});
         return reviewStatus;
     } catch(err) {
         console.log(err);
@@ -21,9 +19,14 @@ async function checkPermission({projectId, taskId, userId}) {
     }
 }
 
-function getCorrectStatus({status, dr1Manager, dr2Manager, userId}) {
+function getTaskData(review, taskId) {
+    return review.tasks.find(item => item.taskId === taskId);
+}
+
+function getCorrectStatus({review, userId, taskId}) {
+    const {status, dr1Manager, dr2Manager} = getTaskData(review, taskId)
     if(status === "dr1" && userId !== dr1Manager.id
-         || status === "dr2" && (userId !== dr2Manager.id || userId !== dr1Manager.id)
+         || status === "dr2" && (userId !== dr2Manager.id || userId === dr1Manager.id)
         ) { 
             return "forbidden";
     }
@@ -33,12 +36,16 @@ function getCorrectStatus({status, dr1Manager, dr2Manager, userId}) {
 async function checkForReassign({status, dr1Manager, projectId, taskId, userId}) {
     try {
         if(status === "dr1" && userId !== dr1Manager.id) {
-            return await Delivery.updateOne({projectId, "tasks.taskId": taskId},
-                {"tasks.$.dr1Manager": userId});
+            return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
+                {$set: {"tasks.$.dr1Manager": userId}},
+                {new: true})
+                .populate("tasks.dr1Manager").populate("tasks.dr2Manager");
         }
         if(status === "dr2" && userId !== dr1Manager.id) {
-            return await Delivery.updateOne({projectId, "tasks.taskId": taskId},
-                {"tasks.dr2Manager": userId});
+            return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
+                {$set: {"tasks.$.dr2Manager": userId}},
+                {new: true})
+                .populate("tasks.dr1Manager").populate("tasks.dr2Manager");
         }
     } catch(err) {
         console.log(err);
@@ -46,4 +53,35 @@ async function checkForReassign({status, dr1Manager, projectId, taskId, userId})
     }
 }
 
-module.exports = { checkPermission }
+async function changeReviewStage({projectId, taskId}) {
+    const dr2Instructions = [
+        {step: "dr2", text: "Check Language combinations", isChecked: false},
+        {step: "dr2", text: "Check File Type", isChecked: false},
+        {step: "dr2", text: "Check Number of files", isChecked: false},
+        {step: "dr2", text: "Check source & target files", isChecked: false},
+        {step: "dr2", text: "Beyond Compare", isChecked: false},
+        {step: "dr2", text: "Were Instructions followed", isChecked: false},
+        {step: "dr2", text: "Terms", isChecked: false},
+        {step: "dr2", text: "TOV", isChecked: false},
+        {step: "dr2", text: "Other instructions", isChecked: false},
+        {step: "dr2", text: "Check Client Type (PPP, Prepayment, Monthly)", isChecked: false}        
+    ]
+    try {
+        await Delivery.updateOne(
+            {projectId, "tasks.taskId": taskId}, 
+            {
+                "tasks.$[i].isAssigned": true, 
+                "tasks.$[i].status": "dr2", 
+                "tasks.$[i].timeStamp": new Date(),
+                $push: {"tasks.$[i].instructions": {$each: dr2Instructions}},
+                "tasks.$[i].files.$[j].isFileApproved": false
+            },
+            {arrayFilters: [{"i.taskId": taskId}, {"j.isFileApproved": true}]}
+        )
+    } catch(err) {
+        console.log(err);
+        console.log("Error in changeReviewStage");
+    }
+}
+
+module.exports = { checkPermission, changeReviewStage }

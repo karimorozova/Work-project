@@ -60,8 +60,8 @@ export default {
     },
     methods: {
         ...mapActions(["alertToggle"]),
-        getDeliveredTime(date) {
-            return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
+        getDeliveredTime() {
+            return this.timestamp ? moment(this.timestamp).format("YYYY-MM-DD, HH:mm Z") : "";
         },
         setContacts({option}) {
             const position = this.slectedContacts.indexOf(option);
@@ -152,6 +152,8 @@ export default {
     }
     &__name {
         position: relative;
+        display: flex;
+        align-items: center;
     }
     &__timestamp {
         cursor: pointer;

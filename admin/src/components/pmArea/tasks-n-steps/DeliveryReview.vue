@@ -165,7 +165,7 @@ export default {
                     const reviewStatus = await this.$http.get(`/pm-manage/review-status?projectId=${this.project._id}&taskId=${this.task.taskId}&userId=${this.user._id}`);
                     if(reviewStatus.data === "forbidden") {
                         this.isReviewing = true;
-                        return this.alertToggle({message: "Someone is reviewing this delivery", isShow: true, type: "error"});
+                        return this.alertToggle({message: "This task Deliery Review is forbidden for you", isShow: true, type: "error"});
                     }
                 } catch(err) {
                     this.alertToggle({message: "Error on checking review status", isShow: true, type: "error"});
@@ -173,16 +173,15 @@ export default {
             }
         },
         async approve() {
-            const taskIds = this.files.map(item => item.taskId)
-                .filter((taskId, index, arr) => arr.indexOf(taskId) === index)
             try {
                 if(this.isDr1 && this.isAssign) {
-                    return await this.assignDr2({projectId: this.project._id, manager: this.assignedManager, taskIds})
+                    await this.assignDr2({projectId: this.project._id, taskId: this.task.taskId});
                 }
                 // if(!this.isNotify && !this.isDeliver) {
                 //     return await this.approveDeliverable(taskIds);
                 // }
                 // await this.approveWithOption({taskIds, isDeliver: this.isDeliver});    
+                await this.getDeliveryData();
             } catch(err) { 
             } finally {
                 this.$emit("close");
@@ -272,9 +271,7 @@ export default {
         border-bottom: 1px solid $main-color;
     }
     &__check-item {
-        &:first-child {
-            margin-bottom: 10px;
-        }
+        margin-bottom: 5px;
     }
     &__options {
         align-self: center;

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const DeliverySchema = new mongoose.Schema({
     projectId: { type: String, default: "", trim: true },
     tasks: [{
-        timeStamp: { type: Date, default: new Date() },
+        timestamp: { type: Date, default: new Date() },
         isAssigned: { type: Boolean, default: false },
         dr1Manager: { type: Schema.Types.ObjectId, ref: 'User' },
         dr2Manager: { type: Schema.Types.ObjectId, ref: 'User' },
