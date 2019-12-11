@@ -60,7 +60,6 @@ export default {
     data() {
         return {
             managers: [],
-            contacts: [],
             slectedContacts: [],
             fields: [
                 {label: "Delivery 1", headerKey: "headerDr1", key: "dr1", width: "33%", padding: 0},
@@ -83,18 +82,20 @@ export default {
         },
         setContacts({option}) {
             const position = this.slectedContacts.indexOf(option);
-            if(position === -1) {
-                this.slectedContacts.push(option);
-            } else {
-                this.slectedContacts.splice(position, 1);
-            }
+            position === -1 ? this.slectedContacts.push(option) : this.slectedContacts.splice(position, 1);
             if(!this.slectedContacts.length) {
                 this.setDefaultContact();
+            } else {
+                const contacts = this.project.customer.contacts
+                    .filter(item => this.slectedContacts.indexOf(`${item.firstName} ${item.surname}`) !== -1)
+                    .map(item => item.email);
+                this.$emit("setContacts", { contacts })
             }
         },
         setDefaultContact() {
-            this.slectedContacts = this.project.customer.contacts.filter(item => item.leadContact)
-                .map(item => `${item.firstName} ${item.surname}`);
+            const leads = this.project.customer.contacts.filter(item => item.leadContact);
+            this.slectedContacts = leads.map(item => `${item.firstName} ${item.surname}`);
+            this.$emit("setContacts", { contacts: [leads[0].email] })
         },
         setManager({option}, prop) {
             const managerIndex = this.managersNames.indexOf(option);

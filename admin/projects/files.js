@@ -24,9 +24,9 @@ async function storeFiles(filesArr, projectId) {
     }
 }
 
-async function getDeliverablesLink({taskFiles, unit, projectId, taskId}) {
+async function getDeliverablesLink({taskFiles, projectId, taskId}) {
     try {
-        const files = unit === 'Words' ? getParsedWordcountFiles(taskFiles) : getParsedFiles(taskFiles);
+        const files = getParsedFiles(taskFiles);
         const outputPath = `./dist/projectFiles/${projectId}/deliverables-${taskId.replace(/\s+/g, '_')}.zip`;
         await archiveMultipleFiles({outputPath, files});
         return outputPath.split("./dist")[1];
@@ -37,16 +37,7 @@ async function getDeliverablesLink({taskFiles, unit, projectId, taskId}) {
 }
 
 function getParsedFiles(taskFiles) {
-    return taskFiles.reduce((acc, cur) => [...acc, {path: cur.path, name: cur.fileName}], [])
-}
-
-function getParsedWordcountFiles(taskFiles) {
-    return taskFiles.reduce((acc, cur) => {
-        const filePathParts = cur.targetFile.split("/");
-        const fileName = filePathParts.slice(-1)[0];
-        const file = {path: `./dist${cur.targetFile}`, name: fileName};
-        return [...acc, file];
-    }, [])
+    return taskFiles.reduce((acc, cur) => [...acc, {path: `./dist${cur.path}`, name: cur.fileName}], [])
 }
 
 async function storeTargetFile({ step, id, projectId, file }) {

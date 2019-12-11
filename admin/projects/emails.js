@@ -65,10 +65,10 @@ async function getPMnotificationMessage(project, task) {
     }
 }
 
-async function notifyClientTaskReady({taskIds, project}) {
+async function notifyClientTaskReady({taskId, project, contacts}) {
+    const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
     try {
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        for(let taskId of taskIds) {
+        for(let contact of notifyContacts) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
             await sendEmail({to: contact.email, subject: `TASK READY (ID C014, ${project.projectId})`}, message);
         }
@@ -78,10 +78,10 @@ async function notifyClientTaskReady({taskIds, project}) {
     }
 }
 
-async function sendClientDeliveries({taskIds, project}) {
+async function sendClientDeliveries({taskId, project, contacts}) {
+    const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
     try {
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        for(let taskId of taskIds) {
+        for(let contact of notifyContacts) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
             await sendEmail({to: contact.email, subject: `DELIVERY (ID C013, ${project.projectId})`}, message);
         }

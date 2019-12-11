@@ -9,7 +9,8 @@
             :dr1Manager="dr1Manager" 
             :dr2Manager="dr2Manager" 
             :timestamp="timestamp"
-            @assignManager="assignManager")
+            @assignManager="assignManager"
+            @setContacts="setContacts")
         .review__title.review_left-align PM Checklist
         .review__check 
             .review__check-item(v-for="instruction in instructions")
@@ -85,6 +86,7 @@ export default {
             files: [],
             dr1Manager: null,
             dr2Manager: null,
+            contacts: [],
             timestamp: "",
             instructions: [],
             isReviewing: false,
@@ -110,6 +112,9 @@ export default {
         closeRollback() {
             this.isModal = false;
             this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager));
+        },
+        setContacts({contacts}) {
+            this.contacts = [...contacts];
         },
         toggleOption({prop}) {
             this[prop] = true;
@@ -205,12 +210,14 @@ export default {
                     await this.assignDr2({
                         projectId: this.project._id, taskId: this.task.taskId, dr2Manager: this.dr2Manager
                         });
+                    return await this.getDeliveryData();
                 }
-                // if(!this.isNotify && !this.isDeliver) {
-                //     return await this.approveDeliverable(taskIds);
-                // }
-                // await this.approveWithOption({taskIds, isDeliver: this.isDeliver});    
-                await this.getDeliveryData();
+                if(!this.isNotify && !this.isDeliver) {
+                    return await this.approveDeliverable(this.task.taskId);
+                }
+                await this.approveWithOption({
+                    taskId: this.task.taskId, isDeliver: this.isDeliver, contacts: this.contacts
+                    });    
             } catch(err) { 
             } finally {
                 this.$emit("close");

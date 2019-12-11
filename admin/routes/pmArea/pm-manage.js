@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User, Clients, Delivery } = require("../../models");
+const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
@@ -361,18 +361,6 @@ router.post("/remove-dr-file", async (req, res) => {
     }
 })
 
-router.post("/tasks-approve-notify", async (req, res) => {
-    const { taskIds, isDeliver } = req.body;
-    try {
-        const project = await getProject({"tasks.taskId": taskIds[0]});
-        const updatedProject = await getProjectAfterApprove({taskIds, project, isDeliver});
-        res.send(updatedProject);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on approving deliverable");
-    }
-})
-
 router.post("/assign-dr2", async (req, res) => {
     const { taskId, projectId, dr2Manager } = req.body;
     try {
@@ -401,11 +389,23 @@ router.post("/rollback-review", async (req, res) => {
     }
 })
 
-router.post("/tasks-approve", async (req, res) => {
-    const { taskIds } = req.body;
+router.post("/tasks-approve-notify", async (req, res) => {
+    const { taskId, isDeliver, contacts } = req.body;
     try {
-        const project = await getProject({"tasks.taskId": taskIds[0]});
-        const updatedProject = await setTasksDeliveryStatus({taskIds, project, status: "Ready for Delivery"});
+        const project = await getProject({"tasks.taskId": taskId});
+        const updatedProject = await getProjectAfterApprove({taskId, project, isDeliver, contacts});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.post("/tasks-approve", async (req, res) => {
+    const { taskId } = req.body;
+    try {
+        const project = await getProject({"tasks.taskId": taskId});
+        const updatedProject = await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery"});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
@@ -433,10 +433,14 @@ router.get("/deliverables", async (req, res) => {
     const { taskId } = req.query;
     try {
         const project = await getProject({"tasks.taskId": taskId});
-        const task = project.tasks.find(item => item.taskId === taskId);
-        const taskFiles = task.xtmJobs || task.targetFiles;
+        // const task = project.tasks.find(item => item.taskId === taskId);
+        // const taskFiles = task.xtmJobs || task.targetFiles;
+        // const link = await getDeliverablesLink({
+        //     taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
+        // });
+        const review = await Delivery.findOne({projectId: project.id, "tasks.taskId": taskId}, {"tasks.$": 1});
         const link = await getDeliverablesLink({
-            taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
+            taskId, projectId: project.id, taskFiles: review.tasks[0].files
         });
         if(link) {
             await Projects.updateOne({"tasks.taskId": taskId}, {"tasks.$.deliverables": link});

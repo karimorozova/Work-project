@@ -1,21 +1,21 @@
 const { updateProject, notifyClientTaskReady, sendClientDeliveries } = require('../projects');
 
-async function getProjectAfterApprove({taskIds, project, isDeliver}) {
+async function getProjectAfterApprove({taskId, project, isDeliver, contacts}) {
     try {
         if(isDeliver) {
-            await sendClientDeliveries({taskIds, project});
-            return await setTasksDeliveryStatus({taskIds, project, status: "Delivered"})
+            await sendClientDeliveries({taskId, project, contacts});
+            return await setTasksDeliveryStatus({taskId, project, status: "Delivered"})
         }
-        await notifyClientTaskReady({taskIds, project});
-        return await setTasksDeliveryStatus({taskIds, project, status: "Ready for Delivery"});
+        await notifyClientTaskReady({taskId, project, contacts});
+        return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery"});
     } catch(err) {
         console.log(err);
         console.log("Error in getProjectAfterApprove");
     }
 }
 
-async function setTasksDeliveryStatus({taskIds, project, status}) {
-    const updatedTasks = getUpdatedTasks({taskIds, tasks: project.tasks, status});
+async function setTasksDeliveryStatus({taskId, project, status}) {
+    const updatedTasks = getUpdatedTasks({taskId, tasks: project.tasks, status});
     let projectStatus = project.status;
     if(status === "Ready for Delivery") {
         projectStatus = getProjectStatus({tasks: updatedTasks, status, projectStatus});
@@ -38,9 +38,9 @@ function getProjectStatus({tasks, status, projectStatus}) {
     return otherStatusTask ? projectStatus : newProjectStatus;
 }
 
-function getUpdatedTasks({taskIds, tasks, status}) {
+function getUpdatedTasks({taskId, tasks, status}) {
     return tasks.map(task => {
-        if(taskIds.indexOf(task.taskId) !== -1) {
+        if(taskId === task.taskId) {
             task.status = status;
             if(status === "Delivered") {
                 task.isDelivered = true;
