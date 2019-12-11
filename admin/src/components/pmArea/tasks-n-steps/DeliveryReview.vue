@@ -3,6 +3,7 @@
         span.review__close(@click="close") +
         .review__title Delivery Review {{ dr }}
         Drops(
+            :isReviewing="isReviewing"
             :project="project" 
             :user="user" 
             :dr1Manager="dr1Manager" 
@@ -15,8 +16,10 @@
                 Check(@toggleApprovement="(e) => toggle(e, instruction)" 
                     :isApproved="instruction.isChecked"
                     :text="instruction.text")
+            .review__forbidden(v-if="isReviewing")        
         .review__table
             Table(
+                :isReviewing="isReviewing"
                 :files="files"
                 @approveFile="approveFile"
                 @approveFiles="approveFiles"
@@ -30,6 +33,7 @@
                     customClass="review-options"
                     @check="(e) => toggleOptions(e, true)" 
                     @uncheck="(e) => toggleOptions(e, false)")
+            .review__forbidden(v-if="isReviewing")            
             Options(v-if="areOptions"
                 :isAssign="isAssign"
                 :isDeliver="isDeliver"
@@ -37,11 +41,20 @@
                 :isDr1="isDr1"
                 @toggleOption="toggleOption"
             )
-        .review__button
-            Button(v-if="isAllChecked"
-                value="Approve Deliverable"
-                @clicked="approve"
-            )
+        .review__buttons
+            .review__forbidden(v-if="isReviewing")
+            .review__button(v-if="!isDr1")
+                Button(
+                    value="Rollback"
+                    @clicked="popupRollback"
+                )
+            .review__button(v-if="isAllChecked")
+                Button(
+                    value="Approve Deliverable"
+                    @clicked="approve"
+                )
+        .review__modal(v-if="isModal")
+            RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
 </template>
 
 <script>
@@ -52,6 +65,7 @@ import Check from "../review/Check";
 const Options = () => import("../review/Options");
 const CheckBox = () => import("@/components/CheckBox");
 const Button = () => import("@/components/Button");
+const RollbackModal = () => import("../review/RollbackModal");
 
 export default {
     props: {
@@ -73,7 +87,9 @@ export default {
             dr2Manager: null,
             timestamp: "",
             instructions: [],
-            isReviewing: false
+            isReviewing: false,
+            isModal: false,
+            rollbackManager: null
         }
     },
     methods: {
@@ -85,10 +101,15 @@ export default {
             "approveDeliverable",
             "assignDr2",
             "changeReviewManager",
+            "rollBackReview",
             "alertToggle"
         ]),
         close() {
             this.$emit("close")
+        },
+        closeRollback() {
+            this.isModal = false;
+            this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager));
         },
         toggleOption({prop}) {
             this[prop] = true;
@@ -103,9 +124,10 @@ export default {
                 this.isDeliver = false;
             }
         },
+        setRollbackManager({manager}) {
+            this.rollbackManager = manager;
+        },
         async toggle(e, instruction) {
-            await this.checkPermission();
-            if(this.isReviewing) return;
             await this.approveInstruction({
                 projectId: this.project._id,
                 taskId: this.task.taskId, 
@@ -126,6 +148,9 @@ export default {
         },
         checkFile({index, bool}) {
             this.files[index].isChecked = bool;
+        },
+        popupRollback() {
+            this.isModal = true;
         },
         async uploadFile({file, index}) {
             await this.checkPermission();
@@ -197,6 +222,14 @@ export default {
                 });
             await this.getDeliveryData();
         },
+        async rollBack() {
+            await this.rollBackReview({
+                projectId: this.project._id, 
+                taskId: this.task.taskId,
+                manager: this.rollbackManager
+                })
+            this.close();
+        },
         async getDeliveryData() {
             if(this.task.status === "Pending Approval [DR2]") {
                 this.isDr1 = false;
@@ -210,7 +243,10 @@ export default {
                 this.dr1Manager = result.data.dr1Manager;
                 this.dr2Manager = result.data.dr2Manager;
                 this.instructions = result.data.instructions.filter(item => item.step === result.data.status);
-                this.timestamp = this.task.status === "Pending Approval [DR2]" ? result.data.timestamp : "";
+                if(this.task.status === "Pending Approval [DR2]") {
+                    this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager));
+                    this.timestamp = result.data.timestamp;
+                }                
             } catch(err) {
                 this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});
             }
@@ -232,7 +268,8 @@ export default {
         Check,
         Options,
         CheckBox,
-        Button
+        Button,
+        RollbackModal
     },
     mounted() {
         this.checkPermission()
@@ -271,6 +308,7 @@ export default {
         margin: 10px 0;
         padding-bottom: 10px;
         border-bottom: 1px solid $main-color;
+        position: relative;
     }
     &__check-item {
         margin-bottom: 5px;
@@ -289,12 +327,34 @@ export default {
         position: absolute;
         left: 0;
     }
+    &__buttons {
+        display: flex;
+        justify-content: center;
+        position: relative;
+    }
     &__button {
-        align-self: center;
+        margin: 0 10px;
     }
     &_left-align {
         text-align: left;
         font-size: 20px; 
+    }
+    &__modal {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__forbidden {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 }
 

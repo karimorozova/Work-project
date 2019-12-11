@@ -16,7 +16,8 @@
                         img.drops__time-icon(src="../../../assets/images/time_icon.png")
                         .drops__time-data {{ getDeliveredTime() }} 
             .drops__data(slot="dr2" slot-scope="{ row }")
-                .drops__menu
+                .drops__name(v-if="timestamp") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
+                .drops__menu(v-else)
                     SelectSingle(
                         :options="managersNames"
                         :selectedOption="selectedDr2Manager"
@@ -29,6 +30,7 @@
                         :selectedOptions="slectedContacts"
                         @chooseOptions="setContacts"
                     )
+        .drops__forbidden(v-if="isReviewing")
 </template>
 
 <script>
@@ -37,14 +39,17 @@ import SelectMulti from "@/components/SelectMulti";
 import DataTable from "@/components/DataTable";
 import moment from "moment";
 import { mapActions } from "vuex";
+import reviewManagers from "@/mixins/reviewManagers";
 
 export default {
+    mixins: [reviewManagers],
     props: {
         project: {type: Object},
         user: {type: Object},
         dr1Manager: {type: Object},
         dr2Manager: {type: Object},
-        timestamp: {type: String, default: ""}
+        timestamp: {type: String, default: ""},
+        isReviewing: {type: Boolean}
     },
     data() {
         return {
@@ -89,29 +94,10 @@ export default {
             const managerIndex = this.managersNames.indexOf(option);
             this.$emit("assignManager", {manager: this.managers[managerIndex], prop});
         },
-        async getManagers() {
-            try {
-                const groups = ["Project Managers", "Account Managers"];
-                const result = await this.$http.get("/users");
-                this.managers = result.body.filter(item => groups.indexOf(item.group.name) !== -1);
-            } catch(err) {
-                this.alertToggle({message: "Error on getting mangers", isShow: true, type: "error"});
-            }
-        }
     },
     computed: {
         contactsNames() {
             return this.project.customer.contacts.map(item => `${item.firstName} ${item.surname}`);
-        },
-        managersNames() {
-            let result = [];
-            if(this.managers.length) {
-                result = this.managers.map(item => {
-                    const position = item.group.name === "Account Managers" ? "[AM]" : "[PM]";
-                    return `${item.firstName} ${item.lastName} ${position}`
-                })
-            }
-            return result;
         },
         selectedDr1Manager() {
             return this.dr1Manager ? `${this.dr1Manager.firstName} ${this.dr1Manager.lastName}` : "";
@@ -141,6 +127,7 @@ export default {
     width: 100%;
     box-sizing: border-box;
     margin-top: 20px;
+    position: relative;
     &__menu {
         position: relative;
         height: 30px;
@@ -184,6 +171,13 @@ export default {
         opacity: 0;
         z-index: -2;
         transition: all 0.2s;
+    }
+    &__forbidden {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 }
 

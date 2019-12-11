@@ -121,6 +121,20 @@ export const changeReviewManager = async ({dispatch}, payload) => {
     }
 }
 
+export const rollBackReview = async ({dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const { taskId, projectId, manager } = payload;
+        const updatedProject = await Vue.http.post("/pm-manage/rollback-review", { taskId, projectId, manager });
+        await dispatch('setCurrentProject', updatedProject.data);
+        dispatch('alertToggle', {message: "Success", isShow: true, type: "success"})
+    } catch(err) {
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}
+
 export const assignDr2 = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {

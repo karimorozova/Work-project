@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail } = require("../../utils/");
-const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeReviewStage } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
@@ -379,6 +379,20 @@ router.post("/assign-dr2", async (req, res) => {
         const message = `Delivery review of the task ${taskId} is assigned to you.`;
         await managerNotifyMail(dr2Manager, message, 'Task delivery review reassignment notification (I014)');
         const updatedProject = await updateProject({"_id": projectId, "tasks.taskId": taskId}, {"tasks.$.status": "Pending Approval [DR2]"});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on approving deliverable");
+    }
+})
+
+router.post("/rollback-review", async (req, res) => {
+    const { taskId, projectId, manager } = req.body;
+    try {
+        await rollbackReview({taskId, projectId, manager});
+        const message = `Delivery review of the task ${taskId} is assigned to you.`;
+        await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)');
+        const updatedProject = await updateProject({"_id": projectId, "tasks.taskId": taskId}, {"tasks.$.status": "Pending Approval [DR1]"});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

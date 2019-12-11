@@ -89,4 +89,33 @@ async function changeReviewStage({projectId, taskId}) {
     }
 }
 
-module.exports = { checkPermission, changeReviewStage }
+async function rollbackReview({projectId, taskId, manager}) {
+    await Delivery.bulkWrite([
+        {
+            updateOne: 
+                {
+                    filter: {projectId, "tasks.taskId": taskId}, 
+                    update: {
+                        "tasks.$[i].isAssigned": false, 
+                        "tasks.$[i].status": "dr1",
+                        "tasks.$[i].dr1Manager": manager,
+                        $pull: {"tasks.$[i].instructions": {step: "dr2"}},
+                        "tasks.$[i].files.$[j].isFileApproved": false
+                    },
+                    arrayFilters: [{"i.taskId": taskId}, {"j.isFileApproved": true}]
+                }
+        },
+        {
+            updateOne: 
+                {
+                    filter: {projectId, "tasks.taskId": taskId}, 
+                    update: {
+                        "tasks.$[i].instructions.$[k].isChecked": false,
+                    },
+                    arrayFilters: [{"i.taskId": taskId}, {"k.isChecked": true}]
+                }
+        }
+    ])
+}
+
+module.exports = { checkPermission, changeReviewStage, rollbackReview }

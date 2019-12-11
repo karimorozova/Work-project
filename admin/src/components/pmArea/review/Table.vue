@@ -29,12 +29,15 @@
             .review-table__data(slot="action" slot-scope="{ row, index }")
                 .review-table__icons
                     template(v-for="(icon, key) in allIcons")
-                        img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, key)")
-                        .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved}")
-                            input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
+                        img.review-table__icon(v-if="key !== 'upload'" 
+                            :src="icon.src" 
+                            :class="{'review-table_opacity-04': row.isFileApproved || key === 'delete' && isReviewing}" 
+                            @click="makeOneAction(index, key)")
+                        .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved || isReviewing}")
+                            input.review-table__file-input(type="file" :disabled="row.isFileApproved || isReviewing" @change="(e) => uploadFile(e, index)")
                     i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
         .review-table__upload.review-table_no-back
-            input.review-table__file-input(type="file" @change="uploadFile")
+            input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
             Add
 </template>
 
@@ -47,7 +50,8 @@ import { mapActions } from "vuex";
 
 export default {
     props: {
-        files: {type: Array}
+        files: {type: Array},
+        isReviewing: {type: Boolean}
     },
     data() {
         return {
@@ -79,6 +83,7 @@ export default {
                 return this.createLinkAndDownolad(file.path);
             }
             if(key === 'delete') {
+                if(this.isReviewing) return;
                 await this.removeDrFile(file);
                 this.$emit("updateDeliveryData");
             }
@@ -107,13 +112,12 @@ export default {
             e.target.value = "";
         },
         toggleAll(e, bool) {
+            if(this.isReviewing) return;
             this.$emit("checkAll", {bool});
         },
         toggle(e, index, bool) {
+            if(this.isReviewing) return;
             this.$emit("checkFile", { index, bool });
-        },
-        addRow() {
-            this.$emit("addFileRow");
         }
     },
     computed: {
