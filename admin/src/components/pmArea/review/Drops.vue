@@ -11,12 +11,18 @@
             .drops__header(slot="headerDr2" slot-scope="{ field }") {{ field.label }}
             .drops__header(slot="headerContacts" slot-scope="{ field }") {{ field.label }}
             .drops__data(slot="dr1" slot-scope="{ row }") 
-                .drops__name {{ getDr1Name() }}    
+                .drops__name(v-if="!isAdmin") {{ getDr1Name() }}    
                     .drops__timestamp(v-if="timestamp")
                         img.drops__time-icon(src="../../../assets/images/time_icon.png")
                         .drops__time-data {{ getDeliveredTime() }} 
+                .drops__menu(v-else)
+                    SelectSingle(
+                        :options="managersNames"
+                        :selectedOption="selectedDr1Manager"
+                        @chooseOption="(e) => setManager(e, 'dr1Manager')"
+                    )
             .drops__data(slot="dr2" slot-scope="{ row }")
-                .drops__name(v-if="timestamp") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
+                .drops__name(v-if="timestamp && !isAdmin") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
                 .drops__menu(v-else)
                     SelectSingle(
                         :options="managersNames"
@@ -104,6 +110,9 @@ export default {
         },
         selectedDr2Manager() {
             return this.dr2Manager ? `${this.dr2Manager.firstName} ${this.dr2Manager.lastName}` : "";
+        },
+        isAdmin() {
+            return this.user.group.name === "Administrators" || this.user.group.name === "Developers";
         }
     },
     components: {

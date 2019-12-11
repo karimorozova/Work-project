@@ -187,7 +187,9 @@ export default {
         async checkPermission() {
             if(!this.isReviewing) {
                 try {
-                    const reviewStatus = await this.$http.get(`/pm-manage/review-status?projectId=${this.project._id}&taskId=${this.task.taskId}&userId=${this.user._id}`);
+                    const reviewStatus = await this.$http.get(
+                        `/pm-manage/review-status?group=${this.user.group.name}&projectId=${this.project._id}&taskId=${this.task.taskId}&userId=${this.user._id}`
+                        );
                     if(reviewStatus.data === "forbidden") {
                         this.isReviewing = true;
                         return this.alertToggle({message: "This task Deliery Review is forbidden for you", isShow: true, type: "error"});
@@ -218,7 +220,13 @@ export default {
             await this.checkPermission();
             if(this.isReviewing || this.dr1Manager._id === manager._id) return;
             await this.changeReviewManager({
-                manager, prop, projectId: this.project._id, taskId: this.task.taskId
+                prevManager: this[prop],
+                manager, 
+                prop, 
+                projectId: this.project._id, 
+                taskId: this.task.taskId,
+                isAdmin: this.isAdmin,
+                status: `dr${this.dr}`
                 });
             await this.getDeliveryData();
         },
@@ -260,6 +268,9 @@ export default {
         },
         dr() {
             return this.task.status === "Pending Approval [DR1]" ? 1 : 2;
+        },
+        isAdmin() {
+            return this.user.group.name === "Administrators" || this.user.group.name === "Developers";
         }
     },
     components: {

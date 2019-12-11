@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail } = require("../../utils/");
-const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeReviewStage, rollbackReview } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
@@ -269,8 +269,11 @@ router.post("/steps-reopen", async (req, res) => {
 })
 
 router.get("/review-status", async (req, res) => {
-    const { projectId, taskId, userId } = req.query;
+    const { group, projectId, taskId, userId } = req.query;
     try {
+        if(group === "Administrators" || group === "Developers") {
+            return res.send("available");
+        }
         const reviewStatus = await checkPermission({projectId, taskId, userId});
         res.send(reviewStatus);
     } catch(err) {
@@ -280,11 +283,9 @@ router.get("/review-status", async (req, res) => {
 })
 
 router.post("/change-manager", async (req, res) => {
-    const { projectId, taskId, manager, prop } = req.body;
-    const key = `tasks.$.${prop}`;
-    const updateQuery = {[key]: manager._id};
+    const { projectId, taskId, manager, prop, isAdmin, status } = req.body;
     try {
-        await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
+        await changeManager({projectId, taskId, manager, prop, isAdmin, status});
         res.send("updated");
     } catch(err) {
         console.log(err);

@@ -70,6 +70,24 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
+async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status}) {
+    const key = `tasks.$.${prop}`;
+    const updateQuery = {[key]: manager._id};
+    const messageToPrev = `Delivery review of the task ${taskId} is reassigned to another manager`;
+    const messageToNew = `Delivery review of the task ${taskId} assigned to you`;
+    try {
+        await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
+        const isDr1 = prop === "dr1Manager";
+        const isDr2 = status === "dr2" && prop === "dr2Manager";
+        if(isAdmin && (isDr1 || isDr2)) {
+            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I010)');
+            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I014)');
+        }
+    } catch(err) {
+
+    }
+}
+
 async function changeReviewStage({projectId, taskId}) {
     try {
         await Delivery.updateOne(
@@ -118,4 +136,4 @@ async function rollbackReview({projectId, taskId, manager}) {
     ])
 }
 
-module.exports = { checkPermission, changeReviewStage, rollbackReview }
+module.exports = { checkPermission, changeManager, changeReviewStage, rollbackReview }
