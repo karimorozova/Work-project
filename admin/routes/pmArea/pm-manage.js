@@ -5,7 +5,7 @@ const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculatio
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
-const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification } = require("../../utils/");
+const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeReviewStage } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
@@ -373,13 +373,11 @@ router.post("/tasks-approve-notify", async (req, res) => {
 })
 
 router.post("/assign-dr2", async (req, res) => {
-    const { taskId, projectId } = req.body;
+    const { taskId, projectId, dr2Manager } = req.body;
     try {
-        // await Delivery.updateOne(
-        //         {projectId, "tasks.taskId": taskId}, 
-        //         {"tasks.$.isAssigned": true, "tasks.$.status": "dr2", "tasks.$.timeStamp": new Date()}
-        //     );
-        await changeReviewStage({taskId, projectId})
+        await changeReviewStage({taskId, projectId});
+        const message = `Delivery review of the task ${taskId} is assigned to you.`;
+        await managerNotifyMail(dr2Manager, message, 'Task delivery review reassignment notification (I014)');
         const updatedProject = await updateProject({"_id": projectId, "tasks.taskId": taskId}, {"tasks.$.status": "Pending Approval [DR2]"});
         res.send(updatedProject);
     } catch(err) {

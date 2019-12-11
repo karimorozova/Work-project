@@ -175,7 +175,9 @@ export default {
         async approve() {
             try {
                 if(this.isDr1 && this.isAssign) {
-                    await this.assignDr2({projectId: this.project._id, taskId: this.task.taskId});
+                    await this.assignDr2({
+                        projectId: this.project._id, taskId: this.task.taskId, dr2Manager: this.dr2Manager
+                        });
                 }
                 // if(!this.isNotify && !this.isDeliver) {
                 //     return await this.approveDeliverable(taskIds);

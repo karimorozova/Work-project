@@ -11,7 +11,7 @@
             .drops__header(slot="headerDr2" slot-scope="{ field }") {{ field.label }}
             .drops__header(slot="headerContacts" slot-scope="{ field }") {{ field.label }}
             .drops__data(slot="dr1" slot-scope="{ row }") 
-                .drops__name {{ user.firstName + ' ' + user.lastName }}    
+                .drops__name {{ getDr1Name() }}    
                     .drops__timestamp(v-if="timestamp")
                         img.drops__time-icon(src="../../../assets/images/time_icon.png")
                         .drops__time-data {{ getDeliveredTime() }} 
@@ -60,6 +60,13 @@ export default {
     },
     methods: {
         ...mapActions(["alertToggle"]),
+        getDr1Name() {
+            let result = `${this.user.firstName} ${this.user.lastName}`;
+            if(this.timestamp) {
+                result = `${this.dr1Manager.firstName} ${this.dr1Manager.lastName}`;
+            }
+            return result;
+        },
         getDeliveredTime() {
             return this.timestamp ? moment(this.timestamp).format("YYYY-MM-DD, HH:mm Z") : "";
         },

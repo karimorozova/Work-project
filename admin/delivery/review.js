@@ -1,15 +1,29 @@
 const { Delivery } = require("../models");
+const { managerNotifyMail } = require("../utils/mailTemplate");
+
+const dr2Instructions = [
+    {step: "dr2", text: "Check Language combinations", isChecked: false},
+    {step: "dr2", text: "Check File Type", isChecked: false},
+    {step: "dr2", text: "Check Number of files", isChecked: false},
+    {step: "dr2", text: "Check source & target files", isChecked: false},
+    {step: "dr2", text: "Beyond Compare", isChecked: false},
+    {step: "dr2", text: "Were Instructions followed", isChecked: false},
+    {step: "dr2", text: "Terms", isChecked: false},
+    {step: "dr2", text: "TOV", isChecked: false},
+    {step: "dr2", text: "Other instructions", isChecked: false},
+    {step: "dr2", text: "Check Client Type (PPP, Prepayment, Monthly)", isChecked: false}        
+]
 
 async function checkPermission({projectId, taskId, userId}) {
     let reviewStatus = "available";
     try {
         let review = await Delivery.findOne({projectId, "tasks.taskId": taskId})
             .populate("tasks.dr1Manager").populate("tasks.dr2Manager")
-        const { status, dr1Manager, files, instructions } = getTaskData(review, taskId);
+        const { status, dr1Manager, dr2Manager, files, instructions } = getTaskData(review, taskId);
         const isCheckedFile = !!files.find(item => item.isFileApproved);
         const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.step === status);
         if(!isCheckedFile && !isCheckedInstruction) {
-            review = await checkForReassign({status, dr1Manager, projectId, taskId, userId}) || review;
+            review = await checkForReassign({status, dr1Manager, dr2Manager, projectId, taskId, userId}) || review;
         }
         reviewStatus = getCorrectStatus({review, userId, taskId});
         return reviewStatus;
@@ -33,15 +47,18 @@ function getCorrectStatus({review, userId, taskId}) {
     return "available";
 }
 
-async function checkForReassign({status, dr1Manager, projectId, taskId, userId}) {
+async function checkForReassign({status, dr1Manager, dr2Manager, projectId, taskId, userId}) {
+    const message = `Delivery review of the task ${taskId} is reassigned to another manager`;
     try {
         if(status === "dr1" && userId !== dr1Manager.id) {
+            await managerNotifyMail(dr1Manager, message, 'Delivery review reassignment notification (I010)');
             return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
                 {$set: {"tasks.$.dr1Manager": userId}},
                 {new: true})
                 .populate("tasks.dr1Manager").populate("tasks.dr2Manager");
         }
-        if(status === "dr2" && userId !== dr1Manager.id) {
+        if(status === "dr2" && userId !== dr1Manager.id && userId !== dr2Manager.id) {
+            await managerNotifyMail(dr2Manager, message, 'Delivery review reassignment notification (I010)');
             return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
                 {$set: {"tasks.$.dr2Manager": userId}},
                 {new: true})
@@ -54,25 +71,13 @@ async function checkForReassign({status, dr1Manager, projectId, taskId, userId})
 }
 
 async function changeReviewStage({projectId, taskId}) {
-    const dr2Instructions = [
-        {step: "dr2", text: "Check Language combinations", isChecked: false},
-        {step: "dr2", text: "Check File Type", isChecked: false},
-        {step: "dr2", text: "Check Number of files", isChecked: false},
-        {step: "dr2", text: "Check source & target files", isChecked: false},
-        {step: "dr2", text: "Beyond Compare", isChecked: false},
-        {step: "dr2", text: "Were Instructions followed", isChecked: false},
-        {step: "dr2", text: "Terms", isChecked: false},
-        {step: "dr2", text: "TOV", isChecked: false},
-        {step: "dr2", text: "Other instructions", isChecked: false},
-        {step: "dr2", text: "Check Client Type (PPP, Prepayment, Monthly)", isChecked: false}        
-    ]
     try {
         await Delivery.updateOne(
             {projectId, "tasks.taskId": taskId}, 
             {
                 "tasks.$[i].isAssigned": true, 
                 "tasks.$[i].status": "dr2", 
-                "tasks.$[i].timeStamp": new Date(),
+                "tasks.$[i].timestamp": new Date(),
                 $push: {"tasks.$[i].instructions": {$each: dr2Instructions}},
                 "tasks.$[i].files.$[j].isFileApproved": false
             },
