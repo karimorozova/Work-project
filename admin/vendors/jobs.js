@@ -132,17 +132,18 @@ async function addToDelivery(project, task) {
         {text: "Make sure to convert all doc files into PDF", isChecked: false}
     ]
     try {
-        console.log("pair: ", pair);
-        await Delivery.updateOne({projectId: project.id},{
-            $push: {tasks: {
-                dr1Manager: project.projectManager,
+        const newTask = {
+            dr1Manager: project.projectManager,
                 dr2Manager: project.accountManager,
                 status: task.deliveryStatus,
                 pair,
                 taskId: task.taskId,
                 instructions,
                 files
-            }}
+        }
+        console.log("newTask: ", newTask);
+        await Delivery.updateOne({projectId: project.id},{
+            $push: {tasks: newTask}
         },{upsert: true})
         console.log("delivery added");
     } catch(err) {
