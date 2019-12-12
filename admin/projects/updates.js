@@ -17,7 +17,7 @@ async function updateProjectProgress(project, isCatTool) {
             } else if(!isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
-            task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval [DR1]" : task.status;
+            // task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval [DR1]" : task.status;
             if(task.status === "Pending Approval [DR1]") {
                 task.deliveryStatus = "dr1";
                 await addToDelivery(project, task);

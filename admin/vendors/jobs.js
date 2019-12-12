@@ -72,7 +72,6 @@ async function updateStepProp({jobId, prop, value}) {
             return item;
         })
         if(prop === "status") {
-            console.log("it is Status: ", value);
             return await manageStatuses({project, steps, jobId, status: value});
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
@@ -132,30 +131,17 @@ async function addToDelivery(project, task) {
         {text: "Make sure to convert all doc files into PDF", isChecked: false}
     ]
     try {
-        const newTask = {
-            dr1Manager: project.projectManager,
-            dr2Manager: project.accountManager,
-            status: "dr1",
-            pair,
-            taskId: task.taskId,
-            instructions,
-            files
-        }
-        console.log("newTask: ", newTask);
-        const review = await Delivery.findOne({projectId: project.id});
-        if(review) {
-            review.tasks.push(newTask);
-            await review.save();
-        } else {
-            await Delivery.create({
-                projectId: project.id,
-                tasks: [newTask]
-            })
-        }
-        // await Delivery.updateOne({projectId: project.id},{
-        //     $push: {tasks: newTask}
-        // },{upsert: true})
-        console.log("delivery added");
+        await Delivery.updateOne({projectId: project.id},{
+            $push: {tasks: {
+                dr1Manager: project.projectManager,
+                dr2Manager: project.accountManager,
+                status: task.deliveryStatus,
+                pair,
+                taskId: task.taskId,
+                instructions,
+                files
+            }}
+        },{upsert: true})
     } catch(err) {
         console.log(err);
         console.log("Error in the addToDelivery");
