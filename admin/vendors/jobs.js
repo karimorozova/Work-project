@@ -107,7 +107,7 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
     try {
         if(isAllStepsCompleted({jobId, steps})) {
             await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval [DR1]"});
-            await addToDelivery(project, {...task, status: "Pending Approval [DR1]", deliveryStatus: "dr1"});
+            await addToDelivery(project, {...task, status: "Pending Approval [DR1]"});
             return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
@@ -150,6 +150,7 @@ async function addToDelivery(project, task) {
 
 function getTaskTargetFiles(task) {
     const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
+    console.log(targetFiles);
     return taskFiles.reduce((prev, cur) => {
         const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
         prev.push({
