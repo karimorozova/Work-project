@@ -134,17 +134,27 @@ async function addToDelivery(project, task) {
     try {
         const newTask = {
             dr1Manager: project.projectManager,
-                dr2Manager: project.accountManager,
-                status: task.deliveryStatus,
-                pair,
-                taskId: task.taskId,
-                instructions,
-                files
+            dr2Manager: project.accountManager,
+            status: "dr1",
+            pair,
+            taskId: task.taskId,
+            instructions,
+            files
         }
         console.log("newTask: ", newTask);
-        await Delivery.updateOne({projectId: project.id},{
-            $push: {tasks: newTask}
-        },{upsert: true})
+        const review = await Delivery.findOne({projectId: project.id});
+        if(review) {
+            review.tasks.push(newTask);
+            await review.save();
+        } else {
+            await Delivery.create({
+                projectId: project.id,
+                tasks: [newTask]
+            })
+        }
+        // await Delivery.updateOne({projectId: project.id},{
+        //     $push: {tasks: newTask}
+        // },{upsert: true})
         console.log("delivery added");
     } catch(err) {
         console.log(err);
