@@ -1,7 +1,7 @@
 function getStepsWithFinanceUpdated(step, project) {
     let { steps } = project;
     const task = project.tasks.find(item => item.taskId === step.taskId);
-    const { receivables, payables } = getPrices(step, task.metrics);
+    const { receivables, payables } = task.service.calculationUnit === 'Words' ? getWordsPrices(step, task.metrics) : getPrices(step);
     const stepIndex = steps.findIndex(item => item.id === step._id);
     steps[stepIndex] = {
         ...step, 
@@ -12,7 +12,16 @@ function getStepsWithFinanceUpdated(step, project) {
     return steps;
 }
 
-function getPrices(step, metrics) {
+function getPrices(step) {
+    const { clientRate, vendorRate } = step;
+    const clientValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*clientRate.value).toFixed(2) : clientRate.value;
+    const vendorValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*vendorRate.value).toFixed(2) : vendorRate.value;
+    const receivables = clientValue > clientRate.min ? clientValue : clientRate.min;
+    const payables = vendorValue > vendorRate.min ? vendorValue : vendorRate.min;
+    return { receivables, payables }
+}
+
+function getWordsPrices(step, metrics) {
     const { clientRate, vendorRate } = step;
     let receivables = metrics.totalWords*clientRate.value
     let payables = metrics.totalWords*vendorRate.value;

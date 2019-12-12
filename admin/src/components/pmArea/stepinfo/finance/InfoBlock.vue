@@ -46,6 +46,7 @@ export default {
             updateVendorRate: "updateVendorRate"
         }),
         setTab({index}) {
+            if(!this.step.vendor && index === 1) return; 
             this.selectedTab = this.tabs[index];
         },
         closeErrorsBlock() {
