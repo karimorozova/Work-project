@@ -126,8 +126,8 @@ export default {
         },
         setValue({option}, prop) {
             this.$emit('setValue', {option, prop});
-            if(prop === 'customer' && this.project.customer.industries.length == 1) {
-                this.selectedIndustry = this.project.customer.industries[0];
+            if(prop === 'customer' && option.industries.length === 1) {
+                this.selectedIndustry = option.industries[0];
             }
         },
         setIndustry({option}) {
@@ -211,7 +211,7 @@ export default {
             return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;
         },
         disabledPicker() {
-            return !!(this.project._id && this.project.tasks.length);
+            return !!(this.project._id && this.project.tasks && this.project.tasks.length);
         }
     },
     components: {
