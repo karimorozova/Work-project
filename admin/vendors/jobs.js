@@ -72,6 +72,7 @@ async function updateStepProp({jobId, prop, value}) {
             return item;
         })
         if(prop === "status") {
+            console.log("it is Status: ", value);
             return await manageStatuses({project, steps, jobId, status: value});
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
@@ -86,6 +87,7 @@ async function manageStatuses({project, steps, jobId, status}) {
     const task = project.tasks.find(item => item.taskId === step.taskId);
     try {
         if(status === "Completed") {
+            console.log("it is completed");
             return await manageCompletedStatus({project, jobId, steps, task})
         }
         if(status === "Started" && task.status !== "Started") {
@@ -106,8 +108,10 @@ async function manageStatuses({project, steps, jobId, status}) {
 async function manageCompletedStatus({project, jobId, steps, task}) {
     try {
         if(isAllStepsCompleted({jobId, steps})) {
+            console.log("start of isALlStepsCompleted case");
             await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval [DR1]"});
             await addToDelivery(project, {...task, status: "Pending Approval [DR1]"});
+            console.log("end of isALlStepsCompleted case");
             return await taskCompleteNotifyPM(project, task);
         }
         const step = steps.find(item => item.id === jobId);
@@ -131,6 +135,7 @@ async function addToDelivery(project, task) {
         {text: "Make sure to convert all doc files into PDF", isChecked: false}
     ]
     try {
+        console.log("pair: ", pair);
         await Delivery.updateOne({projectId: project.id},{
             $push: {tasks: {
                 dr1Manager: project.projectManager,
@@ -142,6 +147,7 @@ async function addToDelivery(project, task) {
                 files
             }}
         },{upsert: true})
+        console.log("delivery added");
     } catch(err) {
         console.log(err);
         console.log("Error in the addToDelivery");
@@ -150,7 +156,7 @@ async function addToDelivery(project, task) {
 
 function getTaskTargetFiles(task) {
     const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
-    console.log(targetFiles);
+    console.log(taskFiles);
     return taskFiles.reduce((prev, cur) => {
         const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
         prev.push({
