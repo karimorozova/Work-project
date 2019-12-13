@@ -62,7 +62,8 @@ export const setStepVendor = async ({ commit, state }, payload) => {
     try {
         const { vendor, index } = payload;
         let step = state.currentProject.steps[index];
-        const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor}, index});
+        const status = step.status === "Rejected" ? "Created" : step.status;
+        const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor, status}, index});
         await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
         await commit('storeCurrentProject', updatedProject.body);
     } catch(err) {
