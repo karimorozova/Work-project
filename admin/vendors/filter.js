@@ -9,7 +9,7 @@ function getFilteringQuery(filters) {
         query["_id"] = {$gt: ObjectId(filters.lastId)}
     }
     if(industries) {
-        query.industries = industries;
+        query.industries = ObjectId(industries);
     }
     if(sourceFilter) {
         query["wordsRates.source"] = sourceFilter;
