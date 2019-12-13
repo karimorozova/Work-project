@@ -18,10 +18,10 @@ async function updateProjectProgress(project, isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
             // task.status = areAllStepsCompleted(steps, task.taskId) && task.status === "Started" ? "Pending Approval [DR1]" : task.status;
-            if(task.status === "Pending Approval [DR1]") {
-                task.deliveryStatus = "dr1";
-                await addToDelivery(project, task);
-            }
+            // if(task.status === "Pending Approval [DR1]") {
+            //     task.deliveryStatus = "dr1";
+            //     await addToDelivery(project, task);
+            // }
         }
         return await updateProject({"_id": project.id}, { steps, tasks });
     } catch(err) {
@@ -30,29 +30,29 @@ async function updateProjectProgress(project, isCatTool) {
     }
 }
 
-async function addToDelivery(project, task) {
-    const files = getTaskTargetFiles(task);
-    const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
-    const instructions = [
-        {step: "dr1", text: "Download and check file", isChecked: false},
-        {step: "dr1", text: "Make sure to convert all doc files into PDF", isChecked: false}
-    ]
-    try {
-        await Delivery.updateOne({projectId: project.id},{
-            tasks: {$push: {
-                manager: project.accountManager,
-                status: task.deliveryStatus,
-                pair,
-                taskid: task.taskid,
-                instructions,
-                files
-            }}
-        },{upsert: true})
-    } catch(err) {
-        console.log(err);
-        console.log("Error in the addToDelivery");
-    }
-}
+// async function addToDelivery(project, task) {
+//     const files = getTaskTargetFiles(task);
+//     const pair = task.sourceLanguage ? `${task.sourceLanguage} >> ${task.targetLanguage}` : `${task.targetLanguage} / ${task.packageSize}`;
+//     const instructions = [
+//         {step: "dr1", text: "Download and check file", isChecked: false},
+//         {step: "dr1", text: "Make sure to convert all doc files into PDF", isChecked: false}
+//     ]
+//     try {
+//         await Delivery.updateOne({projectId: project.id},{
+//             tasks: {$push: {
+//                 manager: project.accountManager,
+//                 status: task.deliveryStatus,
+//                 pair,
+//                 taskid: task.taskid,
+//                 instructions,
+//                 files
+//             }}
+//         },{upsert: true})
+//     } catch(err) {
+//         console.log(err);
+//         console.log("Error in the addToDelivery");
+//     }
+// }
 
 function getTaskTargetFiles(task) {
     const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
