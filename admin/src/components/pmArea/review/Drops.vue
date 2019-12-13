@@ -62,8 +62,8 @@ export default {
             managers: [],
             slectedContacts: [],
             fields: [
-                {label: "Delivery 1", headerKey: "headerDr1", key: "dr1", width: "33%", padding: 0},
-                {label: "Delivery 2", headerKey: "headerDr2", key: "dr2", width: "34%", padding: 0},
+                {label: "Delivery Review 1", headerKey: "headerDr1", key: "dr1", width: "33%", padding: 0},
+                {label: "Delivery Review 2", headerKey: "headerDr2", key: "dr2", width: "34%", padding: 0},
                 {label: "Contacts", headerKey: "headerContacts", key: "contacts", width: "33%", padding: 0},
             ]
         }

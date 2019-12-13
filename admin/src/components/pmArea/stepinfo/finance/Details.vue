@@ -33,7 +33,12 @@
                 .details__item.details_no-margin-bottom
                     LabelVal(text="Total:" customClass="finance-details")
                         span.details__data(type="text" :value="total" :class="{'details_opacity-06': !isEditing}") {{ total }} &euro;
-        ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
+        //- ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
+        .details__errors(v-if="areErrorsExist")
+            .details__messages
+                span.details__close(@click="closeErrorsBlock") +
+                .details__errors-title Errors:
+                li.details__error(v-for="error in errors") {{ error }}
 </template>
 
 <script>
@@ -128,6 +133,9 @@ export default {
     },
     directives: {
         ClickOutside
+    },
+    mounted() {
+        this.cancel();
     }
 }
 </script>
@@ -187,6 +195,36 @@ export default {
     }
     &_margin-top {
         margin-top: 20px;
+    }
+    &__errors {
+        position: absolute;
+        top: 20%;
+        left: 30%;
+        background-color: white;
+        padding: 15px;
+        box-shadow: 0 0 10px $main-color;
+    }
+    &__errors-title {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px; 
+    }
+    &__messages {
+        position: relative;
+    }
+    &__error {
+        color: $orange;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    &__close {
+        transform: rotate(45deg);
+        position: absolute;
+        top: -12px;
+        right: -8px;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
     }
 }
 
