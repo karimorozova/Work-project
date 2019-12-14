@@ -1,5 +1,5 @@
 <template lang="pug">
-.tasks-files
+    .tasks-files
         .tasks-files__main
             .tasks-files__item(v-if="isWords")
                 span.tasks-files__label Source file:
@@ -53,11 +53,15 @@ export default {
                 }
             }
             this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
-            this.$emit('uploadSourceFiles', { files });
         },
         uploadRefFiles({ files }) {
             if (files.length) {
-                this.refFiles.push(files[0]);
+                for (let file of files) {
+                    const isExist = this.refFiles.find(item => item.name === file.name);
+                    if (!isExist) {
+                        this.refFiles.push(file);
+                    }
+                }
             }
             this.setDataValue({prop: "refFiles", value: this.refFiles});
         },
