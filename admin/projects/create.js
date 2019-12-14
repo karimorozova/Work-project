@@ -291,8 +291,8 @@ function getTasksForPackages(tasksInfo) {
             refFiles: taskRefFiles,
             service,
             projectId,
-            start: stepsDates[0].start,
-            deadline: stepsDates[0].deadline,
+            start: stepsDates[0].start || tasksInfo.project.startDate,
+            deadline: stepsDates[0].deadline || tasksInfo.project.deadline,
             finance,
             status: 'Created'
         })
