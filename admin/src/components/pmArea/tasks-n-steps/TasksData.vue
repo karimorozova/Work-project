@@ -121,11 +121,12 @@ export default {
         },
         async checkForErrors() {
             this.errors = [];
-            const { source, targets, sourceFiles, refFiles, quantity } = this.tasksData;
+            const { source, targets, packageSize, sourceFiles, refFiles, quantity } = this.tasksData;
             if(this.isRequest) {
                 this.errors = this.checkRequestErrors();
             }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
+            if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
             this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
             this.checkHoursSteps();
