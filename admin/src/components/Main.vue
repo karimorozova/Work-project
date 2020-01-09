@@ -109,7 +109,6 @@ export default {
                     title: "Graphic Localization"
                 }
             ],
-            dropdownVisible: false,
             accountMenuVisible: false,
             quotes: [],
             path: "Language Settings",
@@ -177,9 +176,6 @@ export default {
                 }
             }
         },
-        hideAdditional() {
-            this.dropdownVisible = false;
-        },
         hideAccountMenu() {
             this.accountMenuVisible = false;
         },
@@ -233,9 +229,6 @@ export default {
         showAccountInfo() {
             this.$router.push('/account-info');
             this.accountMenuVisible = false;
-        },
-        showDropdown() {
-            this.dropdownVisible = !this.dropdownVisible;
         },
         async refreshServices(data) {
             await this.getServices();

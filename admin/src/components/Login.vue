@@ -17,10 +17,7 @@
 </template>
 
 <script>
-import {
-    mapGetters,
-    mapActions
-} from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data() {
@@ -57,9 +54,6 @@ export default {
             } catch (err) {
                 this.alertToggle({message: "Cannot log out", isShow: true, type: "error"})
             }
-        },
-        forget() {
-            this.forgotLink = !this.forgotLink;
         },
         ...mapActions({
             alertToggle: "alertToggle",
