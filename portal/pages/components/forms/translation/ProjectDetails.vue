@@ -4,12 +4,14 @@
             .project-details__files
                 .project-details__item
                     UploadFileButton(label="Files" buttonTitle="Upload File(s)" @uploadedFile="setDetailFiles" inputName="detailFiles")
+                    .project-details__error(v-if="isDetailBig") Files sizes sum must be <= 15MB
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in detailFiles")
                             span.project-details__remove(@click="(e) => deleteFile(e, index, 'detailFiles')") +
                             span.project-details__file {{ file.name }}
                 .project-details__item
                     UploadFileButton(label="Upload Reference File" @uploadedFile="setRefFiles" inputName="refFiles")
+                    .project-details__error(v-if="isRefBig") Files sizes sum must be <= 5MB
                     .project-details__files-list
                         .project-details__files-item(v-for="(file, index) in refFiles")
                             span.project-details__remove(@click="(e) => deleteFile(e, index, 'refFiles')") +
@@ -24,7 +26,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-
+            isRefBig: false,
+            isDetailBig: false
         }
     },
     methods: {
@@ -32,8 +35,16 @@ export default {
             setOrderDetail: "setOrderDetail",
             removeFile: "removeFile"
         }),
+        showBigFileError(prop) {
+            this[prop] = true;
+            setTimeout(() => {
+                this[prop] = false;
+            }, 4000)
+        },
         setDetailFiles({ files }) {
             if(this.detailFiles && this.detailFiles.length) {
+                const filesSizesSum = Array.from([...files, ...this.detailFiles]).reduce((acc, cur) => acc + cur.size, 0);
+                if(filesSizesSum/1000000 > 15) return this.showBigFileError("isDetailBig");
                 let existingFiles = [...this.detailFiles];
                 const fileNames = existingFiles.map(item => item.name);
                 for(let file of files) {
@@ -44,10 +55,14 @@ export default {
                 return this.setOrderDetail({prop: 'detailFiles', value: [...existingFiles]});
                 this.clearFileInput('detailFiles');
             }
+            const filesSizesSum = Array.from(files).reduce((acc, cur) => acc + cur.size, 0);
+            if(filesSizesSum/1000000 > 15) return this.showBigFileError("isDetailBig");
             this.setOrderDetail({prop: 'detailFiles', value: [...files]});
             this.clearFileInput('detailFiles');
         },
         setRefFiles({ files }) {
+            const filesSizesSum = Array.from(files).reduce((acc, cur) => acc + cur.size, 0);
+            if(filesSizesSum/1000000 > 15) return this.showBigFileError("isRefBig");
             this.setOrderDetail({prop: 'refFiles', value: [...files]});
             this.clearFileInput('refFiles');
         },
@@ -83,6 +98,9 @@ export default {
     margin-top: 40px;
     width: 100%;
     box-sizing: border-box;
+    &__item {
+        position: relative;
+    }
     &__files {
         display: flex;
         justify-content: space-between;
@@ -109,6 +127,12 @@ export default {
     }
     &__file {
         font-size: 14px;
+    }
+    &__error {
+        position: absolute;
+        color: red;
+        top: -25px;
+        width: 140%;
     }
 }
 
