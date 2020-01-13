@@ -4,8 +4,8 @@
         :fields="fields"
         :tableData="clients"
         @onRowClicked="onRowClicked"
-        :bodyClass="['clients__table', {'tbody_visible-overflow': clients.length < 30}]"
-        :tableheadRowClass="clients.length < 30 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['clients__table', {'tbody_visible-overflow': clients.length < 29}]"
+        :tableheadRowClass="clients.length < 29 ? 'tbody_visible-overflow' : ''"
         @bottomScrolled="bottomScrolled"
     )
         template(slot="headerName" slot-scope="{ field }")
@@ -284,6 +284,7 @@ export default {
     &__data-cell {
         padding: 6px 0 0 5px;
         max-height: 28px;
+        overflow-y: auto;
     }
     &__drop-menu {
         position: relative;
