@@ -3,8 +3,8 @@
     DataTable(
         :fields="fields"
         :tableData="vendors"
-        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 20}]"
-        :tableheadRowClass="vendors.length < 20 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 19}]"
+        :tableheadRowClass="vendors.length < 19 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="vendors-table_height-28"
         @onRowClicked="onRowClicked"
         @bottomScrolled="bottomScrolled"
