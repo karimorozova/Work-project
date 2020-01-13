@@ -49,7 +49,7 @@ async function setVendorNewPassword(vendor, email) {
 async function updateAccountDetails({user, clientId, accountData, photoFile}) {
     const { email, firstName, surname, password, phone, skype } = accountData;
     const updatedUser = {
-        ...user.__doc,
+        ...user,
         firstName,
         surname,
         email: email || user.email,

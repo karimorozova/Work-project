@@ -45,7 +45,7 @@ router.post("/account-details", checkClientContact,  upload.fields([{ name: 'pho
         const userIndex = client.contacts.findIndex(item => item.email === verificationResult.contactEmail);
         const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
         const updatedUser = await updateAccountDetails({
-            user: client.contacts[userIndex], clientId: client.id, accountData, photoFile
+            user: client.contacts[userIndex]._doc, clientId: client.id, accountData, photoFile
         });
         client.contacts[userIndex] = updatedUser;
         client.save();
