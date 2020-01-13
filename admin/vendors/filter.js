@@ -33,8 +33,8 @@ function getFilteringQuery(filters) {
 function getFilters(filters) {
     const status = filters.statusFilter !== 'All' ? filters.statusFilter : {$ne: ""};
     const industries = filters.industryFilter.name !== 'All' ? filters.industryFilter._id : "";
-    const sourceFilter = filters.sourceFilter[0] ? {$in: filters.sourceFilter}: "";
-    const targetFilter = filters.targetFilter[0] ? {$in: filters.targetFilter}: "";
+    const sourceFilter = filters.sourceFilter[0] ? {$in: filters.sourceFilter.map(item => ObjectId(item))}: "";
+    const targetFilter = filters.targetFilter[0] ? {$in: filters.targetFilter.map(item => ObjectId(item))}: "";
     const stepFilter = filters.stepFilter.title !== 'All' ? filters.stepFilter._id : "";
     const nameFilter = filters.nameFilter;
     return {
