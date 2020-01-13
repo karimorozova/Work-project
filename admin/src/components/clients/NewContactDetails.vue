@@ -48,7 +48,7 @@
                 input.non-personal(type="text" placeholder="Position" v-model="contact.position" :class="{'contact-wrap_error-shadow': !contact.position && isSaveClicked}")
             .details__item
                 label Phone:
-                input.non-personal(type="text" placeholder="Phone number" v-model="contact.phone")
+                input.non-personal(type="text" placeholder="Phone number" :value="contact.phone" @input="setPhone" ref="phone")
             .details__item
                 label Skype:
                 input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
@@ -141,6 +141,14 @@ export default {
             this.timezoneSelected = data;
             this.contact.timezone = data;
         },
+        setPhone(e) {
+            const { value } = e.target;
+            const regex = /^[0-9]+$/;
+            const characters = value.split("").filter(item => regex.test(item));
+            const clearedValue = characters.join("");
+            this.contact.phone = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+            this.$refs.phone.value = this.contact.phone;
+        },
         async checkEmailUniquenes() {
             try {
                 const result = await this.$http.get(`/clientsapi/unique-email?email=${this.contact.email}`);
@@ -154,8 +162,10 @@ export default {
         async checkForErrors() {
             this.errors = [];
             const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-            if(!this.contact.firstName) this.errors.push("Please, enter contact's first name.");
-            if(!this.contact.position) this.errors.push("Please, enter contact's position.");
+            const textReg = /^[-\sa-zA-Z]+$/;
+            if(!this.contact.firstName || !textReg.test(this.contact.firstName)) this.errors.push("Please, enter valid contact's first name.");
+            if(!this.contact.position || !textReg.test(this.contact.position)) this.errors.push("Please, enter valid contact's position.");
+            if(this.contact.surname && !textReg.test(this.contact.surname)) this.errors.push("Please, enter valid contact's surname.");
             if(!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.");
             if(this.contact.email && emailValidReg.test(this.contact.email)) {
                 await this.checkEmailUniquenes();

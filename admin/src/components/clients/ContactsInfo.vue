@@ -178,7 +178,8 @@ export default {
         async checkForValidation(index) {
             this.errors = [];
             const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-            if(!this.currentPosition) this.errors.push("Please, enter contact's position.");
+            const positionReg = /^[-\sa-zA-Z]+$/;
+            if(!this.currentPosition || !positionReg.test(this.currentPosition)) this.errors.push("Please, enter valid contact's position.");
             if(!this.currentEmail || !emailValidReg.test(this.currentEmail)) this.errors.push("Please, enter valid e-mail address.");
             if(this.currentEmail && emailValidReg.test(this.currentEmail)) {
                 await this.checkEmailUniquenes(index);

@@ -34,7 +34,7 @@
                     input.block-item__input-filed(:class="{'block-item_error-shadow': validateEmail() && isSaveClicked}" type="text" placeholder="Email" :value="currentVendor.email" @change="(e) => updateProp(e,'email')")
                 .block-item
                     label Phone:
-                    input.block-item__input-filed(type="text" placeholder="Phone" :value="currentVendor.phone" @change="(e) => updateProp(e,'phone')")
+                    input.block-item__input-filed(type="text" placeholder="Phone" :value="currentVendor.phone" @input="setPhone" ref="phone")
                 .block-item
                     label Time Zone:
                     .block-item__drop-menu.block-item_high-index
@@ -144,6 +144,15 @@ export default {
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase())
         },
+        setPhone(e) {
+            const { value } = e.target;
+            const regex = /^[0-9]+$/;
+            const characters = value.split("").filter(item => regex.test(item));
+            const clearedValue = characters.join("");
+            const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+            this.$refs.phone.value = phoneValue;
+            this.updateVendorProp({prop: "phone", value: phoneValue});
+        },
         async checkEmail() {
             if(this.validateEmail()) {
                 return this.errors.push('Please provide a valid email.')
@@ -159,9 +168,11 @@ export default {
             }
         },
         async checkForErrors() {
+            const textReg = /^[-\sa-zA-Z]+$/;
             try {
                 this.errors = [];
-                if(!this.currentVendor.firstName) this.errors.push('First name cannot be empty.');
+                if(!this.currentVendor.firstName|| !textReg.test(this.currentVendor.firstName)) this.errors.push('Please, enter valid first name.');
+                if(this.currentVendor.surname && !textReg.test(this.currentVendor.surname)) this.errors.push('Please, enter valid surname.');
                 if(!this.currentVendor.industries.length) this.errors.push('Please, choose at least one industry.');
                 if(!this.currentVendor.status) this.errors.push('Please, choose status.');
                 await this.checkEmail();

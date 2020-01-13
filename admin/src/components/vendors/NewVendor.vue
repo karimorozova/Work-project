@@ -33,7 +33,7 @@
                     input.block-item__input-field(:class="{'block-item_error-shadow': checkEmail() && isSaveClicked}" type="text" placeholder="Email" :value="vendor.email" @change="(e) => updateProp(e,'email')")
                 .block-item
                     label Phone:
-                    input.block-item__input-field(type="text" placeholder="Phone" :value="vendor.phone" @change="(e) => updateProp(e,'phone')")
+                    input.block-item__input-field(type="text" placeholder="Phone" :value="vendor.phone" @input="setPhone" ref="phone")
                 .block-item
                     label Time Zone:
                     .block-item__drop-menu.block-item_high-index
@@ -148,9 +148,19 @@ export default {
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             return !this.vendor.email || !emailValidRegex.test(this.vendor.email.toLowerCase())
         },
+        setPhone(e) {
+            const { value } = e.target;
+            const regex = /^[0-9]+$/;
+            const characters = value.split("").filter(item => regex.test(item));
+            const clearedValue = characters.join("");
+            this.vendor.phone = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+            this.$refs.phone.value = this.vendor.phone;
+        },
         async checkForErrors() {
+            const textReg = /^[-\sa-zA-Z]+$/;
             this.errors = [];
-            if(!this.vendor.firstName) this.errors.push('First name cannot be empty.');
+            if(!this.vendor.firstName || !textReg.test(this.vendor.firstName)) this.errors.push('Please, enter valid first name.');
+            if(this.vendor.surname && !textReg.test(this.vendor.surname)) this.errors.push('Please, enter valid surname.');
             if(!this.vendor.industries.length) this.errors.push('Please, choose at least one industry.');
             if(!this.vendor.status) this.errors.push('Please, choose status.');
             if(this.checkEmail()) {
