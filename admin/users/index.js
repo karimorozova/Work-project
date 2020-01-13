@@ -50,9 +50,9 @@ async function updateAccountDetails({user, clientId, accountData, photoFile}) {
     const { email, firstName, surname, password, phone, skype } = accountData;
     const updatedUser = {
         ...user.__doc,
+        firstName,
+        surname,
         email: email || user.email,
-        firstName: firstName || user.firstName,
-        surname: surname || user.surname,
         phone: phone || user.phone,
         skype: skype || user.skype
     }

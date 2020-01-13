@@ -133,15 +133,27 @@ export default {
         },
         async checkErrors() {
             this.errors = [];
-            const emailReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             const phoneReg = /^[1-9][0-9]*$/;
-            if(!this.email || !emailReg.test(this.email)) this.errors.push("Enter a valid email");
+            const namesReg = /^[-\sa-zA-Z]+$/;
+            if(!this.firstName || !namesReg.test(this.firstName)) this.errors.push("Enter a valid first name");
+            if(this.surname && !namesReg.test(this.surname)) this.errors.push("Enter a valid surname");
             if(this.phone && !phoneReg.test(this.phone)) this.errors.push("Only number are allowed in Phone number field");
-            if(this.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match"); 
+            if(this.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match");
+            await this.checkEmail();
             if(this.errors.length) {
                 return this.areErrors = true;
             }
             await this.saveInfo();
+        },
+        async checkEmail() {
+            const emailReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            if(!this.email || !emailReg.test(this.email)) this.errors.push("Enter a valid email");
+            try {
+                const existingUser = await this.$axios.get(`/portal/unique-email?email=${this.email}`);
+                if(this.email !== this.user.email && existingUser.data === "exist") this.errors.push("The entered email is already used in our system.")
+            } catch(err) {
+                this.alertToggle({message: "Error on checking email uniqueness", isShow: true, type: "error"});
+            }
         },
         areEqualPasswords() {
             return this.password.trim() === this.confirmPassword.trim();

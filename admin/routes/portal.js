@@ -56,6 +56,20 @@ router.post("/account-details", checkClientContact,  upload.fields([{ name: 'pho
     }
 })
 
+router.get("/unique-email", async (req, res) => {
+    const { email } = req.query;
+    try {
+        const client = await Clients.findOne({"contacts.email": email});
+        if(client) {
+            return res.send("exist");
+        }
+        res.send("");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking client contact's email uniqueness.")
+    }
+})
+
 router.post("/reset-pass", async (req, res) => {
     const { email } = req.body;
     try {
@@ -67,7 +81,7 @@ router.post("/reset-pass", async (req, res) => {
         res.send("new password sent");
     } catch(err) {
         console.log(err);
-        res.status(500).send("Server error. Try again later.");
+        res.status(500).send("Error on reseting password. Try again later.");
     }
 })
 
