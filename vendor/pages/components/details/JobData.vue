@@ -5,7 +5,7 @@
                 LabelValue(title="Project Name" :isColon="true" :value="job.projectName")  
             .data-block__item
                 LabelValue(title="Job ID" :isColon="true" :value="job.stepId")  
-            .data-block__item
+            .data-block__item(v-if="isWordcount")
                 LabelValue(v-if="job.finance" title="Total Wordcount" :isColon="true" :value="job.finance.Wordcount.receivables")  
         .data-block
             .data-block__item
@@ -16,7 +16,7 @@
             .data-block__item(v-else)
                 LabelValue(title="Total Cost" :isColon="true" :value="job.finance.Price.halfPayables")
                     span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
-            .data-block__item
+            .data-block__item(v-if="isWordcount")
                 LabelValue(v-if="job.finance" title="Weighted Wordcount" :isColon="true" :value="job.finance.Wordcount.payables")
         .data-block
             .data-block__progress
@@ -37,6 +37,9 @@ export default {
                 return this.job.progress.wordsTotal ? +(this.job.progress.wordsDone / this.job.progress.wordsTotal * 100).toFixed(2): this.job.progress;
             }
         },
+        isWordcount() {
+            return this.job.serviceStep.calculationUnit === "Words";
+        }
     },
     components: {
         LabelValue,
