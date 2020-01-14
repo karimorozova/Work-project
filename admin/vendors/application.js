@@ -1,5 +1,6 @@
 const { Vendors, Languages } = require("../models");
-const { moveFile, sendEmail, applicationMessage } = require("../utils");
+const { moveFile, sendEmail } = require("../utils");
+const { applicationMessage } = require("../emailMessages/vendorCommunication");
 const fs = require("fs");
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles}) {

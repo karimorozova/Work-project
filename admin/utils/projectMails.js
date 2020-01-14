@@ -1,7 +1,8 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage, requestMessageForVendor, vendorReassignmentMessage } = require('./emailMessages');
+const { managerAssignmentNotifyingMessage } = require('./emailMessages');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
+const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
 async function notifyManagerProjectStarts(project) {

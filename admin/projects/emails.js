@@ -1,6 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
-const { vendorNotificationMessage, managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage } = require("../utils/emailMessages");
+const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage } = require("../utils/emailMessages");
 const { messageForClient, emailMessageForContact, taskReadyMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
+const { vendorNotificationMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");

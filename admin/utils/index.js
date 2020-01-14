@@ -1,6 +1,5 @@
 const { sendEmail, clientQuoteEmail, managerNotifyMail } = require('./mailTemplate');
-const { getMessageWithRandomPassword, applicationMessage, requestMessageForVendor, managerAssignmentNotifyingMessage, 
-    vendorNotificationMessage, deliverablesDownloadedMessage, vendorReassignmentMessage, managerRequestNotifyingMessage } = require('./emailMessages');
+const { getMessageWithRandomPassword, managerAssignmentNotifyingMessage, deliverablesDownloadedMessage, managerRequestNotifyingMessage } = require('./emailMessages');
 const { sendMail } = require('./mailhandler');
 const { sendMailClient } = require('./mailhandlerclient');
 const { sendMailPortal } = require('./mailhandlerportal');
@@ -16,8 +15,6 @@ module.exports = {
     sendEmail,
     clientQuoteEmail,
     getMessageWithRandomPassword,
-    applicationMessage,
-    requestMessageForVendor,
     managerAssignmentNotifyingMessage,
     upload,
     moveFile,
@@ -32,10 +29,8 @@ module.exports = {
     stepVendorsRequestSending,
     stepEmailToVendor,
     sendEmailToContact,
-    vendorNotificationMessage,
     archiveFile,
     deliverablesDownloadedMessage,
-    vendorReassignmentMessage,
     stepReassignedNotification,
     managerRequestNotifyingMessage
 }
