@@ -1,4 +1,5 @@
-const { getMessageWithRandomPassword, sendEmail, moveFile } = require('../utils');
+const { sendEmail, moveFile } = require('../utils');
+const { getMessageWithRandomPassword } = require('../emailMessages/internalCommunication');
 const passwordGen = require('generate-password');
 const bcrypt = require('bcryptjs');
 

@@ -1,4 +1,5 @@
-const { managerNotifyMail, managerRequestNotifyingMessage } = require('../utils');
+const { managerNotifyMail } = require('../utils');
+const { managerRequestNotifyingMessage } = require('../emailMessages/internalCommunication');
 
 async function clientRequestNotification(request, prop) {
     try {

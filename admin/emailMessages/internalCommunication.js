@@ -1,6 +1,3 @@
-const apiUrl = require("../helpers/apiurl");
-const jwt = require('jsonwebtoken');
-const { secretKey } = require('../configs');
 const moment = require('moment');
 
 function getMessageWithRandomPassword(password) {
