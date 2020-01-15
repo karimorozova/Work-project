@@ -1,6 +1,6 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage } = require('../emailMessages/internalCommunication');
+const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
@@ -8,26 +8,50 @@ const { getClient } = require('../clients');
 async function notifyManagerProjectStarts(project) {
     try {
         const customer = await getClient({"_id": project.customer.id});
-        const projectManager = await User.findOne({"_id": customer.projectManager._id});
-        const salesManager = await User.findOne({"_id": customer.salesManager._id});
-        let notAssignedSteps = 0;
-        let { steps } = project;
-        for(let step of steps) {
-            if(!step.vendor) {
-                notAssignedSteps++
-            } else { 
-                const index = step.vendorsClickedOffer.indexOf(step.vendor._id);
-                await sendRequestToVendor(project, step);
-                if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
+        if(project.isStartAccepted) {
+            const projectManager = await User.findOne({"_id": customer.projectManager._id});
+            const salesManager = await User.findOne({"_id": customer.salesManager._id});
+            const steps = await notifyVendorsProjectAccepted(project.steps);
+            await Projects.updateOne({"_id": project.id}, { steps });
+            const notAssignedStep = steps.find(item => !item.vendor);
+            if(notAssignedStep) {
+                await managerEmailsSend({project, projectManager, salesManager});
             }
-        }
-        await Projects.updateOne({"_id": project.id}, {steps: steps});
-        if(notAssignedSteps) {
-            await managerEmailsSend({project, projectManager, salesManager});
+        } else {
+            await notifyMangerProjectAppoved(project, customer.accountManager._id);
         }
     } catch(err) {
         console.log(err);
         console.log("Error in notifyManagerProjectStarts");
+    }
+}
+
+async function notifyMangerProjectAppoved(project, accManagerId) {
+    try {
+        const accManager = await User.findOne({"_id": accManagerId});
+        const message = managerProjectAcceptedMessage({...project._doc, accManager: accManager.firstName});
+        await managerNotifyMail(accManager, message, `Quote Accepted (ID C002.0, ${project.projectId})`);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyMangerProjectAppoved");
+    }
+}
+
+async function notifyVendorsProjectAccepted(projectSteps) {
+    let steps = [];
+    try {
+        for(let step of projectSteps) {
+            if(step.vendor) {
+                const index = step.vendorsClickedOffer.indexOf(step.vendor._id);
+                await sendRequestToVendor(project, step);
+                if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
+            }
+            steps.push(step);
+        }
+        return steps;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyVendorsProjectAccepted");
     }
 }
 
