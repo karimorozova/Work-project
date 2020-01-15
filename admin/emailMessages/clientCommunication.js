@@ -7,16 +7,20 @@ function messageForClient(obj) {
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
     const tasksInfo = getTasksInfo({tasks: obj.tasks, industry: obj.industry});
     const token = jwt.sign({id: obj.id}, secretKey, { expiresIn: '2h'});
+    const detailHeader = obj.status === 'Quote sent' ? "Your quote has been updated - please see below the quote details:" : "Please see below the quote details:";
     const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
     const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
     return `<div class="wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
         <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${name},</h3>
         <div class="all-info" style="padding: 0 15px 0 30px;">
             <p class="comment" style="font-style: italic;font-weight: bold;">
-                ***This is an automated message***
+                ***This is an automated message*** 
+            </p>
+            <p class="comment" style="font-style: italic;font-weight: bold;">
+                This message is sent to you on behalf of ${obj.accountManager.firstName} ${obj.accountManager.lastName}.
             </p>
             <p class="description" style="font-size: 18px;">
-                Please fined attached the quote on behalf of ${obj.accountManager.firstName} ${obj.accountManager.lastName}.
+                ${detailHeader}
             </p>
             <h3 class="detailsTitle">Quote Details</h3>
             <table class="details" style="width: 600px;box-sizing: border-box;border: 1px solid rgb(129, 129, 129);border-collapse: collapse;">
@@ -33,6 +37,10 @@ function messageForClient(obj) {
             <p>
                 By clicking on one of the links below, you can accept or reject our offer.
             </p>
+            <p>
+                Clicking ”I accept" will also approve and accept our 
+                    <a href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" target="_blank">terms and conditions</a>.
+            </p>
                 <p class="link" style="color: orange;">${acceptQuote}</p>
                 <p>or</p>
                 <p class="link" style="color: orange;">${declineQuote}</p>
@@ -44,7 +52,7 @@ function messageForClient(obj) {
             </p>
             <h4 style="width: 40px;border-bottom: 1px solid rgb(29, 29, 29);">T&C:</h4>
             <ol style="padding-left: 0;">
-                <li>The rstimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
+                <li>The estimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date will vary.</li>
                 <li>Should you agree to a QA service, we cannot accept responsibility if you fail to send us the finished files upon completion. Please note the QA service expires in 30 days after the quote approval.</li>
             </ol>
             <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea TRanslation Services (Cyprus) LTD</h2>
