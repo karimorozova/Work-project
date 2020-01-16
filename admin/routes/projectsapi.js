@@ -22,7 +22,7 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
             const status = project.isStartAccepted ? "Started" : "Approved";
             await updateProjectStatus(projectId, status);
             await Projects.updateOne({"_id": projectId}, {$set: {isClientOfferClicked: true}});
-            emitter.emit('managersNotificationEmail', project);
+            emitter.emit('porjectApprovedNotification', project);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
         }
@@ -49,7 +49,7 @@ router.get('/declinequote', async (req, res) => {
             }
             const client = {...project.customer._doc, id: project.customer.id};
             const user = await User.findOne({"_id": client.projectManager._id});
-            await pmMail(project, client, user);
+            emitter.emit('porjectRejectedNotification', project);
             await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)

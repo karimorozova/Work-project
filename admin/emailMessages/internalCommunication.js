@@ -153,11 +153,26 @@ function managerProjectAcceptedMessage(obj) {
             </div>`;
 }
 
+function managerProjectRejectedMessage(obj) {
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accManager},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="description" style="font-size: 18px;">
+                    Client ${obj.customer.name} has just rejected quote: ${obj.projectId} - ${obj.projectName}. 
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    Please archive the project. 
+                </p>
+            </div>
+            </div>`;
+}
+
 module.exports = { 
     getMessageWithRandomPassword,
     managerAssignmentNotifyingMessage,
     managerTaskCompleteNotificationMessage,
     deliverablesDownloadedMessage,
     managerRequestNotifyingMessage,
-    managerProjectAcceptedMessage
+    managerProjectAcceptedMessage,
+    managerProjectRejectedMessage
 };

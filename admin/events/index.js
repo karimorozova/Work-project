@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
 const { Vendors } = require('../models');
-const { sendEmail, notifyManagerProjectStarts } = require('../utils');
+const { sendEmail, notifyManagerProjectStarts, notifyManagerProjectRejected } = require('../utils');
 
 emitter.on('testEvent', () => {
     setTimeout(async () => {
@@ -17,11 +17,20 @@ emitter.on('testEvent', () => {
     }, 60000) 
 });
 
-emitter.on('managersNotificationEmail', async (project) => {
+emitter.on('porjectApprovedNotification', async (project) => {
     try {
         await notifyManagerProjectStarts(project);
     } catch(err) {
-        console.log("Error from emitter managersNotificationEmail");
+        console.log("Error from emitter porjectApprovedNotification");
+        console.log(err);
+    }
+})
+
+emitter.on('porjectRejectedNotification', async (project) => {
+    try {
+        await notifyManagerProjectRejected(project);
+    } catch(err) {
+        console.log("Error from emitter porjectRejectedNotification");
         console.log(err);
     }
 })

@@ -1,15 +1,26 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage } = require('../emailMessages/internalCommunication');
+const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
+
+async function notifyManagerProjectRejected(project) {
+    try {
+        const accManager = await User.findOne({"_id": project.accountManager.id});
+        const message = managerProjectRejectedMessage({...project._doc, accManager: accManager.firstName});
+        await managerNotifyMail(accManager, message, `Quote Rejected (ID C003.0, ${project.projectId})`);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyManagerProjectRejected");
+    }
+}
 
 async function notifyManagerProjectStarts(project) {
     try {
         const customer = await getClient({"_id": project.customer.id});
         if(project.isStartAccepted) {
-            const projectManager = await User.findOne({"_id": customer.projectManager._id});
+            const projectManager = await User.findOne({"_id": project.projectManager.id});
             const salesManager = await User.findOne({"_id": customer.salesManager._id});
             const steps = await notifyVendorsProjectAccepted(project.steps);
             await Projects.updateOne({"_id": project.id}, { steps });
@@ -18,7 +29,7 @@ async function notifyManagerProjectStarts(project) {
                 await managerEmailsSend({project, projectManager, salesManager});
             }
         } else {
-            await notifyMangerProjectAppoved(project, customer.accountManager._id);
+            await notifyMangerProjectAppoved(project);
         }
     } catch(err) {
         console.log(err);
@@ -26,9 +37,9 @@ async function notifyManagerProjectStarts(project) {
     }
 }
 
-async function notifyMangerProjectAppoved(project, accManagerId) {
+async function notifyMangerProjectAppoved(project) {
     try {
-        const accManager = await User.findOne({"_id": accManagerId});
+        const accManager = await User.findOne({"_id": project.accountManager.id});
         const message = managerProjectAcceptedMessage({...project._doc, accManager: accManager.firstName});
         await managerNotifyMail(accManager, message, `Quote Accepted (ID C002.0, ${project.projectId})`);
     } catch(err) {
@@ -139,4 +150,4 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-module.exports = { notifyManagerProjectStarts, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact, stepReassignedNotification };
+module.exports = { notifyManagerProjectStarts, notifyManagerProjectRejected, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact, stepReassignedNotification };
