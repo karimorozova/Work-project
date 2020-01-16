@@ -1,7 +1,7 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
-const { emailMessageForContact } = require("../emailMessages/clientCommunication");
+const { emailMessageForContact, projectCancelledMessage } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
@@ -150,4 +150,23 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-module.exports = { notifyManagerProjectStarts, notifyManagerProjectRejected, stepVendorsRequestSending, stepEmailToVendor, sendEmailToContact, stepReassignedNotification };
+async function notifyClientProjectCancelled(project) {
+    try {
+        const accManager = await User.findOne({"_id": project.accountManager.id});
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        const message = projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
+        await clientQuoteEmail({contact, subject: `Cancelled Project (ID C005.0, ${project.projectId})`}, message);
+    } catch(err) {
+
+    }
+}
+
+module.exports = { 
+    notifyManagerProjectStarts, 
+    notifyManagerProjectRejected, 
+    stepVendorsRequestSending, 
+    stepEmailToVendor, 
+    sendEmailToContact, 
+    stepReassignedNotification,
+    notifyClientProjectCancelled
+};

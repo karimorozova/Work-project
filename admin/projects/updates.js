@@ -76,16 +76,21 @@ function cancelSteps({stepIdentify, steps}) {
 async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
     const unchangingStatuses = ['Ready for Delivery', 'Pending Approval [DR1]', 'Pending Approval [DR2]', 'Delivered'];
     let tasks = [...projectTasks];
-    for(let task of tasks) {
-        if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
-            task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
-            if(task.status === "Cancelled Halfway") {
-                task.finance = getTaskNewFinance(changedSteps, task);
-                task.xtmjobs = await updateXtmJobs({task, projectId, changedSteps});
+    try {
+        for(let task of tasks) {
+            if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
+                task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
+                if(task.status === "Cancelled Halfway") {
+                    task.finance = getTaskNewFinance(changedSteps, task);
+                    task.xtmjobs = await updateXtmJobs({task, projectId, changedSteps});
+                }
             }
         }
+        return tasks;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in cancellCheckedTasks");
     }
-    return tasks;
 }
 
 async function updateXtmJobs({task, projectId, changedSteps}) {

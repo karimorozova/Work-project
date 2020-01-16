@@ -5,7 +5,7 @@ const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculatio
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
-const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail } = require("../../utils/");
+const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
@@ -87,6 +87,9 @@ router.put("/project-status", async (req, res) => {
     const { id, status } = req.body;
     try {
         const result = await updateProjectStatus(id, status);
+        if(status === "Cancelled") {
+            await notifyClientProjectCancelled(result);
+        }
         res.send(result);
     } catch(err) {
         console.log(err);
