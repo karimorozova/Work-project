@@ -1,7 +1,7 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
-const { emailMessageForContact, projectCancelledMessage } = require("../emailMessages/clientCommunication");
+const { emailMessageForContact, projectCancelledMessage, tasksCancelledMessage } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
@@ -150,14 +150,37 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-async function notifyClientProjectCancelled(project) {
+async function getAccManagerAndContact(project) {
     try {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const contact = project.customer.contacts.find(item => item.leadContact);
+        return { accManager, contact };
+    } catch(err) {
+        console.log(err);
+        console.log('Error in getAccManagerAndContact');
+    }
+}
+
+async function notifyClientProjectCancelled(project) {
+    try {
+        const { accManager, contact } = await getAccManagerAndContact(project);
         const message = projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
         await clientQuoteEmail({contact, subject: `Cancelled Project (ID C005.0, ${project.projectId})`}, message);
     } catch(err) {
+        console.log(err);
+        console.log('Error in notifyClientProjectCancelled');
+    }
+}
 
+async function notifyClientTasksCancelled(project, tasks) {
+    try {
+        const { accManager, contact } = await getAccManagerAndContact(project);
+        const tasksIds = tasks.map(item => item.taskId);
+        const message = tasksCancelledMessage({...project._doc, accManager, contact, tasksIds});
+        await clientQuoteEmail({contact, subject: `Tasks have been cancelled (ID C005.1, ${project.projectId})`}, message);
+    } catch(err) {
+        console.log(err);
+        console.log('Error in notifyClientTasksCancelled');
     }
 }
 
@@ -168,5 +191,6 @@ module.exports = {
     stepEmailToVendor, 
     sendEmailToContact, 
     stepReassignedNotification,
-    notifyClientProjectCancelled
+    notifyClientProjectCancelled,
+    notifyClientTasksCancelled
 };

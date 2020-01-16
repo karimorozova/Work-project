@@ -5,7 +5,8 @@ const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculatio
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
-const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled } = require("../../utils/");
+const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
+    stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils/");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
@@ -239,6 +240,7 @@ router.post("/cancel-tasks", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         const updatedProject = await getProjectAfterCancelTasks(tasks, project);
+        await notifyClientTasksCancelled(project, tasks);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
