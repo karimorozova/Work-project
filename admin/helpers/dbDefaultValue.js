@@ -387,21 +387,18 @@ const timezonesDefault = [
 ]
 
 const emptyCharts = {
-    iceMatch: {text: "ICE Match", value: 0},
-    fuzzyMatch75: {text: "75-84%", value: 0},
-    fuzzyMatch85: {text: "85-94%", value: 0},
-    fuzzyMatch95: {text: "95-99%", value: 0},
+    xTranslated: {text: "X translated", value: 0},
     repeat: {text: "Repetitions", value: 0},
-    leveragedMatch: {text: "Leveraged Match", value: 0},
-    fuzzyRepeats75: {text: "Internal 75-84%", value: 0},
-    fuzzyRepeats85: {text: "Internal 85-94%", value: 0},
-    fuzzyRepeats95: {text: "Internal 95-99%", value: 0}
+    repeat100: {text: "100%", value: 0},
+    repeat50: {text: "50-74%", value: 0},
+    repeat75: {text: "75-84%", value: 0},
+    repeat85: {text: "85-94%", value: 0},
+    repeat95: {text: "95-99%", value: 0}
 }
 
 const emptyMetrics = {
     ...emptyCharts,
-    nonTranslatable: 0,
-    totalWords: 0
+    noMatch: 0
 }
 
 const discountChartsDefault = [
