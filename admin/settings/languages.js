@@ -20,14 +20,14 @@ async function updateLanguage(obj) {
 async function moveFlagIcon(flag) {
         const date = new Date();
         const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
-        const newPath = `./dist/static/flags31x21pix/${formattedDate}-${flag[0].filename}`;
+        const newPath = `./dist/languages/${formattedDate}-${flag[0].filename}`;
         try {
             await moveFile(flag[0], newPath);
         } catch(err) {
             console.log(err);
             console.log("Error in moveFile in moveFlagIcon func");
         }
-        return `/static/flags31x21pix/${formattedDate}-${flag[0].filename}`;
+        return `/languages/${formattedDate}-${flag[0].filename}`;
 }
 
 async function removeOldIcon(icon) {
