@@ -1,10 +1,10 @@
 <template lang="pug">
 .table
     .table__thead
-        .table__thead-row(:class="{'tbody_visible-overflow': tableData.length < 20}")
+        .table__thead-row(:class="{'tbody_visible-overflow': tableData.length < 18}")
             .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
                 slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 20}")
+    .table__tbody(:class="{'tbody_visible-overflow': tableData.length < 18}")
         .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
             .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
                 slot(:name="field.key" :row="row" :index="index")
