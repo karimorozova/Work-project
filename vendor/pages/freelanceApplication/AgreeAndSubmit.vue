@@ -5,7 +5,8 @@
             .terms-agree__check(:class="{checked: isAgree}")
         span.terms-agree__text I confirm that the information given in this form is true, complete and accurate and 
             | I agree to provide evidence and/or references for the aforementioned expertise and qualifications
-            | if required.
+            | if required. I have read and accept the 
+            a.terms-agree__link(href="https://www.pangea.global/employment-candidate-privacy-notice" target="_blank") Employment Candidate Privacy Notice
     .terms-agree__captcha
         span.terms-agree__captcha-comment Please, confirm that you are not a robot   
         .terms-agree__google
@@ -14,7 +15,7 @@
                 "-webkit-transform": "scale(0.77)",
                 "transform-origin": "150px 0",
                 "-webkit-transform-origin": "150px 0" })
-    input.terms-agree__submit(type="button" value="Submit" @click="checkForm")
+    input.terms-agree__submit(type="button" value="Submit" @click="checkForm" :disabled="!isAgree" :class="{'terms-agree_disabled': !isAgree}")
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -34,9 +35,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle"
-        }),
+        ...mapActions(["alertToggle"]),
         toggleTermsAgree() {
             this.isAgree = !this.isAgree;
         },
@@ -127,6 +126,10 @@ export default {
             width: 87%;
         }
     }
+    &__link {
+        color: #67573E;
+        font-weight: 600;
+    }
     &__checkbox {
         margin: 3px 3px 0 5px;
         width: 18px;
@@ -196,6 +199,14 @@ export default {
         }
         &:active {
             box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
+        }
+    }
+    &_disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+        &:hover, &:active {
+            box-shadow: none;
         }
     }
 }
