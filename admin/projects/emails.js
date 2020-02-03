@@ -1,6 +1,6 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage } = require("../emailMessages/internalCommunication");
-const { messageForClient, emailMessageForContact, taskReadyMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
+const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
 const { vendorNotificationMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
@@ -82,9 +82,11 @@ async function notifyClientTaskReady({taskId, project, contacts}) {
 async function sendClientDeliveries({taskId, project, contacts}) {
     const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
     try {
+        const accManager = await User.findOne({"_id": project.accountManager.id});
+        const task = project.tasks.find(item => item.taskId === taskId);
         for(let contact of notifyContacts) {
-            const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: `DELIVERY (ID C013, ${project.projectId})`}, message);
+            const message = taskDeliveryMessage({task, contact, accManager, ...project._doc});
+            await sendEmail({to: contact.email, subject: `TASK DELIVERY (ID C006.1, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);

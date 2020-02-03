@@ -177,6 +177,33 @@ function taskReadyMessage(obj) {
             </div>`;
 }
 
+function taskDeliveryMessage(obj) {
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
+                <div class="all-info" style="padding: 0 15px 0 30px;">
+                    <p class="comment" style="font-style: italic;font-weight: bold;">
+                        ***This is an automated message*** 
+                    </p>
+                    <p class="comment" style="font-style: italic;font-weight: bold;">
+                        This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}.
+                    </p>
+                    <p class="description" style="font-size: 18px;">
+                        The task ${obj.task.taskId} (${obj.task.service.title}) from your project ${obj.projectId} - ${obj.projectName} is ready. Yo can collect it from the 
+                        <a href="https://portal.pangea.global">Protal</a>.
+                    </p>
+                    <p class="description" style="font-size: 18px;">
+                        I'm pleased to inform you that the task ${obj.task.taskId} (${obj.task.service.title}) from your project ${obj.projectId} - ${obj.projectName} has been completed and is ready for review.
+                    </p>
+                    <p class="description" style="font-size: 18px;">
+                        The files are available for you in our <a href="https://portal.pangea.global">Protal</a> and attached to this email in a zip format.
+                    </p>
+                    <p>
+                        In case of any questions, please do not hesitate to contact us :-)
+                    </p>
+                </div>
+            </div>`;
+}
+
 function tasksQuoteMessage(obj) {
     const langPair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} / ${obj.task.packageSize}`;
     const receivables = obj.task.finance.Price.receivables;
@@ -272,6 +299,7 @@ module.exports = {
     messageForClient,
     emailMessageForContact,
     taskReadyMessage,
+    taskDeliveryMessage,
     tasksQuoteMessage,
     projectCancelledMessage,
     tasksCancelledMessage
