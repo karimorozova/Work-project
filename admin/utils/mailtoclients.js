@@ -82,8 +82,8 @@ const clientMail = function(project, client) {
       text: "plain text", // plain text body
       html: msg, // html body
       attachments: [{
-        filename: 'logo.png',
-        path: './static/logo.png',
+        filename: 'email-logo.png',
+        path: './static/email-logo.png',
         cid: 'logo@pan' //same cid value as in the html img src
         }
       ]
