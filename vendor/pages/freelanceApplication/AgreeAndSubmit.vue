@@ -1,11 +1,15 @@
 <template lang="pug">
 .terms-agree
     .terms-agree__term
-        .terms-agree__checkbox(@click="toggleTermsAgree")
-            .terms-agree__check(:class="{checked: isAgree}")
-        span.terms-agree__text I confirm that the information given in this form is true, complete and accurate and 
+        .terms-agree__checkbox(@click="(e) => toggleTermsAgree('isConfirm')")
+            .terms-agree__check(:class="{checked: isConfirm}")
+        span.terms-agree__text.terms-agree_justified I confirm that the information given in this form is true, complete and accurate and 
             | I agree to provide evidence and/or references for the aforementioned expertise and qualifications
-            | if required. I have read and accept the 
+            | if required.
+    .terms-agree__term.terms-agree_align-start
+        .terms-agree__checkbox(@click="(e) => toggleTermsAgree('isAgree')")
+            .terms-agree__check(:class="{checked: isAgree}")
+        span.terms-agree__text I have read and accept the 
             a.terms-agree__link(href="https://www.pangea.global/employment-candidate-privacy-notice" target="_blank") Employment Candidate Privacy Notice
     .terms-agree__captcha
         span.terms-agree__captcha-comment Please, confirm that you are not a robot   
@@ -15,7 +19,7 @@
                 "-webkit-transform": "scale(0.77)",
                 "transform-origin": "150px 0",
                 "-webkit-transform-origin": "150px 0" })
-    input.terms-agree__submit(type="button" value="Submit" @click="checkForm" :disabled="!isAgree" :class="{'terms-agree_disabled': !isAgree}")
+    input.terms-agree__submit(type="button" value="Submit" @click="checkForm" :disabled="!isAgree || !isConfirm" :class="{'terms-agree_disabled': !isAgree || !isConfirm}")
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -30,14 +34,15 @@ export default {
     },
     data() {
         return {
+            isConfirm: false,
             isAgree: false,
             errors: []
         }
     },
     methods: {
         ...mapActions(["alertToggle"]),
-        toggleTermsAgree() {
-            this.isAgree = !this.isAgree;
+        toggleTermsAgree(prop) {
+            this[prop] = !this[prop];
         },
         validateEmail() {
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -120,11 +125,6 @@ export default {
     &__text {
         font-size: 12px;
         margin-left: 3px;
-        width: 90%;
-        text-align: justify;
-        @media (max-width: 450px) {
-            width: 87%;
-        }
     }
     &__link {
         color: #67573E;
@@ -208,6 +208,17 @@ export default {
         &:hover, &:active {
             box-shadow: none;
         }
+    }
+    &_justified {
+        text-align: justify;
+        width: 90%;
+        @media (max-width: 450px) {
+            width: 87%;
+        }
+    }
+    &_align-start {
+        align-self: flex-start;
+        align-items: center;
     }
 }
 
