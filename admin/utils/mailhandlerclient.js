@@ -127,13 +127,13 @@ const sendMailClient = function(request) {
 </table>
 <p style="color: #66563D;font-size: 12px">Looking forward to working together.</p>
     <p style="color: #66563D;font-size: 12px">
-        Illy Dimitrova <br/>
-        Business Development Manager <br/>
-        T: +375 25252150 <br/>
-        M: +375 96130494 <br/>
-        S: illy.pangea <br/>
-        E: illy@pangea.global <br/>
-        W: pangea.global <br/>
+        <span style="color: #47A6A6;font-size: 16px">Amarita Sohal</span> <br/>
+        Senior Business Development Manager <br/>
+        E: amarita@pangea.global <br/>
+        P: +375 25252150 <br/>
+        M: +447522892306 <br/>
+        S: amarita.pangea <br/>
+        W: www.pangea.global <br/>
     </p>
     <div style="margin-left: 170px; margin-top: 20px">
       <a href="https://plus.google.com/116520029165216678356"><img src="cid:Artboard2@pan" alt="" class="social-image"></a>
@@ -144,6 +144,9 @@ const sendMailClient = function(request) {
       <a href="https://www.linkedin.com/company/pangea-language-service"><img src="cid:Artboard7@pan" alt="" class="social-image"></a>
       <a href="https://www.instagram.com/pangea_local/"><img src="cid:Artboard8@pan" alt="" class="social-image"></a>
     </div>
+    <footer style="max-width: 90%; margin: 20px 0; font-size: 10px; color: #66563D;">
+    *Pangea Translation Services LTD (CY) respects your privacy and are committed to protecting your personal data. This is to inform you that your personal data will be used, namely for the purposes of the professional performance of our services only and to stated that Pangea Translation Services LTD (CY) operates under the General Data Protection Regulation ((EU) 2016/679) (GDPR) and the local data protection law. 
+    </footer>
     </div>`;
 
     let mailOptions = {
@@ -195,9 +198,6 @@ const sendMailClient = function(request) {
         return console.log(error);
       }
       console.log('Message sent: %s', info.messageId);
-
-      // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-      // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     });
 
 }
