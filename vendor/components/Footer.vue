@@ -16,6 +16,9 @@
         .footer__item
             img(border="0" src="https://twb.translationcenter.org/workspace/display-badge/index/id/61931/Volunteer_Translator.jpg" alt="English to French & English to Arabic & English to Chinese volunteer translator")
     SocialIcons
+    .footer__privacy-text *Pangea Translation Services LTD (CY) respects your privacy and are committed to protecting your personal data. 
+        | This is to inform you that your personal data will be used, namely for the purposes of the professional performance of our services 
+        | only and to stated that Pangea Translation Services LTD (CY) operates under the General Data Protection Regulation ((EU) 2016/679) (GDPR) and the local data protection law.
 </template>
 
 <script>
@@ -45,6 +48,8 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
+    padding-bottom: 15px;
     &__item {
         &:first-child {
             @media (max-width: 450px) {
@@ -89,6 +94,16 @@ export default {
     }
     &__legal-copywrite-text {
         font-weight: bold;
+    }
+    &__privacy-text {
+        color: #fff;
+        font-size: 10px;
+        max-width: 600px;
+        text-align: justify;
+        line-height: normal;
+        @media (max-width: 620px) {
+            max-width: 310px;
+        }
     }
 }
 
