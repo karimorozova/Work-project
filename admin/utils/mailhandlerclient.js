@@ -136,7 +136,6 @@ const sendMailClient = function(request) {
         W: www.pangea.global <br/>
     </p>
     <div style="margin-left: 170px; margin-top: 20px">
-      <a href="https://plus.google.com/116520029165216678356"><img src="cid:Artboard2@pan" alt="" class="social-image"></a>
       <a href="https://www.facebook.com/PangeaLocalizationServices/"><img src="cid:Artboard3@pan" alt="" class="social-image"></a>
       <a href="https://twitter.com/Pangea_Local"><img src="cid:Artboard4@pan" alt="" class="social-image"></a>
       <a href="https://www.pinterest.com/pangealocalizat/"><img src="cid:Artboard5@pan" alt="" class="social-image"></a>
