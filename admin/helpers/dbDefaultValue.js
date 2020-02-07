@@ -87,7 +87,15 @@ const languagesDefault = [
     {"lang":"Chinese Traditional", "icon":"/static/flags31x21pix/ChineseTraditional[ZH-CN].png", "symbol":"ZH-TW", "xtm": "zh_TW", "iso1":"zh-CN", "iso2":"zho-CN", "direction":"in", "crud": false, "active": true},
     {"lang":"Chinese (Hong Kong)", "icon":"/static/flags31x21pix/Chinese[ZH-HK].png", "symbol":"ZH-HK", "xtm": "zh_HK", "iso1":"zh-HK", "iso2":"zho-HK", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"},
     {"lang":"Chinese (Macao)", "icon":"/static/flags31x21pix/Chinese[ZH-MO].png", "symbol":"ZH-MO", "xtm": "zh_TW", "iso1":"zh-MO", "iso2":"zho-MO", "direction":"in", "crud": false, "active": true, parent: "ZH-CN", china: "traditional"},
-    {"lang":"Chinese (Taiwan)","icon":"/static/flags31x21pix/Chinese[ZH-TW].png", "symbol":"ZH-TW", "xtm": "goyu", "iso1":"zh-TW", "iso2":"zho-TW", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"}
+    {"lang":"Chinese (Taiwan)","icon":"/static/flags31x21pix/Chinese[ZH-TW].png", "symbol":"ZH-TW", "xtm": "goyu", "iso1":"zh-TW", "iso2":"zho-TW", "direction":"in", "crud": false, "check": false, "active": true, parent: "ZH-CN", china: "traditional"},
+    {"lang":"Burmese", "icon":"/static/flags31x21pix/Burmese[BU].png", "symbol":"BU", "xtm": "", "iso1":"my", "iso2":"bur(B) mya(T)", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Filipino", "icon":"/static/flags31x21pix/Filipino[FIL].png", "symbol":"FIL", "xtm": "", "iso1":"", "iso2":"fil", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Haitian Creole", "icon":"/static/flags31x21pix/Haitian[HT].png", "symbol":"HT", "xtm": "", "iso1":"ht", "iso2":"hat", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Khmer", "icon":"/static/flags31x21pix/Khmer[KM].png", "symbol":"KM", "xtm": "", "iso1":"km", "iso2":"khm", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Kurdish (Arabic)", "icon":"/static/flags31x21pix/Kurdish[KU].png", "symbol":"KU", "xtm": "", "iso1":"ku", "iso2":"kur", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Lao", "icon":"/static/flags31x21pix/Lao[LO].png", "symbol":"LO", "xtm": "", "iso1":"lo", "iso2":"lao", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Maltese", "icon":"/static/flags31x21pix/Maltese[MT].png", "symbol":"MT", "xtm": "", "iso1":"mt", "iso2":"mlt", "direction":"in", "crud": false, "active": true, "check": false},
+    {"lang":"Nepali", "icon":"/static/flags31x21pix/Nepali[NE].png", "symbol":"NE", "xtm": "", "iso1":"ne", "iso2":"nep", "direction":"in", "crud": false, "active": true, "check": false},
 ];
 
 const requestsDefault = [];

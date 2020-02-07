@@ -12,7 +12,8 @@ const LanguageSchema = new mongoose.Schema({
     },
     symbol:{
         type: String,
-        default: ''
+        default: '',
+        trim: true
     },
     active: {
         type: Boolean,
@@ -46,9 +47,10 @@ const LanguageSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    xtrf:{
+    memoq:{
         type: String,
         default: '',
+        trim: true
     },
     direction:{
         type: String,
