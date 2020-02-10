@@ -23,7 +23,7 @@ async function sendEmailToManager(personData, vendor) {
     let emailData = {...personData};
     try {
         emailData.to = "career@pangea.global";
-        emailData.subject = `Application form ${emailData.firstName} ${emailData.surname}`;
+        emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
         const motherTongue = await Languages.find({"_id": emailData.native});
         emailData.native = motherTongue[0].lang;
         emailData.languagePairs = await getLanguagePairs(personData.languagePairs);
