@@ -82,7 +82,6 @@ export default {
         getDataForTasks(dataForTasks) {
             let tasksData = new FormData();
             const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
-            tasksData.append('customerId', dataForTasks.xtmId);
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', dataForTasks.template.id);
             tasksData.append('workflow', dataForTasks.workflow.id);
@@ -91,8 +90,8 @@ export default {
             tasksData.append('source', source);
             tasksData.append('targets', JSON.stringify(dataForTasks.targets));
             tasksData.append('projectId', this.currentProject._id);
-            tasksData.append('projectName', this.currentProject.projectName);
-            tasksData.append('join', dataForTasks.isJoinfiles);
+            tasksData.append('projectName', `${this.currentProject.projectId} - ${this.currentProject.projectName}`);
+            tasksData.append('industry', this.currentProject.industry.name);
             tasksData.append('packageSize', dataForTasks.packageSize);
             tasksData.append('quantity', dataForTasks.quantity);
             return tasksData;

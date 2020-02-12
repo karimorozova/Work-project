@@ -21,10 +21,6 @@
             .tasks-data__files(v-else)
                 TasksFilesRequested
             .tasks-data__join-files-wrapper(v-if="currentUnit === 'Words'")
-                .tasks-data__join
-                    span.tasks-data__toggler-title  Join Files
-                    .tasks-data__toggler
-                        BigToggler(:isOn="isJoinFiles" @toggle="toggleJoin")
                 .tasks-data__drop-menu
                     label.tasks-data__menu-title Template
                     SelectSingle(
@@ -61,22 +57,15 @@ export default {
     },
     data() {
         return {
-            templates: [
-                {name: 'Excel segment limit', id: 'XLSwithLimit'},
-                {name: 'Multilingual Excel', id: 'multiexcel'},
-                {name: 'Standard processing', id: '247336FD'},
-            ],
+            templates: [],
             sourceLanguages: [],
             targetLanguages: [],
-            isJoinFiles: false,
             errors: []
         }
     },
     methods: {
         ...mapActions([
-            "addProjectTasks", 
             "alertToggle",
-            "setAllXtmCustomers", 
             "setTasksDataValue",
             "setRequestValue"
         ]),
@@ -93,10 +82,6 @@ export default {
         setTargets({ targets }) {
             this.setTasksDataValue({prop: "targets", value: targets});
             this.targetLanguages = [...targets];
-        },
-        toggleJoin() {
-            this.isJoinFiles = !this.isJoinFiles;
-            this.setTasksDataValue({prop: "isJoinFiles", value: this.isJoinFiles});
         },
         isRefFilesHasSource() {
             const { sourceFiles, refFiles } = this.tasksData;
@@ -174,35 +159,11 @@ export default {
                 isEmail: true
             })
         },
-        async getCustomersFromXtm() {
-            try {
-                if (!this.xtmCustomers.length) {
-                    let result = await this.$http.get('/xtm/xtm-customers');
-                    this.setAllXtmCustomers(result.body);
-                }
-            } catch (err) {
-                this.alertToggle({message: "Error on getting XTM customers",isShow: true,type: "error"});
-            }
-        },
-        async getXtmId() {
-            try {
-                if (!this.xtmCustomers.length && this.tasksData.service.calculationUnit === 'Words') {
-                    await this.getCustomersFromXtm();
-                }
-            } catch (err) {}
-            const xtmCustomer = this.xtmCustomers.find(item => item.name === this.currentProject.customer.name);
-            const xtmId = xtmCustomer ? xtmCustomer.id : "";
-            return { xtmId };
-        },
         async addTasks() {
-            const { xtmId } = await this.getXtmId();
             const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
-            const isJoinFiles = this.tasksData.isJoinFiles || false;
             this.$emit("addTasks", {
                 ...this.tasksData,
-                isJoinfiles: isJoinFiles,
                 refFiles: this.tasksData.refFiles || [],
-                xtmId,
                 source
             });
             this.clearInputFiles(".tasks-data__source-file");
@@ -216,13 +177,23 @@ export default {
         },
         setServiceForm() {
             this.isMonoService = this.tasksData.service.languageForm === "Mono";
+        },
+        async getMemoqTemplates() {
+            try {
+                const result = await this.$http.get("/memoqapi/templates");
+                this.templates = result.data || [];
+                if(this.templates.length) {
+                    this.setTasksDataValue({prop: "template", value: this.templates[0]});
+                }
+            } catch(err) {
+
+            }
         }
     },
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             languages: "getAllLanguages",
-            xtmCustomers: "getXtmCustomers",
             tasksData: "getTasksData"
         }),
         allTemplates() {
@@ -268,8 +239,8 @@ export default {
         ServiceAndWorkflow,
         BigToggler
     },
-    mounted() {
-        this.setTasksDataValue({prop: "template", value: {name: 'Standard processing', id: '247336FD'}});
+    created() {
+        this.getMemoqTemplates();
     }
 }
 </script>
@@ -334,6 +305,7 @@ export default {
     &__drop-menu {
         position: relative;
         width: 191px;
+        height: 50px;
     }
 
     &__menu-title {
