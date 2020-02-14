@@ -38,6 +38,17 @@ async function addAllFiles(projectId, translateFiles) {
     }
 }
 
+async function addProjectFile(projectId, filePath) {
+    try {
+        const fileId = await uploadFileToMemoq(filePath);
+        await addFilesToMemoq(fileId, filePath);
+        await moveMemoqFileToProject(projectId, fileId);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in addAllFiles");
+    }
+}
+
 async function addFilesToMemoq(fileId, name) {
     try {
         const chunksArr = await getChunks(fileId, name);
@@ -125,5 +136,6 @@ module.exports = {
     moveMemoqFileToProject,
     addFilesToMemoq,
     finishMemoqFileMove,
-    addAllFiles
+    addAllFiles,
+    addProjectFile
 }
