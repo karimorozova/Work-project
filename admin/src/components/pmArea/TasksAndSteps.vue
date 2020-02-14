@@ -1,5 +1,8 @@
 <template lang="pug">
 .tasks-steps
+    transition(name="slide-fade")
+        .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
+            .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
     .tasks-steps__tasks-title Tasks and Steps
         img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
@@ -42,6 +45,8 @@ export default {
             isTaskData: false,
             isStepsShow: false,
             isTasksShow: true,
+            isInfo: false,
+            translateFilesAmount: 0
         }
     },
     methods: {
@@ -108,6 +113,7 @@ export default {
             }
             const { sourceFiles, refFiles } = dataForTasks;
             if(sourceFiles && sourceFiles.length) {
+                this.translateFilesAmount = sourceFiles.length;
                 for(let file of sourceFiles) {
                     tasksData.append('sourceFiles', file)
                 }
@@ -118,10 +124,14 @@ export default {
                 }
             }
             try {
+                this.isInfo = true;
                 await this.addProjectTasks(tasksData);
                 this.isTaskData = false;
                 this.clearTasksData();
-            } catch(err) { }
+            } catch(err) { 
+            } finally {
+                this.isInfo = false;
+            }
         },
         appendHoursStepsInfo(dataForTasks) {
                 const steps = [...dataForTasks.service.steps];
@@ -144,7 +154,9 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject'
+            currentProject: 'getCurrentProject',
+            selectedInfoMessage: 'getMemoqProjectMessage',
+            fileCounter: 'getTranslateFileCounter'
         }),
         metricsButton() {
             const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words');
@@ -176,8 +188,28 @@ export default {
     margin-left: 20px;
     margin-right: 20px;
     box-shadow: 0 3px 20px $brown-shadow;
+    position: relative;
     @media (max-width: 1600px) {
         width: 70%;
+    }
+    &__info {
+        position: absolute;
+        z-index: 1000;
+        color: $orange;
+        background-color: $white;
+        padding: 20px;
+        top: 20%;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        width: 300px;
+        border: 1px solid $main-color;
+        box-shadow: 0 3px 20px $brown-shadow;
+    }
+    &__file-counter {
+        margin-top: 10px;
+        text-align: center;
     }
     &__tasks-title {
         font-size: 29px;

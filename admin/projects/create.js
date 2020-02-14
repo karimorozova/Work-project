@@ -44,6 +44,19 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
     }
 }
 
+/// Creating project for memoQ server start ///
+
+async function createMemoqTasks(tasksInfo, docs) {
+    try {
+        return await createTasksWithWordsUnit(tasksInfo, docs);          
+    } catch(err) {
+        console.log(err);
+        console.log("Error in createMemoqTasks");
+    }
+}
+
+/// Creating project for memoQ server start ///
+
 /// Creating tasks using info from client request start ///
 
 async function createTasksFromRequest({project, dataForTasks}) {
@@ -82,21 +95,16 @@ function getModifiedFiles(files) {
     return [];
 }
 
-/// Creating tasks using info from client request start ///
+/// Creating tasks using info from client request end ///
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
+async function createTasksWithWordsUnit(tasksInfo, docs) {
     let newTasksInfo = {...tasksInfo};
     newTasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
-    newTasksInfo.template = tasksInfo.template || '247336FD';
-    newTasksInfo.workflow = tasksInfo.workflow || 2917;
     try {
-        newTasksInfo.customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        newTasksInfo.filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
-        newTasksInfo.referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
         const project = await Projects.findOne({"_id": tasksInfo.projectId});
-        await addTasksToXtm({newTasksInfo, project});
+        await addTasksToProject({newTasksInfo, project, docs});
         return await getProject({"_id": newTasksInfo.projectId});
     } catch(err) {
         console.log(err);
@@ -104,26 +112,14 @@ async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
     }
 }
 
-async function addTasksToXtm({newTasksInfo, project}) {
+async function addTasksToProject({newTasksInfo, project, docs}) {
     try {
         let tasksLength = project.tasks.length + 1;
         for(let target of newTasksInfo.targets) {
-            let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`
-            let xtmProject = await saveTemplateTasks({
-                customerId: newTasksInfo.customerId,
-                name: name,
-                source: newTasksInfo.source.xtm,
-                target: target.xtm,
-                sourceFiles: newTasksInfo.filesToTranslate,
-                refFiels: newTasksInfo.referenceFiles,
-                templateId: newTasksInfo.template,
-                workflowId: newTasksInfo.workflow,
-                join: newTasksInfo.join
-            });
-            xtmProject = JSON.parse(xtmProject);
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
             let taskId = project.projectId + ` ${idNumber}`;
-            await updateProjectTasks({newTasksInfo, project, xtmProject, taskId, target})
+            const memoqDocs = docs.filter(item => item.TargetLangCode === target.memoq);
+            await updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs})
             tasksLength++
         }
     } catch(err) {
@@ -132,13 +128,15 @@ async function addTasksToXtm({newTasksInfo, project}) {
     }
 }
 
-async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, target}) {
+async function updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs}) {
     try {
         await Projects.updateOne({"_id": project._id}, 
-            {$set: {sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, isMetricsExist: false}, 
-            $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: newTasksInfo.service, projectId: xtmProject.projectId, 
-                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
-                status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, check: false, 
+            {$set: {isMetricsExist: false}, 
+            $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId, 
+                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, 
+                sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
+                memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs,
+                status: "Created", cost: "", sourceFiles: newTasksInfo.translateFiles, refFiles: newTasksInfo.referenceFiles, check: false, 
                 finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );
     } catch(err) {
@@ -344,4 +342,4 @@ function getProjectFinance(tasks, projectFinance) {
     }
 }
 
-module.exports = { createProject, createTasks, createTasksFromRequest }
+module.exports = { createProject, createTasks, createTasksFromRequest, createMemoqTasks }

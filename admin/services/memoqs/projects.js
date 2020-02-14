@@ -52,7 +52,7 @@ async function createMemoqProjectWithTemplate(projectData) {
                     <ns:CreatorUser>b0c7615d-4f3c-ea11-8d1e-287fcfe08232</ns:CreatorUser>
                     <ns:Domain>${projectData.industry}</ns:Domain>
                     <ns:Name>[PngSys] ${projectData.projectName}</ns:Name>
-                    <ns:Project>${projectData.projectName}</ns:Project>            
+                    <ns:Project>[PngSys] ${projectData.projectName}</ns:Project>            
                     <ns:SourceLanguageCode>${projectData.source.memoq}</ns:SourceLanguageCode>
                     <ns:TargetLanguageCodes>${targets}</ns:TargetLanguageCodes>
                     <ns:TemplateGuid>${projectData.template}</ns:TemplateGuid>

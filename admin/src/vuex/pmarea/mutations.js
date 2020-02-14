@@ -8,5 +8,14 @@ export const mutations = {
     },
     CLEAR_DATA(state) {
         state.tasksData = {};
+    },
+    SET_MEMOQ_PROJECT_MESSAGE(state, payload) {
+        state.memoqProjectMessage = state.memoqProjectMessages[payload];
+    },
+    RESET_FILE_COUNTER(state) {
+        state.fileCounter = 0;
+    },
+    INCREMENT_FILE_COUNTER(state, payload) {
+        state.fileCounter++;
     }
 };

@@ -3,7 +3,7 @@ const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
+const { getProject, createProject, createMemoqTasks, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
     setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils/");
@@ -54,6 +54,17 @@ router.post("/new-project", async (req, res) => {
     project.accountManager = client.accountManager._id;
     try {
         const result = await createProject(project);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on creating a project!');
+    }
+})
+
+router.post("/project-tasks-steps", async (req, res) => {
+    const { tasksInfo, docs } = req.body;
+    try {
+        const result = await createMemoqTasks(tasksInfo, docs);
         res.send(result);
     } catch(err) {
         console.log(err);
@@ -438,11 +449,6 @@ router.get("/deliverables", async (req, res) => {
     const { taskId } = req.query;
     try {
         const project = await getProject({"tasks.taskId": taskId});
-        // const task = project.tasks.find(item => item.taskId === taskId);
-        // const taskFiles = task.xtmJobs || task.targetFiles;
-        // const link = await getDeliverablesLink({
-        //     taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
-        // });
         const review = await Delivery.findOne({projectId: project.id, "tasks.taskId": taskId}, {"tasks.$": 1});
         const link = await getDeliverablesLink({
             taskId, projectId: project.id, taskFiles: review.tasks[0].files

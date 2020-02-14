@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
 const { getMemoqAllProjects, createMemoqProject, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectUsers } = require("../services/memoqs/projects");
-const { uploadFileToMemoq, moveMemoqFileToProject, addFilesToMemoq, addAllFiles } = require("../services/memoqs/files");
+const { uploadFileToMemoq, moveMemoqFileToProject, addFilesToMemoq, addAllFiles, addProjectFile } = require("../services/memoqs/files");
 const { getMemoqTemplates} = require("../services/memoqs/resources");
 const { createMemoqTasks } = require("../projects/create");
 const { storeFiles } = require("../projects/files");
@@ -27,19 +27,42 @@ router.get('/templates', async (req, res) => {
     }
 })
 
-router.post('/tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
+router.post('/memoq-project', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
+    let tasksInfo = {...req.body};
+    if(tasksInfo.source) {
+        tasksInfo.source = JSON.parse(tasksInfo.source);
+    }
+    tasksInfo.targets = JSON.parse(tasksInfo.targets);
+    tasksInfo.service = JSON.parse(tasksInfo.service);
+    const { sourceFiles, refFiles } = req.files;
     try {
-        let tasksInfo = {...req.body};
-        if(tasksInfo.source) {
-            tasksInfo.source = JSON.parse(tasksInfo.source);
-        }
-        tasksInfo.targets = JSON.parse(tasksInfo.targets);
-        tasksInfo.service = JSON.parse(tasksInfo.service);
-        const { sourceFiles, refFiles } = req.files;
-        const translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
-        const memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
-        await addAllFiles(memoqProjectId, translateFiles);
+        tasksInfo.translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
+        tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+        tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
+        res.send({ tasksInfo });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on creating a Project in memoQ");
+    }
+})
+
+router.post('/add-project-file', async (req, res) => {
+    const { memoqProjectId, filePath } = req.body;
+    try {
+        await addProjectFile(memoqProjectId, filePath);
         res.send("done");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
+router.post('/add-project-files', async (req, res) => {
+    const { memoqProjectId, translateFiles } = req.body;
+    try {
+        await addAllFiles(memoqProjectId, translateFiles);
+        const translationDocs = await getProjectTranslationDocs(memoqProjectId);
+        res.send(translationDocs);
     } catch(err) {
         console.log(err);
         res.status(500).send(err);
@@ -72,17 +95,6 @@ router.get('/project-docs', async (req, res) => {
     try {
         const result = await getProjectTranslationDocs(id);
         res.send(result);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-})
-
-router.post('/all-files', async (req, res) => {
-    const { name } = req.body;
-    try {
-        await addAllFiles(name);
-        res.send("done");
     } catch(err) {
         console.log(err);
         res.status(500).send(err);
