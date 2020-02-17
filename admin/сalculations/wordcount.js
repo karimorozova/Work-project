@@ -2,12 +2,12 @@ const { Vendors } = require('../models');
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
-const { emptyMetrics } = require('../helpers/dbDefaultValue');
+const { emptyMatrix } = require('../helpers/dbDefaultValue');
 const { hasActiveRateValue } = require('./general');
 
 async function metricsCalc(metrics) {
     if(!metrics) {
-        return {xtmMetrics: emptyMetrics, progress: {'invalid': {}, jobsMetrics: []}};
+        return {xtmMetrics: emptyMatrix, progress: {'invalid': {}, jobsMetrics: []}};
     }
     return new Promise((resolve, reject) => {
         const xtmMetrics =  getFilledXtmMetrics(metrics);

@@ -386,25 +386,21 @@ const timezonesDefault = [
     "(UTC+13:00) Samoa"
 ]
 
-const emptyCharts = {
+const emptyMatrix = {
     xTranslated: {text: "X translated", value: 0},
     repeat: {text: "Repetitions", value: 0},
     repeat100: {text: "100%", value: 0},
     repeat50: {text: "50-74%", value: 0},
     repeat75: {text: "75-84%", value: 0},
     repeat85: {text: "85-94%", value: 0},
-    repeat95: {text: "95-99%", value: 0}
-}
-
-const emptyMetrics = {
-    ...emptyCharts,
-    noMatch: 0
+    repeat95: {text: "95-99%", value: 0},
+    noMatch: {text: "No match", value: 1}
 }
 
 const discountChartsDefault = [
-    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}},
-    {name: "Chart 2", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}},
-    {name: "Chart 3", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyCharts, vendor: emptyCharts}}
+    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}},
+    {name: "Chart 2", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}},
+    {name: "Chart 3", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}}
 ]
 
 const instructionsDefault = [
@@ -436,7 +432,7 @@ const defaultValue = {
     groupsDefault,
     stepsDefault,
     packagesDefault,
-    emptyMetrics,
+    emptyMatrix,
     instructionsDefault,
     cancelReasonsDefault,
     discountChartsDefault,

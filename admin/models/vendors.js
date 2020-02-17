@@ -154,15 +154,14 @@ const VendorSchema = new mongoose.Schema({
     matrix: {
         type: Object,
         default: {
-            iceMatch: {text: "ICE Match", rate: 0.1},
-            fuzzyMatch75: {text: "75-84%", rate: 0.8},
-            fuzzyMatch85: {text: "85-94%", rate: 0.6},
-            fuzzyMatch95: {text: "95-99%", rate:0.25},
-            repeat: {text: "Repetitions", rate: 0.2},
-            leveragedMatch: {text: "Leveraged Match", rate: 0.2},
-            fuzzyRepeats75: {text: "Internal 75-84%", rate: 0.8},
-            fuzzyRepeats85: {text: "Internal 85-94%", rate: 0.6},
-            fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.25}
+            xTranslated: {text: "X translated", value: 0.1},
+            repeat: {text: "Repetitions", value: 0.2},
+            repeat100: {text: "100%", value: 0.2},
+            repeat50: {text: "50-74%", value: 1},
+            repeat75: {text: "75-84%", value: 0.8},
+            repeat85: {text: "85-94%", value: 0.6},
+            repeat95: {text: "95-99%", value: 0.25},
+            noMatch: {text: "No match", value: 1}
         }
     },
     cvFiles: {
