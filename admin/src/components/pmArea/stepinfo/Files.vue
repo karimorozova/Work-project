@@ -121,7 +121,7 @@ export default {
         isCompleted() {
             const { progress } = this.step;
             if(this.step.serviceStep.calculationUnit === 'Words') {
-            return (progress.wordsDone / progress.wordsTotal * 100 >= 100 && this.step.status === 'Completed') 
+            return (progress.wordsDone / progress.totalWordCount * 100 >= 100 && this.step.status === 'Completed') 
                 || this.step.status === 'Cancelled Halfway';
             }
             return progress === 100;

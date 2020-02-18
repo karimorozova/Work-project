@@ -172,7 +172,7 @@ function isPrevStep({tasks, projectSteps, step}) {
 function getStepNewFinance(step) {
     const { progress, finance } = step;
     const { Wordcount, Price } = finance;
-    const done = progress.wordsDone/progress.wordsTotal;
+    const done = progress.wordsDone/progress.totalWordCount;
     Wordcount.payables = progress.wordsDone;
     Price.halfReceivables = +((Price.receivables*done).toFixed(2));
     Price.halfPayables = +((Price.payables*done).toFixed(2));

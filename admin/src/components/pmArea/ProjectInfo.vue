@@ -124,12 +124,14 @@ export default {
                 if(this.currentProject.isMetricsExist) {
                     return await this.updateProjectProgress();
                 }
-                const result = await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
-                if(result.body.status === 'invalid') {
-                    return this.alertToggle({message: "One or all files are not managed yet or invalid. Try later! ", isShow: true, type: "error"});
-                }
-                const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
-                await this.setCurrentProject(updatedProject.body);
+                // const result = await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
+                // if(result.body.status === 'invalid') {
+                //     return this.alertToggle({message: "One or all files are not managed yet or invalid. Try later! ", isShow: true, type: "error"});
+                // }
+                const result = await this.$http.get(`/memoqapi/metrics?projectId=${this.currentProject._id}`);
+                await this.setCurrentProject(result.body);
+                // const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
+                // await this.setCurrentProject(updatedProject.body);
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Internal server error. Cannot get metrics.", isShow: true, type: "error"})

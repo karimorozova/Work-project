@@ -352,7 +352,7 @@ export default {
             }
         },
         progress(prog) {
-            return prog.wordsTotal ? ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2) : prog;
+            return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
         },
         toggleCheck(e, index, val) {
             this.allSteps[index].check = val;

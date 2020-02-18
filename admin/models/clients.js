@@ -142,14 +142,14 @@ const ClientSchema = new mongoose.Schema({
     matrix: {
         type: Object,
         default: {
-            xTranslated: {text: "X translated", value: 0.25},
-            repeat: {text: "Repetitions", value: 0.3},
-            repeat100: {text: "100%", value: 0.3},
-            repeat50: {text: "50-74%", value: 1},
-            repeat75: {text: "75-84%", value: 0.9},
-            repeat85: {text: "85-94%", value: 0.7},
-            repeat95: {text: "95-99%", value: 0.4},
-            noMatch: {text: "No match", value: 1}
+            xTranslated: {text: "X translated", rate: 0.25},
+            repeat: {text: "Repetitions", rate: 0.3},
+            repeat100: {text: "100%", rate: 0.3},
+            repeat50: {text: "50-74%", rate: 1},
+            repeat75: {text: "75-84%", rate: 0.9},
+            repeat85: {text: "85-94%", rate: 0.7},
+            repeat95: {text: "95-99%", rate: 0.4},
+            noMatch: {text: "No match", rate: 1}
         }
     }
 }, { minimize: false });

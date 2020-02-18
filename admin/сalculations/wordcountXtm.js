@@ -14,7 +14,7 @@
 //         let progress = {};
 //         for(const key in metrics.metricsProgress) {
 //             progress[key] = {
-//                 wordsTotal: metrics.metricsProgress[key].totalWordCount,
+//                 totalWordCount: metrics.metricsProgress[key].totalWordCount,
 //                 wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
 //                 wordsDone: metrics.metricsProgress[key].wordsDone,
 //                 wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,

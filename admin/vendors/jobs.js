@@ -54,7 +54,7 @@ function getPrevStepData(stepTask, steps, step) {
     }
     const prevStep = sameSteps.find(item => item.serviceStep.title === stage1.step.title);
     if(!prevStep) return false;
-    const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone/prevStep.progress.wordsTotal*100).toFixed(2) : prevStep.progress;
+    const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone/prevStep.progress.totalWordCount*100).toFixed(2) : prevStep.progress;
     return {
         status: prevStep.status,
         progress: prevProgress

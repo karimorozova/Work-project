@@ -157,6 +157,58 @@ async function getProjectTranslationDocs(projectId) {
     }
 }
 
+// async function getProjectAnalysis(projectId, docs) {
+//     const docIds = docs.reduce((acc, cur) => acc + `<arr:guid>${cur.DocumentGuid}</arr:guid>\n`, '');
+//     const langCodes = docs.reduce((acc, cur) => acc + `<arr:string>${cur.TargetLangCode}</arr:string>\n`, '');
+//     const xml = `${xmlHeader}
+//                 <soapenv:Body>
+//                 <ns:RunAnalysis>
+//                     <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+//                     <ns:options>
+//                         <ns:DocumentGuids>${docIds}</ns:DocumentGuids>
+//                         <ns:LanguageCodes>${langCodes}</ns:LanguageCodes>
+//                         <ns:RepetitionPreferenceOver100>true</ns:RepetitionPreferenceOver100>
+//                         <ns:StoreReportInProject>false</ns:StoreReportInProject>
+//                         <ns:TagWeightChar>0</ns:TagWeightChar>
+//                         <ns:TagWeightWord>0</ns:TagWeightWord>
+//                     </ns:options>
+//                 </ns:RunAnalysis>
+//                 </soapenv:Body>
+//             </soapenv:Envelope>`
+//     const headers = headerWithoutAction('ListProjectTranslationDocuments');
+//     try {
+//         const { response } = await soapRequest({url, headers, xml});
+//         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
+//         return !result.RunAnalysisResult ? null : result.RunAnalysisResult;
+//     } catch(err) {
+//         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+//     }
+// }
+
+async function getProjectAnalysis(porjectId) {
+    const xml = `${xmlHeader}
+                <soapenv:Body>
+                <ns:RunAnalysis>
+                    <ns:serverProjectGuid>${porjectId}</ns:serverProjectGuid>
+                    <ns:options>
+                        <ns:RepetitionPreferenceOver100>false</ns:RepetitionPreferenceOver100>
+                        <ns:StoreReportInProject>false</ns:StoreReportInProject>
+                        <ns:TagWeightChar>0</ns:TagWeightChar>
+                        <ns:TagWeightWord>0</ns:TagWeightWord>
+                    </ns:options>
+                </ns:RunAnalysis>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+    const headers = headerWithoutAction('RunAnalysis');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
+        return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
+    } catch(err) {
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
 module.exports = {
     getMemoqAllProjects,
     moveMemoqFileToProject,
@@ -164,5 +216,6 @@ module.exports = {
     createMemoqProjectWithTemplate,
     setMemoqProjectUsers,
     getProjectTranslationDocs,
+    getProjectAnalysis,
     getProjectUsers
 }

@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
-const { getMemoqAllProjects, createMemoqProject, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectUsers } = require("../services/memoqs/projects");
+const { getMemoqAllProjects, createMemoqProject, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers } = require("../services/memoqs/projects");
 const { uploadFileToMemoq, moveMemoqFileToProject, addFilesToMemoq, addAllFiles, addProjectFile } = require("../services/memoqs/files");
 const { getMemoqTemplates} = require("../services/memoqs/resources");
 const { createMemoqTasks } = require("../projects/create");
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
+const { updateProjectMetrics } = require("../projects/metrics");
 
 router.get('/users', async (req, res) => {
     try {
@@ -94,6 +95,28 @@ router.get('/project-docs', async (req, res) => {
     const { id } = req.query;
     try {
         const result = await getProjectTranslationDocs(id);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
+router.get('/metrics', async (req, res) => {
+    const { projectId } = req.query;
+    try {
+        const updatedProject = await updateProjectMetrics({projectId});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting metrics ");
+    }
+})
+
+router.get('/project-analysis', async (req, res) => {
+    const { id } = req.query;
+    try {
+        const result = await getProjectAnalysis(id);
         res.send(result);
     } catch(err) {
         console.log(err);

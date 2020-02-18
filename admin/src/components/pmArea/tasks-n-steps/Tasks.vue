@@ -229,7 +229,7 @@ export default {
             const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
             if(task.service.calculationUnit === 'Words') {
                 return taskSteps.reduce((init, cur) => {
-                    return init + (cur.progress.wordsDone/cur.progress.wordsTotal)*100/taskSteps.length;
+                    return init + (cur.progress.wordsDone/cur.progress.totalWordCount)*100/taskSteps.length;
                 }, 0).toFixed(2);
             }
             return Math.round(taskSteps.reduce((init, cur) => {

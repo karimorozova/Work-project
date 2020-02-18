@@ -118,7 +118,7 @@ async function addTasksToProject({newTasksInfo, project, docs}) {
         for(let target of newTasksInfo.targets) {
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
             let taskId = project.projectId + ` ${idNumber}`;
-            const memoqDocs = docs.filter(item => item.TargetLangCode === target.memoq);
+            const memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === target.memoq) : [docs];
             await updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs})
             tasksLength++
         }
