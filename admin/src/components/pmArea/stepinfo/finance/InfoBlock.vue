@@ -101,6 +101,7 @@ export default {
             const stepRate = this.selectedTab === "Receivables" ? this.step.clientRate : this.step.vendorRate;
             const rateValue = stepRate ? stepRate.value : 0;
             const rateMin = stepRate ? stepRate.min : 0;
+            const quantityRelative = this.selectedTab === "Receivables" ? +this.step.finance.Wordcount.receivables : this.step.finance.Wordcount.payables;
             const stepDiscount = this.selectedTab === "Receivables" ? this.step.clientDiscount : this.step.vendorDiscount;
             let subtotal = this.selectedTab === "Receivables" ? +this.step.finance.Price.receivables : +this.step.finance.Price.payables;
             if(this.step.finance.Price.halfReceivables >= 0) {
@@ -109,8 +110,8 @@ export default {
             return {
                 stepStatus: this.step.status,
                 rateValue,
-                quantityRelative: +this.step.finance.Wordcount.payables,
-                quantityTotal: +this.step.finance.Wordcount.receivables,
+                quantityRelative,
+                quantityTotal: this.step.totalWords || this.step.quantity,
                 subtotal,
                 minimum: rateMin,
                 discount: stepDiscount || 0

@@ -56,7 +56,6 @@ export default {
     data() {
         return {
             matrixData: [],
-            excludeKeys: ["nonTranslatable", "totalWords"]
         }
     },
     methods: {
@@ -67,7 +66,7 @@ export default {
             this.matrixData = [];
             const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
             for(let key of Object.keys(this.task.metrics)) {
-                if(this.excludeKeys.indexOf(key) === -1) {
+                if(key !== "totalWords") {
                     this.matrixData.push({
                         key: key,
                         active: false,
@@ -85,17 +84,17 @@ export default {
             const totalMatchedWords = this.matrixData.reduce((init, cur) => {
                 return init + cur.wordcount;
             }, 0);
-            const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
-            const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
-            const total = wordcount*rateValue;
-            this.matrixData.push({
-                active: false,
-                title: "No match",
-                value: "100",
-                wordcount: wordcount,
-                rate: rateValue,
-                total: total
-            })
+            // const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
+            // const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
+            // const total = wordcount*rateValue;
+            // this.matrixData.push({
+            //     active: false,
+            //     title: "No match",
+            //     value: "100",
+            //     wordcount: wordcount,
+            //     rate: rateValue,
+            //     total: total
+            // })
         },
         stepFilesFiller(arr, category) {
             let files = [];

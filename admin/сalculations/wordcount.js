@@ -42,19 +42,6 @@ function getFilledXtmMetrics(metrics) {
     }
 }
 
-function getFilledMemoqMetrics(metrics) {
-    return {
-        xTranslated: {text: "X translated", value: metrics.XTranslated},
-        repeat: {text: "Repetitions", value: metrics.Repetition},
-        repeat100: {text: "100%", value: metrics.Hit100},
-        repeat50: {text: "50-74%", value: metrics.Hit50_74},
-        repeat75: {text: "75-84%", value: metrics.Hit75_84},
-        repeat85: {text: "85-94%", value: metrics.Hit85_94},
-        repeat95: {text: "95-99%", value: metrics.Hit95_99},
-        noMatch: {text: "No match", value: metrics.NoMatch}
-    }
-}
-
 function taskMetricsCalc({metrics, matrix, prop}) {
     let taskMetrics = {...metrics};
     for(let key in matrix) {
@@ -144,12 +131,12 @@ function calcCost(metrics, field, rate) {
     let wordsSum = 0;
     const rateValue = rate ? rate.value : 0;
     for(let key in metrics) {
-        if(key !== 'totalWords' && key !== "nonTranslatable") {
+        if(key !== 'totalWords') {
             cost+= metrics[key].value*metrics[key][field]*rateValue;
             wordsSum += metrics[key].value;
         }
     }
-    cost += (metrics.totalWords - metrics.nonTranslatable - wordsSum)*rateValue;
+    cost += (metrics.totalWords - wordsSum)*rateValue;
     if(rate && cost < rate.min) {
         cost = rate.min;
     }
@@ -296,12 +283,10 @@ function getWordsData(project) {
 }
 
 function  wordsCalculation(task) {
-    const excludeKeys = ["nonTranslatable", "totalWords"]
-    const words = Object.keys(task.metrics).filter(item => {
-        return excludeKeys.indexOf(item) === -1;
-    }).reduce((prev, cur) => {
-        return prev + task.metrics[cur].value;
-    }, 0)
+    const words = Object.keys(task.metrics).filter(item => item !== 'totalWords')
+        .reduce((prev, cur) => {
+            return prev + task.metrics[cur].value;
+        }, 0)
     return words;
 }
 

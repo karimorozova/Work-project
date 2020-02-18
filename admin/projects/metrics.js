@@ -52,7 +52,7 @@ function getTaskMetrics({task, matrix, analysis}) {
     }, {})
     const memoqFilledMetrics = getFilledMemoqMetrics(metrics);
     let taskMetrics = taskMetricsCalc({metrics: memoqFilledMetrics, matrix, prop: "client"});
-    return {...taskMetrics, totalWords: memoqFilledMetrics.All}
+    return {...taskMetrics, totalWords: metrics.All}
 }
 
 function getFilledMemoqMetrics(metrics) {
@@ -120,6 +120,7 @@ function getTaskSteps(steps, task) {
                     'Price': {receivables: 0, payables: 0}
                 },
                 vendorRate: "",
+                totalWords: task.metrics.totalWords,
                 check: false,
                 vendorsClickedOffer: [],
                 isVendorRead: false

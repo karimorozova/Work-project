@@ -44,6 +44,7 @@ const ProjectsSchema = new mongoose.Schema({
     packageSize: "",
     hours: "",
     quantity: "",
+    totalWords: "",
     start: {},
     deadline: {},
     progress: "",
