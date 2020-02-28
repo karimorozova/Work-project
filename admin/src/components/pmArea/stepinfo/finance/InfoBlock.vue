@@ -121,6 +121,13 @@ export default {
             return this.selectedTab === "Receivables" ? "Client's" : "Vendor's";
         }
     },
+    watch: {
+        step: function(val) {
+            if(!val.vendor) {
+                this.setTab({index: 0});
+            }
+        }
+    },
     components: {
         ValidationErrors,
         ApproveModal,
