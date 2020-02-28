@@ -3,7 +3,7 @@ const fs = require('fs');
 const request = require('request');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');
-const { taskMetricsCalc, metricsCalc } = require('../сalculations/wordcount');
+const { setTaskMetrics, metricsCalc } = require('../сalculations/wordcount');
 const { Clients } = require('../models');
 
 function getXtmCustomers() {
@@ -144,7 +144,7 @@ function getMetrics({projectId, customerId}) {
                 const metrics = response.body[0];
                 const { xtmMetrics, progress } = await metricsCalc(metrics);
                 const customer = await Clients.findOne({"_id": customerId});    
-                const taskMetrics = taskMetricsCalc({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
+                const taskMetrics = setTaskMetrics({metrics: xtmMetrics, matrix: customer.matrix, prop: 'client'});
                 resolve({taskMetrics, progress});
             } catch(err) {
                 console.log("Error in getMetrics");

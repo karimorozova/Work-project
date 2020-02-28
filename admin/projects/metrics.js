@@ -1,5 +1,5 @@
 const { getProject, updateProject } = require('./getProjects');
-const { receivablesCalc, taskMetricsCalc } = require('../сalculations/wordcount');
+const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 // const { getMetrics, getAnalysis } = require('../services');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
 
@@ -31,7 +31,7 @@ async function updateProjectMetrics({projectId}) {
                 const analysis = await getProjectAnalysis(task.memoqProjectId);
                 const taskMetrics = getTaskMetrics({task, matrix: project.customer.matrix, analysis});
                 task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
-                task.finance.Wordcount = calculateWords(task.metrics);
+                task.finance.Wordcount = calculateWords(task);
                 steps = getTaskSteps(steps, task);
             }
         }
@@ -51,7 +51,7 @@ function getTaskMetrics({task, matrix, analysis}) {
         return cur !== 'Fragments' ? {...acc, [cur]: +targetMetrics.Summary[cur].SourceWordCount} : acc;
     }, {})
     const memoqFilledMetrics = getFilledMemoqMetrics(metrics);
-    let taskMetrics = taskMetricsCalc({metrics: memoqFilledMetrics, matrix, prop: "client"});
+    let taskMetrics = setTaskMetrics({metrics: memoqFilledMetrics, matrix, prop: "client"});
     return {...taskMetrics, totalWords: metrics.All}
 }
 
@@ -116,7 +116,7 @@ function getTaskSteps(steps, task) {
                 status: "Created",
                 clientRate: "",
                 finance: {
-                    'Wordcount': { ...task.finance.Wordcount },
+                    'Wordcount': getStepWordcount(task.metrics, `stage${i+1}`),
                     'Price': {receivables: 0, payables: 0}
                 },
                 vendorRate: "",
@@ -137,12 +137,24 @@ function getTaskSteps(steps, task) {
     return updatedSteps;
 }
 
-function calculateWords(metrics) {
-    const receivables = Object.keys(metrics).filter(item => item !== "totalWords")
-        .reduce((prev, cur) => {
-            return prev + metrics[cur].value*metrics[cur].client;
-        }, 0);
-    return { receivables: Math.round(receivables), payables: "" };
+function getStepWordcount(taskMetrics, stage) {
+    const receivables = stage === 'stage1' ? calculateTranslationWords(taskMetrics) : taskMetrics.totalWords;
+    return { receivables, payables: 0 };
+}
+
+function calculateWords(task) {
+    const { metrics, stepsDates } = task;
+    let receivables = calculateTranslationWords(metrics);
+    receivables = stepsDates.length > 1 ? receivables + metrics.totalWords : receivables;
+    const payables = stepsDates.length > 1 ? metrics.totalWords : 0;
+    return { receivables, payables };
+}
+
+function calculateTranslationWords(metrics) {
+    return Math.round(Object.keys(metrics).filter(item => item !== "totalWords")
+    .reduce((prev, cur) => {
+        return prev + metrics[cur].value*metrics[cur].client;
+    }, 0));
 }
 
 function setStepsProgress(symbol, docs) {

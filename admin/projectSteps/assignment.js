@@ -7,7 +7,7 @@ async function reassignVendor(project, reassignData) {
         const { step, vendor, isStart, isPay, reason, progress } = reassignData;
         let { steps, tasks } = project;
         let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-        const newStep = await getNewStep({isStart, progress, step, vendor, project, task: tasks[taskIndex]});
+        const newStep = getNewStep({isStart, progress, step, vendor, project, task: tasks[taskIndex]});
         const updatedStep = updateCurrentStep({step, isStart, isPay, progress});
         const stepIndex = steps.findIndex(item => item.stepId === step.stepId);
         steps.splice(stepIndex, 1, updatedStep, newStep);
@@ -37,49 +37,39 @@ function updateCurrentStep({step, isStart, isPay, progress}) {
     return updatedStep;
 }
 
-async function getNewStep({step, vendor, isStart, progress, project, task}) {
+function getNewStep({step, vendor, isStart, progress, project, task}) {
     const { _id, ...stepInfo } = {...step};
-    const stepId = step.stepId+'-R'
-    try {
-        let newStep = {
-            ...stepInfo,
-            stepId,
-            status: 'Request Sent',
-            vendor,
-            vendorsClickedOffer: [],
-            isVendorRead: false,
-        };
-        const stepWithPaybles = await getStepPayables({task, step: newStep, project})
-        if(!isStart && progress > 0) {
-            return updateFinanceForNewStep(stepWithPaybles, progress);
-        }
-        return stepWithPaybles;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getNewStep");
+    const stepId = step.stepId+'-R';
+    let newStep = {
+        ...stepInfo,
+        stepId,
+        status: 'Request Sent',
+        vendor,
+        vendorsClickedOffer: [],
+        isVendorRead: false,
+    };
+    const stepWithPaybles = getStepPayables({task, step: newStep, project})
+    if(!isStart && progress > 0) {
+        return updateFinanceForNewStep(stepWithPaybles, progress);
     }
+    return stepWithPaybles;
 }
 
-async function getStepPayables({task, step, project}) {
+function getStepPayables({task, step, project}) {
     const unit = step.serviceStep.calculationUnit;
-    try {
-        if(unit === 'Words') {
-            return await payablesCalc({task, project, step});
-        } else {
-            const ratesProp = unit === 'Packages' ? 'monoRates' : 'hoursRates';
-            const { payables, vendorRate } = getVendorRate({
-                ...step, ratesProp, industryId: project.industry.id, step: step.serviceStep
-            })
-            const Price = { ...step.finance.Price, payables };
-            return {
-                ...step, 
-                finance: {...step.finance, Price}, 
-                vendorRate
-            }
+    if(unit === 'Words') {
+        return payablesCalc({metrics: task.metrics, project, step});
+    } else {
+        const ratesProp = unit === 'Packages' ? 'monoRates' : 'hoursRates';
+        const { payables, vendorRate } = getVendorRate({
+            ...step, ratesProp, industryId: project.industry.id, step: step.serviceStep
+        })
+        const Price = { ...step.finance.Price, payables };
+        return {
+            ...step, 
+            finance: {...step.finance, Price}, 
+            vendorRate
         }
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getStepPayables");
     }
 }
 

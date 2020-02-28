@@ -258,7 +258,7 @@ export default {
             this.isReassignment = false;
         },
         setVendor({person}, index) {
-            this.$emit("setVendor", {vendor: { _id: person._id }, index});
+            this.$emit("setVendor", {vendor: person, index});
         },
         async setAction({option}) {
             if(option !== "No action available") {

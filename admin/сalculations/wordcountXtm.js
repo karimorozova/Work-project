@@ -42,7 +42,7 @@
 //     }
 // }
 
-// function taskMetricsCalc({metrics, matrix, prop}) {
+// function setTaskMetrics({metrics, matrix, prop}) {
 //     let taskMetrics = {...metrics};
 //     for(let key in matrix) {
 //         taskMetrics[key][prop] = matrix[key].rate;
@@ -54,7 +54,7 @@
 //     try {
 //         const vendor = await Vendors.findOne({"_id": vendorId});
 //         const matrix = {...vendor.matrix};
-//         const updatedMetrics = taskMetricsCalc({metrics, matrix, prop: 'vendor'});
+//         const updatedMetrics = setTaskMetrics({metrics, matrix, prop: 'vendor'});
 //         return updatedMetrics
 //     } catch(err) {
 //         console.log(err);
@@ -293,4 +293,4 @@
 // }
 
 // module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, 
-//     updateProjectCosts, calcCost, updateTaskMetrics, taskMetricsCalc, getAfterWordcountPayablesUpdated };
+//     updateProjectCosts, calcCost, updateTaskMetrics, setTaskMetrics, getAfterWordcountPayablesUpdated };

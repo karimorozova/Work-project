@@ -52,7 +52,10 @@ export const addProjectTasks = async ({ dispatch }, payload) => {
         dispatch('resetFileCounter');
         dispatch('setMemoqProjectMessage', 'dbTasks');
         const translationDocs = await Vue.http.get(`/memoqapi/project-docs?id=${tasksInfo.memoqProjectId}`);
-        const updatedProject = await Vue.http.post('/pm-manage/project-tasks-steps', { tasksInfo, docs: translationDocs.data });
+        await Vue.http.post('/pm-manage/project-tasks-steps', { tasksInfo, docs: translationDocs.data });
+        dispatch('setMemoqProjectMessage', 'dbSteps');
+        await Vue.http.get(`/memoqapi/metrics?projectId=${tasksInfo.projectId}`);
+        const updatedProject = await Vue.http.get(`/pm-manage/costs?projectId=${tasksInfo.projectId}`);
         await dispatch('setCurrentProject', updatedProject.data);
         dispatch('alertToggle', {message: "Tasks were added", isShow: true, type: "success"})
     } catch(err) {
