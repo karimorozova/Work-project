@@ -139,7 +139,8 @@ function getTaskSteps(steps, task) {
 
 function getStepWordcount(taskMetrics, stage) {
     const receivables = stage === 'stage1' ? calculateTranslationWords(taskMetrics) : taskMetrics.totalWords;
-    return { receivables, payables: 0 };
+    const payables = stage === 'stage1' ? 0 : taskMetrics.totalWords;
+    return { receivables, payables };
 }
 
 function calculateWords(task) {
