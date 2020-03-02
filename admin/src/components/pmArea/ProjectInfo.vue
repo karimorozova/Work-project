@@ -119,9 +119,9 @@ export default {
         },
         async getMetrics() {
             try {
-                // if(this.currentProject.isMetricsExist) {
-                //     return await this.updateProjectProgress();
-                // }
+                if(this.currentProject.isMetricsExist) {
+                    return await this.updateProjectProgress();
+                }
                 const result = await this.$http.get(`/memoqapi/metrics?projectId=${this.currentProject._id}`);
                 const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
                 await this.setCurrentProject(updatedProject.body);

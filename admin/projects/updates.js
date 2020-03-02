@@ -7,15 +7,16 @@ const { pmMail } = require('../utils/mailtopm');
 const { generateTargetFile } = require('../services/xtmApi');
 const { storeTargetFile } = require('./files');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
-const { setMemoqTranlsators } = require('../services/memoqs/projects');
+const { setMemoqTranlsators, getProjectTranslationDocs } = require('../services/memoqs/projects');
 
 async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words' && isCatTool) {
-                const { progress } = await getTaskProgress(task);
-                steps = updateWordcountStepsProgress({task, steps, progress});
+                const docs = await getProjectTranslationDocs(task.memoqProjectId);
+                task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [docs];
+                steps = updateWordcountStepsProgress({steps, docs, task});
             } else if(!isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
@@ -285,22 +286,25 @@ function updateStepsProgress(task, steps) {
     })
 }
 
-function updateWordcountStepsProgress({steps, task, progress}) {
+function updateWordcountStepsProgress({steps, docs, task}) {
     return steps.map(item => {
         if(task.taskId === item.taskId) {
-            item.progress = item.status === 'Started' ? setStepsProgress(item, progress) : item.progress;
+            item.progress = item.status === 'Started' ? setStepsProgress(item.seviceStep.symbol, docs) : item.progress;
         }
         return item;
     });
 }
 
-function setStepsProgress(step, progress) {
-    const { jobsMetrics } = progress;
-    let stepProgress = progress[step.catName];
-    for(let metrics of jobsMetrics) {
-        const { jobId, metricsProgress } = metrics;
-        const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[step.catName];
-        stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
+function setStepsProgress(symbol, docs) {
+    const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
+    const progressData = docs.reduce((acc, cur) => {
+        acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop];
+        acc.totalWordCount = acc.totalWordCount ? acc.totalWordCount + +cur.TotalWordCount : +cur.TotalWordCount;
+        return acc;
+    }, {});
+    let stepProgress = progressData;
+    for(let doc of docs) {
+        stepProgress[doc.DocumentGuid] = { wordsDone: +doc[prop], totalWordCount: +doc.TotalWordCount, fileName: doc.DocumentName };
     }
     return stepProgress;
 }

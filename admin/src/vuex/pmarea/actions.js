@@ -25,19 +25,6 @@ export const setProjectDate = async ({dispatch}, payload) => {
     }
 }
 
-// export const addProjectTasks = async ({ dispatch }, payload) => {
-//     dispatch('incrementRequestCounter')
-//     try {
-//         const updatedProject = await Vue.http.post('/xtm/add-tasks', payload);
-//         await dispatch('setCurrentProject', updatedProject.data);
-//         dispatch('alertToggle', {message: "Tasks were added", isShow: true, type: "success"})
-//     } catch(err) {
-//         dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
-//     } finally {
-//         dispatch('decrementRequestCounter');
-//     }
-// }
-
 export const addProjectTasks = async ({ dispatch }, payload) => {
     dispatch('incrementRequestCounter')
     try {
