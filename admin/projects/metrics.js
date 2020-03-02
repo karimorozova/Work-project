@@ -99,7 +99,7 @@ function getTaskSteps(steps, task) {
         const existedTask = updatedSteps.find(item => item.taskId === task.taskId && item.name === serviceSteps[`stage${i+1}`].title);
         if(!existedTask) {
             let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
-            const serviceStep = serviceSteps[`stage${i+1}`];
+            const serviceStep = {...serviceSteps[`stage${i+1}`], memoqAssignmentRole: i};
             updatedSteps.push({
                 stepId: `${task.taskId} ${stepsIdCounter}`,
                 taskId: task.taskId,
@@ -109,6 +109,7 @@ function getTaskSteps(steps, task) {
                 targetLanguage: task.targetLanguage,
                 memoqSource: task.memoqSource,
                 memoqTarget: task.memoqTarget,
+                memoqDocIds: task.memoqDocs.map(item => item.DocumentGuid),
                 vendor: null,
                 start: task.stepsDates[i].start,
                 deadline: task.stepsDates.length > 1 ? task.stepsDates[i].deadline : task.deadline,

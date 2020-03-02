@@ -1,17 +1,10 @@
 const { xmlHeader, getHeaders } = require("../../configs");
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
+const { getMemoqUsers } = require('./users');
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
-
-// const xml = `${xmlHeader}
-//         <soapenv:Body>
-//             <ns:ListProjectTranslationDocuments>
-//                 <ns:serverProjectGuid>0fcd0419-c741-ea11-90ec-9b40ebd15eb0</ns:serverProjectGuid>
-//             </ns:ListProjectTranslationDocuments>
-//         </soapenv:Body>
-//         </soapenv:Envelope>`
 
 async function getMemoqAllProjects() {
     const xml = `${xmlHeader}
@@ -108,6 +101,48 @@ async function getProjectUsers(projectId) {
     }
 }
 
+async function setMemoqTranlsators(wordsUnitTasks, steps) {
+    const users = await getMemoqUsers();
+    const memoqProjectId = wordsUnitTasks[0].memoqProjectId;
+    const taskIds = wordsUnitTasks.map(item => item.taskId);
+    const acceptedSteps = steps.filter(item => taskIds.indexOf(item.taskId) !== -1 && item.vendor);
+    const projectUsers = acceptedSteps.map(item => {
+        const memoqUser = users.find(user => user.email === item.vendor.email);
+        return memoqUser.id;
+    });
+    try {
+        const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers)));
+        return areUsersSet ? await assignMemoqTranslators({memoqProjectId, acceptedSteps, users}) 
+            : new Error("Can't set one or all users in memoQ");
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setMemoqTranslators")
+    }
+}
+
+async function assignMemoqTranslators({memoqProjectId, acceptedSteps, users}) {
+    const docsInfo = acceptedSteps.reduce((acc, cur) => {
+        const { id } = users.find(item => item.email === cur.vendor.email);
+        for(let docId of cur.memoqDocIds) {
+            acc[docId] = acc[docId] || {};
+            let users = acc[docId].users || [];
+            users.push({
+                deadline: cur.deadline,
+                memoqRole: cur.serviceStep.memoqAssignmentRole,
+                userId: id
+            })
+            acc[docId].users = users;
+        }
+        return acc;
+    }, {})
+    try {
+        await setMemoqDocsAssignments(memoqProjectId, docsInfo);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in assignMemoqTranslators");
+    }
+}
+
 async function setMemoqProjectUsers(projectId, users) {
     const usersInfo = getUsersInfo(users);
     const xml = `${xmlHeader}
@@ -122,7 +157,7 @@ async function setMemoqProjectUsers(projectId, users) {
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
-        return result;
+        return !result["s:Fault"];
     } catch(err) {
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
@@ -135,8 +170,49 @@ function getUsersInfo(users) {
                                     <mem:Terminologist>false</mem:Terminologist>
                                 </ns:ProjectRoles>                      
                                 <ns:UserGuid>${id}</ns:UserGuid>
-                            </ns:ServerProjectUserInfo>`
-    return users.reduce((acc, cur) => acc + userInfoXml(cur.id), "")
+                            </ns:ServerProjectUserInfo>\n`
+    return users.reduce((acc, cur) => acc + userInfoXml(cur), "")
+}
+
+async function setMemoqDocsAssignments(projectId, docsInfo) {
+    const docsUserAssignments = Object.keys(docsInfo).reduce((acc, cur) => {
+        const docRoleAssignments = getDocRoleAssignments({docId: cur, users: docsInfo[cur].users});
+        return acc + docRoleAssignments;
+    }, "");
+    const xml = `${xmlHeader}
+            <soapenv:Body>
+                <ns:SetProjectTranslationDocumentUserAssignments>
+                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+                    <ns:assignments>${docsUserAssignments}</ns:assignments>
+                </ns:SetProjectTranslationDocumentUserAssignments>
+            </soapenv:Body>
+            </soapenv:Envelope>`
+    const headers = headerWithoutAction('SetProjectTranslationDocumentUserAssignments');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+        return !result["s:Fault"];
+    } catch(err) {
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
+function getDocRoleAssignments(obj) {
+    const roles = getRoles(obj.users);
+    return `<ns:ServerProjectTranslationDocumentUserAssignments>
+            <ns:DocumentGuid>${obj.docId}</ns:DocumentGuid>
+            <ns:UserRoleAssignments>${roles}</ns:UserRoleAssignments>
+        </ns:ServerProjectTranslationDocumentUserAssignments>\n`
+}
+
+function getRoles(users) {
+    return users.reduce((acc, cur) => {
+        return acc + `<ns:TranslationDocumentUserRoleAssignment>
+                <ns:DeadLine>${cur.deadline}</ns:DeadLine>
+                <ns:DocumentAssignmentRole>${cur.memoqRole}</ns:DocumentAssignmentRole>
+                <ns:UserGuid>${cur.userId}</ns:UserGuid>
+            </ns:TranslationDocumentUserRoleAssignment>\n`
+    }, '')
 }
 
 async function getProjectTranslationDocs(projectId) {
@@ -157,34 +233,6 @@ async function getProjectTranslationDocs(projectId) {
     }
 }
 
-// async function getProjectAnalysis(projectId, docs) {
-//     const docIds = docs.reduce((acc, cur) => acc + `<arr:guid>${cur.DocumentGuid}</arr:guid>\n`, '');
-//     const langCodes = docs.reduce((acc, cur) => acc + `<arr:string>${cur.TargetLangCode}</arr:string>\n`, '');
-//     const xml = `${xmlHeader}
-//                 <soapenv:Body>
-//                 <ns:RunAnalysis>
-//                     <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
-//                     <ns:options>
-//                         <ns:DocumentGuids>${docIds}</ns:DocumentGuids>
-//                         <ns:LanguageCodes>${langCodes}</ns:LanguageCodes>
-//                         <ns:RepetitionPreferenceOver100>true</ns:RepetitionPreferenceOver100>
-//                         <ns:StoreReportInProject>false</ns:StoreReportInProject>
-//                         <ns:TagWeightChar>0</ns:TagWeightChar>
-//                         <ns:TagWeightWord>0</ns:TagWeightWord>
-//                     </ns:options>
-//                 </ns:RunAnalysis>
-//                 </soapenv:Body>
-//             </soapenv:Envelope>`
-//     const headers = headerWithoutAction('ListProjectTranslationDocuments');
-//     try {
-//         const { response } = await soapRequest({url, headers, xml});
-//         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
-//         return !result.RunAnalysisResult ? null : result.RunAnalysisResult;
-//     } catch(err) {
-//         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
-//     }
-// }
-
 async function getProjectAnalysis(porjectId) {
     const xml = `${xmlHeader}
                 <soapenv:Body>
@@ -203,7 +251,7 @@ async function getProjectAnalysis(porjectId) {
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
-        return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
+        return !result || result.ResultStatus !== 'Success' ? null : result.ResultsForTargetLangs;
     } catch(err) {
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
@@ -217,5 +265,6 @@ module.exports = {
     setMemoqProjectUsers,
     getProjectTranslationDocs,
     getProjectAnalysis,
-    getProjectUsers
+    getProjectUsers,
+    setMemoqTranlsators
 }

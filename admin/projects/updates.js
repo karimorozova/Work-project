@@ -7,6 +7,7 @@ const { pmMail } = require('../utils/mailtopm');
 const { generateTargetFile } = require('../services/xtmApi');
 const { storeTargetFile } = require('./files');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
+const { setMemoqTranlsators } = require('../services/memoqs/projects');
 
 async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
@@ -220,7 +221,11 @@ async function setNewProjectDetails(project, status) {
 async function getApprovedProject(project, status) {
     const taskIds = project.tasks.map(item => item.taskId);
     const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
+    const wordsUnitTasks = tasks.filter(item => item.service.calculationUnit === 'Words' && item.status === 'Approved');
     try {
+        if(wordsUnitTasks.length) {
+            await setMemoqTranlsators(wordsUnitTasks, steps);
+        }
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
