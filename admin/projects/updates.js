@@ -221,10 +221,17 @@ async function setNewProjectDetails(project, status) {
 async function getApprovedProject(project, status) {
     const taskIds = project.tasks.map(item => item.taskId);
     const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
-    const wordsUnitTasks = tasks.filter(item => item.service.calculationUnit === 'Words' && item.status === 'Approved');
+    const stepsStatuses = ["Ready to Start", "Waiting to Start"];
+    const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
+    const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
+        acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
+        return acc;
+    }, {})
     try {
-        if(wordsUnitTasks.length) {
-            await setMemoqTranlsators(wordsUnitTasks, steps);
+        if(wordsUnitSteps.length) {
+            for(let id in splittedByIdSteps) {
+                await setMemoqTranlsators(id, splittedByIdSteps[id]);
+            }
         }
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);

@@ -83,6 +83,25 @@ async function moveMemoqFileToProject(fileId) {
     }
 }
 
+async function updateMemoqProjectUsers(steps) {
+    const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
+    const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
+        const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
+        acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
+        return acc;
+    }, {})
+    try {
+        if(wordsUnitSteps.length) {
+            for(let id in splittedByIdSteps) {
+                await setMemoqTranlsators(id, splittedByIdSteps[id]);
+            }
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateMemoqProjectUsers");
+    }
+}
+
 async function getProjectUsers(projectId) {
     const xml = `${xmlHeader}
                 <soapenv:Body>
@@ -101,18 +120,16 @@ async function getProjectUsers(projectId) {
     }
 }
 
-async function setMemoqTranlsators(wordsUnitTasks, steps) {
+async function setMemoqTranlsators(memoqProjectId, steps) {
     const users = await getMemoqUsers();
-    const memoqProjectId = wordsUnitTasks[0].memoqProjectId;
-    const taskIds = wordsUnitTasks.map(item => item.taskId);
-    const acceptedSteps = steps.filter(item => taskIds.indexOf(item.taskId) !== -1 && item.vendor);
-    const projectUsers = acceptedSteps.map(item => {
+    const assignedSteps = steps.filter(item => item.vendor);
+    const projectUsers = assignedSteps.map(item => {
         const memoqUser = users.find(user => user.email === item.vendor.email);
         return memoqUser.id;
     });
     try {
         const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers)));
-        return areUsersSet ? await assignMemoqTranslators({memoqProjectId, acceptedSteps, users}) 
+        return areUsersSet ? await assignMemoqTranslators({memoqProjectId, assignedSteps, users}) 
             : new Error("Can't set one or all users in memoQ");
     } catch(err) {
         console.log(err);
@@ -120,8 +137,8 @@ async function setMemoqTranlsators(wordsUnitTasks, steps) {
     }
 }
 
-async function assignMemoqTranslators({memoqProjectId, acceptedSteps, users}) {
-    const docsInfo = acceptedSteps.reduce((acc, cur) => {
+async function assignMemoqTranslators({memoqProjectId, assignedSteps, users}) {
+    const docsInfo = assignedSteps.reduce((acc, cur) => {
         const { id } = users.find(item => item.email === cur.vendor.email);
         for(let docId of cur.memoqDocIds) {
             acc[docId] = acc[docId] || {};
@@ -251,7 +268,7 @@ async function getProjectAnalysis(porjectId) {
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
-        return !result || result.ResultStatus !== 'Success' ? null : result.ResultsForTargetLangs;
+        return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
     } catch(err) {
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
@@ -266,5 +283,6 @@ module.exports = {
     getProjectTranslationDocs,
     getProjectAnalysis,
     getProjectUsers,
-    setMemoqTranlsators
+    setMemoqTranlsators,
+    updateMemoqProjectUsers
 }

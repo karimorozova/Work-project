@@ -107,6 +107,7 @@ function getTaskSteps(steps, task) {
                 name: serviceStep.title,
                 sourceLanguage: task.sourceLanguage,
                 targetLanguage: task.targetLanguage,
+                memoqProjectId: task.memoqProjectId,
                 memoqSource: task.memoqSource,
                 memoqTarget: task.memoqTarget,
                 memoqDocIds: task.memoqDocs.map(item => item.DocumentGuid),

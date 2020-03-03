@@ -41,6 +41,7 @@ const ProjectsSchema = new mongoose.Schema({
     catName: "",
     sourceLanguage: "",
     targetLanguage: "",
+    memoqProjectId: "",
     memoqSource: "",
     memoqTarget: "",
     memoqDocIds: [],

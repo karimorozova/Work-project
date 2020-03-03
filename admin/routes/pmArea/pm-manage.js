@@ -12,6 +12,7 @@ const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, c
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
+const { updateMemoqProjectUsers } = require("../../services/memoqs/projects");
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -305,6 +306,7 @@ router.post("/step-status", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const updatedSteps = setStepsStatus({steps, status, project});
+        await updateMemoqProjectUsers(updatedSteps);
         const updatedProject = await updateProject({"_id": id}, {steps: updatedSteps});
         res.send(updatedProject);
     } catch(err) {
