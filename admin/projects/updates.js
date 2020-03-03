@@ -1,7 +1,6 @@
 const { Projects, User } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor } = require('./emails');
-const { getTaskProgress } = require('../services');
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
 const { generateTargetFile } = require('../services/xtmApi');

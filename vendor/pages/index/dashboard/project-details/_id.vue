@@ -73,7 +73,7 @@ export default {
                 }
                 if(this.job.status !== "Started") return;
                 const isCatTool = this.job.serviceStep.calculationUnit === 'Words';
-                await this.$axios.post('/xtm/update-progress', {projectId: this.job.project_Id, isCatTool});
+                await this.$axios.post('/pm-manage/update-progress', {projectId: this.job.project_Id, isCatTool});
                 await this.getJobs();
                 this.setCurrentJob();
                 this.alertToggle({message: "Progress updated", isShow: true, type: "success"});

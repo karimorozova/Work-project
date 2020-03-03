@@ -1,31 +1,11 @@
 const router = require('express').Router();
 const { upload } = require('../utils/');
-const { Projects } = require('../models');
 const { getRequestOptions, generateTargetFile, getXtmCustomers, getEditorUrl, getXtmFileStatus } = require('../services/');
-const { getProject, updateProject, createTasks, updateProjectProgress, 
-    storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, 
-    storeFiles } = require('../projects/');
+const { getProject, createTasks, storeTargetFile, updateTaskTargetFiles, updateNonWordsTaskTargetFiles, storeFiles } = require('../projects/');
 const { calcCost, updateProjectCosts } = require('../сalculations/wordcount');
 const { updateProjectMetrics, checkProjectForMetrics } = require('../projects/metrics');
 const fs = require('fs');
 const https = require('https');
-
-router.post('/add-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
-    try {
-        let tasksInfo = {...req.body};
-        if(tasksInfo.source) {
-            tasksInfo.source = JSON.parse(tasksInfo.source);
-        }
-        tasksInfo.targets = JSON.parse(tasksInfo.targets);
-        tasksInfo.service = JSON.parse(tasksInfo.service);
-        const { sourceFiles, refFiles } = req.files;
-        const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
-        res.send(updatedProject);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on adding project to XTM');
-    }
-})
 
 router.post('/update-matrix', async (req, res) => {
     const { projectId, taskId, step, key, value, prop } = req.body;
@@ -71,18 +51,6 @@ router.get('/metrics', async (req, res) => {
     }
 })
 
-router.post('/update-progress', async (req, res) => {
-    const { projectId, isCatTool } = req.body;
-    try {
-        const project = await getProject({"_id": projectId});
-        const result = await updateProjectProgress(project, isCatTool);
-        res.send(result);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting metrics ");
-    }
-})
-
 router.get('/xtm-customers', async (req, res) => {
     try {
         const xtmCustomers = await getXtmCustomers();
@@ -90,17 +58,6 @@ router.get('/xtm-customers', async (req, res) => {
     } catch(err) {
         console.log(err);
         console.log("Error on getting customers from XTM");
-    }
-})
-
-router.post('/update-project', async (req, res) => {
-    const project = { ...req.body };
-    try {
-        const savedProject = await updateProject({"_id": project.id}, {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
-        res.send(savedProject);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on updating project');
     }
 })
 

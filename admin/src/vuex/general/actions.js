@@ -76,7 +76,7 @@ export const setStepVendor = async ({ commit, state }, payload) => {
 export const updateCurrentProject = async ({ commit, state }, payload) => {
     commit('startRequest')
     try {
-        const updatedProject = await Vue.http.post('/xtm/update-project', {...payload});
+        const updatedProject = await Vue.http.post('/pm-manage/update-project', {...payload});
         const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
         state.projects[index] = updatedProject.data;
         await commit('storeCurrentProject', updatedProject.data);

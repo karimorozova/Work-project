@@ -26,36 +26,19 @@ async function createProject(project) {
     }
 }
 
-async function createTasks({tasksInfo, sourceFiles, refFiles}) {
+async function createTasks({tasksInfo, refFiles}) {
     const { calculationUnit } = tasksInfo.service;
     try {
-        if(calculationUnit === 'Words') {
-            return await createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles});
-        } else {
-            const stepsDates = JSON.parse(tasksInfo.stepsDates);
-            const project = await getProject({"_id": tasksInfo.projectId});
-            const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
-            const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
-            return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
-        }
+        const stepsDates = JSON.parse(tasksInfo.stepsDates);
+        const project = await getProject({"_id": tasksInfo.projectId});
+        const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
+        const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
+        return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
     } catch(err) {
         console.log(err);
         console.log("Error in createTasks");
     }
 }
-
-/// Creating project for memoQ server start ///
-
-async function createMemoqTasks(tasksInfo, docs) {
-    try {
-        return await createTasksWithWordsUnit(tasksInfo, docs);          
-    } catch(err) {
-        console.log(err);
-        console.log("Error in createMemoqTasks");
-    }
-}
-
-/// Creating project for memoQ server start ///
 
 /// Creating tasks using info from client request start ///
 
@@ -342,4 +325,4 @@ function getProjectFinance(tasks, projectFinance) {
     }
 }
 
-module.exports = { createProject, createTasks, createTasksFromRequest, createMemoqTasks }
+module.exports = { createProject, createTasks, createTasksFromRequest, createTasksWithWordsUnit }

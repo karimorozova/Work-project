@@ -3,10 +3,11 @@ const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, createMemoqTasks, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
-    setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
+const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
+    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
+    getProjectAfterFinanceUpdated, updateProjectProgress } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
-    stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils/");
+    stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
@@ -61,14 +62,54 @@ router.post("/new-project", async (req, res) => {
     }
 })
 
-router.post("/project-tasks-steps", async (req, res) => {
+router.post('/project-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
+    try {
+        let tasksInfo = {...req.body};
+        if(tasksInfo.source) {
+            tasksInfo.source = JSON.parse(tasksInfo.source);
+        }
+        tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        tasksInfo.service = JSON.parse(tasksInfo.service);
+        const { sourceFiles, refFiles } = req.files;
+        const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on adding project to XTM');
+    }
+})
+
+router.post("/project-words-tasks", async (req, res) => {
     const { tasksInfo, docs } = req.body;
     try {
-        const result = await createMemoqTasks(tasksInfo, docs);
+        const result = await createTasksWithWordsUnit(tasksInfo, docs);
         res.send(result);
     } catch(err) {
         console.log(err);
         res.status(500).send('Error on creating a project!');
+    }
+})
+
+router.post('/update-project', async (req, res) => {
+    const project = { ...req.body };
+    try {
+        const savedProject = await updateProject({"_id": project.id}, {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
+        res.send(savedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on updating project');
+    }
+})
+
+router.post('/update-progress', async (req, res) => {
+    const { projectId, isCatTool } = req.body;
+    try {
+        const project = await getProject({"_id": projectId});
+        const result = await updateProjectProgress(project, isCatTool);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting metrics ");
     }
 })
 
@@ -604,7 +645,7 @@ router.post("/project-value", async (req, res) => {
     }
 })
 
-router.post("/add-tasks", async (req, res) => {
+router.post("/request-tasks", async (req, res) => {
     const { dataForTasks, request } = req.body;
     const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request; 
     try {

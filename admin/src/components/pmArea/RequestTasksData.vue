@@ -31,8 +31,7 @@ export default {
     },
     methods: {
         ...mapActions([
-            "alertToggle", 
-            "addProjectTasks",
+            "alertToggle",
             "addTasksFromRequest"
             ]),
         toggleTaskData() {

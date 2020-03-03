@@ -1,9 +1,8 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
-const { getMemoqAllProjects, createMemoqProject, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers } = require("../services/memoqs/projects");
-const { uploadFileToMemoq, moveMemoqFileToProject, addFilesToMemoq, addAllFiles, addProjectFile } = require("../services/memoqs/files");
+const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers } = require("../services/memoqs/projects");
+const { moveMemoqFileToProject, addAllFiles, addProjectFile } = require("../services/memoqs/files");
 const { getMemoqTemplates} = require("../services/memoqs/resources");
-const { createMemoqTasks } = require("../projects/create");
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
 const { updateProjectMetrics } = require("../projects/metrics");

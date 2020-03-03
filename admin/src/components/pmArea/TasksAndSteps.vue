@@ -50,12 +50,13 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            alertToggle: "alertToggle",
-            addProjectTasks: "addProjectTasks",
-            clearTasksData: "clearTasksData",
-            getServices: "getServices"
-        }),
+        ...mapActions([
+            "alertToggle",
+            "addProjectTasks",
+            "addProjectWordsTasks",
+            "clearTasksData",
+            "getServices"
+        ]),
         setDefaultIsTaskData() {
             if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
                 this.isTaskData = true;
@@ -125,7 +126,11 @@ export default {
             }
             try {
                 this.isInfo = true;
-                await this.addProjectTasks(tasksData);
+                if(dataForTasks.service.calculationUnit === 'Words') {
+                    await this.addProjectWordsTasks(tasksData);
+                } else {
+                    await this.addProjectTasks(tasksData);
+                }
                 this.isTaskData = false;
                 this.clearTasksData();
             } catch(err) { 
