@@ -77,6 +77,22 @@
                     label Industries:
                     .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
                         MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
+        
+        .title Qualifications
+            TableQualifications(:qualificationData="qualificationData")
+
+        .title Documents
+            TableDocuments(:documentsData="documentsData")
+
+        .title Assessment
+            TableAssessment(:assessmentData="assessmentData")
+        
+        .title Professional experience
+            TableProfessionalExperience(:professionalExperienceData="professionalExperienceData")
+
+        .title Education
+            TableEducation(:educationData="educationData")
+
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
@@ -85,13 +101,24 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
+
+        
+
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
+
+      
     )
 </template>
 
 <script>
+import TableQualifications from "../Table/TableQualifications";
+import TableProfessionalExperience from "../Table/TableProfessionalExperience";
+import TableEducation from "../Table/TableEducation";
+import TableDocuments from "../Table/TableDocuments";
+import TableAssessment from "../Table/TableAssessment";
+
 import ClickOutside from "vue-click-outside";
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
@@ -111,6 +138,12 @@ export default {
     mixins: [photoPreview],
     data() {
         return {
+            educationData:[],
+            professionalExperienceData:[],
+            qualificationData:[],
+            documentsData: [],
+            assessmentData:[],
+
             areErrorsExist: false,
             isSaveClicked: false,
             vendorShow: true,
@@ -238,11 +271,18 @@ export default {
             this.updateIndustry(industry);
         },
         async getVendor() {
+
+            this.educationData = this.currentVendorEducation;
+            this.professionalExperienceData = this.currentVendorProfessionalExperience;
+            this.qualificationData =  this.currentVendorQualifications;
+            this.documentsData = this.currentVendorDocuments;
+            this.assessmentData = this.currentVendorAssessment;
+
             const id = this.$route.params.id;
-            try {
+            try { 
                 if(!this.currentVendor._id) {
                     const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
-                    await this.storeCurrentVendor(vendor.body);
+                    await this.storeCurrentVendor(vendor.body); 
                     this.oldEmail = this.currentVendor.email;
                 }
             } catch(err) {
@@ -264,7 +304,12 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentVendor: "getCurrentVendor"
+            currentVendor: "getCurrentVendor",
+            currentVendorEducation: "getCurrentVendorEducation",
+            currentVendorProfessionalExperience: "getCurrentVendorProfessionalExperience",
+            currentVendorQualifications: "getCurrentVendorQualifications",
+            currentVendorDocuments: "getCurrentVendorDocuments",
+            currentVendorAssessment: "getCurrentVendorAssessment",
         }),
         selectedIndNames() {
             let result = [];
@@ -277,6 +322,11 @@ export default {
         },
     },
     components: {
+        TableQualifications,
+        TableAssessment,
+        TableDocuments,
+        TableEducation,
+        TableProfessionalExperience,
         VendorLeadsourceSelect,
         VendorStatusSelect,
         MultiVendorIndustrySelect,
