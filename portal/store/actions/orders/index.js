@@ -1,14 +1,5 @@
 import { appendData } from "../../../utils/order";
 
-export const getXtmCustomers = async function ({ commit, dispatch }) {
-    try {
-        const result = await this.$axios.get('/xtm/xtm-customers');
-        commit('SET_XTM_CUSTOMERS', result.data);
-    } catch(err) {
-        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"})
-    }
-}
-
 export const setClientsXtmId = async function ({commit, dispatch, state}, payload) {
     let xtmCustomer = state.xtmCustomers.find(item => item.name === state.clientInfo.name);
     try {

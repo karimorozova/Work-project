@@ -9,7 +9,6 @@ export const alertMessage = state => state.alertMessage;
 export const getVuexServices = state => state.services;
 export const getAllLanguages = state => state.languages; 
 export const getClients = state => state.customers;
-export const getXtmCustomers = state => state.xtmCustomers;
 export const getVendors = state => state.vendors;
 export const getRatesDuo = state => state.duoRates;
 export const getAllProjects = state => state.projects;
