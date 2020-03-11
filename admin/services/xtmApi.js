@@ -1,4 +1,3 @@
-const unirest = require('unirest');
 const fs = require('fs');
 const { XMLHttpRequest } = require("xmlhttprequest");
 const { xtmToken, xtmBaseUrl } = require('../configs/');

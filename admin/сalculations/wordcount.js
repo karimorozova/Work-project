@@ -1,46 +1,7 @@
-const { Vendors } = require('../models');
-const { getVendor, getVendors } = require('../vendors/getVendors');
+const { getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
-const { emptyMatrix } = require('../helpers/dbDefaultValue');
 const { hasActiveRateValue } = require('./general');
-
-async function metricsCalc(metrics) {
-    // if(!metrics) {
-    //     return {xtmMetrics: emptyMatrix, progress: {'invalid': {}, jobsMetrics: []}};
-    // }
-    // return new Promise((resolve, reject) => {
-    //     const xtmMetrics =  getFilledXtmMetrics(metrics);
-    //     let progress = {};
-    //     for(const key in metrics.metricsProgress) {
-    //         progress[key] = {
-    //             totalWordCount: metrics.metricsProgress[key].totalWordCount,
-    //             wordsToBeDone: metrics.metricsProgress[key].wordsToBeDone,
-    //             wordsDone: metrics.metricsProgress[key].wordsDone,
-    //             wordsToBeChecked: metrics.metricsProgress[key].wordsToBeChecked,
-    //             wordsToBeCorrected: metrics.metricsProgress[key].wordsToBeCorrected,
-    //         }
-    //     }
-    //     progress.jobsMetrics = [...metrics.jobsMetrics];
-    //     resolve({xtmMetrics, progress});
-    // })
-}
-
-function getFilledXtmMetrics(metrics) {
-    return {
-        // iceMatch: {text: "ICE Match", value: metrics.coreMetrics.iceMatchWords},
-        // fuzzyMatch75: {text: "75-84%", value: metrics.coreMetrics.lowFuzzyMatchWords},
-        // fuzzyMatch85: {text: "85-94%", value: metrics.coreMetrics.mediumFuzzyMatchWords},
-        // fuzzyMatch95: {text: "95-99%", value: metrics.coreMetrics.highFuzzyMatchWords},
-        // repeat: {text: "Repetitions", value: metrics.coreMetrics.repeatsWords},
-        // leveragedMatch: {text: "Leveraged Match", value: metrics.coreMetrics.leveragedWords},
-        // fuzzyRepeats75: {text: "Internal 75-84%", value: metrics.coreMetrics.lowFuzzyRepeatsWords},
-        // fuzzyRepeats85: {text: "Internal 85-94%", value: metrics.coreMetrics.mediumFuzzyRepeatsWords},
-        // fuzzyRepeats95: {text: "Internal 95-99%", value: metrics.coreMetrics.highFuzzyRepeatsWords},
-        // nonTranslatable: metrics.coreMetrics.nonTranslatableWords,
-        // totalWords: metrics.coreMetrics.totalWords,
-    }
-}
 
 function setTaskMetrics({metrics, matrix, prop}) {
     let taskMetrics = {...metrics};
@@ -272,5 +233,5 @@ function getProjectFinanceData(project, prop) {
     },{})
 }
 
-module.exports = { metricsCalc, receivablesCalc, payablesCalc, setDefaultStepVendors, 
+module.exports = { receivablesCalc, payablesCalc, setDefaultStepVendors, 
     updateProjectCosts, calcCost, setTaskMetrics, getAfterWordcountPayablesUpdated };
