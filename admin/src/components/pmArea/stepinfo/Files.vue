@@ -48,9 +48,6 @@ export default {
         },
         projectId: {
             type: [Number, String]
-        },
-        xtmJobs: {
-            type: Array
         }
     },
     data() {
@@ -84,28 +81,8 @@ export default {
             if(this.step.serviceStep.calculationUnit !== 'Words') {
                 return this.createLinkAndDownolad(this.stepFiles[index].target.split("./dist")[1]);
             }
-            let xtmJob = this.xtmJobs.find(item => item.fileName === this.stepFiles[index].fileName);
-            if(xtmJob[`${this.step.name}-targetFile`]) {
-                return this.createLinkAndDownolad(xtmJob[`${this.step.name}-targetFile`]);
-            }
-            await this.generateAndDownloadFile(xtmJob, index);
-        },
-        async generateAndDownloadFile(xtmJob, index) {
-            const id = this.currentProject._id;
-            let xtmInfo = {...xtmJob, projectId: this.projectId};
-            try {
-                const generatedFiles = await this.$http.post('/xtm/generate-file', {...xtmInfo});
-                let fileLink = "";
-                do { 
-                    fileLink = await this.$http.post('/xtm/target-file', { step: this.step, id, file: {...generatedFiles.data[0], ...xtmInfo}});
-                }
-                while(fileLink.data.status && fileLink.data.status !== "FINISHED");
-                let href = fileLink.data.path;
-                this.createLinkAndDownolad(href);
-                await this.storeProject(fileLink.data.updatedProject);
-            } catch(err) {
-                this.alertToggle({message: err.response.data, isShow: true, type: "error"});
-            }
+            this.createLinkAndDownolad(this.stepFiles[index].target);
+            
         },
         createLinkAndDownolad(href) {
             let link = document.createElement('a');

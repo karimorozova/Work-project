@@ -1,25 +1,8 @@
 const { getProject, updateProject } = require('./getProjects');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
-// const { getMetrics, getAnalysis } = require('../services');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
 
 async function checkProjectForMetrics({projectId}) {
-    // try {
-    //     const project = await getProject({"_id": projectId});
-    //     const { tasks } = project;
-    //     for(let task of tasks) {
-    //         if(task.service.calculationUnit === 'Words') {
-    //             const { status } = await getAnalysis(task.projectId);
-    //             if(status !== 'FINISHED') {
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // } catch(err) {
-    //     console.log(err);
-    //     console.log("Error in checkProjectForMetrics");
-    // }
 }
 
 async function updateProjectMetrics({projectId}) {
@@ -96,8 +79,8 @@ function getTaskSteps(steps, task) {
     let updatedSteps = JSON.parse(JSON.stringify(steps));
     let counter = 1;
     for(let i = 0; i < task.stepsDates.length; i++) {
-        const existedTask = updatedSteps.find(item => item.taskId === task.taskId && item.name === serviceSteps[`stage${i+1}`].title);
-        if(!existedTask) {
+        const existedStep = updatedSteps.find(item => item.taskId === task.taskId && item.name === serviceSteps[`stage${i+1}`].title);
+        if(!existedStep) {
             let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
             const serviceStep = {...serviceSteps[`stage${i+1}`], memoqAssignmentRole: i};
             updatedSteps.push({
@@ -162,16 +145,16 @@ function calculateTranslationWords(metrics) {
 
 function setStepsProgress(symbol, docs) {
     const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
-    const progressData = docs.reduce((acc, cur) => {
+    const totalProgress = docs.reduce((acc, cur) => {
         acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop];
         acc.totalWordCount = acc.totalWordCount ? acc.totalWordCount + +cur.TotalWordCount : +cur.TotalWordCount;
         return acc;
     }, {});
-    let stepProgress = progressData;
+    let stepProgress = {};
     for(let doc of docs) {
         stepProgress[doc.DocumentGuid] = { wordsDone: +doc[prop], totalWordCount: +doc.TotalWordCount, fileName: doc.DocumentName };
     }
-    return stepProgress;
+    return {...stepProgress, ...totalProgress};
 }
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance, checkProjectForMetrics }

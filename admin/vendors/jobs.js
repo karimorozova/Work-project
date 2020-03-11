@@ -28,14 +28,14 @@ function getSteps(project, id) {
             assignedSteps.push({...step._doc,
                 project_Id: project._id,
                 projectId: project.projectId, 
-                xtmProjectId: stepTask.projectId,
                 projectName: project.projectName,
                 projectStatus: project.status,
                 manager: project.projectManager,
                 industry: project.industry,
-                xtmJobIds: stepTask.xtmJobs,
+                memocDocs: stepTask.memoqDocs,
                 sourceFiles: stepTask.sourceFiles,
                 refFiles: stepTask.refFiles,
+                taskTargetFiles: stepTask.targetFiles,
                 prevStep
             });
         }
@@ -67,7 +67,6 @@ async function updateStepProp({jobId, prop, value}) {
         const steps = project.steps.map(item => {
             if(item.id === jobId) {
                 item[prop] = value;
-                return item;
             }
             return item;
         })
@@ -149,7 +148,7 @@ async function addToDelivery(project, task) {
 }
 
 function getTaskTargetFiles(task) {
-    const taskFiles = task.service.calculationUnit === 'Words' ? task.xtmJobs : task.targetFiles;
+    const taskFiles = task.targetFiles;
     return taskFiles.reduce((acc, cur) => {
         const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName;
         acc.push({

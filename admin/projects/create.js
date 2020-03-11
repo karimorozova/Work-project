@@ -1,7 +1,7 @@
 const { Projects } = require("../models");
 const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
-const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi");
+const { createNewXtmCustomer } = require("../services/xtmApi");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
 const { getHoursStepFinanceData } = require("../сalculations/hours"); 
 const moment = require("moment");

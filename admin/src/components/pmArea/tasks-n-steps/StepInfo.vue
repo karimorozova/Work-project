@@ -26,7 +26,6 @@
         Files(
             :stepFiles="stepFiles"
             :step="step"
-            :xtmJobs="task.xtmJobs"
             :projectId="task.projectId"
         )
 </template>
@@ -102,12 +101,13 @@ export default {
                 const nameArr = file.split('/');
                 const filePath =  __WEBPACK__API_URL__ + file.split('./dist')[1];
                 const fileName = nameArr[nameArr.length - 1];
+                const targetFile = this.task.targetFiles ? this.task.targetFiles.find(item => item.fileName === fileName) : "";
                 files.push({
                     check: false,
                     fileName: fileName,
                     category: category,
                     source: filePath,
-                    target: this.step.targetFile || ""
+                    target: targetFile ? __WEBPACK__API_URL__ + targetFile.path : ""
                 })
             }
             return files;

@@ -1,18 +1,18 @@
 const router = require("express").Router();
 const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
-const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
+const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
-    getProjectAfterFinanceUpdated, updateProjectProgress } = require("../../projects");
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
-const { updateMemoqProjectUsers } = require("../../services/memoqs/projects");
+const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -114,6 +114,35 @@ router.post('/update-progress', async (req, res) => {
     }
 })
 
+router.post('/update-matrix', async (req, res) => {
+    const { projectId, taskId, step, key, value, prop } = req.body;
+    const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' } 
+    : {rate: step.vendorRate, costName: 'payables'};
+    try {
+        let project = await getProject({"_id": projectId});
+        let taskIndex = project.tasks.findIndex(item => {
+            return item.taskId === taskId
+        });
+        let stepIndex = project.steps.findIndex(item => {
+            return item.name === step.name && item.taskId === step.taskId
+        })
+        let tasks = [...project.tasks];
+        let steps = [...project.steps];
+        tasks[taskIndex].metrics[key][prop] = +value/100;
+        const cost = calcCost(tasks[taskIndex].metrics, prop, rate);
+        steps[stepIndex].finance.Price[costName] = cost;
+        tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
+            return init + +cur.finance.Price[costName];
+        }, 0)
+        let updatedProject = {...project._doc, id: projectId, tasks, steps};
+        const result = await updateProjectCosts(updatedProject);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on updating value of matrix');
+    }
+})
+
 router.get("/all-managers", async (req, res) => {
     const { groupFilters } = req.query;
     try {
@@ -143,6 +172,11 @@ router.put("/project-status", async (req, res) => {
         const result = await updateProjectStatus(id, status);
         if(status === "Cancelled") {
             await notifyClientProjectCancelled(result);
+            const wordsTasks = result.tasks.filter(item => item.service.calculationUnit === 'Words');
+            if(wordsTasks.length) {
+                await cancelMemoqDocs(wordsTasks);
+                await setCancelledNameInMemoq(wordsTasks, `${result.projectId} - ${result.projectName}`);
+            }
         }
         res.send(result);
     } catch(err) {
@@ -293,6 +327,10 @@ router.post("/cancel-tasks", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         const updatedProject = await getProjectAfterCancelTasks(tasks, project);
+        const wordsCancelledTasks = tasks.filter(item => item.service.calculationUnit === 'Words');
+        if(wordsCancelledTasks.length) {
+            await cancelMemoqDocs(wordsCancelledTasks);
+        }
         await notifyClientTasksCancelled(project, tasks);
         res.send(updatedProject);
     } catch(err) {
@@ -658,6 +696,20 @@ router.post("/request-tasks", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on adding tasks");
+    }
+})
+
+router.post('/step-target', upload.fields([{name: 'targetFile'}]), async (req, res) => {
+    const { jobId } = req.body;
+    try {
+        const project = await getProject({"steps._id": jobId});
+        const { targetFile } = req.files;
+        const paths = await storeFiles(targetFile, project.id);
+        const updatedProject = await updateNonWordsTaskTargetFiles({project, path: paths[0], jobId, fileName: targetFile[0].filename});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error / Cannot add Target file to the Steps array of Project")
     }
 })
 

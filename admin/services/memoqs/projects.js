@@ -22,16 +22,8 @@ async function getMemoqAllProjects() {
         // return Buffer.from(base64String, 'base64').toString('utf8');
         return result;
     } catch(err) {
+        console.log("Error in getMemoqAllProjects");
         return parser.toJson(err, {object: true, sanitize: true, trim: true});
-    }
-}
-
-async function createMemoqProject(projectInfo) {
-    try {
-        const client = projectInfo;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in createMemoqProject");
     }
 }
 
@@ -60,6 +52,7 @@ async function createMemoqProjectWithTemplate(projectData) {
         const projectId = result ? result.CreateProjectFromTemplateResponse.CreateProjectFromTemplateResult.ProjectGuid : "";
         return projectId;
     } catch(err) {
+        console.log("Error in createMemoqProjectWithTemplate");
         return parser.toJson(err, {object: true, sanitize: true, trim: true});
     }
 }
@@ -79,6 +72,7 @@ async function moveMemoqFileToProject(fileId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
         return result;
     } catch(err) {
+        console.log("Error in moveMemoqFileToProject");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
@@ -116,6 +110,7 @@ async function getProjectUsers(projectId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].ListProjectUsersResponse;
         return !result.ListProjectUsersResult ? null : result.ListProjectUsersResult.ServerProjectUserInfoHeader;
     } catch(err) {
+        console.log("Error in getProjectUsers");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
@@ -176,6 +171,7 @@ async function setMemoqProjectUsers(projectId, users) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         return !result["s:Fault"];
     } catch(err) {
+        console.log("Error in setMemoqProjectUsers");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
@@ -210,12 +206,13 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         return !result["s:Fault"];
     } catch(err) {
+        console.log("Error in setMemoqDocsAssignments");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
 
 function getDocRoleAssignments(obj) {
-    const roles = getRoles(obj.users);
+    const roles = obj.users ? getRoles(obj.users) : "";
     return `<ns:ServerProjectTranslationDocumentUserAssignments>
             <ns:DocumentGuid>${obj.docId}</ns:DocumentGuid>
             <ns:UserRoleAssignments>${roles}</ns:UserRoleAssignments>
@@ -246,15 +243,16 @@ async function getProjectTranslationDocs(projectId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].ListProjectTranslationDocumentsResponse;
         return !result.ListProjectTranslationDocumentsResult ? null : result.ListProjectTranslationDocumentsResult.ServerProjectTranslationDocInfo;
     } catch(err) {
+        console.log("Error in getProjectTranslationDocs");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
 
-async function getProjectAnalysis(porjectId) {
+async function getProjectAnalysis(projectId) {
     const xml = `${xmlHeader}
                 <soapenv:Body>
                 <ns:RunAnalysis>
-                    <ns:serverProjectGuid>${porjectId}</ns:serverProjectGuid>
+                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
                     <ns:options>
                         <ns:RepetitionPreferenceOver100>false</ns:RepetitionPreferenceOver100>
                         <ns:StoreReportInProject>false</ns:StoreReportInProject>
@@ -270,6 +268,134 @@ async function getProjectAnalysis(porjectId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
         return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
     } catch(err) {
+        console.log("Error in getProjectAnalysis");
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
+async function setMemoqDocStatus({projectId, docIds, status}) {
+    const docStatusInfo = getDocStatusInfo(docIds, status);
+    const xml = `${xmlHeader}
+                <soapenv:Body>
+                <ns:SetDocumentWorkflowStatus>
+                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+                    <ns:workflowChanges>${docStatusInfo}</ns:workflowChanges>
+                </ns:SetDocumentWorkflowStatus>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+    const headers = headerWithoutAction('SetDocumentWorkflowStatus');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+        return !result["s:Fault"];
+    } catch(err) {
+        console.log("Error in setMemoqDocStatus");
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
+function getDocStatusInfo(docIds, status) {
+    docIds.reduce((acc, cur) => {
+        return acc + `<ns:ServerProjectTranslationDocumentWorkflowStatusChange>
+            <ns:DocumentGuid>${cur}</ns:DocumentGuid>
+            <ns:WorkflowStatus>${status}</ns:WorkflowStatus>
+            </ns:ServerProjectTranslationDocumentWorkflowStatusChange>\n`
+    }, "");
+}
+
+async function cancelMemoqDocs(tasks) {
+    const memoqDocs = tasks.reduce((acc, cur) => {
+        const { memoqProjectId, memoqDocs } = cur;
+        acc[memoqProjectId] = acc[memoqProjectId] ? [...acc[memoqProjectId], ...memoqDocs] : [...memoqDocs];
+        return acc;
+    }, {});
+    try {
+        await unassignMemoqDocs(memoqDocs);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in cancelMemoqDocs");
+    }
+}
+
+async function unassignMemoqDocs(memoqDocs) {
+    try {
+        for(let key in memoqDocs) {
+            const docsInfo = memoqDocs[key].reduce((acc, cur) => {
+                return {...acc, [cur.DocumentGuid]: ""}
+            }, {})
+            await setMemoqDocsAssignments(key, docsInfo);
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in unassignMemoqDocs");
+    }
+}
+
+async function setCancelledNameInMemoq(tasks, projectName) {
+    let diffCounter = 0;
+    const names = tasks.reduce((acc, cur) => {
+        const { memoqProjectId } = cur;
+        if(!acc[memoqProjectId]) {
+            const name = diffCounter ? `${projectName}-${diffCounter}` : projectName;
+            acc[memoqProjectId] = name;
+            diffCounter++;
+        }
+        return acc;
+    }, {})
+    try {
+        for(const key in names) {
+            await renameMemoqProject(key, `${names[key]} - Cancelled`);
+        }
+
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setCancelledNameInMemoq");
+    }
+}
+
+async function renameMemoqProject(projectId, name) {
+    const xml = `${xmlHeader}
+                <soapenv:Body>
+                <ns:RenameProject>
+                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+                    <ns:newName>[PngSys] ${name}</ns:newName>
+                </ns:RenameProject>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+    const headers = headerWithoutAction('RenameProject');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+        return !result["s:Fault"];
+    } catch(err) {
+        console.log("Error in renameMemoqProject");
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
+async function getMemoqFileId(projectId, docId) {
+    const xml = `${xmlHeader}
+            <soapenv:Body>
+            <ns:ExportTranslationDocumentAsTwoColumnRtf>
+                <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+                <ns:docGuid>${docId}</ns:docGuid>
+                <ns:options>
+                    <ns:ExportComment>true</ns:ExportComment>
+                    <ns:ExportSegmentStatus>false</ns:ExportSegmentStatus>
+                    <ns:ExportTwoTargetColumns>false</ns:ExportTwoTargetColumns>
+                    <ns:SecondTargetColumnEmpty>false</ns:SecondTargetColumnEmpty>
+                </ns:options>
+            </ns:ExportTranslationDocumentAsTwoColumnRtf>
+            </soapenv:Body>
+        </soapenv:Envelope>`
+    const headers = headerWithoutAction('ExportTranslationDocumentAsTwoColumnRtf');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+        return !result["s:Fault"] ? 
+            result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
+    } catch(err) {
+        console.log("Error in getMemoqFileId");
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
@@ -277,12 +403,15 @@ async function getProjectAnalysis(porjectId) {
 module.exports = {
     getMemoqAllProjects,
     moveMemoqFileToProject,
-    createMemoqProject,
     createMemoqProjectWithTemplate,
     setMemoqProjectUsers,
     getProjectTranslationDocs,
     getProjectAnalysis,
     getProjectUsers,
     setMemoqTranlsators,
-    updateMemoqProjectUsers
+    updateMemoqProjectUsers,
+    setMemoqDocStatus,
+    getMemoqFileId,
+    cancelMemoqDocs,
+    setCancelledNameInMemoq
 }

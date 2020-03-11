@@ -2,6 +2,7 @@ const { xmlHeader, getHeaders } = require("../../configs");
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const fs = require('fs');
+const { getMemoqFileId } = require("./projects");
 
 const url = `https://memoq.pangea.global:8080/memoQServices/FileManager/FileManagerService`;
 const headerWithoutAction = getHeaders('IFileManagerService');
@@ -131,11 +132,94 @@ async function moveMemoqFileToProject(projectId, fileId) {
     }
 }
 
+async function downloadMemoqFile({memoqProjectId, docId, path}) {
+    try {
+        const fileId = await getMemoqFileId(memoqProjectId, docId);
+        const sessionId = await exportMemoqFile(fileId);
+        await getMemoqFileChunks(sessionId, path);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in downloadMemoqFile");
+    }
+}
+
+async function exportMemoqFile(fileId) {
+    const xml = `${xmlHeader}
+                <soapenv:Body>
+                <ns:BeginChunkedFileDownload>
+                    <ns:fileGuid>${fileId}</ns:fileGuid>
+                    <ns:zip>false</ns:zip>
+                </ns:BeginChunkedFileDownload>
+                </soapenv:Body>
+                </soapenv:Envelope>`
+    const headers = headerWithoutAction('BeginChunkedFileDownload');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].BeginChunkedFileDownloadResponse;
+        return result ? result.BeginChunkedFileDownloadResult : new Error(); 
+    } catch(err) {
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
+async function getMemoqFileChunks(sessionId, path) {
+    const xml = `${xmlHeader}
+                    <soapenv:Body>
+                    <ns:GetNextFileChunk>
+                        <ns:sessionId>${sessionId}</ns:sessionId>
+                        <ns:byteCount>131072</ns:byteCount>
+                    </ns:GetNextFileChunk>
+                    </soapenv:Body>
+                </soapenv:Envelope>`
+    const headers = headerWithoutAction('GetNextFileChunk');
+    try {
+        const writeStream = fs.createWriteStream(path);
+        let result = "";
+        while(typeof result === 'string') {
+            const { response } = await soapRequest({url, headers, xml});
+            result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].GetNextFileChunkResponse.GetNextFileChunkResult;
+            if(typeof result === 'string') {
+                writeStream.write(Buffer.from(result, 'base64'), (err) => {
+                    if(err) console.log(err);
+                });
+            }
+        }
+        writeStream.on('error', (err) => console.log(err));
+        writeStream.on('finish', () => console.log("finished"));
+        return sessionId;
+    } catch(err) {
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    } finally {
+        await finishMemoqFileDownload(sessionId);
+    }
+}
+
+async function finishMemoqFileDownload(sessionId) {
+    const xml = `${xmlHeader}
+                <soapenv:Body>
+                <ns:EndChunkedFileDownload>
+                    <ns:sessionId>${sessionId}</ns:sessionId>
+                </ns:EndChunkedFileDownload>
+                </soapenv:Body>
+                </soapenv:Envelope>`
+    const headers = headerWithoutAction('EndChunkedFileDownload');
+    try {
+        const { response } = await soapRequest({url, headers, xml});
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
+        return result;
+    } catch(err) {
+        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+    }
+}
+
 module.exports = {
     uploadFileToMemoq,
     moveMemoqFileToProject,
     addFilesToMemoq,
     finishMemoqFileMove,
     addAllFiles,
-    addProjectFile
+    addProjectFile,
+    exportMemoqFile,
+    getMemoqFileChunks,
+    downloadMemoqFile
 }

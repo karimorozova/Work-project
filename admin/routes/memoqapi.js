@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
-const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers } = require("../services/memoqs/projects");
-const { moveMemoqFileToProject, addAllFiles, addProjectFile } = require("../services/memoqs/files");
+const { downloadCompletedFiles } = require("../projects");
+const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
+const { moveMemoqFileToProject, addAllFiles, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
 const { getMemoqTemplates} = require("../services/memoqs/resources");
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
@@ -133,6 +134,30 @@ router.get('/move-files', async (req, res) => {
         res.status(500).send(err);
     }
 
+})
+
+router.post('/target-files', async (req, res) => {
+    const { stepId } = req.body;
+    try {
+        await downloadCompletedFiles(stepId);
+        res.send("Files downloaded");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
+router.get('/download-file', async (req, res) => {
+    const { projectId, docId } = req.query;
+    try {
+        const fileId = await getMemoqFileId(projectId, docId);
+        const sessionId = await exportMemoqFile(fileId);
+        const result = await getMemoqFileChunks(sessionId);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
 })
 
 module.exports = router;
