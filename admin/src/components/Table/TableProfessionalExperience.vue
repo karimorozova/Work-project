@@ -21,29 +21,30 @@
         .experience__data(v-if="currentActive !== index") {{ row.duration }}
         .experience__editing-data(v-else)
           input.experience__input(type="text" readonly v-model="dateRange")
-          img.experience__calendar(src="../../assets/images/calendar.png" @click="togglePickers")
-          .experience__datepickers(v-if="isDatepickers")
-            .experience__pickers(v-click-outside="closePickers")
-              DatePickers(
-                title="From"
-                @setTodaysDate="(e) => setDate(e, 'fromDate')"
-                @setNextDate="(e) => setDate(e, 'fromDate')"
-                @setPrevDate="(e) => setDate(e, 'fromDate')"
-                @setDate="(e) => setDate(e, 'fromDate')"
-                @removeAnytime="(e) => removeAnytime(e, 'fromDate')"
-                @setAnytime="(e) => setAnytime(e, 'fromDate')"
-                :date="fromDate")
-              DatePickers(
-                title="To"
-                @setTodaysDate="(e) => setDate(e, 'toDate')"
-                @setNextDate="(e) => setDate(e, 'toDate')"
-                @setPrevDate="(e) => setDate(e, 'toDate')"
-                @setDate="(e) => setDate(e, 'toDate')"
-                @removeAnytime="(e) => removeAnytime(e, 'toDate')"
-                @setAnytime="(e) => setAnytime(e, 'toDate')"
-                :date="toDate")
-            .experience__button
-              Button(value="Assign" @clicked="setDateRange")
+          div(v-click-outside="closePickers")
+            img.experience__calendar(src="../../assets/images/calendar.png" @click="openPickers")
+            .experience__datepickers(v-if="isDatepickers")
+              .experience__pickers
+                DatePickers(
+                  title="From"
+                  @setTodaysDate="(e) => setDate(e, 'fromDate')"
+                  @setNextDate="(e) => setDate(e, 'fromDate')"
+                  @setPrevDate="(e) => setDate(e, 'fromDate')"
+                  @setDate="(e) => setDate(e, 'fromDate')"
+                  @removeAnytime="(e) => removeAnytime(e, 'fromDate')"
+                  @setAnytime="(e) => setAnytime(e, 'fromDate')"
+                  :date="fromDate")
+                DatePickers(
+                  title="To"
+                  @setTodaysDate="(e) => setDate(e, 'toDate')"
+                  @setNextDate="(e) => setDate(e, 'toDate')"
+                  @setPrevDate="(e) => setDate(e, 'toDate')"
+                  @setDate="(e) => setDate(e, 'toDate')"
+                  @removeAnytime="(e) => removeAnytime(e, 'toDate')"
+                  @setAnytime="(e) => setAnytime(e, 'toDate')"
+                  :date="toDate")
+              .experience__button
+                Button(value="Assign" @clicked="setDateRange")
 
       template(slot="occupation" slot-scope="{ row, index }")
         .experience__data(v-if="currentActive !== index") {{ row.occupation }}
@@ -91,35 +92,35 @@ export default {
           label: "Duration",
           headerKey: "headerDuration",
           key: "duration",
-          width: "25%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "Occupation / Title",
           headerKey: "headerOccupation",
           key: "occupation",
-          width: "20%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "Company",
           headerKey: "headerCompany",
           key: "company",
-          width: "20%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "Notes",
           headerKey: "headerSummary",
           key: "summary",
-          width: "15%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "20%",
+          width: "14%",
           padding: "0"
         }
       ],
@@ -287,8 +288,8 @@ export default {
     closePickers() {
       this.isDatepickers = false;
     },
-    togglePickers() {
-      this.isDatepickers = !this.isDatepickers;
+    openPickers() {
+      this.isDatepickers = true;
     },
     setDate({ date }, prop) {
       this[prop] = new Date(date);
@@ -355,6 +356,7 @@ export default {
 
   &__icons {
     @extend %table-icons;
+    justify-content: flex-end;
   }
 
   &__icon {

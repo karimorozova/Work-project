@@ -1,5 +1,5 @@
 <template lang="pug">
-.documents 
+.documents
     .documents__table
         SettingsTable(
             :fields="fields"
@@ -36,10 +36,13 @@
 
             template(slot="icons" slot-scope="{ row, index }") 
                 .documents__icons
-                    img.documents__icon(v-if="!row.fileName" src="../../assets/images/Reject-icon.png")
+                    img.documents__icon(v-if="!row.fileName" :class="'documents_opacity'" src="../../assets/images/Reject-icon.png")
                     img.documents__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'documents_opacity': isActive(key, index)}")
-                    .documents__upload
-                        input.documents__load-file(type="file" @change="uploadDocument(index)" )
+                    .documents__upload(v-if="currentActive === index")
+                        input.documents__load-file(type="file" @change="uploadDocument(index)")
+                    .documents__upload(v-if="currentActive !== index" :class="'documents_opacity-half'")
+                        input.documents__load-file(type="file" disabled="disabled")
+                    
             
     Add(@add="addData")
 </template>
@@ -65,28 +68,27 @@ export default {
           label: "File Name",
           headerKey: "headerFileName",
           key: "fileName",
-          width: "40%",
+          width: "64%",
           padding: "0"
         },
         {
           label: "Category",
           headerKey: "headerCategory",
           key: "category",
-          width: "25%",
+          width: "18%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "35%",
+          width: "18%",
           padding: "0"
         }
       ],
 
       currentCategory: "",
       currentFileName: [],
-      imageData: "",
 
       areErrors: false,
       errors: [],
@@ -100,7 +102,8 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeDocuments: "storeCurrentVendorDocuments",
-      deleteDocuments: "deleteCurrentVendorDocuments"
+      deleteDocuments: "deleteCurrentVendorDocuments",
+      deleteDocumentsFile: "deleteCurrentVendorDocumentsFile"
     }),
 
     async makeAction(index, key) {
@@ -143,7 +146,7 @@ export default {
       this.isDeleting = false;
       this.category = [
         { category: "NDA" },
-        { category: "Contact" },
+        { category: "Contract" },
         { category: "Resume" }
       ];
     },
@@ -168,18 +171,20 @@ export default {
       });
     },
 
-    requiredFields() {
+    requiredFields(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
+      let file = this.currentFileName.filter(value => value.id === index);
       if (!this.currentCategory.category)
         this.errors.push("Category should not be empty!");
+      if (!file[file.length - 1]) this.errors.push("File should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
     },
     async manageSaveClick(index) {
-      this.requiredFields();
+      this.requiredFields(index);
       if (this.currentActive == index) {
         if (!this.areErrors) {
           let file = this.currentFileName.filter(value => value.id === index);
@@ -216,14 +221,21 @@ export default {
         this.documentsData.splice(index, 1);
         return this.setDefaults();
       }
+
       this.deleteIndex = index;
       this.isDeleting = true;
     },
 
     async deleteData() {
       const id = this.documentsData[this.deleteIndex]._id;
+      let currentObj = this.documentsData[this.deleteIndex].category
+      let currentLength = this.documentsData.filter(item => item.category === currentObj).length
       try {
-        await this.deleteDocuments(id);
+        if (this.documentsData.length > 3 && currentLength > 1) {
+          await this.deleteDocuments(id);
+        }else{
+          await this.deleteDocumentsFile(id);
+        }
         this.alertToggle({
           message: "Document removed",
           isShow: true,
@@ -232,6 +244,7 @@ export default {
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
+
       this.setDefaults();
       this.getDocuments();
     },
@@ -243,7 +256,7 @@ export default {
     getCategory() {
       this.category = [
         { category: "NDA" },
-        { category: "Contact" },
+        { category: "Contract" },
         { category: "Resume" }
       ];
     },
@@ -281,10 +294,6 @@ export default {
   width: 960px;
   box-shadow: 0 0 15px #67573e9d;
 
-  &__table {
-    width: 550px;
-  }
-
   &__upload {
     position: relative;
     background: url("../../assets/images/Other/upload-icon.png");
@@ -293,6 +302,7 @@ export default {
     height: 30px;
     width: 18px;
     overflow: hidden;
+    margin-right: 8px;
   }
   &__load-file {
     width: 100%;
@@ -322,6 +332,7 @@ export default {
   &__icons {
     @extend %table-icons;
     height: 32px;
+    justify-content: flex-end;
   }
   &__icon {
     @extend %table-icon;
@@ -332,6 +343,9 @@ export default {
   }
   &_opacity {
     opacity: 1;
+    &-half {
+      opacity: 0.5;
+    }
   }
 }
 </style>

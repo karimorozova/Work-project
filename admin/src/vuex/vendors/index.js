@@ -15,7 +15,7 @@ const state = {
         department: "Test321",
         degree: "Test123",
         grade: "344",
-        document: 'test.pdf'
+        document: ''
     }],
 
     currentVendorProfessionalExperience: [{
@@ -40,7 +40,6 @@ const state = {
     currentVendorDocuments: [
         {
             _id: 0,
-            fileName: 'test.pdf',
             category: 'Resume',
         },
         {
@@ -49,7 +48,7 @@ const state = {
         },
         {
             _id:2,
-            category:'Contact'
+            category:'Contract'
         }
     ],
 

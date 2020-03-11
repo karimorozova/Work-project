@@ -21,29 +21,30 @@
             .education__data(v-if="currentActive !== index") {{ row.duration }}
             .education__editing-data(v-else) 
                 input.education__input(type="text" readonly v-model="dateRange")
-                img.education__calendar(src="../../assets/images/calendar.png" @click="togglePickers")
-                .education__datepickers(v-if="isDatepickers")
-                    .education__pickers(v-click-outside="closePickers")
-                        DatePickers(
-                            title="From"
-                            @setTodaysDate="(e) => setDate(e, 'fromDate')"
-                            @setNextDate="(e) => setDate(e, 'fromDate')"
-                            @setPrevDate="(e) => setDate(e, 'fromDate')"
-                            @setDate="(e) => setDate(e, 'fromDate')"
-                            @removeAnytime="(e) => removeAnytime(e, 'fromDate')"
-                            @setAnytime="(e) => setAnytime(e, 'fromDate')"
-                            :date="fromDate")
-                        DatePickers(
-                            title="To"
-                            @setTodaysDate="(e) => setDate(e, 'toDate')"
-                            @setNextDate="(e) => setDate(e, 'toDate')"
-                            @setPrevDate="(e) => setDate(e, 'toDate')"
-                            @setDate="(e) => setDate(e, 'toDate')"
-                            @removeAnytime="(e) => removeAnytime(e, 'toDate')"
-                            @setAnytime="(e) => setAnytime(e, 'toDate')" 
-                            :date="toDate")
-                    .education__button
-                        Button(value="Assign" @clicked="setDateRange")
+                div(v-click-outside="closePickers")
+                  img.education__calendar(src="../../assets/images/calendar.png" @click="openPickers")
+                  .education__datepickers(v-if="isDatepickers")
+                      .education__pickers
+                          DatePickers(
+                              title="From"
+                              @setTodaysDate="(e) => setDate(e, 'fromDate')"
+                              @setNextDate="(e) => setDate(e, 'fromDate')"
+                              @setPrevDate="(e) => setDate(e, 'fromDate')"
+                              @setDate="(e) => setDate(e, 'fromDate')"
+                              @removeAnytime="(e) => removeAnytime(e, 'fromDate')"
+                              @setAnytime="(e) => setAnytime(e, 'fromDate')"
+                              :date="fromDate")
+                          DatePickers(
+                              title="To"
+                              @setTodaysDate="(e) => setDate(e, 'toDate')"
+                              @setNextDate="(e) => setDate(e, 'toDate')"
+                              @setPrevDate="(e) => setDate(e, 'toDate')"
+                              @setDate="(e) => setDate(e, 'toDate')"
+                              @removeAnytime="(e) => removeAnytime(e, 'toDate')"
+                              @setAnytime="(e) => setAnytime(e, 'toDate')" 
+                              :date="toDate")
+                      .education__button
+                          Button(value="Assign" @clicked="setDateRange")
         
         template(slot="education" slot-scope="{ row, index }")
             .education__data(v-if="currentActive !== index") {{ row.education }}
@@ -110,21 +111,21 @@ export default {
           label: "Institute / School",
           headerKey: "headerEducation",
           key: "education",
-          width: "16%",
+          width: "13%",
           padding: "0"
         },
         {
           label: "Major / Department",
           headerKey: "headerDepartment",
           key: "department",
-          width: "16%",
+          width: "14%",
           padding: "0"
         },
         {
           label: "Degree",
           headerKey: "headerDegree",
           key: "degree",
-          width: "12%",
+          width: "13%",
           padding: "0"
         },
 
@@ -132,7 +133,7 @@ export default {
           label: "Grade",
           headerKey: "headerGrade",
           key: "grade",
-          width: "10%",
+          width: "6%",
           padding: "0"
         },
 
@@ -140,7 +141,7 @@ export default {
           label: "Document",
           headerKey: "headerDocument",
           key: "document",
-          width: "10%",
+          width: "20%",
           padding: "0"
         },
 
@@ -148,7 +149,7 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "16%",
+          width: "14%",
           padding: "0"
         }
       ],
@@ -332,16 +333,14 @@ export default {
       });
       this.setEditingData(this.educationData.length - 1);
     },
-
     getEducation() {
       this.educationData = this.currentVendorEducation;
     },
-
     closePickers() {
       this.isDatepickers = false;
-    },
-    togglePickers() {
-      this.isDatepickers = !this.isDatepickers;
+    }, 
+    openPickers(){
+      this.isDatepickers = true;
     },
     setDate({ date }, prop) {
       this[prop] = new Date(date);
@@ -419,6 +418,7 @@ export default {
   }
   &__icons {
     @extend %table-icons;
+    justify-content: flex-end;
   }
   &__icon {
     @extend %table-icon;
