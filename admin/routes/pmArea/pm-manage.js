@@ -686,13 +686,13 @@ router.post("/project-value", async (req, res) => {
 })
 
 router.post("/request-tasks", async (req, res) => {
-    const { dataForTasks, request } = req.body;
+    const { dataForTasks, request, isWords } = req.body;
     const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request; 
     try {
         const updatedProject =  await createProject(project);
-        const projectWithTasks = await createTasksFromRequest({project: updatedProject, dataForTasks});
+        const newProject = await createTasksFromRequest({project: updatedProject, dataForTasks, isWords});
         await removeClientRequest(_id);
-        res.send(projectWithTasks);
+        res.send(newProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on adding tasks");

@@ -42,20 +42,16 @@ async function createTasks({tasksInfo, refFiles}) {
 
 /// Creating tasks using info from client request start ///
 
-async function createTasksFromRequest({project, dataForTasks}) {
+async function createTasksFromRequest({project, dataForTasks, isWords}) {
     const { calculationUnit } = dataForTasks.service;
     let newTasksInfo = {...dataForTasks};
-    newTasksInfo.template = dataForTasks.template ? dataForTasks.template.id : '247336FD';
-    newTasksInfo.workflow = dataForTasks.workflow ? dataForTasks.workflow.id : 2917;
     const sourceFiles = getModifiedFiles(project.sourceFiles);
     const refFiles = getModifiedFiles(project.refFiles);
     try {
-        if(calculationUnit === 'Words') {
-            newTasksInfo.customerId = dataForTasks.xtmId || await createNewXtmCustomer(project.customer.name);
-            newTasksInfo.filesToTranslate = await storeFiles(sourceFiles, project.id);
-            newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
-            await addTasksToXtm({newTasksInfo, project});
-            return await getProject({"_id": project.id});
+        if(isWords) {
+            newTasksInfo.translateFiles = await storeFiles(sourceFiles, project.id);
+            newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, project.id) : [];
+            return { project, newTasksInfo };
         } else {
             const taskRefFiles = await storeFiles(refFiles, project.id);
             const allInfo = {...dataForTasks, taskRefFiles, project};
@@ -82,11 +78,9 @@ function getModifiedFiles(files) {
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTasksWithWordsUnit(tasksInfo, docs) {
-    let newTasksInfo = {...tasksInfo};
-    newTasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
+async function createTasksWithWordsUnit(newTasksInfo, docs) {    
     try {
-        const project = await Projects.findOne({"_id": tasksInfo.projectId});
+        const project = await Projects.findOne({"_id": newTasksInfo.projectId});
         await addTasksToProject({newTasksInfo, project, docs});
         return await getProject({"_id": newTasksInfo.projectId});
     } catch(err) {

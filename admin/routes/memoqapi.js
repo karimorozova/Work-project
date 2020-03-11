@@ -30,13 +30,18 @@ router.get('/templates', async (req, res) => {
 
 router.post('/memoq-project', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     let tasksInfo = {...req.body};
-    if(tasksInfo.source) {
-        tasksInfo.source = JSON.parse(tasksInfo.source);
-    }
-    tasksInfo.targets = JSON.parse(tasksInfo.targets);
-    tasksInfo.service = JSON.parse(tasksInfo.service);
-    const { sourceFiles, refFiles } = req.files;
     try {
+        if(tasksInfo.isRequest) {
+            tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
+            return res.send({ tasksInfo });
+        }
+        if(tasksInfo.source) {
+            tasksInfo.source = JSON.parse(tasksInfo.source);
+        }
+        tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        tasksInfo.service = JSON.parse(tasksInfo.service);
+        tasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
+        const { sourceFiles, refFiles } = req.files;
         tasksInfo.translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
         tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
         tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);

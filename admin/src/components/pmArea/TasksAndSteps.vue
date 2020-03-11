@@ -125,8 +125,8 @@ export default {
                 }
             }
             try {
-                this.isInfo = true;
                 if(dataForTasks.service.calculationUnit === 'Words') {
+                    this.isInfo = true;
                     await this.addProjectWordsTasks(tasksData);
                 } else {
                     await this.addProjectTasks(tasksData);
