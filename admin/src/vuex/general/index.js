@@ -5,7 +5,6 @@ import { mutations } from './mutations';
 const state = {
     services: [],
     customers: [],
-    xtmCustomers: [],
     languages: [],
     clientLangs: [],
     vendors: [],

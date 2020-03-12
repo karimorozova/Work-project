@@ -330,27 +330,6 @@ function setStepsProgress(symbol, docs) {
     return {...stepProgress, ...totalProgress};
 }
 
-async function updateTaskTargetFiles({step, jobId, path}) {
-    try {
-        const project = await Projects.findOne({"steps._id": step._id});
-        const tasks = getTasksWithTargets({tasks: project.tasks, step, jobId, path});
-        return await updateProject({"_id": project.id}, { tasks });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateTaskTargetFiles");
-    }
-}
-
-function getTasksWithTargets({tasks, step, jobId, path}) {
-    return tasks.map(task => {
-        if(task.taskId === step.taskId) {
-            task.xtmJobs = getAfterPathUpdate({
-                xtmJobs: task.xtmJobs, jobId, path, name: step.name});
-        }
-        return task;
-    })
-}
-
 async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
     const steps = project.steps.map(item => {
         if(item.id === jobId) {
@@ -377,29 +356,15 @@ async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
     }
 }
 
-function getAfterPathUpdate({xtmJobs, jobId, path, name}) {
-    return xtmJobs.map(item => {
-        if(item.jobId === jobId) {
-            item[`${name}-targetFile`] = path;
-            item.targetFile = path;
-        }
-        return item;
-    })
-}
-
 async function getAfterApproveFile({taskId, jobId, isFileApproved, path}) {
     try {
         const project = await getProject({"tasks.taskId": taskId});
         const tasks = project.tasks.map(task => {
             if(task.taskId === taskId) {
-                if(task.xtmJobs) {
-                    task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
-                } else {
-                    task.targetFiles = task.targetFiles.map(item => {
-                        item.isFileApproved = item.path === `./dist${path}`;
-                        return item;
-                    })
-                }
+                task.targetFiles = task.targetFiles.map(item => {
+                    item.isFileApproved = item.path === `./dist${path}`;
+                    return item;
+                })                
             }
             return task;
         });
@@ -408,15 +373,6 @@ async function getAfterApproveFile({taskId, jobId, isFileApproved, path}) {
         console.log(err);
         console.log("Error in getAfterApproveFile");
     }
-}
-
-function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
-    return jobs.map(item => {
-        if(item.jobId === jobId) {
-            item.isFileApproved = isFileApproved;
-        }
-        return item;
-    })
 }
 
 async function getAfterReopenSteps(steps, project) {
@@ -442,5 +398,5 @@ function getTasksAfterReopen({steps, tasks}) {
     return updatedTasks;
 }
 
-module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, downloadCompletedFiles,
-    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
+module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, downloadCompletedFiles,
+    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles };

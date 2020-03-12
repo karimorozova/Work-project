@@ -11,7 +11,7 @@ async function uploadFileToMemoq(name) {
     const xml = `${xmlHeader}
                 <soapenv:Body>
                     <ns:BeginChunkedFileUpload>
-                        <ns:fileName>./dist/reqfiles/xtm/${name}</ns:fileName>
+                        <ns:fileName>./dist${name}</ns:fileName>
                         <ns:isZipped>false</ns:isZipped>
                     </ns:BeginChunkedFileUpload>
                 </soapenv:Body>
@@ -26,19 +26,6 @@ async function uploadFileToMemoq(name) {
     }
 }
 
-async function addAllFiles(projectId, translateFiles) {
-    try {
-        for(let name of translateFiles) {
-            const fileId = await uploadFileToMemoq(name);
-            await addFilesToMemoq(fileId, name);
-            await moveMemoqFileToProject(projectId, fileId);
-        }
-    } catch(err) {
-        console.log(err);
-        console.log("Error in addAllFiles");
-    }
-}
-
 async function addProjectFile(projectId, filePath) {
     try {
         const fileId = await uploadFileToMemoq(filePath);
@@ -46,7 +33,7 @@ async function addProjectFile(projectId, filePath) {
         await moveMemoqFileToProject(projectId, fileId);
     } catch(err) {
         console.log(err);
-        console.log("Error in addAllFiles");
+        console.log("Error in addProjectFile");
     }
 }
 
@@ -213,11 +200,9 @@ async function finishMemoqFileDownload(sessionId) {
 }
 
 module.exports = {
-    uploadFileToMemoq,
     moveMemoqFileToProject,
     addFilesToMemoq,
     finishMemoqFileMove,
-    addAllFiles,
     addProjectFile,
     exportMemoqFile,
     getMemoqFileChunks,

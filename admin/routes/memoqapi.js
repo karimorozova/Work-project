@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload } = require('../utils');
 const { downloadCompletedFiles } = require("../projects");
 const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
-const { moveMemoqFileToProject, addAllFiles, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
+const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
 const { getMemoqTemplates} = require("../services/memoqs/resources");
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
@@ -57,18 +57,6 @@ router.post('/add-project-file', async (req, res) => {
     try {
         await addProjectFile(memoqProjectId, filePath);
         res.send("done");
-    } catch(err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-})
-
-router.post('/add-project-files', async (req, res) => {
-    const { memoqProjectId, translateFiles } = req.body;
-    try {
-        await addAllFiles(memoqProjectId, translateFiles);
-        const translationDocs = await getProjectTranslationDocs(memoqProjectId);
-        res.send(translationDocs);
     } catch(err) {
         console.log(err);
         res.status(500).send(err);

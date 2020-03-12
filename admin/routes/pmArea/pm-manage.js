@@ -76,7 +76,7 @@ router.post('/project-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refF
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on adding project to XTM');
+        res.status(500).send('Error on adding project tasks');
     }
 })
 
@@ -87,7 +87,7 @@ router.post("/project-words-tasks", async (req, res) => {
         res.send(result);
     } catch(err) {
         console.log(err);
-        res.status(500).send('Error on creating a project!');
+        res.status(500).send("Error on adding project's words tasks");
     }
 })
 

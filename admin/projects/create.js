@@ -1,7 +1,6 @@
 const { Projects } = require("../models");
 const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
-const { createNewXtmCustomer } = require("../services/xtmApi");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
 const { getHoursStepFinanceData } = require("../сalculations/hours"); 
 const moment = require("moment");
@@ -101,7 +100,7 @@ async function addTasksToProject({newTasksInfo, project, docs}) {
         }
     } catch(err) {
         console.log(err);
-        console.log("Error in addTasksToXtm");
+        console.log("Error in addTasksToProject");
     }
 }
 

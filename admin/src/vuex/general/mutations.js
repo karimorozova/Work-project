@@ -25,9 +25,6 @@ export const mutations = {
     allCustomers(state, payload) {
         state.customers = payload
     },
-    allXtmCustomers(state, payload) {
-        state.xtmCustomers = payload
-    },
     allVendors(state, payload) {
         state.vendors = payload.sort((a, b) => {
             return a.firstName > b.firstName;

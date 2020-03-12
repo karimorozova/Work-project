@@ -7,7 +7,6 @@ export const servicesGetting = ({ commit }, payload) => commit('servicesFill', p
 export const setAllCustomers = ({ commit }, payload) => commit('allCustomers', payload);
 export const gettingClientLangs = ({ commit }, payload) => commit('customerlangs', payload);
 export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
-export const setAllXtmCustomers = ({ commit }, payload) => commit('allXtmCustomers', payload);
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
@@ -91,7 +90,7 @@ export const updateMatrix = async ({ commit }, payload) => {
     commit('startRequest')
     commit('updateMatrixData', payload);
     try {
-        const updatedProject = await Vue.http.post('/xtm/update-matrix', {...payload});
+        const updatedProject = await Vue.http.post('/pm-manage/update-matrix', {...payload});
         await commit('storeCurrentProject', updatedProject.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
