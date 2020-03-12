@@ -105,42 +105,42 @@ export default {
           label: "Source",
           headerKey: "headerSource",
           key: "source",
-          width: "15%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "Targer",
           headerKey: "headerTarget",
           key: "target",
-          width: "15%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "20%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "Task",
           headerKey: "headerTask",
           key: "task",
-          width: "16%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "Task Status",
           headerKey: "headerStatus",
           key: "status",
-          width: "10%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "24%",
+          width: "15%",
           padding: "0"
         }
       ],
@@ -437,6 +437,7 @@ export default {
   &__icons {
     @extend %table-icons;
     height: 32px;
+    justify-content: flex-end;
   }
   &__icon {
     @extend %table-icon;

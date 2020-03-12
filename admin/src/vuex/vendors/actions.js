@@ -211,6 +211,18 @@ export const deleteCurrentVendorDocuments = async ({ commit, state }, payload) =
         commit("endRequest");
     }
 }
+export const deleteCurrentVendorDocumentsFile = async ({ commit, state }, payload) => {
+    commit("startRequest");
+    try {
+        const  id  = payload;
+        const index = state.currentVendorDocuments.findIndex(item => item._id === id);
+        state.currentVendorDocuments[index].fileName = ''
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
 
 export const storeCurrentVendorAssessment = async ({ dispatch }, payload) => {
     dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)

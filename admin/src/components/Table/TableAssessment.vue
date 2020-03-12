@@ -69,35 +69,35 @@ export default {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "26%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "TQI",
           headerKey: "headerTQI",
           key: "tqi",
-          width: "26%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "LQA 1",
           headerKey: "headerLQA1",
           key: "lqa1",
-          width: "16%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "LQA 2",
           headerKey: "headerLQA2",
           key: "lqa2",
-          width: "16%",
+          width: "21.5%",
           padding: "0"
         },
         {
           label: "LQA 3",
           headerKey: "headerLQA3",
           key: "lqa3",
-          width: "16%",
+          width: "14%",
           padding: "0"
         }
       ],
@@ -235,7 +235,6 @@ export default {
     background-position: center;
     background-repeat: no-repeat;
     height: 30px;
-    width: 16px;
     overflow: hidden;
     margin-left: 5px;
   }
