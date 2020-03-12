@@ -120,12 +120,6 @@ export default {
             link.href = this.domain + href;
             link.target = "_blank";
             link.click();
-        },
-        setCurrentJob(project) {
-            const { tasks } = project;
-            const updatedTask = tasks.find(item => item.taskId === this.job.taskId);
-            const currentJob = {...this.job, xtmJobIds: updatedTask.xtmJobs};
-            this.setJob(currentJob);
         }
     },
     computed: {
