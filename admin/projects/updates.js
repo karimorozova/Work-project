@@ -356,25 +356,6 @@ async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
     }
 }
 
-async function getAfterApproveFile({taskId, jobId, isFileApproved, path}) {
-    try {
-        const project = await getProject({"tasks.taskId": taskId});
-        const tasks = project.tasks.map(task => {
-            if(task.taskId === taskId) {
-                task.targetFiles = task.targetFiles.map(item => {
-                    item.isFileApproved = item.path === `./dist${path}`;
-                    return item;
-                })                
-            }
-            return task;
-        });
-        return updateProject({"_id": project.id}, { tasks });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getAfterApproveFile");
-    }
-}
-
 async function getAfterReopenSteps(steps, project) {
     try {
         const updatedSteps = setStepsStatus({steps, status: 'Started', project});
@@ -399,4 +380,4 @@ function getTasksAfterReopen({steps, tasks}) {
 }
 
 module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, downloadCompletedFiles,
-    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
+    updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles };

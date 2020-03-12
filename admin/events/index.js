@@ -1,7 +1,9 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
-const { Vendors } = require('../models');
+const { Vendors, Projects } = require('../models');
 const { sendEmail, notifyManagerProjectStarts, notifyManagerProjectRejected } = require('../utils');
+const { setStepsStatus } = require('../projects/updates');
+const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
 emitter.on('testEvent', () => {
     setTimeout(async () => {
@@ -17,22 +19,41 @@ emitter.on('testEvent', () => {
     }, 60000) 
 });
 
-emitter.on('porjectApprovedNotification', async (project) => {
+emitter.on('projectApprovedNotification', async (project) => {
     try {
         await notifyManagerProjectStarts(project);
     } catch(err) {
-        console.log("Error from emitter porjectApprovedNotification");
+        console.log("Error from emitter projectApprovedNotification");
         console.log(err);
     }
 })
 
-emitter.on('porjectRejectedNotification', async (project) => {
+emitter.on('projectRejectedNotification', async (project) => {
     try {
         await notifyManagerProjectRejected(project);
     } catch(err) {
-        console.log("Error from emitter porjectRejectedNotification");
+        console.log("Error from emitter projectRejectedNotification");
         console.log(err);
     }
 })
 
+emitter.on('stepAcceptAction', async (obj) => {
+    const { project, index, vendorId, decision } = obj;
+    let { steps, status: projectStatus } = project;
+    const isProjectApproved = projectStatus === "Approved" || projectStatus === "In progress";
+    const status = decision === "accept" ? "Accepted" : "Rejected";
+    steps[index].status = status === "Accepted" && isProjectApproved ? "Ready to Start" : status;
+    steps[index].vendorsClickedOffer.push(vendorId);
+    steps = setStepsStatus({steps: [{...steps[index], _id: steps[index].id}], status: steps[index].status, project});
+    try {
+        const isStart = steps[index].status === "Ready to Start" || steps[index].status === "Waiting to Start"
+        if(isStart && steps[index].serviceStep.calculationUnit === "Words") {
+            await updateMemoqProjectUsers(steps);
+        }
+        await Projects.updateOne({"_id": project.id}, { steps });
+    } catch(err) {
+        console.log("Error from emitter stepAcceptAction");
+        console.log(err);
+    }
+})
 module.exports = { emitter };
