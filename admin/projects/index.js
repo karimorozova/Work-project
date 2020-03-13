@@ -1,9 +1,9 @@
 const { getProject, getProjects, updateProject, getFilteredProjects } = require('./getProjects');
-const { storeFiles, getDeliverablesLink, storeTargetFile, manageDeliveryFile } = require('./files');
-const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, 
-    updateTaskTargetFiles, getAfterApproveFile, updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
+const { storeFiles, getDeliverablesLink, manageDeliveryFile } = require('./files');
+const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
+    updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
 const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded, sendTasksQuote } = require('./emails');
-const  { createProject, createTasks, createTasksFromRequest } = require('./create');
+const  { createProject, createTasks, createTasksWithWordsUnit, createTasksFromRequest } = require('./create');
 const { getProjectWithUpdatedFinance, checkProjectForMetrics } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
 
@@ -13,7 +13,6 @@ module.exports = {
     updateProject,
     getFilteredProjects,
     storeFiles,
-    storeTargetFile,
     manageDeliveryFile,
     getProjectAfterCancelTasks,
     updateProjectStatus,
@@ -22,9 +21,7 @@ module.exports = {
     createProject,
     createTasks,
     getMessage,
-    updateTaskTargetFiles,
     taskCompleteNotifyPM,
-    getAfterApproveFile,
     notifyClientTaskReady,
     getDeliverablesLink,
     sendClientDeliveries,
@@ -37,5 +34,7 @@ module.exports = {
     getProjectAfterFinanceUpdated,
     updateNonWordsTaskTargetFiles,
     createTasksFromRequest,
-    checkProjectForMetrics
+    checkProjectForMetrics,
+    createTasksWithWordsUnit,
+    downloadCompletedFiles
 }

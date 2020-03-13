@@ -1,5 +1,3 @@
-import { generateJobTargets } from "../../../utils/job-targets";
-
 export const getJobs = async function({ commit, dispatch, state}) {
     try {
         const result = await this.$axios.get(`/vendor/jobs?token=${state.token}`);
@@ -16,10 +14,10 @@ export const setJobStatus = async function({commit, dispatch, state}, payload) {
             let fileData = new FormData();
             fileData.append('jobId', jobId);
             fileData.append('targetFile', targetFile);
-            await this.$axios.post('/xtm/step-target', fileData);
+            await this.$axios.post('/pm-manage/step-target', fileData);
         }
         if(status === "Completed" && !targetFile) {
-            await generateJobTargets(this, state.selectedJob);
+            await this.$axios.post('/memoqapi/target-files', {stepId: jobId});
         }
         await this.$axios.post('/vendor/job', { jobId, status });
         await dispatch("getJobs");

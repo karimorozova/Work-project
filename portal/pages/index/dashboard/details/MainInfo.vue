@@ -58,7 +58,6 @@ export default {
                 approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
             },
-            isXtmJobs: false,
             isApproveModal: false
         }
     },
@@ -81,7 +80,7 @@ export default {
             const { steps } = this.project;
             if(steps && steps.length) {
                 for(let step of steps) {
-                    const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.wordsTotal*100).toFixed(2) : step.progress;
+                    const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.totalWordCount*100).toFixed(2) : step.progress;
                     total+= progress;
                 }
                 return +(total/steps.length).toFixed(2);

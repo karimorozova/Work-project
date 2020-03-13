@@ -15,5 +15,23 @@ export const mutations = {
         } else {
             state.currentVendor.industries.push(payload);
         }
-    }
+    },
+
+
+    SET_CURRENT_VENDOR_EDUCATION(state,payload){
+        state.currentVendorEducation[payload._id] = payload
+    },
+    SET_CURRENT_VENDOR_PROFESSIONAL_EXPERIENCE(state,payload){
+        state.currentVendorProfessionalExperience[payload._id] = payload
+    },
+    SET_CURRENT_VENDOR_QUALIFICATIONS(state,payload){
+         state.currentVendorQualifications[payload._id] = payload
+    },
+    SET_CURRENT_VENDOR_DOCUMENTS(state,payload){
+        state.currentVendorDocuments[payload._id] = payload
+   },
+   SET_CURRENT_VENDOR_ASSESSMENT(state,payload){
+    state.currentVendorAssessment[payload._id] = payload
+},
+
 }

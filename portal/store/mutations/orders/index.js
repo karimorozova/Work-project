@@ -20,15 +20,3 @@ export const REMOVE_FILE = (state, payload) => {
     files.splice(index, 1);
     state.orderDetails = {...state.orderDetails, [prop]: files}
 }
-
-export const SET_XTM_CUSTOMERS = (state, payload) => {
-    state.xtmCustomers = [...payload];
-}
-
-export const ADD_XTM_CUSTOMER = (state, payload) => {
-    state.xtmCustomers = [...state.xtmCustomers, payload]
-}
-
-export const SET_CLIENTS_XTM = (state, payload) => {
-    state.clientInfo = {...state.clientInfo, xtmiId: payload.id}
-}

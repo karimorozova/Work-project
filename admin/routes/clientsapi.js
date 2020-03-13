@@ -117,13 +117,11 @@ router.get("/unique-email", async (req, res) => {
 
 router.post('/update-client', upload.any(), async (req, res) => {
     let client = JSON.parse(req.body.client);
-    let clientId;
+    let clientId = client._id;
     try {
         if(!client._id) {
             let result = await Clients.create(client);
             clientId = result.id;
-        } else {
-            clientId = client._id;
         }
         const result = await updateClientInfo({clientId, client, files: req.files});
         res.send({client: result})

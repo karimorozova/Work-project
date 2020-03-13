@@ -4,7 +4,15 @@ import { mutations } from './mutations';
 
 const state = {
     requests: [],
-    tasksData: {}
+    tasksData: {},
+    memoqProjectMessages: {
+        memoqProject: "Creating Project in memoQ ...",
+        memoqFiles: "Importing files to the Project in memoQ ...",
+        dbTasks: "Adding tasks to the Project in DB ...",
+        dbSteps: "Adding steps to the Project  in DB ..."
+    },
+    memoqProjectMessage: "",
+    fileCounter: 0
 };
 
 export const pmarea = {

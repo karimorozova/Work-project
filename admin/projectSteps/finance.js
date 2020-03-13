@@ -28,14 +28,14 @@ function getWordsPrices(step, metrics) {
     let wordsSum = 0;
     if(step.catName === "translate1") {
         for(let key in metrics) {
-            if(key !== 'totalWords' && key !== "nonTranslatable") {
+            if(key !== 'totalWords') {
                 receivables += +metrics[key].value*metrics[key].client*clientRate.value;
                 payables += +metrics[key].value*metrics[key].vendor*vendorRate.value;
                 wordsSum += metrics[key].value;
             }
         }
-        receivables += +(metrics.totalWords - metrics.nonTranslatable - wordsSum)*clientRate.value;
-        payables += +(metrics.totalWords - metrics.nonTranslatable - wordsSum)*vendorRate.value;
+        receivables += +(metrics.totalWords - wordsSum)*clientRate.value;
+        payables += +(metrics.totalWords - wordsSum)*vendorRate.value;
     }
     receivables = receivables < clientRate.min ? clientRate.min : receivables;
     payables = payables < vendorRate.min ? vendorRate.min : payables;

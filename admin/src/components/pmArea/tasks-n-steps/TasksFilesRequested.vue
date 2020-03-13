@@ -30,6 +30,7 @@
             @notApprove="closeModal"
             @close="closeModal"
         )
+    .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
 </template>
 
 <script>
@@ -95,7 +96,8 @@ export default {
                 type,
                 path: "",
                 isApproved: false,
-                isChecked: false
+                isChecked: false,
+                size: 0
             })
             setTimeout( () => {
                 this.handleScroll();
@@ -194,6 +196,14 @@ export default {
         position: absolute;
         top: 0;
         left: 15%;
+    }
+    &__tooltip {
+        position: absolute;
+        bottom: -25px;
+        opacity: 0.7;
+        font-size: 14px;
+        text-align: center;
+        width: 100%;
     }
 }
 </style>

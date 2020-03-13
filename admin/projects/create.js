@@ -1,7 +1,6 @@
 const { Projects } = require("../models");
 const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
-const { createNewXtmCustomer, saveTemplateTasks } = require("../services/xtmApi");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
 const { getHoursStepFinanceData } = require("../сalculations/hours"); 
 const moment = require("moment");
@@ -26,18 +25,14 @@ async function createProject(project) {
     }
 }
 
-async function createTasks({tasksInfo, sourceFiles, refFiles}) {
+async function createTasks({tasksInfo, refFiles}) {
     const { calculationUnit } = tasksInfo.service;
     try {
-        if(calculationUnit === 'Words') {
-            return await createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles});
-        } else {
-            const stepsDates = JSON.parse(tasksInfo.stepsDates);
-            const project = await getProject({"_id": tasksInfo.projectId});
-            const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
-            const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
-            return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
-        }
+        const stepsDates = JSON.parse(tasksInfo.stepsDates);
+        const project = await getProject({"_id": tasksInfo.projectId});
+        const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
+        const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
+        return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
     } catch(err) {
         console.log(err);
         console.log("Error in createTasks");
@@ -46,20 +41,16 @@ async function createTasks({tasksInfo, sourceFiles, refFiles}) {
 
 /// Creating tasks using info from client request start ///
 
-async function createTasksFromRequest({project, dataForTasks}) {
+async function createTasksFromRequest({project, dataForTasks, isWords}) {
     const { calculationUnit } = dataForTasks.service;
     let newTasksInfo = {...dataForTasks};
-    newTasksInfo.template = dataForTasks.template ? dataForTasks.template.id : '247336FD';
-    newTasksInfo.workflow = dataForTasks.workflow ? dataForTasks.workflow.id : 2917;
     const sourceFiles = getModifiedFiles(project.sourceFiles);
     const refFiles = getModifiedFiles(project.refFiles);
     try {
-        if(calculationUnit === 'Words') {
-            newTasksInfo.customerId = dataForTasks.xtmId || await createNewXtmCustomer(project.customer.name);
-            newTasksInfo.filesToTranslate = await storeFiles(sourceFiles, project.id);
-            newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
-            await addTasksToXtm({newTasksInfo, project});
-            return await getProject({"_id": project.id});
+        if(isWords) {
+            newTasksInfo.translateFiles = await storeFiles(sourceFiles, project.id);
+            newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, project.id) : [];
+            return { project, newTasksInfo };
         } else {
             const taskRefFiles = await storeFiles(refFiles, project.id);
             const allInfo = {...dataForTasks, taskRefFiles, project};
@@ -82,21 +73,14 @@ function getModifiedFiles(files) {
     return [];
 }
 
-/// Creating tasks using info from client request start ///
+/// Creating tasks using info from client request end ///
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
-    let newTasksInfo = {...tasksInfo};
-    newTasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
-    newTasksInfo.template = tasksInfo.template || '247336FD';
-    newTasksInfo.workflow = tasksInfo.workflow || 2917;
+async function createTasksWithWordsUnit(newTasksInfo, docs) {    
     try {
-        newTasksInfo.customerId = tasksInfo.customerId || await createNewXtmCustomer(tasksInfo.customerName);
-        newTasksInfo.filesToTranslate = sourceFiles && sourceFiles.length ? await storeFiles(sourceFiles, tasksInfo.projectId): [];
-        newTasksInfo.referenceFiles = refFiles && refFiles.length ? await storeFiles(refFiles, tasksInfo.projectId) : [];
-        const project = await Projects.findOne({"_id": tasksInfo.projectId});
-        await addTasksToXtm({newTasksInfo, project});
+        const project = await Projects.findOne({"_id": newTasksInfo.projectId});
+        await addTasksToProject({newTasksInfo, project, docs});
         return await getProject({"_id": newTasksInfo.projectId});
     } catch(err) {
         console.log(err);
@@ -104,41 +88,31 @@ async function createTasksWithWordsUnit({tasksInfo, sourceFiles, refFiles}) {
     }
 }
 
-async function addTasksToXtm({newTasksInfo, project}) {
+async function addTasksToProject({newTasksInfo, project, docs}) {
     try {
         let tasksLength = project.tasks.length + 1;
         for(let target of newTasksInfo.targets) {
-            let name = `${project.projectId} - ${project.projectName} (${target.xtm.toUpperCase()})`
-            let xtmProject = await saveTemplateTasks({
-                customerId: newTasksInfo.customerId,
-                name: name,
-                source: newTasksInfo.source.xtm,
-                target: target.xtm,
-                sourceFiles: newTasksInfo.filesToTranslate,
-                refFiels: newTasksInfo.referenceFiles,
-                templateId: newTasksInfo.template,
-                workflowId: newTasksInfo.workflow,
-                join: newTasksInfo.join
-            });
-            xtmProject = JSON.parse(xtmProject);
             let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
             let taskId = project.projectId + ` ${idNumber}`;
-            await updateProjectTasks({newTasksInfo, project, xtmProject, taskId, target})
+            const memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === target.memoq) : [docs];
+            await updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs})
             tasksLength++
         }
     } catch(err) {
         console.log(err);
-        console.log("Error in addTasksToXtm");
+        console.log("Error in addTasksToProject");
     }
 }
 
-async function updateProjectTasks({newTasksInfo, project, xtmProject, taskId, target}) {
+async function updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs}) {
     try {
         await Projects.updateOne({"_id": project._id}, 
-            {$set: {sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, isMetricsExist: false}, 
-            $push: {tasks: {taskId: taskId, xtmJobs: xtmProject.jobs, service: newTasksInfo.service, projectId: xtmProject.projectId, 
-                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
-                status: "Created", cost: "", sourceFiles: newTasksInfo.filesToTranslate, refFiles: newTasksInfo.referenceFiles, check: false, 
+            {$set: {isMetricsExist: false}, 
+            $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId, 
+                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, 
+                sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
+                memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs,
+                status: "Created", cost: "", sourceFiles: newTasksInfo.translateFiles, refFiles: newTasksInfo.referenceFiles, check: false, 
                 finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );
     } catch(err) {
@@ -344,4 +318,4 @@ function getProjectFinance(tasks, projectFinance) {
     }
 }
 
-module.exports = { createProject, createTasks, createTasksFromRequest }
+module.exports = { createProject, createTasks, createTasksFromRequest, createTasksWithWordsUnit }

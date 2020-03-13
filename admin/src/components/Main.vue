@@ -42,7 +42,6 @@
                     .balloons
             .admin-main-wrapper__inner
                 router-view(:isSidebar="isSidebar"
-                    @refreshXtmCustomers="refreshXtmCustomers"
                     @refreshServices='refreshServices'
                     )
 </template>
@@ -126,9 +125,6 @@ export default {
             } catch (err) {
                 console.log("Cannot identify user group");
             }
-        },
-        refreshXtmCustomers(data) {
-            this.getXtmCustomers();
         },
         async getLanguages() {
             let result = await this.$http.get('/api/languages');

@@ -19,6 +19,7 @@
                         :files="refFiles"
                         @uploadFiles="uploadRefFiles"
                         @deleteFile="(e) => deleteFile(e, 'refFiles')")
+        .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
 </template>
 
 <script>
@@ -43,9 +44,14 @@ export default {
         ...mapActions({
             setDataValue: "setTasksDataValue"
         }),
+        checkFiles(files) {
+            const sizesSum = files.reduce((acc, cur) => acc + cur.size, 0);
+            return sizesSum/1000000 <= 10;
+        },
         uploadSourceFiles({ files }) {
-            if (files.length) {
-                for (let file of files) {
+            const filteredFiles = Array.from(files).filter(item => item.size/1000000 <= 2);
+            if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+                for (let file of filteredFiles) {
                     const isExist = this.sourceFiles.find(item => item.name === file.name);
                     if (!isExist) {
                         this.sourceFiles.push(file);
@@ -55,7 +61,8 @@ export default {
             this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
         },
         uploadRefFiles({ files }) {
-            if (files.length) {
+            const filteredFiles = Array.from(files).filter(item => item.size/1000000 <= 2);
+            if (filteredFiles.length && this.checkFiles(filteredFiles)) {
                 for (let file of files) {
                     const isExist = this.refFiles.find(item => item.name === file.name);
                     if (!isExist) {
@@ -104,6 +111,7 @@ export default {
 <style lang="scss" scoped>
 
 .tasks-files {
+    position: relative;
     &__item {
         display: flex;
         align-items: center;
@@ -122,6 +130,14 @@ export default {
 
     &__upload-file {
         position: relative;
+    }
+    &__tooltip {
+        position: absolute;
+        bottom: -25px;
+        opacity: 0.7;
+        font-size: 14px;
+        text-align: center;
+        width: 100%;
     }
 }
 

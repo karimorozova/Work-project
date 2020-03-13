@@ -234,7 +234,7 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
     try {
         const project = await getProject({"tasks.taskId": taskId});
         const task = project.tasks.find(item => item.taskId === taskId);
-        const taskFiles = task.xtmJobs || task.targetFiles;
+        const taskFiles = task.targetFiles;
         const link = await getDeliverablesLink({
             taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
         });
