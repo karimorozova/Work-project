@@ -18,9 +18,9 @@
                 HoursServiceSteps(:steps="tasksData.service.steps")
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
                 TasksFiles(:service="tasksData.service")
-            .tasks-data__files(v-else)
+            .tasks-data__files.tasks-data_m-bottom-40(v-else)
                 TasksFilesRequested
-            .tasks-data__join-files-wrapper(v-if="currentUnit === 'Words'")
+            .tasks-data__template(v-if="currentUnit === 'Words'")
                 .tasks-data__drop-menu
                     label.tasks-data__menu-title Template
                     SelectSingle(
@@ -250,37 +250,20 @@ export default {
 
 .tasks-data {
     position: relative;
-
     &__workflow-wrapper {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 50px;
     }
-
-    &__join {
-        width: 145px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 63px;
-    }
-
-    &__join-files-wrapper {
-        display: flex;
-        justify-content: space-between;
-    }
-
     &__toggler-title {
         font-size: 14px;
         margin-right: 15px;
     }
-
     &__main {
         display: flex;
         justify-content: space-between;
     }
-
     &__item {
         padding: 30px;
         width: 49%;
@@ -293,7 +276,6 @@ export default {
             margin-bottom: 20px;
         }
     }
-
     &__drops {
         margin-bottom: 40px;
         width: 100%;
@@ -301,25 +283,17 @@ export default {
         justify-content: space-between;
         padding-bottom: 25px;
     }
-
     &__drop-menu {
         position: relative;
         width: 191px;
         height: 50px;
     }
-
     &__menu-title {
         font-size: 14px;
     }
     &__add-tasks {
         display: flex;
         justify-content: center;
-        padding-top: 20px;
-    }
-
-    &__join-files {
-        display: flex;
-        align-items: flex-start;
         padding-top: 20px;
     }
     &__buttons {
@@ -329,6 +303,9 @@ export default {
     }
     &__button {
         margin: 0 20px;
+    }
+    &_m-bottom-40 {
+        margin-bottom: 40px;
     }
 
 }
