@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const { pmMail } = require('../utils/');
-const { Projects, User } = require('../models');
+const { Projects } = require('../models');
 const { getProject, updateProjectStatus } = require('../projects');
 const { emitter } = require('../events');
 const { getProjectManageToken } = require("../middleware");
@@ -22,7 +21,7 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
             const status = project.isStartAccepted ? "Started" : "Approved";
             await updateProjectStatus(projectId, status);
             await Projects.updateOne({"_id": projectId}, {$set: {isClientOfferClicked: true}});
-            emitter.emit('porjectApprovedNotification', project);
+            emitter.emit('projectApprovedNotification', project);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
         }
@@ -48,8 +47,7 @@ router.get('/declinequote', async (req, res) => {
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Link is not valid anymore.</p></body>`)
             }
             const client = {...project.customer._doc, id: project.customer.id};
-            const user = await User.findOne({"_id": client.projectManager._id});
-            emitter.emit('porjectRejectedNotification', project);
+            emitter.emit('projectRejectedNotification', project);
             await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
@@ -69,16 +67,14 @@ router.get('/step-decision', getProjectManageToken, async (req, res) => {
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
-            const project = await Projects.findOne({"_id": projectId});
-            const steps = [...project.steps];
+            const project = await getProject({"_id": projectId});
+            let steps = [...project.steps];
             let index = steps.findIndex(item => item.stepId === stepId);
             if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
                 res.set('Content-Type', 'text/html');
                 return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
             }
-            steps[index].status = (decision === "accept") ? "Accepted" : "Rejected";
-            steps[index].vendorsClickedOffer.push(vendorId);
-            await Projects.updateOne({"_id": projectId}, {steps: steps});
+            emitter.emit('stepAcceptAction', {project, index, vendorId, decision});
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you.</p></body>`)
         }

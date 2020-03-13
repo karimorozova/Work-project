@@ -18,13 +18,9 @@
                 HoursServiceSteps(:steps="tasksData.service.steps")
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
                 TasksFiles(:service="tasksData.service")
-            .tasks-data__files(v-else)
+            .tasks-data__files.tasks-data_m-bottom-40(v-else)
                 TasksFilesRequested
-            .tasks-data__join-files-wrapper(v-if="currentUnit === 'Words'")
-                .tasks-data__join
-                    span.tasks-data__toggler-title  Join Files
-                    .tasks-data__toggler
-                        BigToggler(:isOn="isJoinFiles" @toggle="toggleJoin")
+            .tasks-data__template(v-if="currentUnit === 'Words'")
                 .tasks-data__drop-menu
                     label.tasks-data__menu-title Template
                     SelectSingle(
@@ -61,22 +57,15 @@ export default {
     },
     data() {
         return {
-            templates: [
-                {name: 'Excel segment limit', id: 'XLSwithLimit'},
-                {name: 'Multilingual Excel', id: 'multiexcel'},
-                {name: 'Standard processing', id: '247336FD'},
-            ],
+            templates: [],
             sourceLanguages: [],
             targetLanguages: [],
-            isJoinFiles: false,
             errors: []
         }
     },
     methods: {
         ...mapActions([
-            "addProjectTasks", 
             "alertToggle",
-            "setAllXtmCustomers", 
             "setTasksDataValue",
             "setRequestValue"
         ]),
@@ -93,10 +82,6 @@ export default {
         setTargets({ targets }) {
             this.setTasksDataValue({prop: "targets", value: targets});
             this.targetLanguages = [...targets];
-        },
-        toggleJoin() {
-            this.isJoinFiles = !this.isJoinFiles;
-            this.setTasksDataValue({prop: "isJoinFiles", value: this.isJoinFiles});
         },
         isRefFilesHasSource() {
             const { sourceFiles, refFiles } = this.tasksData;
@@ -174,35 +159,11 @@ export default {
                 isEmail: true
             })
         },
-        async getCustomersFromXtm() {
-            try {
-                if (!this.xtmCustomers.length) {
-                    let result = await this.$http.get('/xtm/xtm-customers');
-                    this.setAllXtmCustomers(result.body);
-                }
-            } catch (err) {
-                this.alertToggle({message: "Error on getting XTM customers",isShow: true,type: "error"});
-            }
-        },
-        async getXtmId() {
-            try {
-                if (!this.xtmCustomers.length && this.tasksData.service.calculationUnit === 'Words') {
-                    await this.getCustomersFromXtm();
-                }
-            } catch (err) {}
-            const xtmCustomer = this.xtmCustomers.find(item => item.name === this.currentProject.customer.name);
-            const xtmId = xtmCustomer ? xtmCustomer.id : "";
-            return { xtmId };
-        },
         async addTasks() {
-            const { xtmId } = await this.getXtmId();
             const source = this.tasksData.source || this.languages.find(item => item.symbol === 'EN-GB');
-            const isJoinFiles = this.tasksData.isJoinFiles || false;
             this.$emit("addTasks", {
                 ...this.tasksData,
-                isJoinfiles: isJoinFiles,
                 refFiles: this.tasksData.refFiles || [],
-                xtmId,
                 source
             });
             this.clearInputFiles(".tasks-data__source-file");
@@ -216,13 +177,23 @@ export default {
         },
         setServiceForm() {
             this.isMonoService = this.tasksData.service.languageForm === "Mono";
+        },
+        async getMemoqTemplates() {
+            try {
+                const result = await this.$http.get("/memoqapi/templates");
+                this.templates = result.data || [];
+                if(this.templates.length) {
+                    this.setTasksDataValue({prop: "template", value: this.templates[0]});
+                }
+            } catch(err) {
+
+            }
         }
     },
     computed: {
         ...mapGetters({
             currentProject: 'getCurrentProject',
             languages: "getAllLanguages",
-            xtmCustomers: "getXtmCustomers",
             tasksData: "getTasksData"
         }),
         allTemplates() {
@@ -268,8 +239,8 @@ export default {
         ServiceAndWorkflow,
         BigToggler
     },
-    mounted() {
-        this.setTasksDataValue({prop: "template", value: {name: 'Standard processing', id: '247336FD'}});
+    created() {
+        this.getMemoqTemplates();
     }
 }
 </script>
@@ -279,37 +250,20 @@ export default {
 
 .tasks-data {
     position: relative;
-
     &__workflow-wrapper {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 50px;
     }
-
-    &__join {
-        width: 145px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 63px;
-    }
-
-    &__join-files-wrapper {
-        display: flex;
-        justify-content: space-between;
-    }
-
     &__toggler-title {
         font-size: 14px;
         margin-right: 15px;
     }
-
     &__main {
         display: flex;
         justify-content: space-between;
     }
-
     &__item {
         padding: 30px;
         width: 49%;
@@ -322,7 +276,6 @@ export default {
             margin-bottom: 20px;
         }
     }
-
     &__drops {
         margin-bottom: 40px;
         width: 100%;
@@ -330,24 +283,17 @@ export default {
         justify-content: space-between;
         padding-bottom: 25px;
     }
-
     &__drop-menu {
         position: relative;
         width: 191px;
+        height: 50px;
     }
-
     &__menu-title {
         font-size: 14px;
     }
     &__add-tasks {
         display: flex;
         justify-content: center;
-        padding-top: 20px;
-    }
-
-    &__join-files {
-        display: flex;
-        align-items: flex-start;
         padding-top: 20px;
     }
     &__buttons {
@@ -357,6 +303,9 @@ export default {
     }
     &__button {
         margin: 0 20px;
+    }
+    &_m-bottom-40 {
+        margin-bottom: 40px;
     }
 
 }

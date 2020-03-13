@@ -1,20 +1,20 @@
 const { Projects, User } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor } = require('./emails');
-const { getTaskProgress } = require('../services');
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
-const { generateTargetFile } = require('../services/xtmApi');
-const { storeTargetFile } = require('./files');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
+const { setMemoqTranlsators, getProjectTranslationDocs } = require('../services/memoqs/projects');
+const { downloadMemoqFile } = require('../services/memoqs/files');
 
 async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words' && isCatTool) {
-                const { progress } = await getTaskProgress(task);
-                steps = updateWordcountStepsProgress({task, steps, progress});
+                const docs = await getProjectTranslationDocs(task.memoqProjectId);
+                task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [docs];
+                steps = updateWordcountStepsProgress({steps, task});
             } else if(!isCatTool) {
                 steps = updateStepsProgress(task, steps);
             }
@@ -53,7 +53,9 @@ async function cancelTasks(tasks, project) {
     }
     const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId): [];
     const changedSteps = stepIdentify.length ? cancelSteps({stepIdentify, steps: projectSteps}) : [];
-    const changedTasks = await cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId: project.id});
+    const changedTasks = await cancelCheckedTasks({
+            tasksIds, projectTasks, projectId: project.id, changedSteps
+        });
     return { changedTasks, changedSteps, inCompletedSteps };
 }
 
@@ -73,7 +75,7 @@ function cancelSteps({stepIdentify, steps}) {
     return updated;
 }
 
-async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
+async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
     const unchangingStatuses = ['Ready for Delivery', 'Pending Approval [DR1]', 'Pending Approval [DR2]', 'Delivered'];
     let tasks = [...projectTasks];
     try {
@@ -82,31 +84,44 @@ async function cancellCheckedTasks({tasksIds, projectTasks, changedSteps, projec
                 task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
                 if(task.status === "Cancelled Halfway") {
                     task.finance = getTaskNewFinance(changedSteps, task);
-                    task.xtmjobs = await updateXtmJobs({task, projectId, changedSteps});
+                    task.targetFiles = await getTaskTarfgetFiles({task, projectId});
                 }
             }
         }
         return tasks;
     } catch(err) {
         console.log(err);
-        console.log("Error in cancellCheckedTasks");
+        console.log("Error in cancelCheckedTasks");
     }
 }
 
-async function updateXtmJobs({task, projectId, changedSteps}) {
-    const { xtmJobs } = task;
-    const step = changedSteps.find(item => item.taskId === task.taskId && item.status !== 'Cancelled');
+async function getTaskTarfgetFiles({task, projectId}) {
+    let targetFiles = [];
+    const { memoqDocs, memoqProjectId } = task;
     try {
-        let updatedXtmJobs = [];
-        for(let job of xtmJobs) {
-            let generatedFiles = await generateTargetFile({projectId: task.projectId, jobId: job.jobId});
-            const { path } = await storeTargetFile({step, id: projectId, projectId: task.projectId, file: {...generatedFiles[0], fileName: job.fileName}});
-            updatedXtmJobs = getAfterPathUpdate({xtmJobs, jobId: job.jobId, path, name: step.name});
+        for(let doc of memoqDocs) {
+            const fileName = doc.DocumentName.split(".").slice(0, -1).join(".") + '.rtf';
+            const path = `/projectFiles/${projectId}/${fileName}`;
+            await downloadMemoqFile({memoqProjectId, docId: doc.DocumentGuid, path: `./dist${path}`});
+            targetFiles.push({fileName: doc.DocumentName, path});
         }
-        return updatedXtmJobs;
+        return targetFiles;
     } catch(err) {
         console.log(err);
-        console.log("Error in updateXtmJobs");
+        console.log("Error in getTaskTarfgetFiles");
+    }
+}
+
+async function downloadCompletedFiles(stepId) {
+    try {
+        let { id, steps, tasks } = await getProject({"steps._id": stepId});
+        const step = steps.find(item => item.id === stepId);
+        const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+        tasks[taskIndex].targetFiles = await getTaskTarfgetFiles({task: tasks[taskIndex], projectId: id});
+        await Projects.updateOne({"_id": id}, { tasks });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in downloadCompletedFiles");
     }
 }
 
@@ -172,7 +187,7 @@ function isPrevStep({tasks, projectSteps, step}) {
 function getStepNewFinance(step) {
     const { progress, finance } = step;
     const { Wordcount, Price } = finance;
-    const done = progress.wordsDone/progress.wordsTotal;
+    const done = progress.wordsDone/progress.totalWordCount;
     Wordcount.payables = progress.wordsDone;
     Price.halfReceivables = +((Price.receivables*done).toFixed(2));
     Price.halfPayables = +((Price.payables*done).toFixed(2));
@@ -220,7 +235,18 @@ async function setNewProjectDetails(project, status) {
 async function getApprovedProject(project, status) {
     const taskIds = project.tasks.map(item => item.taskId);
     const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
+    const stepsStatuses = ["Ready to Start", "Waiting to Start"];
+    const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
+    const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
+        acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
+        return acc;
+    }, {})
     try {
+        if(wordsUnitSteps.length) {
+            for(let id in splittedByIdSteps) {
+                await setMemoqTranlsators(id, splittedByIdSteps[id]);
+            }
+        }
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
@@ -280,45 +306,28 @@ function updateStepsProgress(task, steps) {
     })
 }
 
-function updateWordcountStepsProgress({steps, task, progress}) {
+function updateWordcountStepsProgress({steps, task}) {
+    const { memoqDocs: docs } = task;
     return steps.map(item => {
         if(task.taskId === item.taskId) {
-            item.progress = item.status === 'Started' ? setStepsProgress(item, progress) : item.progress;
+            item.progress = item.status === 'Started' ? setStepsProgress(item.serviceStep.symbol, docs) : item.progress;
         }
         return item;
     });
 }
 
-function setStepsProgress(step, progress) {
-    const { jobsMetrics } = progress;
-    let stepProgress = progress[step.catName];
-    for(let metrics of jobsMetrics) {
-        const { jobId, metricsProgress } = metrics;
-        const { wordsDone, wordsToBeDone, totalWordCount } = metricsProgress[step.catName];
-        stepProgress[jobId] = { wordsDone, wordsToBeDone, totalWordCount };
+function setStepsProgress(symbol, docs) {
+    const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
+    const totalProgress = docs.reduce((acc, cur) => {
+        acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop];
+        acc.totalWordCount = acc.totalWordCount ? acc.totalWordCount + +cur.TotalWordCount : +cur.TotalWordCount;
+        return acc;
+    }, {});
+    let stepProgress = {};
+    for(let doc of docs) {
+        stepProgress[doc.DocumentGuid] = { wordsDone: +doc[prop], totalWordCount: +doc.TotalWordCount, fileName: doc.DocumentName };
     }
-    return stepProgress;
-}
-
-async function updateTaskTargetFiles({step, jobId, path}) {
-    try {
-        const project = await Projects.findOne({"steps._id": step._id});
-        const tasks = getTasksWithTargets({tasks: project.tasks, step, jobId, path});
-        return await updateProject({"_id": project.id}, { tasks });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateTaskTargetFiles");
-    }
-}
-
-function getTasksWithTargets({tasks, step, jobId, path}) {
-    return tasks.map(task => {
-        if(task.taskId === step.taskId) {
-            task.xtmJobs = getAfterPathUpdate({
-                xtmJobs: task.xtmJobs, jobId, path, name: step.name});
-        }
-        return task;
-    })
+    return {...stepProgress, ...totalProgress};
 }
 
 async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
@@ -347,48 +356,6 @@ async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
     }
 }
 
-function getAfterPathUpdate({xtmJobs, jobId, path, name}) {
-    return xtmJobs.map(item => {
-        if(item.jobId === jobId) {
-            item[`${name}-targetFile`] = path;
-            item.targetFile = path;
-        }
-        return item;
-    })
-}
-
-async function getAfterApproveFile({taskId, jobId, isFileApproved, path}) {
-    try {
-        const project = await getProject({"tasks.taskId": taskId});
-        const tasks = project.tasks.map(task => {
-            if(task.taskId === taskId) {
-                if(task.xtmJobs) {
-                    task.xtmJobs = getAfterApproveUpdate({jobs: task.xtmJobs, jobId, isFileApproved});
-                } else {
-                    task.targetFiles = task.targetFiles.map(item => {
-                        item.isFileApproved = item.path === `./dist${path}`;
-                        return item;
-                    })
-                }
-            }
-            return task;
-        });
-        return updateProject({"_id": project.id}, { tasks });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getAfterApproveFile");
-    }
-}
-
-function getAfterApproveUpdate({jobs, jobId, isFileApproved}) {
-    return jobs.map(item => {
-        if(item.jobId === jobId) {
-            item.isFileApproved = isFileApproved;
-        }
-        return item;
-    })
-}
-
 async function getAfterReopenSteps(steps, project) {
     try {
         const updatedSteps = setStepsStatus({steps, status: 'Started', project});
@@ -412,5 +379,5 @@ function getTasksAfterReopen({steps, tasks}) {
     return updatedTasks;
 }
 
-module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateTaskTargetFiles, 
-    getAfterApproveFile, updateProjectProgress, updateWithApprovedTasks, getTasksWithTargets, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
+module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, downloadCompletedFiles,
+    updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles };

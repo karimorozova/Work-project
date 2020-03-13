@@ -117,7 +117,7 @@
         return this.progress(row.progress) >= 100 && row.status === "Started";
       },
       progress(prog) {
-        return prog.wordsTotal ? ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2) : prog;
+        return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
       },
       showModal(index) {
         this.$emit("showModal", { index });

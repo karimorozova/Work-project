@@ -12,12 +12,12 @@ const vendorApplicationRouter = require('./vendors/application');
 const portalRouter = require('./portal');
 const industryRouter = require('./industry');
 const serviceRouter = require('./service');
-const xtmRouter = require('./xtm');
 const zohoRouter = require('./zoho');
 const clientsapiRouter = require('./clientsapi');
 const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
 const settingsUpdate = require('./settings/updates');
+const memoqapiRouter = require('./memoqapi');
 
 router.use('/', admin);
 router.use('/api', apiRouter);
@@ -29,12 +29,12 @@ router.use('/rates-manage', requiresLogin, pricelistsRatesRouter);
 router.use('/portal', portalRouter);
 router.use('/industry', industryRouter);
 router.use('/service', serviceRouter);
-router.use('/xtm', xtmRouter);
 router.use('/zoho', zohoRouter);
 router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 router.use('/vendors/application', vendorApplicationRouter);
 router.use('/projectsapi', projectsRouter);
 router.use('/settings-update', settingsUpdate);
+router.use('/memoqapi', memoqapiRouter);
 
 module.exports = router;

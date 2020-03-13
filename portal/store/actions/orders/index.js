@@ -1,27 +1,5 @@
 import { appendData } from "../../../utils/order";
 
-export const getXtmCustomers = async function ({ commit, dispatch }) {
-    try {
-        const result = await this.$axios.get('/xtm/xtm-customers');
-        commit('SET_XTM_CUSTOMERS', result.data);
-    } catch(err) {
-        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"})
-    }
-}
-
-export const setClientsXtmId = async function ({commit, dispatch, state}, payload) {
-    let xtmCustomer = state.xtmCustomers.find(item => item.name === state.clientInfo.name);
-    try {
-        if(!xtmCustomer) {
-            await dispatch('createNewXtmCustomer');
-            xtmCustomer = state.xtmCustomers.find(item => item.name === state.clientInfo.name);
-        }
-        commit('SET_CLIENTS_XTM', xtmCustomer.id);
-    } catch(err) {
-        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
-    }
-}
-
 export const setOrderDetails = ({commit}, payload) => {
     commit('SET_ORDER_DETAILS', payload);
 }
@@ -92,15 +70,6 @@ export const createPackagesRequest = async function ({commit, dispatch, state}, 
         const newRequest = await this.$axios.post('/portal/request', details);
         const requests = [...state.requests, newRequest.data];
         commit('SET_REQUESTS', requests);
-    } catch(err) {
-        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
-    }
-}
-
-export const createNewXtmCustomer = async function ({commit, state}, payload) {
-    try {
-        const result = await this.$axios.get(`/xtm/newcustomer?name=${state.clientInfo.name}`);
-        commit('ADD_XTM_CUSTOMER', result.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
     }

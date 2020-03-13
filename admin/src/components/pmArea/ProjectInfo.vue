@@ -44,7 +44,6 @@ export default {
     data() {
         return {
             statuses: ["Accepted", "Draft", "Open", "Ready"],
-            excludeKeys: ["nonTranslatable", "totalWords"],
             errors: [],
             areErrorsExist: false,
             isBlockAbsoulte: true,
@@ -96,11 +95,10 @@ export default {
             }
         },
         wordsCalculation(metrics) {
-            const repetitions = Object.keys(metrics).filter(item => {
-                return this.excludeKeys.indexOf(item) === -1;
-            }).reduce((prev, cur) => {
-                return prev + metrics[cur].value;
-            }, 0);
+            const repetitions = Object.keys(metrics).filter(item => item !== "totalWords")
+                .reduce((prev, cur) => {
+                    return prev + metrics[cur].value;
+                }, 0);
             const receivables = metrics.totalWords - metrics.nonTranslatable;
             const payables = receivables - repetitions;
             return { receivables, payables };
@@ -124,10 +122,7 @@ export default {
                 if(this.currentProject.isMetricsExist) {
                     return await this.updateProjectProgress();
                 }
-                const result = await this.$http.get(`/xtm/metrics?projectId=${this.currentProject._id}`);
-                if(result.body.status === 'invalid') {
-                    return this.alertToggle({message: "One or all files are not managed yet or invalid. Try later! ", isShow: true, type: "error"});
-                }
+                const result = await this.$http.get(`/memoqapi/metrics?projectId=${this.currentProject._id}`);
                 const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${this.currentProject._id}`);
                 await this.setCurrentProject(updatedProject.body);
                 this.alertToggle({message: "Metrics are received.", isShow: true, type: "success"});

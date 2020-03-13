@@ -95,13 +95,17 @@ export default {
         isTheSameName(fileName) {
             return this.allFiles.find(item => item.fileName === fileName);
         },
+        isOverSize(size) {
+            const total = this.allFiles.reduce((acc,cur) => acc + cur.size, 0) + size;
+            return size/1000000 > 2 || total/1000000 > 10;
+        },
         async uploadFile(e, index) {
-            if(this.isTheSameName(e.target.files[0].name)) return;
-            e.target.files;
+            const file = e.target.files[0];
+            if(this.isTheSameName(file.name) || this.isOverSize(file.size)) return;
             let formData = new FormData();
             formData.append("oldFile", JSON.stringify(this.allFiles[index]));
             formData.append("id", this.currentRequest._id);
-            formData.append("newFile", e.target.files[0]);
+            formData.append("newFile", file);
             try {
                 await this.addFileToRequest(formData);
                 this.$emit("parseFilesToArray");
@@ -199,12 +203,15 @@ export default {
     }
 
     &__name {
+        overflow: hidden;
+        max-height: 100%;
         &:hover {
             position: relative;
-
+            overflow: visible;
             .files-table__full-name {
                 display: block;
                 z-index: 5;
+                box-shadow: 0 0 15px $brown-shadow;
             }
         }
     }

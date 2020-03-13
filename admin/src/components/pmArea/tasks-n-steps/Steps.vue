@@ -258,7 +258,7 @@ export default {
             this.isReassignment = false;
         },
         setVendor({person}, index) {
-            this.$emit("setVendor", {vendor: { _id: person._id }, index});
+            this.$emit("setVendor", {vendor: person, index});
         },
         async setAction({option}) {
             if(option !== "No action available") {
@@ -352,7 +352,7 @@ export default {
             }
         },
         progress(prog) {
-            return prog.wordsTotal ? ((prog.wordsDone/prog.wordsTotal)*100).toFixed(2) : prog;
+            return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
         },
         toggleCheck(e, index, val) {
             this.allSteps[index].check = val;

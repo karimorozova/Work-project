@@ -18,8 +18,14 @@ const sendEmail = function (obj, msg) {
                 console.log(error);
                 rej(error);
             }
-        console.log('Message sent: %s', info.messageId);
-        res(info.messageId);
+        
+            if(info){ 
+                console.log('Message sent: %s', info.messageId);
+                res(info.messageId);
+            } else {
+                console.log('Error in sendEmail');
+                rej("no message sent");
+            }
         });
     })
 }

@@ -41,7 +41,6 @@ export default {
                 approve: {icon: require("../../../../assets/images/Approve-icon.png"), active: true},
                 reject: {icon: require("../../../../assets/images/Reject-icon.png"), active: true}
             },
-            isXtmJobs: false,
             isApproveModal: false
         }
     },

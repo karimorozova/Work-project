@@ -36,7 +36,7 @@
                         img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
             template(slot="editor" slot-scope="{ row, index }")
                 .job-files__editor(v-if="isEditor && row.category === 'Source file'")
-                    img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToXtmEditor(row)")                   
+                    img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToMemoqEditor(row)")                   
 </template>
 
 <script>
@@ -66,15 +66,14 @@ export default {
             alertToggle: "alertToggle"
         }),
         isTargetLink(file) {
-            return this.getProgress(file) === 100 || this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
+            return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
         },
         getProgress(file) {
-            const xtmJob = this.getFilesJobId(file);
-            const progress = xtmJob ? this.job.progress[xtmJob.jobId] : "";
-            return progress ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2): this.job.progress;
+            return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
         },
-        getFilesJobId(file) {
-            return this.job.xtmJobIds ? this.job.xtmJobIds.find(item => item.fileName === file.fileName) : "";
+        getMemoqFilesProgress(fileName) {
+            const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
+            return +(100*this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2);
         },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
@@ -93,68 +92,34 @@ export default {
                 const nameArr = file.split('/');
                 const filePath = this.domain + file.split('./dist')[1];
                 const fileName = nameArr[nameArr.length - 1];
+                const targetFile = this.job.taskTargetFiles ? this.job.taskTargetFiles .find(item => item.fileName === fileName) : "";
                 files.push({
                     fileName,
                     category: category,
-                    source: filePath
+                    source: filePath,
+                    target: targetFile ? targetFile.path : ""
                 })
             }
             return files;
         },
-        async goToXtmEditor(file) {
-            const { jobId } = this.getFilesJobId(file);
-            try {
-                const url = await this.$axios.post('/xtm/editor', {jobId, stepName: this.job.catName, xtmProjectId: this.job.xtmProjectId});
-                let link = document.createElement("a");
-                link.target = "_blank";
-                link.href = url.data;
-                link.click();
-            } catch(err) {
-                this.alertToggle({message: err.message, isShow: true, type: "error"});
-            }
+        async goToMemoqEditor(file) {
+            const { WebTransUrl } = this.job.memocDocs.find(item => item.DocumentName === file.fileName && item.TargetLangCode === this.job.memoqTarget);
+            let link = document.createElement("a");
+            link.target = "_blank";
+            link.href = WebTransUrl;
+            link.click();
         },
         async downloadTarget(file) {
             if(this.job.serviceStep.calculationUnit !== 'Words') {
                 return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
             }
-            const xtmJob = this.getFilesJobId(file);
-            const existingTarget = this.getExistingTargetPath(xtmJob.jobId);
-            if(this.job.status === "Completed" && existingTarget) {
-                return this.createLinkAndDownolad(existingTarget);
-            }
-            await this.generateAndDownloadFile(xtmJob, file);
-        },
-        async generateAndDownloadFile(xtmJob, file) {
-            let xtmInfo = {...xtmJob, projectId: this.job.xtmProjectId};
-            try {
-                const generatedFiles = await this.$axios.post('/xtm/generate-file', {projectId: this.job.xtmProjectId, jobId: xtmJob.jobId});
-                let fileLink = "";
-                do {
-                    fileLink = await this.$axios.post('/xtm/target-file', {step: this.job, id: this.job.project_Id, file: {...generatedFiles.data[0], ...xtmInfo}});
-                }
-                while(fileLink.data.status && fileLink.data.status === 'FINISHED');
-                let href = fileLink.data.path;
-                this.createLinkAndDownolad(href);
-                this.setCurrentJob(fileLink.data.updatedProject);
-            } catch(err) {
-                this.alertToggle({message: err.message, isShow: true, type: "error"});
-            }
+            this.createLinkAndDownolad(file.target);
         },
         createLinkAndDownolad(href) {
             let link = document.createElement('a');
             link.href = this.domain + href;
             link.target = "_blank";
             link.click();
-        },
-        getExistingTargetPath(jobId) {
-            const xtmJob = this.job.xtmJobIds.find(item => item.jobId === jobId);
-            return xtmJob[`${this.job.name}-targetFile`];
-        },
-        setCurrentJob(project) {
-            const { tasks } = project;
-            const updatedTask = tasks.find(item => item.taskId === this.job.taskId);
-            const currentJob = {...this.job, xtmJobIds: updatedTask.xtmJobs};
-            this.setJob(currentJob);
         }
     },
     computed: {

@@ -13,8 +13,7 @@ const state = {
   isAlert: false,
   alertType: "success",
   currentRequests: 0,
-  selectedProject: {},
-  xtmCustomers: []
+  selectedProject: {}
 };
 
 export default state

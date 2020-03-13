@@ -89,7 +89,7 @@ export default {
         },
         getCurrentProgress() {
             const { progress } = this.step;
-            return progress.wordsTotal ? Math.floor(progress.wordsDone/progress.wordsTotal*100) : progress;
+            return progress.totalWordCount ? Math.floor(progress.wordsDone/progress.totalWordCount*100) : progress;
         },
         currentVendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";

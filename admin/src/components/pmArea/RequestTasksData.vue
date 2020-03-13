@@ -1,5 +1,8 @@
 <template lang="pug">
 .request-tasks
+    transition(name="slide-fade")
+        .request-tasks__info(v-if="isInfo") {{ selectedInfoMessage }}
+            .request-tasks__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
     .request-tasks__tasks-title Tasks and Steps
         img.request-tasks__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'request-tasks_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
@@ -27,13 +30,15 @@ export default {
             sourceLanguages: [],
             targetLanguages: [],
             isTaskData: true,
+            isInfo: false,
+            translateFilesAmount: 0
         }
     },
     methods: {
         ...mapActions([
-            "alertToggle", 
-            "addProjectTasks",
-            "addTasksFromRequest"
+            "alertToggle",
+            "addTasksFromRequest",
+            "addProjectWordsTasks"
             ]),
         toggleTaskData() {
             if(this.currentProject.status !== 'Delivered') {
@@ -67,14 +72,40 @@ export default {
             }
             try {
                 const request = {...this.currentProject, status: "Draft"};
-                await this.addTasksFromRequest({dataForTasks, request});
+                if(dataForTasks.service.calculationUnit !== 'Words') {
+                    await this.addTasksFromRequest({dataForTasks, request, isWords: false});
+                } else {
+                    await this.addWordsTasksFromRequest({dataForTasks, request});    
+                }
                 this.$router.push(`/project-details/${this.currentProject._id}`);
             } catch(err) { }
+        },
+        async addWordsTasksFromRequest({dataForTasks, request}) {
+            try {
+                const newProject = await this.$http.post('/pm-manage/request-tasks', {dataForTasks, request, isWords: true});
+                const { project, newTasksInfo } = newProject.data;
+                let { refFiles, template, ...tasksData } = newTasksInfo;
+                tasksData.template = template.id;
+                tasksData.projectId = project._id;
+                tasksData.projectName = `${project.projectId} - ${project.projectName}`;
+                tasksData.customerName = project.customer.name;
+                tasksData.industry = project.industry.name;
+                this.translateFilesAmount = tasksData.translateFiles.length;
+                this.isInfo = true;
+                await this.addProjectWordsTasks({...tasksData, isRequest: true});
+            } catch(err) {
+                console.log(err); 
+                this.alertToggle({message: "Error on adding tasks from request", isShow: true, type: "error"});
+            } finally {
+                this.isInfo = false;
+            }
         }
     },
     computed: {
         ...mapGetters({
-            currentProject: 'getCurrentProject'
+            currentProject: 'getCurrentProject',
+            selectedInfoMessage: 'getMemoqProjectMessage',
+            fileCounter: 'getTranslateFileCounter'
         }),
         targetLangs() {
             return this.targetLanguages.map(item => {
@@ -97,8 +128,28 @@ export default {
     padding: 20px;
     margin: 0 20px 20px 20px;
     box-shadow: 0 3px 20px $brown-shadow;
+    position: relative;
     @media (max-width: 1600px) {
         width: 70%;
+    }
+    &__info {
+        position: absolute;
+        z-index: 1000;
+        color: $orange;
+        background-color: $white;
+        padding: 20px;
+        top: 20%;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        width: 300px;
+        border: 1px solid $main-color;
+        box-shadow: 0 3px 20px $brown-shadow;
+    }
+    &__file-counter {
+        margin-top: 10px;
+        text-align: center;
     }
     &__tasks-title {
         font-size: 29px;

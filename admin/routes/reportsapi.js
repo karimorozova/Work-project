@@ -16,17 +16,6 @@ router.get('/languages', async (req, res) => {
     }
 })
 
-router.post('/tier-report', async (req, res) => {
-    const { type, filters } = req.body;
-    try {
-        const reportData = await getReport(type, filters);
-        res.send(reportData);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting tier report");
-    }
-})
-
 router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
     const { start, end, industry } = req.body;
     const { reportFiles } = req.files;

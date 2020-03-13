@@ -1,16 +1,18 @@
 const router = require("express").Router();
 const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
-const { setDefaultStepVendors, updateProjectCosts } = require("../../сalculations/wordcount");
+const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest,
-    setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, getProjectAfterFinanceUpdated } = require("../../projects/");
+const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
+    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
-    stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils/");
+    stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
+const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -61,6 +63,86 @@ router.post("/new-project", async (req, res) => {
     }
 })
 
+router.post('/project-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
+    try {
+        let tasksInfo = {...req.body};
+        if(tasksInfo.source) {
+            tasksInfo.source = JSON.parse(tasksInfo.source);
+        }
+        tasksInfo.targets = JSON.parse(tasksInfo.targets);
+        tasksInfo.service = JSON.parse(tasksInfo.service);
+        const { sourceFiles, refFiles } = req.files;
+        const updatedProject = await createTasks({tasksInfo, sourceFiles, refFiles});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on adding project tasks');
+    }
+})
+
+router.post("/project-words-tasks", async (req, res) => {
+    const { tasksInfo, docs } = req.body;
+    try {
+        const result = await createTasksWithWordsUnit(tasksInfo, docs);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on adding project's words tasks");
+    }
+})
+
+router.post('/update-project', async (req, res) => {
+    const project = { ...req.body };
+    try {
+        const savedProject = await updateProject({"_id": project.id}, {steps: project.steps, tasks: project.tasks, isMetricsExist: project.isMetricsExist});
+        res.send(savedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on updating project');
+    }
+})
+
+router.post('/update-progress', async (req, res) => {
+    const { projectId, isCatTool } = req.body;
+    try {
+        const project = await getProject({"_id": projectId});
+        const result = await updateProjectProgress(project, isCatTool);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting metrics ");
+    }
+})
+
+router.post('/update-matrix', async (req, res) => {
+    const { projectId, taskId, step, key, value, prop } = req.body;
+    const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' } 
+    : {rate: step.vendorRate, costName: 'payables'};
+    try {
+        let project = await getProject({"_id": projectId});
+        let taskIndex = project.tasks.findIndex(item => {
+            return item.taskId === taskId
+        });
+        let stepIndex = project.steps.findIndex(item => {
+            return item.name === step.name && item.taskId === step.taskId
+        })
+        let tasks = [...project.tasks];
+        let steps = [...project.steps];
+        tasks[taskIndex].metrics[key][prop] = +value/100;
+        const cost = calcCost(tasks[taskIndex].metrics, prop, rate);
+        steps[stepIndex].finance.Price[costName] = cost;
+        tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
+            return init + +cur.finance.Price[costName];
+        }, 0)
+        let updatedProject = {...project._doc, id: projectId, tasks, steps};
+        const result = await updateProjectCosts(updatedProject);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Error on updating value of matrix');
+    }
+})
+
 router.get("/all-managers", async (req, res) => {
     const { groupFilters } = req.query;
     try {
@@ -90,6 +172,11 @@ router.put("/project-status", async (req, res) => {
         const result = await updateProjectStatus(id, status);
         if(status === "Cancelled") {
             await notifyClientProjectCancelled(result);
+            const wordsTasks = result.tasks.filter(item => item.service.calculationUnit === 'Words');
+            if(wordsTasks.length) {
+                await cancelMemoqDocs(wordsTasks);
+                await setCancelledNameInMemoq(wordsTasks, `${result.projectId} - ${result.projectName}`);
+            }
         }
         res.send(result);
     } catch(err) {
@@ -240,6 +327,10 @@ router.post("/cancel-tasks", async (req, res) => {
     try {
         const project = await getProject({"_id": projectId});
         const updatedProject = await getProjectAfterCancelTasks(tasks, project);
+        const wordsCancelledTasks = tasks.filter(item => item.service.calculationUnit === 'Words');
+        if(wordsCancelledTasks.length) {
+            await cancelMemoqDocs(wordsCancelledTasks);
+        }
         await notifyClientTasksCancelled(project, tasks);
         res.send(updatedProject);
     } catch(err) {
@@ -253,6 +344,7 @@ router.post("/step-status", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const updatedSteps = setStepsStatus({steps, status, project});
+        await updateMemoqProjectUsers(updatedSteps);
         const updatedProject = await updateProject({"_id": id}, {steps: updatedSteps});
         res.send(updatedProject);
     } catch(err) {
@@ -438,11 +530,6 @@ router.get("/deliverables", async (req, res) => {
     const { taskId } = req.query;
     try {
         const project = await getProject({"tasks.taskId": taskId});
-        // const task = project.tasks.find(item => item.taskId === taskId);
-        // const taskFiles = task.xtmJobs || task.targetFiles;
-        // const link = await getDeliverablesLink({
-        //     taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
-        // });
         const review = await Delivery.findOne({projectId: project.id, "tasks.taskId": taskId}, {"tasks.$": 1});
         const link = await getDeliverablesLink({
             taskId, projectId: project.id, taskFiles: review.tasks[0].files
@@ -598,17 +685,31 @@ router.post("/project-value", async (req, res) => {
     }
 })
 
-router.post("/add-tasks", async (req, res) => {
-    const { dataForTasks, request } = req.body;
+router.post("/request-tasks", async (req, res) => {
+    const { dataForTasks, request, isWords } = req.body;
     const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request; 
     try {
         const updatedProject =  await createProject(project);
-        const projectWithTasks = await createTasksFromRequest({project: updatedProject, dataForTasks});
+        const newProject = await createTasksFromRequest({project: updatedProject, dataForTasks, isWords});
         await removeClientRequest(_id);
-        res.send(projectWithTasks);
+        res.send(newProject);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on adding tasks");
+    }
+})
+
+router.post('/step-target', upload.fields([{name: 'targetFile'}]), async (req, res) => {
+    const { jobId } = req.body;
+    try {
+        const project = await getProject({"steps._id": jobId});
+        const { targetFile } = req.files;
+        const paths = await storeFiles(targetFile, project.id);
+        const updatedProject = await updateNonWordsTaskTargetFiles({project, path: paths[0], jobId, fileName: targetFile[0].filename});
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error / Cannot add Target file to the Steps array of Project")
     }
 })
 

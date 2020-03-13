@@ -25,7 +25,7 @@ async function storeRequestFiles(filesArr, requestId) {
             for(let file of filesArr) {
                 const newPath = `/reqfiles/${requestId}/${file.filename.replace(/\s+/g, '_')}`;
                 await moveFile(file, `./dist${newPath}`);
-                storedFiles.push({path: newPath, fileName: file.filename, isApproved: false});
+                storedFiles.push({path: newPath, fileName: file.filename, isApproved: false, size: file.size});
             }
         }
         return storedFiles;

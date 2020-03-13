@@ -142,15 +142,14 @@ const ClientSchema = new mongoose.Schema({
     matrix: {
         type: Object,
         default: {
-            iceMatch: {text: "ICE Match", rate: 0.25},
-            fuzzyMatch75: {text: "75-84%", rate: 0.9},
-            fuzzyMatch85: {text: "85-94%", rate: 0.7},
-            fuzzyMatch95: {text: "95-99%", rate: 0.4},
-            repeat: {text: "Repetitions", rate: 0.25},
-            leveragedMatch: {text: "Leveraged Match", rate: 0.25},
-            fuzzyRepeats75: {text: "Internal 75-84%", rate: 0.9},
-            fuzzyRepeats85: {text: "Internal 85-94%", rate: 0.7},
-            fuzzyRepeats95: {text: "Internal 95-99%", rate: 0.4}
+            xTranslated: {text: "X translated", rate: 0.25},
+            repeat: {text: "Repetitions", rate: 0.3},
+            repeat100: {text: "100%", rate: 0.3},
+            repeat50: {text: "50-74%", rate: 1},
+            repeat75: {text: "75-84%", rate: 0.9},
+            repeat85: {text: "85-94%", rate: 0.7},
+            repeat95: {text: "95-99%", rate: 0.4},
+            noMatch: {text: "No match", rate: 1}
         }
     }
 }, { minimize: false });
