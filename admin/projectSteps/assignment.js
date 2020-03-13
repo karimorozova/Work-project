@@ -1,6 +1,7 @@
 const { payablesCalc } = require('../сalculations/wordcount');
 const { getVendorRate } = require('../сalculations/general');
 const { stepVendorsRequestSending, stepReassignedNotification } = require('../utils');
+const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
 async function reassignVendor(project, reassignData) {
     try {
@@ -11,6 +12,7 @@ async function reassignVendor(project, reassignData) {
         const updatedStep = updateCurrentStep({step, isStart, isPay, progress});
         const stepIndex = steps.findIndex(item => item.stepId === step.stepId);
         steps.splice(stepIndex, 1, updatedStep, newStep);
+        await updateMemoqProjectUsers(steps); 
         tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
         tasks[taskIndex].status = "Created";
         await stepReassignedNotification(project, updatedStep, reason);

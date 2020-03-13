@@ -31,7 +31,7 @@ async function getAfterWordcountPayablesUpdated({project, step}) {
     try {
         let { tasks, steps } = project;
         const taskIndex = tasks.findIndex(item => item.taskId == step.taskId);
-        const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.name === step.name);
+        const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.stepId === step.stepId);
         if(steps[stepIndex].serviceStep.symbol === 'translation') {
             tasks[taskIndex].metrics = setTaskMetrics({metrics: tasks[taskIndex].metrics, matrix: step.vendor.matrix, prop: 'vendor'});
         }
