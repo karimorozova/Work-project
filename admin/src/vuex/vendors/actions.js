@@ -144,13 +144,19 @@ export const updateVendorRate = async ({ commit, dispatch }, payload) => {
 }
 
 export const storeCurrentVendorEducation = async ({ dispatch }, payload) => {
-    dispatch('SET_CURRENT_VENDOR_EDUCATION', payload)
+
+    try {
+        const result = await Vue.http.post("/vendorsapi/upload-vendor-education", payload);
+        dispatch('SET_CURRENT_VENDOR_EDUCATION', result.body)
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    }
 }
 
 export const deleteCurrentVendorEducation = async ({ commit, state }, payload) => {
     commit("startRequest");
     try {
-        const  id  = payload;
+        const id = payload;
         const index = state.currentVendorEducation.findIndex(item => item._id === id);
         state.currentVendorEducation.splice(index, 1)
     } catch (err) {
@@ -167,7 +173,7 @@ export const storeCurrentVendorProfessionalExperience = async ({ dispatch }, pay
 export const deleteCurrentVendorProfessionalExperience = async ({ commit, state }, payload) => {
     commit("startRequest");
     try {
-        const  id  = payload;
+        const id = payload;
         const index = state.currentVendorProfessionalExperience.findIndex(item => item._id === id);
         state.currentVendorProfessionalExperience.splice(index, 1)
     } catch (err) {
@@ -179,12 +185,15 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, state 
 
 export const storeCurrentVendorQualifications = async ({ dispatch }, payload) => {
     dispatch('SET_CURRENT_VENDOR_QUALIFICATIONS', payload)
+    if(payload.status === 'Passed'){
+        dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)
+    }
 }
 
 export const deleteCurrentVendorQualifications = async ({ commit, state }, payload) => {
     commit("startRequest");
     try {
-        const  id  = payload;
+        const id = payload;
         const index = state.currentVendorQualifications.findIndex(item => item._id === id);
         state.currentVendorQualifications.splice(index, 1)
     } catch (err) {
@@ -196,13 +205,19 @@ export const deleteCurrentVendorQualifications = async ({ commit, state }, paylo
 
 export const storeCurrentVendorDocuments = async ({ dispatch }, payload) => {
 
-    dispatch('SET_CURRENT_VENDOR_DOCUMENTS', payload)
+    try {
+        const result = await Vue.http.post("/vendorsapi/upload-vendor-document", payload);
+        console.log(result.body);
+        dispatch('SET_CURRENT_VENDOR_DOCUMENTS', result.body)
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    }
 }
 
 export const deleteCurrentVendorDocuments = async ({ commit, state }, payload) => {
     commit("startRequest");
     try {
-        const  id  = payload;
+        const id = payload;
         const index = state.currentVendorDocuments.findIndex(item => item._id === id);
         state.currentVendorDocuments.splice(index, 1)
     } catch (err) {
@@ -214,26 +229,10 @@ export const deleteCurrentVendorDocuments = async ({ commit, state }, payload) =
 export const deleteCurrentVendorDocumentsFile = async ({ commit, state }, payload) => {
     commit("startRequest");
     try {
-        const  id  = payload;
+        const id = payload;
         const index = state.currentVendorDocuments.findIndex(item => item._id === id);
         state.currentVendorDocuments[index].fileName = ''
-    } catch (err) {
-        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
-    } finally {
-        commit("endRequest");
-    }
-}
-
-export const storeCurrentVendorAssessment = async ({ dispatch }, payload) => {
-    dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)
-}
-
-export const deleteCurrentVendorAssessment = async ({ commit, state }, payload) => {
-    commit("startRequest");
-    try {
-        const  id  = payload;
-        const index = state.currentVendorAssessment.findIndex(item => item._id === id);
-        state.currentVendorAssessment.splice(index, 1)
+        state.currentVendorDocuments[index].fileLink = ''
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
