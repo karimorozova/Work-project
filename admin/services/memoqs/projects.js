@@ -34,7 +34,7 @@ async function createMemoqProjectWithTemplate(projectData) {
                 <ns:CreateProjectFromTemplate>
                 <ns:createInfo>
                     <ns:Client>${projectData.customerName}</ns:Client>
-                    <ns:CreatorUser>b0c7615d-4f3c-ea11-8d1e-287fcfe08232</ns:CreatorUser>
+                    <ns:CreatorUser>${projectData.creatorUserId}</ns:CreatorUser>
                     <ns:Domain>${projectData.industry}</ns:Domain>
                     <ns:Name>[PngSys] ${projectData.projectName}</ns:Name>
                     <ns:Project>[PngSys] ${projectData.projectName}</ns:Project>            
@@ -87,12 +87,14 @@ async function updateMemoqProjectUsers(steps) {
     try {
         if(wordsUnitSteps.length) {
             for(let id in splittedByIdSteps) {
-                await setMemoqTranlsators(id, splittedByIdSteps[id]);
+                const error = await setMemoqTranlsators(id, splittedByIdSteps[id]);
+                if(error) throw error;
             }
         }
     } catch(err) {
         console.log(err);
         console.log("Error in updateMemoqProjectUsers");
+        return err;
     }
 }
 
@@ -116,19 +118,21 @@ async function getProjectUsers(projectId) {
 }
 
 async function setMemoqTranlsators(memoqProjectId, steps) {
-    const users = await getMemoqUsers();
-    const assignedSteps = steps.filter(item => item.vendor);
-    const projectUsers = assignedSteps.map(item => {
-        const memoqUser = users.find(user => user.email === item.vendor.email);
-        return memoqUser.id;
-    });
     try {
+        const users = await getMemoqUsers();
+        const assignedSteps = steps.filter(item => item.vendor);
+        const projectUsers = assignedSteps.map(item => {
+        const memoqUser = users.find(user => user.email === item.vendor.email);
+            if(!memoqUser) throw new Error(`No such memoq user - ${item.vendor.firstName} ${item.vendor.surname}`);
+            return memoqUser.id;
+        });
         const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers)));
         return areUsersSet ? await assignMemoqTranslators({memoqProjectId, assignedSteps, users}) 
             : new Error("Can't set one or all users in memoQ");
     } catch(err) {
         console.log(err);
-        console.log("Error in setMemoqTranslators")
+        console.log("Error in setMemoqTranslators");
+        return err;
     }
 }
 

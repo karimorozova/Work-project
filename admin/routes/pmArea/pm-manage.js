@@ -344,12 +344,13 @@ router.post("/step-status", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const updatedSteps = setStepsStatus({steps, status, project});
-        await updateMemoqProjectUsers(updatedSteps);
+        const memoqAssignResult = await updateMemoqProjectUsers(updatedSteps);
+        if(memoqAssignResult) throw memoqAssignResult;
         const updatedProject = await updateProject({"_id": id}, {steps: updatedSteps});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
-        res.status(500).send("Error on setting step status");
+        res.status(500).send(err.message);
     }
 })
 

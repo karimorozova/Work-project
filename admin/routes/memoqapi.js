@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
+const { User } = require('../models');
 const { downloadCompletedFiles } = require("../projects");
 const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
@@ -14,7 +15,20 @@ router.get('/users', async (req, res) => {
         res.json(result);
     } catch(err) {
         console.log(err);
-        res.status(500).send(err);
+        res.status(500).send("Error on getting memoQ users");
+    }
+})
+
+router.get('/userId', async (req, res) => {
+    const { userId } = req.query;
+    try {
+        const user = await User.findOne({_id: userId});
+        const memoqUsers = await getMemoqUsers();
+        const creatorUser = memoqUsers.find(item => item.email === user.email);
+        res.send({creatorUserId: creatorUser ? creatorUser.id : "" });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting memoQ user");
     }
 })
 
@@ -25,7 +39,7 @@ router.get('/templates', async (req, res) => {
         res.json(result);
     } catch(err) {
         console.log(err);
-        res.status(500).send(err);
+        res.status(500).send("Error on getting memoQ templates");
     }
 })
 

@@ -40,7 +40,7 @@ export const setProjectStatus = async ({commit, state}, payload) => {
         commit('endRequest');
   } 
 }
-export const setStepsStatus = async ({ commit, state }, payload) => {
+export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
   commit('startRequest')
   try {
     const { status, steps } = payload;
