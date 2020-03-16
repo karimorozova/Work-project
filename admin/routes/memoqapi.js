@@ -20,7 +20,8 @@ router.get('/users', async (req, res) => {
 
 router.get('/templates', async (req, res) => {
     try {
-        const result = await getMemoqTemplates();
+        const unSorted = await getMemoqTemplates();
+        const result = unSorted.sort((a,b) => a.name > b.name ? 1 : -1);
         res.json(result);
     } catch(err) {
         console.log(err);

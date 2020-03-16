@@ -84,7 +84,7 @@ export default {
             try {
                 const newProject = await this.$http.post('/pm-manage/request-tasks', {dataForTasks, request, isWords: true});
                 const { project, newTasksInfo } = newProject.data;
-                let { refFiles, template, ...tasksData } = newTasksInfo;
+                let { isAssigned, requestId, refFiles, template, ...tasksData } = newTasksInfo;
                 tasksData.template = template.id;
                 tasksData.projectId = project._id;
                 tasksData.projectName = `${project.projectId} - ${project.projectName}`;
