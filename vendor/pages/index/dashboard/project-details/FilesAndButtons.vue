@@ -8,7 +8,7 @@
         .files-buttons__buttons(v-if="deliverables.length || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
             .files-buttons__button(v-if="isStartButton")
                 Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
-            .files-buttons__button(v-if="progress >= 100 || deliverables.length")
+            .files-buttons__button(v-if="isCompleteButton")
                 Button(value="Complete" @makeAction="showModal")
         .files-buttons__icons(v-if="areIcons && job.status !== 'Completed'")
             .files-buttons__icon(v-for="(icon, key) in icons")
@@ -93,6 +93,16 @@ export default {
         },
         isFileUpload() {
             return this.job.status === 'Started' && this.job.serviceStep.calculationUnit !== 'Words';
+        },
+        isCompleteButton() {
+            if(this.job.serviceStep.calculationUnit === 'Words') {
+                const { symbol } = this.job.serviceStep;
+                const statusWord = symbol === 'translation' ? 'Translation' : 'Review1';
+                const notFinishedStatus = this.job.memocDocs.find(item => item.WorkflowStatus.indexOf(statusWord) !== -1);
+                return this.progress >= 100 && !notFinishedStatus;
+            }
+            return !!this.deliverables.length;
+            
         }
     },
     components: {
