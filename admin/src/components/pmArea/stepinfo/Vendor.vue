@@ -65,10 +65,7 @@ export default {
             const index = this.currentProject.steps.findIndex(item => item._id === this.step._id);
             try {
                 await this.setStepVendor({vendor: person, index});
-                this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
-            } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot set vendor for the step.", isShow: true, type: "error"})
-            }
+            } catch(err) {}
         },
         toggleRadio(e, key) {
             this[key] = !this[key];

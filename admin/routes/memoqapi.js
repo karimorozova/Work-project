@@ -19,7 +19,7 @@ router.get('/users', async (req, res) => {
     }
 })
 
-router.get('/userId', async (req, res) => {
+router.get('/user', async (req, res) => {
     const { userId } = req.query;
     try {
         const user = await User.findOne({_id: userId});
@@ -29,6 +29,21 @@ router.get('/userId', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting memoQ user");
+    }
+})
+
+router.post('/check-user', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const memoqUsers = await getMemoqUsers();
+        const user = memoqUsers.find(item => item.email === email);
+        if(!user) {
+            return res.status(500).send(`No such user in memoQ with email - ${email}`);
+        }
+        res.send("ok");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking memoQ user");
     }
 })
 

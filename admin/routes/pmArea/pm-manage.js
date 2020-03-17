@@ -13,6 +13,7 @@ const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSt
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
+const { getMemoqUsers} = require("../../services/memoqs/users");
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -302,7 +303,8 @@ router.get('/costs', async (req, res) => {
     try {
       let project = await getProject({"_id": projectId});
       let projectToUpdate = await getProjectWithUpdatedFinance(project);
-      const { steps, tasks } = await setDefaultStepVendors(projectToUpdate);
+      const memoqUsers = await getMemoqUsers();
+      const { steps, tasks } = await setDefaultStepVendors(projectToUpdate, memoqUsers);
       const updatedProject = await updateProjectCosts({...projectToUpdate, steps, tasks});
       res.send(updatedProject);
     } catch(err) {

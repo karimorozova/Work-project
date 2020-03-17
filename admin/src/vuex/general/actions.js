@@ -27,7 +27,7 @@ export const getServices = async ({ commit, dispatch }) => {
     commit('endRequest');
   }
 }
-export const setProjectStatus = async ({commit, state}, payload) => {
+export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
   commit('startRequest')
   try {
     const { status } = payload;
@@ -56,15 +56,19 @@ export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
         commit('endRequest');
   }
 }
-export const setStepVendor = async ({ commit, state }, payload) => {
+export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
     commit('startRequest')
     try {
         const { vendor, index } = payload;
         let step = state.currentProject.steps[index];
+        if(step.serviceStep.calculationUnit === 'Words') {
+            await Vue.http.post('/memoqapi/check-user', { email: vendor.email });
+        }
         const status = "Request Sent";
         const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor, status}, index});
         await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
         await commit('storeCurrentProject', updatedProject.body);
+        dispatch('alertToggle', {message: "Step data updated", isShow: true})
     } catch(err) {
         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
     } finally {
@@ -72,7 +76,7 @@ export const setStepVendor = async ({ commit, state }, payload) => {
     }
 }
 
-export const updateCurrentProject = async ({ commit, state }, payload) => {
+export const updateCurrentProject = async ({ commit, dispatch, state }, payload) => {
     commit('startRequest')
     try {
         const updatedProject = await Vue.http.post('/pm-manage/update-project', {...payload});

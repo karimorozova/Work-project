@@ -126,7 +126,7 @@ export default {
             }
             try {
                 if(dataForTasks.service.calculationUnit === 'Words') {
-                    const memoqCreatorUser = await this.$http.get(`/memoqapi/userId?userId=${this.currentProject.projectManager._id}`);
+                    const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                     const { creatorUserId } = memoqCreatorUser.data;
                     if(!creatorUserId) throw new Error("No such user in memoq");
                     tasksData.append('creatorUserId', creatorUserId);
