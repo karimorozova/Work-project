@@ -120,13 +120,19 @@ async function getProjectUsers(projectId) {
 async function setMemoqTranlsators(memoqProjectId, steps) {
     try {
         const users = await getMemoqUsers();
+        const currentUsers = await getProjectUsers(memoqProjectId);
+        const pm = Array.isArray(currentUsers) ? currentUsers.find(item => item.ProjectRoles["a:ProjectManager"]) : currentUsers;
         const assignedSteps = steps.filter(item => item.vendor);
-        const projectUsers = assignedSteps.map(item => {
+        let projectUsers = assignedSteps.map(item => {
         const memoqUser = users.find(user => user.email === item.vendor.email);
             if(!memoqUser) throw new Error(`No such memoq user - ${item.vendor.firstName} ${item.vendor.surname}`);
-            return memoqUser.id;
+            return {id: memoqUser.id, isPm: false};
         });
-        const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers)));
+        projectUsers.push({id: pm.User.UserGuid, isPm: true});
+        const areUsersSet = await setMemoqProjectUsers(
+            memoqProjectId, 
+            Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
+            );
         return areUsersSet ? await assignMemoqTranslators({memoqProjectId, assignedSteps, users}) 
             : new Error("Can't set one or all users in memoQ");
     } catch(err) {
@@ -181,12 +187,12 @@ async function setMemoqProjectUsers(projectId, users) {
 }
 
 function getUsersInfo(users) {
-    const userInfoXml = (id) => `<ns:ServerProjectUserInfo>                    
+    const userInfoXml = (user) => `<ns:ServerProjectUserInfo>                    
                                 <ns:ProjectRoles>                         
-                                    <mem:ProjectManager>false</mem:ProjectManager>                         
+                                    <mem:ProjectManager>${user.isPm}</mem:ProjectManager>                         
                                     <mem:Terminologist>false</mem:Terminologist>
                                 </ns:ProjectRoles>                      
-                                <ns:UserGuid>${id}</ns:UserGuid>
+                                <ns:UserGuid>${user.id}</ns:UserGuid>
                             </ns:ServerProjectUserInfo>\n`
     return users.reduce((acc, cur) => acc + userInfoXml(cur), "")
 }
