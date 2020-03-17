@@ -145,14 +145,14 @@ async function calcProofingStep({step, task, project, words}) {
     }
 }
 
-async function setDefaultStepVendors(project) {
+async function setDefaultStepVendors(project, memoqUsers) {
     try {
         let { steps, tasks } = project;
         const activeVendors = await getVendors({status: 'Active'});
         for(let i = 0; i < steps.length; i++) {
             if(steps[i].serviceStep.calculationUnit === 'Words' && !steps[i].vendor) {
                 let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
-                let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project});
+                let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project, memoqUsers});
                 if(matchedVendors.length === 1) {
                     steps[i].vendor = matchedVendors[0];
                     tasks[taskIndex].metrics = steps[i].serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
@@ -171,9 +171,11 @@ async function setDefaultStepVendors(project) {
     }
 }
 
-function getMatchedVendors({activeVendors, steps, index, project}) {
+function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
     const step = steps[index];
-    let availableVendors = [...activeVendors];
+    const memoqEmails = memoqUsers.map(item => item.email);
+    let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
+    if(!availableVendors.length) return [];
     if(index > 0 && step.taskId === steps[index-1].taskId) {
         availableVendors = availableVendors.filter(item => {
             if(steps[index-1].vendor) {

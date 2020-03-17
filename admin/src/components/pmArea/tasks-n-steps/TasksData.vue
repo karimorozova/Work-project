@@ -183,11 +183,10 @@ export default {
                 const result = await this.$http.get("/memoqapi/templates");
                 this.templates = result.data || [];
                 if(this.templates.length) {
-                    this.setTasksDataValue({prop: "template", value: this.templates[0]});
+                    const defTemplate = this.templates.find(item => item.name === '2 Steps');
+                    this.setTasksDataValue({prop: "template", value: defTemplate || this.templates[0]});
                 }
-            } catch(err) {
-
-            }
+            } catch(err) { }
         }
     },
     computed: {
@@ -285,7 +284,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
-        width: 191px;
+        width: 50%;
         height: 50px;
     }
     &__menu-title {

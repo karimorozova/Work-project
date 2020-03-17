@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
+const { User } = require('../models');
 const { downloadCompletedFiles } = require("../projects");
 const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
@@ -14,17 +15,46 @@ router.get('/users', async (req, res) => {
         res.json(result);
     } catch(err) {
         console.log(err);
-        res.status(500).send(err);
+        res.status(500).send("Error on getting memoQ users");
+    }
+})
+
+router.get('/user', async (req, res) => {
+    const { userId } = req.query;
+    try {
+        const user = await User.findOne({_id: userId});
+        const memoqUsers = await getMemoqUsers();
+        const creatorUser = memoqUsers.find(item => item.email === user.email);
+        res.send({creatorUserId: creatorUser ? creatorUser.id : "" });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting memoQ user");
+    }
+})
+
+router.post('/check-user', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const memoqUsers = await getMemoqUsers();
+        const user = memoqUsers.find(item => item.email === email);
+        if(!user) {
+            return res.status(500).send(`No such user in memoQ with email - ${email}`);
+        }
+        res.send("ok");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on checking memoQ user");
     }
 })
 
 router.get('/templates', async (req, res) => {
     try {
-        const result = await getMemoqTemplates();
+        const unSorted = await getMemoqTemplates();
+        const result = unSorted.sort((a,b) => a.name > b.name ? 1 : -1);
         res.json(result);
     } catch(err) {
         console.log(err);
-        res.status(500).send(err);
+        res.status(500).send("Error on getting memoQ templates");
     }
 })
 

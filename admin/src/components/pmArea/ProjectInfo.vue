@@ -74,10 +74,7 @@ export default {
             }
             try {
                 await this.setStepVendor({vendor, index});
-                this.alertToggle({message: "Step data updated", isShow: true, type: "success"})
-            } catch(err) {
-                this.alertToggle({message: "Internal service error. Cannot calculate payables for the step.", isShow: true, type: "error"})
-            }
+            } catch(err) { }
         },
         async setDate({date, prop, index}) {
             try {

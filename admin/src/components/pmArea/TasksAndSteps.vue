@@ -126,6 +126,10 @@ export default {
             }
             try {
                 if(dataForTasks.service.calculationUnit === 'Words') {
+                    const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
+                    const { creatorUserId } = memoqCreatorUser.data;
+                    if(!creatorUserId) throw new Error("No such user in memoq");
+                    tasksData.append('creatorUserId', creatorUserId);
                     this.isInfo = true;
                     await this.addProjectWordsTasks(tasksData);
                 } else {
@@ -133,7 +137,8 @@ export default {
                 }
                 this.isTaskData = false;
                 this.clearTasksData();
-            } catch(err) { 
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
             } finally {
                 this.isInfo = false;
             }

@@ -6,8 +6,8 @@ async function getProjects(obj) {
         .populate('industry')
         .populate('customer')
         .populate('service')
-        .populate('projectManager', ['firstName', 'lastName', 'photo'])
-        .populate('accountManager', ['firstName', 'lastName', 'photo'])
+        .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
@@ -16,8 +16,8 @@ async function getProject(obj) {
         .populate('industry')
         .populate('customer')
         .populate('service')
-        .populate('projectManager', ['firstName', 'lastName', 'photo'])
-        .populate('accountManager', ['firstName', 'lastName', 'photo'])
+        .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
@@ -26,8 +26,8 @@ async function updateProject(query, update) {
         .populate('industry')
         .populate('customer')
         .populate('service')
-        .populate('projectManager', ['firstName', 'lastName', 'photo'])
-        .populate('accountManager', ['firstName', 'lastName', 'photo'])
+        .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
+        .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
         .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
@@ -53,8 +53,8 @@ async function getFilteredProjects(filters) {
         return Projects.populate(projects, [
             'industry',
             'service',
-            {path: 'projectManager', select: ['firstName', 'lastName', 'photo']},
-            {path: 'accountManager', select: ['firstName', 'lastName', 'photo']},
+            {path: 'projectManager', select: ['firstName', 'lastName', 'photo', 'email']},
+            {path: 'accountManager', select: ['firstName', 'lastName', 'photo', 'email']},
             {path: 'steps.vendor', select: ['firstName', 'surname', 'email']}
 
         ])

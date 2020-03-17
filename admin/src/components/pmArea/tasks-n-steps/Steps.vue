@@ -304,7 +304,7 @@ export default {
                         await this.reopenSteps(steps);
                 }
             } catch(err) {
-                this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
+                
             } finally {
                 this.closeApproveModal();
             }
