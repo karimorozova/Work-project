@@ -18,7 +18,7 @@
 
             template(slot="fileName" slot-scope="{ row, index }")
                 .documents__data(v-if="currentActive !== index")
-                    a(href="/static/example.xlsx") {{row.fileName}}
+                    a( :href="row.fileLink") {{row.fileName}}
                 .documents__editing-data(v-else) 
                     input.documents__input(type="text" readonly :value="row.fileName")
 
@@ -36,10 +36,10 @@
 
             template(slot="icons" slot-scope="{ row, index }") 
                 .documents__icons
-                    img.documents__icon(v-if="!row.fileName" :class="'documents_opacity'" src="../../assets/images/Reject-icon.png")
+                    img.documents__icon(v-if="!row.fileName" :style="{cursor: 'default'}" :class="'documents_opacity'" src="../../assets/images/red-info-icon.png")
                     img.documents__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'documents_opacity': isActive(key, index)}")
                     .documents__upload(v-if="currentActive === index")
-                        input.documents__load-file(type="file" @change="uploadDocument(index)")
+                        input.documents__load-file(type="file" id="file" ref="file" @change="uploadDocument(index)")
                     .documents__upload(v-if="currentActive !== index" :class="'documents_opacity-half'")
                         input.documents__load-file(type="file" disabled="disabled")
                     
@@ -59,6 +59,9 @@ export default {
   props: {
     documentsData: {
       type: Array
+    },
+    vendorId: {
+      type: String
     }
   },
   data() {
@@ -89,6 +92,7 @@ export default {
 
       currentCategory: "",
       currentFileName: [],
+      currentFile: "",
 
       areErrors: false,
       errors: [],
@@ -127,14 +131,12 @@ export default {
           await this.checkErrors(index);
       }
     },
-
     setEditingData(index) {
       this.currentActive = index;
       this.currentCategory = {
         category: this.documentsData[index].category
       };
     },
-
     manageCancelEdition(index) {
       if (this.documentsData[index]._id == undefined) {
         this.documentsData.splice(index, 1);
@@ -160,7 +162,6 @@ export default {
       });
       this.setEditingData(this.documentsData.length - 1);
     },
-
     getDocuments() {
       this.documentsData = this.currentVendorDocuments;
     },
@@ -169,8 +170,8 @@ export default {
         fileName: event.target.files[0].name,
         id: id
       });
+      this.currentFile = this.$refs.file.files[0];
     },
-
     requiredFields(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
@@ -187,17 +188,18 @@ export default {
       this.requiredFields(index);
       if (this.currentActive == index) {
         if (!this.areErrors) {
-          let file = this.currentFileName.filter(value => value.id === index);
           const obj = {
             _id: index,
-            fileName:
-              file[file.length - 1] == undefined
-                ? ""
-                : file[file.length - 1].fileName,
-            category: this.currentCategory.category
+            category: this.currentCategory.category,
+            vendorId: this.vendorId
           };
+
+          let formData = new FormData();
+          formData.append("document", JSON.stringify(obj));
+          formData.append("file", this.currentFile);
+
           try {
-            const result = await this.storeDocuments(obj);
+            const result = await this.storeDocuments(formData);
             this.alertToggle({
               message: "Document saved",
               isShow: true,
@@ -215,7 +217,6 @@ export default {
         }
       }
     },
-
     async manageDeleteClick(index) {
       if (this.documentsData[index]._id == undefined) {
         this.documentsData.splice(index, 1);
@@ -225,15 +226,16 @@ export default {
       this.deleteIndex = index;
       this.isDeleting = true;
     },
-
     async deleteData() {
       const id = this.documentsData[this.deleteIndex]._id;
-      let currentObj = this.documentsData[this.deleteIndex].category
-      let currentLength = this.documentsData.filter(item => item.category === currentObj).length
+      let currentObj = this.documentsData[this.deleteIndex].category;
+      let currentLength = this.documentsData.filter(
+        item => item.category === currentObj
+      ).length;
       try {
         if (this.documentsData.length > 3 && currentLength > 1) {
           await this.deleteDocuments(id);
-        }else{
+        } else {
           await this.deleteDocumentsFile(id);
         }
         this.alertToggle({
@@ -244,15 +246,12 @@ export default {
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
-
       this.setDefaults();
       this.getDocuments();
     },
-
     closeErrors() {
       this.areErrors = false;
     },
-
     getCategory() {
       this.category = [
         { category: "NDA" },

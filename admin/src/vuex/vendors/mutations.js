@@ -31,7 +31,10 @@ export const mutations = {
         state.currentVendorDocuments[payload._id] = payload
    },
    SET_CURRENT_VENDOR_ASSESSMENT(state,payload){
-    state.currentVendorAssessment[payload._id] = payload
+    state.currentVendorAssessment.push({
+        _id: payload._id,
+        industry: payload.industry,
+    })
 },
 
 }

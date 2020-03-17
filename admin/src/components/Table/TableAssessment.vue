@@ -36,11 +36,12 @@
                   .assessment__editing-data(v-else) 
                       input.assessment__input(type="text" readonly )
 
-            template(slot="lqa3" slot-scope="{ row, index }")
-                  .assessment__upload
-                     .assessment__load-file(@click="openForm")
-                    
-    Add(@add="addData")
+            template(slot="lqa3" slot-scope="{ row, index }") 
+                  .assessment__data(v-if="currentActive !== index") {{ row.lqa3 }}
+                  .assessment__editing-data(v-else) 
+                      input.assessment__input(type="text" readonly )
+                  //- .assessment__upload
+                  //-    .assessment__load-file(@click="openForm")
 
     .assessment__form(v-if="isForm")
         VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
@@ -51,8 +52,6 @@
 
 <script>
 import SettingsTable from "./SettingsTable";
-import DataTable from "../DataTable";
-import Add from "../Add";
 import VendorLqaForm from "../reports/upcomingLqas/VendorLqaForm";
 import { mapGetters, mapActions } from "vuex";
 
@@ -166,13 +165,6 @@ export default {
     closeErrors() {
       this.areErrors = false;
     },
-    addData() {
-      if (this.currentActive !== -1) {
-        return this.isEditing();
-      }
-      this.assessmentData.push({});
-      this.currentActive = this.assessmentData.length - 1;
-    },
     closeForm() {
       this.isForm = false;
     },
@@ -182,8 +174,6 @@ export default {
   },
   components: {
     SettingsTable,
-    DataTable,
-    Add,
     VendorLqaForm
   },
 

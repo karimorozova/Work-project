@@ -22,6 +22,7 @@
                   SelectSingle(
                       :isTableDropMenu="isTableDropMenu"
                       placeholder="Select"
+                      :hasSearch="true"
                       :selectedOption="currentSource.lang"
                       :options="sourceData"
                       @chooseOption="setSource"
@@ -34,6 +35,7 @@
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
+                    :hasSearch="true"
                     :selectedOption="currentTarget.lang"
                     :options="targetData"
                     @chooseOption="setTarget"
@@ -46,6 +48,7 @@
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
+                    :hasSearch="true"
                     :selectedOption="currentIndustry.name"
                     :options="industryData"
                     @chooseOption="setIndustry"
@@ -58,6 +61,7 @@
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
+                    :hasSearch="true"
                     :selectedOption="currentTask.title"
                     :options="taskData"
                     @chooseOption="setTask"
@@ -70,6 +74,7 @@
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
+                    :hasSearch="true"
                     :selectedOption="currentStatus.status"
                     :options="statusData"
                     @chooseOption="setStatus"
@@ -95,6 +100,9 @@ export default {
   mixins: [scrollDrop, crudIcons],
   props: {
     qualificationData: {
+      type: Array
+    },
+    vendorIndustries: {
       type: Array
     }
   },
@@ -130,7 +138,7 @@ export default {
           padding: "0"
         },
         {
-          label: "Task Status",
+          label: "Test Status",
           headerKey: "headerStatus",
           key: "status",
           width: "17%",
@@ -168,7 +176,6 @@ export default {
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
     },
-
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -307,7 +314,7 @@ export default {
         source: "",
         target: "",
         industry: "",
-        status: "",
+        status: "NA",
         task: ""
       });
       this.setEditingData(this.qualificationData.length - 1);
@@ -331,14 +338,7 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
-    async getIndustry() {
-      try {
-        const result = await this.$http.get("/api/industries");
-        this.industry = result.body;
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
-      }
-    },
+
     async getTask() {
       try {
         const result = await this.$http.get("/api/services");
@@ -349,12 +349,12 @@ export default {
     },
     getStatus() {
       this.status = [
-        { status: ".NA" },
-        { status: ".Sent" },
-        { status: ".Received" },
-        { status: ".In Review" },
-        { status: ".Passed" },
-        { status: ".Not Passed" }
+        { status: "NA" },
+        { status: "Sample Requested" },
+        { status: "Test Sent" },
+        { status: "Received" },
+        { status: "Passed" },
+        { status: "Not Passed" }
       ];
     },
 
@@ -365,7 +365,7 @@ export default {
       this.currentTarget = this.target.find(item => item.lang === option);
     },
     setIndustry({ option }) {
-      this.currentIndustry = this.industry.find(item => item.name === option);
+      this.currentIndustry = this.vendorIndustries.find(item => item.name === option);
     },
     setStatus({ option }) {
       this.currentStatus = this.status.find(item => item.status === option);
@@ -379,7 +379,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentVendorQualifications: "getCurrentVendorQualifications"
+      currentVendorQualifications: "getCurrentVendorQualifications"    
     }),
     sourceData() {
       return this.sources.map(item => item.lang);
@@ -388,14 +388,14 @@ export default {
       return this.target.map(item => item.lang);
     },
     industryData() {
-      return this.industry.map(item => item.name);
+      return this.vendorIndustries.map(item => item.name);
     },
     statusData() {
       return this.status.map(item => item.status);
     },
     taskData() {
       return this.task.map(item => item.title);
-    }
+    },
   },
   components: {
     SettingsTable,
@@ -406,7 +406,6 @@ export default {
   mounted() {
     this.getSource();
     this.getTarget();
-    this.getIndustry();
     this.getStatus();
     this.getTask();
   }

@@ -69,9 +69,9 @@
         template(slot="document" slot-scope="{ row, index }")
               .education__no-file.education__data(v-if="!row.document && currentActive !== index") No file loaded
               .education__data(v-if="row.document.length && currentActive !== index")
-                a(href="/static/example.xlsx") {{row.document}}
+                a(:href="row.fileLink") {{row.document}}
               .education__upload(v-if="currentActive === index")
-                  input.education__load-file(type="file" @change="uploadDocument(index)")
+                  input.education__load-file(type="file" id="file" ref="file" @change="uploadDocument(index)")
 
         template(slot="icons" slot-scope="{ row, index }")
             .education__icons
@@ -95,6 +95,9 @@ export default {
   props: {
     educationData: {
       type: Array
+    },
+    vendorId: {
+      type: String
     }
   },
   data() {
@@ -155,13 +158,15 @@ export default {
       ],
 
       currentActive: -1,
+
       currentDegree: "",
       currentEducation: "",
       currentDepartment: "",
       currentGrade: "",
       dateRange: "",
-      currentDocument: [],
-
+      currentFile: "",
+      currentDocument: "",
+      currentFileName: [],
       areErrors: false,
       errors: [],
       isDeleting: false,
@@ -205,14 +210,13 @@ export default {
           await this.checkErrors(index);
       }
     },
-
     uploadDocument(id) {
-      this.currentDocument.push({
+      this.currentFileName.push({
         fileName: event.target.files[0].name,
         id: id
       });
+      this.currentFile = this.$refs.file.files[0];
     },
-
     requiredFields() {
       if (this.currentActive === -1) return;
       this.errors = [];
@@ -229,11 +233,11 @@ export default {
         return;
       }
     },
-
     async manageSaveClick(index) {
       this.requiredFields();
       this.validationIsNumber(this.currentGrade, "Grade");
-      let file = this.currentDocument.filter(value => value.id === index);
+      let file = this.currentFileName.filter(value => value.id === index);
+
       if (this.currentActive == index) {
         if (!this.areErrors) {
           const obj = {
@@ -243,13 +247,17 @@ export default {
             department: this.currentDepartment,
             degree: this.currentDegree,
             grade: this.currentGrade,
-            document:
-              file[file.length - 1] == undefined
-                ? ""
-                : file[file.length - 1].fileName
+            document: this.currentDocument,
+            fileLink: this.fileLink,
+            vendorId: this.vendorId
           };
+
+          let formData = new FormData();
+          formData.append("education", JSON.stringify(obj));
+          if (file[file.length - 1]) formData.append("file", this.currentFile);
+
           try {
-            const result = await this.storeEducation(obj);
+            const result = await this.storeEducation(formData);
             this.alertToggle({
               message: "Education saved",
               isShow: true,
@@ -267,14 +275,12 @@ export default {
         }
       }
     },
-
     manageCancelEdition(index) {
       if (this.educationData[index]._id == undefined) {
         this.educationData.splice(index, 1);
       }
       this.setDefaults();
     },
-
     async manageDeleteClick(index) {
       if (this.educationData[index]._id == undefined) {
         this.educationData.splice(index, 1);
@@ -283,7 +289,6 @@ export default {
       this.deleteIndex = index;
       this.isDeleting = true;
     },
-
     async deleteData() {
       const id = this.educationData[this.deleteIndex]._id;
       try {
@@ -299,7 +304,6 @@ export default {
       this.setDefaults();
       this.getEducation();
     },
-
     setEditingData(index) {
       this.currentActive = index;
       this.dateRange = this.educationData[index].duration;
@@ -308,7 +312,6 @@ export default {
       this.currentDepartment = this.educationData[index].department;
       this.currentGrade = this.educationData[index].grade;
     },
-
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
@@ -318,7 +321,6 @@ export default {
       this.currentGrade = "";
       this.dateRange = "";
     },
-
     addData() {
       if (this.currentActive !== -1) {
         return this.isEditing();
@@ -338,8 +340,8 @@ export default {
     },
     closePickers() {
       this.isDatepickers = false;
-    }, 
-    openPickers(){
+    },
+    openPickers() {
       this.isDatepickers = true;
     },
     setDate({ date }, prop) {
@@ -366,11 +368,9 @@ export default {
         moment(this.toDate).format("DD-MM-YYYY");
       this.closePickers();
     },
-
     closeErrors() {
       this.areErrors = false;
     },
-
     validationIsNumber(field, fieldName) {
       if (/([a-zA-Z])/.exec(field) !== null) {
         if (!this.errors.includes(fieldName + " field must be a number")) {

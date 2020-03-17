@@ -15,7 +15,7 @@ const state = {
         department: "Test321",
         degree: "Test123",
         grade: "344",
-        document: ''
+        document:''
     }],
 
     currentVendorProfessionalExperience: [{
@@ -33,7 +33,7 @@ const state = {
             target: '',
             industry: '',
             task: '',
-            status: '',
+            status: 'NA',
         }
 
     ],
@@ -52,16 +52,7 @@ const state = {
         }
     ],
 
-    currentVendorAssessment: [
-        {   
-            _id: 0,
-            industry: "IGaming",
-            tqi: 33,
-            lqa1: 23,
-            lqa2: 65,
-            lqa3: ''
-          }
-    ],
+    currentVendorAssessment: [],
 
 }
 

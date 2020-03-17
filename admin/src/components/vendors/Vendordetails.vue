@@ -82,10 +82,10 @@
             VendorCandidate(:candidateData='candidateData' v-if="currentVendor.status === 'Potential'")
          
         .title Qualifications
-            TableQualifications(:qualificationData="qualificationData")
+            TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries")
 
         .title Documents
-            TableDocuments(:documentsData="documentsData")
+            TableDocuments(:documentsData="documentsData" :vendorId="vendorId")
 
         .title Assessment
             TableAssessment(:assessmentData="assessmentData")
@@ -93,8 +93,8 @@
         .title Professional experience
             TableProfessionalExperience(:professionalExperienceData="professionalExperienceData")
 
-        .title Education
-            TableEducation(:educationData="educationData")
+        .title Education 
+            TableEducation(:educationData="educationData" :vendorId="vendorId")
 
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
@@ -108,7 +108,6 @@
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
-
     )
 </template>
 
@@ -138,6 +137,7 @@ export default {
   mixins: [photoPreview],
   data() {
     return {
+      vendorId:'',
       educationData: [],
       professionalExperienceData: [],
       qualificationData: [],
@@ -150,7 +150,6 @@ export default {
         softwareExperience: "HTML,DTP software - MemoQ",
         availability: "Approve Deadline"
       },
-
       areErrorsExist: false,
       isSaveClicked: false,
       vendorShow: true,
@@ -329,7 +328,7 @@ export default {
       this.qualificationData = this.currentVendorQualifications;
       this.documentsData = this.currentVendorDocuments;
       this.assessmentData = this.currentVendorAssessment;
-
+      this.vendorId = this.$route.params.id;
       const id = this.$route.params.id;
       try {
         if (!this.currentVendor._id) {
@@ -407,7 +406,7 @@ export default {
     this.getVendor();
   },
   mounted() {
-    this.oldEmail = this.currentVendor.email;
+    this.oldEmail = this.currentVendor.email;    
   }
 };
 </script>
