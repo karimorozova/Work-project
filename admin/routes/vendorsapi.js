@@ -16,9 +16,9 @@ function moveFile(oldFile, vendorId) {
     return oldFile.filename;
 }
 
-router.post('/upload-vendor-document', upload.fields([{ name: 'file' }]), async (req, res) => {
+router.post('/upload-vendor-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
     let data = await JSON.parse(req.body.document);
-    const file = req.files["file"];
+    const file = req.files["documentFile"];
     try {
         if (file) {
             await moveFile(file[0], data.vendorId);
@@ -32,9 +32,9 @@ router.post('/upload-vendor-document', upload.fields([{ name: 'file' }]), async 
     }
 })
 
-router.post('/upload-vendor-education', upload.fields([{ name: 'file' }]), async (req, res) => {
+router.post('/upload-vendor-education', upload.fields([{ name: 'educationFile' }]), async (req, res) => {
     let data = await JSON.parse(req.body.education);
-    const file = req.files["file"];
+    const file = req.files["educationFile"];
     try {
         if (file) {
             await moveFile(file[0], data.vendorId);

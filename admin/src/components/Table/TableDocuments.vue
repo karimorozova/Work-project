@@ -196,7 +196,7 @@ export default {
 
           let formData = new FormData();
           formData.append("document", JSON.stringify(obj));
-          formData.append("file", this.currentFile);
+          formData.append("documentFile", this.currentFile);
 
           try {
             const result = await this.storeDocuments(formData);

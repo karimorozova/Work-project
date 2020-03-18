@@ -19,7 +19,7 @@ export const mutations = {
 
 
     SET_CURRENT_VENDOR_EDUCATION(state,payload){
-        state.currentVendorEducation[payload._id] = payload
+        state.currentVendorEducations[payload._id] = payload
     },
     SET_CURRENT_VENDOR_PROFESSIONAL_EXPERIENCE(state,payload){
         state.currentVendorProfessionalExperience[payload._id] = payload
