@@ -82,6 +82,50 @@ const VendorSchema = new mongoose.Schema({
         default: '',
         trim : true 
     },
+    experienceYears: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    availability: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    catExperience: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    internetAccess: {
+        type: String,
+        default: 'Yes',
+        trim: true
+    },
+    softwares: {
+        type: Array,
+        default: []
+    },
+    qualifications: {
+        type: Array,
+        default: []
+    },
+    documents: {
+        type: Array,
+        default: []
+    },
+    profExperiences: {
+        type: Array,
+        default: []
+    },
+    educations: {
+        type: Array,
+        default: []
+    },
+    asessments: {
+        type: Array,
+        default: []
+    },
     wordsRates: [{ 
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
@@ -139,11 +183,11 @@ const VendorSchema = new mongoose.Schema({
             type: Schema.Types.ObjectId, ref: 'Language'
         }
     }],
-    position: {
+    positions: {
         type: Array,
         default: []
     },
-    test: {
+    isTest: {
         type: Boolean,
         default: false
     },

@@ -336,7 +336,7 @@ export default {
       this.setEditingData(this.educationData.length - 1);
     },
     getEducation() {
-      this.educationData = this.currentVendorEducation;
+      this.educationData = this.currentVendorEducations;
     },
     closePickers() {
       this.isDatepickers = false;

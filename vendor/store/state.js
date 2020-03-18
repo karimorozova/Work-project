@@ -10,7 +10,7 @@ const state = {
   steps: [],
   packages: [],
   applicationFormData: {
-    name: "",
+    firstName: "",
     surname: "",
     phone: "",
     email: "",
@@ -18,13 +18,13 @@ const state = {
     timezone: "",
     languagePairs: [],
     cvFiles: [],
-    position: [],
-    education: [],
-    translationExp: "",
+    positions: [],
+    educations: [],
+    experienceYears: "",
     technicalComp: {
       internet: "",
       cat: "",
-      software: []
+      softwares: []
     },
     industries: [],
     availability: "",

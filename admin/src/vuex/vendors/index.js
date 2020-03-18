@@ -8,7 +8,7 @@ const state = {
     currentVendor: {},
     filteredVendors: [],
 
-    currentVendorEducation: [{
+    currentVendorEducations: [{
         _id: 0,
         duration: "12-02-2020 / 20-02-2020",
         education: "Test school",

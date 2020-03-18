@@ -157,8 +157,8 @@ export const deleteCurrentVendorEducation = async ({ commit, state }, payload) =
     commit("startRequest");
     try {
         const id = payload;
-        const index = state.currentVendorEducation.findIndex(item => item._id === id);
-        state.currentVendorEducation.splice(index, 1)
+        const index = state.currentVendorEducations.findIndex(item => item._id === id);
+        state.currentVendorEducations.splice(index, 1)
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {

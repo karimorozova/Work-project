@@ -9,6 +9,12 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
         vendor.cvFiles = await manageFiles(cvFiles, vendor.id, 'cvFile');
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
         const parsedPersondata = getParsedData(person);
+        vendor.catExperience = parsedPersondata.technicalComp.cat || "";
+        vendor.softwares = parsedPersondata.technicalComp.softwares || [];
+        vendor.positions = parsedPersondata.positions;
+        vendor.educations = parsedPersondata.educations || [];
+        vendor.internetAccess = parsedPersondata.technicalComp.internet;
+        vendor.isTest = parsedPersondata.testAgree === "Yes";
         vendor.languagePairs = parsedPersondata.languagePairs;
         vendor.industries = parsedPersondata.industries;
         await vendor.save();

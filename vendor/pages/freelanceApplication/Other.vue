@@ -20,7 +20,7 @@
         )
     .other__options.rate-value
         span.other__label Please state your translation rate (Euro)
-        input.other__input(type="text" v-model="rate" @change="setRate")
+        input.other__input(type="text" v-model="basicRate" @change="setRate")
         .other__error(v-if="isRateIncorrect") Please enter the correct rate using only numbers "0-9" and a " . "
     .other__options.cover-letter
         .other__letter-text
@@ -53,7 +53,7 @@ export default {
             testAnswers: ["Yes", "No"],
             coverLetter: "",
             cvFiles: [],
-            rate: "",
+            basicRate: "",
         }
     },
     methods: {
@@ -71,14 +71,14 @@ export default {
         },
         setRate() {
             if(!this.isRateIncorrect) {
-                this.$emit("setValue", {property: "rate", value: this.rate})
+                this.$emit("setValue", {property: "basicRate", value: this.basicRate})
             }
         }
     },
     computed: {
         isRateIncorrect() {
             let regex = /^[0-9.]+$/;
-            return this.rate && !regex.test(this.rate)
+            return this.basicRate && !regex.test(this.basicRate)
         }
     },
     components: {

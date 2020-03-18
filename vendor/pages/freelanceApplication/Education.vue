@@ -52,10 +52,10 @@ export default {
     methods: {
         chooseOption({option, activeObject}, index) {
             this.tableData[index].study = option;
-            this.$emit("setValue", {property: 'education', value: this.tableData})
+            this.$emit("setValue", {property: 'educations', value: this.tableData})
         },
         setEducation() {
-            this.$emit("setValue", {property: 'education', value: this.tableData})
+            this.$emit("setValue", {property: 'educations', value: this.tableData})
         },
         addEducation() {
             this.tableData.push({

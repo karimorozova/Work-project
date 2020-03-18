@@ -1,7 +1,6 @@
 const apiUrl = require("../helpers/apiurl");
 const jwt = require('jsonwebtoken');
 const { secretKey } = require('../configs');
-const moment = require('moment');
 
 function applicationMessage(obj) {
     let cvFiles = "";
@@ -9,41 +8,41 @@ function applicationMessage(obj) {
     let software = "";
     let industries = "";
     let coverLetterFiles = "";
-    let education = "";
+    let educations = "";
     let positions = "";
     if(obj.cvFiles.length) {
-        cvFiles = obj.cvFiles.reduce((initial, current, index) => {
-            return initial + `<a href="${apiUrl}${current}" download target='_self'>cvFile${index+1}</a>; `
+        cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
+            return acc + `<a href="${apiUrl}${cur}" download target='_self'>cvFile${index+1}</a>; `
         }, "")
     }
     if(obj.coverLetterFiles.length) {
-        coverLetterFiles = obj.coverLetterFiles.reduce((initial, current, index) => {
-            return initial + `<a href="${apiUrl}${current}" download target='_self'>coverLetterFile${index+1}</a>; `
+        coverLetterFiles = obj.coverLetterFiles.reduce((acc, cur, index) => {
+            return acc + `<a href="${apiUrl}${cur}" download target='_self'>coverLetterFile${index+1}</a>; `
         }, "")
     }
     if(obj.languagePairs) {
-        languagePairs = obj.languagePairs.reduce((initial, current, index) => {
-            return initial + current.source + ' >> ' + current.target + "; "
+        languagePairs = obj.languagePairs.reduce((acc, cur) => {
+            return acc + cur.source + ' >> ' + cur.target + "; "
         }, "")
     }
     if(obj.industries) {
-        industries = obj.industries.reduce((initial, current, index) => {
-            return initial + current.name + "; "
+        industries = obj.industries.reduce((acc, cur) => {
+            return acc + cur.name + "; "
         }, "")
     }
-    if(obj.position) {
-        positions = obj.position.reduce((initial, current, index) => {
-            return initial + current + "; " 
+    if(obj.positions) {
+        positions = obj.positions.reduce((acc, cur) => {
+            return acc + cur + "; " 
         }, "")
     }
-    if(obj.technicalComp.software) {
-        software = obj.technicalComp.software.reduce((initial, current, index) => {
-            return initial + current + "; "
+    if(obj.technicalComp.softwares) {
+        software = obj.technicalComp.softwares.reduce((acc, cur) => {
+            return acc + cur + "; "
         }, "")
     }
-    if(obj.education) {
-        education = obj.education.reduce((initial, current, index) => {
-            return initial + `${current.study}/${current.field}/${current.institute}/${current.grade} <br>`
+    if(obj.educations) {
+        educations = obj.educations.reduce((acc, cur) => {
+            return acc + `${cur.study}/${cur.field}/${cur.institute}/${cur.grade} <br>`
         }, "")
     }
     return `<div class="main" style="font-weight:400;font-size:12px;border-width:1px;border-style:solid;border-color:#66563E;max-width:700px;display:flex;flex-direction:column;padding-top:10px;padding-bottom:10px;padding-right:10px;padding-left:10px;" >
@@ -65,14 +64,14 @@ function applicationMessage(obj) {
             <ul>
                 <li style="margin-bottom:5px;" >Education:
                     <div>
-                        ${education}
+                        ${educations}
                     </div>
                 </li>
             </ul>
         </div>
         <div class="transExp">
             <ul>
-                <li style="margin-bottom:5px;" >Transaltion Experience: <span>${obj.translationExp}</span></li>
+                <li style="margin-bottom:5px;" >Transaltion Experience: <span>${obj.experienceYears}</span></li>
             </ul>
         </div>
         <div class="tech">
@@ -91,7 +90,7 @@ function applicationMessage(obj) {
             <ul>
                 <li style="margin-bottom:5px;" >Availability: ${obj.availability}</li>
                 <li style="margin-bottom:5px;" >Willing to take a test: ${obj.testAgree}</li>
-                <li style="margin-bottom:5px;" >Rate: ${obj.rate}</li>
+                <li style="margin-bottom:5px;" >Rate: ${obj.basicRate}</li>
                 <li style="margin-bottom:5px;" >Cover Letter: ${obj.coverLetter}</li>
                 <li style="margin-bottom:5px;" >Cover Letter (files): ${coverLetterFiles}</li>
             </ul>
