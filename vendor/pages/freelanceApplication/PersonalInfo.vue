@@ -130,7 +130,7 @@ export default {
             } else {
                 this.selectedPositions.splice(elementPosition, 1);
             }
-            this.$emit("setValue", {property: 'position', value: this.selectedPositions});
+            this.$emit("setValue", {property: 'positions', value: this.selectedPositions});
         },
         setInfoValue({property, value}) {
             this.$emit("setValue", {property: property, value: value})
@@ -141,7 +141,7 @@ export default {
         saveOtherChoice({referTo, choice}) {
             this.otherChoice = "Other - " + choice;
             this.selectedPositions.push(this.otherChoice);
-            this.$emit("setValue", {property: 'position', value: this.selectedPositions});
+            this.$emit("setValue", {property: 'positions', value: this.selectedPositions});
             this.$emit("closeOtherChoice", {variable: 'otherPositionVisibile'})
         }
     },

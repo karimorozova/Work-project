@@ -323,7 +323,7 @@ export default {
       this.updateIndustry(industry);
     },
     async getVendor() {
-      this.educationData = this.currentVendorEducation;
+      this.educationData = this.currentVendorEducations;
       this.professionalExperienceData = this.currentVendorProfessionalExperience;
       this.qualificationData = this.currentVendorQualifications;
       this.documentsData = this.currentVendorDocuments;
@@ -360,7 +360,7 @@ export default {
   computed: {
     ...mapGetters({
       currentVendor: "getCurrentVendor",
-      currentVendorEducation: "getCurrentVendorEducation",
+      currentVendorEducations: "getCurrentVendorEducations",
       currentVendorProfessionalExperience:
         "getCurrentVendorProfessionalExperience",
       currentVendorQualifications: "getCurrentVendorQualifications",

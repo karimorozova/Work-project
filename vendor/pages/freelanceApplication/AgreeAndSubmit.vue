@@ -90,8 +90,8 @@ export default {
                 if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
                     this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");
                 }
-                if(!this.person.position) this.errors.push("Please select position(s).");
-                if(!this.person.translationExp) this.errors.push("Please select years of experience.");
+                if(!this.person.positions) this.errors.push("Please select position(s).");
+                if(!this.person.experienceYears) this.errors.push("Please select years of experience.");
                 if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
                 if(!this.person.industries) this.errors.push("Please select industries.");
                 if(!this.person.availability) this.errors.push("Please select availability.");

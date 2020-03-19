@@ -22,11 +22,11 @@
     .technical__options
         span.technical__label Software experience
         SelectMulti(
-            :selectedOptions="selectedCompetence.software"
+            :selectedOptions="selectedCompetence.softwares"
             :otherSoftwareChoice="otherSoftwareChoice"
             :otherDtpChoice="otherDtpChoice"
-            :options="competences.software"
-            @chooseOptions="(e) => chooseCompetence(e, 'software')"
+            :options="competences.softwares"
+            @chooseOptions="(e) => chooseCompetence(e, 'softwares')"
         )
     OtherChoice(
         v-if="otherChoiceVisibile"
@@ -53,12 +53,12 @@ export default {
             selectedCompetence: {
                 internet: "",
                 cat: "",
-                software: []
+                softwares: []
             },
             competences: {
                 internet: ["Yes", "No", "Limited online availability"],
                 cat: ["Yes", "No", "Very little"],
-                software: ["HTML", "Microsoft Excel", "DTP software", "Other software"]
+                softwares: ["HTML", "Microsoft Excel", "DTP software", "Other software"]
             },
             otherDtpChoice: "",
             otherSoftwareChoice: "",
@@ -68,7 +68,7 @@ export default {
     },
     methods: {
         chooseCompetence({option}, prop) {
-            if(prop !== "software") {
+            if(prop !== "softwares") {
                 if(option === "Yes" && prop === "cat") {
                     this.otherChoiceRef = "cat"
                     this.otherChoicelabel = "Please specify CAT tool"
@@ -77,33 +77,33 @@ export default {
                 }
                 this.selectedCompetence[prop] = option;
             } else {
-                this.otherChoiceRef = "software"
+                this.otherChoiceRef = "softwares"
                 if(option === "DTP software") {
                     this.specifySoftware(option, "dtp", 'otherDtpChoice');
                     return
                 }
                 if(option === "Other software") {
-                    this.specifySoftware(option.split(' ')[1], "software", 'otherSoftwareChoice');
+                    this.specifySoftware(option.split(' ')[1], "softwares", 'otherSoftwareChoice');
                     return
                 }
-                const elementPosition = this.selectedCompetence.software.indexOf(option);
+                const elementPosition = this.selectedCompetence.softwares.indexOf(option);
                 if(elementPosition != -1) {
-                    this.selectedCompetence.software.splice(elementPosition, 1)
+                    this.selectedCompetence.softwares.splice(elementPosition, 1)
                 } else {
-                    this.selectedCompetence.software.push(option);
+                    this.selectedCompetence.softwares.push(option);
                 }
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence})
         },
         specifySoftware(opt, ref, choice) {
-            const position = this.selectedCompetence.software.indexOf(this[choice]);
+            const position = this.selectedCompetence.softwares.indexOf(this[choice]);
             if(position === -1) {
                 this.otherChoiceRef = ref;
                 this.otherChoicelabel = "Please specify " + opt;
                 this.$emit("showOtherChoice", {variable: 'otherTechVisibile'});
             } else {
-                const pos = this.selectedCompetence.software.indexOf(this[choice]);
-                this.selectedCompetence.software.splice(pos, 1);
+                const pos = this.selectedCompetence.softwares.indexOf(this[choice]);
+                this.selectedCompetence.softwares.splice(pos, 1);
                 this[choice] = "";
             }
         },
@@ -122,7 +122,7 @@ export default {
                     this.otherSoftwareChoice = "Other software - " + choice;
                     otherChoice = this.otherSoftwareChoice;
                 }
-                this.selectedCompetence.software.push(otherChoice);
+                this.selectedCompetence.softwares.push(otherChoice);
             }
             this.$emit("setValue", {property: 'technicalComp', value: this.selectedCompetence});
             this.$emit("closeOtherChoice", {variable: 'otherTechVisibile'});

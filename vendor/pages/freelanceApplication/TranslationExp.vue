@@ -25,7 +25,7 @@ export default {
     methods: {
         chooseExperience({option}) {
             this.selectedExperience = option;
-            this.$emit("setValue", {property: 'translationExp', value: option})
+            this.$emit("setValue", {property: 'experienceYears', value: option})
         }
     },
     components: {
