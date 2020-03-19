@@ -39,7 +39,7 @@
                     .block-item
                         label Time Zone:
                         .block-item__drop-menu.block-item_high-index
-                            TimezoneSelect(:timezoneSelected="currentVendor.timezone" :timezones="timezones" @chosenZone="setTimezone")
+                            TimezoneSelect(:timezoneSelected="currentVendor.timezone" @chosenZone="setTimezone")
                     .block-item
                         label.block-item__label.block-item_relative Native Language:
                         .block-item__drop-menu.block-item_medium-index(:class="{'block-item_error-shadow': !currentVendor.native && isSaveClicked}")
@@ -85,7 +85,7 @@
             TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries")
 
         .title Documents
-            TableDocuments(:documentsData="documentsData" :vendorId="vendorId")
+            TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
 
         .title Assessment
             TableAssessment(:assessmentData="assessmentData")
@@ -154,7 +154,6 @@ export default {
       isSaveClicked: false,
       vendorShow: true,
       imageExist: false,
-      timezones: [],
       isApproveModal: false,
       asteriskStyle: { top: "-4px" },
       photoFile: [],
@@ -322,12 +321,14 @@ export default {
     chosenInd({ industry }) {
       this.updateIndustry(industry);
     },
+    setDetailsTablesData() {
+        this.educationData = this.currentVendor.educations;
+        this.professionalExperienceData = this.currentVendor.profExperiences;
+        this.qualificationData = this.currentVendor.qualifications;
+        this.documentsData = this.currentVendor.documents;
+        this.assessmentData = this.currentVendor.assessments;
+    },
     async getVendor() {
-      this.educationData = this.currentVendorEducations;
-      this.professionalExperienceData = this.currentVendorProfessionalExperience;
-      this.qualificationData = this.currentVendorQualifications;
-      this.documentsData = this.currentVendorDocuments;
-      this.assessmentData = this.currentVendorAssessment;
       this.vendorId = this.$route.params.id;
       const id = this.$route.params.id;
       try {
@@ -336,6 +337,7 @@ export default {
           await this.storeCurrentVendor(vendor.body);
           this.oldEmail = this.currentVendor.email;
         }
+        this.setDetailsTablesData();
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Vendor's info",
@@ -359,20 +361,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentVendor: "getCurrentVendor",
-      currentVendorEducations: "getCurrentVendorEducations",
-      currentVendorProfessionalExperience:
-        "getCurrentVendorProfessionalExperience",
-      currentVendorQualifications: "getCurrentVendorQualifications",
-      currentVendorDocuments: "getCurrentVendorDocuments",
-      currentVendorAssessment: "getCurrentVendorAssessment"
+      currentVendor: "getCurrentVendor"
     }),
     selectedIndNames() {
       let result = [];
-      if (
-        this.currentVendor.industries &&
-        this.currentVendor.industries.length
-      ) {
+      if (this.currentVendor.industries && this.currentVendor.industries.length) {
         for (let ind of this.currentVendor.industries) {
           result.push(ind.name);
         }

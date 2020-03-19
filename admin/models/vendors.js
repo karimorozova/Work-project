@@ -122,7 +122,7 @@ const VendorSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    asessments: {
+    assessments: {
         type: Array,
         default: []
     },

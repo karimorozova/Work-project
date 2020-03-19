@@ -3,7 +3,7 @@ const { checkVendor } = require('../../middleware');
 const jwt = require("jsonwebtoken");
 const { secretKey } = require('../../configs');
 const { Vendors } = require('../../models');
-const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldPhoto, getJobs, updateStepProp } = require('../../vendors');
+const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp } = require('../../vendors');
 const { upload } = require('../../utils');
 const { setVendorNewPassword } = require('../../users');
 
@@ -70,7 +70,7 @@ router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req
         if(photoFile) {
             let oldPath = info.photo;
             info.photo = await getPhotoLink(id, photoFile);
-            await removeOldPhoto(oldPath, info.photo);
+            await removeOldVendorFile(oldPath, info.photo);
         }
         vendor = await getVendorAfterUpdate({"_id": id}, { ...info })
         res.send(vendor);

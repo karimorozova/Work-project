@@ -146,7 +146,7 @@ export const updateVendorRate = async ({ commit, dispatch }, payload) => {
 export const storeCurrentVendorEducation = async ({ dispatch }, payload) => {
 
     try {
-        const result = await Vue.http.post("/vendorsapi/upload-vendor-education", payload);
+        const result = await Vue.http.post("/vendorsapi/vendor-education", payload);
         dispatch('SET_CURRENT_VENDOR_EDUCATION', result.body)
 
         // const result = await Vue.http.post("/vendorsapi/vendor-education-store", payload);
@@ -225,43 +225,18 @@ export const deleteCurrentVendorQualifications = async ({ commit, state }, paylo
 export const storeCurrentVendorDocuments = async ({ dispatch }, payload) => {
 
     try {
-        const result = await Vue.http.post("/vendorsapi/upload-vendor-document", payload);
-        dispatch('SET_CURRENT_VENDOR_DOCUMENTS', result.body)
-
-        // const result = await Vue.http.post("/vendorsapi/vendor-document-store", payload);
-
-
+        const result = await Vue.http.post("/vendorsapi/vendor-document", payload);
+        dispatch('storeCurrentVendor', result.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     }
 }
 
-export const deleteCurrentVendorDocuments = async ({ commit, state }, payload) => {
+export const deleteCurrentVendorDocument = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
     try {
-        const id = payload;
-        const index = state.currentVendorDocuments.findIndex(item => item._id === id);
-        state.currentVendorDocuments.splice(index, 1)
-        
-        // const result = await Vue.http.post("/vendorsapi/vendor-document-delete", payload);
-
-    } catch (err) {
-        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
-    } finally {
-        commit("endRequest");
-    }
-}
-export const deleteCurrentVendorDocumentsFile = async ({ commit, state }, payload) => {
-    commit("startRequest");
-    try {
-        const id = payload;
-        const index = state.currentVendorDocuments.findIndex(item => item._id === id);
-        state.currentVendorDocuments[index].fileName = ''
-        state.currentVendorDocuments[index].fileLink = ''
-
-        // const result = await Vue.http.post("/vendorsapi/vendor-documentFile-delete", payload);
-
-
+        const result = await Vue.http.post("/vendorsapi/remove-vendor-doc", payload);
+        dispatch('storeCurrentVendor', result.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {

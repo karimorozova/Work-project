@@ -1,7 +1,40 @@
 const { Vendors } = require('../models');
+const { getVendorAfterUpdate } = require('./getVendors');
 const bcrypt = require('bcryptjs');
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
+
+async function saveVendorDocument({vendorId, file, category, oldFilePath}) {
+    try {
+        const vendor = await Vendors.findOne({_id: vendorId});
+        let { documents } = vendor;
+        const namePrefix = category.slice(0, 3).toLowerCase();
+        const newPath = `/vendorsDocs/${vendorId}/${namePrefix}-${file.filename}`;
+        await moveFile(file, `./dist${newPath}`);
+        const newDoc = {fileName: file.filename, path: newPath, category};
+        if(oldFilePath) {
+            await removeOldVendorFile(oldFilePath, newPath);
+            const index = documents.findIndex(item => item.path === oldFilePath && item.category === category);
+            documents.splice(index, 1, newDoc)
+        } else {
+            documents.push(newDoc);
+        }
+        return getVendorAfterUpdate({_id: vendorId}, { documents });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveVendorDocument");
+    }
+}
+
+async function removeVendorDoc({vendorId, fileName, path, category}) {
+    try {
+        await removeOldVendorFile(path, "");
+        return await getVendorAfterUpdate({_id: vendorId}, {$pull: {documents: {fileName, path, category}}});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeVendorDoc");
+    }
+}
 
 async function saveHashedPassword(id, pass) {
     try {
@@ -28,13 +61,13 @@ async function getPhotoLink(id, file) {
     }
 }
 
-function removeOldPhoto(oldPath, newPath) {
+function removeOldVendorFile(oldPath, newPath) {
     if(oldPath === newPath || !oldPath) return;
     return new Promise((resolve, reject) => {
         fs.unlink(`./dist${oldPath}`, (err) => {
             if (err) {
                 console.log(err);
-                console.log("Error in removeOldPhoto");
+                console.log("Error in removeOldVendorFile");
                 reject(err);
             }
         });
@@ -42,4 +75,4 @@ function removeOldPhoto(oldPath, newPath) {
     })
 }
 
-module.exports = { saveHashedPassword, getPhotoLink, removeOldPhoto }
+module.exports = { saveVendorDocument, removeVendorDoc, saveHashedPassword, getPhotoLink, removeOldVendorFile }

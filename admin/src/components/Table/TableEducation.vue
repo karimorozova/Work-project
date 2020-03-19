@@ -94,7 +94,7 @@ export default {
   mixins: [crudIcons],
   props: {
     educationData: {
-      type: Array
+      type: Array, default: () => []
     },
     vendorId: {
       type: String
@@ -271,7 +271,6 @@ export default {
             });
           }
           this.setDefaults();
-          this.getEducation();
         }
       }
     },
@@ -302,7 +301,6 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
       this.setDefaults();
-      this.getEducation();
     },
     setEditingData(index) {
       this.currentActive = index;
@@ -334,9 +332,6 @@ export default {
         department: ""
       });
       this.setEditingData(this.educationData.length - 1);
-    },
-    getEducation() {
-      this.educationData = this.currentVendorEducations;
     },
     closePickers() {
       this.isDatepickers = false;
@@ -391,8 +386,7 @@ export default {
   },
   directives: {
     ClickOutside
-  },
-  mounted() {}
+  }
 };
 </script>
 

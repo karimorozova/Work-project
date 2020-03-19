@@ -100,10 +100,10 @@ export default {
   mixins: [scrollDrop, crudIcons],
   props: {
     qualificationData: {
-      type: Array
+      type: Array, default: () => []
     },
     vendorIndustries: {
-      type: Array
+      type: Array, default: () => []
     }
   },
   data() {

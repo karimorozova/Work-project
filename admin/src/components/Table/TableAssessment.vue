@@ -58,7 +58,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   props: {
     assessmentData: {
-      type: Array
+      type: Array, default: () => []
     }
   },
   data() {
@@ -175,9 +175,7 @@ export default {
   components: {
     SettingsTable,
     VendorLqaForm
-  },
-
-  mounted() {}
+  }
 };
 </script>
 

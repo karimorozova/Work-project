@@ -17,10 +17,10 @@
                 .documents__head-title {{ field.label }}
 
             template(slot="fileName" slot-scope="{ row, index }")
-                .documents__data(v-if="currentActive !== index")
-                    a( :href="row.fileLink") {{row.fileName}}
-                .documents__editing-data(v-else) 
-                    input.documents__input(type="text" readonly :value="row.fileName")
+                .documents__editing-data(v-if="currentActive === index && currentFile") 
+                    span.documents__input {{ currentFile.name }}
+                .documents__data(v-else)
+                    a( :href="domain + row.path" ) {{ row.fileName }}
 
             template(slot="category" slot-scope="{ row, index }") 
                 .documents__data(v-if="currentActive !== index") {{row.category}}
@@ -28,8 +28,8 @@
                     SelectSingle(
                         :isTableDropMenu="isTableDropMenu"
                         placeholder="Select"
-                        :selectedOption="currentCategory.category"
-                        :options="categoryData"
+                        :selectedOption="currentCategory"
+                        :options="categories"
                         @chooseOption="setCategory"
                         @scrollDrop="scrollDrop"
                     )
@@ -58,7 +58,7 @@ export default {
   mixins: [scrollDrop, crudIcons],
   props: {
     documentsData: {
-      type: Array
+      type: Array, default: () => []
     },
     vendorId: {
       type: String
@@ -89,9 +89,8 @@ export default {
           padding: "0"
         }
       ],
-
+      categories: ["NDA", "Contract", "Resume"],
       currentCategory: "",
-      currentFileName: [],
       currentFile: "",
 
       areErrors: false,
@@ -99,15 +98,15 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       isTableDropMenu: true,
-      currentActive: -1
+      currentActive: -1,
+      domain: "http://localhost:3001"
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
       storeDocuments: "storeCurrentVendorDocuments",
-      deleteDocuments: "deleteCurrentVendorDocuments",
-      deleteDocumentsFile: "deleteCurrentVendorDocumentsFile"
+      deleteDocument: "deleteCurrentVendorDocument"
     }),
 
     async makeAction(index, key) {
@@ -124,33 +123,25 @@ export default {
         case "delete":
           this.manageDeleteClick(index);
           break;
-        case "save":
-          await this.manageSaveClick(index);
-          break;
         default:
-          await this.checkErrors(index);
+          await this.checkErrors(index);          
       }
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentCategory = {
-        category: this.documentsData[index].category
-      };
+      this.currentCategory = this.documentsData[index].category;
     },
     manageCancelEdition(index) {
-      if (this.documentsData[index]._id == undefined) {
-        this.documentsData.splice(index, 1);
+      if (!this.documentsData[index].path) {
+        this.documentsData.pop();
       }
       this.setDefaults();
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.category = [
-        { category: "NDA" },
-        { category: "Contract" },
-        { category: "Resume" }
-      ];
+      this.currentCategory = "";
+      this.currentFile = "";
     },
     addData() {
       if (this.currentActive !== -1) {
@@ -158,68 +149,60 @@ export default {
       }
       this.documentsData.push({
         category: "",
-        fileName: ""
+        fileName: "",
+        path: ""
       });
       this.setEditingData(this.documentsData.length - 1);
     },
-    getDocuments() {
-      this.documentsData = this.currentVendorDocuments;
-    },
-    uploadDocument(id) {
-      this.currentFileName.push({
-        fileName: event.target.files[0].name,
-        id: id
-      });
+    uploadDocument() {
       this.currentFile = this.$refs.file.files[0];
     },
-    requiredFields(index) {
-      if (this.currentActive === -1) return;
-      this.errors = [];
-      let file = this.currentFileName.filter(value => value.id === index);
-      if (!this.currentCategory.category)
-        this.errors.push("Category should not be empty!");
-      if (!file[file.length - 1]) this.errors.push("File should not be empty!");
-      if (this.errors.length) {
-        this.areErrors = true;
-        return;
-      }
+    async checkErrors(index) {
+        if(this.currentActive === -1) return;
+        this.errors = [];
+        if (!this.currentCategory) this.errors.push("Category should not be empty!");
+        if (!this.currentFile) this.errors.push("File should not be empty!");
+        if(this.isSameExist(index)) this.errors.push("There is a duplication of the file for chosen category!");
+        if (this.errors.length) {
+            this.areErrors = true;
+            return;
+        }
+        await this.manageSaveClick();
+    },
+    isSameExist(index) {
+        const { fileName, category } = this.documentsData[index];
+        const isSame = this.documentsData.find((item, i) => {
+            return item.fileName === fileName && i !== index && item.category === category
+        })
+        return !!isSame;
     },
     async manageSaveClick(index) {
-      this.requiredFields(index);
-      if (this.currentActive == index) {
-        if (!this.areErrors) {
-          const obj = {
-            _id: index,
-            category: this.currentCategory.category,
-            vendorId: this.vendorId
-          };
-
-          let formData = new FormData();
-          formData.append("document", JSON.stringify(obj));
-          formData.append("documentFile", this.currentFile);
-
-          try {
-            const result = await this.storeDocuments(formData);
-            this.alertToggle({
-              message: "Document saved",
-              isShow: true,
-              type: "success"
-            });
-          } catch (err) {
-            this.alertToggle({
-              message: err.message,
-              isShow: true,
-              type: "error"
-            });
-          }
-          this.setDefaults();
-          this.getDocuments();
+        let formData = new FormData();
+        formData.append("vendorId", this.vendorId);
+        formData.append("category", this.currentCategory);
+        formData.append("documentFile", this.currentFile);
+        if(this.documentsData[index]) {
+            const { path, category } = this.documentsData[index];
+            if(category === this.currentCategory) {
+                formData.append("oldFilePath", path);
+            }
         }
-      }
+        try {
+        const result = await this.storeDocuments(formData);
+            this.alertToggle({
+                message: "Document saved",
+                isShow: true,
+                type: "success"
+            });
+        } catch (err) { 
+        } finally {
+            this.$emit("refreshDocuments");
+            this.setDefaults();
+        }
     },
     async manageDeleteClick(index) {
-      if (this.documentsData[index]._id == undefined) {
-        this.documentsData.splice(index, 1);
+      if (!this.documentsData[index].path) {
+        this.documentsData.pop();
         return this.setDefaults();
       }
 
@@ -227,60 +210,35 @@ export default {
       this.isDeleting = true;
     },
     async deleteData() {
-      const id = this.documentsData[this.deleteIndex]._id;
-      let currentObj = this.documentsData[this.deleteIndex].category;
-      let currentLength = this.documentsData.filter(
-        item => item.category === currentObj
-      ).length;
+      const docFile = this.documentsData[this.deleteIndex];
       try {
-        if (this.documentsData.length > 3 && currentLength > 1) {
-          await this.deleteDocuments(id);
-        } else {
-          await this.deleteDocumentsFile(id);
-        }
+          await this.deleteDocument({docFile, vendorId: this.vendorId});
         this.alertToggle({
           message: "Document removed",
           isShow: true,
           type: "success"
         });
       } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      } finally {
+          this.$emit("refreshDocuments");
+          this.setDefaults();
       }
-      this.setDefaults();
-      this.getDocuments();
     },
     closeErrors() {
       this.areErrors = false;
     },
-    getCategory() {
-      this.category = [
-        { category: "NDA" },
-        { category: "Contract" },
-        { category: "Resume" }
-      ];
-    },
     setCategory({ option }) {
-      this.currentCategory = this.category.find(
-        item => item.category === option
-      );
+      this.currentCategory = this.categories.find(item => item === option);
     }
-  },
-  computed: {
-    ...mapGetters({
-      currentVendorDocuments: "getCurrentVendorDocuments"
-    }),
-    categoryData() {
-      return this.category.map(item => item.category);
-    }
-  },
-  mounted() {
-    this.getCategory();
   },
   components: {
     SettingsTable,
     SelectSingle,
     Add
-  }
+  },
+  mounted() {
+        this.domain = __WEBPACK__API_URL__;
+    }
 };
 </script>
 <style lang="scss" scoped>

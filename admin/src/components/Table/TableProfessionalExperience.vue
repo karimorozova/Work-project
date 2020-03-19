@@ -82,7 +82,7 @@ export default {
   mixins: [crudIcons],
   props: {
     professionalExperienceData: {
-      type: Array
+      type: Array, default: () => []
     }
   },
   data() {

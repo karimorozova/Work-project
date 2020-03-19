@@ -3,7 +3,8 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, importRates, getVendorAfterCombinationsUpdated } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, 
+    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc } = require('../vendors');
 const { Vendors } = require('../models');
 
 
@@ -16,23 +17,34 @@ function moveFile(oldFile, vendorId) {
     return oldFile.filename;
 }
 
-router.post('/upload-vendor-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
-    let data = await JSON.parse(req.body.document);
-    const file = req.files["documentFile"];
+router.post('/vendor-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
+    const { vendorId, category, oldFilePath } = req.body;
+    const files = req.files["documentFile"];
     try {
-        if (file) {
-            await moveFile(file[0], data.vendorId);
-            data.fileLink = `/vendorsDocs/${data.vendorId}/${file[0].filename}`;
-            data.fileName = file[0].filename;
-        }
-        res.send(data);
+        const updatedVendor = await saveVendorDocument({
+            vendorId, file: files[0], category, oldFilePath
+        });
+        res.send(updatedVendor);
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error on updating");
+        res.status(500).send("Error on adding vendor document");
     }
 })
 
-router.post('/upload-vendor-education', upload.fields([{ name: 'educationFile' }]), async (req, res) => {
+router.post('/remove-vendor-doc', async (req, res) => {
+    const { vendorId, docFile } = req.body;
+    try {
+        const updatedVendor = await removeVendorDoc({
+            vendorId, ...docFile
+        });
+        res.send(updatedVendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing vendor document");
+    }
+})
+
+router.post('/vendor-education', upload.fields([{ name: 'educationFile' }]), async (req, res) => {
     let data = await JSON.parse(req.body.education);
     const file = req.files["educationFile"];
     try {
