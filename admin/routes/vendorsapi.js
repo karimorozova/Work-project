@@ -18,11 +18,11 @@ function moveFile(oldFile, vendorId) {
 }
 
 router.post('/vendor-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
-    const { vendorId, category, oldFilePath } = req.body;
-    const files = req.files["documentFile"];
+    const { vendorId, category, oldFilePath, oldName, oldCategory } = req.body;
+    const files = req.files["documentFile"] || [];
     try {
         const updatedVendor = await saveVendorDocument({
-            vendorId, file: files[0], category, oldFilePath
+            vendorId, file: files[0], category, oldFilePath, oldName, oldCategory
         });
         res.send(updatedVendor);
     } catch (err) {

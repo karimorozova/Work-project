@@ -4,8 +4,14 @@ const bcrypt = require('bcryptjs');
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
 
-async function saveVendorDocument({vendorId, file, category, oldFilePath}) {
+async function saveVendorDocument({vendorId, file, category, oldFilePath, oldName, oldCategory}) {
     try {
+        if(!file) {
+            return await getVendorAfterUpdate(
+                {_id: vendorId, "documents.category": oldCategory, "documents.fileName": oldName},
+                {"documents.$.category": category}
+            )
+        }
         const vendor = await Vendors.findOne({_id: vendorId});
         let { documents } = vendor;
         const namePrefix = category.slice(0, 3).toLowerCase();
@@ -19,7 +25,7 @@ async function saveVendorDocument({vendorId, file, category, oldFilePath}) {
         } else {
             documents.push(newDoc);
         }
-        return getVendorAfterUpdate({_id: vendorId}, { documents });
+        return await getVendorAfterUpdate({_id: vendorId}, { documents });
     } catch(err) {
         console.log(err);
         console.log("Error in saveVendorDocument");

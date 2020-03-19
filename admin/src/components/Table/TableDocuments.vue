@@ -159,15 +159,16 @@ export default {
     },
     async checkErrors(index) {
         if(this.currentActive === -1) return;
+        const doc = this.documentsData[index];
         this.errors = [];
         if (!this.currentCategory) this.errors.push("Category should not be empty!");
-        if (!this.currentFile) this.errors.push("File should not be empty!");
+        if (!doc.path && !this.currentFile) this.errors.push("Upload a file to save!");
         if(this.isSameExist(index)) this.errors.push("There is a duplication of the file for chosen category!");
         if (this.errors.length) {
             this.areErrors = true;
             return;
         }
-        await this.manageSaveClick();
+        await this.manageSaveClick(index);
     },
     isSameExist(index) {
         const { fileName, category } = this.documentsData[index];
@@ -181,8 +182,10 @@ export default {
         formData.append("vendorId", this.vendorId);
         formData.append("category", this.currentCategory);
         formData.append("documentFile", this.currentFile);
-        if(this.documentsData[index]) {
-            const { path, category } = this.documentsData[index];
+        if(this.documentsData[index].path) {
+            const { fileName, path, category } = this.documentsData[index];
+            formData.append("oldCategory", category);
+            formData.append("oldName", fileName);
             if(category === this.currentCategory) {
                 formData.append("oldFilePath", path);
             }
