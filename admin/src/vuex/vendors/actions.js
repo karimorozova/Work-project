@@ -148,6 +148,9 @@ export const storeCurrentVendorEducation = async ({ dispatch }, payload) => {
     try {
         const result = await Vue.http.post("/vendorsapi/upload-vendor-education", payload);
         dispatch('SET_CURRENT_VENDOR_EDUCATION', result.body)
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-education-store", payload);
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     }
@@ -159,6 +162,9 @@ export const deleteCurrentVendorEducation = async ({ commit, state }, payload) =
         const id = payload;
         const index = state.currentVendorEducations.findIndex(item => item._id === id);
         state.currentVendorEducations.splice(index, 1)
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-education-delete", payload);
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
@@ -168,6 +174,9 @@ export const deleteCurrentVendorEducation = async ({ commit, state }, payload) =
 
 export const storeCurrentVendorProfessionalExperience = async ({ dispatch }, payload) => {
     dispatch('SET_CURRENT_VENDOR_PROFESSIONAL_EXPERIENCE', payload)
+
+    // const result = await Vue.http.post("/vendorsapi/vendor-profExperience-store", payload);
+
 }
 
 export const deleteCurrentVendorProfessionalExperience = async ({ commit, state }, payload) => {
@@ -176,6 +185,10 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, state 
         const id = payload;
         const index = state.currentVendorProfessionalExperience.findIndex(item => item._id === id);
         state.currentVendorProfessionalExperience.splice(index, 1)
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-profExperience-delete", payload);
+        
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
@@ -185,6 +198,9 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, state 
 
 export const storeCurrentVendorQualifications = async ({ dispatch }, payload) => {
     dispatch('SET_CURRENT_VENDOR_QUALIFICATIONS', payload)
+
+    // const result = await Vue.http.post("/vendorsapi/vendor-qualifications-store", payload);
+
     if(payload.status === 'Passed'){
         dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)
     }
@@ -196,6 +212,9 @@ export const deleteCurrentVendorQualifications = async ({ commit, state }, paylo
         const id = payload;
         const index = state.currentVendorQualifications.findIndex(item => item._id === id);
         state.currentVendorQualifications.splice(index, 1)
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-qualifications-delete", payload);
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
@@ -207,8 +226,11 @@ export const storeCurrentVendorDocuments = async ({ dispatch }, payload) => {
 
     try {
         const result = await Vue.http.post("/vendorsapi/upload-vendor-document", payload);
-        console.log(result.body);
         dispatch('SET_CURRENT_VENDOR_DOCUMENTS', result.body)
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-document-store", payload);
+
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     }
@@ -220,6 +242,9 @@ export const deleteCurrentVendorDocuments = async ({ commit, state }, payload) =
         const id = payload;
         const index = state.currentVendorDocuments.findIndex(item => item._id === id);
         state.currentVendorDocuments.splice(index, 1)
+        
+        // const result = await Vue.http.post("/vendorsapi/vendor-document-delete", payload);
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
@@ -233,6 +258,10 @@ export const deleteCurrentVendorDocumentsFile = async ({ commit, state }, payloa
         const index = state.currentVendorDocuments.findIndex(item => item._id === id);
         state.currentVendorDocuments[index].fileName = ''
         state.currentVendorDocuments[index].fileLink = ''
+
+        // const result = await Vue.http.post("/vendorsapi/vendor-documentFile-delete", payload);
+
+
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {

@@ -179,7 +179,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentVendorEducation: "getCurrentVendorEducation"
+      currentVendorEducations: "getCurrentVendorEducations"
     })
   },
   methods: {
@@ -254,7 +254,7 @@ export default {
 
           let formData = new FormData();
           formData.append("education", JSON.stringify(obj));
-          if (file[file.length - 1]) formData.append("file", this.currentFile);
+          if (file[file.length - 1]) formData.append("educationFile", this.currentFile);
 
           try {
             const result = await this.storeEducation(formData);
