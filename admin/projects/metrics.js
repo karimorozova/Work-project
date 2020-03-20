@@ -95,8 +95,8 @@ function getTaskSteps(steps, task) {
                 memoqTarget: task.memoqTarget,
                 memoqDocIds: task.memoqDocs.map(item => item.DocumentGuid),
                 vendor: null,
-                start: task.stepsDates[i].start,
-                deadline: task.stepsDates.length > 1 ? task.stepsDates[i].deadline : task.deadline,
+                start: task.stepsDates[i].start || task.start,
+                deadline: getStepDeadline(task, i),
                 progress: setStepsProgress(serviceStep.symbol, task.memoqDocs),
                 status: "Created",
                 clientRate: "",
@@ -120,6 +120,13 @@ function getTaskSteps(steps, task) {
         }
     }
     return updatedSteps;
+}
+
+function getStepDeadline(task, i) {
+    if(task.stepsDates.length > 1) {
+        return task.stepsDates[i].deadline || task.deadline
+    }
+    return task.deadline;
 }
 
 function getStepWordcount(taskMetrics, stage) {
