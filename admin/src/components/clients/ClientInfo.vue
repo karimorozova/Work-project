@@ -120,6 +120,9 @@ export default {
             this.clientShow = true;
             this.contactShow = false;
             try {
+                if(this.currentClient.contacts.length === 1) {
+                    return this.alertToggle({message: "Error! At least one contact should remain!", isShow: true, type: "error"});
+                }
                 const contacts = this.updateLeadWhenDeleted(index);
                 const result = await this.$http.post('/clientsapi/deleteContact', {id: this.currentClient._id, contacts})
                 const {updatedClient} = result.body;
