@@ -91,7 +91,7 @@
             TableAssessment(:assessmentData="assessmentData")
         
         .title Professional experience
-            TableProfessionalExperience(:professionalExperienceData="professionalExperienceData")
+            TableProfessionalExperience(:professionalExperienceData="professionalExperienceData" :vendorId="vendorId" @refreshProfExperiences="setDetailsTablesData")
 
         .title Education 
             TableEducation(:educationData="educationData" :vendorId="vendorId" @refreshEducations="setDetailsTablesData")

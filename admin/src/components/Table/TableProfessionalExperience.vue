@@ -9,7 +9,7 @@
       :bodyClass="'vendor__experience-body'"
       :headerClass="'vendor__experience-header'"
       @closeErrors="closeErrors"
-      @approve="deleteSource"
+      @approve="deleteExperience"
       @notApprove="setDefaults"
       @closeModal="setDefaults"
     )
@@ -56,10 +56,10 @@
         .experience__editing-data(v-else)
           input.experience__input(type="text" v-model="currentCompany")
 
-      template(slot="summary" slot-scope="{ row, index }")
-        .experience__data(v-if="currentActive !== index") {{ row.summary }}
+      template(slot="notes" slot-scope="{ row, index }")
+        .experience__data(v-if="currentActive !== index") {{ row.notes }}
         .experience__editing-data(v-else)
-          input.experience__input(type="text" v-model="currentSummary")
+          input.experience__input(type="text" v-model="currentNotes")
 
       template(slot="icons" slot-scope="{ row, index }")
         .experience__icons
@@ -81,6 +81,9 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   mixins: [crudIcons],
   props: {
+    vendorId: {
+        type: String
+    },
     professionalExperienceData: {
       type: Array, default: () => []
     }
@@ -111,8 +114,8 @@ export default {
         },
         {
           label: "Notes",
-          headerKey: "headerSummary",
-          key: "summary",
+          headerKey: "headerNotes",
+          key: "notes",
           width: "21.5%",
           padding: "0"
         },
@@ -126,7 +129,7 @@ export default {
       ],
 
       currentActive: -1,
-      currentSummary: "",
+      currentNotes: "",
       currentCompany: "",
       currentOccupation: "",
       dateRange: "",
@@ -165,13 +168,10 @@ export default {
           this.setEditingData(index);
           break;
         case "cancel":
-          this.manageCancelEdition(index);
+          this.manageCancelEdition();
           break;
         case "delete":
           this.manageDeleteClick(index);
-          break;
-        case "save":
-          await this.manageSaveClick(index);
           break;
         default:
           await this.checkErrors(index);
@@ -179,30 +179,27 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentSummary = this.professionalExperienceData[index].summary;
+      this.currentNotes = this.professionalExperienceData[index].notes;
       this.currentCompany = this.professionalExperienceData[index].company;
       this.currentOccupation = this.professionalExperienceData[
         index
       ].occupation;
       this.dateRange = this.professionalExperienceData[index].duration;
     },
-    manageCancelEdition(index) {
-      if (this.professionalExperienceData[index]._id == undefined) {
-        this.professionalExperienceData.splice(index, 1);
-      }
+    manageCancelEdition() {
+      this.$emit("refreshProfExperiences");
       this.setDefaults();
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentSummary = "";
+      this.currentNotes = "";
       this.currentCompany = "";
       this.currentOccupation = "";
       this.dateRange = "";
     },
 
-    requiredFields() {
-      if (this.currentActive === -1) return;
+    async checkErrors(index) {
       this.errors = [];
       if (!this.dateRange) this.errors.push("Duration should not be empty!");
       if (!this.currentOccupation)
@@ -215,61 +212,50 @@ export default {
         this.areErrors = true;
         return;
       }
+      await this.manageSaveClick(index);
     },
 
     async manageSaveClick(index) {
-      this.requiredFields();
-      if (this.currentActive == index) {
-        if (!this.areErrors) {
-          const obj = {
-            _id: index,
+        if (this.currentActive === -1) return;
+        const obj = {
+            vendorId: this.vendorId,
+            index,
             duration: this.dateRange,
-            summary: this.currentSummary,
+            notes: this.currentNotes,
             company: this.currentCompany,
             occupation: this.currentOccupation
-          };
-          try {
-            const result = await this.storeProfessionalExperience(obj);
+        };
+        try {
+            await this.storeProfessionalExperience(obj);
             this.alertToggle({
-              message: "Professional Experience saved",
-              isShow: true,
-              type: "success"
+                message: "Professional Experience saved",
+                isShow: true,
+                type: "success"
             });
-          } catch (err) {
-            this.alertToggle({
-              message: err.message,
-              isShow: true,
-              type: "error"
-            });
-          }
-          this.setDefaults();
-          this.getProfessionalExperience();
+        } catch (err) {
+        } finally {
+            this.manageCancelEdition();
         }
-      }
     },
     async manageDeleteClick(index) {
-      if (this.professionalExperienceData[index]._id == undefined) {
-        this.professionalExperienceData.splice(index, 1);
-        return this.setDefaults();
-      }
       this.deleteIndex = index;
       this.isDeleting = true;
     },
 
-    async deleteSource() {
-      const id = this.professionalExperienceData[this.deleteIndex]._id;
+    async deleteExperience() {
       try {
-        await this.deleteProfessionalExperience(id);
+        await this.deleteProfessionalExperience({
+            vendorId: this.vendorId, index: this.deleteIndex
+        });
         this.alertToggle({
           message: "Professional Experience removed",
           isShow: true,
           type: "success"
         });
       } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      } finally {
+        this.manageCancelEdition();
       }
-      this.setDefaults();
-      this.getProfessionalExperience();
     },
 
     addData() {
@@ -277,7 +263,7 @@ export default {
         return this.isEditing();
       }
       this.professionalExperienceData.push({
-        summary: "",
+        notes: "",
         company: "",
         occupation: "",
         duration: ""
