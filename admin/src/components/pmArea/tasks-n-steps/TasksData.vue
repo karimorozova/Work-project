@@ -115,7 +115,8 @@ export default {
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
             this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
             this.checkHoursSteps();
-            if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity."); 
+            if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
+            if(this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).");
             if (this.errors.length) {
                 return this.$emit("showErrors", { errors: this.errors });
             }
@@ -124,6 +125,12 @@ export default {
             } catch (err) {
                 this.alertToggle({message: "Error on adding tasks", isShow: true, type: "error"});
             }
+        },
+        isDeadlineMissed() {
+            let today = new Date();
+            today.setHours(23,59,59);
+            const missedDeadline = this.tasksData.stepsDates.find(item => item.deadline && new Date(item.deadline) <= today);
+            return !!missedDeadline || new Date(this.currentProject.deadline) <= today;
         },
         checkRequestFies() {
             const { sourceFiles, refFiles } = this.currentProject;
