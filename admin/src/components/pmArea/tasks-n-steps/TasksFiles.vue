@@ -38,6 +38,12 @@ export default {
             refFiles: [],
             isSourceFilesShow: false,
             isRefFilesShow: false,
+            forbiddenExtensions: [
+                "webm","mpg","mp2","mpeg","mpe","mpv","ogg","mp4","m4p",
+                "m4v","avi","wmv","mov","qt","flv","swf","avchd","jpeg",
+                "png","gif","bmp","tiff","ppm","pgm","jpg","svg","bat",
+                "mp3", "aac", "3gp","aa","aax","aiff","alac","m4p","mpc"
+            ]
         }
     },
     methods: {
@@ -49,7 +55,11 @@ export default {
             return sizesSum/1000000 <= 10;
         },
         uploadSourceFiles({ files }) {
-            const filteredFiles = Array.from(files).filter(item => item.size/1000000 <= 2);
+            const filteredFiles = Array.from(files).filter(item => {
+                const {size, name} = item;
+                const extension = name.split(".").pop();
+                return size/1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
+                });
             if (filteredFiles.length && this.checkFiles(filteredFiles)) {
                 for (let file of filteredFiles) {
                     const isExist = this.sourceFiles.find(item => item.name === file.name);
@@ -57,6 +67,9 @@ export default {
                         this.sourceFiles.push(file);
                     }
                 }
+            }
+            if(!filteredFiles.length) {
+                this.clearInputFiles(".files-upload__source-file")
             }
             this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
         },
@@ -69,6 +82,9 @@ export default {
                         this.refFiles.push(file);
                     }
                 }
+            }
+            if(!filteredFiles.length) {
+                this.clearInputFiles(".files-upload__ref-file")
             }
             this.setDataValue({prop: "refFiles", value: this.refFiles});
         },
