@@ -61,7 +61,7 @@
                     @chosenInd="setIndustry"
                     @scrollDrop="scrollDrop"
                 )
-            .vendors-table__no-drop(v-else)
+            .vendors-table__no-drop.vendors-table_flex-wrap(v-else)
                 img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon") 
         template(slot="basicRate" slot-scope="{ row, index }")
             .vendors-table__active(v-if="currentEditingIndex === index")
@@ -195,7 +195,7 @@ export default {
             this.currentEditingIndex = index;
             this.currentBasicRate = this.vendors[index].basicRate;
             this.currentTqi = this.vendors[index].tqi;
-            this.industrySelected = this.vendors[index].industries;
+            this.industrySelected = Array.from(this.vendors[index].industries);
             this.selectedStatus = this.vendors[index].status;
             this.selectedNative = this.vendors[index].native;
         },
@@ -418,6 +418,9 @@ export default {
     }
     &__button {
         margin-bottom: 5px;
+    }
+    &_flex-wrap {
+        flex-wrap: wrap;
     }
 }
 </style>
