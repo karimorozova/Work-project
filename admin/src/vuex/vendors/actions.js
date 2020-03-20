@@ -146,25 +146,19 @@ export const updateVendorRate = async ({ commit, dispatch }, payload) => {
 export const storeCurrentVendorEducation = async ({ dispatch }, payload) => {
 
     try {
-        const result = await Vue.http.post("/vendorsapi/vendor-education", payload);
-        dispatch('SET_CURRENT_VENDOR_EDUCATION', result.body)
-
-        // const result = await Vue.http.post("/vendorsapi/vendor-education-store", payload);
-
+        const updatedVendor = await Vue.http.post("/vendorsapi/vendor-education", payload);
+        dispatch("storeCurrentVendor", updatedVendor.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     }
 }
 
-export const deleteCurrentVendorEducation = async ({ commit, state }, payload) => {
+export const deleteCurrentVendorEducation = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
     try {
-        const id = payload;
-        const index = state.currentVendorEducations.findIndex(item => item._id === id);
-        state.currentVendorEducations.splice(index, 1)
-
-        // const result = await Vue.http.post("/vendorsapi/vendor-education-delete", payload);
-
+        const { vendorId, index, doc } = payload;
+        const updatedVendor = await Vue.http.post("/vendorsapi/remove-vendor-education", {vendorId, index, doc});
+        dispatch("storeCurrentVendor", updatedVendor.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {

@@ -3,8 +3,8 @@ const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
-const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, 
-    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc } = require('../vendors');
+const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
+    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc, removeVendorEdu } = require('../vendors');
 const { Vendors } = require('../models');
 
 
@@ -45,18 +45,31 @@ router.post('/remove-vendor-doc', async (req, res) => {
 })
 
 router.post('/vendor-education', upload.fields([{ name: 'educationFile' }]), async (req, res) => {
-    let data = await JSON.parse(req.body.education);
-    const file = req.files["educationFile"];
+    let education = JSON.parse(req.body.education);
+    const { vendorId, index } = req.body;
+    const files = req.files["educationFile"] || [];
     try {
-        if (file) {
-            await moveFile(file[0], data.vendorId);
-            data.fileLink = `/vendorsDocs/${data.vendorId}/${file[0].filename}`;
-            data.document = file[0].filename;
-        }
-        res.send(data);
+        const updatedVendor = await updateVendorEducation({
+            vendorId, education, file: files[0], index
+        })
+        res.send(updatedVendor);
     } catch (err) {
         console.log(err);
         res.status(500).send("Error on updating");
+    }
+})
+
+router.post('/remove-vendor-education', async (req, res) => {
+    const { vendorId, index, doc } = req.body;
+    const path = doc ? doc.path : "";
+    try {
+        const updatedVendor = await removeVendorEdu({
+            vendorId, index, path
+        });
+        res.send(updatedVendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing vendor document");
     }
 })
 

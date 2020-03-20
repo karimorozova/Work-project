@@ -94,7 +94,7 @@
             TableProfessionalExperience(:professionalExperienceData="professionalExperienceData")
 
         .title Education 
-            TableEducation(:educationData="educationData" :vendorId="vendorId")
+            TableEducation(:educationData="educationData" :vendorId="vendorId" @refreshEducations="setDetailsTablesData")
 
         .title(v-if="currentVendor._id") Rates    
         .rates(v-if="currentVendor._id")
@@ -322,11 +322,11 @@ export default {
       this.updateIndustry(industry);
     },
     setDetailsTablesData() {
-        this.educationData = this.currentVendor.educations;
-        this.professionalExperienceData = this.currentVendor.profExperiences;
-        this.qualificationData = this.currentVendor.qualifications;
-        this.documentsData = this.currentVendor.documents;
-        this.assessmentData = this.currentVendor.assessments;
+        this.educationData = Array.from(this.currentVendor.educations);
+        this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
+        this.qualificationData = Array.from(this.currentVendor.qualifications);
+        this.documentsData = Array.from(this.currentVendor.documents);
+        this.assessmentData = Array.from(this.currentVendor.assessments);
     },
     async getVendor() {
       this.vendorId = this.$route.params.id;

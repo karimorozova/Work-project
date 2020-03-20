@@ -42,6 +42,42 @@ async function removeVendorDoc({vendorId, fileName, path, category}) {
     }
 }
 
+async function removeVendorEdu({vendorId, index, path}) {
+    try {
+        const query = `educations.${index}`;
+        await Vendors.updateOne({_id: vendorId}, {[query]: null});
+        if(path) {
+            await removeOldVendorFile(path, "");
+        }
+        return await getVendorAfterUpdate({_id: vendorId}, {$pull: {"educations": null}});
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeVendorEdu");
+    }
+}
+
+async function updateVendorEducation({vendorId, education, file, index}) {
+    try {
+        const vendor = await Vendors.findOne({_id: vendorId});
+        let { educations } = vendor;
+        let currentEdu = {...education};
+        currentEdu.document = educations[index] ? educations[index].document : "";
+        if(file) {
+            const newPath = `/vendorsDocs/${vendorId}/doc${index}-${file.filename}`;
+            await moveFile(file, `./dist${newPath}`);
+            if(currentEdu.document) {
+                await removeOldVendorFile(currentEdu.document.path, newPath);
+            }
+            currentEdu.document = {name: file.filename, path: newPath};
+        }
+        educations.splice(index, 1, currentEdu);
+        return await getVendorAfterUpdate({_id: vendorId}, { educations });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveHashedPassword")
+    }
+}
+
 async function saveHashedPassword(id, pass) {
     try {
         bcrypt.hash(pass, 10, async (err, hash) => {
@@ -81,4 +117,12 @@ function removeOldVendorFile(oldPath, newPath) {
     })
 }
 
-module.exports = { saveVendorDocument, removeVendorDoc, saveHashedPassword, getPhotoLink, removeOldVendorFile }
+module.exports = { 
+    saveVendorDocument, 
+    removeVendorDoc, 
+    saveHashedPassword, 
+    getPhotoLink, 
+    removeOldVendorFile,
+    updateVendorEducation,
+    removeVendorEdu
+}

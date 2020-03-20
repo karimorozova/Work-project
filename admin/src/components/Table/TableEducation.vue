@@ -47,17 +47,17 @@
                           Button(value="Assign" @clicked="setDateRange")
         
         template(slot="education" slot-scope="{ row, index }")
-            .education__data(v-if="currentActive !== index") {{ row.education }}
+            .education__data(v-if="currentActive !== index") {{ row.institute }}
             .education__editing-data(v-else) 
                 input.education__input(type="text" v-model="currentEducation")
         
         template(slot="department" slot-scope="{ row, index }")
-            .education__data(v-if="currentActive !== index") {{ row.department }}
+            .education__data(v-if="currentActive !== index") {{ row.field }}
             .education__editing-data(v-else) 
                 input.education__input(type="text" v-model="currentDepartment")
 
         template(slot="degree" slot-scope="{ row, index }")
-              .education__data(v-if="currentActive !== index") {{ row.degree }}
+              .education__data(v-if="currentActive !== index") {{ row.study }}
               .education__editing-data(v-else) 
                   input.education__input(type="text" v-model="currentDegree")
 
@@ -68,10 +68,10 @@
 
         template(slot="document" slot-scope="{ row, index }")
               .education__no-file.education__data(v-if="!row.document && currentActive !== index") No file loaded
-              .education__data(v-if="row.document.length && currentActive !== index")
-                a(:href="row.fileLink") {{row.document}}
+              .education__data(v-if="row.document && currentActive !== index")
+                a(:href="domain + row.document.path") {{row.document.name}}
               .education__upload(v-if="currentActive === index")
-                  input.education__load-file(type="file" id="file" ref="file" @change="uploadDocument(index)")
+                  input.education__load-file(type="file" id="file" ref="file" @change="uploadDocument")
 
         template(slot="icons" slot-scope="{ row, index }")
             .education__icons
@@ -166,7 +166,6 @@ export default {
       dateRange: "",
       currentFile: "",
       currentDocument: "",
-      currentFileName: [],
       areErrors: false,
       errors: [],
       isDeleting: false,
@@ -174,13 +173,9 @@ export default {
 
       isDatepickers: false,
       fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-      toDate: new Date()
+      toDate: new Date(),
+      domain: "http://localhost:3001"
     };
-  },
-  computed: {
-    ...mapGetters({
-      currentVendorEducations: "getCurrentVendorEducations"
-    })
   },
   methods: {
     ...mapActions({
@@ -203,21 +198,14 @@ export default {
         case "delete":
           this.manageDeleteClick(index);
           break;
-        case "save":
-          await this.manageSaveClick(index);
-          break;
         default:
           await this.checkErrors(index);
       }
     },
-    uploadDocument(id) {
-      this.currentFileName.push({
-        fileName: event.target.files[0].name,
-        id: id
-      });
+    uploadDocument() {
       this.currentFile = this.$refs.file.files[0];
     },
-    requiredFields() {
+    async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
       if (!this.dateRange) this.errors.push("Duration should not be empty!");
@@ -226,88 +214,73 @@ export default {
       if (!this.currentDepartment)
         this.errors.push("Major / Department should not be empty!");
       if (!this.currentDegree) this.errors.push("Degree should not be empty!");
-      if (this.fromDate > this.toDate)
-        this.errors.push("Start date must be earlier than end date");
+      if (this.fromDate > this.toDate) this.errors.push("Start date must be earlier than end date");
+      this.validationIsNumber(this.currentGrade, "Grade");
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
+        await this.manageSaveClick(index);
     },
     async manageSaveClick(index) {
-      this.requiredFields();
-      this.validationIsNumber(this.currentGrade, "Grade");
-      let file = this.currentFileName.filter(value => value.id === index);
-
-      if (this.currentActive == index) {
-        if (!this.areErrors) {
-          const obj = {
-            _id: index,
+      if (this.currentActive === -1) return;
+        const obj = {
             duration: this.dateRange,
-            education: this.currentEducation,
-            department: this.currentDepartment,
-            degree: this.currentDegree,
+            institute: this.currentEducation,
+            field: this.currentDepartment,
+            study: this.currentDegree,
             grade: this.currentGrade,
             document: this.currentDocument,
-            fileLink: this.fileLink,
-            vendorId: this.vendorId
-          };
+        };
 
-          let formData = new FormData();
-          formData.append("education", JSON.stringify(obj));
-          if (file[file.length - 1]) formData.append("educationFile", this.currentFile);
+        let formData = new FormData();
+        formData.append("vendorId", this.vendorId);
+        formData.append("index", index);        
+        formData.append("education", JSON.stringify(obj));
+        if (this.currentFile) formData.append("educationFile", this.currentFile);
 
-          try {
+        try {
             const result = await this.storeEducation(formData);
             this.alertToggle({
-              message: "Education saved",
-              isShow: true,
-              type: "success"
+                message: "Education saved",
+                isShow: true,
+                type: "success"
             });
-          } catch (err) {
-            this.alertToggle({
-              message: err.message,
-              isShow: true,
-              type: "error"
-            });
-          }
-          this.setDefaults();
+        } catch (err) {
+        } finally {
+            this.manageCancelEdition();
         }
-      }
     },
-    manageCancelEdition(index) {
-      if (this.educationData[index]._id == undefined) {
-        this.educationData.splice(index, 1);
-      }
-      this.setDefaults();
+    manageCancelEdition() {
+        this.$emit('refreshEducations');
+        this.setDefaults();
     },
     async manageDeleteClick(index) {
-      if (this.educationData[index]._id == undefined) {
-        this.educationData.splice(index, 1);
-        return this.setDefaults();
-      }
       this.deleteIndex = index;
       this.isDeleting = true;
     },
     async deleteData() {
-      const id = this.educationData[this.deleteIndex]._id;
+        const doc = this.educationData[this.deleteIndex].document;
       try {
-        await this.deleteEducation(id);
+        await this.deleteEducation({
+            vendorId: this.vendorId, index: this.deleteIndex, doc
+        });
         this.alertToggle({
           message: "Education removed",
           isShow: true,
           type: "success"
         });
       } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      } finally {
+        this.manageCancelEdition();
       }
-      this.setDefaults();
     },
     setEditingData(index) {
       this.currentActive = index;
       this.dateRange = this.educationData[index].duration;
-      this.currentEducation = this.educationData[index].education;
-      this.currentDegree = this.educationData[index].degree;
-      this.currentDepartment = this.educationData[index].department;
+      this.currentEducation = this.educationData[index].institute;
+      this.currentDegree = this.educationData[index].study;
+      this.currentDepartment = this.educationData[index].field;
       this.currentGrade = this.educationData[index].grade;
     },
     setDefaults() {
@@ -318,18 +291,19 @@ export default {
       this.currentDepartment = "";
       this.currentGrade = "";
       this.dateRange = "";
+      this.currentFile = "";
     },
     addData() {
       if (this.currentActive !== -1) {
         return this.isEditing();
       }
       this.educationData.push({
-        education: "",
-        degree: "",
+        institute: "",
+        study: "",
         grade: "",
         document: "",
         duration: "",
-        department: ""
+        field: ""
       });
       this.setEditingData(this.educationData.length - 1);
     },
@@ -371,13 +345,9 @@ export default {
         if (!this.errors.includes(fieldName + " field must be a number")) {
           this.errors.push(fieldName + " field must be a number");
         }
-        if (this.errors.length) {
-          return (this.areErrors = true);
-        }
       }
     }
   },
-
   components: {
     DatePickers,
     Button,
@@ -386,7 +356,10 @@ export default {
   },
   directives: {
     ClickOutside
-  }
+  },
+  mounted() {
+        this.domain = __WEBPACK__API_URL__;
+    }
 };
 </script>
 
