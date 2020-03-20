@@ -79,6 +79,7 @@
                     calendarClass="steps__calendar-custom" 
                     :format="customFormatter" 
                     monday-first=true
+                    :disabledPicker="isDatePickDisabled"
                     :highlighted="highlighted"
                     @scrollDrop="scrollDrop")
             template(slot="deadline" slot-scope="{ row, index }")
@@ -90,6 +91,7 @@
                     :format="customFormatter" 
                     monday-first=true
                     :disabled="disabled"
+                    :disabledPicker="isDatePickDisabled"
                     :highlighted="highlighted"
                     @scrollDrop="scrollDrop")
             template(slot="progress" slot-scope="{ row }")
@@ -405,6 +407,10 @@ export default {
         isAllSelected() {
             const unchecked = this.currentProject.steps.find(item => !item.check);
             return !unchecked;
+        },
+        isDatePickDisabled() {
+            const statuses = ["Closed", "Rejected", "Cancelled", "Cancelled Halfway"];
+            return statuses.indexOf(this.currentProject.status) !== -1;
         }
     },
     components: {
