@@ -8,13 +8,8 @@
             p.footer__legal-maps
                 a.footer__link(href="https://www.google.com/maps/place/Pangea+Localization+Services/@34.6831861,33.0312479,15z/data=!4m5!3m4!1s0x0:0xd80067655ceaa5df!8m2!3d34.6831861!4d33.0312479" target="_blank")
                     img.footer__legal-icon(src="../assets/images/direction_icon.svg")
-                span.footer__legal-text Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol
-            p.footer__legal-text office : +35725252150
-            p.footer__legal-text Reg. No. HE362046  VAT. No. 10362046H
-            p.footer__legal-text © {{ year }} 
-                span.footer__legal-copywrite-text Pangea Translation Services (Cyprus) LTD
-        .footer__item
-            img(border="0" src="https://twb.translationcenter.org/workspace/display-badge/index/id/61931/Volunteer_Translator.jpg" alt="English to French & English to Arabic & English to Chinese volunteer translator")
+                span.footer__legal-text Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol office : +35725252150
+            p.footer__legal-text Reg. No. HE362046 ©{{ year }} Pangea Translation Services (Cyprus) LTD
     SocialIcons
     .footer__privacy-text *Pangea Translation Services LTD (CY) respects your privacy and are committed to protecting your personal data. 
         | This is to inform you that your personal data will be used, namely for the purposes of the professional performance of our services 
@@ -86,6 +81,10 @@ export default {
         margin-top: 8px;
         margin-bottom: 0;
         height: 20px;
+        @media (max-width: 450px) {
+            margin-bottom: 30px;
+            display: block;
+        }
     }
     &__legal-text {
         color: #fff;
