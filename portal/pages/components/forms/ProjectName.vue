@@ -14,7 +14,11 @@ export default {
             setOrderDetail: "setOrderDetail" 
         }),
         setProjectName(e) {
-            const value = e.target.value;
+            let value = e.target.value;
+            if(value.length > 50) {
+                value = value.slice(0, 50);
+                e.target.value = value;
+            }
             this.setOrderDetail({prop: 'projectName', value})
         }
     },

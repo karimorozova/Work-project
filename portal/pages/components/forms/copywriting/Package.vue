@@ -59,7 +59,6 @@ export default {
 <style lang="scss" scoped>
 
 .sizes {
-    margin-top: 10px;
     width: calc(100% - 12px);
     padding-left: 12px;
     display: flex;
@@ -69,6 +68,7 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-top: 20px;
     }
     &__name {
         font-size: 14px;
