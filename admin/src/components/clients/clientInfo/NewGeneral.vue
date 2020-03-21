@@ -4,19 +4,19 @@
             .block-item
                 label.block-item__label.block-item_relative Company Name:
                     Asterisk(:customStyle="asteriskStyle")
-                input(type="text" placeholder="Company Name" v-model="client.name" :class="{'client-info_error-shadow': !client.name && isSaveClicked}")
+                input(type="text" placeholder="Company Name" v-model="client.name" :class="{'new-general_error-shadow': !client.name && isSaveClicked}")
             .block-item
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" v-model="client.website")
             .block-item
                 label.block-item__label.block-item_relative Industry:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !client.industries.length}")
+                .block-item__drop.block-item_high-index(:class="{'new-general_error-shadow': isSaveClicked && !client.industries.length}")
                     MultiClientIndustrySelect(:selectedInd="client.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
             .block-item
                 label.block-item__label.block-item_relative Status:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !client.status}")
+                .block-item__drop(:class="{'new-general_error-shadow': isSaveClicked && !client.status}")
                     ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="setStatus")
         .new-general__block
             .block-item
@@ -37,17 +37,17 @@
             .block-item
                 label.block-item__label.block-item_relative Account Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !client.accountManager}")
+                .block-item__drop.block-item_high-index(:class="{'new-general_error-shadow': isSaveClicked && !client.accountManager}")
                     AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')")
             .block-item
                 label.block-item__label.block-item_relative Sales Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': isSaveClicked && !client.salesManager}")
+                .block-item__drop.block-item_medium-index(:class="{'new-general_error-shadow': isSaveClicked && !client.salesManager}")
                     AMSelect(:selectedManager="client.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')")
             .block-item
                 label.block-item__label.block-item_relative Project Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !client.projectManager}")
+                .block-item__drop(:class="{'new-general_error-shadow': isSaveClicked && !client.projectManager}")
                     AMSelect(:selectedManager="client.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')")
 </template>
 
@@ -95,6 +95,17 @@ export default {
             this.client.industries.push(industry);
         },
     },
+    computed: {
+        selectedIndNames() {
+            let result = [];
+            if(this.client.industries && this.client.industries.length) {
+                for(let ind of this.client.industries) {
+                    result.push(ind.name);
+                }
+            }
+            return result;
+        }
+    },
     components: {
         Asterisk,
         MultiClientIndustrySelect,
@@ -114,6 +125,9 @@ export default {
     justify-content: space-between;
     &__block {
         width: 35%;
+    }
+    &_error-shadow {
+        box-shadow: 0 0 5px $red;
     }
 }
 

@@ -4,19 +4,19 @@
             .block-item
                 label.block-item__label.block-item_relative Company Name:
                     Asterisk(:customStyle="asteriskStyle")
-                input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'client-info_error-shadow': !currentClient.name && isSaveClicked}")
+                input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'general-info_error-shadow': !currentClient.name && isSaveClicked}")
             .block-item
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
             .block-item
                 label.block-item__label.block-item_relative Industry:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
+                .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
                     MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
             .block-item
                 label.block-item__label.block-item_relative Status:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.status}")
+                .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.status}")
                     ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
         .general-info__block
             .block-item
@@ -37,17 +37,17 @@
             .block-item
                 label.block-item__label.block-item_relative Account Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_high-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
+                .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.accountManager}")
                     AMSelect(:selectedManager="currentClient.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
             .block-item
                 label.block-item__label.block-item_relative Sales Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop.block-item_medium-index(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.salesManager}")
+                .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.salesManager}")
                     AMSelect(:selectedManager="currentClient.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
             .block-item
                 label.block-item__label.block-item_relative Project Manager:
                     Asterisk(:customStyle="asteriskStyle")
-                .block-item__drop(:class="{'client-info_error-shadow': isSaveClicked && !currentClient.projectManager}")
+                .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.projectManager}")
                     AMSelect(:selectedManager="currentClient.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
 </template>
 
@@ -133,6 +133,9 @@ export default {
     justify-content: space-between;
     &__block {
         width: 35%;
+    }
+    &_error-shadow {
+        box-shadow: 0 0 5px $red;
     }
 }
 
