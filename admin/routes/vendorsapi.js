@@ -101,6 +101,34 @@ router.post('/remove-vendor-experience', async (req, res) => {
     }
 })
 
+router.post('/vendor-qualification', async (req, res) => {
+    const { vendorId, index, qualification } = req.body;
+    try {
+        const query = `qualifications.${index}`;
+        const updatedVendor = await getVendorAfterUpdate(
+            {_id: vendorId }, 
+            { [query]: qualification }
+            )
+        res.send(updatedVendor);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on updating");
+    }
+})
+
+router.post('/remove-vendor-qualification', async (req, res) => {
+    const { vendorId, index } = req.body;
+    try {
+        const query = `qualifications.${index}.status`;
+        await Vendors.updateOne({_id: vendorId}, {[query]: ""});
+        const updatedVendor = await getVendorAfterUpdate({_id: vendorId}, {$pull: {qualifications: {status: ""}}});
+        res.send(updatedVendor);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on removing vendor document");
+    }
+})
+
 router.post('/filtered-vendors', async (req, res) => {
     const { filters } = req.body;
     try {

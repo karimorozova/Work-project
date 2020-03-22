@@ -15,6 +15,11 @@ async function getVendor(query) {
             .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
+            .populate("qualifications.source")
+            .populate("qualifications.target")
+            .populate("qualifications.industry")
+            .populate("qualifications.task")
+            .populate("assessments.industry")
     return vendor;
 }
 
@@ -32,6 +37,11 @@ async function getVendors(query) {
             .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
+            .populate("qualifications.source")
+            .populate("qualifications.target")
+            .populate("qualifications.industry")
+            .populate("qualifications.task")
+            .populate("assessments.industry")
     return vendors;
 }
 
@@ -49,6 +59,11 @@ async function getVendorAfterUpdate(query, update) {
             .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
+            .populate("qualifications.source")
+            .populate("qualifications.target")
+            .populate("qualifications.industry")
+            .populate("qualifications.task")
+            .populate("assessments.industry")
 }
 
 async function getFilteredVendors(filters) {
@@ -71,7 +86,12 @@ async function getFilteredVendors(filters) {
             "monoRates.industries",
             "monoRates.target",
             "languagePairs.source",
-            "languagePairs.target"
+            "languagePairs.target",
+            "qualifications.source",
+            "qualifications.target",
+            "qualifications.industry",
+            "qualifications.task",
+            "assessments.industry"
         ]);
     } catch(err) {
         console.log(err);

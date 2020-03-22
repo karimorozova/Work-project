@@ -17,7 +17,8 @@
               .qualifications__head-title {{ field.label }}
 
           template(slot="source" slot-scope="{ row, index }")
-              .qualifications__data(v-if="currentActive !== index") {{ row.source }}
+              .qualifications__data(v-if="currentActive !== index")
+                span.qualifications__source(v-if="row.source") {{ row.source.lang }}
               .qualifications__drop-menu(v-else)
                   SelectSingle(
                       :isTableDropMenu="isTableDropMenu"
@@ -30,7 +31,7 @@
                   )
 
           template(slot="target" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.target }}
+            .qualifications__data(v-if="currentActive !== index") {{ row.target.lang }}
             .qualifications__drop-menu(v-else)
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
@@ -43,7 +44,7 @@
                 )
 
           template(slot="industry" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.industry }}
+            .qualifications__data(v-if="currentActive !== index") {{ row.industry.name }}
             .qualifications__drop-menu(v-else)
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
@@ -56,14 +57,14 @@
                 )
 
           template(slot="task" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.task }}
+            .qualifications__data(v-if="currentActive !== index") {{ row.task.title }}
             .qualifications__drop-menu(v-else)
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
                     :hasSearch="true"
                     :selectedOption="currentTask.title"
-                    :options="taskData"
+                    :options="tasksData"
                     @chooseOption="setTask"
                     @scrollDrop="scrollDrop"
                 )
@@ -75,8 +76,8 @@
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
                     :hasSearch="true"
-                    :selectedOption="currentStatus.status"
-                    :options="statusData"
+                    :selectedOption="currentStatus"
+                    :options="statuses"
                     @chooseOption="setStatus"
                     @scrollDrop="scrollDrop"
                 )
@@ -104,7 +105,10 @@ export default {
     },
     vendorIndustries: {
       type: Array, default: () => []
-    }
+    },
+    vendorId: {
+        type: String
+    },
   },
   data() {
     return {
@@ -117,7 +121,7 @@ export default {
           padding: "0"
         },
         {
-          label: "Targer",
+          label: "Target",
           headerKey: "headerTarget",
           key: "target",
           width: "17%",
@@ -152,7 +156,17 @@ export default {
           padding: "0"
         }
       ],
-
+      statuses: [
+        "NA",
+        "Sample Requested",
+        "Test Sent",
+        "Received",
+        "Passed",
+        "Not Passed"
+      ],
+      sources: [],
+      targets: [],
+      tasks: [],
       currentSource: "",
       currentTarget: "",
       currentIndustry: "",
@@ -170,8 +184,8 @@ export default {
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
-      storeQualification: "storeCurrentVendorQualifications",
-      deleteQualification: "deleteCurrentVendorQualifications"
+      storeQualification: "storeCurrentVendorQualification",
+      deleteQualification: "deleteCurrentVendorQualification"
     }),
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
@@ -190,35 +204,20 @@ export default {
         case "delete":
           this.manageDeleteClick(index);
           break;
-        case "save":
-          await this.manageSaveClick(index);
-          break;
         default:
           await this.checkErrors(index);
       }
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentSource = {
-        lang: this.qualificationData[index].source
-      };
-      this.currentTarget = {
-        lang: this.qualificationData[index].target
-      };
-      this.currentIndustry = {
-        name: this.qualificationData[index].industry
-      };
-      this.currentStatus = {
-        status: this.qualificationData[index].status
-      };
-      this.currentTask = {
-        title: this.qualificationData[index].task
-      };
+      this.currentSource = this.qualificationData[index].source;
+      this.currentTarget = this.qualificationData[index].target;
+      this.currentIndustry = this.qualificationData[index].industry;
+      this.currentStatus = this.qualificationData[index].status;
+      this.currentTask = this.qualificationData[index].task;
     },
     manageCancelEdition(index) {
-      if (this.qualificationData[index]._id == undefined) {
-        this.qualificationData.splice(index, 1);
-      }
+      this.$emit('refreshQualifications');
       this.setDefaults();
     },
     setDefaults() {
@@ -230,80 +229,68 @@ export default {
       this.currentStatus = "";
       this.currentTask = "";
     },
-    requiredFields() {
+    async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      if (!this.currentSource.lang)
-        this.errors.push("Source should not be empty!");
-      if (!this.currentTarget.lang)
-        this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry.name)
-        this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus.status)
-        this.errors.push("Task status should not be empty!");
-      if (!this.currentTask.title)
-        this.errors.push("Task should not be empty!");
+      if (!this.currentSource) this.errors.push("Source should not be empty!");
+      if (!this.currentTarget) this.errors.push("Target should not be empty!");
+      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
+      if (!this.currentStatus) this.errors.push("Task status should not be empty!");
+      if (!this.currentTask) this.errors.push("Task should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
+      await this.manageSaveClick(index);
     },
 
     async manageSaveClick(index) {
-      this.requiredFields();
-      if (this.currentActive == index) {
-        if (!this.areErrors) {
-          const obj = {
-            _id: index,
-            source: this.currentSource.lang,
-            target: this.currentTarget.lang,
-            industry: this.currentIndustry.name,
-            task: this.currentTask.title,
-            status: this.currentStatus.status
-          };
-          try {
-            const result = await this.storeQualification(obj);
-            this.alertToggle({
-              message: "Qualification saved",
-              isShow: true,
-              type: "success"
-            });
-          } catch (err) {
-            this.alertToggle({
-              message: err.message,
-              isShow: true,
-              type: "error"
-            });
-          }
-          this.getQualifications();
-          this.setDefaults();
+        let qualification = {
+            target: this.currentTarget,
+            industry: this.currentIndustry,
+            task: this.currentTask,
+            status: this.currentStatus
+        };
+        if(this.currentSource.lang !== "NA") {
+            qualification.source = this.currentSource;
         }
-      }
+        try {
+            const result = await this.storeQualification({
+                vendorId: this.vendorId,
+                index,
+                qualification
+                });
+            this.alertToggle({
+                message: "Qualification saved",
+                isShow: true,
+                type: "success"
+            });
+        } catch (err) {
+        } finally {
+        this.manageCancelEdition();
+        }
     },
 
     async manageDeleteClick(index) {
-      if (this.qualificationData[index]._id == undefined) {
-        this.qualificationData.splice(index, 1);
-        return this.setDefaults();
-      }
       this.deleteIndex = index;
       this.isDeleting = true;
     },
 
     async deleteData() {
-      const id = this.qualificationData[this.deleteIndex]._id;
       try {
-        await this.deleteQualification(id);
+        await this.deleteQualification({
+            vendorId: this.vendorId,
+            index: this.deleteIndex
+        });
         this.alertToggle({
           message: "Qualification removed",
           isShow: true,
           type: "success"
         });
       } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      } finally {
+        this.manageCancelEdition();
       }
-      this.getQualifications();
-      this.setDefaults();
     },
 
     addData() {
@@ -320,58 +307,39 @@ export default {
       this.setEditingData(this.qualificationData.length - 1);
     },
 
-    async getSource() {
+    async getLangs() {
       try {
         const result = await this.$http.get("/api/languages");
-        let newResult = result.body;
-        newResult.unshift({ lang: "NA" });
-        this.sources = newResult;
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
-      }
-    },
-    async getTarget() {
-      try {
-        const result = await this.$http.get("/api/languages");
-        this.target = result.body;
+        this.sources = Array.from(result.body);
+        this.targets = Array.from(result.body);
+        this.sources.unshift({ lang: "NA" });
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
 
-    async getTask() {
+    async getTasks() {
       try {
-        const result = await this.$http.get("/api/services");
-        this.task = result.body;
+        const result = await this.$http.get("/api/steps");
+        this.tasks = result.body;
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
-    getStatus() {
-      this.status = [
-        { status: "NA" },
-        { status: "Sample Requested" },
-        { status: "Test Sent" },
-        { status: "Received" },
-        { status: "Passed" },
-        { status: "Not Passed" }
-      ];
-    },
-
     setSource({ option }) {
       this.currentSource = this.sources.find(item => item.lang === option);
     },
     setTarget({ option }) {
-      this.currentTarget = this.target.find(item => item.lang === option);
+      this.currentTarget = this.targets.find(item => item.lang === option);
     },
     setIndustry({ option }) {
       this.currentIndustry = this.vendorIndustries.find(item => item.name === option);
     },
     setStatus({ option }) {
-      this.currentStatus = this.status.find(item => item.status === option);
+      this.currentStatus = option;
     },
     setTask({ option }) {
-      this.currentTask = this.task.find(item => item.title === option);
+      this.currentTask = this.tasks.find(item => item.title === option);
     },
     closeErrors() {
       this.areErrors = false;
@@ -385,16 +353,13 @@ export default {
       return this.sources.map(item => item.lang);
     },
     targetData() {
-      return this.target.map(item => item.lang);
+      return this.targets.map(item => item.lang);
     },
     industryData() {
       return this.vendorIndustries.map(item => item.name);
     },
-    statusData() {
-      return this.status.map(item => item.status);
-    },
-    taskData() {
-      return this.task.map(item => item.title);
+    tasksData() {
+      return this.tasks.map(item => item.title);
     },
   },
   components: {
@@ -404,10 +369,8 @@ export default {
   },
 
   mounted() {
-    this.getSource();
-    this.getTarget();
-    this.getStatus();
-    this.getTask();
+    this.getLangs();
+    this.getTasks();
   }
 };
 </script>

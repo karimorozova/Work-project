@@ -82,7 +82,7 @@
             VendorCandidate(:candidateData='candidateData' v-if="currentVendor.status === 'Potential'")
          
         .title Qualifications
-            TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries")
+            TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries" :vendorId="vendorId" @refreshQualifications="setDetailsTablesData")
 
         .title Documents
             TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")

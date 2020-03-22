@@ -192,25 +192,28 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, dispat
     }
 }
 
-export const storeCurrentVendorQualifications = async ({ dispatch }, payload) => {
-    dispatch('SET_CURRENT_VENDOR_QUALIFICATIONS', payload)
-
-    // const result = await Vue.http.post("/vendorsapi/vendor-qualifications-store", payload);
-
-    if(payload.status === 'Passed'){
-        dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)
+export const storeCurrentVendorQualification = async ({ commit, dispatch }, payload) => {
+    commit("startRequest");
+    try {
+        const { vendorId, index, qualification } = payload;
+        const updatedVendor = await Vue.http.post("/vendorsapi/vendor-qualification", { vendorId, index, qualification });
+        dispatch("storeCurrentVendor", updatedVendor.body);
+        if(payload.status === 'Passed'){
+            dispatch('SET_CURRENT_VENDOR_ASSESSMENT', payload)
+        }
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
     }
 }
 
-export const deleteCurrentVendorQualifications = async ({ commit, state }, payload) => {
+export const deleteCurrentVendorQualification = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
     try {
-        const id = payload;
-        const index = state.currentVendorQualifications.findIndex(item => item._id === id);
-        state.currentVendorQualifications.splice(index, 1)
-
-        // const result = await Vue.http.post("/vendorsapi/vendor-qualifications-delete", payload);
-
+        const { index, vendorId } = payload;
+        const updatedVendor = await Vue.http.post("/vendorsapi/remove-vendor-qualification", { index, vendorId });
+        dispatch("storeCurrentVendor", updatedVendor.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
