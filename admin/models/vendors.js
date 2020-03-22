@@ -106,10 +106,25 @@ const VendorSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    qualifications: {
-        type: Array,
-        default: []
-    },
+    qualifications: [{ 
+        source: {
+            type: Schema.Types.ObjectId, ref: 'Language',
+        },
+        target: {
+            type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        industry: {
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        },
+        task: {
+            type: Schema.Types.ObjectId, ref: 'Step'
+        },
+        status: {
+            type: String,
+            default: 'Yes',
+            trim: true
+        }
+    }],
     documents: {
         type: Array,
         default: []
@@ -122,10 +137,15 @@ const VendorSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    assessments: {
-        type: Array,
-        default: []
-    },
+    assessments: [{
+        industry: {
+            type: Schema.Types.ObjectId, ref: 'Industries'
+        },
+        tqi: {},
+        lqa1: {},
+        lqa2: {},
+        lqa3: {}
+    }],
     wordsRates: [{ 
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
