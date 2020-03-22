@@ -101,7 +101,7 @@ router.post('/remove-vendor-experience', async (req, res) => {
     }
 })
 
-router.post('/vendor-qualification', async (req, res) => {
+router.post('/vendor-qualification',  upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
     const { vendorId, index, qualification } = req.body;
     try {
         const query = `qualifications.${index}`;

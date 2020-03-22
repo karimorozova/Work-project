@@ -3,16 +3,17 @@
     .candidate__title Candidate
     .candidate__row
         .candidate__row-key Years of experience:
-        .candidate__row-value {{candidateData.experience}}
+        .candidate__row-value {{candidateData.experienceYears}}
     .candidate__row
         .candidate__row-key Internet access:
         .candidate__row-value {{candidateData.internetAccess}}
     .candidate__row
         .candidate__row-key CAT experience:
-        .candidate__row-value {{candidateData.cat}}
+        .candidate__row-value {{candidateData.catExperience}}
     .candidate__row
         .candidate__row-key Software experience:
-        .candidate__row-value {{candidateData.softwareExperience}}
+        .candidate__row-value 
+          p(v-for="item in candidateData.softwares") {{item}}
     .candidate__row
         .candidate__row-key Availability:
         .candidate__row-value {{candidateData.availability}}
@@ -56,6 +57,11 @@ export default {
     &-value {
       width: 150px;
       font-size: 14px;
+      p {
+        display: block;
+        margin-top: 3px;
+        margin-bottom: 6px;
+      }
     }
   }
 }

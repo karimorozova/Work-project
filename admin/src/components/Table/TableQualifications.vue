@@ -1,5 +1,7 @@
 <template lang="pug">
 .qualifications
+  .qualifications__form(v-if="isForm")
+        VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
   .qualifications__table
       SettingsTable(
           :fields="fields"
@@ -96,19 +98,25 @@ import SelectSingle from "../SelectSingle";
 import Add from "../Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
+import VendorLqaForm from "../reports/upcomingLqas/VendorLqaForm";
 
 export default {
   mixins: [scrollDrop, crudIcons],
   props: {
     qualificationData: {
-      type: Array, default: () => []
+      type: Array,
+      default: () => []
+    },
+    currentVendor: {
+      type: Object
     },
     vendorIndustries: {
-      type: Array, default: () => []
+      type: Array,
+      default: () => []
     },
     vendorId: {
-        type: String
-    },
+      type: String
+    }
   },
   data() {
     return {
@@ -156,6 +164,20 @@ export default {
           padding: "0"
         }
       ],
+
+      vendorData: {
+        vendor: {
+          name: "TEST",
+          language: {
+            lang: "TEST"
+          }
+        },
+        industry: "TEST",
+        isLqa1: true,
+        isLqa2: false,
+        isLqa3: false
+      },
+
       statuses: [
         "NA",
         "Sample Requested",
@@ -178,7 +200,8 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       isTableDropMenu: true,
-      currentActive: -1
+      currentActive: -1,
+      isForm: false
     };
   },
   methods: {
@@ -217,7 +240,7 @@ export default {
       this.currentTask = this.qualificationData[index].task;
     },
     manageCancelEdition(index) {
-      this.$emit('refreshQualifications');
+      this.$emit("refreshQualifications");
       this.setDefaults();
     },
     setDefaults() {
@@ -234,41 +257,79 @@ export default {
       this.errors = [];
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTarget) this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus) this.errors.push("Task status should not be empty!");
+      if (!this.currentIndustry)
+        this.errors.push("Industry should not be empty!");
+      if (!this.currentStatus)
+        this.errors.push("Task status should not be empty!");
       if (!this.currentTask) this.errors.push("Task should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
+      } else {
+        if (this.currentStatus == "Passed") {
+          this.openForm();
+        } else {
+          await this.manageSaveClick(index);
+        }
       }
-      await this.manageSaveClick(index);
+    },
+
+    async saveVendorLqa({ vendorData }) {
+      let qualification = {
+        target: this.currentTarget,
+        industry: this.currentIndustry,
+        task: this.currentTask,
+        status: this.currentStatus
+      };
+
+      let formData = new FormData();
+      formData.append("assessment", vendorData);
+      formData.append("assessmentFile", vendorData.file);
+      
+      try {
+        const result = await this.storeQualification({
+          vendorId: this.vendorId,
+          index,
+          qualification,
+          formData
+        });
+        this.alertToggle({
+          message: "Qualification saved",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+      } finally {
+        this.manageCancelEdition();
+      }
+      this.closeForm();
     },
 
     async manageSaveClick(index) {
-        let qualification = {
-            target: this.currentTarget,
-            industry: this.currentIndustry,
-            task: this.currentTask,
-            status: this.currentStatus
-        };
-        if(this.currentSource.lang !== "NA") {
-            qualification.source = this.currentSource;
-        }
-        try {
-            const result = await this.storeQualification({
-                vendorId: this.vendorId,
-                index,
-                qualification
-                });
-            this.alertToggle({
-                message: "Qualification saved",
-                isShow: true,
-                type: "success"
-            });
-        } catch (err) {
-        } finally {
+      let qualification = {
+        target: this.currentTarget,
+        industry: this.currentIndustry,
+        task: this.currentTask,
+        status: this.currentStatus
+      };
+      if (this.currentSource.lang !== "NA") {
+        qualification.source = this.currentSource;
+      }
+      try {
+        const result = await this.storeQualification({
+          vendorId: this.vendorId,
+          index,
+          qualification
+        });
+        this.alertToggle({
+          message: "Qualification saved",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+      } finally {
         this.manageCancelEdition();
-        }
+      }
     },
 
     async manageDeleteClick(index) {
@@ -279,8 +340,8 @@ export default {
     async deleteData() {
       try {
         await this.deleteQualification({
-            vendorId: this.vendorId,
-            index: this.deleteIndex
+          vendorId: this.vendorId,
+          index: this.deleteIndex
         });
         this.alertToggle({
           message: "Qualification removed",
@@ -333,7 +394,9 @@ export default {
       this.currentTarget = this.targets.find(item => item.lang === option);
     },
     setIndustry({ option }) {
-      this.currentIndustry = this.vendorIndustries.find(item => item.name === option);
+      this.currentIndustry = this.vendorIndustries.find(
+        item => item.name === option
+      );
     },
     setStatus({ option }) {
       this.currentStatus = option;
@@ -343,11 +406,17 @@ export default {
     },
     closeErrors() {
       this.areErrors = false;
+    },
+    closeForm() {
+      this.isForm = false;
+    },
+    openForm() {
+      this.isForm = true;
     }
   },
   computed: {
     ...mapGetters({
-      currentVendorQualifications: "getCurrentVendorQualifications"    
+      currentVendorQualifications: "getCurrentVendorQualifications"
     }),
     sourceData() {
       return this.sources.map(item => item.lang);
@@ -360,11 +429,12 @@ export default {
     },
     tasksData() {
       return this.tasks.map(item => item.title);
-    },
+    }
   },
   components: {
     SettingsTable,
     SelectSingle,
+    VendorLqaForm,
     Add
   },
 
@@ -410,6 +480,14 @@ export default {
   }
   &_opacity {
     opacity: 1;
+  }
+   &__form {
+    width: 70%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 </style>
