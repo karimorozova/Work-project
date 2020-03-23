@@ -78,6 +78,23 @@ async function updateVendorEducation({vendorId, education, file, index}) {
     }
 }
 
+async function updateVendorAssessment({vendorId, index, assessment, file}) {
+    try {
+        const qaKey = Object.keys(assessment).find(item => assessment[item].grade && !assessment[item].path);
+        const path = `/vendorsDocs/${vendorId}/${qaKey}${index}-${file.filename}`;
+        await moveFile(file, `./dist${path}`);
+        const newAssessment = {...assessment, [qaKey]: {...assessment[qaKey], fileName: file.filename, path}};
+        const query = `assessments.${index}`;
+        return await getVendorAfterUpdate(
+            {_id: vendorId}, 
+            {[query]: newAssessment}
+            );
+    } catch(err) {
+        console.log(err);
+        console.log("Error in updateVendorAssessment");
+    }
+}
+
 async function saveHashedPassword(id, pass) {
     try {
         bcrypt.hash(pass, 10, async (err, hash) => {
@@ -124,5 +141,6 @@ module.exports = {
     getPhotoLink, 
     removeOldVendorFile,
     updateVendorEducation,
-    removeVendorEdu
+    removeVendorEdu,
+    updateVendorAssessment
 }

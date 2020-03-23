@@ -4,7 +4,7 @@ const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
-    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc, removeVendorEdu } = require('../vendors');
+    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc, removeVendorEdu, updateVendorAssessment } = require('../vendors');
 const { Vendors } = require('../models');
 
 
@@ -126,6 +126,21 @@ router.post('/remove-vendor-qualification', async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on removing vendor document");
+    }
+})
+
+router.post('/vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
+    const assessmentData = JSON.parse(req.body);
+    const { vendorId, index, assessment } = assessmentData;
+    const files = req.files["assessmentFile"];
+    try {
+        const updatedVendor = await updateVendorAssessment({
+                vendorId, index, assessment, file: files[0]
+            })
+        res.send(updatedVendor);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on updating");
     }
 })
 
