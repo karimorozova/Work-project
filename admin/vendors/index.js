@@ -1,6 +1,7 @@
 const { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors } = require("./getVendors");
 const { updateVendorRates, deleteRate, importRates, getVendorAfterCombinationsUpdated } = require("./vendorRates");
-const { saveVendorDocument, removeVendorDoc, saveHashedPassword, getPhotoLink, removeOldVendorFile, updateVendorEducation, removeVendorEdu } = require("./info");
+const { saveVendorDocument, removeVendorDoc, saveHashedPassword, getPhotoLink, 
+    removeOldVendorFile, updateVendorEducation, removeVendorEdu, updateVendorAssessment} = require("./info");
 const { getJobs, updateStepProp } = require("./jobs");
 const { manageNewApplication } = require("./application");
 
@@ -22,5 +23,6 @@ module.exports = {
     getVendorAfterCombinationsUpdated,
     manageNewApplication,
     updateVendorEducation,
-    removeVendorEdu
+    removeVendorEdu,
+    updateVendorAssessment
 }
