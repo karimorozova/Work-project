@@ -1,9 +1,7 @@
 <template lang="pug">
 .social
-    ul.social__list
-        li.social__item(v-for="social in socialsArray")
-            a.social__link(:href="social.url")
-                img.social__image(:src="social.image")
+    .social__item(v-for="social in socialsArray" :style="{backgroundImage: `url('${social.image}')`}")
+        a.social__link(:href="social.url")
 </template>
 
 <script>
@@ -26,26 +24,27 @@ export default {
 <style lang="scss" scoped>
 
 .social {
-    display: inline;
     display: flex;
-    flex-direction: row;
+    align-items: center;
     justify-content: center;
-    margin: 0 10px;
+    margin-top: -27px;
+    padding-bottom: 10px;
     &__list {
         padding-left: 0;
     }
     &__item {
-        display: inline;
-        list-style: none;
+        background-position: -7px -7px;
+        border-radius: 50%;
+        margin: 5px; 
     }
     &__link {
         text-decoration: none;
+        width: 28px;
+        height: 28px;
+        display: block;
     }
     &__image {
         margin: 5px;
-        @media (max-width: 400px) {
-            width: 31px;
-        }
     }
 }
 

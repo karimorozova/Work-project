@@ -1,33 +1,24 @@
 <template lang="pug">
 .navbar
-    .navbar__block
-        ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.firstRow" :class="{'no-border-mobile': link.title === 'Privacy Policy'}")
-                a.navbar__link(:href='link.url') {{ link.title }}
-    .navbar__block
-        ul.navbar__list
-            li.navbar__item(v-for="link in linksArray.secondRow" :class="{'no-border': link.title === 'Blog'}")
-                a.navbar__link(:href='link.url') {{ link.title }}    
+    ul.navbar__list
+        li.navbar__item(v-for="link in links")
+            a.navbar__link(:href='link.url') {{ link.title }}
 </template>
 
 <script>
 export default {
     data() {
         return {
-            linksArray: {
-                firstRow:
-                [
-                    {url: 'https://www.pangea.global', title: 'Home'},
-                    {url: 'https://www.pangea.global/careers', title: 'Careers'},
-                    {url: 'https://www.pangea.global/faq', title: 'FAQ'},
-                    {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'}
-                ],
-                secondRow: [
-                    {url: 'https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf', title: 'Clients Terms & Conditions'},
-                    {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'},
-                    {url: 'https://www.pangea.global/blog', title: 'Blog'}
-                ]
-            }
+            links:
+            [
+                {url: 'https://www.pangea.global', title: 'Home'},
+                {url: 'https://www.pangea.global/careers', title: 'Careers'},
+                {url: 'https://www.pangea.global/faq', title: 'FAQ'},
+                {url: 'https://www.pangea.global/privacy-policy', title: 'Privacy Policy'},
+                {url: 'https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf', title: 'Clients Terms & Conditions'},
+                {url: 'https://www.pangea.global/blog', title: 'Blog'},
+                {url: 'https://www.pangea.global/contact-us', title: 'Contact Us'}
+            ]
         }
     }
 }
@@ -35,44 +26,52 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
-    display: flex;
-    justify-content: center;
-    @media (max-width: 580px) {
-        flex-direction: column;
-        align-items: center;
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
+    padding: 0 10px;
     &__list {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
         list-style: none;
-        padding-left: 0;
-        @media (max-width: 450px) {
-            margin: 6px 0;
+        margin: 0;
+        padding: 0;
+    }
+    &__item {
+        margin: auto 20px auto 0;
+        position: relative;
+        padding: 5px 0 5px 0;
+        flex-grow: 1;
+        font-weight: bold;
+        &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            background-color: #fff;
+            width: 2px;
+            height: 19px;
+            top: 2px;
+            right: -12px;
         }
-        .no-border {
-            border-right: none;
+        &:last-child, &:nth-child(6) {
+            &::after {
+                display: none;
+            }   
         }
-        .no-border-mobile {
-            @media (max-width: 450px) {
-                border-right: none;
+        &:nth-child(3), 
+        &:nth-child(4) {
+            @media (max-width: 620px) {
+                &::after {
+                    display: none;
+                }   
             }
         }
     }
-    &__item {
-        display: inline;
-        padding: 0 4px;
-        text-shadow: 0 3px 5px black;
-        border-right: 1.5px solid #fff;
-        font-size: 12px;
-    }
     &__link {
         text-decoration: none;
-        color: #fff;
-        font-family: 'Open Sans';
-        font-size: 15px;
-        margin: 9px;
-        @media (max-width: 768px) {
-            font-size: 13px;
+        color: white;
+        font-size: 17px;
+        transition: color .2s;
+        &:hover {
+            color: #4BA5A5;
         }
     }
 }
