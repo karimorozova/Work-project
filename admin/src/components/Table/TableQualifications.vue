@@ -107,15 +107,16 @@ export default {
       type: Array,
       default: () => []
     },
+    assessmentData: {
+      type: Array,
+      default: () => []
+    },
     currentVendor: {
       type: Object
     },
     vendorIndustries: {
       type: Array,
       default: () => []
-    },
-    vendorId: {
-      type: String
     }
   },
   data() {
@@ -167,17 +168,14 @@ export default {
 
       vendorData: {
         vendor: {
-          name: "TEST",
+          name:'',
           language: {
-            lang: "TEST"
+            lang:''
           }
         },
-        industry: '',
-        industryId: '',
-        tqi: true,
-        isLqa1: false,
-        isLqa2: false,
-        isLqa3: false
+        industry: "",
+        industryId: "",
+        tqi: true
       },
 
       statuses: [
@@ -270,10 +268,12 @@ export default {
         this.areErrors = true;
         return;
       } else {
-        if (this.currentStatus == "Passed") {
+        if (this.currentStatus === "Passed") {
           this.currentIndex = index;
           this.vendorData.industry = this.currentIndustry.name;
           this.vendorData.industryId = this.currentIndustry._id;
+          this.vendorData.vendor.name = this.currentVendor.firstName + ' ' + this.currentVendor.surname;
+          this.vendorData.vendor.language.lang = this.currentTarget.lang
           this.openForm();
         } else {
           await this.manageSaveClick(index);
@@ -292,16 +292,17 @@ export default {
         qualification.source = this.currentSource;
       }
       let formData = new FormData();
-      formData.append("vendorId", this.vendorId);
-      formData.append("index", this.currentIndex);
+      formData.append("vendorId", this.currentVendor._id);
+      formData.append("index", this.assessmentData.length);
       formData.append("assessment", JSON.stringify(vendorData));
       formData.append("assessmentFile", vendorData.file);
+      
       try {
         const assessment = await this.storeAssessment(formData);
       } catch (err) {
       } finally {
         const result = await this.storeQualification({
-          vendorId: this.vendorId,
+          vendorId: this.currentVendor._id,
           index: this.currentIndex,
           qualification
         });
@@ -322,7 +323,7 @@ export default {
       }
       try {
         const result = await this.storeQualification({
-          vendorId: this.vendorId,
+          vendorId: this.currentVendor._id,
           index,
           qualification
         });
@@ -345,7 +346,7 @@ export default {
     async deleteData() {
       try {
         await this.deleteQualification({
-          vendorId: this.vendorId,
+          vendorId: this.currentVendor._id,
           index: this.deleteIndex
         });
         this.alertToggle({

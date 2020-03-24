@@ -1,12 +1,7 @@
 <template lang="pug">
 .assessment 
-
-    .assessment__form(v-if="isFormLqa1")
-        VendorLqaForm(:vendorData="vendorDataLqa1" :uploadForm="true" @closeForm="closeForm('lqa1')"  @saveVendorLqa="saveVendorLqa")
-    .assessment__form(v-if="isFormLqa2")
-        VendorLqaForm(:vendorData="vendorDataLqa2" :uploadForm="true" @closeForm="closeForm('lqa2')"  @saveVendorLqa="saveVendorLqa")
-    .assessment__form(v-if="isFormLqa3")
-        VendorLqaForm(:vendorData="vendorDataLqa3" :uploadForm="true" @closeForm="closeForm('lqa3')"  @saveVendorLqa="saveVendorLqa")
+    .assessment__form(v-if="isForm")
+        VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm()"  @saveVendorLqa="saveVendorLqa")
 
     .assessment__subtitle Download and check file 
     .assessment__subtitle Make sure to convert all doc file into PDF
@@ -28,33 +23,35 @@
                 .assessment__data(v-if="row.industry") {{ row.industry.name }}
             
             template(slot="tqi" slot-scope="{ row, index }")
-                div(v-if="row.tqi" :class="'assessment__grade'") {{ row.tqi.grade }}
+                div(v-if="!row.tqi == ''" :class="'assessment__grade'") {{ row.tqi.grade }}
                   a(:href="domain + row.tqi.path")
-                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
 
             template(slot="lqa1" slot-scope="{ row, index }")
-                div(v-if="row.lqa1" :class="'assessment__grade'") {{ row.lqa1.grade }}
+                div(v-if="!row.lqa1 == ''" :class="'assessment__grade'") {{ row.lqa1.grade }}
                   a(:href="domain + row.lqa1.path")
-                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="row.tqi && !row.lqa1")
-                  .assessment__upload(v-if="row.tqi.grade > gradeNextLvl")
-                      .assessment__load-file(@click="openForm('lqa1',index)")
+                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="!row.tqi == ''")
+                  .assessment__upload
+                      .assessment__load-file(@click="openForm('isLqa1',index)")
 
             template(slot="lqa2" slot-scope="{ row, index }")
-                div(v-if="row.lqa2" :class="'assessment__grade'") {{ row.lqa2.grade }}
+                div(v-if="!row.lqa2 == ''" :class="'assessment__grade'") {{ row.lqa2.grade }}
                   a(:href="domain + row.lqa2.path")
-                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="row.lqa1 && !row.lqa2")
-                  .assessment__upload(v-if="row.lqa1.grade > gradeNextLvl")
-                      .assessment__load-file(@click="openForm('lqa2',index)")
+                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="!row.lqa1 == ''" )
+                  .assessment__upload
+                      .assessment__load-file(@click="openForm('isLqa2',index)")
 
-            template(slot="lqa3" slot-scope="{ row, index }") 
-                div(v-if="row.lqa3" :class="'assessment__grade'") {{ row.lqa3.grade }}
+            template(slot="lqa3" slot-scope="{ row, index }")
+                div(v-if="!row.lqa3 == ''" :class="'assessment__grade'") {{ row.lqa3.grade }}
                   a(:href="domain + row.lqa3.path")
-                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="row.lqa2 && !row.lqa3")
-                  .assessment__upload(v-if="row.lqa2.grade > gradeNextLvl")
-                      .assessment__load-file(@click="openForm('lqa3',index)")
+                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="!row.lqa2 == ''" )
+                  .assessment__upload
+                      .assessment__load-file(@click="openForm('isLqa3',index)")
+
+
 </template>
 
 <script>
@@ -64,12 +61,12 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
-    vendorId: {
-      type: String
-    },
     assessmentData: {
       type: Array,
       default: () => []
+    },
+    currentVendor: {
+      type: Object
     }
   },
   data() {
@@ -111,56 +108,10 @@ export default {
           padding: "0"
         }
       ],
-
       gradeNextLvl: 50,
-      currentIndex:'',
-
-      vendorDataLqa1: {
-        vendor: {
-          name: "TEST1",
-          language: {
-            lang: "TEST"
-          }
-        },
-        industry: "",
-        industryId: "",
-        tqi: false,
-        isLqa1: true,
-        isLqa2: false,
-        isLqa3: false
-      },
-      vendorDataLqa2: {
-        vendor: {
-          name: "TEST2",
-          language: {
-            lang: "TEST"
-          }
-        },
-        industry: "",
-        industryId: "",
-        tqi: false,
-        isLqa1: false,
-        isLqa2: true,
-        isLqa3: false
-      },
-      vendorDataLqa3: {
-        vendor: {
-          name: "TEST3",
-          language: {
-            lang: "TEST"
-          }
-        },
-        industry: "",
-        industryId: "",
-        tqi: false,
-        isLqa1: false,
-        isLqa2: false,
-        isLqa3: true
-      },
-
-      isFormLqa1: false,
-      isFormLqa2: false,
-      isFormLqa3: false,
+      currentIndex: "",
+      vendorData: {},
+      isForm: false,
 
       currentActive: -1,
       areErrors: false,
@@ -177,10 +128,11 @@ export default {
     }),
     async saveVendorLqa({ vendorData }) {
       let formData = new FormData();
-      formData.append("vendorId", this.vendorId);
+      formData.append("vendorId", this.currentVendor._id);
       formData.append("index", this.currentIndex);
       formData.append("assessment", JSON.stringify(vendorData));
       formData.append("assessmentFile", vendorData.file);
+
       try {
         const result = await this.storeAssessment(formData);
         this.alertToggle({
@@ -192,41 +144,30 @@ export default {
       } finally {
         this.$emit("refreshAssessment");
       }
-      this.closeAllForms();
-    },
-    closeAllForms() {
-      this.isFormLqa1 = false;
-      this.isFormLqa2 = false;
-      this.isFormLqa3 = false;
+      this.closeForm();
     },
     closeErrors() {
       this.areErrors = false;
     },
     closeForm(field) {
-      field == "lqa1"
-        ? (this.isFormLqa1 = false)
-        : field == "lqa2"
-        ? (this.isFormLqa2 = false)
-        : field == "lqa3"
-        ? (this.isFormLqa3 = false)
-        : false;
+      this.isForm = false;
     },
-    openForm(field,index) {
-      field == "lqa1"
-        ? (this.isFormLqa1 = true)
-        : field == "lqa2"
-        ? (this.isFormLqa2 = true)
-        : field == "lqa3"
-        ? (this.isFormLqa3 = true)
-        : false;
+    openForm(field, index) {
+      this.isForm = true;
       this.currentIndex = index;
-      this.setindustryId();
+      this.vendorData = {
+        vendor: {
+          name: this.currentVendor.firstName + ' ' + this.currentVendor.surname,
+          language: {
+            lang: " "
+          }
+        },
+        industry: this.assessmentData[index].industry.name,
+        industryId: this.assessmentData[index].industry._id,
+        [field]: true
+      };
     },
-    setindustryId(){
-      this.vendorDataLqa1.industryId = this.assessmentData[this.currentIndex].industry._id;
-      this.vendorDataLqa2.industryId = this.assessmentData[this.currentIndex].industry._id;
-      this.vendorDataLqa3.industryId = this.assessmentData[this.currentIndex].industry._id;
-    }
+
   },
   components: {
     SettingsTable,
@@ -298,8 +239,6 @@ export default {
   &__download {
     height: 20px;
     width: 20px;
-    margin-top: -3px;
-    position: absolute;
     margin-left: 15px;
     cursor: pointer;
   }

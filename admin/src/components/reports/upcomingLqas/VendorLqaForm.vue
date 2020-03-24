@@ -90,7 +90,11 @@ export default {
           !this.vendorData.isLqa1 && this.vendorData.isLqa2 ? "lqa2" : result;
         result = result !== "lqa2" && this.vendorData.isLqa3 ? "lqa3" : result;
       }
-      return result;
+      if(this.vendorData.tqi){
+        return 'tqi'
+      }else{
+        return result;
+      }
     }
   },
   components: {

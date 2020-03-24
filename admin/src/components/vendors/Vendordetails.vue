@@ -82,13 +82,13 @@
             VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
          
         .title Qualifications
-            TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries" :vendorId="vendorId" @refreshQualifications="setDetailsTablesData")
+            TableQualifications(:qualificationData="qualificationData" :assessmentData="assessmentData" :currentVendor="currentVendor" :vendorIndustries="currentVendor.industries" @refreshQualifications="setDetailsTablesData")
 
         .title Documents
             TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
 
         .title Assessment
-            TableAssessment(:assessmentData="assessmentData" :vendorId="vendorId" @refreshAssessment="setDetailsTablesData")
+            TableAssessment(:assessmentData="assessmentData" :currentVendor="currentVendor" @refreshAssessment="setDetailsTablesData")
         
         .title Professional experience
             TableProfessionalExperience(:professionalExperienceData="professionalExperienceData" :vendorId="vendorId" @refreshProfExperiences="setDetailsTablesData")
