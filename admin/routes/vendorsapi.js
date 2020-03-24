@@ -38,7 +38,7 @@ router.post('/remove-vendor-doc', async (req, res) => {
             vendorId, ...docFile
         });
         res.send(updatedVendor);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send("Error on removing vendor document");
     }
@@ -67,7 +67,7 @@ router.post('/remove-vendor-education', async (req, res) => {
             vendorId, index, path
         });
         res.send(updatedVendor);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send("Error on removing vendor document");
     }
@@ -78,9 +78,9 @@ router.post('/vendor-profExperience', async (req, res) => {
     try {
         const query = `profExperiences.${index}`;
         const updatedVendor = await getVendorAfterUpdate(
-            {_id: vendorId }, 
+            { _id: vendorId },
             { [query]: experience }
-            )
+        )
         res.send(updatedVendor);
     } catch (err) {
         console.log(err);
@@ -92,23 +92,23 @@ router.post('/remove-vendor-experience', async (req, res) => {
     const { vendorId, index } = req.body;
     try {
         const query = `profExperiences.${index}`;
-        await Vendors.updateOne({_id: vendorId}, {[query]: null});
-        const updatedVendor = await getVendorAfterUpdate({_id: vendorId}, {$pull: {"profExperiences": null}});
+        await Vendors.updateOne({ _id: vendorId }, { [query]: null });
+        const updatedVendor = await getVendorAfterUpdate({ _id: vendorId }, { $pull: { "profExperiences": null } });
         res.send(updatedVendor);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send("Error on removing vendor document");
     }
 })
 
-router.post('/vendor-qualification', async (req, res) => {
+router.post('/vendor-qualification', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
     const { vendorId, index, qualification } = req.body;
     try {
         const query = `qualifications.${index}`;
         const updatedVendor = await getVendorAfterUpdate(
-            {_id: vendorId }, 
+            { _id: vendorId },
             { [query]: qualification }
-            )
+        )
         res.send(updatedVendor);
     } catch (err) {
         console.log(err);
@@ -120,23 +120,40 @@ router.post('/remove-vendor-qualification', async (req, res) => {
     const { vendorId, index } = req.body;
     try {
         const query = `qualifications.${index}.status`;
-        await Vendors.updateOne({_id: vendorId}, {[query]: ""});
-        const updatedVendor = await getVendorAfterUpdate({_id: vendorId}, {$pull: {qualifications: {status: ""}}});
+        await Vendors.updateOne({ _id: vendorId }, { [query]: "" });
+        const updatedVendor = await getVendorAfterUpdate({ _id: vendorId }, { $pull: { qualifications: { status: "" } } });
         res.send(updatedVendor);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send("Error on removing vendor document");
     }
 })
 
 router.post('/vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
-    const assessmentData = JSON.parse(req.body);
-    const { vendorId, index, assessment } = assessmentData;
+
+    const assessmentData = JSON.parse(req.body.assessment);
     const files = req.files["assessmentFile"];
+    let assessmentStage = assessmentData.tqi
+        ? "tqi"
+        : assessmentData.isLqa1
+            ? "lqa1"
+            : assessmentData.isLqa2
+                ? "lqa2"
+                : assessmentData.isLqa3
+                    ? "lqa3"
+                    : "tqi";
     try {
         const updatedVendor = await updateVendorAssessment({
-                vendorId, index, assessment, file: files[0]
-            })
+            vendorId: req.body.vendorId,
+            index: req.body.index,
+            assessment: {
+                industry: assessmentData.industryId,
+                [assessmentStage]: {
+                    grade: assessmentData.grade,
+                },
+            },
+            file: files[0]
+        })
         res.send(updatedVendor);
     } catch (err) {
         console.log(err);

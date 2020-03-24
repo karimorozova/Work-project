@@ -79,7 +79,7 @@
                         .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
                             MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             
-            VendorCandidate(:candidateData='candidateData' v-if="currentVendor.status === 'Potential'")
+            VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
          
         .title Qualifications
             TableQualifications(:qualificationData="qualificationData" :vendorIndustries="currentVendor.industries" :vendorId="vendorId" @refreshQualifications="setDetailsTablesData")
@@ -88,7 +88,7 @@
             TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
 
         .title Assessment
-            TableAssessment(:assessmentData="assessmentData")
+            TableAssessment(:assessmentData="assessmentData" :vendorId="vendorId" @refreshAssessment="setDetailsTablesData")
         
         .title Professional experience
             TableProfessionalExperience(:professionalExperienceData="professionalExperienceData" :vendorId="vendorId" @refreshProfExperiences="setDetailsTablesData")
@@ -143,13 +143,6 @@ export default {
       qualificationData: [],
       documentsData: [],
       assessmentData: [],
-      candidateData: {
-        experience: "2-4 years",
-        internetAccess: "Limited online availability",
-        cat: "Yes - MemoQ",
-        softwareExperience: "HTML,DTP software - MemoQ",
-        availability: "Approve Deadline"
-      },
       areErrorsExist: false,
       isSaveClicked: false,
       vendorShow: true,

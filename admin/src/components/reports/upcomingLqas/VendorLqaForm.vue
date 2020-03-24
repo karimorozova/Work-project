@@ -19,9 +19,8 @@
                 LabelVal(text="Grade:" customClass="new-chart-label start-justified")
                     input.vendor-lqa__text(type="text" :value="grade" @input="setGrade" :class="{'vendor-lqa_red-border': isGradeEmpty}")
                     .vendor-lqa__upload(v-if="uploadForm")
-                        input.vendor-lqa__load-file(type="file")
+                        input.vendor-lqa__load-file(type="file" id="file" ref="file" @change="uploadDocument()")
                 .vendor-lqa__error-message(v-if="isGradeEmpty") Grade field shouldn't be empty
-                
                 
 
         .vendor-lqa__buttons
@@ -40,17 +39,21 @@ export default {
   props: {
     vendorData: { type: Object },
     languages: { type: Array, default: () => [] },
-    uploadForm: {type: Boolean, default: false},
+    uploadForm: { type: Boolean, default: false }
   },
   data() {
     return {
       grade: "",
+      currentFile: "",
       isGradeEmpty: false
     };
   },
   methods: {
     close() {
       this.$emit("closeForm");
+    },
+    uploadDocument() {
+      this.currentFile = this.$refs.file.files[0];
     },
     setGrade(e) {
       this.isGradeEmpty = false;
@@ -67,9 +70,16 @@ export default {
       if (!this.grade) {
         return (this.isGradeEmpty = true);
       }
-      this.$emit("saveVendorLqa", {
-        vendorData: { ...this.vendorData, grade: this.grade, lqa: this.lqa }
-      });
+
+      if (this.uploadForm) {
+        this.$emit("saveVendorLqa", {
+          vendorData: { ...this.vendorData, grade: this.grade, lqa: this.lqa, file: this.currentFile }
+        });
+      } else {
+        this.$emit("saveVendorLqa", {
+          vendorData: { ...this.vendorData, grade: this.grade, lqa: this.lqa }
+        });
+      }
     }
   },
   computed: {
@@ -156,11 +166,11 @@ export default {
   }
   &__upload {
     position: relative;
-    background: url("../../../assets/images/Other/upload-icon.png");
+    background: url("../../../assets/images/upload-blue.png");
     background-position: center;
     background-repeat: no-repeat;
-    height: 18px;
-    width: 18px;
+    height: 21px;
+    width: 21px;
     overflow: hidden;
     vertical-align: sub;
     margin-left: 50px;

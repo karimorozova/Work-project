@@ -1,5 +1,13 @@
 <template lang="pug">
 .assessment 
+
+    .assessment__form(v-if="isFormLqa1")
+        VendorLqaForm(:vendorData="vendorDataLqa1" :uploadForm="true" @closeForm="closeForm('lqa1')"  @saveVendorLqa="saveVendorLqa")
+    .assessment__form(v-if="isFormLqa2")
+        VendorLqaForm(:vendorData="vendorDataLqa2" :uploadForm="true" @closeForm="closeForm('lqa2')"  @saveVendorLqa="saveVendorLqa")
+    .assessment__form(v-if="isFormLqa3")
+        VendorLqaForm(:vendorData="vendorDataLqa3" :uploadForm="true" @closeForm="closeForm('lqa3')"  @saveVendorLqa="saveVendorLqa")
+
     .assessment__subtitle Download and check file 
     .assessment__subtitle Make sure to convert all doc file into PDF
     .assessment__table
@@ -17,37 +25,36 @@
                 .assessment__head-title {{ field.label }}
             
             template(slot="industry" slot-scope="{ row, index }")
-                .assessment__data(v-if="currentActive !== index") {{ row.industry }}
-                .assessment__editing-data(v-else) 
-                    input.assessment__input(type="text" readonly )
+                .assessment__data(v-if="row.industry") {{ row.industry.name }}
             
             template(slot="tqi" slot-scope="{ row, index }")
-                .assessment__data(v-if="currentActive !== index") {{ row.tqi }}
-                .assessment__editing-data(v-else) 
-                    input.assessment__input(type="text" readonly )
+                div(v-if="row.tqi" :class="'assessment__grade'") {{ row.tqi.grade }}
+                  a(:href="domain + row.tqi.path")
+                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
 
             template(slot="lqa1" slot-scope="{ row, index }")
-                  .assessment__data(v-if="currentActive !== index") {{ row.lqa1 }}
-                  .assessment__editing-data(v-else) 
-                      input.assessment__input(type="text" readonly)
+                div(v-if="row.lqa1" :class="'assessment__grade'") {{ row.lqa1.grade }}
+                  a(:href="domain + row.lqa1.path")
+                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="row.tqi && !row.lqa1")
+                  .assessment__upload(v-if="row.tqi.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa1',index)")
 
             template(slot="lqa2" slot-scope="{ row, index }")
-                  .assessment__data(v-if="currentActive !== index") {{ row.lqa2 }}
-                  .assessment__editing-data(v-else) 
-                      input.assessment__input(type="text" readonly )
+                div(v-if="row.lqa2" :class="'assessment__grade'") {{ row.lqa2.grade }}
+                  a(:href="domain + row.lqa2.path")
+                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="row.lqa1 && !row.lqa2")
+                  .assessment__upload(v-if="row.lqa1.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa2',index)")
 
             template(slot="lqa3" slot-scope="{ row, index }") 
-                  .assessment__data(v-if="currentActive !== index") {{ row.lqa3 }}
-                  .assessment__editing-data(v-else) 
-                      input.assessment__input(type="text" readonly )
-                  //- .assessment__upload
-                  //-    .assessment__load-file(@click="openForm")
-
-    .assessment__form(v-if="isForm")
-        VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
-            
-
-
+                div(v-if="row.lqa3" :class="'assessment__grade'") {{ row.lqa3.grade }}
+                  a(:href="domain + row.lqa3.path")
+                    img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                span(v-if="row.lqa2 && !row.lqa3")
+                  .assessment__upload(v-if="row.lqa2.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa3',index)")
 </template>
 
 <script>
@@ -57,8 +64,12 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
+    vendorId: {
+      type: String
+    },
     assessmentData: {
-      type: Array, default: () => []
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -68,113 +79,161 @@ export default {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "21.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "TQI",
           headerKey: "headerTQI",
           key: "tqi",
-          width: "21.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "LQA 1",
           headerKey: "headerLQA1",
           key: "lqa1",
-          width: "21.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "LQA 2",
           headerKey: "headerLQA2",
           key: "lqa2",
-          width: "21.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "LQA 3",
           headerKey: "headerLQA3",
           key: "lqa3",
-          width: "14%",
+          width: "20%",
           padding: "0"
         }
       ],
 
-      vendorData: {
-        _id: "5ddd02be798ffa2a528740bc",
-        wordcounts: {
-          steps: "Translator, Revisor",
-          Finance: 788524.1499999999,
-          General: 5408.65,
-          iGaming: 999.9,
-          Legal: 0,
-          Pharma: 0,
-          "Sport-Betting": 0,
-          "eLearning ": 0,
-          Law: 0,
-          Medicine: 0,
-          "Video Games": 0,
-          eLearning: 0
-        },
+      gradeNextLvl: 50,
+      currentIndex:'',
 
-        updatedAt: "2019-11-26T10:39:20.549Z",
-
+      vendorDataLqa1: {
         vendor: {
-          _id: "5ddd02be798ffa2a528740bb",
-          name: "TEST vendor",
-          basicPrice: "0.05",
-          tqi: "100",
-          lqa1: "100",
-          lqa2: "100",
-          lqa3: "",
-          steps: ["Translator", "Revisor"],
-          type: "Pangea",
-          wordcount: "",
+          name: "TEST1",
           language: {
-            _id: "5dd6aaa318239889b8cc17fa",
-            lang: "Arabic [grouped]"
-          },
-
-          __v: 0,
-          tqis: { Finance: "100", iGaming: "100" },
-          lqa1s: { Finance: "100", iGaming: "100" },
-          lqa2s: { Finance: "100", iGaming: "100" },
-          lqa3s: { Finance: "", iGaming: "" },
-          basicPrices: { Finance: "0.05", iGaming: "0.05" }
+            lang: "TEST"
+          }
         },
-
-        __v: 0,
-        tier: 1,
-        industry: "Finance",
+        industry: "",
+        industryId: "",
+        tqi: false,
+        isLqa1: true,
+        isLqa2: false,
+        isLqa3: false
+      },
+      vendorDataLqa2: {
+        vendor: {
+          name: "TEST2",
+          language: {
+            lang: "TEST"
+          }
+        },
+        industry: "",
+        industryId: "",
+        tqi: false,
+        isLqa1: false,
+        isLqa2: true,
+        isLqa3: false
+      },
+      vendorDataLqa3: {
+        vendor: {
+          name: "TEST3",
+          language: {
+            lang: "TEST"
+          }
+        },
+        industry: "",
+        industryId: "",
+        tqi: false,
         isLqa1: false,
         isLqa2: false,
         isLqa3: true
       },
 
-      isForm: false,
+      isFormLqa1: false,
+      isFormLqa2: false,
+      isFormLqa3: false,
 
       currentActive: -1,
       areErrors: false,
       errors: [],
       isDeleting: false,
-      deleteIndex: -1
+      deleteIndex: -1,
+      domain: "http://localhost:3001"
     };
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle",
+      storeAssessment: "storeCurrentVendorAssessment"
+    }),
+    async saveVendorLqa({ vendorData }) {
+      let formData = new FormData();
+      formData.append("vendorId", this.vendorId);
+      formData.append("index", this.currentIndex);
+      formData.append("assessment", JSON.stringify(vendorData));
+      formData.append("assessmentFile", vendorData.file);
+      try {
+        const result = await this.storeAssessment(formData);
+        this.alertToggle({
+          message: "Assessment saved",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+      } finally {
+        this.$emit("refreshAssessment");
+      }
+      this.closeAllForms();
+    },
+    closeAllForms() {
+      this.isFormLqa1 = false;
+      this.isFormLqa2 = false;
+      this.isFormLqa3 = false;
+    },
     closeErrors() {
       this.areErrors = false;
     },
-    closeForm() {
-      this.isForm = false;
+    closeForm(field) {
+      field == "lqa1"
+        ? (this.isFormLqa1 = false)
+        : field == "lqa2"
+        ? (this.isFormLqa2 = false)
+        : field == "lqa3"
+        ? (this.isFormLqa3 = false)
+        : false;
     },
-    openForm() {
-      this.isForm = true;
+    openForm(field,index) {
+      field == "lqa1"
+        ? (this.isFormLqa1 = true)
+        : field == "lqa2"
+        ? (this.isFormLqa2 = true)
+        : field == "lqa3"
+        ? (this.isFormLqa3 = true)
+        : false;
+      this.currentIndex = index;
+      this.setindustryId();
     },
+    setindustryId(){
+      this.vendorDataLqa1.industryId = this.assessmentData[this.currentIndex].industry._id;
+      this.vendorDataLqa2.industryId = this.assessmentData[this.currentIndex].industry._id;
+      this.vendorDataLqa3.industryId = this.assessmentData[this.currentIndex].industry._id;
+    }
   },
   components: {
     SettingsTable,
     VendorLqaForm
+  },
+  mounted() {
+    this.domain = __WEBPACK__API_URL__;
   }
 };
 </script>
@@ -194,9 +253,8 @@ export default {
     padding-bottom: 4px;
     font-weight: 600;
   }
-
   &__data {
-    @extend %table-data;
+    padding: 8.5px 5px;
   }
   &__editing-data {
     @extend %table-data;
@@ -219,7 +277,7 @@ export default {
   }
   &__upload {
     position: relative;
-    background: url("../../assets/images/Other/upload-icon.png");
+    background: url("../../assets/images/upload-blue.png");
     background-position: center;
     background-repeat: no-repeat;
     height: 30px;
@@ -237,6 +295,14 @@ export default {
     cursor: pointer;
     font-size: 0;
   }
+  &__download {
+    height: 20px;
+    width: 20px;
+    margin-top: -3px;
+    position: absolute;
+    margin-left: 15px;
+    cursor: pointer;
+  }
   &__form {
     width: 70%;
     position: absolute;
@@ -244,6 +310,9 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+  }
+  &__grade {
+    padding: 8.5px 5px;
   }
 }
 </style>
