@@ -166,11 +166,11 @@ export default {
   }
   &__upload {
     position: relative;
-    background: url("../../../assets/images/Other/upload-icon.png");
+    background: url("../../../assets/images/upload-blue.png");
     background-position: center;
     background-repeat: no-repeat;
-    height: 18px;
-    width: 18px;
+    height: 21px;
+    width: 21px;
     overflow: hidden;
     vertical-align: sub;
     margin-left: 50px;

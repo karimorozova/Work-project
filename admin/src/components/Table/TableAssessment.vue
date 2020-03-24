@@ -277,7 +277,7 @@ export default {
   }
   &__upload {
     position: relative;
-    background: url("../../assets/images/Other/upload-icon.png");
+    background: url("../../assets/images/upload-blue.png");
     background-position: center;
     background-repeat: no-repeat;
     height: 30px;
@@ -296,7 +296,10 @@ export default {
     font-size: 0;
   }
   &__download {
-    height: 16px;
+    height: 20px;
+    width: 20px;
+    margin-top: -3px;
+    position: absolute;
     margin-left: 15px;
     cursor: pointer;
   }
@@ -309,7 +312,7 @@ export default {
     bottom: 0;
   }
   &__grade {
-    padding: 4px 5px;
+    padding: 8.5px 5px;
   }
 }
 </style>
