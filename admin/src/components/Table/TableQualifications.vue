@@ -172,8 +172,10 @@ export default {
             lang: "TEST"
           }
         },
-        industry: "TEST",
-        isLqa1: true,
+        industry: '',
+        industryId: '',
+        tqi: true,
+        isLqa1: false,
         isLqa2: false,
         isLqa3: false
       },
@@ -194,6 +196,7 @@ export default {
       currentIndustry: "",
       currentTask: "",
       currentStatus: "",
+      currentIndex: "",
 
       areErrors: false,
       errors: [],
@@ -208,7 +211,8 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeQualification: "storeCurrentVendorQualification",
-      deleteQualification: "deleteCurrentVendorQualification"
+      deleteQualification: "deleteCurrentVendorQualification",
+      storeAssessment: "storeCurrentVendorAssessment"
     }),
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
@@ -267,6 +271,9 @@ export default {
         return;
       } else {
         if (this.currentStatus == "Passed") {
+          this.currentIndex = index;
+          this.vendorData.industry = this.currentIndustry.name;
+          this.vendorData.industryId = this.currentIndustry._id;
           this.openForm();
         } else {
           await this.manageSaveClick(index);
@@ -281,25 +288,23 @@ export default {
         task: this.currentTask,
         status: this.currentStatus
       };
-
+      if (this.currentSource.lang !== "NA") {
+        qualification.source = this.currentSource;
+      }
       let formData = new FormData();
-      formData.append("assessment", vendorData);
+      formData.append("vendorId", this.vendorId);
+      formData.append("index", this.currentIndex);
+      formData.append("assessment", JSON.stringify(vendorData));
       formData.append("assessmentFile", vendorData.file);
-      
       try {
-        const result = await this.storeQualification({
-          vendorId: this.vendorId,
-          index,
-          qualification,
-          formData
-        });
-        this.alertToggle({
-          message: "Qualification saved",
-          isShow: true,
-          type: "success"
-        });
+        const assessment = await this.storeAssessment(formData);
       } catch (err) {
       } finally {
+        const result = await this.storeQualification({
+          vendorId: this.vendorId,
+          index: this.currentIndex,
+          qualification
+        });
         this.manageCancelEdition();
       }
       this.closeForm();
@@ -481,7 +486,7 @@ export default {
   &_opacity {
     opacity: 1;
   }
-   &__form {
+  &__form {
     width: 70%;
     position: absolute;
     top: 0;

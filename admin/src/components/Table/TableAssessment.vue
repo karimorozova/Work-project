@@ -1,5 +1,5 @@
 <template lang="pug">
-.assessment
+.assessment 
 
     .assessment__form(v-if="isFormLqa1")
         VendorLqaForm(:vendorData="vendorDataLqa1" :uploadForm="true" @closeForm="closeForm('lqa1')"  @saveVendorLqa="saveVendorLqa")
@@ -25,33 +25,36 @@
                 .assessment__head-title {{ field.label }}
             
             template(slot="industry" slot-scope="{ row, index }")
-                .assessment__data(v-if="row.industry") {{ row.industry }}
+                .assessment__data(v-if="row.industry") {{ row.industry.name }}
             
             template(slot="tqi" slot-scope="{ row, index }")
-                div(v-if="row.tqi.grade" :class="'assessment__grade'") {{ row.tqi.grade }}
-                  a(:href="domain + row.tqi.filePath")
+                div(v-if="row.tqi" :class="'assessment__grade'") {{ row.tqi.grade }}
+                  a(:href="domain + row.tqi.path")
                     img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
 
             template(slot="lqa1" slot-scope="{ row, index }")
-                div(v-if="row.lqa1.grade" :class="'assessment__grade'") {{ row.lqa1.grade }}
-                  a(:href="domain + row.lqa1.filePath")
+                div(v-if="row.lqa1" :class="'assessment__grade'") {{ row.lqa1.grade }}
+                  a(:href="domain + row.lqa1.path")
                     img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                .assessment__upload(v-if="row.tqi.grade > 50 && !row.lqa1.grade")
-                    .assessment__load-file(@click="openForm('lqa1')")
+                span(v-if="row.tqi && !row.lqa1")
+                  .assessment__upload(v-if="row.tqi.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa1',index)")
 
             template(slot="lqa2" slot-scope="{ row, index }")
-                div(v-if="row.lqa2.grade" :class="'assessment__grade'") {{ row.lqa2.grade }}
-                  a(:href="domain + row.lqa2.filePath")
+                div(v-if="row.lqa2" :class="'assessment__grade'") {{ row.lqa2.grade }}
+                  a(:href="domain + row.lqa2.path")
                     img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                .assessment__upload(v-if="row.lqa1.grade > 50 && !row.lqa2.grade")
-                    .assessment__load-file(@click="openForm('lqa2')")
+                span(v-if="row.lqa1 && !row.lqa2")
+                  .assessment__upload(v-if="row.lqa1.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa2',index)")
 
             template(slot="lqa3" slot-scope="{ row, index }") 
-                div(v-if="row.lqa3.grade" :class="'assessment__grade'") {{ row.lqa3.grade }}
-                  a(:href="domain + row.lqa3.filePath")
+                div(v-if="row.lqa3" :class="'assessment__grade'") {{ row.lqa3.grade }}
+                  a(:href="domain + row.lqa3.path")
                     img(v-if="!row.fileName" :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                .assessment__upload(v-if="row.lqa2.grade > 50 && !row.lqa3.grade")
-                    .assessment__load-file(@click="openForm('lqa3')")
+                span(v-if="row.lqa2 && !row.lqa3")
+                  .assessment__upload(v-if="row.lqa2.grade > gradeNextLvl")
+                      .assessment__load-file(@click="openForm('lqa3',index)")
 </template>
 
 <script>
@@ -109,6 +112,9 @@ export default {
         }
       ],
 
+      gradeNextLvl: 50,
+      currentIndex:'',
+
       vendorDataLqa1: {
         vendor: {
           name: "TEST1",
@@ -116,7 +122,9 @@ export default {
             lang: "TEST"
           }
         },
-        industry: "TEST",
+        industry: "",
+        industryId: "",
+        tqi: false,
         isLqa1: true,
         isLqa2: false,
         isLqa3: false
@@ -128,7 +136,9 @@ export default {
             lang: "TEST"
           }
         },
-        industry: "TEST",
+        industry: "",
+        industryId: "",
+        tqi: false,
         isLqa1: false,
         isLqa2: true,
         isLqa3: false
@@ -140,7 +150,9 @@ export default {
             lang: "TEST"
           }
         },
-        industry: "TEST",
+        industry: "",
+        industryId: "",
+        tqi: false,
         isLqa1: false,
         isLqa2: false,
         isLqa3: true
@@ -165,7 +177,9 @@ export default {
     }),
     async saveVendorLqa({ vendorData }) {
       let formData = new FormData();
-      formData.append("assessment", vendorData);
+      formData.append("vendorId", this.vendorId);
+      formData.append("index", this.currentIndex);
+      formData.append("assessment", JSON.stringify(vendorData));
       formData.append("assessmentFile", vendorData.file);
       try {
         const result = await this.storeAssessment(formData);
@@ -176,6 +190,7 @@ export default {
         });
       } catch (err) {
       } finally {
+        // this.$emit("refreshAssessment");
       }
       this.closeAllForms();
     },
@@ -196,7 +211,7 @@ export default {
         ? (this.isFormLqa3 = false)
         : false;
     },
-    openForm(field) {
+    openForm(field,index) {
       field == "lqa1"
         ? (this.isFormLqa1 = true)
         : field == "lqa2"
@@ -204,6 +219,13 @@ export default {
         : field == "lqa3"
         ? (this.isFormLqa3 = true)
         : false;
+      this.currentIndex = index;
+      this.setindustryId();
+    },
+    setindustryId(){
+      this.vendorDataLqa1.industryId = this.assessmentData[this.currentIndex].industry._id;
+      this.vendorDataLqa2.industryId = this.assessmentData[this.currentIndex].industry._id;
+      this.vendorDataLqa3.industryId = this.assessmentData[this.currentIndex].industry._id;
     }
   },
   components: {
@@ -286,7 +308,7 @@ export default {
     right: 0;
     bottom: 0;
   }
-  &__grade{
+  &__grade {
     padding: 4px 5px;
   }
 }

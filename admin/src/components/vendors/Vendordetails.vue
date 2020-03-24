@@ -88,7 +88,7 @@
             TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
 
         .title Assessment
-            TableAssessment(:assessmentData="assessmentData")
+            TableAssessment(:assessmentData="assessmentData" :vendorId="vendorId" @refreshAssessment="setDetailsTablesData")
         
         .title Professional experience
             TableProfessionalExperience(:professionalExperienceData="professionalExperienceData" :vendorId="vendorId" @refreshProfExperiences="setDetailsTablesData")

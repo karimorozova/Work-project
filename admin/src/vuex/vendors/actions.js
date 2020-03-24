@@ -219,23 +219,9 @@ export const deleteCurrentVendorQualification = async ({ commit, dispatch }, pay
 }
 
 export const storeCurrentVendorAssessment = async ({ dispatch }, payload) => {
-    commit("startRequest");
     try {
-        // const result = await Vue.http.post("/vendorsapi/vendor-assessment", payload);
-        // dispatch("storeCurrentVendor", updatedVendor.body);
-    } catch (err) {
-        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
-    } finally {
-        commit("endRequest");
-    }
-}
-
-export const deleteCurrentVendorAssessment = async ({ commit, dispatch }, payload) => {
-    commit("startRequest");
-    try {
-        // const { index, vendorId } = payload;
-        // const updatedVendor = await Vue.http.post("/vendorsapi/remove-vendor-assessment", { index, vendorId });
-        // dispatch("storeCurrentVendor", updatedVendor.body);
+        const result = await Vue.http.post("/vendorsapi/vendor-assessment", payload);
+        dispatch("storeCurrentVendor", updatedVendor.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
