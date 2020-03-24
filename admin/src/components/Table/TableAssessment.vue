@@ -190,7 +190,7 @@ export default {
         });
       } catch (err) {
       } finally {
-        // this.$emit("refreshAssessment");
+        this.$emit("refreshAssessment");
       }
       this.closeAllForms();
     },

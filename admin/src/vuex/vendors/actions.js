@@ -220,7 +220,7 @@ export const deleteCurrentVendorQualification = async ({ commit, dispatch }, pay
 
 export const storeCurrentVendorAssessment = async ({ dispatch }, payload) => {
     try {
-        const result = await Vue.http.post("/vendorsapi/vendor-assessment", payload);
+        const updatedVendor = await Vue.http.post("/vendorsapi/vendor-assessment", payload);
         dispatch("storeCurrentVendor", updatedVendor.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
