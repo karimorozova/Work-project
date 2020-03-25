@@ -138,13 +138,26 @@ const VendorSchema = new mongoose.Schema({
         default: []
     },
     assessments: [{
-        industry: {
-            type: Schema.Types.ObjectId, ref: 'Industries'
+        step: {
+            type: Schema.Types.ObjectId, ref: 'Step'
         },
-        tqi: {},
-        lqa1: {},
-        lqa2: {},
-        lqa3: {}
+        langsData: [{
+            source: {
+                type: Schema.Types.ObjectId, ref: 'Language',
+            },
+            target: {
+                type: Schema.Types.ObjectId, ref: 'Language'
+            },
+            industries: [{
+                industry: {
+                    type: Schema.Types.ObjectId, ref: 'Industries'
+                },
+                tqi: {},
+                lqa1: {},
+                lqa2: {},
+                lqa3: {}
+            }]
+        }]
     }],
     wordsRates: [{ 
         source: {

@@ -18,8 +18,11 @@ async function getVendor(query) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.task")
-            .populate("assessments.industry")
+            .populate("qualifications.step")
+            .populate("assessments.step")
+            .populate("assessments.langsData.source")
+            .populate("assessments.langsData.target")
+            .populate("assessments.langsData.industries.industry")
     return vendor;
 }
 
@@ -40,8 +43,11 @@ async function getVendors(query) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.task")
-            .populate("assessments.industry")
+            .populate("qualifications.step")
+            .populate("assessments.step")
+            .populate("assessments.langsData.source")
+            .populate("assessments.langsData.target")
+            .populate("assessments.langsData.industries.industry")
     return vendors;
 }
 
@@ -62,8 +68,11 @@ async function getVendorAfterUpdate(query, update) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.task")
-            .populate("assessments.industry")
+            .populate("qualifications.step")
+            .populate("assessments.step")
+            .populate("assessments.langsData.source")
+            .populate("assessments.langsData.target")
+            .populate("assessments.langsData.industries.industry")
 }
 
 async function getFilteredVendors(filters) {
@@ -90,8 +99,11 @@ async function getFilteredVendors(filters) {
             "qualifications.source",
             "qualifications.target",
             "qualifications.industry",
-            "qualifications.task",
-            "assessments.industry"
+            "qualifications.step",
+            "assessments.step",
+            "assessments.langsData.source",
+            "assessments.langsData.target",
+            "assessments.langsData.industries.industry",
         ]);
     } catch(err) {
         console.log(err);

@@ -274,16 +274,20 @@ export default {
     },
     async saveVendorLqa({vendorData}) {
       const { file, grade } = vendorData;
-      const assessment = {
+      let assessment = {
+          step: this.currentStep,
+          target: this.currentTarget,
           industry: this.currentIndustry,
           tqi: {fileName: "", path: "", grade},
           lqa1: {},
           lqa2: {},
           lqa3: {}
       }
+      if (this.currentSource.lang !== "NA") {
+        assessment.source = this.currentSource;
+      }
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
-      formData.append("index", this.assessmentData.length);
       formData.append("assessment", JSON.stringify(assessment));
       formData.append("assessmentFile", file);
       

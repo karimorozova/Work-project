@@ -1,5 +1,5 @@
 const { Vendors } = require('../models');
-const { getVendorAfterUpdate } = require('./getVendors');
+const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const bcrypt = require('bcryptjs');
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
@@ -80,19 +80,84 @@ async function updateVendorEducation({vendorId, education, file, index}) {
 
 async function updateVendorAssessment({vendorId, index, assessment, file}) {
     try {
-        const qaKey = Object.keys(assessment).find(item => assessment[item].grade && !assessment[item].path);
-        const path = `/vendorsDocs/${vendorId}/${qaKey}${index}-${file.filename}`;
-        await moveFile(file, `./dist${path}`);
-        const newAssessment = {...assessment, [qaKey]: {...assessment[qaKey], fileName: file.filename, path}};
-        const query = `assessments.${index}`;
-        return await getVendorAfterUpdate(
-            {_id: vendorId}, 
-            {[query]: newAssessment}
-            );
+        const vendor = await getVendor({_id: vendorId});
+        let { assessments } = vendor;
+        const fileData = await saveAssessmentFile({assessment, file, vendorId});
+        const updateIndex = assessments.findIndex(item => item.step.id === assessment.step._id);
+        if(updateIndex !== -1) {
+            assessments[updateIndex] = updateExistingAssesment({
+                vendorId, index, assessment, fileData, updatingAssessment: assessments[updateIndex]
+            });
+        } else {
+            const newAssessment = addNewAssesment({assessment, fileData});
+            assessments.push(newAssessment);
+        }
+        return await getVendorAfterUpdate({_id: vendorId}, { assessments });
     } catch(err) {
         console.log(err);
         console.log("Error in updateVendorAssessment");
     }
+}
+
+async function saveAssessmentFile({assessment, file, vendorId}) {
+    try {
+        const qaKey = Object.keys(assessment).find(item => assessment[item].grade && !assessment[item].path);
+        const path = `/vendorsDocs/${vendorId}/${qaKey}${assessment.target.symbol}-${file.filename}`;
+        await moveFile(file, `./dist${path}`);
+        return { qaKey, path, fileName: file.filename }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveAssessmentFile");
+    }
+}
+
+function langsMatchIndex({source, target, langsData}) {
+    return langsData.findIndex(item => {
+        let isPairMatch = item.target.id === target._id;
+        if(isPairMatch && item.source) {
+            isPairMatch = source && item.source.id === source._id;
+        }
+        return isPairMatch;
+    })
+}
+
+function updateExistingAssesment({index, assessment, fileData, updatingAssessment}) {
+    const { step, source, target, ...assessmentData } = assessment;
+    const { qaKey, fileName, path } = fileData;
+    const newAssessment = { ...assessmentData, [qaKey]: {...assessmentData[qaKey], fileName, path}};
+    let { langsData } = updatingAssessment;
+    const langsDataIndex = langsMatchIndex({source, target, langsData});
+    if(langsDataIndex !== -1) {
+        if(index) {
+            langsData[langsDataIndex].industries[index] = newAssessment;
+        } else {
+            langsData[langsDataIndex].industries = [newAssessment];
+        }
+    } else {
+        langsData.push({
+            source, target, industries: [newAssessment]
+        })
+    }
+    return {step, langsData};
+}
+
+function addNewAssesment({assessment, fileData}) {
+    let {step, source, target, ...assessmentData } = assessment;
+    const { qaKey, fileName, path } = fileData;
+    assessmentData[qaKey] = { ...assessmentData[qaKey], fileName, path };
+    let newAssessment = {
+        step,
+        langsData: [{
+            target,
+            industries: [{
+                ...assessmentData
+            }]
+        }]
+    }
+    if(source) {
+        newAssessment.langsData[0].source = source;
+    }
+    return newAssessment;
 }
 
 async function saveHashedPassword(id, pass) {

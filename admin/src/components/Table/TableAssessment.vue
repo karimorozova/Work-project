@@ -5,53 +5,52 @@
 
     .assessment__subtitle Download and check file 
     .assessment__subtitle Make sure to convert all doc file into PDF
-    .assessment__table
-        SettingsTable(
-            :fields="fields"
-            :tableData="assessmentData"
-            :errors="errors"
-            :areErrors="areErrors" 
-            :isApproveModal="isDeleting"
-            :bodyClass="'vendor__assessment-body'"
-            :headerClass="'vendor__assessment-header'"
-        )
+    .assessment__item(v-for="(stepData, stepIndex ) in assessmentData")
+        .assessment__step {{ stepData.step.title }}
+        .assessment__language(v-for="(langsData, langsIndex) in stepData.langsData")
+            .assessment__pair {{ langsData.source.lang }} >> {{ langsData.target.lang }}
+            .assessment__table
+                SettingsTable(
+                    :fields="fields"
+                    :tableData="langsData.industries"
+                    :errors="errors"
+                    :areErrors="areErrors" 
+                    :isApproveModal="isDeleting"
+                    :bodyClass="'vendor__assessment-body'"
+                    :headerClass="'vendor__assessment-header'"
+                )
 
-            template(v-for="field in fields"  :slot="field.headerKey" slot-scope="{ field }")
-                .assessment__head-title {{ field.label }}
-            
-            template(slot="industry" slot-scope="{ row, index }")
-                .assessment__data(v-if="row.industry") {{ row.industry.name }}
-            
-            template(slot="tqi" slot-scope="{ row, index }")
-                div(v-if="!row.tqi == ''" :class="'assessment__grade'") {{ row.tqi.grade }}
-                  a(:href="domain + row.tqi.path")
-                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                    template(v-for="field in fields"  :slot="field.headerKey" slot-scope="{ field }")
+                        .assessment__head-title {{ field.label }}
+                    
+                    template(slot="industry" slot-scope="{ row, index }")
+                        .assessment__data(v-if="row.industry") {{ row.industry.name }}
+                    
+                    template(slot="tqi" slot-scope="{ row, index }")
+                        div(v-if="row.tqi.grade" :class="'assessment__grade'") {{ row.tqi.grade }}
+                        a(:href="domain + row.tqi.path")
+                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
 
-            template(slot="lqa1" slot-scope="{ row, index }")
-                div(v-if="!row.lqa1 == ''" :class="'assessment__grade'") {{ row.lqa1.grade }}
-                  a(:href="domain + row.lqa1.path")
-                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="!row.tqi == ''")
-                  .assessment__upload
-                      .assessment__load-file(@click="openForm('Lqa1',index)")
+                    template(slot="lqa1" slot-scope="{ row, index }")
+                        div(v-if="row.lqa1.grade" :class="'assessment__grade'") {{ row.lqa1.grade }}
+                        a(:href="domain + row.lqa1.path")
+                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload
+                            .assessment__load-file(@click="openForm({field: 'Lqa1', index, stepIndex, langsIndex})")
 
-            template(slot="lqa2" slot-scope="{ row, index }")
-                div(v-if="!row.lqa2 == ''" :class="'assessment__grade'") {{ row.lqa2.grade }}
-                  a(:href="domain + row.lqa2.path")
-                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="!row.lqa1 == ''" )
-                  .assessment__upload
-                      .assessment__load-file(@click="openForm('Lqa2',index)")
+                    template(slot="lqa2" slot-scope="{ row, index }")
+                        div(v-if="row.lqa2.grade" :class="'assessment__grade'") {{ row.lqa2.grade }}
+                        a(:href="domain + row.lqa2.path")
+                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload
+                            .assessment__load-file(@click="openForm({field: 'Lqa2', index, stepIndex, langsIndex})")
 
-            template(slot="lqa3" slot-scope="{ row, index }")
-                div(v-if="!row.lqa3 == ''" :class="'assessment__grade'") {{ row.lqa3.grade }}
-                  a(:href="domain + row.lqa3.path")
-                    img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                span(v-if="!row.lqa2 == ''" )
-                  .assessment__upload
-                      .assessment__load-file(@click="openForm('Lqa3',index)")
-
-
+                    template(slot="lqa3" slot-scope="{ row, index }")
+                        div(v-if="row.lqa3.grade" :class="'assessment__grade'") {{ row.lqa3.grade }}
+                        a(:href="domain + row.lqa3.path")
+                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload
+                            .assessment__load-file(@click="openForm({field: 'Lqa3', index, stepIndex, langsIndex})")
 </template>
 
 <script>
@@ -110,6 +109,7 @@ export default {
       ],
       gradeNextLvl: 50,
       currentIndex: "",
+      currentAssessment: {},
       currentField: "lqa1",
       vendorData: {},
       isForm: false,
@@ -128,9 +128,12 @@ export default {
       storeAssessment: "storeCurrentVendorAssessment"
     }),
     async saveVendorLqa({ vendorData }) {
-      const { file, grade } = vendorData;
+      const { file, grade, source, target, step, industryId } = vendorData;
       const assessment = {
-          ...this.assessmentData[this.currentIndex],
+          ...this.currentAssessment,
+          step,
+          source,
+          target,
           [this.currentField]: {fileName: "", path: "", grade}
         }
       let formData = new FormData();
@@ -158,7 +161,10 @@ export default {
     closeForm(field) {
       this.isForm = false;
     },
-    openForm(field, index) {
+    openForm({field, index, stepIndex, langsIndex}) {
+      const stepData = this.assessmentData[stepIndex];
+      const { source, target, industries } = stepData.langsData[langsIndex];
+      this.currentAssessment = industries[index];
       this.currentIndex = index;
       this.currentField = field.toLowerCase();
       this.vendorData = {
@@ -168,8 +174,11 @@ export default {
             lang: ""
           }
         },
-        industry: this.assessmentData[index].industry.name,
-        industryId: this.assessmentData[index].industry._id,
+        step: stepData.step,
+        source, 
+        target,
+        industry: industries[index].name,
+        industryId: industries[index]._id,
         [`is${field}`]: true
       };
       this.isForm = true;
@@ -200,6 +209,12 @@ export default {
     font-size: 14px;
     padding-bottom: 4px;
     font-weight: 600;
+  }
+  &__step {
+      margin: 10px 0;
+  }
+  &__pair {
+      font-size: 18px;
   }
   &__data {
     padding: 8.5px 5px;
