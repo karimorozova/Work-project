@@ -278,29 +278,33 @@ export default {
       };
       this.openForm();
     },
-
     checkSuchData() {
-      if (this.assessmentData > 0) {
+      if (this.assessmentData == 0) {
+        return true;
+      } else {
         const getStep = this.assessmentData.find(
           value => value.step._id == this.currentStep._id
         );
-        const getTarget = getStep.langsData.find(
-          value => value.target._id == this.currentSource._id
-        );
-        const getSource = getStep.langsData.find(
-          value => value.source._id == this.currentSource._id
-        );
-        const getIndustry = getSource.industries.find(
-          value => value.industry._id == this.currentIndustry._id
-        );
-
-        if (getStep && getTarget && getSource && getIndustry) {
-          return false;
+        if (getStep) {
+          const getTarget = getStep.langsData.find(
+            value => value.target._id == this.currentSource._id
+          );
+          const getSource = getStep.langsData.find(
+            value => value.source._id == this.currentSource._id
+          );
+          const getIndustry = getSource.industries.find(
+            value => value.industry._id == this.currentIndustry._id
+          );
+          if (getTarget && getSource && getIndustry) {
+            this.errors.push("Such assessment information already exists!");
+            this.areErrors = true;
+            return false;
+          } else {
+            return true;
+          }
         } else {
           return true;
         }
-      } else {
-        return true;
       }
     },
 
