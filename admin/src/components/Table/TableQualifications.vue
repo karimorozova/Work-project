@@ -1,7 +1,7 @@
 <template lang="pug">
 .qualifications
   .qualifications__form(v-if="isForm")
-        VendorLqaForm(:vendorData="lqaData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
+        VendorLqa(:vendorData="lqaData" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
   .qualifications__table
       SettingsTable(
           :fields="fields"
@@ -98,7 +98,7 @@ import SelectSingle from "../SelectSingle";
 import Add from "../Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
-import VendorLqaForm from "../reports/upcomingLqas/VendorLqaForm";
+import VendorLqa from "../vendors/VendorLqa";
 
 export default {
   mixins: [scrollDrop, crudIcons],
@@ -251,8 +251,10 @@ export default {
       this.errors = [];
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTarget) this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus) this.errors.push("Step status should not be empty!");
+      if (!this.currentIndustry)
+        this.errors.push("Industry should not be empty!");
+      if (!this.currentStatus)
+        this.errors.push("Step status should not be empty!");
       if (!this.currentStep) this.errors.push("Step should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
@@ -265,37 +267,71 @@ export default {
       }
     },
     handleLqa() {
-        this.lqaData.industry = this.currentIndustry.name;
-        this.lqaData.vendor = {
-            name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
-            language: this.currentTarget
-            };
-        this.openForm();
+      this.lqaData = {
+        vendor: {
+          name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
+          industry: this.currentIndustry.name,
+          sourceLang: this.currentSource.lang,
+          targetLang: this.currentTarget.lang,
+          step: this.currentStep.title
+        }
+      };
+      this.openForm();
     },
-    async saveVendorLqa({vendorData}) {
-      const { file, grade } = vendorData;
-      let assessment = {
+
+    checkSuchData() {
+      if (this.assessmentData > 0) {
+        const getStep = this.assessmentData.find(
+          value => value.step._id == this.currentStep._id
+        );
+        const getTarget = getStep.langsData.find(
+          value => value.target._id == this.currentSource._id
+        );
+        const getSource = getStep.langsData.find(
+          value => value.source._id == this.currentSource._id
+        );
+        const getIndustry = getSource.industries.find(
+          value => value.industry._id == this.currentIndustry._id
+        );
+
+        if (getStep && getTarget && getSource && getIndustry) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
+
+    async saveVendorLqa({ vendorData }) {
+      if (this.checkSuchData()) {
+        const { file, grade } = vendorData;
+        let assessment = {
           step: this.currentStep,
-          target: this.currentTarget,
+          target: this.currentSource,
           industry: this.currentIndustry,
-          tqi: {fileName: "", path: "", grade},
+          tqi: { fileName: "", path: "", grade },
           lqa1: {},
           lqa2: {},
           lqa3: {}
-      }
-      if (this.currentSource.lang !== "NA") {
-        assessment.source = this.currentSource;
-      }
-      let formData = new FormData();
-      formData.append("vendorId", this.currentVendor._id);
-      formData.append("assessment", JSON.stringify(assessment));
-      formData.append("assessmentFile", file);
-      
-      try {
-        await this.storeAssessment(formData);
-        await this.manageSaveClick(this.currentActive);
-      } catch (err) {
-      } finally {
+        };
+        if (this.currentSource.lang !== "NA") {
+          assessment.source = this.currentSource;
+        }
+        let formData = new FormData();
+        formData.append("vendorId", this.currentVendor._id);
+        formData.append("assessment", JSON.stringify(assessment));
+        formData.append("assessmentFile", file);
+
+        try {
+          await this.storeAssessment(formData);
+          await this.manageSaveClick(this.currentActive);
+        } catch (err) {
+        } finally {
+          this.closeForm();
+        }
+      } else {
         this.closeForm();
       }
     },
@@ -326,12 +362,10 @@ export default {
         this.manageCancelEdition();
       }
     },
-
     async manageDeleteClick(index) {
       this.deleteIndex = index;
       this.isDeleting = true;
     },
-
     async deleteData() {
       try {
         await this.deleteQualification({
@@ -348,7 +382,6 @@ export default {
         this.manageCancelEdition();
       }
     },
-
     addData() {
       if (this.currentActive !== -1) {
         return this.isEditing();
@@ -362,7 +395,6 @@ export default {
       });
       this.setEditingData(this.qualificationData.length - 1);
     },
-
     async getLangs() {
       try {
         const result = await this.$http.get("/api/languages");
@@ -373,7 +405,6 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
-
     async getSteps() {
       try {
         const result = await this.$http.get("/api/steps");
@@ -429,7 +460,7 @@ export default {
   components: {
     SettingsTable,
     SelectSingle,
-    VendorLqaForm,
+    VendorLqa,
     Add
   },
 
