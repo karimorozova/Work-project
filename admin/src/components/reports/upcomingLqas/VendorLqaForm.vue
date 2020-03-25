@@ -21,11 +21,10 @@
                     .vendor-lqa__upload(v-if="uploadForm")
                         input.vendor-lqa__load-file(type="file" id="file" ref="file" @change="uploadDocument()")
                 .vendor-lqa__error-message(v-if="isGradeEmpty") Grade field shouldn't be empty
-                
-
+                .vendor-lqa__error-message(v-if="!isFile") Upload file
         .vendor-lqa__buttons
             .vendor-lqa__button 
-                Button(value="Save" @clicked="checkGrade")
+                Button(value="Save" @clicked="checkErrors")
             .vendor-lqa__button
                 Button(value="Cancel" @clicked="close")
 </template>
@@ -45,7 +44,8 @@ export default {
     return {
       grade: "",
       currentFile: "",
-      isGradeEmpty: false
+      isGradeEmpty: false,
+      isFile: true
     };
   },
   methods: {
@@ -54,6 +54,7 @@ export default {
     },
     uploadDocument() {
       this.currentFile = this.$refs.file.files[0];
+      this.isFile = true;
     },
     setGrade(e) {
       this.isGradeEmpty = false;
@@ -66,12 +67,13 @@ export default {
       e.target.value = gradeValue;
       this.grade = gradeValue;
     },
-    checkGrade() {
+    checkErrors() {
       if (!this.grade) {
         return (this.isGradeEmpty = true);
       }
-
+        
       if (this.uploadForm) {
+        if(!this.currentFile) return this.isFile = false;
         this.$emit("saveVendorLqa", {
           vendorData: { ...this.vendorData, grade: this.grade, lqa: this.lqa, file: this.currentFile }
         });
@@ -84,17 +86,14 @@ export default {
   },
   computed: {
     lqa() {
+      if(this.vendorData.isTqi) return "tqi";
       let result = "lqa1";
       if (this.vendorData) {
         result =
           !this.vendorData.isLqa1 && this.vendorData.isLqa2 ? "lqa2" : result;
         result = result !== "lqa2" && this.vendorData.isLqa3 ? "lqa3" : result;
       }
-      if(this.vendorData.tqi){
-        return 'tqi'
-      }else{
-        return result;
-      }
+      return result;
     }
   },
   components: {

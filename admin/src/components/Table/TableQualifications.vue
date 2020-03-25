@@ -1,7 +1,7 @@
 <template lang="pug">
 .qualifications
   .qualifications__form(v-if="isForm")
-        VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
+        VendorLqaForm(:vendorData="lqaData" :uploadForm="true" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
   .qualifications__table
       SettingsTable(
           :fields="fields"
@@ -166,16 +166,8 @@ export default {
         }
       ],
 
-      vendorData: {
-        vendor: {
-          name:'',
-          language: {
-            lang:''
-          }
-        },
-        industry: "",
-        industryId: "",
-        tqi: true
+      lqaData: {
+        isTqi: true
       },
 
       statuses: [
@@ -259,56 +251,49 @@ export default {
       this.errors = [];
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTarget) this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry)
-        this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus)
-        this.errors.push("Task status should not be empty!");
+      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
+      if (!this.currentStatus) this.errors.push("Task status should not be empty!");
       if (!this.currentTask) this.errors.push("Task should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
+      }
+      if (this.currentStatus === "Passed") {
+        this.handleLqa();
       } else {
-        if (this.currentStatus === "Passed") {
-          this.currentIndex = index;
-          this.vendorData.industry = this.currentIndustry.name;
-          this.vendorData.industryId = this.currentIndustry._id;
-          this.vendorData.vendor.name = this.currentVendor.firstName + ' ' + this.currentVendor.surname;
-          this.vendorData.vendor.language.lang = this.currentTarget.lang
-          this.openForm();
-        } else {
-          await this.manageSaveClick(index);
-        }
+        await this.manageSaveClick(index);
       }
     },
-
-    async saveVendorLqa({ vendorData }) {
-      let qualification = {
-        target: this.currentTarget,
-        industry: this.currentIndustry,
-        task: this.currentTask,
-        status: this.currentStatus
-      };
-      if (this.currentSource.lang !== "NA") {
-        qualification.source = this.currentSource;
+    handleLqa() {
+        this.lqaData.industry = this.currentIndustry.name;
+        this.lqaData.vendor = {
+            name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
+            language: this.currentTarget
+            };
+        this.openForm();
+    },
+    async saveVendorLqa({vendorData}) {
+      const { file, grade } = vendorData;
+      const assessment = {
+          industry: this.currentIndustry,
+          tqi: {fileName: "", path: "", grade},
+          lqa1: {},
+          lqa2: {},
+          lqa3: {}
       }
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
       formData.append("index", this.assessmentData.length);
-      formData.append("assessment", JSON.stringify(vendorData));
-      formData.append("assessmentFile", vendorData.file);
+      formData.append("assessment", JSON.stringify(assessment));
+      formData.append("assessmentFile", file);
       
       try {
-        const assessment = await this.storeAssessment(formData);
+        await this.storeAssessment(formData);
+        await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
-        const result = await this.storeQualification({
-          vendorId: this.currentVendor._id,
-          index: this.currentIndex,
-          qualification
-        });
-        this.manageCancelEdition();
+        this.closeForm();
       }
-      this.closeForm();
     },
 
     async manageSaveClick(index) {
@@ -322,7 +307,7 @@ export default {
         qualification.source = this.currentSource;
       }
       try {
-        const result = await this.storeQualification({
+        await this.storeQualification({
           vendorId: this.currentVendor._id,
           index,
           qualification

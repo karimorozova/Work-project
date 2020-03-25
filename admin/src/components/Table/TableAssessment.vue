@@ -33,7 +33,7 @@
                     img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
                 span(v-if="!row.tqi == ''")
                   .assessment__upload
-                      .assessment__load-file(@click="openForm('isLqa1',index)")
+                      .assessment__load-file(@click="openForm('Lqa1',index)")
 
             template(slot="lqa2" slot-scope="{ row, index }")
                 div(v-if="!row.lqa2 == ''" :class="'assessment__grade'") {{ row.lqa2.grade }}
@@ -41,7 +41,7 @@
                     img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
                 span(v-if="!row.lqa1 == ''" )
                   .assessment__upload
-                      .assessment__load-file(@click="openForm('isLqa2',index)")
+                      .assessment__load-file(@click="openForm('Lqa2',index)")
 
             template(slot="lqa3" slot-scope="{ row, index }")
                 div(v-if="!row.lqa3 == ''" :class="'assessment__grade'") {{ row.lqa3.grade }}
@@ -49,7 +49,7 @@
                     img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
                 span(v-if="!row.lqa2 == ''" )
                   .assessment__upload
-                      .assessment__load-file(@click="openForm('isLqa3',index)")
+                      .assessment__load-file(@click="openForm('Lqa3',index)")
 
 
 </template>
@@ -110,6 +110,7 @@ export default {
       ],
       gradeNextLvl: 50,
       currentIndex: "",
+      currentField: "lqa1",
       vendorData: {},
       isForm: false,
 
@@ -127,11 +128,16 @@ export default {
       storeAssessment: "storeCurrentVendorAssessment"
     }),
     async saveVendorLqa({ vendorData }) {
+      const { file, grade } = vendorData;
+      const assessment = {
+          ...this.assessmentData[this.currentIndex],
+          [this.currentField]: {fileName: "", path: "", grade}
+        }
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
       formData.append("index", this.currentIndex);
-      formData.append("assessment", JSON.stringify(vendorData));
-      formData.append("assessmentFile", vendorData.file);
+      formData.append("assessment", JSON.stringify(assessment));
+      formData.append("assessmentFile", file);
 
       try {
         const result = await this.storeAssessment(formData);
@@ -143,8 +149,8 @@ export default {
       } catch (err) {
       } finally {
         this.$emit("refreshAssessment");
+        this.closeForm();
       }
-      this.closeForm();
     },
     closeErrors() {
       this.areErrors = false;
@@ -153,19 +159,20 @@ export default {
       this.isForm = false;
     },
     openForm(field, index) {
-      this.isForm = true;
       this.currentIndex = index;
+      this.currentField = field.toLowerCase();
       this.vendorData = {
         vendor: {
-          name: this.currentVendor.firstName + ' ' + this.currentVendor.surname,
+          name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
           language: {
-            lang: " "
+            lang: ""
           }
         },
         industry: this.assessmentData[index].industry.name,
         industryId: this.assessmentData[index].industry._id,
-        [field]: true
+        [`is${field}`]: true
       };
+      this.isForm = true;
     },
 
   },

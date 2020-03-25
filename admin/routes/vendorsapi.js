@@ -130,47 +130,20 @@ router.post('/remove-vendor-qualification', async (req, res) => {
 })
 
 router.post('/vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
-
-    const assessmentData = JSON.parse(req.body.assessment);
+    const assessment = JSON.parse(req.body.assessment);
+    const { index, vendorId } = req.body;
     const files = req.files["assessmentFile"];
-
     try {
-        if (assessmentData.tqi) {
-            const updatedVendor = await updateVendorAssessment({
-                vendorId: req.body.vendorId,
-                index: req.body.index,
-                assessment: {
-                    industry: assessmentData.industryId,
-                    tqi: {
-                        grade: assessmentData.grade,
-                    },
-                    lqa1: '',
-                    lqa2: '',
-                    lqa3: ''
-                },
-                file: files[0]
-            })
-            res.send(updatedVendor);
-
-        }else{
-            const updatedVendor = await updateVendorAssessment({
-                vendorId: req.body.vendorId,
-                index: req.body.index,
-                assessment: {
-                    industry: assessmentData.industryId,
-                    [assessmentData.lqa]: {
-                        grade: assessmentData.grade,
-                    },
-                },
-                file: files[0]
-            })
-            res.send(updatedVendor);
-
-        }
-        // res.send(updatedVendor);
+        const updatedVendor = await updateVendorAssessment({
+            vendorId,
+            index,
+            assessment,
+            file: files[0]
+        })
+        res.send(updatedVendor);
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error on updating");
+        res.status(500).send("Error on saving Vendor's assessment");
     }
 })
 
