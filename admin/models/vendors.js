@@ -116,7 +116,7 @@ const VendorSchema = new mongoose.Schema({
         industry: {
             type: Schema.Types.ObjectId, ref: 'Industries'
         },
-        task: {
+        step: {
             type: Schema.Types.ObjectId, ref: 'Step'
         },
         status: {

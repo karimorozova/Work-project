@@ -58,16 +58,16 @@
                     @scrollDrop="scrollDrop"
                 )
 
-          template(slot="task" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.task.title }}
+          template(slot="step" slot-scope="{ row, index }")
+            .qualifications__data(v-if="currentActive !== index") {{ row.step.title }}
             .qualifications__drop-menu(v-else)
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
                     :hasSearch="true"
-                    :selectedOption="currentTask.title"
-                    :options="tasksData"
-                    @chooseOption="setTask"
+                    :selectedOption="currentStep.title"
+                    :options="stepsData"
+                    @chooseOption="setStep"
                     @scrollDrop="scrollDrop"
                 )
 
@@ -144,9 +144,9 @@ export default {
           padding: "0"
         },
         {
-          label: "Task",
-          headerKey: "headerTask",
-          key: "task",
+          label: "Step",
+          headerKey: "headerStep",
+          key: "step",
           width: "17%",
           padding: "0"
         },
@@ -180,11 +180,11 @@ export default {
       ],
       sources: [],
       targets: [],
-      tasks: [],
+      steps: [],
       currentSource: "",
       currentTarget: "",
       currentIndustry: "",
-      currentTask: "",
+      currentStep: "",
       currentStatus: "",
       currentIndex: "",
 
@@ -231,7 +231,7 @@ export default {
       this.currentTarget = this.qualificationData[index].target;
       this.currentIndustry = this.qualificationData[index].industry;
       this.currentStatus = this.qualificationData[index].status;
-      this.currentTask = this.qualificationData[index].task;
+      this.currentStep = this.qualificationData[index].step;
     },
     manageCancelEdition(index) {
       this.$emit("refreshQualifications");
@@ -244,7 +244,7 @@ export default {
       this.currentTarget = "";
       this.currentIndustry = "";
       this.currentStatus = "";
-      this.currentTask = "";
+      this.currentStep = "";
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
@@ -252,8 +252,8 @@ export default {
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTarget) this.errors.push("Target should not be empty!");
       if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus) this.errors.push("Task status should not be empty!");
-      if (!this.currentTask) this.errors.push("Task should not be empty!");
+      if (!this.currentStatus) this.errors.push("Step status should not be empty!");
+      if (!this.currentStep) this.errors.push("Step should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -300,7 +300,7 @@ export default {
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
-        task: this.currentTask,
+        step: this.currentStep,
         status: this.currentStatus
       };
       if (this.currentSource.lang !== "NA") {
@@ -354,7 +354,7 @@ export default {
         target: "",
         industry: "",
         status: "NA",
-        task: ""
+        step: ""
       });
       this.setEditingData(this.qualificationData.length - 1);
     },
@@ -370,10 +370,10 @@ export default {
       }
     },
 
-    async getTasks() {
+    async getSteps() {
       try {
         const result = await this.$http.get("/api/steps");
-        this.tasks = result.body;
+        this.steps = result.body;
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
@@ -392,8 +392,8 @@ export default {
     setStatus({ option }) {
       this.currentStatus = option;
     },
-    setTask({ option }) {
-      this.currentTask = this.tasks.find(item => item.title === option);
+    setStep({ option }) {
+      this.currentStep = this.steps.find(item => item.title === option);
     },
     closeErrors() {
       this.areErrors = false;
@@ -418,8 +418,8 @@ export default {
     industryData() {
       return this.vendorIndustries.map(item => item.name);
     },
-    tasksData() {
-      return this.tasks.map(item => item.title);
+    stepsData() {
+      return this.steps.map(item => item.title);
     }
   },
   components: {
@@ -431,7 +431,7 @@ export default {
 
   mounted() {
     this.getLangs();
-    this.getTasks();
+    this.getSteps();
   }
 };
 </script>
