@@ -16,8 +16,6 @@
                     :errors="errors"
                     :areErrors="areErrors" 
                     :isApproveModal="isDeleting"
-                    :bodyClass="'vendor__assessment-body'"
-                    :headerClass="'vendor__assessment-header'"
                 )
 
                     template(v-for="field in fields"  :slot="field.headerKey" slot-scope="{ field }")
@@ -260,8 +258,9 @@ export default {
     font-size: 0;
   }
   &__download {
-    height: 20px;
-    width: 20px;
+    height: 21px;
+    width: 21px;
+    margin-top: -5px;
     margin-left: 15px;
     cursor: pointer;
   }
@@ -274,7 +273,7 @@ export default {
     bottom: 0;
   }
   &__grade {
-    padding: 8.5px 5px;
+    padding: 8.5px 0 0 5px;
     display: flex;
   }
 }

@@ -190,8 +190,8 @@ export default {
     position: relative;
     background: url("../../assets/images/upload-blue.png");
     background-repeat: no-repeat;
-    height: 21px;
-    width: 21px;
+    height: 24px;
+    width: 24px;
     overflow: hidden;
     margin-top: 3px;
   }
