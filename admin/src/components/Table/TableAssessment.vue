@@ -1,7 +1,7 @@
 <template lang="pug">
-.assessment 
+.assessment
     .assessment__form(v-if="isForm")
-        VendorLqaForm(:vendorData="vendorData" :uploadForm="true" @closeForm="closeForm()"  @saveVendorLqa="saveVendorLqa")
+        VendorLqa(:vendorData="lqaData" @closeForm="closeForm()"  @saveVendorLqa="saveVendorLqa")
 
     .assessment__subtitle Download and check file 
     .assessment__subtitle Make sure to convert all doc file into PDF
@@ -16,8 +16,6 @@
                     :errors="errors"
                     :areErrors="areErrors" 
                     :isApproveModal="isDeleting"
-                    :bodyClass="'vendor__assessment-body'"
-                    :headerClass="'vendor__assessment-header'"
                 )
 
                     template(v-for="field in fields"  :slot="field.headerKey" slot-scope="{ field }")
@@ -28,34 +26,34 @@
                     
                     template(slot="tqi" slot-scope="{ row, index }")
                         div(v-if="row.tqi.grade" :class="'assessment__grade'") {{ row.tqi.grade }}
-                        a(:href="domain + row.tqi.path")
-                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                          a(:href="domain + row.tqi.path")
+                              img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
 
                     template(slot="lqa1" slot-scope="{ row, index }")
                         div(v-if="row.lqa1.grade" :class="'assessment__grade'") {{ row.lqa1.grade }}
-                        a(:href="domain + row.lqa1.path")
-                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                        .assessment__upload
+                          a(:href="domain + row.lqa1.path")
+                              img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload(v-if="!row.lqa1.grade && row.tqi.grade")
                             .assessment__load-file(@click="openForm({field: 'Lqa1', index, stepIndex, langsIndex})")
 
                     template(slot="lqa2" slot-scope="{ row, index }")
                         div(v-if="row.lqa2.grade" :class="'assessment__grade'") {{ row.lqa2.grade }}
-                        a(:href="domain + row.lqa2.path")
-                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                        .assessment__upload
+                          a(:href="domain + row.lqa2.path")
+                              img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload(v-if="!row.lqa2.grade && row.lqa1.grade")
                             .assessment__load-file(@click="openForm({field: 'Lqa2', index, stepIndex, langsIndex})")
 
                     template(slot="lqa3" slot-scope="{ row, index }")
                         div(v-if="row.lqa3.grade" :class="'assessment__grade'") {{ row.lqa3.grade }}
-                        a(:href="domain + row.lqa3.path")
-                            img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
-                        .assessment__upload
+                          a(:href="domain + row.lqa3.path")
+                              img( :class="'assessment__download'" src="../../assets/images/download-big-b.png")
+                        .assessment__upload(v-if="!row.lqa3.grade && row.lqa2.grade")
                             .assessment__load-file(@click="openForm({field: 'Lqa3', index, stepIndex, langsIndex})")
 </template>
 
 <script>
 import SettingsTable from "./SettingsTable";
-import VendorLqaForm from "../reports/upcomingLqas/VendorLqaForm";
+import VendorLqa from "../vendors/VendorLqa";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -111,7 +109,7 @@ export default {
       currentIndex: "",
       currentAssessment: {},
       currentField: "lqa1",
-      vendorData: {},
+      lqaData: {},
       isForm: false,
 
       currentActive: -1,
@@ -130,12 +128,12 @@ export default {
     async saveVendorLqa({ vendorData }) {
       const { file, grade, source, target, step, industryId } = vendorData;
       const assessment = {
-          ...this.currentAssessment,
-          step,
-          source,
-          target,
-          [this.currentField]: {fileName: "", path: "", grade}
-        }
+        ...this.currentAssessment,
+        step,
+        source,
+        target,
+        [this.currentField]: { fileName: "", path: "", grade }
+      };
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
       formData.append("index", this.currentIndex);
@@ -161,33 +159,34 @@ export default {
     closeForm(field) {
       this.isForm = false;
     },
-    openForm({field, index, stepIndex, langsIndex}) {
+    openForm({ field, index, stepIndex, langsIndex }) {
       const stepData = this.assessmentData[stepIndex];
       const { source, target, industries } = stepData.langsData[langsIndex];
       this.currentAssessment = industries[index];
       this.currentIndex = index;
       this.currentField = field.toLowerCase();
-      this.vendorData = {
+
+      this.lqaData = {
         vendor: {
           name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
-          language: {
-            lang: ""
-          }
+          industry: this.currentAssessment.industry.name,
+          sourceLang: source.lang,
+          targetLang: target.lang,
+          step: stepData.step.title,
         },
         step: stepData.step,
-        source, 
+        source,
         target,
         industry: industries[index].name,
         industryId: industries[index]._id,
         [`is${field}`]: true
       };
       this.isForm = true;
-    },
-
+    }
   },
   components: {
     SettingsTable,
-    VendorLqaForm
+    VendorLqa
   },
   mounted() {
     this.domain = __WEBPACK__API_URL__;
@@ -211,10 +210,10 @@ export default {
     font-weight: 600;
   }
   &__step {
-      margin: 10px 0;
+    margin: 10px 0;
   }
   &__pair {
-      font-size: 18px;
+    font-size: 18px;
   }
   &__data {
     padding: 8.5px 5px;
@@ -259,8 +258,9 @@ export default {
     font-size: 0;
   }
   &__download {
-    height: 20px;
-    width: 20px;
+    height: 21px;
+    width: 21px;
+    margin-top: -5px;
     margin-left: 15px;
     cursor: pointer;
   }
@@ -273,7 +273,8 @@ export default {
     bottom: 0;
   }
   &__grade {
-    padding: 8.5px 5px;
+    padding: 8.5px 0 0 5px;
+    display: flex;
   }
 }
 </style>
