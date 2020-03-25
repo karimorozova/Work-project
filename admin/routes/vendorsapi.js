@@ -133,28 +133,41 @@ router.post('/vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), a
 
     const assessmentData = JSON.parse(req.body.assessment);
     const files = req.files["assessmentFile"];
-    let assessmentStage = assessmentData.tqi
-        ? "tqi"
-        : assessmentData.isLqa1
-            ? "lqa1"
-            : assessmentData.isLqa2
-                ? "lqa2"
-                : assessmentData.isLqa3
-                    ? "lqa3"
-                    : "tqi";
+
     try {
-        const updatedVendor = await updateVendorAssessment({
-            vendorId: req.body.vendorId,
-            index: req.body.index,
-            assessment: {
-                industry: assessmentData.industryId,
-                [assessmentStage]: {
-                    grade: assessmentData.grade,
+        if (assessmentData.tqi) {
+            const updatedVendor = await updateVendorAssessment({
+                vendorId: req.body.vendorId,
+                index: req.body.index,
+                assessment: {
+                    industry: assessmentData.industryId,
+                    tqi: {
+                        grade: assessmentData.grade,
+                    },
+                    lqa1: '',
+                    lqa2: '',
+                    lqa3: ''
                 },
-            },
-            file: files[0]
-        })
-        res.send(updatedVendor);
+                file: files[0]
+            })
+            res.send(updatedVendor);
+
+        }else{
+            const updatedVendor = await updateVendorAssessment({
+                vendorId: req.body.vendorId,
+                index: req.body.index,
+                assessment: {
+                    industry: assessmentData.industryId,
+                    [assessmentData.lqa]: {
+                        grade: assessmentData.grade,
+                    },
+                },
+                file: files[0]
+            })
+            res.send(updatedVendor);
+
+        }
+        // res.send(updatedVendor);
     } catch (err) {
         console.log(err);
         res.status(500).send("Error on updating");
