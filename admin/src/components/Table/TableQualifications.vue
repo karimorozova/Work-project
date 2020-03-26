@@ -261,7 +261,11 @@ export default {
         return;
       }
       if (this.currentStatus === "Passed") {
-        this.handleLqa();
+        if (this.checkSuchData()) {
+          this.handleLqa();
+        } else {
+          return;
+        }
       } else {
         await this.manageSaveClick(index);
       }
@@ -279,7 +283,7 @@ export default {
       this.openForm();
     },
     checkSuchData() {
-      if (this.assessmentData == 0) {
+      if (this.assessmentData.length == 0) {
         return true;
       } else {
         const getStep = this.assessmentData.find(
@@ -287,7 +291,7 @@ export default {
         );
         if (getStep) {
           const getTarget = getStep.langsData.find(
-            value => value.target._id == this.currentSource._id
+            value => value.target._id == this.currentTarget._id
           );
           const getSource = getStep.langsData.find(
             value => value.source._id == this.currentSource._id
@@ -296,7 +300,7 @@ export default {
             value => value.industry._id == this.currentIndustry._id
           );
           if (getTarget && getSource && getIndustry) {
-            this.errors.push("Such assessment information already exists!");
+            this.errors.push("Such information already exists!");
             this.areErrors = true;
             return false;
           } else {
@@ -307,39 +311,33 @@ export default {
         }
       }
     },
-
     async saveVendorLqa({ vendorData }) {
-      if (this.checkSuchData()) {
-        const { file, grade } = vendorData;
-        let assessment = {
-          step: this.currentStep,
-          target: this.currentSource,
-          industry: this.currentIndustry,
-          tqi: { fileName: "", path: "", grade },
-          lqa1: {},
-          lqa2: {},
-          lqa3: {}
-        };
-        if (this.currentSource.lang !== "NA") {
-          assessment.source = this.currentSource;
-        }
-        let formData = new FormData();
-        formData.append("vendorId", this.currentVendor._id);
-        formData.append("assessment", JSON.stringify(assessment));
-        formData.append("assessmentFile", file);
+      const { file, grade } = vendorData;
+      let assessment = {
+        step: this.currentStep,
+        target: this.currentTarget,
+        industry: this.currentIndustry,
+        tqi: { fileName: "", path: "", grade },
+        lqa1: {},
+        lqa2: {},
+        lqa3: {}
+      };
+      if (this.currentSource.lang !== "NA") {
+        assessment.source = this.currentSource;
+      }
+      let formData = new FormData();
+      formData.append("vendorId", this.currentVendor._id);
+      formData.append("assessment", JSON.stringify(assessment));
+      formData.append("assessmentFile", file);
 
-        try {
-          await this.storeAssessment(formData);
-          await this.manageSaveClick(this.currentActive);
-        } catch (err) {
-        } finally {
-          this.closeForm();
-        }
-      } else {
+      try {
+        await this.storeAssessment(formData);
+        await this.manageSaveClick(this.currentActive);
+      } catch (err) {
+      } finally {
         this.closeForm();
       }
     },
-
     async manageSaveClick(index) {
       let qualification = {
         target: this.currentTarget,
