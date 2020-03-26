@@ -8,7 +8,7 @@
     .assessment__item(v-for="(stepData, stepIndex ) in assessmentData")
         .assessment__step {{ stepData.step.title }}
         .assessment__language(v-for="(langsData, langsIndex) in stepData.langsData")
-            .assessment__pair {{ langsData.source.lang }} >> {{ langsData.target.lang }}
+            .assessment__pair {{ getPair(langsData) }}
             .assessment__table
                 SettingsTable(
                     :fields="fields"
@@ -125,6 +125,12 @@ export default {
       alertToggle: "alertToggle",
       storeAssessment: "storeCurrentVendorAssessment"
     }),
+    getPair(langsData) {
+        if(langsData.source) {
+            return `${langsData.source.lang} >> ${langsData.target.lang}`;
+        }
+        return langsData.target.lang;
+    },
     async saveVendorLqa({ vendorData }) {
       const { file, grade, source, target, step, industryId } = vendorData;
       const assessment = {
