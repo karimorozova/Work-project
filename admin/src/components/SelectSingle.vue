@@ -6,7 +6,7 @@
             .arrow-button(@click="toggleOptions" :class="{'no-border': projectsType === 'requests'}")
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
+            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ showOption(option) }}
 </template>
@@ -79,6 +79,9 @@ export default {
             }
             this.isDropped = !this.isDropped;
             this.searchValue = "";
+            if(this.isDropped) {
+                this.$nextTick(() => this.$refs.search.focus());
+            } 
             this.showOptions(event);
         },
         chooseOption(index) {
@@ -114,7 +117,7 @@ export default {
     },
     directives: {
         ClickOutside
-    },
+    }
 }
 </script>
 
