@@ -4,6 +4,19 @@ const bcrypt = require('bcryptjs');
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
 
+async function saveVendorDocumentDefault({vendorId, category}) {
+    try {
+        const vendor = await Vendors.findOne({_id: vendorId});
+        let { documents } = vendor;
+        const newDoc = {fileName: '', path: `${new Date().getTime()}`, category};
+        documents.push(newDoc);
+        return await getVendorAfterUpdate({_id: vendorId}, { documents });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveVendorDocumentDefault");
+    }
+}
+
 async function saveVendorDocument({vendorId, file, category, oldFilePath, oldName, oldCategory}) {
     try {
         if(!file) {
@@ -200,7 +213,8 @@ function removeOldVendorFile(oldPath, newPath) {
 }
 
 module.exports = { 
-    saveVendorDocument, 
+    saveVendorDocument,
+    saveVendorDocumentDefault,
     removeVendorDoc, 
     saveHashedPassword, 
     getPhotoLink, 

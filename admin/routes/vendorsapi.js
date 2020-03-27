@@ -4,7 +4,7 @@ const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
-    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, removeVendorDoc, removeVendorEdu, updateVendorAssessment } = require('../vendors');
+    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, removeVendorEdu, updateVendorAssessment } = require('../vendors');
 const { Vendors } = require('../models');
 
 
@@ -16,6 +16,19 @@ function moveFile(oldFile, vendorId) {
     });
     return oldFile.filename;
 }
+
+router.post('/vendor-document-default', async (req, res) => {
+    const { vendorId, category } = req.body;
+    try {
+        const updatedVendor = await saveVendorDocumentDefault({
+            vendorId, category
+        });
+        res.send(updatedVendor);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on adding vendor document");
+    }
+})
 
 router.post('/vendor-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
     const { vendorId, category, oldFilePath, oldName, oldCategory } = req.body;

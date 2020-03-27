@@ -1,5 +1,5 @@
 <template lang="pug">
-.documents
+.documents 
     .documents__table
         SettingsTable(
             :fields="fields"
@@ -31,7 +31,7 @@
                         :selectedOption="currentCategory"
                         :options="categories"
                         @chooseOption="setCategory"
-                        @scrollDrop="scrollDrop"
+                        @scrollDrop="scrollDrop(index)"
                     )
 
             template(slot="icons" slot-scope="{ row, index }") 
@@ -57,8 +57,9 @@ import crudIcons from "@/mixins/crudIcons";
 export default {
   mixins: [scrollDrop, crudIcons],
   props: {
-    documentsData: {
-      type: Array, default: () => []
+    ["documentsData"]: {
+      type: Array,
+      default: () => []
     },
     vendorId: {
       type: String
@@ -106,7 +107,8 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeDocuments: "storeCurrentVendorDocuments",
-      deleteDocument: "deleteCurrentVendorDocument"
+      deleteDocument: "deleteCurrentVendorDocument",
+      storeDocumentsDefault: "storeCurrentVendorDocumentsDefault"
     }),
 
     async makeAction(index, key) {
@@ -124,7 +126,7 @@ export default {
           this.manageDeleteClick(index);
           break;
         default:
-          await this.checkErrors(index);          
+          await this.checkErrors(index);
       }
     },
     setEditingData(index) {
@@ -148,7 +150,7 @@ export default {
         return this.isEditing();
       }
       this.documentsData.push({
-        category: "",
+        category: "NDA",
         fileName: "",
         path: ""
       });
@@ -158,64 +160,104 @@ export default {
       this.currentFile = this.$refs.file.files[0];
     },
     async checkErrors(index) {
-        if(this.currentActive === -1) return;
-        const doc = this.documentsData[index];
-        this.errors = [];
-        if (!this.currentCategory) this.errors.push("Category should not be empty!");
-        if (!doc.path && !this.currentFile) this.errors.push("Upload a file to save!");
-        if(this.isSameExist(index)) this.errors.push("There is a duplication of the file for chosen category!");
-        if (this.errors.length) {
-            this.areErrors = true;
-            return;
-        }
+      if (this.currentActive === -1) return;
+      const doc = this.documentsData[index];
+      this.errors = [];
+      if (!this.currentCategory)
+        this.errors.push("Category should not be empty!");
+      if (
+        (!doc.path && !this.currentFile) ||
+        (doc.fileName == "" && !this.currentFile)
+      )
+        this.errors.push("Upload a file to save!");
+      if (this.isSameExist(index))
+        this.errors.push(
+          "There is a duplication of the file for chosen category!"
+        );
+      if (this.errors.length) {
+        this.areErrors = true;
+        return;
+      } else {
         await this.manageSaveClick(index);
+      }
+    },
+    scrollDrop(index) {
+      const { category } = this.documentsData[index];
+      let countCategories = this.documentsData.filter(
+        item => item.category == category
+      );
+      if (countCategories.length <= 1) {
+        this.errors = [];
+        this.errors.push("Сannot update category!");
+        this.areErrors = true;
+      } else {
+        false;
+      }
     },
     isSameExist(index) {
-        const { fileName, category } = this.documentsData[index];
-        const isSame = this.documentsData.find((item, i) => {
-            return item.fileName === fileName && i !== index && item.category === category
-        })
-        return !!isSame;
+      const { fileName, category } = this.documentsData[index];
+      const isSame = this.documentsData.find((item, i) => {
+        return (
+          item.fileName === fileName &&
+          i !== index &&
+          item.category === category
+        );
+      });
+      return !!isSame;
     },
     async manageSaveClick(index) {
-        let formData = new FormData();
-        formData.append("vendorId", this.vendorId);
-        formData.append("category", this.currentCategory);
-        formData.append("documentFile", this.currentFile);
-        if(this.documentsData[index].path) {
-            const { fileName, path, category } = this.documentsData[index];
-            formData.append("oldCategory", category);
-            formData.append("oldName", fileName);
-            if(category === this.currentCategory) {
-                formData.append("oldFilePath", path);
-            }
+      let formData = new FormData();
+      formData.append("vendorId", this.vendorId);
+      formData.append("category", this.currentCategory);
+      formData.append("documentFile", this.currentFile);
+
+      if (this.documentsData[index].path) {
+        const { fileName, path, category } = this.documentsData[index];
+        formData.append("oldCategory", category);
+        formData.append("oldName", fileName);
+        if (category === this.currentCategory) {
+          formData.append("oldFilePath", path);
         }
-        try {
+      }
+      try {
         const result = await this.storeDocuments(formData);
-            this.alertToggle({
-                message: "Document saved",
-                isShow: true,
-                type: "success"
-            });
-        } catch (err) { 
-        } finally {
-            this.$emit("refreshDocuments");
-            this.setDefaults();
-        }
+        this.alertToggle({
+          message: "Document saved",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+      } finally {
+        this.$emit("refreshDocuments");
+        this.setDefaults();
+      }
     },
     async manageDeleteClick(index) {
       if (!this.documentsData[index].path) {
         this.documentsData.pop();
         return this.setDefaults();
       }
-
-      this.deleteIndex = index;
-      this.isDeleting = true;
+      if (this.checkDelete(index)) {
+        this.deleteIndex = index;
+        this.isDeleting = true;
+      } else {
+        this.errors = [];
+        this.errors.push("Сannot delete category!");
+        this.areErrors = true;
+        return;
+      }
+    },
+    checkDelete(index) {
+      const { category } = this.documentsData[index];
+      let countCategories = this.documentsData.filter(
+        item => item.category == category
+      );
+      return countCategories.length > 1 ? true : false;
     },
     async deleteData() {
       const docFile = this.documentsData[this.deleteIndex];
       try {
-          await this.deleteDocument({docFile, vendorId: this.vendorId});
+        await this.deleteDocument({ docFile, vendorId: this.vendorId });
         this.alertToggle({
           message: "Document removed",
           isShow: true,
@@ -223,8 +265,8 @@ export default {
         });
       } catch (err) {
       } finally {
-          this.$emit("refreshDocuments");
-          this.setDefaults();
+        this.$emit("refreshDocuments");
+        this.setDefaults();
       }
     },
     closeErrors() {
@@ -232,6 +274,16 @@ export default {
     },
     setCategory({ option }) {
       this.currentCategory = this.categories.find(item => item === option);
+    },
+    async setDocumentsDefaults(category) {
+      let defaultDocument = { vendorId: this.vendorId, category: category };
+      try {
+        const result = await this.storeDocumentsDefault(defaultDocument);
+      } catch (err) {
+      } finally {
+        this.$emit("refreshDocuments");
+        this.setDefaults();
+      }
     }
   },
   components: {
@@ -239,9 +291,19 @@ export default {
     SelectSingle,
     Add
   },
-  mounted() {
-        this.domain = __WEBPACK__API_URL__;
+  async created() {
+    const vendor = await this.$http.get(
+      `/vendorsapi/vendor?id=${this.$route.params.id}`
+    );
+    if (vendor.data.documents.length == 0) {
+      await this.setDocumentsDefaults("NDA");
+      await this.setDocumentsDefaults("Contract");
+      await this.setDocumentsDefaults("Resume");
     }
+  },
+  mounted() {
+    this.domain = __WEBPACK__API_URL__;
+  }
 };
 </script>
 <style lang="scss" scoped>
