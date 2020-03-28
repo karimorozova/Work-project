@@ -36,7 +36,7 @@
 
             template(slot="icons" slot-scope="{ row, index }") 
                 .documents__icons
-                    img.documents__icon(v-if="!row.fileName" :style="{cursor: 'default'}" :class="'documents_opacity'" src="../../assets/images/red-info-icon.png")
+                    img.documents__icon(v-if="!row.fileName && index <= 2" :style="{cursor: 'default'}" :class="'documents_opacity'" src="../../assets/images/red-info-icon.png")
                     img.documents__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'documents_opacity': isActive(key, index)}")
                     .documents__upload(v-if="currentActive === index")
                         input.documents__load-file(type="file" id="file" ref="file" @change="uploadDocument(index)")
@@ -150,7 +150,7 @@ export default {
         return this.isEditing();
       }
       this.documentsData.push({
-        category: "NDA",
+        category: "",
         fileName: "",
         path: ""
       });
@@ -182,11 +182,17 @@ export default {
       }
     },
     scrollDrop(index) {
+      let fillingСategory = this.documentsData.filter(function(item) {
+        return item.fileName !== "";
+      });
+
+      this.categories = [...new Set(fillingСategory.map(item => item.category))];
+
       const { category } = this.documentsData[index];
       let countCategories = this.documentsData.filter(
         item => item.category == category
       );
-      if (countCategories.length <= 1) {
+      if (countCategories.length <= 1 && this.documentsData.length == 3) {
         this.errors = [];
         this.errors.push("Сannot update category!");
         this.areErrors = true;
