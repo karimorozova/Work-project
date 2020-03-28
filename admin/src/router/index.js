@@ -54,6 +54,7 @@ import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
+import VendorsTests from '@/components/vendors/VendorsTests'
 import Xtrf from '@/components/reports/Xtrf'
 import { store } from '../vuex/store'
 
@@ -207,7 +208,7 @@ const router = new Router({
                             name: 'active-vendors',
                             props: true,
                             component: ActiveVendors
-                        },
+                        }, 
                         {
                             path: 'inactive',
                             name: 'inactive-vendors',
@@ -219,6 +220,12 @@ const router = new Router({
                             name: 'potential-vendors',
                             props: true,
                             component: PotentialVendors
+                        },
+                        {
+                            path: 'tests',
+                            name: 'tests-vendors',
+                            props: true,
+                            component: VendorsTests
                         },
                         {
                             path: 'details/:id',

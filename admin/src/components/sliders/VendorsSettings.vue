@@ -23,11 +23,12 @@ export default {
           {title: "All", routeName: "all-vendors"}, 
           {title: "Active", routeName: "active-vendors"}, 
           {title: "Inactive", routeName: "inactive-vendors"}, 
-          {title: "Potential", routeName: "potential-vendors"}
-        ],
+          {title: "Potential", routeName: "potential-vendors"},
+          {title: "Tests", routeName: "tests-vendors"}  
+        ], 
       currentIndex: 0,
       defaultRouteName: "vendors"
-    }
+    } 
   },
   methods: {
     
