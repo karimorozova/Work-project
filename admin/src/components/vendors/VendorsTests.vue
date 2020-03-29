@@ -218,7 +218,7 @@ export default {
           this.setEditingData(index);
           break;
         case "cancel":
-          this.manageCancelEdition();
+          this.manageCancelEdition(index);
           break;
         case "delete":
           this.manageDeleteClick(index);
@@ -237,26 +237,32 @@ export default {
       this.currentIndustry = this.vendorTest[index].industry;
       this.currentStep = this.vendorTest[index].step;
     },
-    manageCancelEdition() {
+    manageCancelEdition(index) {
+      if (!this.vendorTest[index].uploaded) {
+        this.vendorTest.pop();
+      }
       // this.$emit("refreshVendorTests");
       this.setDefaults();
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
+      this.currentUploaded = "";
+      this.currentFile = "";
+      this.currentSource = "";
+      this.currentIndustry = "";
+      this.currentStep = "";
+      this.selectedTargets = [];
     },
 
     async checkErrors(index) {
       this.errors = [];
-
-      // if (!this.dateRange) this.errors.push("Duration should not be empty!");
-      // if (!this.currentOccupation)
-      //   this.errors.push("Occupation / Title should not be empty!");
-      // if (!this.currentCompany)
-      //   this.errors.push("Company should not be empty!");
-      // if (this.fromDate > this.toDate)
-      //   this.errors.push("Start date must be earlier than end date");
-
+      if(!this.currentSource) this.errors.push("Source should not be empty!")
+      if(this.selectedTargets.length == 0) this.errors.push("Target should not be empty!")
+      if(!this.currentIndustry) this.errors.push("Industry should not be empty!")
+      if(!this.currentStep) this.errors.push("Step should not be empty!")
+      if(!this.currentFile) this.errors.push("File should not be empty!")
+      
       if (this.errors.length) {
         this.areErrors = true;
         return;

@@ -222,7 +222,7 @@ export default {
     font-size: 18px;
   }
   &__data {
-    padding: 8.5px 5px;
+    padding: 7.5px 5px;
   }
   &__editing-data {
     @extend %table-data;
