@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="[{'z-index1': isDropped}, customClass]")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
             span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
@@ -20,6 +20,10 @@ export default {
     props: {
         customClass: {
             type: String
+        },
+        isTableDropMenu: {
+            type: Boolean,
+            default: false
         },
         selectedOptions: {
             type: Array
@@ -89,6 +93,7 @@ export default {
     border-radius: 5px;
     overflow: hidden;
     box-sizing: border-box;
+
     .drop {
         width: 100%;
         max-height: 100px;
@@ -230,6 +235,21 @@ export default {
     }
     .drop {
         max-height: 160px;
+    }
+}
+
+.table-drop-menu {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    overflow: visible;
+    .drop {
+        border: 1px solid #BFB09D;
+    }
+    .select {
+        height: 32px;
+        border-radius: 0px;
+        box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }
 

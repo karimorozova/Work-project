@@ -243,7 +243,17 @@ export const storeCurrentVendorDocuments = async ({ commit, dispatch }, payload)
         commit("endRequest");
     }
 }
-
+export const storeCurrentVendorDocumentsDefault = async ({ commit, dispatch }, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post("/vendorsapi/vendor-document-default", payload);
+        dispatch('storeCurrentVendor', result.body);
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
 export const deleteCurrentVendorDocument = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
     try {

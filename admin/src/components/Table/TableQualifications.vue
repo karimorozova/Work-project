@@ -74,6 +74,7 @@
           template(slot="status" slot-scope="{ row, index }")
             .qualifications__data(v-if="currentActive !== index") {{ row.status }}
             .qualifications__drop-menu(v-else)
+              div(@click="checkTestsStatus(index)")
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
@@ -169,15 +170,7 @@ export default {
       lqaData: {
         isTqi: true
       },
-
-      statuses: [
-        "NA",
-        "Sample Requested",
-        "Test Sent",
-        "Received",
-        "Passed",
-        "Not Passed"
-      ],
+      statuses: ["NA", "Sample Requested", "Test Sent"],
       sources: [],
       targets: [],
       steps: [],
@@ -204,6 +197,28 @@ export default {
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment"
     }),
+
+    checkTestsStatus(index) {
+      let currentStatus = this.qualificationData[index].status;
+      
+      if (currentStatus == "NA") {
+        this.statuses = ["NA"];
+      } else if (
+        currentStatus == "Sample Requested" ||
+        currentStatus == "Test Sent"
+      ) {
+        this.statuses = ["Received"];
+      } else if (currentStatus == "Received") {
+        this.statuses = ["Passed", "Not Passed"];
+      } else if (
+        currentStatus == "Not Passed" ||
+        currentStatus == "Passed"
+      ) {
+        this.statuses = [];
+      }else{
+
+      }
+    },
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
     },
@@ -296,13 +311,17 @@ export default {
           const getSource = getStep.langsData.find(
             value => value.source._id == this.currentSource._id
           );
-          const getIndustry = getSource.industries.find(
-            value => value.industry._id == this.currentIndustry._id
-          );
-          if (getTarget && getSource && getIndustry) {
-            this.errors.push("Such information already exists!");
-            this.areErrors = true;
-            return false;
+          if (getTarget && getSource) {
+            const getIndustry = getSource.industries.find(
+              value => value.industry._id == this.currentIndustry._id
+            );
+            if (getIndustry) {
+              this.errors.push("Such information already exists!");
+              this.areErrors = true;
+              return false;
+            } else {
+              return true;
+            }
           } else {
             return true;
           }
@@ -392,7 +411,7 @@ export default {
         source: "",
         target: "",
         industry: "",
-        status: "NA",
+        status: "",
         step: ""
       });
       this.setEditingData(this.qualificationData.length - 1);
