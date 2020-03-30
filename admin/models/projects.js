@@ -85,6 +85,10 @@ const ProjectsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isPriceUpdated: {
+    type: Boolean,
+    default: false
+  },
   customer: {
     type: Schema.Types.ObjectId, ref: 'Clients'
   },

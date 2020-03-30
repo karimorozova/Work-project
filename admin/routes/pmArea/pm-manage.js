@@ -5,7 +5,7 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
-    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles } = require("../../projects");
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -236,7 +236,11 @@ router.post("/send-quote", async (req, res) => {
     try {
         const project = await getProject({"_id": id});
         const subject = project.isUrgent ? "URGENT! Quote Details" : "Quote Details";
-        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID C001.0, ${project.projectId})` }, message);
+        let messageId = "C001.0";
+        if(project.isPriceUpdated) {
+            messageId = project.status === "Quote sent" ? "C001.1" : "C004.0";
+        }
+        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID ${messageId}, ${project.projectId})` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         res.send(updatedProject);
     } catch(err) {
@@ -551,6 +555,9 @@ router.post("/deliver", async (req, res) => {
     const { tasks } = req.body;
     try {
         const updatedProject = await getAfterTasksDelivery(tasks);
+        if(updateProject.status === 'Delivered') {
+            await notifyProjectDelivery(updatedProject);
+        }
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

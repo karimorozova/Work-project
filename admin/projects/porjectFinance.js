@@ -2,9 +2,11 @@ const { updateProject } = require('./getProjects');
 
 async function getProjectAfterFinanceUpdated({project, steps, tasks}) {
     try {
-        let { finance } = project;
+        let { finance, isPriceUpdated, status } = project;
         finance.Price = getProjectFinancePrice(tasks);
-        return await updateProject({"_id": project.id}, { finance, steps, tasks });
+        const checkStatuses = ["Quote sent", "Approved"];
+        isPriceUpdated = checkStatuses.indexOf(status) !== -1; 
+        return await updateProject({"_id": project.id}, { finance, steps, tasks, isPriceUpdated });
     } catch(err) {
         console.log(err);
         console.log("Error in getProjectAfterFinanceUpdated");
