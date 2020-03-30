@@ -106,49 +106,49 @@ export default {
           label: "File Name",
           headerKey: "headerFile",
           key: "file",
-          width: "14.2%",
+          width: "161px",
           padding: "0"
         },
         {
           label: "Uploaded",
           headerKey: "headerUploaded",
           key: "uploaded",
-          width: "14.2%",
+          width: "161px",
           padding: "0"
         },
         {
           label: "Source",
           headerKey: "headerSource",
           key: "source",
-          width: "14.2%",
+          width: "161px",
           padding: "0"
         },
         {
           label: "Target",
           headerKey: "headerTarget",
           key: "targets",
-          width: "193px",
+          width: "191px",
           padding: "0"
         },
         {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "14.2%",
+          width: "161px",
           padding: "0"
         },
         {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "14.2%",
+          width: "161px",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "14.2%",
+          width: "164px",
           padding: "0"
         }
       ],
@@ -430,7 +430,7 @@ export default {
   &__icons {
     @extend %table-icons;
     height: 32px;
-    justify-content: flex-end;
+    justify-content: center;
   }
   &__icon {
     @extend %table-icon;
