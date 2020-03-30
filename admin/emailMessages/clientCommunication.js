@@ -5,8 +5,8 @@ const { secretKey } = require('../configs');
 function messageForClient(obj) {
     const date = Date.now();
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
-    const tasksInfo = getTasksInfo({tasks: obj.tasks, industry: obj.industry});
-    const token = jwt.sign({id: obj.id}, secretKey, { expiresIn: '2h'});
+    const tasksInfo = getTasksInfo({ tasks: obj.tasks, industry: obj.industry });
+    const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
     const detailHeader = obj.status === 'Quote sent' ? "Your quote has been updated - please see below the quote details:" : "Please see below the quote details:";
     const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
     const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
@@ -70,7 +70,7 @@ function getTasksInfo(info) {
         return acc;
     }, {})
     let result = "";
-    for(let key in services) {
+    for (let key in services) {
         const tasksInfo = services[key].reduce((acc, cur) => {
             const deadline = acc['deadline'] || cur.deadline;
             const langPair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}` : `${cur.targetLanguage} / ${cur.packageSize}`;
@@ -79,7 +79,7 @@ function getTasksInfo(info) {
             acc['cost'] = acc['cost'] ? acc['cost'] + cur.finance.Price.receivables : cur.finance.Price.receivables;
             return acc;
         }, {})
-        result+= getTaskCode({...tasksInfo, service: key, industry});
+        result += getTaskCode({ ...tasksInfo, service: key, industry });
     }
     return result;
 }
@@ -295,6 +295,71 @@ function tasksCancelledMessage(obj) {
         </div>`;
 }
 
+function decideQuote(obj) {
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+    <header style="background-color:#66563E;text-align:center;" >
+        <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+    </header>
+    <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+        <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
+        <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
+            This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
+        <p>Please see below the quote details:</p>
+        <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
+            <h4 class="details__title">Quote Details</h4>
+            <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Name:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Service:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language(s):</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Estimated delivery date:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+                <tr>
+                    <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>
+                    <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj}</td>
+                </tr>
+            </table>
+        </div>
+        <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >
+            By clicking on one of the link below, you can accept or reject our offer.<br>
+            <span class="main_line15-red" style="background-color:#FBF3DB;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
+                Clicking "I accept" will also approve and accept our <a href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link" style="color:#D15F46;" >terms and conditions</a>
+            </span>
+        </p>
+        <p>You can accept the quote by clicking the link below:</p>
+        <a class="link" href="${acceptQuote}" style="color:#D15F46;" >I accept - ${obj.project.projectId} - ${obj.project.projectName}</a>
+        <p>or</p>
+        <a class="link" href="${declineQuote}" style="color:#D15F46;" >I reject - ${obj.project.projectId} - ${obj.project.projectName}</a>
+        <p><span class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >Please note:</span>once accepting the quote, the project will start
+            automatically.<br>
+            In case of any questions, please do not hesitate to contact us :-)</p>
+    </div>
+    <footer>
+        <hr size="15" color="#66563E">
+        <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+    </footer>
+</div>`;
+
+}
+
 module.exports = {
     messageForClient,
     emailMessageForContact,
@@ -302,5 +367,6 @@ module.exports = {
     taskDeliveryMessage,
     tasksQuoteMessage,
     projectCancelledMessage,
-    tasksCancelledMessage
+    tasksCancelledMessage,
+    decideQuote
 }
