@@ -127,7 +127,7 @@ export default {
           label: "Target",
           headerKey: "headerTarget",
           key: "targets",
-          width: "191px",
+          width: "193px",
           padding: "0"
         },
         {
@@ -190,8 +190,8 @@ export default {
       alertToggle: "alertToggle"
     }),
     setTargets({ option }) {
-      if (option === "All") {
-        return (this.selectedTargets = ["All"]);
+      if (option === "ALL") {
+        return (this.selectedTargets = ["ALL"]);
       }
       const position = this.selectedTargets.indexOf(option);
       this.setElements({ position, mainProp: "selectedTargets", option });
@@ -202,7 +202,7 @@ export default {
       }
       if (
         this[mainProp].length &&
-        (this[mainProp][0] === "All" || this[mainProp][0][prop] === "All")
+        (this[mainProp][0] === "ALL" || this[mainProp][0][prop] === "ALL")
       ) {
         this[mainProp] = [];
       }
@@ -329,7 +329,7 @@ export default {
         file: "",
         uploaded: "",
         source: "",
-        targets: "",
+        targets: [],
         industry: "",
         step: ""
       });
