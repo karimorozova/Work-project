@@ -79,7 +79,7 @@ export default {
             }
             this.isDropped = !this.isDropped;
             this.searchValue = "";
-            if(this.isDropped) {
+            if(this.isDropped && this.hasSearch) {
                 this.$nextTick(() => this.$refs.search.focus());
             } 
             this.showOptions(event);

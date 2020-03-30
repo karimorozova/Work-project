@@ -88,7 +88,7 @@ export default {
 
 .drop-select {
     position: absolute;
-    width: 191px;
+    width: 100%;
     border: 1px solid #67573E;
     border-radius: 5px;
     overflow: hidden;
@@ -147,7 +147,7 @@ export default {
     }
 }
 
-.z-index1 {
+.z-index {
     z-index: 1;
 }
 
