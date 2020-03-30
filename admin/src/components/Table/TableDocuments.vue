@@ -42,9 +42,9 @@
                         input.documents__load-file(type="file" id="file" ref="file" @change="uploadDocument(index)")
                     .documents__upload(v-if="currentActive !== index" :class="'documents_opacity-half'")
                         input.documents__load-file(type="file" disabled="disabled")
-                    
-            
-    Add(@add="addData")
+
+    Add(@add="addData" v-if="documentsData.filter(item => item.fileName !== '').length > 0")
+
 </template>
 <script>
 import SettingsTable from "./SettingsTable";
