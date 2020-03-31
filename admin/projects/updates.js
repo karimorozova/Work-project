@@ -208,7 +208,10 @@ async function updateProjectStatus(id, status) {
         if(notifySteps.length) {
             await stepCancelNotifyVendor(notifySteps, project.projectId);
         }
-        return await updateProject({"_id": id}, { status: projectStatus, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps});
+        return await updateProject(
+                {"_id": id}, 
+                { status: projectStatus, isPriceUpdated: false, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps}
+            );
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectStatus");
@@ -225,7 +228,7 @@ async function setNewProjectDetails(project, status) {
             const user = await User.findOne({"_id": client.projectManager._id});
             await pmMail(project, client, user);
         }
-        return await updateProject({"_id": project.id}, { status })
+        return await updateProject({"_id": project.id}, { status, isPriceUpdated: false });
     } catch(err) {
         console.log(err);
         console.log("Error in setNewProjectDetails");

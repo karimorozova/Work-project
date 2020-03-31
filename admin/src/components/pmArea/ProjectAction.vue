@@ -140,6 +140,9 @@ export default {
         filteredActions() {
             let result = this.actions;
             const nonStartedStatuses = ["Draft", "Quote sent", "Requested", "Cancelled"]
+            if(this.project.status === "Approved") {
+                result = ["Send a Quote", "Cancel"];
+            }
             if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
                 result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
             }
