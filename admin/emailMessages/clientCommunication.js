@@ -253,8 +253,7 @@ function projectCancelledMessage(obj) {
         </div>`;
 }
 
-function tasksCancelledMessage(obj) {
-    const cancelledTasks = obj.tasksIds.reduce((acc, cur) => acc + `<li>${cur}</li>`, "");
+function projectMiddleCancelledMessage(obj) {
     return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: auto">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
@@ -265,8 +264,57 @@ function tasksCancelledMessage(obj) {
                     This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}.
                 </p>
                 <p class="description" style="font-size: 18px;">
-                    Next tasks from your project ${obj.projectId} - ${obj.projectName} have been cancelled:
-                    ${cancelledTasks}
+                    We would like to inform you that project ${obj.projectId} - ${obj.projectName} has been cancelled in the middle of the work.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    Reason - ${obj.reason}.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    You will need to pay a partial amount of ${obj.finance.Price.halfReceivables}.
+                </p>
+                <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea Translation Services (Cyprus) LTD</h2>
+                <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
+            </div>
+        </div>`;
+}
+
+function tasksCancelledMessage(obj) {
+    return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: auto">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="comment" style="font-style: italic;font-weight: bold;">
+                    ***This is an automated message*** 
+                </p>
+                <p class="comment" style="font-style: italic;font-weight: bold;">
+                    This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    The task ${obj.taskId} from your project ${obj.projectId} - ${obj.projectName} has been cancelled.
+                </p>
+                <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea Translation Services (Cyprus) LTD</h2>
+                <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
+            </div>
+        </div>`;
+}
+
+function tasksMiddleCancelledMessage(obj) {
+    return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);overflow-y: auto">
+            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
+            <div class="all-info" style="padding: 0 15px 0 30px;">
+                <p class="comment" style="font-style: italic;font-weight: bold;">
+                    ***This is an automated message*** 
+                </p>
+                <p class="comment" style="font-style: italic;font-weight: bold;">
+                    This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    We would like to inform you that task ${obj.task.taskId} (${obj.task.service.title}) from project ${obj.projectId} - ${obj.projectName} has been cancelled in the middle of the work.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    Reason - ${obj.reason}.
+                </p>
+                <p class="description" style="font-size: 18px;">
+                    You will need to pay a partial amount of ${obj.task.finance.Price.halfReceivables}.
                 </p>
                 <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea Translation Services (Cyprus) LTD</h2>
                 <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
@@ -305,5 +353,7 @@ module.exports = {
     tasksQuoteMessage,
     projectCancelledMessage,
     tasksCancelledMessage,
-    projectDeliveryMessage
+    tasksMiddleCancelledMessage,
+    projectDeliveryMessage,
+    projectMiddleCancelledMessage
 }

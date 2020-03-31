@@ -1,7 +1,7 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
-const { emailMessageForContact, projectCancelledMessage, tasksCancelledMessage } = require("../emailMessages/clientCommunication");
+const { emailMessageForContact, projectCancelledMessage, tasksCancelledMessage, tasksMiddleCancelledMessage, projectMiddleCancelledMessage } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
@@ -150,22 +150,20 @@ async function sendEmailToContact(project, contact) {
     }
 }
 
-async function getAccManagerAndContact(project) {
-    try {
-        const accManager = await User.findOne({"_id": project.accountManager.id});
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        return { accManager, contact };
-    } catch(err) {
-        console.log(err);
-        console.log('Error in getAccManagerAndContact');
-    }
+function getAccManagerAndContact(project) {
+    const accManager = project.accountManager;
+    const contact = project.customer.contacts.find(item => item.leadContact);
+    return { accManager, contact };
 }
 
 async function notifyClientProjectCancelled(project) {
     try {
-        const { accManager, contact } = await getAccManagerAndContact(project);
-        const message = projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
-        await clientQuoteEmail({contact, subject: `Cancelled Project (ID C005.0, ${project.projectId})`}, message);
+        const { accManager, contact } = getAccManagerAndContact(project);
+        const message = project.status === "Cancelled" ? 
+            projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"})
+            : projectMiddleCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
+        const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0";
+        await clientQuoteEmail({contact, subject: `Cancelled Project (ID ${messageId}, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientProjectCancelled');
@@ -174,10 +172,16 @@ async function notifyClientProjectCancelled(project) {
 
 async function notifyClientTasksCancelled(project, tasks) {
     try {
-        const { accManager, contact } = await getAccManagerAndContact(project);
+        const { accManager, contact } = getAccManagerAndContact(project);
         const tasksIds = tasks.map(item => item.taskId);
-        const message = tasksCancelledMessage({...project._doc, accManager, contact, tasksIds});
-        await clientQuoteEmail({contact, subject: `Tasks have been cancelled (ID C005.1, ${project.projectId})`}, message);
+        const cancelledTasks = project.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+        for(let task of cancelledTasks) {
+            const message = task.status === 'Cancelled' ? 
+                tasksCancelledMessage({...project._doc, ...task, accManager, contact})
+                : tasksMiddleCancelledMessage({...project._doc, task, accManager, contact, reason: "Some reason"});
+            const messageId = task.status === "Cancelled" ? "C005.1" : "C008.1";
+            await clientQuoteEmail({contact, subject: `Tasks have been cancelled (ID ${messageId}, ${project.projectId})`}, message);
+        }
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientTasksCancelled');
