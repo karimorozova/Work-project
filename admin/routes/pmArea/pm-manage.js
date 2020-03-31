@@ -337,7 +337,7 @@ router.post("/cancel-tasks", async (req, res) => {
         if(wordsCancelledTasks.length) {
             await cancelMemoqDocs(wordsCancelledTasks);
         }
-        await notifyClientTasksCancelled(project, tasks);
+        await notifyClientTasksCancelled(updatedProject, tasks);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
