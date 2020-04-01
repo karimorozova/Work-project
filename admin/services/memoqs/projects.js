@@ -23,7 +23,7 @@ async function getMemoqAllProjects() {
         return result;
     } catch(err) {
         console.log("Error in getMemoqAllProjects");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true});
+        console.log(err);
     }
 }
 
@@ -53,7 +53,7 @@ async function createMemoqProjectWithTemplate(projectData) {
         return projectId;
     } catch(err) {
         console.log("Error in createMemoqProjectWithTemplate");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true});
+        console.log(err);
     }
 }
 
@@ -73,7 +73,7 @@ async function moveMemoqFileToProject(fileId) {
         return result;
     } catch(err) {
         console.log("Error in moveMemoqFileToProject");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -94,7 +94,6 @@ async function updateMemoqProjectUsers(steps) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateMemoqProjectUsers");
-        return err;
     }
 }
 
@@ -113,7 +112,7 @@ async function getProjectUsers(projectId) {
         return !result.ListProjectUsersResult ? null : result.ListProjectUsersResult.ServerProjectUserInfoHeader;
     } catch(err) {
         console.log("Error in getProjectUsers");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -138,7 +137,6 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
     } catch(err) {
         console.log(err);
         console.log("Error in setMemoqTranslators");
-        return err;
     }
 }
 
@@ -182,7 +180,7 @@ async function setMemoqProjectUsers(projectId, users) {
         return !result["s:Fault"];
     } catch(err) {
         console.log("Error in setMemoqProjectUsers");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -217,7 +215,7 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
         return !result["s:Fault"];
     } catch(err) {
         console.log("Error in setMemoqDocsAssignments");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err); 
     }
 }
 
@@ -254,7 +252,7 @@ async function getProjectTranslationDocs(projectId) {
         return !result.ListProjectTranslationDocumentsResult ? null : result.ListProjectTranslationDocumentsResult.ServerProjectTranslationDocInfo;
     } catch(err) {
         console.log("Error in getProjectTranslationDocs");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -279,7 +277,7 @@ async function getProjectAnalysis(projectId) {
         return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
     } catch(err) {
         console.log("Error in getProjectAnalysis");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -300,7 +298,7 @@ async function setMemoqDocStatus({projectId, docIds, status}) {
         return !result["s:Fault"];
     } catch(err) {
         console.log("Error in setMemoqDocStatus");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -379,7 +377,7 @@ async function renameMemoqProject(projectId, name) {
         return !result["s:Fault"];
     } catch(err) {
         console.log("Error in renameMemoqProject");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 
@@ -406,7 +404,7 @@ async function getMemoqFileId(projectId, docId) {
             result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
     } catch(err) {
         console.log("Error in getMemoqFileId");
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
     }
 }
 

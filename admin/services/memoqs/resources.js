@@ -19,7 +19,8 @@ async function getMemoqTemplates() {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].ListResourcesResponse;
         return !result ? null : result.ListResourcesResult.LightResourceInfo.map(item => {return {name: item.Name, id: item.Guid}});
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in getMemoqTemplates")
     }
 }
 

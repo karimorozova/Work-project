@@ -22,7 +22,8 @@ async function uploadFileToMemoq(name) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
         return result["s:Envelope"]["s:Body"].BeginChunkedFileUploadResponse.BeginChunkedFileUploadResult;
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in uploadFileToMemoq");
     }
 }
 
@@ -70,6 +71,8 @@ function getChunks(fileId, name) {
             chunksArr.push(xml);
         })
         readStream.on('error', (err) => {
+            console.log(err);
+            console.log("Error in getChunks");
             reject(err);
         })
         readStream.on('end', () => {
@@ -92,7 +95,8 @@ async function finishMemoqFileMove(fileId, results) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
         return {finish: result, addFiles: results};
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in finishMemoqFileMove");
     }
 }
 
@@ -115,7 +119,8 @@ async function moveMemoqFileToProject(projectId, fileId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
         return result;
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in moveMemoqFileToProject");
     }
 }
 
@@ -145,7 +150,8 @@ async function exportMemoqFile(fileId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].BeginChunkedFileDownloadResponse;
         return result ? result.BeginChunkedFileDownloadResult : new Error(); 
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in exportMemoqFile");
     }
 }
 
@@ -175,7 +181,8 @@ async function getMemoqFileChunks(sessionId, path) {
         writeStream.on('finish', () => console.log("finished"));
         return sessionId;
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in getMemoqFileChunks");
     } finally {
         await finishMemoqFileDownload(sessionId);
     }
@@ -195,7 +202,8 @@ async function finishMemoqFileDownload(sessionId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
         return result;
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in finishMemoqFileDownload");
     }
 }
 
