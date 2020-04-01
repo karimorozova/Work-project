@@ -140,34 +140,48 @@ function managerRequestNotifyingMessage(obj) {
 }
 
 function managerProjectAcceptedMessage(obj) {
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accManager},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Client ${obj.customer.name} has just accepted quote: ${obj.projectId} - ${obj.projectName}. 
-                </p>
-                <p class="description" style="font-size: 18px;">
-                    You can proceed with the project. 
-                </p>
-            </div>
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.accManager}</h4>
+                    <p>
+                        Client ${obj.customer.name} has just accepted quote: ${obj.projectId} - ${obj.projectName}.
+                    </p>
+                    <p>
+                        You can proceed with the project.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 function managerProjectRejectedMessage(obj) {
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accManager},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Client ${obj.customer.name} has just rejected quote: ${obj.projectId} - ${obj.projectName}. 
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+            <header style="background-color:#66563E;text-align:center;" >
+                <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+            </header>
+            <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <h4 class="contact-name">Dear ${obj.accManager}</h4>
+                <p>
+                    Client ${obj.customer.name} has just rejected quote: ${obj.projectId} - ${obj.projectName}н.
                 </p>
-                <p class="description" style="font-size: 18px;">
-                    Please archive the project. 
+                <p>
+                    Please archive the project.
                 </p>
             </div>
-            </div>`;
+            <footer>
+                <hr size="15" color="#66563E">
+                <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+            </footer>
+        </div>`;
 }
 
-module.exports = { 
+module.exports = {
     getMessageWithRandomPassword,
     managerAssignmentNotifyingMessage,
     managerTaskCompleteNotificationMessage,
