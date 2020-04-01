@@ -53,7 +53,6 @@ async function createMemoqProjectWithTemplate(projectData) {
         return projectId;
     } catch(err) {
         console.log("Error in createMemoqProjectWithTemplate");
-        console.log(err);
         return parser.toJson(err, {object: true, sanitize: true, trim: true});
     }
 }
@@ -280,7 +279,7 @@ async function getProjectAnalysis(projectId) {
         return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
     } catch(err) {
         console.log("Error in getProjectAnalysis");
-        console.log(parser.toJson(err, {object: true, sanitize: true, trim: true}));
+        console.log(err);
         return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
     }
 }
