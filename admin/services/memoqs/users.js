@@ -19,7 +19,8 @@ async function getMemoqUsers() {
             return {email: item.EmailAddress, id: item.UserGuid, fullName: item.FullName, userName: item.UserName}
         });
     } catch(err) {
-        return parser.toJson(err, {object: true, sanitize: true, trim: true}); 
+        console.log(err);
+        console.log("Error in getMemoqUsers");
     }
 }
 
