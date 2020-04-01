@@ -53,7 +53,7 @@ async function createMemoqProjectWithTemplate(projectData) {
         return projectId;
     } catch(err) {
         console.log("Error in createMemoqProjectWithTemplate");
-        console.log(parser.toJson(err, {object: true, sanitize: true, trim: true}));
+        console.log(err);
         return parser.toJson(err, {object: true, sanitize: true, trim: true});
     }
 }
