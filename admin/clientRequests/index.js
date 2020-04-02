@@ -1,7 +1,7 @@
 const { getClientRequest, getClientRequests, updateClientRequest, getFilteredClientRequests } = require("./get");
 const { createRequest } = require("./create");
 const { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles, removeClientRequest } = require("./files");
-const { clientRequestNotification, sendNotificationToManager } = require("./emails");
+const { clientRequestNotification, sendNotificationToManager, noitfyRequestCancelled } = require("./emails");
 
 module.exports = { 
     getClientRequest, 
@@ -15,5 +15,6 @@ module.exports = {
     removeRequestFiles,
     clientRequestNotification,
     sendNotificationToManager,
-    removeClientRequest
+    removeClientRequest,
+    noitfyRequestCancelled
 };

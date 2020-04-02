@@ -80,8 +80,8 @@ async function changeManager({projectId, taskId, prevManager, manager, prop, isA
         const isDr1 = prop === "dr1Manager";
         const isDr2 = status === "dr2" && prop === "dr2Manager";
         if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I010)');
-            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I014)');
+            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I009.0)');
+            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I010.0)');
         }
     } catch(err) {
 

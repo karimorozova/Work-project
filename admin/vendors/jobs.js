@@ -1,4 +1,4 @@
-const { getProjects, getProject, taskCompleteNotifyPM } = require('../projects');
+const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted, stepCompletedNotifyPM } = require('../projects');
 const { Projects, Delivery } = require('../models');
 
 async function getJobs(id) {
@@ -87,13 +87,16 @@ async function manageStatuses({project, steps, jobId, status}) {
         if(status === "Completed") {
             return await manageCompletedStatus({project, jobId, steps, task})
         }
-        if(status === "Started" && task.status !== "Started") {
-            return await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
-        }
         if(status === "Accepted" || status === "Rejected") {
             const updatedSteps = status === "Accepted" ? setAcceptedStepStatus({project, steps, jobId})
             : setRejectedStatus({steps, jobId});
             return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
+        }
+        if(status === "Started") {
+            if(task.status !== "Started") {
+                await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
+            }
+            return await notifyManagerStepStarted(project, step);
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
@@ -103,13 +106,14 @@ async function manageStatuses({project, steps, jobId, status}) {
 }
 
 async function manageCompletedStatus({project, jobId, steps, task}) {
+    const step = steps.find(item => item.id === jobId);
     try {
+        await stepCompletedNotifyPM(project, step);
         if(isAllStepsCompleted({jobId, steps})) {
             await setTaskStatusAndSave({project, jobId, steps, status: "Pending Approval [DR1]"});
             await addToDelivery(project, {...task, status: "Pending Approval [DR1]"});
             return await taskCompleteNotifyPM(project, task);
         }
-        const step = steps.find(item => item.id === jobId);
         const stage1step = task.service.steps.find(item => item.stage === 'stage1');
         if(step.serviceStep._id === stage1step.step._id) {
             const updatedSteps = getWithReadyToStartSteps({task, steps});

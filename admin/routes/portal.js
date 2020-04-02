@@ -5,7 +5,7 @@ const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
-const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification } = require("../clientRequests");
+const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, noitfyRequestCancelled } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
@@ -264,6 +264,7 @@ router.post('/cancel-quote', checkClientContact, async (req, res) => {
     const { id } = req.body;
     try {
         const request = await updateClientRequest({"_id": id},{ status: "Cancelled" });
+        await noitfyRequestCancelled(request);
         res.send(request);
     } catch(err) {
         console.log(err);

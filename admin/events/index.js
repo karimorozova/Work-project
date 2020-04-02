@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const emitter = new EventEmitter();
 const { Vendors, Projects } = require('../models');
 const { sendEmail, notifyManagerProjectStarts, notifyManagerProjectRejected } = require('../utils');
+const { notifyStepDecisionMade } = require('../projects/emails');
 const { setStepsStatus } = require('../projects/updates');
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
@@ -51,6 +52,7 @@ emitter.on('stepAcceptAction', async (obj) => {
             await updateMemoqProjectUsers(steps);
         }
         await Projects.updateOne({"_id": project.id}, { steps });
+        await notifyStepDecisionMade({project, step: steps[index], decision});
     } catch(err) {
         console.log("Error from emitter stepAcceptAction");
         console.log(err);
