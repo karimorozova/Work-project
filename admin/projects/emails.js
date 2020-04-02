@@ -1,5 +1,5 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
-const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage } = require("../emailMessages/internalCommunication");
+const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
 const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
 const { vendorNotificationMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
@@ -41,11 +41,22 @@ async function getQuoteInfo(projectId) {
     return quote;
 }
 
+async function stepCompletedNotifyPM(project, step) {
+    const subject = `Step completed (ID I003.0, ${project.projectId})`;
+    const message = stepCompletedMessage({...project._doc, step});
+    try {
+        await sendEmail({to: project.projectManager.email, subject}, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in stepCompletedNotifyPM");
+    }
+}
+
 async function taskCompleteNotifyPM(project, task) {
     try {
         const manager = await User.findOne({"_id": project.projectManager.id}, {email: 1});
         const message = await getPMnotificationMessage(project, task);
-        await managerNotifyMail(manager, message, `Task finish notification (ID I002, ${project.projectId})`);
+        await managerNotifyMail(manager, message, `Task is ready for DR1 (ID I008.0, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in taskCompleteNotifyPM");
@@ -71,7 +82,7 @@ async function notifyClientTaskReady({taskId, project, contacts}) {
     try {
         for(let contact of notifyContacts) {
             const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: `TASK READY (ID C014, ${project.projectId})`}, message);
+            await sendEmail({to: contact.email, subject: `TASK IS READY (ID C014, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);
@@ -139,6 +150,39 @@ async function notifyProjectDelivery(project) {
     }
 }
 
+async function notifyManagerStepStarted(project, step) {
+    const subject = `Step started (ID I002.0, ${project.projectId})`;
+    const message = stepStartedMessage({...project._doc, step});
+    try {
+        await sendEmail({to: project.projectManager.email, subject}, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyManagerStepStarted");
+    }
+}
+
+async function notifyStepDecisionMade({project, step, decision}) {
+    const message = stepDecisionMessage({...project.doc, step, decision});
+    const messageId = decision === 'accept' ? 'I006.0' : 'I006.1';
+    const subject = `Vendor ${decision === 'accept' ? 'approved' : 'rejected'} the job (ID ${messageId}, ${project.projectId})`;
+    try {
+        await sendEmail({to: project.projectManager.email, subject}, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyManagerStepStarted");
+    }
+}
+
+async function notifyReadyForDr2({dr2Manager, project, taskId}) {
+    const message = readyForDr2Message({...project._doc, dr2Manager, taskId});
+    try {
+        await managerNotifyMail(dr2Manager, message, `Task is ready for DR2 (I008.1, ${project.projectId})`);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyReadyForDr2");
+    }
+}
+
 module.exports = { 
     stepCancelNotifyVendor, 
     getMessage, 
@@ -147,5 +191,9 @@ module.exports = {
     sendClientDeliveries, 
     notifyDeliverablesDownloaded, 
     sendTasksQuote,
-    notifyProjectDelivery
+    notifyProjectDelivery,
+    notifyManagerStepStarted,
+    stepCompletedNotifyPM,
+    notifyStepDecisionMade,
+    notifyReadyForDr2
 }

@@ -5,7 +5,7 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
-    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery } = require("../../projects");
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2 } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -469,9 +469,8 @@ router.post("/assign-dr2", async (req, res) => {
     const { taskId, projectId, dr2Manager } = req.body;
     try {
         await changeReviewStage({taskId, projectId});
-        const message = `Delivery review of the task ${taskId} is assigned to you.`;
-        await managerNotifyMail(dr2Manager, message, 'Task delivery review reassignment notification (I014)');
         const updatedProject = await updateProject({"_id": projectId, "tasks.taskId": taskId}, {"tasks.$.status": "Pending Approval [DR2]"});
+        await notifyReadyForDr2({dr2Manager, project: updatedProject, taskId});
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

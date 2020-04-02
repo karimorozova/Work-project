@@ -51,14 +51,14 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     const message = `Delivery review of the task ${taskId} is reassigned to another manager`;
     try {
         if(status === "dr1" && userId !== dr1Manager.id) {
-            await managerNotifyMail(dr1Manager, message, 'Delivery review reassignment notification (I010)');
+            await managerNotifyMail(dr1Manager, message, 'Delivery review reassignment notification (I009.0)');
             return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
                 {$set: {"tasks.$.dr1Manager": userId}},
                 {new: true})
                 .populate("tasks.dr1Manager").populate("tasks.dr2Manager");
         }
         if(status === "dr2" && userId !== dr1Manager.id && userId !== dr2Manager.id) {
-            await managerNotifyMail(dr2Manager, message, 'Delivery review reassignment notification (I010)');
+            await managerNotifyMail(dr2Manager, message, 'Delivery review reassignment notification (I009.0)');
             return await Delivery.findOneAndUpdate({projectId, "tasks.taskId": taskId},
                 {$set: {"tasks.$.dr2Manager": userId}},
                 {new: true})
@@ -80,8 +80,8 @@ async function changeManager({projectId, taskId, prevManager, manager, prop, isA
         const isDr1 = prop === "dr1Manager";
         const isDr2 = status === "dr2" && prop === "dr2Manager";
         if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I010)');
-            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I014)');
+            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I00.9)');
+            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I010.0)');
         }
     } catch(err) {
 
