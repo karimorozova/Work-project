@@ -45,20 +45,27 @@ function managerAssignmentNotifyingMessage(obj) {
 function managerTaskCompleteNotificationMessage(obj) {
     const lastName = obj.projectManager.lastName || "";
     const pair = obj.task.sourceLanguage ? `${obj.task.sourceLanguage} >> ${obj.task.targetLanguage}` : `${obj.task.targetLanguage} / ${obj.task.packageSize}`;
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.projectManager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Task ${obj.task.taskId} from project ${obj.projectId} - ${obj.projectName} has been completed and ready for DR1.
-                </p>
-                <p class="description" style="font-size: 18px;">
-                    Project deadline is: ${obj.deadline}
-                </p>
-                <p class="description" style="font-size: 18px;">
-                    Please, make the review or assign another PM to do it.
-                </p>
-            </div>
-        </div>`;
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.projectManager.firstName} ${lastName}</h4>
+                    <p>
+                        Task ${obj.task.taskId} from project ${obj.projectId} - ${obj.projectName} is completed and ready for DR1.
+                    </p>
+                    <p>
+                        Project deadline is: ${obj.deadline}
+                    </p>
+                    <p>
+                        Please, make the review or assign another PM to do it.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function deliverablesDownloadedMessage(obj) {
@@ -91,66 +98,102 @@ function managerRequestNotifyingMessage(obj) {
         acc+= sourceLanguage ? `${sourceLanguage.lang} >> ${cur.lang}; ` : `${cur.lang}/${packageSize.size}; `
         return acc; 
     }, "")
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.user.firstName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Client ${obj.customer.name} has sent a request. 
-                </p>
-                <h3 class="detailsTitle">Please, find the details below:</h3>
-                <table class="details">
-                    <tr>
-                        <td>Request name:</td>
-                        <td>${obj.projectName}</td>
-                    </tr>
-                    <tr>
-                        <td>Request ID:</td>
-                        <td>${obj.requestId}</td>
-                    </tr>
-                    <tr>
-                        <td>Service:</td>
-                        <td>${obj.service.title}</td>
-                    </tr>
-                    <tr>
-                        <td>Languages:</td>
-                        <td>${languages}</td>
-                    </tr>
-                    <tr>
-                        <td>Industry:</td>
-                        <td>${industry}</td>
-                    </tr>
-                    <tr>
-                        <td>Estimated delivery date: </td>
-                        <td>${obj.deadline}</td>
-                    </tr>
-                </table>
-            </div>
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.user.firstName}</h4>
+                    <p>
+                        Client ${obj.customer.name} has send a request.
+                    </p>
+                    <p>
+                        Please find the details below:
+                    </p>
+                    <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
+
+                        <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Name:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.projectName}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.requestId}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Service:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.service.title}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${languages}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${industry}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Estimated delivery date:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.deadline}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 function managerRequestAssignedMessage(obj) {
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.user.firstName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Please pay attention to the fact that there is a request from client ${obj.customer.name} that has been assigned to you. 
-                </p>
-                <h3 class="detailsTitle">Request Details</h3>
-                <table class="details">
-                    <tr>
-                        <td>Request ID:</td>
-                        <td>${obj.requestId}</td>
-                    </tr>
-                    <tr>
-                        <td>Request name:</td>
-                        <td>${obj.projectName}</td>
-                    </tr>
-                    <tr>
-                        <td>Suggested Deadline: </td>
-                        <td>${obj.deadline}</td>
-                    </tr>
-                </table>
-            </div>
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.user.firstName}</h4>
+                    <p>
+                        Request ${obj.requestId} - ${obj.projectName} has been assigned to you.
+                    </p>
+                    <p>
+                        Please find the details below:
+                    </p>
+                    <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
+
+                        <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Name:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.projectName}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.requestId}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Service:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" ></td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" ></td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" ></td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Estimated delivery date:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.deadline}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
@@ -196,79 +239,113 @@ function managerProjectRejectedMessage(obj) {
         </div>`;
 }
 
-<<<<<<< HEAD
-module.exports = {
-=======
 function stepStartedMessage(obj) {
     const lastName = obj.projectManager.lastName || "";
     const vendorSurname = obj.step.vendor.surname || "";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.projectManager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Vendor ${obj.step.vendor} ${vendorSurname} has just started the step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName}. You can track progress on Project page.
-                </p>
-            </div>
-            </div>`
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.projectManager.firstName} ${lastName}</h4>
+                    <p>
+                        Vendor ${obj.step.vendor} ${vendorSurname} just start the step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName}.
+                    </p>
+                    <p>
+                        You can track progress on Project page.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function stepCompletedMessage(obj) {
     const lastName = obj.accountManager.lastName || "";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accountManager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Vendor ${obj.step.vendor} ${vendorSurname} has just completed the step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName}.
-                </p>
-            </div>
-            </div>`
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.accountManager.firstName} ${lastName}</h4>
+                    <p>
+                        Vendor ${obj.step.vendor} ${vendorSurname} just completed the step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName}.  
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function requestCancelledMessage(obj) {
     const lastName = obj.accountManager.lastName || "";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accountManager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Client ${obj.customer.name} has cancelled the request: ${obj.requestId} - ${obj.projectName}.
-                </p>
-            </div>
-            </div>`
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.accountManager.firstName} ${lastName}</h4>
+                    <p>
+                        Client${obj.customer.name} has cancelled the project: ${obj.requestId} - ${obj.projectName}.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function  stepDecisionMessage(obj) {
     const lastName = obj.accountManager.lastName || "";
     const decision = obj.decision === "accept" ? "approved" : "rejected";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.accountManager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Vendor ${obj.step.vendor} ${vendorSurname} has ${decision} the assigned step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName} Project.
-                </p>
-            </div>
-            </div>`
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.accountManager.firstName} ${lastName}</h4>
+                    <p>
+                        Vendor ${obj.step.vendor} ${vendorSurname} has ${decision} the assigned step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName} Project.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function readyForDr2Message(obj) {
     const lastName = obj.dr2Manager.lastName || "";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.dr2Manager.firstName} ${lastName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    The Delivery Review for ${taskId} from project${obj.projectId} - ${obj.projectName} has been finished.
-                </p>
-                <p class="description" style="font-size: 18px;">
-                    Please, do the Delivery Review 2.
-                </p>
-                <p class="description" style="font-size: 18px;">
-                    Project deadline is: ${obj.deadline}
-                </p>
-            </div>
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.dr2Manager.firstName} ${lastName}</h4>
+                    <p>
+                        The Delivery Review for ${taskId} from project ${obj.projectId} - ${obj.projectName} has been finished. 
+                    </p>
+                    <p>
+                        Please, do the Delivery Review 2
+                    </p>
+                    <p>
+                        Project deadline is: ${obj.deadline}
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 module.exports = { 
->>>>>>> master
     getMessageWithRandomPassword,
     managerAssignmentNotifyingMessage,
     managerTaskCompleteNotificationMessage,
