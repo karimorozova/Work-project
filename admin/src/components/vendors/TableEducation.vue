@@ -83,7 +83,7 @@
 <script>
 import DatePickers from "../reports/DatePickers";
 import Button from "../Button";
-import SettingsTable from "./SettingsTable";
+import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
 import crudIcons from "@/mixins/crudIcons";
 import moment from "moment";

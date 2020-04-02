@@ -113,11 +113,11 @@
 
 <script>
 import VendorCandidate from "./VendorCandidate";
-import TableQualifications from "../Table/TableQualifications";
-import TableProfessionalExperience from "../Table/TableProfessionalExperience";
-import TableEducation from "../Table/TableEducation";
-import TableDocuments from "../Table/TableDocuments";
-import TableAssessment from "../Table/TableAssessment";
+import TableQualifications from "./TableQualifications";
+import TableProfessionalExperience from "./TableProfessionalExperience";
+import TableEducation from "./TableEducation";
+import TableDocuments from "./TableDocuments";
+import TableAssessment from "./TableAssessment";
 import ClickOutside from "vue-click-outside";
 import VendorStatusSelect from "./VendorStatusSelect";
 import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
