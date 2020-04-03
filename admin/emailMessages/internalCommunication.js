@@ -334,14 +334,16 @@ function readyForDr2Message(obj) {
 }
 
 function managerDr1Reassign(obj){
+    const lastNamePrevManager = obj.prevManager.lastName || "";
+    const lastNameNextManager = obj.manager.lastName || "";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ??</h4>
+                    <h4 class="contact-name">Dear ${obj.prevManager.firstName} ${lastNamePrevManager}</h4>
                     <p>
-                        The Delivery Review 1 for ${taskId} from project %%quote id%% - %%quote name%% has been reassigned to %%another pm%%.
+                        The Delivery Review 1 for ${taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been reassigned to ${obj.manager.firstName} ${lastNameNextManager}.
                     </p>
                 </div>
                 <footer>
@@ -352,17 +354,18 @@ function managerDr1Reassign(obj){
 }
 
 function managerDr1Assigned(obj){
+    const lastName = obj.manager.lastName || "";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ??</h4>
+                    <h4 class="contact-name">Dear ${obj.manager.firstName} ${lastName}</h4>
                     <p>
-                        Delivery review 1 for ${taskId} from project %%quote id%% - %%quote name%% has been assigned to you.
+                        Delivery review 1 for ${taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been assigned to you.
                     </p>
                     <p>
-                        Project deadline is: %%deadline%%
+                        Project deadline is: ${obj.project.deadline}
                     </p>
                 </div>
                 <footer>

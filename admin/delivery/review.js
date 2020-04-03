@@ -72,13 +72,11 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
-async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status}) {
+async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status , project}) {
     const key = `tasks.$.${prop}`;
     const updateQuery = {[key]: manager._id};
-    // const messageToPrev = `Delivery review of the task ${taskId} is reassigned to another manager`;
-    // const messageToNew = `Delivery review of the task ${taskId} assigned to you`;
-    const messageToPrev = managerDr1Reassign({taskId});
-    const messageToNew = managerDr1Assigned({taskId});
+    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager});
+    const messageToNew = managerDr1Assigned({taskId, project, manager});
     try {
         await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
         const isDr1 = prop === "dr1Manager";
