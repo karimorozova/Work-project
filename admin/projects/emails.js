@@ -113,8 +113,8 @@ async function notifyDeliverablesDownloaded(taskId, project) {
             manager: projectManager, taskId, project_id: project.projectId})
         const accManagerMessage = deliverablesDownloadedMessage({
             manager: accManager, taskId, project_id: project.projectId})
-        await managerNotifyMail(projectManager, pmMessage, `Task delivery notification (ID I006, ${project.projectId})`);
-        await managerNotifyMail(accManager, accManagerMessage, `Task delivery notification (ID I006, ${project.projectId})`);
+        await managerNotifyMail(projectManager, pmMessage, `Task delivery notification (ID I010.0, ${project.projectId})`);
+        await managerNotifyMail(accManager, accManagerMessage, `Task delivery notification (ID I010.0, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyDeliverablesDownloaded");

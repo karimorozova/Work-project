@@ -1,6 +1,6 @@
 const { Delivery } = require("../models");
 const { managerNotifyMail } = require("../utils/mailTemplate");
-const { managerDr1Assigned , managerDr1Reassign, taskDelivered } = require("../emailMessages/internalCommunication");
+const { managerDr1Assigned , managerDr1Reassign } = require("../emailMessages/internalCommunication");
 
 
 const dr2Instructions = [
