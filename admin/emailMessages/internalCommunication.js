@@ -337,6 +337,64 @@ function readyForDr2Message(obj) {
             </div>`;
 }
 
+function managerDr1Reassign(obj){
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ??</h4>
+                    <p>
+                        The Delivery Review 1 for ${taskId} from project %%quote id%% - %%quote name%% has been reassigned to %%another pm%%.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function managerDr1Assigned(obj){
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ??</h4>
+                    <p>
+                        Delivery review 1 for ${taskId} from project %%quote id%% - %%quote name%% has been assigned to you.
+                    </p>
+                    <p>
+                        Project deadline is: %%deadline%%
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function taskDelivered(obj){
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ??</h4>
+                    <p>
+                        Task %%task id%% from project %%quote id%% - %%quote name%% has been reviewed and delivered by %%name%%
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+
 module.exports = { 
     getMessageWithRandomPassword,
     managerAssignmentNotifyingMessage,
@@ -350,5 +408,9 @@ module.exports = {
     stepCompletedMessage,
     requestCancelledMessage,
     stepDecisionMessage,
-    readyForDr2Message
+    readyForDr2Message,
+    managerDr1Reassign,
+    managerDr1Assigned,
+    taskDelivered
+
 };
