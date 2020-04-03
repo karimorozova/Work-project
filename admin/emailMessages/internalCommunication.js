@@ -13,32 +13,20 @@ function getMessageWithRandomPassword(password) {
 }
 
 function managerAssignmentNotifyingMessage(obj) {
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-            <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.user.firstName},</h3>
-            <div class="all-info" style="padding: 0 15px 0 30px;">
-                <p class="description" style="font-size: 18px;">
-                    Please pay attention to the fact that there is a quote that has been accepted and a porject is ready to start, but translators were not assigned. 
-                </p>
-                <h3 class="detailsTitle">Step Details</h3>
-                <table class="details">
-                    <tr>
-                        <td>Project ID:</td>
-                        <td>${obj.projectId}</td>
-                    </tr>
-                    <tr>
-                        <td>Project name:</td>
-                        <td>${obj.projectName}</td>
-                    </tr>
-                    <tr>
-                        <td>Start date: </td>
-                        <td>${obj.startDate}</td>
-                    </tr>
-                    <tr>
-                        <td>Deadline: </td>
-                        <td>${obj.deadline}</td>
-                    </tr>
-                </table>
-            </div>
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.user.firstName}</h4>
+                    <p>
+                        Quote ${obj.projectId} - ${obj.projectName} has been accepted. Please, assign Vendor(s) for the task(s) to start project.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
@@ -303,6 +291,7 @@ function requestCancelledMessage(obj) {
 function  stepDecisionMessage(obj) {
     const lastName = obj.accountManager.lastName || "";
     const decision = obj.decision === "accept" ? "approved" : "rejected";
+    const reason = obj.reason || "";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="../static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -311,6 +300,9 @@ function  stepDecisionMessage(obj) {
                     <h4 class="contact-name">Dear ${obj.accountManager.firstName} ${lastName}</h4>
                     <p>
                         Vendor ${obj.step.vendor} ${vendorSurname} has ${decision} the assigned step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName} Project.
+                    </p>
+                    <p>
+                        ${reason}
                     </p>
                 </div>
                 <footer>

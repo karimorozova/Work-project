@@ -72,8 +72,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
     const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
     const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
     try {
-        await managerNotifyMail(projectManager, pmMessage, `Quote Accepted but translators were not assigned (ID I001, ${project.projectId})`);
-        await managerNotifyMail(salesManager, smMessage, `Quote Accepted but translators were not assigned (ID I001, ${project.projectId})`);
+        await managerNotifyMail(projectManager, pmMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
+        await managerNotifyMail(salesManager, smMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in managerEmailsSend");
