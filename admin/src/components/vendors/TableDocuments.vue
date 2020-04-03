@@ -47,7 +47,7 @@
 
 </template>
 <script>
-import SettingsTable from "./SettingsTable";
+import SettingsTable from "../Table/SettingsTable";
 import { mapGetters, mapActions } from "vuex";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
