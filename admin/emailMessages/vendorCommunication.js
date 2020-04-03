@@ -172,36 +172,28 @@ function requestMessageForVendor(obj) {
     </div>`;
 }
 
-function vendorNotificationMessage(obj) {
-    const pairSourceTitle = obj.sourceLanguage ? "Source language:" : "Target language:";
-    const pairTargetTitle = obj.sourceLanguage ? "Target language:" : "Package size:";
-    const pairLeft = obj.sourceLanguage || obj.targetLanguage;
-    const pairRight = obj.sourceLanguage ? obj.targetLanguage : obj.packageSize;
+function stepCancelledMessage(obj) {
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
                 <div class="all-info" style="padding: 0 15px 0 30px;">
                     <p class="description" style="font-size: 18px;">
-                        Please pay attention to the fact that there is a step that has been cancelled. 
+                        We would like to inform you that step: ${obj.stepId} ${obj.service.title} has been cancelled in the middle.
                     </p>
-                    <h3 class="detailsTitle">Step Details</h3>
-                    <table class="details">
-                        <tr>
-                            <td>Step ID</td>
-                            <td>${obj.stepId}</td>
-                        </tr>
-                        <tr>
-                            <td>Step</td>
-                            <td>${obj.name}</td>
-                        </tr>
-                        <tr>
-                            <td>${pairSourceTitle}</td>
-                            <td>${pairLeft}</td>
-                        </tr>
-                        <tr>
-                            <td>${pairTargetTitle}</td>
-                            <td>${pairRight}</td>
-                        </tr>
-                    </table>
+                </div>
+            </div>`;
+}
+
+function stepMiddleCancelledMessage(obj) {
+    const fee = obj.status === "Completed" ? obj.finance.Price.payables : obj.finance.Price.halfPayables;
+    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
+                <div class="all-info" style="padding: 0 15px 0 30px;">
+                    <p class="description" style="font-size: 18px;">
+                        We would like to inform you that step: ${obj.stepId} ${obj.service.title} has been cancelled in the middle.
+                    </p>
+                    <p class="description" style="font-size: 18px;">
+                        You will be paid ${fee}, which is according to relative work you have completed.
+                    </p>
                 </div>
             </div>`;
 }
@@ -245,6 +237,7 @@ function vendorReassignmentMessage(obj, reason) {
 module.exports = {
     applicationMessage,
     requestMessageForVendor,
-    vendorNotificationMessage,
+    stepCancelledMessage, 
+    stepMiddleCancelledMessage,
     vendorReassignmentMessage
 }

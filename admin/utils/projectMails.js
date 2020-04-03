@@ -128,7 +128,7 @@ async function sendRequestToVendor(project, step) {
     requestInfo.brief = project.brief;
     const message = requestMessageForVendor(requestInfo);
     try {
-        await sendEmail({to: step.vendor.email, subject: `Request Confirmation (ID V001, ${project.projectId})`}, message);
+        await sendEmail({to: step.vendor.email, subject: `Request Confirmation (ID V001.0, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in sendRequestToVendor');

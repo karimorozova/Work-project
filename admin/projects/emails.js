@@ -1,7 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
 const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
-const { vendorNotificationMessage } = require("../emailMessages/vendorCommunication");
+const { stepCancelledMessage, stepMiddleCancelledMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
@@ -11,9 +11,12 @@ async function stepCancelNotifyVendor(steps, projectId) {
         const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {
             if(step.vendor && notifyStepStatuses.indexOf(step.status) === -1) {
-                const message = vendorNotificationMessage(step);
+                const message = step.status === "Cancelled" ? 
+                    stepCancelledMessage(step)
+                    : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;
-                step.subject = `Step cancelling notification! (ID V007, ${projectId})`;
+                const id = step.status === "Cancelled" ? "V003.1" : "V004.0";
+                step.subject = `Step cancelling notification! (ID ${id}, ${projectId})`;
                 await sendEmail(step, message);
             }
         }

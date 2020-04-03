@@ -4,7 +4,7 @@ const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
-    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, 
+    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2 } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
@@ -173,6 +173,7 @@ router.put("/project-status", async (req, res) => {
         const result = await updateProjectStatus(id, status);
         if(status === "Cancelled") {
             await notifyClientProjectCancelled(result);
+            await notifyVendorsProjectCancelled(result);
             const wordsTasks = result.tasks.filter(item => item.service.calculationUnit === 'Words');
             if(wordsTasks.length) {
                 await cancelMemoqDocs(wordsTasks);
