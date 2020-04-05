@@ -5,7 +5,7 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, notifyVendorsProjectCancelled,
-    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2 } = require("../../projects");
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -366,6 +366,7 @@ router.post("/steps-reopen", async (req, res) => {
     try {
         const project = await getProject({"steps._id": steps[0]._id});
         const updateProject = await getAfterReopenSteps(steps, project);
+        await notifyStepReopened(steps, project.projectId);
         res.send(updateProject);
     } catch(err) {
         console.log(err);
