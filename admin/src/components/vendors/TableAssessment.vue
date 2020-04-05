@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import SettingsTable from "./SettingsTable";
+import SettingsTable from "../Table/SettingsTable";
 import VendorLqa from "../vendors/VendorLqa";
 import { mapGetters, mapActions } from "vuex";
 

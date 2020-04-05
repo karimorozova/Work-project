@@ -94,12 +94,12 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import SettingsTable from "./SettingsTable";
+import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
-import VendorLqa from "../vendors/VendorLqa";
+import VendorLqa from "./VendorLqa";
 
 export default {
   mixins: [scrollDrop, crudIcons],
