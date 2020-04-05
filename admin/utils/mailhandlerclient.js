@@ -2,21 +2,21 @@ const nodemailer = require('nodemailer');
 const apiUrl = require("../helpers/apiurl");
 
 const sendMailClient = function(request) {
-    var detailFile = "";
+    let detailFile = "";
     if (request.detailFiles.length > 0) {
-      for (var i = 0; i < request.detailFiles.length; i++) {
+      for (let i = 0; i < request.detailFiles.length; i++) {
         detailFile += `<a href=${apiUrl}/reqfiles/${request.id}/${request.detailFiles[i]} download target='_self'>${request.detailFiles[i]}</a><br/>`;
       }
     }
 
-    var referenceFile = "";
+    let referenceFile = "";
     if (request.refFiles.length > 0) {
-      for (var i = 0; i < request.refFiles.length; i++) {
+      for (let i = 0; i < request.refFiles.length; i++) {
         referenceFile += `<a href=${apiUrl}/reqfiles/${request.id}/${request.refFiles[i]} download target='_self'>${request.refFiles[i]}</a><br/>`;
       }
     }
 
-    var targetLangs = "";
+    let targetLangs = "";
     request.targetLanguages.forEach(element => {
       targetLangs += element.lang + ",";
     });
@@ -30,7 +30,7 @@ const sendMailClient = function(request) {
         pass: '@Png122019!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
-    var msg = `<div class="emailWrapper" style="width: 600px; padding:10px;">
+    let msg = `<div class="emailWrapper" style="width: 600px; padding:10px;">
     <a href="https://www.pangea.global/">
     <img src="cid:logo@pan" style="width: 50%;"></a>
     <p style="color: #66563D;font-size: 12px; line-height: 1.5em;">

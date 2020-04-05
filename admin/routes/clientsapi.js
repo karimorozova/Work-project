@@ -28,18 +28,6 @@ router.get('/clients-every', async (req,res) => {
         }
 })
 
-router.post('/mailtoclient', async (req, res) => {
-    const project = req.body;
-    try {
-        const client = await getClient({"_id": project.customer});
-        await clientMail(project, client);
-        res.send('An email to Cilent sent!')
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on mailing to Client");
-    }
-})
-
 router.post('/rates', async (req, res) => {
     const { clientId, ...rateInfo } = req.body;
     try {
