@@ -1,5 +1,7 @@
 const { Delivery } = require("../models");
 const { managerNotifyMail } = require("../utils/mailTemplate");
+const { managerDr1Assigned , managerDr1Reassign } = require("../emailMessages/internalCommunication");
+
 
 const dr2Instructions = [
     {step: "dr2", text: "Check Language combinations", isChecked: false},
@@ -70,18 +72,18 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
-async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status}) {
+async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status , project}) {
     const key = `tasks.$.${prop}`;
     const updateQuery = {[key]: manager._id};
-    const messageToPrev = `Delivery review of the task ${taskId} is reassigned to another manager`;
-    const messageToNew = `Delivery review of the task ${taskId} assigned to you`;
+    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager});
+    const messageToNew = managerDr1Assigned({taskId, project, manager});
     try {
         await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
         const isDr1 = prop === "dr1Manager";
         const isDr2 = status === "dr2" && prop === "dr2Manager";
         if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I00.9)');
-            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I010.0)');
+            await managerNotifyMail(prevManager, messageToPrev, 'Delivery review reassignment notification (I009.0)');
+            await managerNotifyMail(manager, messageToNew, 'Task delivery review reassignment notification (I009.1)');
         }
     } catch(err) {
 

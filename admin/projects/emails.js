@@ -116,8 +116,8 @@ async function notifyDeliverablesDownloaded(taskId, project) {
             manager: projectManager, taskId, project_id: project.projectId})
         const accManagerMessage = deliverablesDownloadedMessage({
             manager: accManager, taskId, project_id: project.projectId})
-        await managerNotifyMail(projectManager, pmMessage, `Task delivery notification (ID I006, ${project.projectId})`);
-        await managerNotifyMail(accManager, accManagerMessage, `Task delivery notification (ID I006, ${project.projectId})`);
+        await managerNotifyMail(projectManager, pmMessage, `Task delivery notification (ID I010.0, ${project.projectId})`);
+        await managerNotifyMail(accManager, accManagerMessage, `Task delivery notification (ID I010.0, ${project.projectId})`);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyDeliverablesDownloaded");
@@ -166,7 +166,7 @@ async function notifyManagerStepStarted(project, step) {
 
 async function notifyStepDecisionMade({project, step, decision}) {
     const message = stepDecisionMessage({...project.doc, step, decision});
-    const messageId = decision === 'accept' ? 'I006.0' : 'I006.1';
+    const messageId = decision === 'accept' ? 'I006.0' : 'I007.0';
     const subject = `Vendor ${decision === 'accept' ? 'approved' : 'rejected'} the job (ID ${messageId}, ${project.projectId})`;
     try {
         await sendEmail({to: project.projectManager.email, subject}, message);
