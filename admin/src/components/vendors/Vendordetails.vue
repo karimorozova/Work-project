@@ -79,7 +79,12 @@
                         .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
                             MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             
-            VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
+            .right-informational-block
+                VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
+                VendorAction(@openPreview="openPreview")
+
+        .vendor-info__preview(v-if="isEditAndSend")
+            VendorPreview(@closePreview="closePreview" :message="'<p>Message...</p>'" @send="sendQuote")
          
         .title Qualifications
             TableQualifications(:qualificationData="qualificationData" :assessmentData="assessmentData" :currentVendor="currentVendor" :vendorIndustries="currentVendor.industries" @refreshQualifications="setDetailsTablesData")
@@ -112,6 +117,8 @@
 </template>
 
 <script>
+import VendorPreview from "./VendorPreview";
+import VendorAction from "./VendorAction";
 import VendorCandidate from "./VendorCandidate";
 import TableQualifications from "./TableQualifications";
 import TableProfessionalExperience from "./TableProfessionalExperience";
@@ -137,7 +144,7 @@ export default {
   mixins: [photoPreview],
   data() {
     return {
-      vendorId:'',
+      vendorId: "",
       educationData: [],
       professionalExperienceData: [],
       qualificationData: [],
@@ -155,10 +162,25 @@ export default {
       langPairs: [],
       addSeveralPriceId: "",
       oldEmail: "",
-      isFileError: false
+      isFileError: false,
+      isEditAndSend: false
     };
   },
   methods: {
+    closePreview() {
+      this.isEditAndSend = false;
+    },
+    openPreview() {
+      this.isEditAndSend = true;
+    },
+    async sendQuote(message) {
+      try {
+        console.log(message);
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
+      this.closePreview();
+    },
     closeLangPairs() {
       this.isAvailablePairs = false;
     },
@@ -315,11 +337,13 @@ export default {
       this.updateIndustry(industry);
     },
     setDetailsTablesData() {
-        this.educationData = Array.from(this.currentVendor.educations);
-        this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
-        this.qualificationData = Array.from(this.currentVendor.qualifications);
-        this.documentsData = Array.from(this.currentVendor.documents);
-        this.assessmentData = Array.from(this.currentVendor.assessments);
+      this.educationData = Array.from(this.currentVendor.educations);
+      this.professionalExperienceData = Array.from(
+        this.currentVendor.profExperiences
+      );
+      this.qualificationData = Array.from(this.currentVendor.qualifications);
+      this.documentsData = Array.from(this.currentVendor.documents);
+      this.assessmentData = Array.from(this.currentVendor.assessments);
     },
     async getVendor() {
       this.vendorId = this.$route.params.id;
@@ -358,7 +382,10 @@ export default {
     }),
     selectedIndNames() {
       let result = [];
-      if (this.currentVendor.industries && this.currentVendor.industries.length) {
+      if (
+        this.currentVendor.industries &&
+        this.currentVendor.industries.length
+      ) {
         for (let ind of this.currentVendor.industries) {
           result.push(ind.name);
         }
@@ -367,7 +394,9 @@ export default {
     }
   },
   components: {
+    VendorPreview,
     VendorCandidate,
+    VendorAction,
     TableQualifications,
     TableAssessment,
     TableDocuments,
@@ -392,7 +421,7 @@ export default {
     this.getVendor();
   },
   mounted() {
-    this.oldEmail = this.currentVendor.email;    
+    this.oldEmail = this.currentVendor.email;
   }
 };
 </script>
@@ -400,6 +429,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+
+.vendor-details {
+  .right-informational-block {
+    position: absolute;
+    top: 118px;
+    left: 1070px;
+  }
+}
 
 .vendor-wrap {
   position: relative;
@@ -411,6 +448,15 @@ export default {
   padding: 40px;
   position: relative;
   width: 1020px;
+
+  &__preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+  }
 }
 
 .title {

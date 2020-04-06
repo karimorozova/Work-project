@@ -30,11 +30,8 @@ export default {
 <style lang="scss" scoped>
 .candidate {
   min-height: 209px;
-  position: absolute;
+  margin-bottom: 40px;
   width: 309px;
-  top: 118px;
-  right: 500px;
-  left: 1070px;
   background: #fff;
   box-shadow: 0 0 15px #67573e9d;
   padding: 20px;
