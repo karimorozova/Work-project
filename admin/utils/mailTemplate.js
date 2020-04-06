@@ -9,9 +9,12 @@ const sendEmail = function (obj, msg) {
             text: "plain text", // plain text body
             html: "<b>" + msg + "</b>", // html body
         };
-        if(obj.attachments && obj.attachments.length) {
-            mailOptions.attachments = obj.attachments;
-        }
+        mailOptions.attachments = obj.attachments || [];
+        mailOptions.attachments.push({
+            filename: 'logo.png',
+            path: './static/email-logo.png',
+            cid: 'logo@pan' //same cid value as in the html img src
+        })
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {
@@ -39,13 +42,13 @@ const clientQuoteEmail = function (obj, msg) {
             subject: obj.subject,
             text: "plain text",
             html: msg,
-            attachments: [{
-                filename: 'logo.png',
-                path: './static/logo.png',
-                cid: 'logo@pan' //same cid value as in the html img src
-                }
-            ]
         };
+        mailOptions.attachments = obj.attachments || [];
+        mailOptions.attachments.push({
+            filename: 'logo.png',
+            path: './static/email-logo.png',
+            cid: 'logo@pan' //same cid value as in the html img src
+        })
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {
@@ -66,6 +69,12 @@ const managerNotifyMail = function(obj, msg, subject) {
             text: "plain text",
             html: msg
         };
+        mailOptions.attachments = obj.attachments || [];
+        mailOptions.attachments.push({
+            filename: 'logo.png',
+            path: './static/email-logo.png',
+            cid: 'logo@pan' //same cid value as in the html img src
+        })
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {
