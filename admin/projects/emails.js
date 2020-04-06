@@ -1,7 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
 const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
-const { stepCancelledMessage, stepMiddleCancelledMessage } = require("../emailMessages/vendorCommunication");
+const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
@@ -186,6 +186,20 @@ async function notifyReadyForDr2({dr2Manager, project, taskId}) {
     }
 }
 
+async function notifyStepReopened(steps, projectId) {
+    try {
+        for(let step of steps) {
+            const message = stepReopenedMessage(step);
+            step["to"] = step.vendor.email;
+            step.subject = `Step reopened (ID V007.0, ${projectId})`;
+            await sendEmail(step, message);
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notfyStepsReopen");
+    }
+}
+
 module.exports = { 
     stepCancelNotifyVendor, 
     getMessage, 
@@ -198,5 +212,6 @@ module.exports = {
     notifyManagerStepStarted,
     stepCompletedNotifyPM,
     notifyStepDecisionMade,
-    notifyReadyForDr2
+    notifyReadyForDr2,
+    notifyStepReopened
 }
