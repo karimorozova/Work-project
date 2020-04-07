@@ -4,8 +4,10 @@ const mv = require('mv');
 const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
-    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, removeVendorEdu, updateVendorAssessment } = require('../vendors');
+    importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, 
+    removeVendorEdu, updateVendorAssessment } = require('../vendors');
 const { Vendors } = require('../models');
+const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 
 
 function moveFile(oldFile, vendorId) {
@@ -319,6 +321,40 @@ router.get('/any-step', async (req, res) => {
         res.send(project);
     } catch (err) {
         res.status(500).send("Error on gettinf any step with current Vendor");
+    }
+})
+
+router.get('/lang-tests', async (req, res) => {
+    try {
+        const tests = await getLangTests({});
+        res.send(tests);
+    } catch (err) {
+        res.status(500).send("Error on getting lang tests for vendors");
+    }
+})
+
+router.post('/lang-test', upload.fields([{ name: 'testFile' }]), async (req, res) => {
+    const stringifiedData = req.body;
+    const langTest = Object.keys(stringifiedData).reduce((acc, cur) => {
+        acc[cur] = JSON.parse(stringifiedData[cur]);
+        return acc;
+    },{})
+    const { testFile } = req.files;
+    try {
+        await updateLangTest(langTest, testFile[0]);
+        res.send("saved");
+    } catch (err) {
+        res.status(500).send("Error on updating lang tests for vendors");
+    }
+})
+
+router.post('/remove-lang-test', async (req, res) => {
+    const { _id, path } = req.body;
+    try {
+        await removeLangTest(_id, path);
+        res.send("removed");
+    } catch(err) {
+        res.send(500).send("Error on removing lang tests for vendors");
     }
 })
 

@@ -26,6 +26,7 @@ const XtrfLqa = require('./xtrfLqa');
 const XtrfPrice = require('./xtrfPrice');
 const Delivery = require('./delivery');
 const TierLqa = require('./tierLqa');
+const LangTest = require('./langTest');
 
 const Models = {
     Languages,
@@ -55,7 +56,8 @@ const Models = {
     XtrfLqa,
     XtrfPrice,
     Delivery,
-    TierLqa
+    TierLqa,
+    LangTest
 };
 
 module.exports = Models;

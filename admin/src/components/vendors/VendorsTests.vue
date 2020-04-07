@@ -3,7 +3,7 @@
     .vendorTests__table
         SettingsTable(
           :fields="fields"
-          :tableData="vendorTest"
+          :tableData="vendorTests"
           :errors="errors"
           :areErrors="areErrors"
           :isApproveModal="isDeleting"
@@ -17,19 +17,17 @@
             .vendorTests__head-title {{ field.label }}
 
           template(slot="file" slot-scope="{ row, index }")
-              .vendorTests__no-file.vendorTests__data(v-if="!row.file && currentActive !== index") No file loaded
-              .vendorTests__data(v-if="row.file && currentActive !== index")
-                a(:href="domain + row.file.path") {{row.file.name}}
+              .vendorTests__no-file.vendorTests__data(v-if="!row.fileName && currentActive !== index") No file loaded
+              .vendorTests__data(v-if="row.fileName && currentActive !== index")
+                a(:href="domain + row.path") {{row.fileName}}
               .vendorTests__upload(v-if="currentActive === index")
                   input.vendorTests__load-file(type="file" id="file" ref="file" @change="uploadDocument")
           
           template(slot="uploaded" slot-scope="{ row, index }")
-            .vendorTests__data(v-if="currentActive !== index") {{ row.uploaded }}
-            .vendorTests__data(v-else)
-                input.vendorTests__input(:value="currentUploaded" readonly)
+            .vendorTests__data {{ getFormattedDate(row.uploadDate) }}
 
           template(slot="source" slot-scope="{ row, index }")
-            .vendorTests__data(v-if="currentActive !== index") {{ row.source.lang }}
+            .vendorTests__data(v-if="currentActive !== index") {{ presentSource(row.source) }}
             .vendorTests__drop-menu(v-else)
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
@@ -42,8 +40,7 @@
                 )
 
           template(slot="targets" slot-scope="{ row, index }")
-            .vendorTests__data(v-if="currentActive !== index")
-                span(v-for="item in row.targets") {{ item.lang }}; 
+            .vendorTests__data(v-if="currentActive !== index") {{ presentTargets(row.targets) }}
             .vendorTests__drop-menu(v-else)
                 SelectMulti(
                   :isTableDropMenu="isTableDropMenu"
@@ -90,6 +87,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import moment from "moment";
 import Add from "../Add";
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
@@ -153,23 +151,13 @@ export default {
         }
       ],
 
-      vendorTest: [
-        {
-          file: { name: "test.pdf", path: "/path" },
-          uploaded: "20-05-2026",
-          source: { lang: "Danish" },
-          targets: [{ lang: "Afrikaans" }, { lang: "Arabic (Egypt)" }],
-          industry: { name: "CFDs & Online Trading" },
-          step: { title: "Translation" }
-        }
-      ],
+      vendorTests: [],
       currentActive: -1,
-      currentUploaded: "",
       currentFile: "",
       currentSource: "",
       currentIndustry: "",
       currentStep: "",
-      selectedTargets: [],
+      currentTargets: [],
 
       industries: [],
       sources: [],
@@ -186,29 +174,36 @@ export default {
     };
   },
   methods: {
-    ...mapActions({
-      alertToggle: "alertToggle"
-    }),
+    ...mapActions([
+        "saveLangTest",
+        "removeLangTest",
+        "alertToggle"
+    ]),
+    presentSource(source) {
+        return source ? source.lang : "NA";
+    },
+    presentTargets(targets) {
+        if(!targets.length) return "";
+        if(targets.length === this.targets.filter(item => item.lang !== "All").length) return "All";
+        return targets.reduce((acc, cur) => acc + `${cur.lang}; `, "");
+    },
+    getFormattedDate(date) {
+        if(!date) return "";
+        return moment(date).format("DD-MM-YYYY");
+    },
     setTargets({ option }) {
-      if (option === "ALL") {
-        return (this.selectedTargets = ["ALL"]);
-      }
       const position = this.selectedTargets.indexOf(option);
-      this.setElements({ position, mainProp: "selectedTargets", option });
-    },
-    setElements({ position, mainProp, prop, option }) {
+      this.currentTargets = this.currentTargets.filter(item => item.lang !== 'All');
       if (position !== -1) {
-        return this[mainProp].splice(position, 1);
+        this.currentTargets.splice(position, 1);
+      } else {
+        const lang = this.targets.find(item => item.lang === option);
+        this.currentTargets.push(lang);
       }
-      if (
-        this[mainProp].length &&
-        (this[mainProp][0] === "ALL" || this[mainProp][0][prop] === "ALL")
-      ) {
-        this[mainProp] = [];
+      if (option === "All" || !this.selectedTargets.length) {
+        this.currentTargets = [{lang: "All"}];
       }
-      this[mainProp].push(option);
     },
-
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -218,7 +213,7 @@ export default {
           this.setEditingData(index);
           break;
         case "cancel":
-          this.manageCancelEdition(index);
+          this.manageCancelEdition();
           break;
         case "delete":
           this.manageDeleteClick(index);
@@ -229,30 +224,24 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentUploaded = this.vendorTest[index].uploaded;
-      this.currentSource = this.vendorTest[index].source;
-      this.selectedTargets = this.vendorTest[index].targets.map(
-        item => item.lang
-      );
-      this.currentIndustry = this.vendorTest[index].industry;
-      this.currentStep = this.vendorTest[index].step;
+      this.currentSource = this.vendorTests[index].source || {lang: "NA"};
+      this.currentTargets = Array.from(this.vendorTests[index].targets);
+      this.currentIndustry = this.vendorTests[index].industry;
+      this.currentStep = this.vendorTests[index].step;
     },
-    manageCancelEdition(index) {
-      if (!this.vendorTest[index].uploaded) {
-        this.vendorTest.pop();
-      }
-      // this.$emit("refreshVendorTests");
-      this.setDefaults();
+    manageCancelEdition() {
+        this.vendorTests = this.vendorTests.filter(item => item._id);
+        this.setDefaults();
+        this.isDeleting = false;
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentUploaded = "";
       this.currentFile = "";
       this.currentSource = "";
       this.currentIndustry = "";
       this.currentStep = "";
-      this.selectedTargets = [];
+      this.currentTargets = [];
     },
 
     async checkErrors(index) {
@@ -271,69 +260,63 @@ export default {
     },
 
     async manageSaveClick(index) {
-      if (this.currentActive === -1) return;
-
-      let deleteIndex = index;
-      if (deleteIndex == 0) {
-        deleteIndex = 1;
-      }
-
-      const uploaded = `${withZero(new Date().getDate()) +
-        "-" +
-        withZero(new Date().getMonth()) +
-        "-" +
-        new Date().getFullYear()}`;
-
-      function withZero(number) {
-        number < 10 ? (number = "0" + number) : number;
-        return number;
-      }
-
-      this.vendorTest.splice(index, deleteIndex, {
-        file: this.currentFile,
-        uploaded: uploaded,
-        source: this.currentSource,
-        targets: this.selectedTargets.map(function(item) {
-          return { lang: item };
-        }),
-        industry: this.currentIndustry,
-        step: this.currentStep
-      });
-
-      this.setDefaults();
+        if (this.currentActive === -1) return;
+        const targets = this.currentTargets[0].lang === 'All' ? 
+            this.targets.filter(item => item.lang !== "All") 
+            : this.currentTargets;
+        let testData = {
+            targets,
+            industry: this.currentIndustry,
+            step: this.currentStep,
+            index,
+            oldPath: this.vendorTests[index].path || "",
+            _id: this.vendorTests[index]._id || ""
+        }
+        if(this.currentSource.lang !== 'NA') {
+            testData.source = this.currentSource
+        }
+        try {
+            await this.saveLangTest({testData, file: this.currentFile});
+            await this.getTests();
+        } catch(err) {
+        } finally {
+            this.setDefaults();
+        }
     },
 
     async manageDeleteClick(index) {
-      this.deleteIndex = index;
-      this.isDeleting = true;
-      this.vendorTest.splice(index, 1);
+        if(!this.vendorTests[index]._id) {
+           this.vendorTests.splice(index, 1);
+           return this.setDefaults();
+        }
+        this.deleteIndex = index;
+        this.isDeleting = true;
     },
     async deveteVendorsTest() {
-      try {
-        this.alertToggle({
-          message: "Vendor test removed",
-          isShow: true,
-          type: "success"
-        });
-      } catch (err) {
-      } finally {
-        this.manageCancelEdition();
-      }
+        const { _id, path } = this.vendorTests[this.deleteIndex];
+        try {
+            await this.removeLangTest({_id, path});
+            await this.getTests();
+        } catch (err) {
+        } finally {
+            this.manageCancelEdition();
+        }
     },
 
     addData() {
       if (this.currentActive !== -1) {
         return this.isEditing();
       }
-      this.vendorTest.push({
-        file: "",
-        uploaded: "",
+      this.vendorTests.push({
+        fileName: "",
+        path: "",
+        uploadDate: "",
         source: "",
         targets: [],
         industry: "",
         step: ""
       });
-      this.setEditingData(this.vendorTest.length - 1);
+      this.setEditingData(this.vendorTests.length - 1);
     },
 
     async getLangs() {
@@ -342,7 +325,7 @@ export default {
         this.sources = Array.from(result.body);
         this.targets = Array.from(result.body);
         this.sources.unshift({ lang: "NA" });
-        this.targets.unshift({ lang: "ALL" });
+        this.targets.unshift({ lang: "All" });
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
@@ -375,8 +358,16 @@ export default {
     setStep({ option }) {
       this.currentStep = this.steps.find(item => item.title === option);
     },
-    uploadDocument() {
+    uploadDocument(e) {
       this.currentFile = this.$refs.file.files[0];
+    },
+    async getTests() {
+        try {
+            const result = await this.$http.get("/vendorsapi/lang-tests");
+            this.vendorTests = result.body;
+        } catch(err) {
+            this.alertToggle({message: "Error on getting tests", isShow: true});
+        }
     }
   },
   computed: {
@@ -391,12 +382,18 @@ export default {
     },
     stepsData() {
       return this.steps.map(item => item.title);
+    },
+    selectedTargets() {
+        return this.currentTargets.length ?
+            this.currentTargets.map(item => item.lang)
+            : []
     }
   },
-  mounted() {
-    this.getLangs();
-    this.getSteps();
-    this.getIndustries();
+  created() {
+        this.getTests();
+        this.getLangs();
+        this.getSteps();
+        this.getIndustries();
   },
   components: {
     SelectSingle,

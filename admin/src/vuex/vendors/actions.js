@@ -266,5 +266,36 @@ export const deleteCurrentVendorDocument = async ({ commit, dispatch }, payload)
     }
 }
 
+export const saveLangTest = async ({ commit, dispatch }, payload) => {
+    commit("startRequest");
+    const { testData, file } = payload;
+    let langTest = new FormData();
+    for(let key in testData) {
+        langTest.append(key, JSON.stringify(testData[key]));
+    }
+    langTest.append("testFile", file);
+    try {
+        await Vue.http.post("/vendorsapi/lang-test", langTest);
+        dispatch('alertToggle', { message: "Test is saved", isShow: true });
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
+
+export const removeLangTest = async ({ commit, dispatch }, payload) => {
+    commit("startRequest");
+    const { _id, path } = payload;
+    try {
+        await Vue.http.post("/vendorsapi/remove-lang-test", { _id, path });
+        dispatch('alertToggle', { message: "Test is removed", isShow: true });
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
+
 
 
