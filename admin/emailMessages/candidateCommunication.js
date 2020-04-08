@@ -1,6 +1,7 @@
 function testSentMessage(obj) {
     let date = new Date();
     date.setDate(date.getDate() + 5);
+    const sourceLang = obj.source ? obj.source.lang : "NA";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -8,7 +9,7 @@ function testSentMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.firstName}</h4>
                     <p>
-                        As part of our initial process, please find attached our sample text in: ${obj.source.lang}.
+                        As part of our initial process, please find attached our sample text in: ${sourceLang}.
                         The sample translation focuses on ${obj.industry.name} terminology.
                         Please translate the sample into: ${obj.target.lang} and keep in mind that the translation has to be delivered by ${date}.
                         Kindly confirm you have received this email and please advise ahead if you have any issues with the deadline that was provided.

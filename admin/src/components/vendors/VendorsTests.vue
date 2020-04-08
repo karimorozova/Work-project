@@ -267,6 +267,7 @@ export default {
             if(i !== index && this.isMatch(item)) {
                 return targetIds.some(el => currentTargetIds.indexOf(el) !== -1)
             }
+            return false;
         })
         return !!sameTest;
     },

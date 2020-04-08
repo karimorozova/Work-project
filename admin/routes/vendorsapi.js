@@ -5,7 +5,7 @@ const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
     importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, 
-    removeVendorEdu, updateVendorAssessment } = require('../vendors');
+    removeVendorEdu, updateVendorAssessment, notifyTestStatus } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 
@@ -356,6 +356,16 @@ router.post('/remove-lang-test', async (req, res) => {
         res.send("removed");
     } catch(err) {
         res.send(500).send("Error on removing lang tests for vendors");
+    }
+})
+
+router.post('/test-emails', async (req, res) => {
+    const { vendor, qualification, testPath } = req.body;
+    try {
+        await notifyTestStatus({vendor, qualification, testPath});
+        res.send("email sent");
+    } catch(err) {
+        res.send(500).send("Error on sending test status email to vendor");
     }
 })
 

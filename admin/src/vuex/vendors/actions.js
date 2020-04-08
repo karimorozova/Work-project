@@ -197,9 +197,13 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, dispat
 export const storeCurrentVendorQualification = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
     try {
-        const { vendorId, index, qualification } = payload;
-        const updatedVendor = await Vue.http.post("/vendorsapi/vendor-qualification", { vendorId, index, qualification });
+        const { vendor, index, qualification, testPath } = payload;
+        const updatedVendor = await Vue.http.post("/vendorsapi/vendor-qualification", { vendorId: vendor._id, index, qualification });
         dispatch("storeCurrentVendor", updatedVendor.body);
+        const statuses = ["Test Sent", "Not Passed", "Passed"];
+        if(statuses.indexOf(qualification.status) !== -1) {
+            await Vue.http.post("/vendorsapi/test-emails", { vendor, qualification, testPath });
+        }
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {

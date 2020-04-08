@@ -74,7 +74,6 @@
           template(slot="status" slot-scope="{ row, index }")
             .qualifications__data(v-if="currentActive !== index") {{ row.status }}
             .qualifications__drop-menu(v-else)
-              div(@click="checkTestsStatus(index)")
                 SelectSingle(
                     :isTableDropMenu="isTableDropMenu"
                     placeholder="Select"
@@ -166,11 +165,10 @@ export default {
           padding: "0"
         }
       ],
-
+      vendorTests: [],
       lqaData: {
         isTqi: true
       },
-      statuses: ["NA", "Sample Requested", "Test Sent"],
       sources: [],
       targets: [],
       steps: [],
@@ -197,28 +195,6 @@ export default {
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment"
     }),
-
-    checkTestsStatus(index) {
-      let currentStatus = this.qualificationData[index].status;
-      
-      if (currentStatus == "NA") {
-        this.statuses = ["NA"];
-      } else if (
-        currentStatus == "Sample Requested" ||
-        currentStatus == "Test Sent"
-      ) {
-        this.statuses = ["Received"];
-      } else if (currentStatus == "Received") {
-        this.statuses = ["Passed", "Not Passed"];
-      } else if (
-        currentStatus == "Not Passed" ||
-        currentStatus == "Passed"
-      ) {
-        this.statuses = [];
-      }else{
-
-      }
-    },
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
     },
@@ -271,6 +247,7 @@ export default {
       if (!this.currentStatus)
         this.errors.push("Step status should not be empty!");
       if (!this.currentStep) this.errors.push("Step should not be empty!");
+      if(!this.errors.length && !this.getAvailableTest()) this.errors.push("There is no test available for such data!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -284,6 +261,22 @@ export default {
       } else {
         await this.manageSaveClick(index);
       }
+    },
+    getAvailableTest() {
+        if(!this.vendorTests.length) return null;
+        return this.vendorTests.find(item => {
+            const targetIds = item.targets.map(t => t._id);
+            if(targetIds.indexOf(this.currentTarget._id) !== 1 
+                && this.currentStep._id === item.step._id
+                && this.currentIndustry._id === item.industry._id) {
+                    return this.isSourceMatch(item.source);
+                }
+            return false;
+        })
+    },
+    isSourceMatch(source) {
+        return !source && this.currentSource.lang === "NA" 
+         || source._id === this.currentSource._id
     },
     handleLqa() {
       this.lqaData = {
@@ -367,11 +360,13 @@ export default {
       if (this.currentSource.lang !== "NA") {
         qualification.source = this.currentSource;
       }
+      const test = this.getAvailableTest();
       try {
         await this.storeQualification({
-          vendorId: this.currentVendor._id,
+          vendor: this.currentVendor,
           index,
-          qualification
+          qualification,
+          testPath: test ? test.path : ""
         });
         this.alertToggle({
           message: "Qualification saved",
@@ -434,6 +429,25 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
+    setStatuses() {
+        let result = ["NA", "Sample Requested"];
+        if(!!this.getAvailableTest()) {
+            result = ["NA", "Sample Requested", "Test Sent"];
+        }
+        switch(this.currentStatus) {
+            case "NA":
+                result = ["NA"];
+                break;
+            case "Sample Requested":
+            case "Test Sent":
+                result = ["Received"];
+                break;
+            case "Received":
+                result = ["Passed", "Not Passed"];
+                break;
+        }
+        return result;
+    },
     setSource({ option }) {
       this.currentSource = this.sources.find(item => item.lang === option);
     },
@@ -459,12 +473,31 @@ export default {
     },
     openForm() {
       this.isForm = true;
+    },
+    async getTests() {
+        try {
+            const result = await this.$http.get("/vendorsapi/lang-tests");
+            this.vendorTests = result.body;
+        } catch(err) {
+            this.alertToggle({message: "Error on getting tests", isShow: true});
+        }
     }
   },
   computed: {
     ...mapGetters({
       currentVendorQualifications: "getCurrentVendorQualifications"
     }),
+    statuses() {
+        let result = ["NA", "Sample Requested"];
+        if(!this.currentSource || !this.currentTarget
+            || !this.currentStep || !this.currentIndustry) {
+            return result;
+        }
+        if(this.currentIndex !== -1) {
+            result = this.setStatuses();
+        }
+        return result;
+    },
     sourceData() {
       return this.sources.map(item => item.lang);
     },
@@ -485,7 +518,8 @@ export default {
     Add
   },
 
-  mounted() {
+  created() {
+    this.getTests();
     this.getLangs();
     this.getSteps();
   }
