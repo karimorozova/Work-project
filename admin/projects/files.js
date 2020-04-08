@@ -22,6 +22,24 @@ async function storeFiles(filesArr, projectId) {
     }
 }
 
+async function getProjectDeliverables(project) {
+    const { tasks, id: projectId } = project;
+    let files = [];
+    try {
+        for(let task of tasks) {
+            const { taskId, targetFiles: taskFiles } = task;
+            taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
+            files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
+        }
+        const outputPath = `./dist/projectFiles/${projectId}/project-deliverables.zip`;
+        await archiveMultipleFiles({outputPath, files});
+        return outputPath.split("./dist")[1];
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getProjectDeliverables");
+    }
+}
+
 async function getDeliverablesLink({taskFiles, projectId, taskId}) {
     try {
         const files = getParsedFiles(taskFiles);
@@ -58,4 +76,4 @@ async function manageDeliveryFile({fileData, file}) {
     }
 }
 
-module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile };
+module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables };

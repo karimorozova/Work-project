@@ -138,9 +138,10 @@ const ProjectsSchema = new mongoose.Schema({
     default: [],
     trim: true
   },
-  jsession: {
+  deliverables: {
     type: String,
-    default: ""
+    default: "",
+    trim: true
   },
   genBrief: {
     type: String | Object,

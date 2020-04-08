@@ -5,6 +5,7 @@ const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage } 
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
+const { getDeliverablesLink, getProjectDeliverables } = require("./files");
 
 async function stepCancelNotifyVendor(steps, projectId) {
     try {
@@ -98,9 +99,12 @@ async function sendClientDeliveries({taskId, project, contacts}) {
     try {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const task = project.tasks.find(item => item.taskId === taskId);
+        const subject = `TASK DELIVERY (ID C006.1, ${project.projectId})`;
+        const deliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles: task.targetFiles, projectId});
+        const attachments = [{filename: "deliverables.zip", path: deliverables}];
         for(let contact of notifyContacts) {
             const message = taskDeliveryMessage({task, contact, accManager, ...project._doc});
-            await sendEmail({to: contact.email, subject: `TASK DELIVERY (ID C006.1, ${project.projectId})`}, message);
+            await sendEmail({to: contact.email, attachments, subject}, message);
         }
     } catch(err) {
         console.log(err);
@@ -146,7 +150,9 @@ async function notifyProjectDelivery(project) {
     const message = projectDeliveryMessage({...project._doc, contact, accManager: customer.accountManager});
     const subject = `Project Delivery (ID C006.0, ${project.projectId})`;
     try {
-        await sendEmail({to: contact.email, subject}, message);
+        const deliverables = project.deliverables || await getProjectDeliverables(project);
+        const attachments = [{filename: "deliverables.zip", path: deliverables}];
+        await sendEmail({to: contact.email, attachments, subject}, message);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyProjectDelivery");
