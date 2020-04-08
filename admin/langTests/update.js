@@ -5,18 +5,19 @@ const fs = require('fs');
 
 async function  updateLangTest(langTest, testFile) {
     const { _id, oldPath, ...testData } = langTest;
+    let path = oldPath;
+    let { fileName } = testData;
     try {
-        const path = `/langTestsFiles/${testFile.filename.replace(/\s+/g, '_')}`;
-        await moveFile(testFile, `./dist${path}`);
+        if(testFile) { 
+            path = `/langTestsFiles/${testFile.filename.replace(/\s+/g, '_')}`;
+            fileName = testFile.filename;
+            await moveFile(testFile, `./dist${path}`);
+        }
         if(_id) {
-            await getUpdatedTest({ _id }, {...testData, fileName: testFile.filename, path});
+            await getUpdatedTest({ _id }, {...testData, fileName, path});
             return await removeOldFile(oldPath, path);
         }
-        await LangTest.create({
-            ...testData,
-            fileName: testFile.filename, 
-            path
-        })
+        await LangTest.create({...testData, fileName, path});
     } catch(err) {
         console.log(err);
         console.log("Error in updateLangTest");

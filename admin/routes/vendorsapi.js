@@ -340,8 +340,9 @@ router.post('/lang-test', upload.fields([{ name: 'testFile' }]), async (req, res
         return acc;
     },{})
     const { testFile } = req.files;
+    const file = testFile ? testFile[0] : "";
     try {
-        await updateLangTest(langTest, testFile[0]);
+        await updateLangTest(langTest, file);
         res.send("saved");
     } catch (err) {
         res.status(500).send("Error on updating lang tests for vendors");

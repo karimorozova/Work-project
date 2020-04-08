@@ -250,7 +250,8 @@ export default {
       if(this.selectedTargets.length == 0) this.errors.push("Target should not be empty!")
       if(!this.currentIndustry) this.errors.push("Industry should not be empty!")
       if(!this.currentStep) this.errors.push("Step should not be empty!")
-      if(!this.currentFile) this.errors.push("File should not be empty!")
+      if(!this.vendorTests[index]._id && !this.currentFile) this.errors.push("File should not be empty!")
+      if(!this.errors.length && this.isNotUnique(index)) this.errors.push("A test with entered data is already exists!")
       
       if (this.errors.length) {
         this.areErrors = true;
@@ -258,7 +259,22 @@ export default {
       }
       await this.manageSaveClick(index);
     },
-
+    isNotUnique(index) {
+        if(this.vendorTests.length < 2) return false;
+        const currentTargetIds = this.currentTargets.map(item => item._id);
+        const sameTest = this.vendorTests.find((item, i) => {
+            const targetIds = item.targets.map(t => t._id);
+            if(i !== index && this.isMatch(item)) {
+                return targetIds.some(el => currentTargetIds.indexOf(el) !== -1)
+            }
+        })
+        return !!sameTest;
+    },
+    isMatch(item) {
+        return (this.currentSource.lang === "NA" || this.currentSource.lang === item.source.lang)
+            && this.currentStep._id === item.step._id
+            && this.currentIndustry._id === item.industry._id
+    },
     async manageSaveClick(index) {
         if (this.currentActive === -1) return;
         const targets = this.currentTargets[0].lang === 'All' ? 
@@ -274,6 +290,9 @@ export default {
         }
         if(this.currentSource.lang !== 'NA') {
             testData.source = this.currentSource
+        }
+        if(this.vendorTests[index]._id) {
+            testData.fileName = this.vendorTests[index].fileName;
         }
         try {
             await this.saveLangTest({testData, file: this.currentFile});

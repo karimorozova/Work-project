@@ -273,7 +273,9 @@ export const saveLangTest = async ({ commit, dispatch }, payload) => {
     for(let key in testData) {
         langTest.append(key, JSON.stringify(testData[key]));
     }
-    langTest.append("testFile", file);
+    if(file) {
+        langTest.append("testFile", file);
+    }
     try {
         await Vue.http.post("/vendorsapi/lang-test", langTest);
         dispatch('alertToggle', { message: "Test is saved", isShow: true });
