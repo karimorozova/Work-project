@@ -13,11 +13,17 @@ function getStepsWithFinanceUpdated(step, project) {
 }
 
 function getPrices(step) {
-    const { clientRate, vendorRate } = step;
-    const clientValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*clientRate.value).toFixed(2) : clientRate.value;
-    const vendorValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*vendorRate.value).toFixed(2) : vendorRate.value;
-    const receivables = clientValue > clientRate.min ? clientValue : clientRate.min;
-    const payables = vendorValue > vendorRate.min ? vendorValue : vendorRate.min;
+    const { clientRate, vendorRate, finance } = step;
+    let receivables = +finance.Price.receivables;
+    let payables = +finance.Price.payables;
+    if(clientRate) {
+        const clientValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*clientRate.value).toFixed(2) : clientRate.value;
+        receivables = clientValue > clientRate.min ? clientValue : clientRate.min;
+    }
+    if(vendorRate) {
+        const vendorValue = step.serviceStep.calculationUnit === 'Hours' ? +(step.hours*step.quantity*vendorRate.value).toFixed(2) : vendorRate.value;
+        payables = vendorValue > vendorRate.min ? vendorValue : vendorRate.min;
+    }
     return { receivables, payables }
 }
 

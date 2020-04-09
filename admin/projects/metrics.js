@@ -6,6 +6,7 @@ async function updateProjectMetrics({projectId}) {
     try {
         const project = await getProject({"_id": projectId});
         let { steps, tasks } = project;
+        let isMetricsExist = true;
         for(let task of tasks) {
             if(task.service.calculationUnit === 'Words') {
                 const analysis = await getProjectAnalysis(task.memoqProjectId);
@@ -14,10 +15,13 @@ async function updateProjectMetrics({projectId}) {
                     task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
                     task.finance.Wordcount = calculateWords(task);
                     steps = getTaskSteps(steps, task);
+                    isMetricsExist = true;
+                } else {
+                    isMetricsExist = false;
                 }
             }
         }
-        return await updateProject({"_id": projectId}, {tasks, steps, isMetricsExist: true});
+        return await updateProject({"_id": projectId}, {tasks, steps, isMetricsExist});
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectMetrics");
