@@ -1,13 +1,15 @@
 <template lang="pug">
     .instructions
         .instructions__textarea
-            .instructions__title Instructions:
-            p.instructions__text Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+            .instructions__title Brief:
+            p.instructions__text {{ job.brief }}
 </template>
 
 <script>
 export default {
-    
+    props: {
+        job: {type: Object}
+    }
 }
 </script>
 
@@ -23,11 +25,12 @@ export default {
         border: 2px solid $light-brown;
         border-radius: 5px;
         height: 125px;
-        overflow-y: auto;
     }
     &__text {
         margin: 10px 0;
         font-size: 14px;
+        max-height: 65px;
+        overflow-y: auto;
     }
 }
 

@@ -30,6 +30,7 @@ function getSteps(project, id) {
                 projectId: project.projectId, 
                 projectName: project.projectName,
                 projectStatus: project.status,
+                brief: project.brief,
                 manager: project.projectManager,
                 industry: project.industry,
                 memocDocs: stepTask.memoqDocs,
