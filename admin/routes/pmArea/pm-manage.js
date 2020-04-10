@@ -5,7 +5,8 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, notifyVendorsProjectCancelled,
-    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened } = require("../../projects");
+    getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
+    getPdf } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -241,8 +242,13 @@ router.post("/send-quote", async (req, res) => {
         if(project.isPriceUpdated) {
             messageId = project.status === "Quote sent" ? "C001.1" : "C004.0";
         }
-        await clientQuoteEmail({...project.customer._doc, subject: `${subject} (ID ${messageId}, ${project.projectId})` }, message);
+        const pdf = await getPdf(message);
+        const attachments = [{content: fs.createReadStream(pdf), filename: "quote.pdf"}];
+        await clientQuoteEmail({...project.customer._doc, attachments, subject: `${subject} (ID ${messageId}, ${project.projectId})` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
+        fs.unlink(pdf, (err) => {
+            if(err) console.log(err)
+        })
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

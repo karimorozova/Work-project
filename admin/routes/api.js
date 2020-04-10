@@ -4,7 +4,7 @@ const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
 const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest, TierLqa } = require('../models');
-const { getFilteredProjects } = require('../projects/');
+const { getFilteredProjects, getPdf } = require('../projects/');
 const { getFilteredClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
 const reqq = require('request');
@@ -431,6 +431,16 @@ router.get('/chart', async (req, res) => {
 router.get('/tier-lqas', async (req, res) => {
     try {
         const result = await TierLqa.find();
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on getting tier lqas");
+    }
+})
+
+router.get('/pdf-file', async (req, res) => {
+    try {
+        const result = await getPdf();
         res.send(result);
     } catch(err) {
         console.log(err);
