@@ -42,6 +42,12 @@ Vue.http.interceptors.push((request, next) => {
 Vue.use(VueLodash);
 Vue.config.productionTip = false
 
+if(location.hostname !== 'localhost') {
+    Vue.config.devtools = false;
+    Vue.config.debug = false;
+    Vue.config.silent = true;
+}
+
 Vue.config.errorHandler = (err, vm, info) => {
     console.log(`Error: ${err.toString()}\nInfo: ${info}`);
 }
