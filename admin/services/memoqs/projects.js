@@ -185,7 +185,8 @@ async function setMemoqProjectUsers(projectId, users) {
 }
 
 function getUsersInfo(users) {
-    const userInfoXml = (user) => `<ns:ServerProjectUserInfo>                    
+    const userInfoXml = (user) => `<ns:ServerProjectUserInfo>
+                                <ns:PermForLicense>true</ns:PermForLicense>                 
                                 <ns:ProjectRoles>                         
                                     <mem:ProjectManager>${user.isPm}</mem:ProjectManager>                         
                                     <mem:Terminologist>false</mem:Terminologist>
