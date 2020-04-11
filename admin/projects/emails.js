@@ -1,5 +1,6 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
-const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
+const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
+    stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
 const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
