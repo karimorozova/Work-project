@@ -101,7 +101,7 @@ async function sendClientDeliveries({taskId, project, contacts}) {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const task = project.tasks.find(item => item.taskId === taskId);
         const subject = `TASK DELIVERY (ID C006.1, ${project.projectId})`;
-        const deliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles: task.targetFiles, projectId});
+        const deliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles: task.targetFiles, projectId: project.projectId});
         const attachments = [{filename: "deliverables.zip", path: deliverables}];
         for(let contact of notifyContacts) {
             const message = taskDeliveryMessage({task, contact, accManager, ...project._doc});
