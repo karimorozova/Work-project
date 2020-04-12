@@ -84,7 +84,7 @@ async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, project
                 task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
                 if(task.status === "Cancelled Halfway") {
                     task.finance = getTaskNewFinance(changedSteps, task);
-                    task.targetFiles = await getTaskTarfgetFiles({task, projectId});
+                    task.targetFiles = await getTaskTarfgetFiles({task, projectId, stepName: 'halfway'});
                 }
             }
         }
@@ -95,13 +95,13 @@ async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, project
     }
 }
 
-async function getTaskTarfgetFiles({task, projectId}) {
+async function getTaskTarfgetFiles({task, projectId, stepName}) {
     let targetFiles = [];
     const { memoqDocs, memoqProjectId } = task;
     try {
         for(let doc of memoqDocs) {
             const fileName = doc.DocumentName.split(".").slice(0, -1).join(".") + '.rtf';
-            const path = `/projectFiles/${projectId}/${fileName}`;
+            const path = `/projectFiles/${projectId}/${stepName}_${fileName}`;
             await downloadMemoqFile({memoqProjectId, docId: doc.DocumentGuid, path: `./dist${path}`});
             targetFiles.push({fileName: doc.DocumentName, path});
         }
@@ -117,7 +117,7 @@ async function downloadCompletedFiles(stepId) {
         let { id, steps, tasks } = await getProject({"steps._id": stepId});
         const step = steps.find(item => item.id === stepId);
         const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-        tasks[taskIndex].targetFiles = await getTaskTarfgetFiles({task: tasks[taskIndex], projectId: id});
+        tasks[taskIndex].targetFiles = await getTaskTarfgetFiles({task: tasks[taskIndex], projectId: id, stepName: step.name});
         await Projects.updateOne({"_id": id}, { tasks });
     } catch(err) {
         console.log(err);
