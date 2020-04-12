@@ -96,8 +96,9 @@ async function manageStatuses({project, steps, jobId, status}) {
         if(status === "Started") {
             if(task.status !== "Started") {
                 await setTaskStatusAndSave({project, jobId, steps, status: "Started"});
+                return await notifyManagerStepStarted(project, step);
             }
-            return await notifyManagerStepStarted(project, step);
+            await notifyManagerStepStarted(project, step);
         }
         await Projects.updateOne({'steps._id': jobId}, { steps });
     } catch(err) {
