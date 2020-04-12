@@ -22,7 +22,6 @@ export default {
             a.href = href;
             a.target = "_blank";
             a.click();
-            // document.removeChild("a");
         } catch(err) {
             this.alertToggle({message: err, isShow: true, type: "error"});
         } finally {
