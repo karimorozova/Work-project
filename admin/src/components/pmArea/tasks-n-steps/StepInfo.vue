@@ -83,17 +83,6 @@ export default {
             const totalMatchedWords = this.matrixData.reduce((init, cur) => {
                 return init + cur.wordcount;
             }, 0);
-            // const wordcount = this.task.metrics.totalWords - totalMatchedWords - this.task.metrics.nonTranslatable;
-            // const rateValue = this.step[rateProp] ? +this.step[rateProp].value : 0;
-            // const total = wordcount*rateValue;
-            // this.matrixData.push({
-            //     active: false,
-            //     title: "No match",
-            //     value: "100",
-            //     wordcount: wordcount,
-            //     rate: rateValue,
-            //     total: total
-            // })
         },
         stepFilesFiller(arr, category) {
             let files = [];
