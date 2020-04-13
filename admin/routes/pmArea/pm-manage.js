@@ -389,10 +389,10 @@ router.get("/review-status", async (req, res) => {
 })
 
 router.post("/change-manager", async (req, res) => {
-    const { projectId, taskId, manager, prop, isAdmin, status } = req.body;
+    const { projectId, taskId, manager, prevManager, prop, isAdmin, status } = req.body;
     try {
         const project = await getProject({"_id": projectId});
-        await changeManager({projectId, taskId, manager, prop, isAdmin, status, project});
+        await changeManager({projectId, taskId, manager, prevManager, prop, isAdmin, status, project});
         res.send("updated");
     } catch(err) {
         console.log(err);
