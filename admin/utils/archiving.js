@@ -10,6 +10,7 @@ const archiveFile = ({outputPath, originFile}) => {
         output.on('close', () => {
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
+            resolve();
         });
         output.on('end', () => {
             console.log('Data has been drained');
@@ -24,7 +25,6 @@ const archiveFile = ({outputPath, originFile}) => {
         const file = originFile.path;
         archive.append(fs.createReadStream(file), {name: originFile.filename});
         archive.finalize();
-        resolve();
     })
 }
 
@@ -37,6 +37,7 @@ const archiveMultipleFiles = ({outputPath, files}) => {
         output.on('close', () => {
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
+            resolve();
         });
         output.on('end', () => {
             console.log('Data has been drained');
@@ -52,7 +53,6 @@ const archiveMultipleFiles = ({outputPath, files}) => {
             archive.append(fs.createReadStream(file.path), {name: file.name});
         }
         archive.finalize();
-        resolve();
     })
 }
 
