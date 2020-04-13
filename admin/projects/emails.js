@@ -7,6 +7,7 @@ const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
 const { getDeliverablesLink, getProjectDeliverables } = require("./files");
+const fs = require('fs');
 
 async function stepCancelNotifyVendor(steps, projectId) {
     try {
@@ -101,8 +102,9 @@ async function sendClientDeliveries({taskId, project, contacts}) {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const task = project.tasks.find(item => item.taskId === taskId);
         const subject = `TASK DELIVERY (ID C006.1, ${project.projectId})`;
-        const deliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles: task.targetFiles, projectId: project.projectId});
-        const attachments = [{filename: "deliverables.zip", path: deliverables}];
+        const deliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles: task.targetFiles, projectId: project.id});
+        const content = fs.createReadStream(`./dist${deliverables}`);
+        const attachments = [{filename: "deliverables.zip", content}];
         for(let contact of notifyContacts) {
             const message = taskDeliveryMessage({task, contact, accManager, ...project._doc});
             await sendEmail({to: contact.email, attachments, subject}, message);
