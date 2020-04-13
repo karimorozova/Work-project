@@ -316,7 +316,7 @@ function readyForDr2Message(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.dr2Manager.firstName} ${lastName}</h4>
                     <p>
-                        The Delivery Review for ${taskId} from project ${obj.projectId} - ${obj.projectName} has been finished. 
+                        The Delivery Review for ${obj.taskId} from project ${obj.projectId} - ${obj.projectName} has been finished. 
                     </p>
                     <p>
                         Please, do the Delivery Review 2
@@ -342,7 +342,7 @@ function managerDr1Reassign(obj){
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.prevManager.firstName} ${lastNamePrevManager}</h4>
                     <p>
-                        The Delivery Review 1 for ${taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been reassigned to ${obj.manager.firstName} ${lastNameNextManager}.
+                        The Delivery Review 1 for ${obj.taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been reassigned to ${obj.manager.firstName} ${lastNameNextManager}.
                     </p>
                 </div>
                 <footer>
@@ -361,7 +361,7 @@ function managerDr1Assigned(obj){
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.manager.firstName} ${lastName}</h4>
                     <p>
-                        Delivery review 1 for ${taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been assigned to you.
+                        Delivery review 1 for ${obj.taskId} from project ${obj.project.projectId} - ${obj.project.projectName} has been assigned to you.
                     </p>
                     <p>
                         Project deadline is: ${obj.project.deadline}
