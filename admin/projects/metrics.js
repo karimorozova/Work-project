@@ -15,7 +15,6 @@ async function updateProjectMetrics({projectId}) {
                     task.metrics = !task.finance.Price.receivables ? {...taskMetrics} : task.metrics;
                     task.finance.Wordcount = calculateWords(task);
                     steps = getTaskSteps(steps, task);
-                    isMetricsExist = true;
                 } else {
                     isMetricsExist = false;
                 }

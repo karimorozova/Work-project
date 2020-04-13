@@ -127,7 +127,7 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
             if(!memoqUser) throw new Error(`No such memoq user - ${item.vendor.firstName} ${item.vendor.surname}`);
             return {id: memoqUser.id, isPm: false};
         });
-        projectUsers.push({id: pm.User.UserGuid, isPm: true});
+        projectUsers.unshift({id: pm.User.UserGuid, isPm: true});
         const areUsersSet = await setMemoqProjectUsers(
             memoqProjectId, 
             Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
@@ -382,27 +382,48 @@ async function renameMemoqProject(projectId, name) {
     }
 }
 
+// async function getMemoqFileId(projectId, docId) {
+//     const xml = `${xmlHeader}
+//             <soapenv:Body>
+//             <ns:ExportTranslationDocumentAsTwoColumnRtf>
+//                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+//                 <ns:docGuid>${docId}</ns:docGuid>
+//                 <ns:options>
+//                     <ns:ExportComment>true</ns:ExportComment>
+//                     <ns:ExportSegmentStatus>false</ns:ExportSegmentStatus>
+//                     <ns:ExportTwoTargetColumns>false</ns:ExportTwoTargetColumns>
+//                     <ns:SecondTargetColumnEmpty>false</ns:SecondTargetColumnEmpty>
+//                 </ns:options>
+//             </ns:ExportTranslationDocumentAsTwoColumnRtf>
+//             </soapenv:Body>
+//         </soapenv:Envelope>`
+//     const headers = headerWithoutAction('ExportTranslationDocumentAsTwoColumnRtf');
+//     try {
+//         const { response } = await soapRequest({url, headers, xml});
+//         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+//         return !result["s:Fault"] ? 
+//             result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
+//     } catch(err) {
+//         console.log("Error in getMemoqFileId");
+//         console.log(err);
+//     }
+// }
+
 async function getMemoqFileId(projectId, docId) {
     const xml = `${xmlHeader}
             <soapenv:Body>
-            <ns:ExportTranslationDocumentAsTwoColumnRtf>
+            <ns:ExportTranslationDocument>
                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
                 <ns:docGuid>${docId}</ns:docGuid>
-                <ns:options>
-                    <ns:ExportComment>true</ns:ExportComment>
-                    <ns:ExportSegmentStatus>false</ns:ExportSegmentStatus>
-                    <ns:ExportTwoTargetColumns>false</ns:ExportTwoTargetColumns>
-                    <ns:SecondTargetColumnEmpty>false</ns:SecondTargetColumnEmpty>
-                </ns:options>
-            </ns:ExportTranslationDocumentAsTwoColumnRtf>
+            </ns:ExportTranslationDocument>
             </soapenv:Body>
         </soapenv:Envelope>`
-    const headers = headerWithoutAction('ExportTranslationDocumentAsTwoColumnRtf');
+    const headers = headerWithoutAction('ExportTranslationDocument');
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         return !result["s:Fault"] ? 
-            result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
+            result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid : false;
     } catch(err) {
         console.log("Error in getMemoqFileId");
         console.log(err);

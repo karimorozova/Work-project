@@ -100,7 +100,7 @@ async function getTaskTarfgetFiles({task, projectId, stepName}) {
     const { memoqDocs, memoqProjectId } = task;
     try {
         for(let doc of memoqDocs) {
-            const fileName = doc.DocumentName.split(".").slice(0, -1).join(".") + '.rtf';
+            const fileName = doc.ExportPath.slice(1);
             const path = `/projectFiles/${projectId}/${stepName}_${fileName}`;
             await downloadMemoqFile({memoqProjectId, docId: doc.DocumentGuid, path: `./dist${path}`});
             targetFiles.push({fileName: doc.DocumentName, path});
@@ -179,7 +179,11 @@ function updateStepsStatuses({projectSteps, tasks, status, stepIdentify}) {
 
 function isPrevStep({tasks, projectSteps, step}) {
     const stepTask = tasks.find(item => item.taskId === step.taskId);
-    const sameSteps = projectSteps.filter(item => item.taskId === stepTask.taskId && item.stepId !== step.stepId);
+    const sameSteps = projectSteps.filter(item => {
+        return item.taskId === stepTask.taskId 
+                && item.stepId !== step.stepId
+                && item.status !== "Completed"
+    });
     const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1');
     return sameSteps.length && stage1.step.title !== step.serviceStep.title;
 }
