@@ -11,7 +11,7 @@
             :timestamp="timestamp"
             @assignManager="assignManager"
             @setContacts="setContacts")
-        .review__title.review_left-align PM Checklist
+        .review__title.review_left-align {{ checklistTile }} Checklist
         .review__check 
             .review__check-item(v-for="instruction in instructions")
                 Check(@toggleApprovement="(e) => toggle(e, instruction)" 
@@ -275,6 +275,9 @@ export default {
         },
         dr() {
             return this.task.status === "Pending Approval [DR1]" ? 1 : 2;
+        },
+        checklistTile() {
+            return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2";
         },
         isAdmin() {
             return this.user.group.name === "Administrators" || this.user.group.name === "Developers";
