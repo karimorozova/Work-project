@@ -2,7 +2,7 @@
     .instructions
         .instructions__textarea
             .instructions__title Brief:
-            p.instructions__text {{ job.brief }}
+            textarea.instructions__text(disabled) {{ job.brief }}
 </template>
 
 <script>
@@ -19,6 +19,8 @@ export default {
 .instructions {
     margin-top: 20px;
     padding-right: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
     &__textarea {
         padding: 8px;
         box-sizing: border-box;
@@ -27,10 +29,16 @@ export default {
         height: 125px;
     }
     &__text {
-        margin: 10px 0;
+        box-sizing: border-box;
+        padding: 10px 0;
         font-size: 14px;
-        max-height: 65px;
         overflow-y: auto;
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        resize: none;
     }
 }
 
