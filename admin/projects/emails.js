@@ -14,7 +14,7 @@ async function stepCancelNotifyVendor(steps, projectId) {
         const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {
             if(step.vendor && notifyStepStatuses.indexOf(step.status) === -1) {
-                const message = step.status === "Cancelled" ? 
+                const message = step.status !== "Started" && step.status !== "Completed" ? 
                     stepCancelledMessage(step)
                     : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;

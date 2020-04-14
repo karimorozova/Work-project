@@ -115,7 +115,7 @@ function requestMessageForVendor(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                        Step ${stepId} ${obj.servicesStep.title} has been assigned to you.
+                        Step ${obj.stepId} ${obj.serviceStep.title} has been assigned to you.
                     </p>
                     <p>
                         Here are the needed details:
@@ -124,11 +124,11 @@ function requestMessageForVendor(obj) {
                         <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
                             <tr>
                                 <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${stepId}</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.stepId}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Work type:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.servicesStep.title}</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.serviceStep.title}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
@@ -184,7 +184,7 @@ function stepCancelledMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                        We would like to information you that step: ${obj.stepId} ${obj.servicesStep.title} has been cancelled.
+                        We would like to information you that step: ${obj.stepId} ${obj.serviceStep.title} has been cancelled.
                     </p>
                 </div>
                 <footer>
@@ -203,7 +203,7 @@ function stepMiddleCancelledMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                        We would like to inform you that step: ${obj.stepId} ${obj.servicesStep.title} has been cancelled in the middle.
+                        We would like to inform you that step: ${obj.stepId} ${obj.serviceStep.title} has been cancelled in the middle.
                     </p>
                     <p>
                         You will be paid ${fee}, which is according to relative work you have completed.
@@ -224,7 +224,7 @@ function vendorReassignmentMessage(obj, reason) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                        We would like to update you that ${obj.stepId} ${obj.servicesStep.title} has been reassigned to a different vendor. 
+                        We would like to update you that ${obj.stepId} ${obj.serviceStep.title} has been reassigned to a different vendor. 
                     </p>
                 </div>
                 <footer>
@@ -243,7 +243,7 @@ function stepReopenedMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                         Step: ${obj.stepId} ${obj.servicesStep.title} has been reopened.
+                         Step: ${obj.stepId} ${obj.serviceStep.title} has been reopened.
                     </p>
                     <p>
                         Reason: ${reason}
