@@ -64,7 +64,7 @@ export default {
                     if(!regex.test(this.currentInfo.rates[key].value) || !regex.test(this.currentInfo.rates[key].min)) {
                         return true;
                     }
-                    if(+this.currentInfo.rates[key].value <= 0 || this.currentInfo.rates[key].min <= 0) {
+                    if(+this.currentInfo.rates[key].value <= 0 || this.currentInfo.rates[key].min < 0) {
                         return true;
                     }
                 }
