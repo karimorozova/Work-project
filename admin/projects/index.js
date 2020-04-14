@@ -1,5 +1,5 @@
 const { getProject, getProjects, updateProject, getFilteredProjects } = require('./getProjects');
-const { storeFiles, getDeliverablesLink, manageDeliveryFile } = require('./files');
+const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf } = require('./files');
 const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
     updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
 const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
@@ -42,5 +42,6 @@ module.exports = {
     stepCompletedNotifyPM,
     notifyStepDecisionMade,
     notifyReadyForDr2,
-    notifyStepReopened
+    notifyStepReopened,
+    getPdf
 }

@@ -2,6 +2,8 @@ const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveProjectFile, moveFile } = require('../utils/movingFile');
 const { getProject } = require('./getProjects');
 const fs = require('fs');
+const htmlToPdf = require('html-pdf');
+const apiUrl = require('../helpers/apiurl');
 
 async function storeFiles(filesArr, projectId) {
     try {
@@ -76,4 +78,26 @@ async function manageDeliveryFile({fileData, file}) {
     }
 }
 
-module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables };
+async function getPdf(message) {
+    try {
+        const htmlWithoutImage = message.split('<img class="logo" src="cid:logo@pan"');
+        let html = htmlWithoutImage.join('<img class="logo" src="static/email-logo.png"'); 
+        const htmlWithoutWrapper = html.split('<div class="wrapper" style="width:800px;');
+        html = htmlWithoutWrapper.join('<div class="wrapper" style="width:600px;');
+        var options = { format: 'Letter', base: apiUrl };
+        return new Promise((resolve, reject) => {
+            htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
+                if (err) {
+                    console.log(err)
+                    reject(err);
+                }
+                resolve('./dist/uploads/htmlpdf.pdf');
+              });
+        })
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getPdf");
+    }
+}
+
+module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables, getPdf };

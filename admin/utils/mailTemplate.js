@@ -52,10 +52,12 @@ const clientQuoteEmail = function (obj, msg) {
         mailTransporter.sendMail(mailOptions, (error, info) => {
             mailTransporter.close();
             if (error) {
+                console.log(error);
                 rej(error);
             }
-        console.log('Message sent: %s', info.messageId);
-        res(info.messageId);
+        const messageId = info && info.messageId ? info.messageId : "Error";
+        console.log('Message sent: %s', messageId);
+        res();
         });
     })
 }

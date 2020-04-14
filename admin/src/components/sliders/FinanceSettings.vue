@@ -2,8 +2,7 @@
 .finance-settings
   Sidebar(title="FINANCE")
     //-   router-view
-  button.button(@click="sendFiles") Send files
-  .counter(v-if="isSending") {{ filesCounter }} of {{ files.length }}
+  button.button(@click="downloadPdf") Get pdf
 </template>
 
 <script>
@@ -11,26 +10,18 @@ import Sidebar from "../Sidebar";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  data() {
-    return {
-        isSending: false,
-        filesCounter: 1,
-        files: ["website.docx"]
-        // files: ["website.pdf", "website.1.pdf", "website.2.pdf", "website.3.pdf", "website.4.pdf"]
-    };
-  },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
     }),
-    async sendFiles() {
+    async downloadPdf() {
         try {
-            this.isSending = true;
-            for(let name of this.files) {
-                const result = await this.$http.post("/memoqapi/all-files", { name });
-                this.filesCounter++;
-            }
-            this.alertToggle({message: "Files are uploaded to the MemoQ Server", isShow: true, type: "success"});
+            const result = await this.$http.get("/api/pdf-file");
+            const href = result.body;
+            let a = document.createElement("a");
+            a.href = href;
+            a.target = "_blank";
+            a.click();
         } catch(err) {
             this.alertToggle({message: err, isShow: true, type: "error"});
         } finally {

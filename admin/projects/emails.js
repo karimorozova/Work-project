@@ -30,21 +30,31 @@ async function stepCancelNotifyVendor(steps, projectId) {
 }
 
 async function getMessage(projectId, messageTarget) {
-    let quote = await getQuoteInfo(projectId);
-    const message = messageTarget === "quote" ? messageForClient(quote) : emailMessageForContact(quote);
-    return message;
+    try {
+        let quote = await getQuoteInfo(projectId);
+        const message = messageTarget === "quote" ? messageForClient(quote) : emailMessageForContact(quote);
+        return message;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getMessage");
+    }
 }
 
 async function getQuoteInfo(projectId) {
-    const project = await getProject({"_id": projectId});
-    const service = await getService({"_id": project.tasks[0].service});
-    let quote = {...project._doc, id: project.id};
-    quote.service = service.title;
-    const { contacts } = project.customer;
-    quote.contact = contacts.find(item => item.leadContact);
-    quote.firstName = quote.contact.firstName;
-    quote.surname = quote.contact.surname;
-    return quote;
+    try {
+        const project = await getProject({"_id": projectId});
+        const service = await getService({"_id": project.tasks[0].service});
+        let quote = {...project._doc, id: project.id};
+        quote.service = service.title;
+        const { contacts } = project.customer;
+        quote.contact = contacts.find(item => item.leadContact);
+        quote.firstName = quote.contact.firstName;
+        quote.surname = quote.contact.surname;
+        return quote;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getQuoteInfo");
+    }
 }
 
 async function stepCompletedNotifyPM(project, step) {
