@@ -7,7 +7,6 @@ function messageForClient(obj) {
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
     const tasksInfo = getTasksInfo({ tasks: obj.tasks, industry: obj.industry });
     const subTotal = getSubTotal(obj.tasks);
-    const total = getTotal({tasks: obj.tasks})
     const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
 
     let detailHeader = "Please see below the quote details:";
@@ -143,7 +142,7 @@ function messageForClient(obj) {
                                 Total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                    ${total}</td>
+                                    ${obj.finance.Price.receivables}</td>
                             </tr>
                         </table>
 
@@ -173,20 +172,9 @@ function messageForClient(obj) {
                 </footer>
             </div>`;
 }
-function getSubTotal(obj){
-    const result = obj.reduce(function(sum, cur) {
-        return sum.finance.Price.receivables + cur.finance.Price.receivables;
-      });
-    return result;
-}
-function getTotal(obj) {
-    let total;
-    const subTotal = obj.tasks.reduce(function(sum, cur) {
-        return sum.finance.Price.receivables + cur.finance.Price.receivables;
-      });
 
-    total = subTotal;
-    return total;
+function getSubTotal(tasks){
+    return tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0);
 }
 
 function getTasksInfo(info) {

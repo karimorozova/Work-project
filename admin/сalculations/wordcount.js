@@ -220,7 +220,9 @@ async function updateProjectCosts(project) {
         finance.Discount = discount;
     }
     try {
-        return await updateProject({"_id": project.id}, { ...project, finance });
+        const checkStatuses = ["Quote sent", "Approved"];
+        const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1;
+        return await updateProject({"_id": project.id}, { ...project, finance, isPriceUpdated });
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectCosts");

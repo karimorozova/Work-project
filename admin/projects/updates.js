@@ -257,7 +257,7 @@ async function getApprovedProject(project, status) {
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
-        return await updateProject({"_id": project.id},{status, tasks, steps});
+        return await updateProject({"_id": project.id},{status, tasks, steps, isPriceUpdated: false});
     } catch(err) {
         console.log(err);
         console.log("Error in getApprovedProject");
