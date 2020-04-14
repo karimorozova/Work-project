@@ -83,27 +83,7 @@ async function getPdf(message) {
         const htmlWithoutImage = message.split('<img class="logo" src="cid:logo@pan"');
         let html = htmlWithoutImage.join('<img class="logo" src="static/email-logo.png"'); 
         const htmlWithoutWrapper = html.split('<div class="wrapper" style="width:800px;');
-        html = htmlWithoutWrapper.join('<div class="wrapper" style="width:600px;'); 
-    //     const html = `<div class="wrapper" style="width:600px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-    //     <header style="background-color:#66563E;text-align:center;" >
-    //         <img class="logo" src="static/email-logo.png" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-    //     </header>
-    //     <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-    //         <h4 class="contact-name">Hello Daniyal</h4>
-    //         <p>
-    //             Your test was evaluated and received positive feedback
-    //             Please review the test results attached.
-    //             If you have any comments regarding evaluation, let us know.
-    //         </p>
-    //         <p>
-    //             You will receive shortly email with our offer.
-    //         </p>
-    //     </div>
-    //     <footer>
-    //         <hr size="15" color="#66563E">
-    //         <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-    //     </footer>
-    // </div>`;
+        html = htmlWithoutWrapper.join('<div class="wrapper" style="width:600px;');
         var options = { format: 'Letter', base: apiUrl };
         return new Promise((resolve, reject) => {
             htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
