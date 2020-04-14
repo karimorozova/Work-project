@@ -95,10 +95,11 @@ async function getPMnotificationMessage(project, task) {
 
 async function notifyClientTaskReady({taskId, project, contacts}) {
     const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
+    const task = project.tasks.find(item => item.taskId === taskId);
     try {
         for(let contact of notifyContacts) {
-            const message = taskReadyMessage({taskId, contact, project_id: project.projectId});
-            await sendEmail({to: contact.email, subject: `TASK IS READY (ID C014, ${project.projectId})`}, message);
+            const message = taskReadyMessage({task, contact, project});
+            await sendEmail({to: contact.email, subject: `TASK IS READY (ID C006.2, ${project.projectId})`}, message);
         }
     } catch(err) {
         console.log(err);

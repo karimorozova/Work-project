@@ -289,23 +289,21 @@ function emailMessageForContact(obj) {
 }
 
 function taskReadyMessage(obj) {
+    const am = `${obj.project.accountManager.firstName} ${obj.project.accountManager.lastName}`;
     return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
+                <p class="main_italic main_line15 main_weight600"
+                        style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
+                        ***This is an automated message***<br>
+                        This message is sent to you on behalf of ${am}</p>
                 <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.contact.firstName} ${obj.contact.surname},</h3>
                 <div class="all-info" style="padding: 0 15px 0 30px;">
                     <p class="description" style="font-size: 18px;">
-                        Task is ready. 
+                        Task ${obj.task.taskId} (${obj.task.service.title}) from project ${obj.project.projectId} - ${obj.project.projectName} is ready. 
+                        It will be delivered once all tasks have been completed.
                     </p>
-                    <h3 class="detailsTitle">Details</h3>
-                    <table class="details">
-                        <tr>
-                            <td>Task ID:</td>
-                            <td>${obj.taskId}</td>
-                        </tr>
-                        <tr>
-                            <td>Project ID:</td>
-                            <td>${obj.project_id}</td>
-                        </tr>
-                    </table>
+                    <p class="description" style="font-size: 18px;">
+                        In case of any questions, please do not hesitate to contact us :-)
+                    </p>
                 </div>
             </div>`;
 }
