@@ -104,148 +104,155 @@ function requestMessageForVendor(obj) {
     const langPair = obj.sourceLanguage ? `${obj.sourceLanguage} >> ${obj.targetLanguage}; ` : `${obj.targetLanguage} / ${obj.packageSize}; `;
     const token = jwt.sign({vendorId: obj.vendor.id}, secretKey, { expiresIn: '2h'});
     const stepId = obj.stepId.replace(/ /g, '%20');
-    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
-    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=decline&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: orange;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=accept&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
+    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/step-decision?decision=decline&vendorId=${obj.vendor.id}&projectId=${obj.projectId}&stepId=${stepId}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.name}, ${obj.finance.Price.payables} &euro;</a>`
     const start = obj.start.split('T')[0].split('-').reverse().join('-');
     const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
-
-    return `<div contenteditable="true" class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-        <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
-        <div class="all-info" style="padding: 0 15px 0 30px;">
-            <p class="description" style="font-size: 18px;">
-                Please find attached Quote(s).
-            </p>
-            <p>
-                By clicking on one of the links below, you can accept or reject our offer.
-            </p>
-            <h3 class="detailsTitle">Step Details</h3>
-            <table class="details">
-                <tr>
-                    <td>Step name:</td>
-                    <td>${obj.name}</td>
-                </tr>
-                <tr>
-                    <td>Project name:</td>
-                    <td>${obj.projectName}</td>
-                </tr>
-                <tr>
-                    <td>Start date: </td>
-                    <td>${start}</td>
-                </tr>
-                <tr>
-                    <td>Deadline: </td>
-                    <td>${deadline}</td>
-                </tr>
-                <tr>
-                    <td>Language pair:</td>
-                    <td>${langPair}</td>
-                </tr>
-                <tr>
-                    <td>Specialization:</td>
-                    <td>${obj.industry}</td>
-                </tr>
-                <tr>
-                    <td>Amount:</td>
-                    <td>${obj.finance.Price.payables} &euro;</td>
-                </tr>
-            </table>
-            <p class="description" style="font-size: 18px;">
-                This request confirmation expires on: ${expiryDate}
-            </p>
-                <p class="link" style="color: orange;">${acceptQuote}</p>
-                <p>or</p>
-                <p class="link" style="color: orange;">${declineQuote}</p>
-            <p class="description" style="font-size: 18px;">
-                Please note that by accepting the request, you will automatically be assigned to the step.
-            </p>
-            <p>
-                In case of any questions, please do not hesitate to contact us.
-            </p>
-            <h4 style="width: 35px;border-bottom: 1px solid rgb(29, 29, 29);">T&C:</h4>
-            <ol style="padding-left: 0;">
-                <li>The estimated delivery date is only applicable if you accept the quote on the day of receipt. If not, the estimated date willl vary.</li>
-                <li>Should you agree to a QA service, we cannot accept responsibility if you fail to send us the finished files upon completion. Please note the QA service expires in 30 days after the quote approval.</li>
-            </ol>
-            <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea TRanslation Services (Cyprus) LTD</h2>
-            <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
-        </div>
-    </div>`;
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                        Step ${stepId} ${obj.servicesStep.title} has been assigned to you.
+                    </p>
+                    <p>
+                        Here are the needed details:
+                    </p>
+                    <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
+                        <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${stepId}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Work type:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.servicesStep.title}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${langPair}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.industry}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.finance.Wordcount.payables}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Matrix:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >--</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${deadline}</td>
+                            </tr>
+                            <tr>
+                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>
+                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.finance.Price.payables} &euro;</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >
+                        By clicking on one of the links below, you can accept or reject the job.<br>
+                        <span class="main_line15-red" style="background-color:#FBF3DB;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
+                            Clicking "I accept" will also approve and accept our <a href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link" style="color:#D15F46;" >terms and conditions</a>
+                        </span>
+                    </p>
+                    <p>
+                        You can accept the quote by clicking the link below:  
+                    </p>
+                    I accept - ${acceptQuote}
+                    <p>or</p>
+                    I reject - ${declineQuote}
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
 }
 
 function stepCancelledMessage(obj) {
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
-                <div class="all-info" style="padding: 0 15px 0 30px;">
-                    <p class="description" style="font-size: 18px;">
-                        We would like to inform you that step: ${obj.stepId} ${obj.service.title} has been cancelled in the middle.
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                        We would like to information you that step: ${obj.stepId} ${obj.servicesStep.title} has been cancelled.
                     </p>
                 </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 function stepMiddleCancelledMessage(obj) {
     const fee = obj.status === "Completed" ? obj.finance.Price.payables : obj.finance.Price.halfPayables;
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
-                <div class="all-info" style="padding: 0 15px 0 30px;">
-                    <p class="description" style="font-size: 18px;">
-                        We would like to inform you that step: ${obj.stepId} ${obj.service.title} has been cancelled in the middle.
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                        We would like to inform you that step: ${obj.stepId} ${obj.servicesStep.title} has been cancelled in the middle.
                     </p>
-                    <p class="description" style="font-size: 18px;">
+                    <p>
                         You will be paid ${fee}, which is according to relative work you have completed.
                     </p>
                 </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 function vendorReassignmentMessage(obj, reason) {
-    const pairSourceTitle = obj.sourceLanguage ? "Source language:" : "Target language:";
-    const pairTargetTitle = obj.sourceLanguage ? "Target language:" : "Package size:";
-    const pairLeft = obj.sourceLanguage || obj.targetLanguage;
-    const pairRight = obj.sourceLanguage ? obj.targetLanguage : obj.packageSize;
-    const reassignReason = `<p><h3>Reason</h3><span>${reason}</span></p>` || '';
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
-                <div class="all-info" style="padding: 0 15px 0 30px;">
-                    <p class="description" style="font-size: 18px;">
-                        Please pay attention to the fact that there is a step that has been reassigned to a new Vendor. 
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                        We would like to update you that ${obj.stepId} ${obj.servicesStep.title} has been reassigned to a different vendor. 
                     </p>
-                    ${reassignReason}
-                    <h3 class="detailsTitle">Step Details</h3>
-                    <table class="details">
-                        <tr>
-                            <td>Step ID</td>
-                            <td>${obj.stepId}</td>
-                        </tr>
-                        <tr>
-                            <td>Step Name</td>
-                            <td>${obj.name}</td>
-                        </tr>
-                        <tr>
-                            <td>${pairSourceTitle}</td>
-                            <td>${pairLeft}</td>
-                        </tr>
-                        <tr>
-                            <td>${pairTargetTitle}</td>
-                            <td>${pairRight}</td>
-                        </tr>
-                    </table>
                 </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 
 function stepReopenedMessage(obj) {
     const reason = obj.reason || "";
-    return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
-                <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.vendor.firstName},</h3>
-                <div class="all-info" style="padding: 0 15px 0 30px;">
-                    <p class="description" style="font-size: 18px;">
-                        Step: ${obj.stepId} ${obj.service.title} has been reopened.
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                         Step: ${obj.stepId} ${obj.servicesStep.title} has been reopened.
                     </p>
-                    <p class="description" style="font-size: 18px;">
+                    <p>
                         Reason: ${reason}
                     </p>
                 </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
             </div>`;
 }
 

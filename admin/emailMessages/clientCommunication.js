@@ -6,6 +6,8 @@ function messageForClient(obj) {
     const date = Date.now();
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
     const tasksInfo = getTasksInfo({ tasks: obj.tasks, industry: obj.industry });
+    const subTotal = getSubTotal(obj.tasks);
+    const total = getTotal({tasks: obj.tasks})
     const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
 
     let detailHeader = "Please see below the quote details:";
@@ -95,13 +97,9 @@ function messageForClient(obj) {
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                    Sub-total:</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                    Sub-total:</td><td></td><td></td><td></td><td></td>
                                 <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    33</td>
+                                    ${subTotal}</td>
                             </tr>
                         </table>
                         </br>
@@ -113,7 +111,7 @@ function messageForClient(obj) {
                                     Sub-total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                   --</td>
+                                    ${subTotal}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
@@ -145,7 +143,7 @@ function messageForClient(obj) {
                                 Total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                    --</td>
+                                    ${total}</td>
                             </tr>
                         </table>
 
@@ -175,6 +173,21 @@ function messageForClient(obj) {
                 </footer>
             </div>`;
 }
+function getSubTotal(obj){
+    const result = obj.reduce(function(sum, cur) {
+        return sum.finance.Price.receivables + cur.finance.Price.receivables;
+      });
+    return result;
+}
+function getTotal(obj) {
+    let total;
+    const subTotal = obj.tasks.reduce(function(sum, cur) {
+        return sum.finance.Price.receivables + cur.finance.Price.receivables;
+      });
+
+    total = subTotal;
+    return total;
+}
 
 function getTasksInfo(info) {
     let { tasks, industry } = info;
@@ -185,6 +198,7 @@ function getTasksInfo(info) {
         return acc;
     }, {})
     let result = "";
+    
     for (let key in services) {
         const tasksInfo = services[key].reduce((acc, cur) => {
             const deadline = acc['deadline'] || cur.deadline;
@@ -192,8 +206,11 @@ function getTasksInfo(info) {
             acc['deadline'] = cur.deadline > deadline ? cur.deadline : deadline;
             acc['langPairs'] = acc['langPairs'] ? acc['langPairs'] + `; ${langPair}` : `${langPair}`;
             acc['cost'] = acc['cost'] ? acc['cost'] + cur.finance.Price.receivables : cur.finance.Price.receivables;
+            acc['quantity'] = acc['quantity'] ? acc['quantity'] + cur.finance.Wordcount.receivables : cur.finance.Wordcount.receivables;
+            acc['unit'] = cur.service.calculationUnit;
             return acc;
         }, {})
+
         result += getTaskCode({ ...tasksInfo, service: key, industry });
     }
     return result;
@@ -209,16 +226,16 @@ function getTaskCode(tasksInfo) {
                     ${tasksInfo.langPairs}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
+                    --</td>
+                <td
+                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
+                    ${tasksInfo.unit}</td>
+                <td
+                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
+                    ${tasksInfo.quantity}</td>
+                <td
+                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                     ${tasksInfo.cost}</td>
-                <td
-                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    --</td>
-                <td
-                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    --</td>
-                <td
-                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    --</td>
             </tr>`;
 }
 
