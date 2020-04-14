@@ -58,12 +58,15 @@ export default {
         notValidRates() {
             const regex = /^\d*\.?\d+$/;
             const ratesKeys = Object.keys(this.currentInfo.rates);
+            const selectedStepsIds = this.selectedSteps.map(item => item._id);
             for(let key of ratesKeys) {
-                if(!regex.test(this.currentInfo.rates[key].value) || !regex.test(this.currentInfo.rates[key].min)) {
-                    return true;
-                }
-                if(+this.currentInfo.rates[key].value <= 0 || this.currentInfo.rates[key].min <= 0) {
-                    return true;
+                if(selectedStepsIds.indexOf(key) !== -1) {
+                    if(!regex.test(this.currentInfo.rates[key].value) || !regex.test(this.currentInfo.rates[key].min)) {
+                        return true;
+                    }
+                    if(+this.currentInfo.rates[key].value <= 0 || this.currentInfo.rates[key].min <= 0) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -84,11 +87,11 @@ export default {
             } catch(err) { }
         },
         async save() {
-            const rates = Object.keys(this.currentInfo.rates).reduce((prev, cur) => {
+            const rates = Object.keys(this.currentInfo.rates).reduce((acc, cur) => {
                 const value = +this.currentInfo.rates[cur].value;
                 const min = +this.currentInfo.rates[cur].min;
-                prev[cur] = {...this.currentInfo.rates[cur], value, min};
-                return {...prev};
+                acc[cur] = {...this.currentInfo.rates[cur], value, min};
+                return {...acc};
             }, {})
             if(!this.isClient && !this.isVendor) {
                 await this.savePricelistRates({...this.currentInfo, rates, prop: this.rateForm, stepsIds: this.stepsIds});
