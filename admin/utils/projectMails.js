@@ -67,11 +67,11 @@ async function notifyVendorsProjectAccepted(projectSteps) {
 }
 
 async function managerEmailsSend({project, projectManager, salesManager}) {
-    const pmMessageObj = {...project._doc, user: {...projectManager._doc, id: projectManager.id}};
-    const smMessageObj = {...project._doc, user: {...salesManager._doc, id: salesManager.id}};
-    const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
-    const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
     try {
+        const pmMessageObj = {...project._doc, user: {...projectManager._doc, id: projectManager.id}};
+        const smMessageObj = {...project._doc, user: {...salesManager._doc, id: salesManager.id}};
+        const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
+        const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
         await managerNotifyMail(projectManager, pmMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
         await managerNotifyMail(salesManager, smMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
     } catch(err) {
@@ -81,8 +81,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
 }
 
 async function stepReassignedNotification(project, step, reason) {
-    const message = vendorReassignmentMessage(step, reason);
     try {
+        const message = vendorReassignmentMessage(step, reason);
         await sendEmail({to: step.vendor.email, subject: `Step has been reassigned (ID V001.1, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
@@ -91,9 +91,9 @@ async function stepReassignedNotification(project, step, reason) {
 }
 
 async function stepVendorsRequestSending(project, checkedSteps) {
-    let steps = [...project.steps];
-    const assignedStepsCheck = checkedSteps.map(item => item.stepId);
     try {
+        let steps = [...project.steps];
+        const assignedStepsCheck = checkedSteps.map(item => item.stepId);
         for(let step of steps) {
             if(step.vendor && assignedStepsCheck.indexOf(step.stepId) !== -1) {
                 await sendRequestToVendor(project, step);
@@ -108,26 +108,31 @@ async function stepVendorsRequestSending(project, checkedSteps) {
 }
 
 async function stepEmailToVendor(project, step) {
-    let steps = [...project.steps];
-    await sendRequestToVendor(project, step);
-    const updatedSteps = steps.map(item => {
-        if(step.taskId === item.taskId && step.name === item.name) {
-            item.status = "Request Sent";
+    try {
+        let steps = [...project.steps];
+        await sendRequestToVendor(project, step);
+        const updatedSteps = steps.map(item => {
+            if(step.taskId === item.taskId && step.name === item.name) {
+                item.status = "Request Sent";
+                return item;
+            }
             return item;
-        }
-        return item;
-    });
-    return updatedSteps;
+        });
+        return updatedSteps;
+    } catch(err){
+        console.log(err);
+        console.log("Error in stepEmailToVendor")
+    }
 }
 
 async function sendRequestToVendor(project, step) {
-    let requestInfo = {...step._doc};
-    requestInfo.projectId = project.id;
-    requestInfo.projectName = project.projectName;
-    requestInfo.industry = project.industry.name;
-    requestInfo.brief = project.brief;
-    const message = requestMessageForVendor(requestInfo);
     try {
+        let requestInfo = {...step._doc};
+        requestInfo.projectId = project.id;
+        requestInfo.projectName = project.projectName;
+        requestInfo.industry = project.industry.name;
+        requestInfo.brief = project.brief;
+        const message = requestMessageForVendor(requestInfo);
         await sendEmail({to: step.vendor.email, subject: `Request Confirmation (ID V001.0, ${project.projectId})`}, message);
     } catch(err) {
         console.log(err);
@@ -136,10 +141,10 @@ async function sendRequestToVendor(project, step) {
 }
 
 async function sendEmailToContact(project, contact) {
-    let projectInfo = {...project._doc};
-    projectInfo.firstName = contact.firstName;
-    projectInfo.surname = contact.surname;
     try {
+        let projectInfo = {...project._doc};
+        projectInfo.firstName = contact.firstName;
+        projectInfo.surname = contact.surname;
         const service = await Services.findOne({"_id": project.tasks[0].service});
         projectInfo.service = service.title;
         const message = emailMessageForContact(projectInfo);
