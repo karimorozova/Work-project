@@ -89,7 +89,7 @@ export default {
                 tasksData.projectId = project._id;
                 tasksData.projectName = `${project.projectId} - ${project.projectName}`;
                 tasksData.customerName = project.customer.name;
-                tasksData.industry = project.industry.name;
+                tasksData.industry = project.industry.name.replace('&','and');
                 this.translateFilesAmount = tasksData.translateFiles.length;
                 this.isInfo = true;
                 await this.addProjectWordsTasks({...tasksData, isRequest: true});

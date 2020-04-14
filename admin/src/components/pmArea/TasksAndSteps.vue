@@ -97,7 +97,7 @@ export default {
             tasksData.append('targets', JSON.stringify(dataForTasks.targets));
             tasksData.append('projectId', this.currentProject._id);
             tasksData.append('projectName', `${this.currentProject.projectId} - ${this.currentProject.projectName}`);
-            tasksData.append('industry', this.currentProject.industry.name);
+            tasksData.append('industry', this.currentProject.industry.name.replace('&','and'));
             tasksData.append('packageSize', dataForTasks.packageSize);
             tasksData.append('quantity', dataForTasks.quantity);
             return tasksData;
