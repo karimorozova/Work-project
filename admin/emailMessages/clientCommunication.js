@@ -171,7 +171,9 @@ function messageForClient(obj) {
 function getSubTotal(tasks, steps){
     return tasks.reduce((acc, cur) => {
         const taskSteps = steps.filter(item => item.taskId === cur.taskId);
-        let unitPrice = taskSteps.reduce((sum, c) => sum + +c.clientRate.value, 0);
+        let unitPrice = taskSteps.reduce((sum, c) => {
+            return sum += c.clientRate ? c.clientRate.value : 0;
+        }, 0);
         let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
         if(cur.service.calculationUnit !== 'Words') {
             totalQuantity = cur.finance.Price.receivables;
@@ -184,7 +186,9 @@ function getSubTotal(tasks, steps){
 function getTasksInfo(tasks, steps) {
     const tasksInfo = tasks.reduce((acc, cur) => {
         const taskSteps = steps.filter(item => item.taskId === cur.taskId);
-        const unitPrice = taskSteps.reduce((sum, c) => sum + +c.clientRate.value, 0);
+        const unitPrice = taskSteps.reduce((sum, c) => {
+            return sum += c.clientRate ? c.clientRate.value : 0;
+        }, 0);
         const langPair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}` : `${cur.targetLanguage} / ${cur.packageSize}`;
         let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
         let cost = unitPrice*totalQuantity;
