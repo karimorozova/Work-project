@@ -125,6 +125,7 @@ const middleware = {
             '/projects/open-projects',
             '/projects/requests',
             '/projects/prev-projects',
+            '/projects/other-projects',
             '/pm-projects',
             '/project-details',
             '/request-details',

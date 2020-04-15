@@ -9,7 +9,7 @@ async function notifyManagerProjectRejected(project) {
     try {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const message = managerProjectRejectedMessage({...project._doc, accManager: accManager.firstName});
-        await managerNotifyMail(accManager, message, `Quote Rejected (ID C003.0, ${project.projectId})`);
+        await managerNotifyMail(accManager, message, `Quote Rejected ${project.projectId} - ${project.projectName} (ID C003.0)`);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyManagerProjectRejected");
@@ -41,7 +41,7 @@ async function notifyMangerProjectAppoved(project) {
     try {
         const accManager = await User.findOne({"_id": project.accountManager.id});
         const message = managerProjectAcceptedMessage({...project._doc, accManager: accManager.firstName});
-        await managerNotifyMail(accManager, message, `Quote Accepted (ID C002.0, ${project.projectId})`);
+        await managerNotifyMail(accManager, message, `Quote Accepted ${project.projectId} - ${project.projectName} (ID C002.0)`);
     } catch(err) {
         console.log(err);
         console.log("Error in notifyMangerProjectAppoved");
@@ -72,8 +72,8 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
         const smMessageObj = {...project._doc, user: {...salesManager._doc, id: salesManager.id}};
         const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
         const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
-        await managerNotifyMail(projectManager, pmMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
-        await managerNotifyMail(salesManager, smMessage, `Quote Accepted but translators were not assigned (ID I001.0, ${project.projectId})`);
+        await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${project.projectId} - ${project.projectName} (ID I001.0)`);
+        await managerNotifyMail(salesManager, smMessage, `Quote Accepted: ${project.projectId} - ${project.projectName} (ID I001.0)`);
     } catch(err) {
         console.log(err);
         console.log("Error in managerEmailsSend");
@@ -83,7 +83,7 @@ async function managerEmailsSend({project, projectManager, salesManager}) {
 async function stepReassignedNotification(project, step, reason) {
     try {
         const message = vendorReassignmentMessage(step, reason);
-        await sendEmail({to: step.vendor.email, subject: `Step has been reassigned (ID V001.1, ${project.projectId})`}, message);
+        await sendEmail({to: step.vendor.email, subject: `Step ${step.stepId} has been reassigned (ID V001.1)`}, message);
     } catch(err) {
         console.log(err);
         console.log("Error in stepReassignedNotification")
@@ -133,7 +133,7 @@ async function sendRequestToVendor(project, step) {
         requestInfo.industry = project.industry.name;
         requestInfo.brief = project.brief;
         const message = requestMessageForVendor(requestInfo);
-        await sendEmail({to: step.vendor.email, subject: `Request Confirmation (ID V001.0, ${project.projectId})`}, message);
+        await sendEmail({to: step.vendor.email, subject: `Availability approval for a Step ${step.stepId} (${step.serviceStep.title}) (ID V001.0)`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in sendRequestToVendor');
@@ -148,7 +148,7 @@ async function sendEmailToContact(project, contact) {
         const service = await Services.findOne({"_id": project.tasks[0].service});
         projectInfo.service = service.title;
         const message = emailMessageForContact(projectInfo);
-        await clientQuoteEmail({contact, subject: `Project information (ID C006, ${project.projectId})`}, message);
+        await clientQuoteEmail({contact, subject: `Project information (ID C006, ${project.projectId} - ${project.projectName})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in sendEmailToContact');
@@ -168,7 +168,8 @@ async function notifyClientProjectCancelled(project) {
             projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"})
             : projectMiddleCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
         const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0";
-        await clientQuoteEmail({contact, subject: `Cancelled Project (ID ${messageId}, ${project.projectId})`}, message);
+        const subject = project.status === "Cancelled" ? "Project cancelled" : "Project has been cancelled in the middle of the work";
+        await clientQuoteEmail({contact, subject: `${subject}: ${project.projectId} - ${project.projectName} (ID ${messageId})`}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientProjectCancelled');
@@ -185,7 +186,8 @@ async function notifyClientTasksCancelled(project, tasks) {
                 tasksCancelledMessage({...project._doc, ...task, accManager, contact})
                 : tasksMiddleCancelledMessage({...project._doc, task, accManager, contact, reason: "Some reason"});
             const messageId = task.status === "Cancelled" ? "C005.1" : "C008.1";
-            await clientQuoteEmail({contact, subject: `Tasks have been cancelled (ID ${messageId}, ${project.projectId})`}, message);
+            const subject = task.status === "Cancelled" ? "Task cancelled" : "Task has been cancelled in the middle of the work";
+            await clientQuoteEmail({contact, subject: `${subject}: ${task.taskId} - ${task.service.title} (ID ${messageId})`}, message);
         }
     } catch(err) {
         console.log(err);

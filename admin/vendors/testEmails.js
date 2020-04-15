@@ -5,7 +5,7 @@ const fs = require("fs");
 async function notifyTestStatus({vendor, qualification, testPath}) {
     const {source, target, industry, status} = qualification;
     let messageId = "CAN001.0"; 
-    let subject = `Test sent (ID ${messageId})`;
+    let subject = `${target.lang} - Translator@Pangea position - Sample text for translation (ID ${messageId})`;
     let message = testSentMessage({...vendor, source, target, industry});
     try {
         if(status === "Test Sent") {
@@ -13,7 +13,9 @@ async function notifyTestStatus({vendor, qualification, testPath}) {
             return await sendEmail({to: vendor.email, subject, attachments}, message);
         } 
         messageId = status === "Passed" ? "CAN003.0" : "CAN002.0";
-        subject = status === "Passed" ? `Test Passed (ID ${messageId})` : `Test Not Passed (ID ${messageId})`;
+        subject = status === "Passed" ? 
+            `${target.lang} - Translator@Pangea position - Test Passed (ID ${messageId})` 
+            : `${target.lang} - Translator@Pangea position - Test Not Passed (ID ${messageId})`;
         message = status === "Passed" ? testPassedMessage(vendor) : testNotPassedMessage({...vendor, target});
         await sendEmail({to: vendor.email, subject}, message);
     } catch(err) {

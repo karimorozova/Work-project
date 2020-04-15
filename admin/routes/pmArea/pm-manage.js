@@ -225,7 +225,7 @@ router.post("/project-details", async (req, res) => {
     const { id, message } = req.body;
     try {
         const project = await getProject({"_id": id});
-        await clientQuoteEmail({...project.customer._doc, subject: `Project details (ID C006, ${project.projectId})`}, message);
+        await clientQuoteEmail({...project.customer._doc, subject: `Project details (ID C006, ${project.projectId} - ${project.projectName})`}, message);
         res.send("Project details sent");
     } catch(err) {
         console.log(err);
@@ -245,7 +245,7 @@ router.post("/send-quote", async (req, res) => {
         }
         const pdf = await getPdf(message);
         const attachments = [{content: fs.createReadStream(pdf), filename: "quote.pdf"}];
-        await clientQuoteEmail({...project.customer._doc, attachments, subject: `${subject} (ID ${messageId}, ${project.projectId})` }, message);
+        await clientQuoteEmail({...project.customer._doc, attachments, subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});
         fs.unlink(pdf, (err) => {
             if(err) console.log(err)

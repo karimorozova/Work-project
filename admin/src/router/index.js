@@ -47,6 +47,7 @@ import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import Requests from '@/components/pmArea/Requests'
 import PrevProjects from '@/components/pmArea/PrevProjects'
+import OtherProjects from '@/components/pmArea/OtherProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
@@ -348,6 +349,11 @@ const router = new Router({
                             path: 'prev-projects',
                             name: 'prev-projects',
                             component: PrevProjects
+                        },
+                        {
+                            path: 'other-projects',
+                            name: 'other-projects',
+                            component: OtherProjects
                         }
                     ]
                 },
