@@ -157,10 +157,7 @@ function requestMessageForVendor(obj) {
                         </table>
                     </div>
                     <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >
-                        By clicking on one of the links below, you can accept or reject the job.<br>
-                        <span class="main_line15-red" style="background-color:#FBF3DB;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
-                            Clicking "I accept" will also approve and accept our <a href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link" style="color:#D15F46;" >terms and conditions</a>
-                        </span>
+                        By clicking on one of the links below, you can accept or reject the job.
                     </p>
                     <p>
                         You can accept the quote by clicking the link below:  

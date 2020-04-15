@@ -81,7 +81,9 @@ async function manageDeliveryFile({fileData, file}) {
 async function getPdf(message) {
     try {
         const htmlWithoutImage = message.split('<img class="logo" src="cid:logo@pan"');
-        let html = htmlWithoutImage.join('<img class="logo" src="static/email-logo.png"'); 
+        let html = htmlWithoutImage.join('<img class="logo" src="static/email-logo.png"');
+        const htmlWithoutImagePdf = message.split('<img src="cid:logoPdf@pan"');
+        html = htmlWithoutImagePdf.join('<img src="static/logo.png"'); 
         const htmlWithoutWrapper = html.split('<div class="wrapper" style="width:800px;');
         html = htmlWithoutWrapper.join('<div class="wrapper" style="width:600px;');
         var options = { format: 'Letter', base: apiUrl };
