@@ -5,8 +5,9 @@ const { secretKey } = require('../configs');
 function messageForClient(obj) {
     const date = Date.now();
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
-    const tasksInfo = getTasksInfo({ tasks: obj.tasks, industry: obj.industry });
-    const subTotal = getSubTotal(obj.tasks);
+    const tasksInfo = getTasksInfo(obj.tasks, obj.steps);
+    const subTotal = getSubTotal(obj.tasks, obj.steps);
+    const tmDiscount = (obj.finance.Price.receivables - subTotal).toFixed(2);
     const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
 
     let detailHeader = "Please see below the quote details:";
@@ -71,7 +72,7 @@ function messageForClient(obj) {
                         </table>
                         </br>
                         <table class="details__table"
-                            style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+                            style="width:100%;color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -93,13 +94,7 @@ function messageForClient(obj) {
                                     Cost</td>
                             </tr>
                             ${tasksInfo}
-                            <tr>
-                                <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                    Sub-total:</td><td></td><td></td><td></td><td></td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    ${subTotal}</td>
-                            </tr>
+                            
                         </table>
                         </br>
                         <table class="details__table"
@@ -110,7 +105,7 @@ function messageForClient(obj) {
                                     Sub-total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                    ${subTotal}</td>
+                                    ${subTotal.toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
@@ -118,7 +113,7 @@ function messageForClient(obj) {
                                     TM Discount:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                    --</td>
+                                    ${tmDiscount}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
@@ -173,57 +168,67 @@ function messageForClient(obj) {
             </div>`;
 }
 
-function getSubTotal(tasks){
-    return tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0);
+function getSubTotal(tasks, steps){
+    return tasks.reduce((acc, cur) => {
+        const taskSteps = steps.filter(item => item.taskId === cur.taskId);
+        let unitPrice = taskSteps.reduce((sum, c) => sum + +c.clientRate.value, 0);
+        let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
+        if(cur.service.calculationUnit !== 'Words') {
+            totalQuantity = cur.finance.Price.receivables;
+            unitPrice = 1;
+        }
+        return acc + +(unitPrice*totalQuantity);
+    }, 0);
 }
 
-function getTasksInfo(info) {
-    let { tasks, industry } = info;
-    tasks.sort((a, b) => a.service.title > b.service.title ? 1 : -1);
-    const services = tasks.reduce((acc, cur) => {
-        const title = cur.service.title;
-        acc[title] = acc[title] ? [...acc[title], cur] : [cur];
-        return acc;
-    }, {})
+function getTasksInfo(tasks, steps) {
+    const tasksInfo = tasks.reduce((acc, cur) => {
+        const taskSteps = steps.filter(item => item.taskId === cur.taskId);
+        const unitPrice = taskSteps.reduce((sum, c) => sum + +c.clientRate.value, 0);
+        const langPair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}` : `${cur.targetLanguage} / ${cur.packageSize}`;
+        let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
+        let cost = unitPrice*totalQuantity;
+        if(cur.service.calculationUnit !== 'Words') {
+            totalQuantity = cur.service.calculationUnit === 'Hours' ? taskSteps[0].quantity : 1;
+            cost = cur.finance.Price.receivables;
+        }
+        acc.push({
+            task: cur.service.title,
+            langPair: `${langPair}`,
+            unitPrice: unitPrice,
+            unit: cur.service.calculationUnit,
+            quantity: totalQuantity,
+            cost
+        })
+        return [...acc];
+    }, [])
     let result = "";
-    
-    for (let key in services) {
-        const tasksInfo = services[key].reduce((acc, cur) => {
-            const deadline = acc['deadline'] || cur.deadline;
-            const langPair = cur.sourceLanguage ? `${cur.sourceLanguage} >> ${cur.targetLanguage}` : `${cur.targetLanguage} / ${cur.packageSize}`;
-            acc['deadline'] = cur.deadline > deadline ? cur.deadline : deadline;
-            acc['langPairs'] = acc['langPairs'] ? acc['langPairs'] + `; ${langPair}` : `${langPair}`;
-            acc['cost'] = acc['cost'] ? acc['cost'] + cur.finance.Price.receivables : cur.finance.Price.receivables;
-            acc['quantity'] = acc['quantity'] ? acc['quantity'] + cur.finance.Wordcount.receivables : cur.finance.Wordcount.receivables;
-            acc['unit'] = cur.service.calculationUnit;
-            return acc;
-        }, {})
-
-        result += getTaskCode({ ...tasksInfo, service: key, industry });
+    for(let info of tasksInfo) {
+        result += getTaskCode(info);
     }
     return result;
 }
 
-function getTaskCode(tasksInfo) {
+function getTaskCode(taskInfo) {
     return `<tr>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${tasksInfo.service}</td>
+                    ${taskInfo.task}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${tasksInfo.langPairs}</td>
+                    ${taskInfo.langPair}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    --</td>
+                    ${taskInfo.unitPrice}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${tasksInfo.unit}</td>
+                    ${taskInfo.unit}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${tasksInfo.quantity}</td>
+                    ${taskInfo.quantity}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${tasksInfo.cost}</td>
+                    ${taskInfo.cost.toFixed(2)}</td>
             </tr>`;
 }
 
