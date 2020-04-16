@@ -240,6 +240,7 @@ function getTaskCode(taskInfo) {
 function getPdfOfQuote(obj){
     const tasksInfo = getTasksInfoPdf(obj.tasks, obj.steps);
     const subTotal = getSubTotal(obj.tasks, obj.steps);
+    let clientName = obj.customer.officialName ? obj.customer.officialName : obj.customer.name
     return `<div class="wrapper pdf" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt=""> 
@@ -254,19 +255,19 @@ function getPdfOfQuote(obj){
                                 To:
                             </div>
                             <div class="quote__row-text" style="width:300px;" >
-                                <b>Panorama Partners Ltd.</b>
+                                <b>${clientName}</b>
                             </div>
                         </div>
                         <div class="quote__row" style="padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;display:-webkit-box;" >
                             <div class="quote__row-title" style="font-weight:bold;width:100px;" ></div>
                             <div class="quote__row-text" style="width:300px;" >
-                                Panorama Partners Ltd.
+                                ${clientName}
                             </div>
                         </div>
                         <div class="quote__row" style="padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;display:-webkit-box;" >
                             <div class="quote__row-title" style="font-weight:bold;width:100px;" ></div>
                             <div class="quote__row-text" style="width:300px;" >
-                                London E2 8AA, United Kingdom
+                                ${obj.customer.address}
                             </div>
                         </div>
                     </div>
