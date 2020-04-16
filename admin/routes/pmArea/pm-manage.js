@@ -15,7 +15,6 @@ const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers} = require("../../services/memoqs/users");
-const { getPdfOfQuote } = require("../../emailMessages/clientCommunication");
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -244,8 +243,7 @@ router.post("/send-quote", async (req, res) => {
             messageId = project.status === "Quote sent" ? "C001.1" : "C004.0";
             subject = project.status === "Quote sent" ? "Decide on a Quote(UPDATED)" : "Re-calculated Quote";
         }
-        const pdfMessage = await getPdfOfQuote(project); 
-        const pdf = await getPdf(pdfMessage); 
+        const pdf = await getPdf(project);
         const attachments = [{content: fs.createReadStream(pdf), filename: "quote.pdf"}];
         await clientQuoteEmail({...project.customer._doc, attachments, subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})` }, message);
         const updatedProject = await updateProject({"_id": project.id}, {status: "Quote sent", isClientOfferClicked: false});

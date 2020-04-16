@@ -242,7 +242,7 @@ function getPdfOfQuote(obj){
     const subTotal = getSubTotal(obj.tasks, obj.steps);
     return `<div class="wrapper pdf" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
-                    <img src="cid:logoPdf@pan" alt=""> 
+                    <img src="static/logo.png" alt=""> 
                 </header>
                 <div class="quote__header" style="background-color:#66563D;color:white;text-transform:uppercase;text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     quote
