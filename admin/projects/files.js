@@ -1,6 +1,7 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveProjectFile, moveFile } = require('../utils/movingFile');
 const { getProject } = require('./getProjects');
+const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
 const fs = require('fs');
 const htmlToPdf = require('html-pdf');
 const apiUrl = require('../helpers/apiurl');
@@ -80,10 +81,7 @@ async function manageDeliveryFile({fileData, file}) {
 
 async function getPdf(message) {
     try {
-        const htmlWithoutImage = message.split('<img class="logo" src="cid:logo@pan"');
-        let html = htmlWithoutImage.join('<img class="logo" src="static/email-logo.png"'); 
-        const htmlWithoutWrapper = html.split('<div class="wrapper" style="width:800px;');
-        html = htmlWithoutWrapper.join('<div class="wrapper" style="width:600px;');
+        const html = await getPdfOfQuote(message);
         var options = { format: 'Letter', base: apiUrl };
         return new Promise((resolve, reject) => {
             htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
