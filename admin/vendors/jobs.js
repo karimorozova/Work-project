@@ -1,5 +1,6 @@
 const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted, stepCompletedNotifyPM } = require('../projects');
 const { Projects, Delivery } = require('../models');
+const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
 async function getJobs(id) {
     try {
@@ -89,7 +90,8 @@ async function manageStatuses({project, steps, jobId, status}) {
             return await manageCompletedStatus({project, jobId, steps, task})
         }
         if(status === "Accepted" || status === "Rejected") {
-            const updatedSteps = status === "Accepted" ? setAcceptedStepStatus({project, steps, jobId})
+            const updatedSteps = status === "Accepted" 
+            ? await setAcceptedStepStatus({project, steps, jobId})
             : setRejectedStatus({steps, jobId});
             return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
         }
@@ -177,24 +179,33 @@ function getWithReadyToStartSteps({task, steps}) {
     })
 }
 
-function setAcceptedStepStatus({project, steps, jobId}) {
+async function setAcceptedStepStatus({project, steps, jobId}) {
     let status = "Accepted";
-    if(project.status === "In progress" || project.status === "Approved") {
-        status = "Ready to Start";
-    }
-    const step = steps.find(item => item.id === jobId);
-    const task = project.tasks.find(item => item.taskId === step.taskId);
-    const taskSteps = steps.filter(item=> item.taskId === task.taskId);
-    if(taskSteps.length > 1) {
-        const stage1 = task.service.steps.find(item => item.stage === 'stage1');
-        if(step.serviceStep.symbol !== stage1.step.symbol) {
-            status = taskSteps[0].status === 'Completed' ? status : 'Waiting to Start';
+    try {
+        if(project.status === "In progress" || project.status === "Approved") {
+            status = "Ready to Start";
         }
+        const step = steps.find(item => item.id === jobId);
+        const task = project.tasks.find(item => item.taskId === step.taskId);
+        const taskSteps = steps.filter(item=> item.taskId === task.taskId);
+        if(taskSteps.length > 1) {
+            const stage1 = task.service.steps.find(item => item.stage === 'stage1');
+            if(step.serviceStep.symbol !== stage1.step.symbol) {
+                status = taskSteps[0].status === 'Completed' ? status : 'Waiting to Start';
+            }
+        }
+        const updatedSteps = steps.map(item => {
+            item.status = item.id === jobId ? status : item.status;
+            return item;
+        })
+        if((status === 'Ready to Start' || status === 'Waiting to Start') && step.serviceStep.title === 'Words') {
+            await updateMemoqProjectUsers(updatedSteps);
+        }
+        return updatedSteps;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in setAcceptedStepStatus");
     }
-    return steps.map(item => {
-        item.status = item.id === jobId ? status : item.status;
-        return item;
-    })
 }
 
 function setRejectedStatus({steps, jobId}) {
