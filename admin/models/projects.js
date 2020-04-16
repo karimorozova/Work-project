@@ -38,7 +38,6 @@ const ProjectsSchema = new mongoose.Schema({
     taskId: "",
     serviceStep: {},
     name: "",
-    catName: "",
     sourceLanguage: "",
     targetLanguage: "",
     memoqProjectId: "",

@@ -32,7 +32,7 @@ function getWordsPrices(step, metrics) {
     let receivables = metrics.totalWords*clientRate.value
     let payables = metrics.totalWords*vendorRate.value;
     let wordsSum = 0;
-    if(step.catName === "translate1") {
+    if(step.serviceStep.title === "translation") {
         for(let key in metrics) {
             if(key !== 'totalWords') {
                 receivables += +metrics[key].value*metrics[key].client*clientRate.value;
