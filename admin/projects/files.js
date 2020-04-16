@@ -79,9 +79,9 @@ async function manageDeliveryFile({fileData, file}) {
     }
 }
 
-async function getPdf(message) {
+async function getPdf(project) {
     try {
-        const html = await getPdfOfQuote(message);
+        const html = await getPdfOfQuote(project);
         var options = { format: 'Letter', base: apiUrl };
         return new Promise((resolve, reject) => {
             htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
