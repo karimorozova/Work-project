@@ -230,9 +230,12 @@ async function updateProjectCosts(project) {
 }
 
 function getProjectFinanceData(project, prop) {
-    return project.tasks.reduce((acc, cur) => {
-        acc.receivables = acc.receivables ? +(acc.receivables + +cur.finance[prop].receivables).toFixed(2) : +cur.finance[prop].receivables;
-        acc.payables = acc.payables ? +(acc.payables + +cur.finance[prop].payables).toFixed(2) : +cur.finance[prop].payables;
+    const activeTasks = project.tasks.filter(item => item.status !== "Cancelled");
+    return activeTasks.reduce((acc, cur) => {
+        const receivables = +cur.finance[prop].halfReceivables || +cur.finance[prop].receivables;
+        const payables = +cur.finance[prop].halfPayables || +cur.finance[prop].payables;
+        acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables;
+        acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables;
         return acc;
     },{})
 }

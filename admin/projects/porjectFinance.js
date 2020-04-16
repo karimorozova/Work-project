@@ -14,13 +14,14 @@ async function getProjectAfterFinanceUpdated({project, steps, tasks}) {
 }
 
 function getProjectFinancePrice(tasks) {
-    const receivables = +(tasks.reduce((prev, cur) => {
+    const notCancelledTasks = tasks.filter(item => item.status !== 'Cancelled');
+    const receivables = +(notCancelledTasks.reduce((prev, cur) => {
         if(cur.status === "Cancelled Halfway") {
            return prev + cur.finance.Price.halfReceivables;
         }
         return prev + cur.finance.Price.receivables;
     }, 0).toFixed(2));
-    const payables = +(tasks.reduce((prev, cur) => {
+    const payables = +(notCancelledTasks.reduce((prev, cur) => {
         if(cur.status === "Cancelled Halfway") {
            return prev + cur.finance.Price.halfPayables;
         }
