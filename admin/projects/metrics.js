@@ -43,13 +43,14 @@ function getTaskMetrics({task, matrix, analysis}) {
 function getFilledMemoqMetrics(metrics) {
     return {
         xTranslated: {text: "X translated", value: +metrics.XTranslated},
-        repeat: {text: "Repetitions", value: +metrics.Repetition},
+        repeat: {text: "Repetition", value: +metrics.Repetition},
+        contextMatch: {text: "Context match", value: +metrics.Hit101},
         repeat100: {text: "100%", value: +metrics.Hit100},
         repeat50: {text: "50-74%", value: +metrics.Hit50_74},
         repeat75: {text: "75-84%", value: +metrics.Hit75_84},
         repeat85: {text: "85-94%", value: +metrics.Hit85_94},
         repeat95: {text: "95-99%", value: +metrics.Hit95_99},
-        noMatch: {text: "No match", value: +metrics.NoMatch + +metrics.Hit101}
+        noMatch: {text: "No match", value: +metrics.NoMatch}
     }
 }
 

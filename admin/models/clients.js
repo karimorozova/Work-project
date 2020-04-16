@@ -143,7 +143,8 @@ const ClientSchema = new mongoose.Schema({
         type: Object,
         default: {
             xTranslated: {text: "X translated", rate: 0.25},
-            repeat: {text: "Repetitions", rate: 0.3},
+            repeat: {text: "Repetition", rate: 0.3},
+            contextMatch: {text: "Context match", value: 0.3},
             repeat100: {text: "100%", rate: 0.3},
             repeat50: {text: "50-74%", rate: 1},
             repeat75: {text: "75-84%", rate: 0.9},

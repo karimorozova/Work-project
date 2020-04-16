@@ -396,7 +396,8 @@ const timezonesDefault = [
 
 const emptyMatrix = {
     xTranslated: {text: "X translated", value: 0},
-    repeat: {text: "Repetitions", value: 0},
+    repeat: {text: "Repetition", value: 0},
+    contextMatch: {text: "Context match", value: 0},
     repeat100: {text: "100%", value: 0},
     repeat50: {text: "50-74%", value: 0},
     repeat75: {text: "75-84%", value: 0},
