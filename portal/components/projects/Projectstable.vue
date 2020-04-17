@@ -51,7 +51,8 @@ export default {
                 {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: Math.floor(970*0.12), padding: "0"},
                 {label: "", headerKey: "headerDownload", key: "download", width: 0, padding: "0"},
             ],
-            tableWidth: 970
+            tableWidth: 970,
+            domain: ""
         }
     },
     methods: {
@@ -59,7 +60,7 @@ export default {
             return moment(date).format("DD-MM-YYYY");
         },
         isDownload(project) {
-            const statuses = ['Ready for Delivery', 'Delivered'];
+            const statuses = ['Ready for Delivery', 'Delivered', 'Closed'];
             return statuses.indexOf(project.status) !== -1;
         },
         async clientInfo() {
@@ -68,22 +69,27 @@ export default {
             this.companyName = result.client.name;
         },
         async download(index) {
-            console.log('Start downloading project files...', index);
-            // let result = await this.$axios.get(`/portal/projectFiles?projectId=${this.clientProjects[index].id}`, {withCredentials: true});
-            // let file = await this.$axios.get(`/portal/downloadProject?projectId=${this.clientProjects[index].id}`);
-
-            // let link = document.createElement('a');
-            //     link.href = file.data;
-            //     link.click();
-            // let del = await this.$axios.get(`/portal/deleteZip?projectId=${this.clientProjects[index].id}`);
-        },
-        getDetails({index}) {
-            const id = this.projects[index]._id
-            this.$router.push(`/projects/details/${id}`);
+            const project = this.projects[index];
+            try {
+                let href = project.deliverables;
+                if(!href) {
+                    const result = await this.$axios.post('/portal/project-deliverables', { project });
+                    href = result.data;
+                }
+                let link = document.createElement('a');
+                link.href = this.domain + href;
+                link.target = "_blank";
+                link.click();
+            } catch(err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+            }
         }
     },
     components: {
         DataTable
+    },
+    mounted() {
+        this.domain = process.env.domain;
     }
 }
 </script>

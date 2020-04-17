@@ -7,7 +7,7 @@ async function getAfterTaskStatusUpdate({task, project, status}) {
     let updatedProject = {};
     try {
         if(status === 'Delivered') {
-            updatedProject = await setTasksDeliveryStatus({taskIds: [task.taskId], project, status});    
+            updatedProject = await setTasksDeliveryStatus({taskId: task.taskId, project, status});    
             await notifyDeliverablesDownloaded(task.taskId, project);
         }
         if(status === 'Approved') {

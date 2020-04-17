@@ -5,6 +5,7 @@ const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
+const { getProjectDeliverables } = require("../projects/files");
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, noitfyRequestCancelled } = require("../clientRequests");
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients, Projects } = require('../models');
@@ -245,6 +246,17 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on downloading deliverables");
+    }
+})
+
+router.post('/project-deliverables', checkClientContact, async (req, res) => {
+    const { project } = req.body;
+    try {
+        const result = await getProjectDeliverables(project);
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on downloading project deliverables");
     }
 })
 
