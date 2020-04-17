@@ -2,11 +2,12 @@ const { testSentMessage, testNotPassedMessage, testPassedMessage } = require("..
 const { sendEmail } = require("../utils/mailTemplate");
 const fs = require("fs");
 
-async function notifyTestStatus({vendor, qualification, testPath}) {
+async function notifyTestStatus({vendor, qualification, testPath, template}) {
     const {source, target, industry, status} = qualification;
     let messageId = "CAN001.0"; 
     let subject = `${target.lang} - Translator@Pangea position - Sample text for translation (ID ${messageId})`;
-    let message = testSentMessage({...vendor, source, target, industry});
+    let message;
+    template ? message = template : message = testSentMessage({...vendor, source, target, industry});
     try {
         if(status === "Test Sent") {
             const attachments = [{filename: testPath.split("/").pop(), content: fs.createReadStream(`./dist${testPath}`)}];

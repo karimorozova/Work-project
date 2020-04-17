@@ -1,5 +1,7 @@
 <template lang="pug">
 .qualifications
+  .qualifications__preview(v-if="isEditAndSend")
+        VendorPreview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
   .qualifications__form(v-if="isForm")
         VendorLqa(:vendorData="lqaData" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
   .qualifications__table
@@ -92,6 +94,7 @@
 </template>
 
 <script>
+import VendorPreview from "./VendorPreview";
 import { mapGetters, mapActions } from "vuex";
 import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "../SelectSingle";
@@ -178,14 +181,15 @@ export default {
       currentStep: "",
       currentStatus: "",
       currentIndex: "",
-
+      previewMessage: "",
       areErrors: false,
       errors: [],
       isDeleting: false,
       deleteIndex: -1,
       isTableDropMenu: true,
       currentActive: -1,
-      isForm: false
+      isForm: false,
+      isEditAndSend: false
     };
   },
   methods: {
@@ -195,6 +199,20 @@ export default {
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment"
     }),
+    closePreview() {
+      this.isEditAndSend = false;
+    },
+    openPreview() {
+      this.isEditAndSend = true;
+    },
+    async sendMessage(message) {
+      try {
+        await this.manageSaveClick(this.currentActive, message);
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
+      this.closePreview();
+    },
     getQualifications() {
       this.qualificationData = this.currentVendorQualifications;
     },
@@ -247,7 +265,8 @@ export default {
       if (!this.currentStatus)
         this.errors.push("Step status should not be empty!");
       if (!this.currentStep) this.errors.push("Step should not be empty!");
-      if(!this.errors.length && !this.getAvailableTest()) this.errors.push("There is no test available for such data!");
+      if (!this.errors.length && !this.getAvailableTest())
+        this.errors.push("There is no test available for such data!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -258,25 +277,38 @@ export default {
         } else {
           return;
         }
+      } else if (this.currentStatus === "Test Sent") {
+        const template = await this.$http.post(`/vendorsapi/get-message`, {
+          ...this.currentVendor,
+          industry: this.currentIndustry,
+          target: this.currentTarget,
+          source: this.currentSource
+        });
+        this.previewMessage = template.body.message;
+        this.openPreview();
       } else {
         await this.manageSaveClick(index);
       }
     },
     getAvailableTest() {
-        if(!this.vendorTests.length) return null;
-        return this.vendorTests.find(item => {
-            const targetIds = item.targets.map(t => t._id);
-            if(targetIds.indexOf(this.currentTarget._id) !== 1 
-                && this.currentStep._id === item.step._id
-                && this.currentIndustry._id === item.industry._id) {
-                    return this.isSourceMatch(item.source);
-                }
-            return false;
-        })
+      if (!this.vendorTests.length) return null;
+      return this.vendorTests.find(item => {
+        const targetIds = item.targets.map(t => t._id);
+        if (
+          targetIds.indexOf(this.currentTarget._id) !== 1 &&
+          this.currentStep._id === item.step._id &&
+          this.currentIndustry._id === item.industry._id
+        ) {
+          return this.isSourceMatch(item.source);
+        }
+        return false;
+      });
     },
     isSourceMatch(source) {
-        return !source && this.currentSource.lang === "NA" 
-         || source._id === this.currentSource._id
+      return (
+        (!source && this.currentSource.lang === "NA") ||
+        source._id === this.currentSource._id
+      );
     },
     handleLqa() {
       this.lqaData = {
@@ -350,7 +382,7 @@ export default {
         this.closeForm();
       }
     },
-    async manageSaveClick(index) {
+    async manageSaveClick(index, message) {
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
@@ -366,7 +398,8 @@ export default {
           vendor: this.currentVendor,
           index,
           qualification,
-          testPath: test ? test.path : ""
+          testPath: test ? test.path : "",
+          message: message ? message : ""
         });
         this.alertToggle({
           message: "Qualification saved",
@@ -430,23 +463,23 @@ export default {
       }
     },
     setStatuses() {
-        let result = ["NA", "Sample Requested"];
-        if(!!this.getAvailableTest()) {
-            result = ["NA", "Sample Requested", "Test Sent"];
-        }
-        switch(this.currentStatus) {
-            case "NA":
-                result = ["NA"];
-                break;
-            case "Sample Requested":
-            case "Test Sent":
-                result = ["Received"];
-                break;
-            case "Received":
-                result = ["Passed", "Not Passed"];
-                break;
-        }
-        return result;
+      let result = ["NA", "Sample Requested"];
+      if (!!this.getAvailableTest()) {
+        result = ["NA", "Sample Requested", "Test Sent"];
+      }
+      switch (this.currentStatus) {
+        case "NA":
+          result = ["NA"];
+          break;
+        case "Sample Requested":
+        case "Test Sent":
+          result = ["Received"];
+          break;
+        case "Received":
+          result = ["Passed", "Not Passed"];
+          break;
+      }
+      return result;
     },
     setSource({ option }) {
       this.currentSource = this.sources.find(item => item.lang === option);
@@ -475,12 +508,12 @@ export default {
       this.isForm = true;
     },
     async getTests() {
-        try {
-            const result = await this.$http.get("/vendorsapi/lang-tests");
-            this.vendorTests = result.body;
-        } catch(err) {
-            this.alertToggle({message: "Error on getting tests", isShow: true});
-        }
+      try {
+        const result = await this.$http.get("/vendorsapi/lang-tests");
+        this.vendorTests = result.body;
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting tests", isShow: true });
+      }
     }
   },
   computed: {
@@ -488,15 +521,19 @@ export default {
       currentVendorQualifications: "getCurrentVendorQualifications"
     }),
     statuses() {
-        let result = ["NA", "Sample Requested"];
-        if(!this.currentSource || !this.currentTarget
-            || !this.currentStep || !this.currentIndustry) {
-            return result;
-        }
-        if(this.currentIndex !== -1) {
-            result = this.setStatuses();
-        }
+      let result = ["NA", "Sample Requested"];
+      if (
+        !this.currentSource ||
+        !this.currentTarget ||
+        !this.currentStep ||
+        !this.currentIndustry
+      ) {
         return result;
+      }
+      if (this.currentIndex !== -1) {
+        result = this.setStatuses();
+      }
+      return result;
     },
     sourceData() {
       return this.sources.map(item => item.lang);
@@ -512,17 +549,18 @@ export default {
     }
   },
   components: {
+    VendorPreview,
     SettingsTable,
     SelectSingle,
     VendorLqa,
     Add
   },
-
   created() {
     this.getTests();
     this.getLangs();
     this.getSteps();
-  }
+  },
+  mounted() {}
 };
 </script>
 
