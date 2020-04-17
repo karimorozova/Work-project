@@ -73,7 +73,7 @@ async function taskCompleteNotifyPM(project, task) {
     try {
         const manager = await User.findOne({"_id": project.projectManager.id}, {email: 1});
         const message = await getPMnotificationMessage(project, task);
-        await managerNotifyMail(manager, message, `Task is ready for DR1: ${taskId} - ${project.projectName} (ID I008.0)`);
+        await managerNotifyMail(manager, message, `Task is ready for DR1: ${task.taskId} - ${project.projectName} (ID I008.0)`);
     } catch(err) {
         console.log(err);
         console.log("Error in taskCompleteNotifyPM");
