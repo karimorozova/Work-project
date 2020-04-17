@@ -422,8 +422,13 @@ async function getMemoqFileId(projectId, docId) {
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
-        return !result["s:Fault"] ? 
-            result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid : false;
+        if(!result["s:Fault"]) {
+            const isError = result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.ResultStatus === "Error";
+            if(isError) return new Error("It is impossible to get a target file!");
+            return result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid;
+        } else {
+            throw new Error(result["s:Fault"]);
+        }
     } catch(err) {
         console.log("Error in getMemoqFileId");
         console.log(err);

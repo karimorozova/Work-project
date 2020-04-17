@@ -127,11 +127,15 @@ async function moveMemoqFileToProject(projectId, fileId) {
 async function downloadMemoqFile({memoqProjectId, docId, path}) {
     try {
         const fileId = await getMemoqFileId(memoqProjectId, docId);
+        if(fileId.message) {
+            throw new Error(fileId.message);
+        }
         const sessionId = await exportMemoqFile(fileId);
         await getMemoqFileChunks(sessionId, path);
     } catch(err) {
         console.log(err);
         console.log("Error in downloadMemoqFile");
+        throw new Error(err.message);
     }
 }
 

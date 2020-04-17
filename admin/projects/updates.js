@@ -35,7 +35,8 @@ async function getProjectAfterCancelTasks(tasks, project) {
             {tasks: changedTasks, steps: changedSteps, finance: {...project.finance, Price}});
     } catch(err) {
         console.log(err);
-        console.log("Error in getProjectAfterCancelTasks")
+        console.log("Error in getProjectAfterCancelTasks");
+        throw new Error(err.message);
     }
 }
 
@@ -53,10 +54,16 @@ async function cancelTasks(tasks, project) {
     }
     const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId): [];
     const changedSteps = stepIdentify.length ? cancelSteps({stepIdentify, steps: projectSteps}) : [];
+    try {
     const changedTasks = await cancelCheckedTasks({
             tasksIds, projectTasks, projectId: project.id, changedSteps
         });
     return { changedTasks, changedSteps, inCompletedSteps };
+    } catch(err) {
+        console.log(err);
+        console.log("Error in getProjectAfterCancelTasks");
+        throw new Error(err.message);
+    }
 }
 
 function cancelSteps({stepIdentify, steps}) {
@@ -92,6 +99,7 @@ async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, project
     } catch(err) {
         console.log(err);
         console.log("Error in cancelCheckedTasks");
+        throw new Error(err.message);
     }
 }
 
@@ -109,6 +117,7 @@ async function getTaskTarfgetFiles({task, projectId, stepName}) {
     } catch(err) {
         console.log(err);
         console.log("Error in getTaskTarfgetFiles");
+        throw new Error(err.message);
     }
 }
 
@@ -122,6 +131,7 @@ async function downloadCompletedFiles(stepId) {
     } catch(err) {
         console.log(err);
         console.log("Error in downloadCompletedFiles");
+        throw new Error(err.message);
     }
 }
 
@@ -219,6 +229,7 @@ async function updateProjectStatus(id, status) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectStatus");
+        throw new Error(err.message);
     }
 }
 
@@ -236,6 +247,7 @@ async function setNewProjectDetails(project, status) {
     } catch(err) {
         console.log(err);
         console.log("Error in setNewProjectDetails");
+        throw new Error(err.message);
     }
 }
 
@@ -261,6 +273,7 @@ async function getApprovedProject(project, status) {
     } catch(err) {
         console.log(err);
         console.log("Error in getApprovedProject");
+        throw new Error(err.message);
     }
 }
 
@@ -360,6 +373,7 @@ async function updateNonWordsTaskTargetFiles({project, jobId, path, fileName}) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateNonWordsTaskTargetFiles");
+        throw new Error(err.message);
     }
 }
 
@@ -371,7 +385,9 @@ async function getAfterReopenSteps(steps, project) {
         const updatedtasks = getTasksAfterReopen({steps: chosenSteps, tasks: project.tasks});
         return await updateProject({"_id": project.id}, { tasks: updatedtasks, steps: updatedSteps, status: "In progress" });
     } catch(err) {
-
+        console.log(err);
+        console.log("Error in getAfterReopenSteps");
+        throw new Error(err.message);
     }
 }
 

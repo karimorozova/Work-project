@@ -22,7 +22,6 @@ export const setJobStatus = async function({commit, dispatch, state}, payload) {
         await this.$axios.post('/vendor/job', { jobId, status });
         await dispatch("getJobs");
     } catch(err) {
-        console.log(err);
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
 }
