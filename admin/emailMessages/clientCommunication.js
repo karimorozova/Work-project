@@ -1,6 +1,7 @@
 const apiUrl = require("../helpers/apiurl");
 const jwt = require('jsonwebtoken');
 const { secretKey } = require('../configs');
+const moment = require('moment');
 
 function messageForClient(obj) {
     const date = Date.now();
@@ -36,7 +37,7 @@ function messageForClient(obj) {
                     <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">
                         <h4 class="details__title">Quote Details</h4>
                         <table class="details__table"
-                            style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+                            style="color:#66563E;width:100%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
@@ -67,7 +68,7 @@ function messageForClient(obj) {
                                     Estimated delivery date:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
-                                    ${obj.deadline}</td>
+                                    ${moment(obj.deadline).format('LLL')}</td>
                             </tr>
                         </table>
                         </br>
@@ -98,45 +99,45 @@ function messageForClient(obj) {
                         </table>
                         </br>
                         <table class="details__table"
-                            style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+                            style="color:#66563E;min-width: 32%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
                             <tr>
                                 <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                     Sub-total:</td>
                                 <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     ${subTotal.toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                     TM Discount:</td>
                                 <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     ${tmDiscount}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                     Discount [%]:</td>
                                 <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     --</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                     PM fee [%]:</td>
                                 <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     --</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                 Total:</td>
                                 <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     ${obj.finance.Price.receivables}</td>
                             </tr>
                         </table>
@@ -166,7 +167,6 @@ function messageForClient(obj) {
                         style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;">www.pangea.global</a>
                 </footer>
             </div>`;
-
 }
 
 function getSubTotal(tasks, steps){
@@ -241,8 +241,8 @@ function getPdfOfQuote(obj){
     const tasksInfo = getTasksInfoPdf(obj.tasks, obj.steps);
     const subTotal = getSubTotal(obj.tasks, obj.steps);
     const clientName = obj.customer.officialName || obj.customer.name;
-    const contact = obj.customer.contacts.find(item => item.leadContact);
-    return `<div class="wrapper pdf" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+    const contact = obj.customer.contacts.find(item => item.leadContact); 
+    return `<div class="wrapper pdf" style="width:800px;font-size:'12px';border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt=""> 
                 </header>
@@ -278,7 +278,7 @@ function getPdfOfQuote(obj){
                                 Date:
                             </div>
                             <div class="quote__row-text" style="width:300px;" >
-                                ${obj.deadline}
+                                ${moment(obj.deadline).format('LLL')}
                             </div>
                         </div>
                         <div class="quote__row" style="padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;display:-webkit-box;" >
