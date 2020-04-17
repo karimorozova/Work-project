@@ -180,9 +180,6 @@ export default {
                     case 'Deliver':
                         await this.deliverTasks(checkedTasks);
                         break
-                    case 'Send a Quote':
-                        await this.sendTasksDetails(checkedTasks);
-                        break
                 }
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot execute action", isShow: true, type: "error"});
@@ -275,7 +272,6 @@ export default {
             storeProject: "setCurrentProject",
             setProjectStatus: "setProjectStatus",
             deliverTasks: "deliverTasks",
-            sendTasksDetails: "sendTasksDetails"
         })
     },
     computed: {
@@ -286,16 +282,9 @@ export default {
         availableActions() {
             let result = ["Cancel"];
             const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
-            const createdTask = this.allTasks.find(item => item.status === 'Created');
             if(approvedTask) {
                 if(result.indexOf('Deliver') === -1) {
                     result.push('Deliver')
-                }
-            }
-            const projectStatuses = ["Draft", "Requested", "Quote sent", "Rejected"];
-            if(createdTask && projectStatuses.indexOf(this.currentProject.status) === -1) {
-                if(result.indexOf('Send a Quote') === -1) {
-                    result.push('Send a Quote')
                 }
             }
             return result;

@@ -245,7 +245,7 @@ function getPdfOfQuote(obj){
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt=""> 
                 </header>
-                <div class="quote__header" style="background-color:#66563D;color:white;text-transform:uppercase;text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
+                <div class="quote__header" style="font-size:14px;background-color:#66563D;color:white;text-transform:uppercase;text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     quote
                 </div>
                 <div class="quote" style="display: -webkit-box;" >
@@ -573,30 +573,6 @@ function taskDeliveryMessage(obj) {
                 </div>`;
 }
 
-function tasksQuoteMessage(obj) {
-    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-                </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
-                    <p>
-                        The new task added to your project ${obj.projectId} - ${obj.projectName}.
-                    </p>
-                    <p>
-                        Task: ${obj.task.taskId} - ${obj.task.service.title}.
-                    </p>
-                    <p>
-                        You can track the progress on the <a href="https://portal.pangea.global/">Portal</a>.
-                    </p>
-                </div>
-                <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-                </footer>
-            </div>`;
-}
-
 function projectCancelledMessage(obj) {
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
@@ -731,7 +707,6 @@ module.exports = {
     emailMessageForContact,
     taskReadyMessage,
     taskDeliveryMessage,
-    tasksQuoteMessage,
     projectCancelledMessage,
     tasksCancelledMessage,
     tasksMiddleCancelledMessage,

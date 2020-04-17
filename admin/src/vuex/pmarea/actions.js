@@ -225,21 +225,6 @@ export const deliverTasks = async ({dispatch}, payload) => {
     }
 }
 
-export const sendTasksDetails = async ({dispatch}, payload) => {
-    dispatch('incrementRequestCounter')
-    try {
-        const tasks = payload.filter(task => task.status === "Created");
-        if(tasks.length) {
-            await Vue.http.post("/pm-manage/tasks-quote", { tasks });
-        }
-        dispatch('alertToggle', {message: "Tasks delivered", isShow: true, type: "success"});
-    } catch(err) {
-        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
-    } finally {
-        dispatch('decrementRequestCounter')
-    }
-}
-
 export const reopenSteps = async ({dispatch}, payload) => {
     dispatch('incrementRequestCounter')
     try {

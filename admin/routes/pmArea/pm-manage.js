@@ -4,7 +4,7 @@ const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
-    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, sendTasksQuote, getAfterReopenSteps, notifyVendorsProjectCancelled,
+    manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
     getPdf } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
@@ -568,17 +568,6 @@ router.post("/deliver", async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on delivering tasks");
-    }
-})
-
-router.post("/tasks-quote", async (req, res) => {
-    const { tasks } = req.body;
-    try {
-        await sendTasksQuote(tasks);
-        res.send('Quote sent');
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on sending tasks quote");
     }
 })
 

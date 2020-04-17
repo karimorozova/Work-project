@@ -1,7 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
     stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
-const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, tasksQuoteMessage } = require("../emailMessages/clientCommunication");
+const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage } = require("../emailMessages/clientCommunication");
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
@@ -143,22 +143,6 @@ async function notifyDeliverablesDownloaded(taskId, project) {
     }
 }
 
-async function sendTasksQuote(tasks) {
-    try {
-        const project = await getProject({"tasks.taskId": tasks[0].taskId});
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        for(let task of tasks) {
-            const quoteInfo = {...project._doc, task, contact};
-            const message = tasksQuoteMessage(quoteInfo);
-            await clientQuoteEmail({contact, subject: `New task added ${task.taskId} (${task.service.title}) (ID C005.2)`}, message);
-        }
-    } catch(err) {
-        console.log(err);
-        console.log("Error in notifyDeliverablesDownloaded");
-    }
-
-}
-
 async function notifyProjectDelivery(project) {
     const { customer } = project;
     const contact = customer.contacts.find(item => item.leadContact);
@@ -227,8 +211,7 @@ module.exports = {
     taskCompleteNotifyPM, 
     notifyClientTaskReady, 
     sendClientDeliveries, 
-    notifyDeliverablesDownloaded, 
-    sendTasksQuote,
+    notifyDeliverablesDownloaded,
     notifyProjectDelivery,
     notifyManagerStepStarted,
     stepCompletedNotifyPM,
