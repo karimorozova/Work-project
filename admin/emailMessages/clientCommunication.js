@@ -165,6 +165,7 @@ function messageForClient(obj) {
                         style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;">www.pangea.global</a>
                 </footer>
             </div>`;
+
 }
 
 function getSubTotal(tasks, steps){
@@ -240,7 +241,7 @@ function getPdfOfQuote(obj){
     const subTotal = getSubTotal(obj.tasks, obj.steps);
     const clientName = obj.customer.officialName || obj.customer.name;
     const contact = obj.customer.contacts.find(item => item.leadContact); 
-    return `<div class="wrapper pdf" style="width:800px;font-size:'12px';border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+    return `<div class="wrapper pdf" style="width:800px;font-size:12px!important;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt=""> 
                 </header>
@@ -326,26 +327,26 @@ function getPdfOfQuote(obj){
                             <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
                             Sub-total</td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="float:left;" >&euro;</span>
+                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>
                             ${subTotal.toFixed(2)}</td>
                         </tr>
                         <tr>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
-                            Project Management Fee - count%</td>
+                            Project Management Fee - %</td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="float:left;" >&euro;</span>
-                            --</td>
+                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" >
+                            </td>
                         </tr>
                         <tr>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
-                            Introductory Discount - count%</td>
+                            Introductory Discount - %</td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="float:left;" >-&euro;</span>
-                            --</td>
+                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" >
+                            </td>
                         </tr>
                         <tr>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
@@ -353,7 +354,7 @@ function getPdfOfQuote(obj){
                             <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
                             Total</td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="float:left;" >&euro;</span>
+                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>
                             ${obj.finance.Price.receivables}</td>
                         </tr>
                     </tbody>
@@ -465,8 +466,8 @@ function getTaskCodePdf(taskInfo) {
                 <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" >${taskInfo.quantity}</td>
                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" >${taskInfo.unit}</td>
                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" >${taskInfo.task}</td>
-                <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="float:left;" >&euro;</span>${taskInfo.unitPrice}</td>
-                <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="float:left;" >&euro;</span>${taskInfo.cost.toFixed(2)}</td>
+                <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>${taskInfo.unitPrice}</td>
+                <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>${taskInfo.cost.toFixed(2)}</td>
             </tr>`
 }
 
