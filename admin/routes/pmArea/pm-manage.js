@@ -240,8 +240,8 @@ router.post("/send-quote", async (req, res) => {
         let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
         let messageId = "C001.0";
         if(project.isPriceUpdated) {
-            messageId = project.status === "Quote sent" ? "C001.1" : "C004.0";
-            subject = project.status === "Quote sent" ? "Decide on a Quote(UPDATED)" : "Re-calculated Quote";
+            messageId = "C001.1";
+            subject+= " (UPDATED)";
         }
         const pdf = await getPdf(project);
         const attachments = [{content: fs.createReadStream(pdf), filename: "quote.pdf"}];

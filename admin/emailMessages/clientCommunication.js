@@ -12,9 +12,7 @@ function messageForClient(obj) {
 
     let detailHeader = "Please see below the quote details:";
     if (obj.isPriceUpdated) {
-        detailHeader = obj.status === "Quote sent" ?
-            "Your quote has been updated - please see below the quote details:"
-            : `Your project ${obj.projectId} - ${obj.projectName} had a change in it's price.`;
+        detailHeader = "Your quote has been updated - please see below the quote details:";
     }
     const reason = obj.reason ? `<p>Reason ${obj.reason}</p><p>Please see below the updated quote details</p>` : "";
     const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
