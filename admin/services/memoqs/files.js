@@ -24,6 +24,7 @@ async function uploadFileToMemoq(name) {
     } catch(err) {
         console.log(err);
         console.log("Error in uploadFileToMemoq");
+        throw new Error(err.message);
     }
 }
 
@@ -35,6 +36,7 @@ async function addProjectFile(projectId, filePath) {
     } catch(err) {
         console.log(err);
         console.log("Error in addProjectFile");
+        throw new Error(err.message);
     }
 }
 
@@ -51,6 +53,7 @@ async function addFilesToMemoq(fileId, name) {
     } catch(err) {
         console.log(err);
         console.log("Error in addFilesToMemoq");
+        throw new Error(err.message);
     }
 }
 
@@ -97,6 +100,7 @@ async function finishMemoqFileMove(fileId, results) {
     } catch(err) {
         console.log(err);
         console.log("Error in finishMemoqFileMove");
+        throw new Error(err.message);
     }
 }
 
@@ -121,15 +125,13 @@ async function moveMemoqFileToProject(projectId, fileId) {
     } catch(err) {
         console.log(err);
         console.log("Error in moveMemoqFileToProject");
+        throw new Error(err.message);
     }
 }
 
 async function downloadMemoqFile({memoqProjectId, docId, path}) {
     try {
         const fileId = await getMemoqFileId(memoqProjectId, docId);
-        if(fileId.message) {
-            throw new Error(fileId.message);
-        }
         const sessionId = await exportMemoqFile(fileId);
         await getMemoqFileChunks(sessionId, path);
     } catch(err) {
@@ -156,6 +158,7 @@ async function exportMemoqFile(fileId) {
     } catch(err) {
         console.log(err);
         console.log("Error in exportMemoqFile");
+        throw new Error(err.message);
     }
 }
 
@@ -208,6 +211,7 @@ async function finishMemoqFileDownload(sessionId) {
     } catch(err) {
         console.log(err);
         console.log("Error in finishMemoqFileDownload");
+        throw new Error(err.message);
     }
 }
 

@@ -24,6 +24,7 @@ async function getMemoqAllProjects() {
     } catch(err) {
         console.log("Error in getMemoqAllProjects");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -54,6 +55,7 @@ async function createMemoqProjectWithTemplate(projectData) {
     } catch(err) {
         console.log("Error in createMemoqProjectWithTemplate");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -74,6 +76,7 @@ async function moveMemoqFileToProject(fileId) {
     } catch(err) {
         console.log("Error in moveMemoqFileToProject");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -94,6 +97,7 @@ async function updateMemoqProjectUsers(steps) {
     } catch(err) {
         console.log(err);
         console.log("Error in updateMemoqProjectUsers");
+        throw new Error(err.message);
     }
 }
 
@@ -113,6 +117,7 @@ async function getProjectUsers(projectId) {
     } catch(err) {
         console.log("Error in getProjectUsers");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -137,6 +142,7 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
     } catch(err) {
         console.log(err);
         console.log("Error in setMemoqTranslators");
+        throw new Error(err.message);
     }
 }
 
@@ -160,6 +166,7 @@ async function assignMemoqTranslators({memoqProjectId, assignedSteps, users}) {
     } catch(err) {
         console.log(err);
         console.log("Error in assignMemoqTranslators");
+        throw new Error(err.message);
     }
 }
 
@@ -181,6 +188,7 @@ async function setMemoqProjectUsers(projectId, users) {
     } catch(err) {
         console.log("Error in setMemoqProjectUsers");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -217,6 +225,7 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
     } catch(err) {
         console.log("Error in setMemoqDocsAssignments");
         console.log(err); 
+        throw new Error(err.message);
     }
 }
 
@@ -254,6 +263,7 @@ async function getProjectTranslationDocs(projectId) {
     } catch(err) {
         console.log("Error in getProjectTranslationDocs");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -279,6 +289,7 @@ async function getProjectAnalysis(projectId) {
     } catch(err) {
         console.log("Error in getProjectAnalysis");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -300,6 +311,7 @@ async function setMemoqDocStatus({projectId, docIds, status}) {
     } catch(err) {
         console.log("Error in setMemoqDocStatus");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -323,6 +335,7 @@ async function cancelMemoqDocs(tasks) {
     } catch(err) {
         console.log(err);
         console.log("Error in cancelMemoqDocs");
+        throw new Error(err.message);
     }
 }
 
@@ -337,6 +350,7 @@ async function unassignMemoqDocs(memoqDocs) {
     } catch(err) {
         console.log(err);
         console.log("Error in unassignMemoqDocs");
+        throw new Error(err.message);
     }
 }
 
@@ -359,6 +373,7 @@ async function setCancelledNameInMemoq(tasks, projectName) {
     } catch(err) {
         console.log(err);
         console.log("Error in setCancelledNameInMemoq");
+        throw new Error(err.message);
     }
 }
 
@@ -379,6 +394,7 @@ async function renameMemoqProject(projectId, name) {
     } catch(err) {
         console.log("Error in renameMemoqProject");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
@@ -424,7 +440,7 @@ async function getMemoqFileId(projectId, docId) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         if(!result["s:Fault"]) {
             const isError = result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.ResultStatus === "Error";
-            if(isError) return new Error("It is impossible to get a target file!");
+            if(isError) throw new Error("It is impossible to get a target file!");
             return result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid;
         } else {
             throw new Error(result["s:Fault"]);
@@ -432,6 +448,7 @@ async function getMemoqFileId(projectId, docId) {
     } catch(err) {
         console.log("Error in getMemoqFileId");
         console.log(err);
+        throw new Error(err.message);
     }
 }
 
