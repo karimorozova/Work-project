@@ -3,7 +3,8 @@ const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf } = require(
 const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
     updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles } = require('./updates');
 const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
-    sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened } = require('./emails');
+    sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
+    notifyVendorStepStart } = require('./emails');
 const  { createProject, createTasks, createTasksWithWordsUnit, createTasksFromRequest } = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
@@ -42,5 +43,6 @@ module.exports = {
     notifyStepDecisionMade,
     notifyReadyForDr2,
     notifyStepReopened,
-    getPdf
+    getPdf,
+    notifyVendorStepStart
 }

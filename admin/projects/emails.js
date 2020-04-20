@@ -2,7 +2,7 @@ const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mai
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
     stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
 const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage } = require("../emailMessages/clientCommunication");
-const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage } = require("../emailMessages/vendorCommunication");
+const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
@@ -205,6 +205,30 @@ async function notifyStepReopened(steps, projectId) {
     }
 }
 
+async function notifyVendorStepStart(steps, allSteps, project) {
+    const stepIds = steps.length ? steps.map(item => item._id) : steps;
+    try {
+        const notifyingSteps = allSteps.filter(item => {
+            if(stepIds.length) {
+                return item.status === 'Ready to Start' && stepIds.indexOf(item.id) !== -1;
+            }
+            return item.status === 'Ready to Start';
+        })
+        if(notifyingSteps.length) {
+            for(let step of notifyingSteps) {
+                const message = stepReadyToStartMessage({step, project});
+                step["to"] = step.vendor.email;
+                step.subject = `Step ${step.stepId}: ${project.projectName} is ready to start (ID V001.2)`;
+                await sendEmail(step, message);
+            }
+        }
+    } catch(err) {
+        console.log(err);
+        console.log("Error in notifyVendorStepStart");
+        throw new Error(err.message);
+    }
+}
+
 module.exports = { 
     stepCancelNotifyVendor, 
     getMessage, 
@@ -217,5 +241,6 @@ module.exports = {
     stepCompletedNotifyPM,
     notifyStepDecisionMade,
     notifyReadyForDr2,
-    notifyStepReopened
+    notifyStepReopened,
+    notifyVendorStepStart
 }

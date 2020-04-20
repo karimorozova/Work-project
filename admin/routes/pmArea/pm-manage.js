@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
-    getPdf } = require("../../projects");
+    getPdf, notifyVendorStepStart } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -357,6 +357,7 @@ router.post("/step-status", async (req, res) => {
         const updatedSteps = setStepsStatus({steps, status, project});
         const memoqAssignResult = await updateMemoqProjectUsers(updatedSteps);
         if(memoqAssignResult) throw memoqAssignResult;
+        await notifyVendorStepStart(steps, updatedSteps, project);
         const updatedProject = await updateProject({"_id": id}, {steps: updatedSteps});
         res.send(updatedProject);
     } catch(err) {

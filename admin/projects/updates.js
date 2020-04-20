@@ -1,6 +1,6 @@
 const { Projects, User } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
-const { stepCancelNotifyVendor } = require('./emails');
+const { stepCancelNotifyVendor, notifyVendorStepStart } = require('./emails');
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
@@ -269,6 +269,7 @@ async function getApprovedProject(project, status) {
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }
+        await notifyVendorStepStart([], steps, project);
         return await updateProject({"_id": project.id},{status, tasks, steps, isPriceUpdated: false});
     } catch(err) {
         console.log(err);
