@@ -75,7 +75,7 @@ function messageForClient(obj) {
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                    Task</td>
+                                    Service</td>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                                     Language</td>
