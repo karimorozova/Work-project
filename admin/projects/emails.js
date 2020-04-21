@@ -9,7 +9,7 @@ const { User } = require("../models");
 const { getDeliverablesLink, getProjectDeliverables } = require("./files");
 const fs = require('fs');
 
-async function stepCancelNotifyVendor(steps, projectId) {
+async function stepCancelNotifyVendor(steps) {
     try {
         const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {

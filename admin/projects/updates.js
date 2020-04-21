@@ -28,9 +28,10 @@ async function updateProjectProgress(project, isCatTool) {
 
 async function getProjectAfterCancelTasks(tasks, project) {
     try {
-        const { changedTasks, changedSteps, inCompletedSteps } = await cancelTasks(tasks, project);
+        const { changedTasks, changedSteps, stepIdentify } = await cancelTasks(tasks, project);
         const Price = getUpdatedProjectFinance(changedTasks);
-        await stepCancelNotifyVendor(inCompletedSteps, project.projectId);
+        const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps;
+        await stepCancelNotifyVendor(notifySteps);
         return await updateProject({"_id": project.id}, 
             {tasks: changedTasks, steps: changedSteps, finance: {...project.finance, Price}});
     } catch(err) {
@@ -58,7 +59,7 @@ async function cancelTasks(tasks, project) {
     const changedTasks = await cancelCheckedTasks({
             tasksIds, projectTasks, projectId: project.id, changedSteps
         });
-    return { changedTasks, changedSteps, inCompletedSteps };
+    return { changedTasks, changedSteps, stepIdentify };
     } catch(err) {
         console.log(err);
         console.log("Error in getProjectAfterCancelTasks");
@@ -220,7 +221,7 @@ async function updateProjectStatus(id, status) {
         const projectStatus = getProjectNewStatus(changedTasks, status);
         const Price = getUpdatedProjectFinance(changedTasks);
         if(notifySteps.length) {
-            await stepCancelNotifyVendor(notifySteps, project.projectId);
+            await stepCancelNotifyVendor(notifySteps);
         }
         return await updateProject(
                 {"_id": id}, 
