@@ -4,6 +4,11 @@ const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
 
 function setTaskMetrics({metrics, matrix, prop}) {
+    console.log("metrics...", metrics);
+    console.log("=================================");
+    console.log("=================================");
+    console.log("=================================");
+    console.log("matrix...", matrix);
     let taskMetrics = {...metrics};
     for(let key in matrix) {
         taskMetrics[key][prop] = matrix[key].rate;
