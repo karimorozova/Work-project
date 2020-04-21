@@ -6,8 +6,9 @@ const moment = require('moment');
 function messageForClient(obj) {
     const date = Date.now();
     const name = `${obj.contact.firstName} ${obj.contact.surname}`;
-    const tasksInfo = getTasksInfo(obj.tasks, obj.steps);
-    const subTotal = getSubTotal(obj.tasks, obj.steps);
+    const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
+    const tasksInfo = getTasksInfo(activeTasks, obj.steps);
+    const subTotal = getSubTotal(activeTasks, obj.steps);
     const tmDiscount = (obj.finance.Price.receivables - subTotal).toFixed(2);
     const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
 
@@ -237,8 +238,9 @@ function getTaskCode(taskInfo) {
 }
 
 function getPdfOfQuote(obj){
-    const tasksInfo = getTasksInfoPdf(obj.tasks, obj.steps);
-    const subTotal = getSubTotal(obj.tasks, obj.steps);
+    const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
+    const tasksInfo = getTasksInfoPdf(activeTasks, obj.steps);
+    const subTotal = getSubTotal(activeTasks, obj.steps);
     const clientName = obj.customer.officialName || obj.customer.name;
     const contact = obj.customer.contacts.find(item => item.leadContact); 
     return `<div class="wrapper pdf" style="width:800px;font-size:12px!important;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
