@@ -1,7 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
     stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
-const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage } = require("../emailMessages/clientCommunication");
+const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, projectDeliveryMessage } = require("../emailMessages/clientCommunication");
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
@@ -150,7 +150,7 @@ async function notifyProjectDelivery(project) {
     const subject = `Delivery: ${project.projectId} - ${project.projectName} (ID C006.0)`;
     try {
         const deliverables = project.deliverables || await getProjectDeliverables(project);
-        const attachments = [{filename: "deliverables.zip", path: deliverables}];
+        const attachments = [{filename: "deliverables.zip", path: `./dist${deliverables}`}];
         await sendEmail({to: contact.email, attachments, subject}, message);
     } catch(err) {
         console.log(err);
@@ -170,7 +170,7 @@ async function notifyManagerStepStarted(project, step) {
 }
 
 async function notifyStepDecisionMade({project, step, decision}) {
-    const message = stepDecisionMessage({...project.doc, step, decision});
+    const message = stepDecisionMessage({project, step, decision});
     const messageId = decision === 'accept' ? 'I006.0' : 'I007.0';
     const subject = `Vendor ${decision === 'accept' ? 'approved' : 'rejected'} the job: ${step.stepId} - ${project.projectName} (ID ${messageId})`;
     try {

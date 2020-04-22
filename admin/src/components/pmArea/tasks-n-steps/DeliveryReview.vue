@@ -143,7 +143,7 @@ export default {
         toggleOptions(e, bool) {
             this.areOptions = bool;
             this.isAssign = this.isDr1;
-            this.isDeliver = bool;
+            this.isDeliver = this.isDr1 ? false : bool;
             this.isNotify = false;
         },
         checkAllFiles({bool}) {
@@ -249,7 +249,7 @@ export default {
             if(this.task.status === "Pending Approval [DR2]") {
                 this.isDr1 = false;
             }
-            this.isDeliver = this.areOptions;
+            this.isDeliver = this.isDr1 ? false : this.areOptions;
             try {
                 const result = await this.$http.post("/pm-manage/delivery-data", {projectId: this.project._id, taskId: this.task.taskId});
                 if(result.data.files.length) {
