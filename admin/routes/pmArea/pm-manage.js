@@ -15,6 +15,7 @@ const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers} = require("../../services/memoqs/users");
+const { projectCancelledMessage , projectMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
