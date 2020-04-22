@@ -30,9 +30,11 @@ async function getProjectDeliverables(project) {
     let files = [];
     try {
         for(let task of tasks) {
-            const { taskId, targetFiles: taskFiles } = task;
-            taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
-            files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
+            if(task.status !== 'Cancelled') {
+                const { taskId, targetFiles: taskFiles } = task;
+                taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
+                files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
+            }
         }
         const outputPath = `./dist/projectFiles/${projectId}/project-deliverables.zip`;
         await archiveMultipleFiles({outputPath, files});

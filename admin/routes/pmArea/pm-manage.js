@@ -9,7 +9,7 @@ const { getProject, createProject, createTasks, createTasksWithWordsUnit, update
     getPdf, notifyVendorStepStart } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
-const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
+const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, getAfterProjectDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
@@ -562,9 +562,20 @@ router.post("/deliver", async (req, res) => {
     const { tasks } = req.body;
     try {
         const updatedProject = await getAfterTasksDelivery(tasks);
-        if(updateProject.status === 'Delivered') {
+        if(updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
             await notifyProjectDelivery(updatedProject);
         }
+        res.send(updatedProject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Error on delivering tasks");
+    }
+})
+
+router.post("/project-delivery", async (req, res) => {
+    const { _id } = req.body;
+    try {
+        const updatedProject = await getAfterProjectDelivery(_id);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);

@@ -369,3 +369,16 @@ export const reassignVendor = async ({dispatch}, payload) => {
         dispatch('decrementRequestCounter')
     }
 }
+
+export const deliverProjectToClient = async ({dispatch}, payload) => {
+    dispatch('incrementRequestCounter')
+    try {
+        const updatedProject = await Vue.http.post("/pm-manage/project-delivery", {_id: payload});
+        await dispatch('setCurrentProject', updatedProject.data);
+    } catch(err) {
+        console.log(err);
+        dispatch('alertToggle', {message: err.data, isShow: true, type: "error"});
+    } finally {
+        dispatch('decrementRequestCounter')
+    }
+}

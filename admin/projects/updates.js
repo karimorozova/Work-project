@@ -109,8 +109,10 @@ async function getTaskTarfgetFiles({task, projectId, stepName}) {
     const { memoqDocs, memoqProjectId } = task;
     try {
         for(let doc of memoqDocs) {
-            const fileName = doc.ExportPath.slice(1);
-            const path = `/projectFiles/${projectId}/${stepName}_${fileName}`;
+            const exportPath = doc.ExportPath.slice(1);
+            const pathParts = exportPath.split(".");
+            const fileName = pathParts.slice(0, -1).join();
+            const path = `/projectFiles/${projectId}/${stepName}_${fileName}.rtf`;
             await downloadMemoqFile({memoqProjectId, docId: doc.DocumentGuid, path: `./dist${path}`});
             targetFiles.push({fileName: doc.DocumentName, path});
         }

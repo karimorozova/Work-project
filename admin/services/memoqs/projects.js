@@ -425,23 +425,54 @@ async function renameMemoqProject(projectId, name) {
 //     }
 // }
 
+// async function getMemoqFileId(projectId, docId) {
+//     const xml = `${xmlHeader}
+//             <soapenv:Body>
+//             <ns:ExportTranslationDocument>
+//                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+//                 <ns:docGuid>${docId}</ns:docGuid>
+//             </ns:ExportTranslationDocument>
+//             </soapenv:Body>
+//         </soapenv:Envelope>`
+//     const headers = headerWithoutAction('ExportTranslationDocument');
+//     try {
+//         const { response } = await soapRequest({url, headers, xml});
+//         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+//         if(!result["s:Fault"]) {
+//             const isError = result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.ResultStatus === "Error";
+//             if(isError) throw new Error("It is impossible to get a target file!");
+//             return result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid;
+//         } else {
+//             throw new Error(result["s:Fault"]);
+//         }
+//     } catch(err) {
+//         console.log("Error in getMemoqFileId");
+//         console.log(err);
+//         throw new Error(err.message);
+//     }
+// }
+
 async function getMemoqFileId(projectId, docId) {
     const xml = `${xmlHeader}
             <soapenv:Body>
-            <ns:ExportTranslationDocument>
+            <ns:ExportTranslationDocumentAsRtfBilingual>
                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
                 <ns:docGuid>${docId}</ns:docGuid>
-            </ns:ExportTranslationDocument>
+                <ns:options>
+                <ns:SegmentedContextEmptyTranslation>true</ns:SegmentedContextEmptyTranslation>
+                <ns:SuppressContext>true</ns:SuppressContext>
+            </ns:options>
+            </ns:ExportTranslationDocumentAsRtfBilingual>
             </soapenv:Body>
         </soapenv:Envelope>`
-    const headers = headerWithoutAction('ExportTranslationDocument');
+    const headers = headerWithoutAction('ExportTranslationDocumentAsRtfBilingual');
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         if(!result["s:Fault"]) {
-            const isError = result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.ResultStatus === "Error";
+            const isError = result.ExportTranslationDocumentAsRtfBilingualResponse.ExportTranslationDocumentAsRtfBilingualResult.ResultStatus === "Error";
             if(isError) throw new Error("It is impossible to get a target file!");
-            return result.ExportTranslationDocumentResponse.ExportTranslationDocumentResult.FileGuid;
+            return result.ExportTranslationDocumentAsRtfBilingualResponse.ExportTranslationDocumentAsRtfBilingualResult.FileGuid;
         } else {
             throw new Error(result["s:Fault"]);
         }

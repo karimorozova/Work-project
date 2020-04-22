@@ -1,7 +1,7 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
 const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
     stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
-const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage } = require("../emailMessages/clientCommunication");
+const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, projectDeliveryMessage } = require("../emailMessages/clientCommunication");
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
@@ -150,7 +150,7 @@ async function notifyProjectDelivery(project) {
     const subject = `Delivery: ${project.projectId} - ${project.projectName} (ID C006.0)`;
     try {
         const deliverables = project.deliverables || await getProjectDeliverables(project);
-        const attachments = [{filename: "deliverables.zip", path: deliverables}];
+        const attachments = [{filename: "deliverables.zip", path: `./dist${deliverables}`}];
         await sendEmail({to: contact.email, attachments, subject}, message);
     } catch(err) {
         console.log(err);

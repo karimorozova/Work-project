@@ -70,6 +70,9 @@ export default {
                     case "Accept/Reject Quote":
                         await this.acceptQuote();
                         break;
+                    case "Deliver":
+                        await this.deliverProject();
+                        break;
                     case "Cancel":
                         await this.cancelProject();
                         break;
@@ -127,13 +130,17 @@ export default {
                 this.alertToggle({message: 'Internal server error. Cannot send the Quote.', isShow: true, type: 'error'})
             }
         },
-        isAnyTaskReady() {
-            return this.project.tasks.find(item => item.status === "Ready for Delivery");
+        async deliverProject() {
+            try {
+                await this.deliverProjectToClient(this.project._id);
+            } catch(err) {              
+            }
         },
         ...mapActions({
             alertToggle: "alertToggle",
             storeProject: "setCurrentProject",
-            setProjectStatus: "setProjectStatus"
+            setProjectStatus: "setProjectStatus",
+            deliverProjectToClient: "deliverProjectToClient"
         }),
     },
     computed: {
@@ -149,8 +156,11 @@ export default {
             if(this.project.status === "Started" || this.project.status === "In progress") {
                 result = ["Send Project Details", "Cancel"];
             }
-            if(this.isAnyTaskReady()) {
+            if(this.project.status === "Ready for Delivery") {
                 result = ["Deliver", "Cancel"];
+            }
+            if(this.project.status === "Closed") {
+                result = ["Deliver"];
             }
             return result;
         }
