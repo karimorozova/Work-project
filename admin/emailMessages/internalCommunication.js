@@ -5,7 +5,7 @@ function getMessageWithRandomPassword(password) {
                 <p class="description" style="font-size: 18px;">
                     We generated new password for you to sign in to the system.
                 </p>
-                <p> Please, use this password: ${password}.</p>
+                <p> Please, use this password: ${password}</p>
             </div>
         </div>`;
 }
