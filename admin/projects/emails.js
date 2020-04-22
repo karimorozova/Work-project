@@ -170,7 +170,7 @@ async function notifyManagerStepStarted(project, step) {
 }
 
 async function notifyStepDecisionMade({project, step, decision}) {
-    const message = stepDecisionMessage({...project.doc, step, decision});
+    const message = stepDecisionMessage({project, step, decision});
     const messageId = decision === 'accept' ? 'I006.0' : 'I007.0';
     const subject = `Vendor ${decision === 'accept' ? 'approved' : 'rejected'} the job: ${step.stepId} - ${project.projectName} (ID ${messageId})`;
     try {

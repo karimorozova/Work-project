@@ -284,7 +284,8 @@ function requestCancelledMessage(obj) {
 }
 
 function  stepDecisionMessage(obj) {
-    const lastName = obj.accountManager.lastName || "";
+    const lastName = obj.project.accountManager.lastName || "";
+    const vendorSurname = obj.step.vendor.surname;
     const decision = obj.decision === "accept" ? "approved" : "rejected";
     const reason = obj.reason || "";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -292,9 +293,9 @@ function  stepDecisionMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${obj.accountManager.firstName} ${lastName}</h4>
+                    <h4 class="contact-name">Dear ${obj.project.accountManager.firstName} ${lastName}</h4>
                     <p>
-                        Vendor ${obj.step.vendor} ${vendorSurname} has ${decision} the assigned step: ${obj.step.stepId} from ${obj.projectId} - ${obj.projectName} Project.
+                        Vendor ${obj.step.vendor.firstName} ${vendorSurname} has ${decision} the assigned step: ${obj.step.stepId} from ${obj.project.projectId} - ${obj.project.projectName} Project.
                     </p>
                     <p>
                         ${reason}
