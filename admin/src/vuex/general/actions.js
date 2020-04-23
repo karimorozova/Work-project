@@ -66,8 +66,8 @@ export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
         }
         const status = "Created";
         const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor, status}, index});
-        if(step.vendor) {
-            await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
+        if(step.vendor && step.status !== "Started") {
+            await Vue.http.post('/pm-manage/vendor-assignment', { step });
         }
         await commit('storeCurrentProject', updatedProject.body);
         dispatch('alertToggle', {message: "Step data updated", isShow: true})

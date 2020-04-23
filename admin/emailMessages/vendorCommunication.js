@@ -143,10 +143,6 @@ function requestMessageForVendor(obj) {
                                 <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${obj.finance.Wordcount.payables}</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Matrix:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >--</td>
-                            </tr>
-                            <tr>
                                 <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
                                 <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${deadline}</td>
                             </tr>
@@ -231,6 +227,34 @@ function vendorReassignmentMessage(obj, reason) {
             </div>`;
 }
 
+function vendorMiddleReassignmentMessage(obj, reason, isPay) {
+    const fee = isPay ? obj.finance.Price.halfPayables : obj.finance.Price.payables;
+    const approveText = isPay ? 
+        `Payment for step: ${obj.stepId} (${obj.serviceStep.title}) has been approved`
+        : ``
+    const payText = isPay ?
+        `You will be paid ${fee} according to relative work that has been done.`
+        : `Reason: ${reason || ""}`
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
+                    <p>
+                        ${approveText}
+                    </p>
+                    <p>
+                        ${payText}
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
 function stepReopenedMessage(obj) {
     const reason = obj.reason || "";
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -283,6 +307,7 @@ module.exports = {
     stepCancelledMessage, 
     stepMiddleCancelledMessage,
     vendorReassignmentMessage,
+    vendorMiddleReassignmentMessage,
     stepReopenedMessage,
     stepReadyToStartMessage
 }
