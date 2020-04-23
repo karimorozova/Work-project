@@ -11,10 +11,9 @@ const fs = require('fs');
 
 async function stepCancelNotifyVendor(steps) {
     try {
-        const notifyStepStatuses = ["Cancelled", "Cancelled Halfway", "Completed"]
         for(let step of steps) {
-            if(step.vendor && notifyStepStatuses.indexOf(step.status) === -1) {
-                const message = step.status !== "Started" && step.status !== "Completed" ? 
+            if(step.vendor && step.status !== "Completed") {
+                const message = step.status !== "Cancelled Halfway" ? 
                     stepCancelledMessage(step)
                     : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;
