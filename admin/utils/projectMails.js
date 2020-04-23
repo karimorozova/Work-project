@@ -1,7 +1,7 @@
 const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
-const { emailMessageForContact, projectCancelledMessage, tasksCancelledMessage, tasksMiddleCancelledMessage, projectMiddleCancelledMessage } = require("../emailMessages/clientCommunication");
+const { emailMessageForContact, tasksCancelledMessage, tasksMiddleCancelledMessage } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
@@ -161,12 +161,10 @@ function getAccManagerAndContact(project) {
     return { accManager, contact };
 }
 
-async function notifyClientProjectCancelled(project) {
+async function notifyClientProjectCancelled(project, template) {
     try {
-        const { accManager, contact } = getAccManagerAndContact(project);
-        const message = project.status === "Cancelled" ? 
-            projectCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"})
-            : projectMiddleCancelledMessage({...project._doc, accManager, contact, reason: "Some reason"});
+        const { contact } = getAccManagerAndContact(project);
+        const message = template;
         const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0";
         const subject = project.status === "Cancelled" ? "Project cancelled" : "Project has been cancelled in the middle of the work";
         await clientQuoteEmail({contact, subject: `${subject}: ${project.projectId} - ${project.projectName} (ID ${messageId})`}, message);

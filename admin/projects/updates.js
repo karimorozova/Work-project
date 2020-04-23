@@ -211,7 +211,7 @@ function getStepNewFinance(step) {
     return { Wordcount, Price }
 }
 
-async function updateProjectStatus(id, status) {
+async function updateProjectStatus(id, status, reason) {
     try {
         const project = await getProject({"_id": id});
         if(status !== "Cancelled") {
@@ -227,7 +227,7 @@ async function updateProjectStatus(id, status) {
         }
         return await updateProject(
                 {"_id": id}, 
-                { status: projectStatus, isPriceUpdated: false, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps}
+                { status: projectStatus, reason: reason, isPriceUpdated: false, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps}
             );
     } catch(err) {
         console.log(err);

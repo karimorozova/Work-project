@@ -28,18 +28,18 @@ export const getServices = async ({ commit, dispatch }) => {
   }
 }
 export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
-  commit('startRequest')
-  try {
-    const { status } = payload;
-    const id = state.currentProject._id;
-    const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status });
-    await commit('storeCurrentProject', updatedProject.body);
-  } catch(err) {
-        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
-  } finally {
-        commit('endRequest');
-  } 
-}
+    commit('startRequest')
+    try {      
+      const {status, message, reason} = payload;
+      const id = state.currentProject._id;
+      const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, message, reason}); 
+      await commit('storeCurrentProject', updatedProject.body);
+    } catch(err) {
+          dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+          commit('endRequest');
+    } 
+  }
 export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
   commit('startRequest')
   try {

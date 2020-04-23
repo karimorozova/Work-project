@@ -127,6 +127,10 @@ const ProjectsSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  reason: {
+    type: String,
+    default: ''
+  },
   sourceFiles: {
     type: Array,
     default: [],
