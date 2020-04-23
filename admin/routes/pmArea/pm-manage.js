@@ -15,7 +15,7 @@ const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers} = require("../../services/memoqs/users");
-const { projectCancelledMessage , projectMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
+const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage } = require("../../emailMessages/clientCommunication")
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -574,9 +574,9 @@ router.post("/deliver", async (req, res) => {
 })
 
 router.post("/project-delivery", async (req, res) => {
-    const { _id } = req.body;
+    const { _id, message } = req.body;
     try {
-        const updatedProject = await getAfterProjectDelivery(_id);
+        const updatedProject = await getAfterProjectDelivery(_id, message);
         res.send(updatedProject);
     } catch(err) {
         console.log(err);
@@ -739,9 +739,9 @@ router.post("/get-cancel-message", async (req, res) => {
     }
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
-        const message = req.body.status === "In progress" ?
-        await projectMiddleCancelledMessage({...req.body, accManager, contact})
-        : await projectCancelledMessage({...req.body, accManager, contact})
+        const message = (req.body.status === "In progress") ? await projectMiddleCancelledMessage({ ...req.body, accManager, contact }) :
+            (req.body.status === "Ready for Delivery") ? await projectDeliveryMessage({ ...req.body, accManager, contact }) :
+                await projectCancelledMessage({ ...req.body, accManager, contact })
         res.send({message}); 
     } catch(err) {
         console.log(err); 

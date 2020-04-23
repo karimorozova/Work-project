@@ -143,10 +143,10 @@ async function notifyDeliverablesDownloaded(taskId, project) {
     }
 }
 
-async function notifyProjectDelivery(project) {
+async function notifyProjectDelivery(project,template) {
     const { customer } = project;
     const contact = customer.contacts.find(item => item.leadContact);
-    const message = projectDeliveryMessage({...project._doc, contact, accManager: customer.accountManager});
+    const message = template;
     const subject = `Delivery: ${project.projectId} - ${project.projectName} (ID C006.0)`;
     try {
         const deliverables = project.deliverables || await getProjectDeliverables(project);

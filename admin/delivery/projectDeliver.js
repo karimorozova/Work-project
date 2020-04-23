@@ -1,9 +1,9 @@
 const { getProject, updateProject, notifyProjectDelivery } = require("../projects");
 
-async function getAfterProjectDelivery(_id) {
+async function getAfterProjectDelivery(_id, message) {    
     try {
         const project = await getProject({ _id });
-        await notifyProjectDelivery(project);
+        await notifyProjectDelivery(project, message); 
         const updatedTasks = setTasksStatuses(project.tasks);
         return updateProject({ _id }, { status: "Closed", tasks: updatedTasks });
     } catch(err) {
