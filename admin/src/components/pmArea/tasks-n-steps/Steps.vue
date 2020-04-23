@@ -128,6 +128,11 @@
             @approve="approveAction"
             @notApprove="notApproveAction"
             @close="closeApproveModal")
+    ValidationErrors(v-if="areErrorsExist"
+        :errors="errors"
+        :isAbsolute="true"
+        @closeErrors="closeErrors"
+    )
 </template>
 
 <script>
@@ -136,11 +141,12 @@ import ProgressLine from "../../ProgressLine";
 import CheckBox from "@/components/CheckBox";
 import Tabs from "../../Tabs";
 import PersonSelect from "../PersonSelect";
-import ApproveModal from "../../ApproveModal";
+const ApproveModal = () => import("../../ApproveModal");
 const StepInfo = () => import("./StepInfo");
 const Reassignment = () => import("../stepinfo/Reassignment");
 import SelectSingle from "../../SelectSingle";
 const Datepicker = () => import("../../Datepicker");
+const ValidationErrors = () => import("../../ValidationErrors");
 import moment from "moment";
 import scrollDrop from "@/mixins/scrollDrop";
 import stepVendor from "@/mixins/stepVendor";
@@ -189,7 +195,8 @@ export default {
             infoIndex: -1,
             isStepInfo: false,
             isReassignment: false,
-            reassignStep: {}
+            reassignStep: {},
+            areErrorsExist: false
         }
     },
     methods: {
@@ -345,6 +352,10 @@ export default {
         async requestConfirmation(steps) {
             const filteredSteps = steps.filter(item => item.status === "Created" || item.status === "Rejected");
             if(!filteredSteps.length) return;
+            const zeroPayablesStep = filteredSteps.find(item => !item.finance.Price.payables);
+            if(zeroPayablesStep) {
+                return this.showErrors(["There are steps with no payables!"]);
+            }
             try {
                 const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id });
                 await this.setCurrentProject(result.body);
@@ -352,6 +363,14 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error'});
             }
+        },
+        showErrors(errors) {
+            this.errors = errors;
+            this.areErrorsExist = true;
+        },
+        closeErrors() {
+            this.areErrorsExist = false;
+            this.errors = [];
         },
         progress(prog) {
             return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
@@ -420,6 +439,7 @@ export default {
         SelectSingle,
         CheckBox,
         Datepicker,
+        ValidationErrors,
         StepInfo,
         Reassignment,
         ApproveModal,
