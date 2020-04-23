@@ -21,6 +21,9 @@
     div(v-if="isAction('Send a Quote')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getSendQuoteMessage")
+    div(v-if="isAction('Deliver')")
+        .project-action__confirm
+                Button(:value="'Edit & Send'" @clicked="getCancelMessage")
     div(v-if="isAction('Send Project Details')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
@@ -142,7 +145,7 @@ export default {
             await this.projectDetails(message);
             break;
           case "Deliver":
-            await this.deliverProject();
+            await this.deliverProject(message);
             break;
           case "Accept/Reject Quote":
             await this.acceptQuote();
@@ -267,9 +270,12 @@ export default {
     //     });
     //   }
     // },
-    async deliverProject() {
+    async deliverProject(message) {
       try {
-        await this.deliverProjectToClient(this.project._id);
+        await this.deliverProjectToClient({
+          id: this.project._id,
+          message: message
+        });
       } catch (err) {}
     },
     ...mapActions({
